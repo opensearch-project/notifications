@@ -16,8 +16,10 @@
 
 package com.amazon.opendistroforelasticsearch.notification.channel
 
+import com.amazon.opendistroforelasticsearch.notification.channel.EmailFactory.EMAIL_PREFIX
+
 object ChannelFactory {
-    private val channelMap = mapOf("mailto:" to EmailFactory.getNotificationChannel())
+    private val channelMap = mapOf(EMAIL_PREFIX to EmailFactory.getNotificationChannel())
 
     fun getNotificationChannel(recipient: String): NotificationChannel {
         var mappedChannel: NotificationChannel = EmptyChannel

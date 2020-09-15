@@ -19,9 +19,22 @@ package com.amazon.opendistroforelasticsearch.notification.channel
 import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessageResponse
 import org.elasticsearch.rest.RestStatus
+import java.io.IOException
+import javax.mail.MessagingException
+import javax.mail.internet.AddressException
 
 object SesChannel : NotificationChannel {
+    private const val FROM_ADDRESS = "from@email.com" // TODO: Get from configuration
     override fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
+        try {
+            val mimeMessage = EmailMimeProvider.prepareMimeMessage(FROM_ADDRESS, recipient, channelMessage)
+        } catch (addressException: AddressException) {
+            return ChannelMessageResponse(RestStatus.BAD_REQUEST, "recipient parsing failed with status:${addressException.message}")
+        } catch (messagingException: MessagingException) {
+            return ChannelMessageResponse(RestStatus.FAILED_DEPENDENCY, "Email message creation failed with status:${messagingException.message}")
+        } catch (ioException: IOException) {
+            return ChannelMessageResponse(RestStatus.FAILED_DEPENDENCY, "Email message creation failed with status:${ioException.message}")
+        }
         return ChannelMessageResponse(RestStatus.OK, "Success")
     }
 }

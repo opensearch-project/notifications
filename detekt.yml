@@ -1,7 +1,11 @@
-failFast: false
-
 style:
   ForbiddenComment:
     active: false
   MaxLineLength:
     maxLineLength: 150
+  ThrowsCount:
+    active: true
+    max: 10
+  ReturnCount:
+    active: true
+    max: 10

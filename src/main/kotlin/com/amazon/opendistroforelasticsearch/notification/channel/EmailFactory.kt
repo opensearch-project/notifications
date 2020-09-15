@@ -17,6 +17,7 @@
 package com.amazon.opendistroforelasticsearch.notification.channel
 
 object EmailFactory {
+    const val EMAIL_PREFIX = "mailto:"
     fun getNotificationChannel(): NotificationChannel {
         return SesChannel
     }
