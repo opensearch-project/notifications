@@ -14,10 +14,10 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.core
+package com.amazon.opendistroforelasticsearch.notification.channel
 
-class NotificationMessage(
-    val refTag: String,
-    val recipients: List<String>,
-    val channelMessage: ChannelMessage
-)
+object EmailFactory {
+    fun getNotificationChannel(): NotificationChannel {
+        return SesChannel
+    }
+}

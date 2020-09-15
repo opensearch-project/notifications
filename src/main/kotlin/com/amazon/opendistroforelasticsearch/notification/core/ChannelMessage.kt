@@ -16,8 +16,16 @@
 
 package com.amazon.opendistroforelasticsearch.notification.core
 
-class NotificationMessage(
-    val refTag: String,
-    val recipients: List<String>,
-    val channelMessage: ChannelMessage
-)
+class ChannelMessage(
+    val title: String,
+    val textDescription: String,
+    val htmlDescription: String?,
+    val attachment: Attachment?
+) {
+    class Attachment(
+        val fileName: String,
+        val fileEncoding: String,
+        val fileData: String,
+        val fileContentType: String?
+    )
+}

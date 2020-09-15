@@ -16,6 +16,7 @@
 
 package com.amazon.opendistroforelasticsearch.notification.core
 
+import com.amazon.opendistroforelasticsearch.notification.NotificationPlugin
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils.ensureExpectedToken
@@ -25,6 +26,7 @@ object RestRequestParser {
     private val log = LogManager.getLogger(javaClass)
 
     fun parse(request: RestRequest): NotificationMessage {
+        log.debug("${NotificationPlugin.PLUGIN_NAME}:RestRequestParser")
         var type: String? = null
         var message: NotificationMessage? = null
         val contentParser = request.contentOrSourceParamParser()
@@ -34,7 +36,9 @@ object RestRequestParser {
             contentParser.nextToken()
             when (fieldName) {
                 "type" -> type = contentParser.text()
-                "params" -> { message = parseNotificationMessage(contentParser) }
+                "params" -> {
+                    message = parseNotificationMessage(contentParser)
+                }
                 else -> {
                     contentParser.skipChildren()
                 }
@@ -51,8 +55,7 @@ object RestRequestParser {
         var title: String? = null
         var textDescription: String? = null
         var htmlDescription: String? = null
-        var textData: String? = null
-        var binaryData: String? = null
+        var attachment: ChannelMessage.Attachment? = null
         val recipients: MutableList<String> = mutableListOf()
         ensureExpectedToken(XContentParser.Token.START_OBJECT, contentParser.currentToken(), contentParser::getTokenLocation)
         while (contentParser.nextToken() != XContentParser.Token.END_OBJECT) {
@@ -61,34 +64,12 @@ object RestRequestParser {
             when (fieldName) {
                 "refTag" -> refTag = contentParser.text()
                 "recipients" -> {
-                    ensureExpectedToken(XContentParser.Token.START_ARRAY, contentParser.currentToken(), contentParser::getTokenLocation)
-                    while (contentParser.nextToken() != XContentParser.Token.END_ARRAY) {
-                        recipients.add(contentParser.text())
-                    }
+                    parseRecipients(contentParser, recipients)
                 }
                 "title" -> title = contentParser.text()
-                "description" -> {
-                    ensureExpectedToken(XContentParser.Token.START_OBJECT, contentParser.currentToken(), contentParser::getTokenLocation)
-                    while (contentParser.nextToken() != XContentParser.Token.END_OBJECT) {
-                        val descriptionType = contentParser.currentName()
-                        contentParser.nextToken()
-                        when (descriptionType) {
-                            "text" -> textDescription = contentParser.text()
-                            "html" -> htmlDescription = contentParser.text()
-                        }
-                    }
-                }
-                "data" -> {
-                    ensureExpectedToken(XContentParser.Token.START_OBJECT, contentParser.currentToken(), contentParser::getTokenLocation)
-                    while (contentParser.nextToken() != XContentParser.Token.END_OBJECT) {
-                        val dataType = contentParser.currentName()
-                        contentParser.nextToken()
-                        when (dataType) {
-                            "base64" -> binaryData = contentParser.text()
-                            "text" -> textData = contentParser.text()
-                        }
-                    }
-                }
+                "textDescription" -> textDescription = contentParser.text()
+                "htmlDescription" -> htmlDescription = contentParser.text()
+                "attachment" -> attachment = parseAttachment(contentParser)
                 else -> {
                     contentParser.skipChildren()
                 }
@@ -99,12 +80,38 @@ object RestRequestParser {
             throw IllegalArgumentException("Empty recipient list")
         }
         title ?: throw IllegalArgumentException("Title field not present")
-        if (textDescription == null && htmlDescription == null) {
-            throw IllegalArgumentException("Both text and html description not present")
+        textDescription ?: throw IllegalArgumentException("textDescription not present")
+        return NotificationMessage(refTag,
+            recipients.toList(),
+            ChannelMessage(title, textDescription, htmlDescription, attachment))
+    }
+
+    private fun parseRecipients(contentParser: XContentParser, recipients: MutableList<String>) {
+        ensureExpectedToken(XContentParser.Token.START_ARRAY, contentParser.currentToken(), contentParser::getTokenLocation)
+        while (contentParser.nextToken() != XContentParser.Token.END_ARRAY) {
+            recipients.add(contentParser.text())
         }
-        if (binaryData != null && textData != null) {
-            throw IllegalArgumentException("Both text and binary data present")
+    }
+
+    private fun parseAttachment(contentParser: XContentParser): ChannelMessage.Attachment {
+        var fileName: String? = null
+        var fileEncoding: String? = null
+        var fileData: String? = null
+        var fileContentType: String? = null
+        ensureExpectedToken(XContentParser.Token.START_OBJECT, contentParser.currentToken(), contentParser::getTokenLocation)
+        while (contentParser.nextToken() != XContentParser.Token.END_OBJECT) {
+            val dataType = contentParser.currentName()
+            contentParser.nextToken()
+            when (dataType) {
+                "fileName" -> fileName = contentParser.text()
+                "fileEncoding" -> fileEncoding = contentParser.text()
+                "fileData" -> fileData = contentParser.text()
+                "fileContentType" -> fileContentType = contentParser.text()
+            }
         }
-        return NotificationMessage(refTag, title, recipients.toList(), textDescription, htmlDescription, binaryData, textData)
+        fileName ?: throw IllegalArgumentException("attachment:fileName not present")
+        fileEncoding ?: throw IllegalArgumentException("attachment:fileEncoding not present")
+        fileData ?: throw IllegalArgumentException("attachment:fileData not present")
+        return ChannelMessage.Attachment(fileName, fileEncoding, fileData, fileContentType)
     }
 }

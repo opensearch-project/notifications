@@ -14,10 +14,14 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.core
+package com.amazon.opendistroforelasticsearch.notification.channel
 
-class NotificationMessage(
-    val refTag: String,
-    val recipients: List<String>,
-    val channelMessage: ChannelMessage
-)
+import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessage
+import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessageResponse
+import org.elasticsearch.rest.RestStatus
+
+object SesChannel : NotificationChannel {
+    override fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
+        return ChannelMessageResponse(RestStatus.OK, "Success")
+    }
+}

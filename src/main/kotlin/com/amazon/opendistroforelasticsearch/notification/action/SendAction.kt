@@ -17,6 +17,7 @@
 package com.amazon.opendistroforelasticsearch.notification.action
 
 import com.amazon.opendistroforelasticsearch.notification.NotificationPlugin.Companion.PLUGIN_NAME
+import com.amazon.opendistroforelasticsearch.notification.channel.ChannelFactory
 import com.amazon.opendistroforelasticsearch.notification.core.RestRequestParser
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.client.node.NodeClient
@@ -36,15 +37,22 @@ class SendAction(private val request: RestRequest, private val client: NodeClien
             .startObject("params")
             .field("refTag", message.refTag)
             .startArray("recipients")
+        var restStatus = RestStatus.OK // Default to success
         message.recipients.forEach {
+            val channel = ChannelFactory.getNotificationChannel(it)
+            val status = channel.sendMessage(message.refTag, it, message.channelMessage)
+            if (status.statusCode != RestStatus.OK) {
+                restStatus = RestStatus.MULTI_STATUS // if any of the value != success then return 207
+            }
             response.startObject()
                 .field("recipient", it)
-                .field("status", "Success")
+                .field("statusCode", status.statusCode.status)
+                .field("statusText", status.statusText)
                 .endObject()
         }
         response.endArray()
             .endObject()
             .endObject()
-        restChannel.sendResponse(BytesRestResponse(RestStatus.OK, response))
+        restChannel.sendResponse(BytesRestResponse(restStatus, response))
     }
 }
