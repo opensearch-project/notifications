@@ -104,7 +104,8 @@ object EmailMimeProvider {
 
     private fun getTextAttachmentPart(attachment: ChannelMessage.Attachment): MimeBodyPart {
         val attachmentMime = MimeBodyPart()
-        attachmentMime.setText(attachment.fileData, "UTF-8", attachment.fileContentType)
+        val subContentType = attachment.fileContentType?.substringAfterLast('/') ?: "plain"
+        attachmentMime.setText(attachment.fileData, "UTF-8", subContentType)
         attachmentMime.fileName = attachment.fileName
         return attachmentMime
     }

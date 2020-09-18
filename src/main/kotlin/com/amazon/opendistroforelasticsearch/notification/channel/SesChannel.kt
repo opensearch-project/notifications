@@ -18,6 +18,7 @@ package com.amazon.opendistroforelasticsearch.notification.channel
 
 import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessageResponse
+import com.amazon.opendistroforelasticsearch.notification.security.SecurityAccess
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.rest.RestStatus
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
@@ -35,7 +36,6 @@ import software.amazon.awssdk.services.ses.model.SendRawEmailRequest
 import software.amazon.awssdk.services.ses.model.SesException
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.nio.ByteBuffer
 import javax.mail.MessagingException
 import javax.mail.internet.AddressException
 import javax.mail.internet.MimeMessage
@@ -58,26 +58,25 @@ object SesChannel : NotificationChannel {
         }
     }
 
-    fun sendMimeMessage(refTag: String, mimeMessage: MimeMessage): ChannelMessageResponse {
+    private fun sendMimeMessage(refTag: String, mimeMessage: MimeMessage): ChannelMessageResponse {
         return try {
             log.info("Sending Email-SES:$refTag")
             val region = Region.US_WEST_2
-            val client = SesClient.builder().region(region).credentialsProvider(DefaultCredentialsProvider.create()).build()
+            val client = SecurityAccess.doPrivileged {
+                SesClient.builder().region(region).credentialsProvider(DefaultCredentialsProvider.create()).build()
+            }
             val outputStream = ByteArrayOutputStream()
             mimeMessage.writeTo(outputStream)
-            val buf = ByteBuffer.wrap(outputStream.toByteArray())
-            val arr = ByteArray(buf.remaining())
-            buf[arr]
-            val data = SdkBytes.fromByteArray(arr)
+            val data = SdkBytes.fromByteArray(outputStream.toByteArray())
             val rawMessage = RawMessage.builder()
                 .data(data)
                 .build()
             val rawEmailRequest = SendRawEmailRequest.builder()
                 .rawMessage(rawMessage)
                 .build()
-            val response = client.sendRawEmail(rawEmailRequest)
+            val response = SecurityAccess.doPrivileged { client.sendRawEmail(rawEmailRequest) }
             log.info("Email-SES:$refTag status:$response")
-            return ChannelMessageResponse(RestStatus.OK, "Success")
+            ChannelMessageResponse(RestStatus.OK, "Success")
         } catch (exception: MessageRejectedException) {
             ChannelMessageResponse(RestStatus.SERVICE_UNAVAILABLE, getSesExceptionText(exception))
         } catch (exception: MailFromDomainNotVerifiedException) {
