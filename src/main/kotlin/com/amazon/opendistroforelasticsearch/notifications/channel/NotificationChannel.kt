@@ -20,6 +20,18 @@ import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
 import org.elasticsearch.common.settings.Settings
 
+/**
+ * Interface for sending notification message over a implemented channel.
+ */
 interface NotificationChannel {
+    /**
+     * Sending notification message over this channel.
+     *
+     * @param settings instance reference for settings
+     * @param refTag ref tag for logging purpose
+     * @param recipient recipient address to send notification to
+     * @param channelMessage The message to send notification
+     * @return Channel message response
+     */
     fun sendMessage(settings: Settings, refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse
 }

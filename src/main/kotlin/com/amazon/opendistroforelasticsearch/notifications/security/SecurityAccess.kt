@@ -23,6 +23,7 @@ import java.security.PrivilegedActionException
 import java.security.PrivilegedExceptionAction
 
 /**
+ * Class for providing the elevated permission for the function call.
  * Ref:
  * https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugin-authors.html#_java_security_permissions
  */

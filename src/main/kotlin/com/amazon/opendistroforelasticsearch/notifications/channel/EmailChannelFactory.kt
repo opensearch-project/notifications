@@ -20,13 +20,19 @@ import com.amazon.opendistroforelasticsearch.notifications.settings.EmailChannel
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import org.elasticsearch.common.settings.Settings
 
-object EmailFactory : ChannelProvider {
+/**
+ * Factory object for creating and providing email channel provider.
+ */
+object EmailChannelFactory : ChannelProvider {
     const val EMAIL_PREFIX = "mailto:"
     private val channelMap = mapOf(
         EmailChannelType.SMTP.stringValue to EmptyChannel,
         EmailChannelType.SES.stringValue to SesChannel
     )
 
+    /**
+     * {@inheritDoc}
+     */
     override fun getNotificationChannel(settings: Settings, recipient: String): NotificationChannel {
         return channelMap.getOrDefault(PluginSettings.EMAIL_CHANNEL.get(settings), EmptyChannel)
     }

@@ -44,21 +44,31 @@ import org.elasticsearch.threadpool.ThreadPool
 import org.elasticsearch.watcher.ResourceWatcherService
 import java.util.function.Supplier
 
+/**
+ * Entry point of the OpenDistro for Elasticsearch Notifications plugin
+ * This class initializes the rest handlers.
+ */
 internal class NotificationPlugin : ActionPlugin, Plugin() {
 
     private val log = LogManager.getLogger(javaClass)
-    lateinit var clusterService: ClusterService
+    lateinit var clusterService: ClusterService // initialized in createComponents()
 
     companion object {
         const val PLUGIN_NAME = "opendistro-notifications"
         const val PLUGIN_BASE_URI = "/_opendistro/_notifications"
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun getSettings(): List<Setting<*>> {
         log.debug("$PLUGIN_NAME:getSettings")
         return PluginSettings.getAllSettings()
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun createComponents(
         client: Client,
         clusterService: ClusterService,
@@ -77,11 +87,17 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
         return listOf()
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun getActions(): List<ActionPlugin.ActionHandler<out ActionRequest, out ActionResponse>> {
         log.debug("$PLUGIN_NAME:getActions")
         return listOf()
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun getRestHandlers(
         settings: Settings,
         restController: RestController,

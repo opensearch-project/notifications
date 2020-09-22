@@ -22,9 +22,18 @@ import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils.ensureExpectedToken
 import org.elasticsearch.rest.RestRequest
 
+/**
+ * This object parses the Rest request for notification plugin.
+ */
 object RestRequestParser {
     private val log = LogManager.getLogger(javaClass)
 
+    /**
+     * Parses request and returns object data.
+     *
+     * @param request the rest request to parse
+     * @return parsed object [NotificationMessage] when type is "notifications"
+     */
     fun parse(request: RestRequest): NotificationMessage {
         log.debug("${NotificationPlugin.PLUGIN_NAME}:RestRequestParser")
         var type: String? = null
@@ -50,6 +59,12 @@ object RestRequestParser {
         return message ?: throw IllegalArgumentException("Request params not present")
     }
 
+    /**
+     * Parses request and returns object data.
+     *
+     * @param contentParser opened content parser
+     * @return parsed object [NotificationMessage]
+     */
     private fun parseNotificationMessage(contentParser: XContentParser): NotificationMessage? {
         var refTag: String? = null
         var title: String? = null
@@ -86,6 +101,11 @@ object RestRequestParser {
             ChannelMessage(title, textDescription, htmlDescription, attachment))
     }
 
+    /**
+     * Parse "recipients" section of json
+     * @param contentParser opened content parser
+     * @param recipients parsed recipients added to this mutable list
+     */
     private fun parseRecipients(contentParser: XContentParser, recipients: MutableList<String>) {
         ensureExpectedToken(XContentParser.Token.START_ARRAY, contentParser.currentToken(), contentParser::getTokenLocation)
         while (contentParser.nextToken() != XContentParser.Token.END_ARRAY) {
@@ -93,6 +113,11 @@ object RestRequestParser {
         }
     }
 
+    /**
+     * Parse "attachment" section of json
+     * @param contentParser opened content parser
+     * @return parsed [ChannelMessage.Attachment] object
+     */
     private fun parseAttachment(contentParser: XContentParser): ChannelMessage.Attachment {
         var fileName: String? = null
         var fileEncoding: String? = null

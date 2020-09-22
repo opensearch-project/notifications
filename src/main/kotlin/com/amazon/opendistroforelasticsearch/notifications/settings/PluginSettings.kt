@@ -26,11 +26,30 @@ import org.elasticsearch.common.settings.Settings
 import java.io.IOException
 import java.nio.file.Path
 
+/**
+ * settings specific to Notifications Plugin.
+ */
 object PluginSettings {
+    /**
+     * Setting to choose smtp or SES for sending mail.
+     */
     const val EMAIL_CHANNEL_KEY = "opendistro.notifications.email.channel"
+
+    /**
+     * "From:" email address while sending email.
+     */
     const val EMAIL_FROM_ADDRESS_KEY = "opendistro.notifications.email.fromAddress"
+
+    /**
+     * Monthly email sending limit from this plugin.
+     */
     const val EMAIL_LIMIT_MONTHLY_KEY = "opendistro.notifications.email.monthlyLimit"
-    const val UNCOFIGURED_EMAIL_ADDRESS = "nobody@email.com" // Email will not be sent if email address different than this value
+
+    /**
+     * If the "From:" email address is set to below value then email will NOT be submitted to server.
+     * any other valid "From:" email address would be submitted to server.
+     */
+    const val UNCONFIGURED_EMAIL_ADDRESS = "nobody@email.com" // Email will not be sent if email address different than this value
 
     private val log = LogManager.getLogger(javaClass)
     private val defaultSettings: Map<String, String>
@@ -48,7 +67,7 @@ object PluginSettings {
         }
         defaultSettings = mapOf(
             EMAIL_CHANNEL_KEY to (settings?.get(EMAIL_CHANNEL_KEY) ?: EmailChannelType.SMTP.stringValue),
-            EMAIL_FROM_ADDRESS_KEY to (settings?.get(EMAIL_FROM_ADDRESS_KEY) ?: UNCOFIGURED_EMAIL_ADDRESS),
+            EMAIL_FROM_ADDRESS_KEY to (settings?.get(EMAIL_FROM_ADDRESS_KEY) ?: UNCONFIGURED_EMAIL_ADDRESS),
             EMAIL_LIMIT_MONTHLY_KEY to (settings?.get(EMAIL_LIMIT_MONTHLY_KEY) ?: "200")
         )
     }
@@ -71,6 +90,11 @@ object PluginSettings {
         NodeScope, Dynamic
     )
 
+    /**
+     * Returns list of additional settings available specific to this plugin.
+     *
+     * @return list of settings defined in this plugin
+     */
     fun getAllSettings(): List<Setting<*>> {
         return listOf(EMAIL_CHANNEL,
             EMAIL_FROM_ADDRESS,

@@ -16,4 +16,7 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.util
 
+/**
+ * Annotation to elevate access for testing purpose.
+ */
 annotation class OpenForTesting

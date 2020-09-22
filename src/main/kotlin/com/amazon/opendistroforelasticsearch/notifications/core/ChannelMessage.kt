@@ -16,12 +16,18 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.core
 
+/**
+ * Data class for storing channel message.
+ */
 class ChannelMessage(
     val title: String,
     val textDescription: String,
     val htmlDescription: String?,
     val attachment: Attachment?
 ) {
+    /**
+     * Data class for storing attachment of channel message.
+     */
     class Attachment(
         val fileName: String,
         val fileEncoding: String,

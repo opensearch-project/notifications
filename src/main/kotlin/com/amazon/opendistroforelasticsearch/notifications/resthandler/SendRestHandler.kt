@@ -29,20 +29,34 @@ import org.elasticsearch.rest.RestRequest
 import org.elasticsearch.rest.RestRequest.Method.POST
 import java.io.IOException
 
+/**
+ * Rest handler for sending notification.
+ * This handler [SendAction] for sending notification.
+ */
 class SendRestHandler(private val settings: Settings) : BaseRestHandler() {
     private val log = LogManager.getLogger(javaClass)
+
     companion object {
         const val SEND_BASE_URI = "$PLUGIN_BASE_URI/send"
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun getName(): String = "send"
 
+    /**
+     * {@inheritDoc}
+     */
     override fun routes(): List<Route> {
         return listOf(
-                Route(POST, SEND_BASE_URI)
+            Route(POST, SEND_BASE_URI)
         )
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Throws(IOException::class)
     @Suppress("SpreadOperator") // There is no way around dealing with java vararg without spread operator.
     override fun prepareRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {

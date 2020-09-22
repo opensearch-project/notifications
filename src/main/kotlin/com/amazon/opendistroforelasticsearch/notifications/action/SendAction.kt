@@ -28,6 +28,9 @@ import org.elasticsearch.rest.RestChannel
 import org.elasticsearch.rest.RestRequest
 import org.elasticsearch.rest.RestStatus
 
+/**
+ * Send action for send notification request.
+ */
 class SendAction(
     private val settings: Settings,
     private val request: RestRequest,
@@ -35,6 +38,10 @@ class SendAction(
     private val restChannel: RestChannel
 ) {
     private val log = LogManager.getLogger(javaClass)
+
+    /**
+     * Send notification for the given [request] on the provided [restChannel].
+     */
     fun send() {
         log.info("$PLUGIN_NAME:send")
         val message = RestRequestParser.parse(request)

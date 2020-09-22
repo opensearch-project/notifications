@@ -42,12 +42,18 @@ import javax.mail.MessagingException
 import javax.mail.internet.AddressException
 import javax.mail.internet.MimeMessage
 
+/**
+ * Notification channel for sending mail over Amazon SES.
+ */
 object SesChannel : NotificationChannel {
     private val log = LogManager.getLogger(javaClass)
 
+    /**
+     * {@inheritDoc}
+     */
     override fun sendMessage(settings: Settings, refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
         val fromAddress = PluginSettings.EMAIL_FROM_ADDRESS.get(settings)
-        if (PluginSettings.UNCOFIGURED_EMAIL_ADDRESS == fromAddress) {
+        if (PluginSettings.UNCONFIGURED_EMAIL_ADDRESS == fromAddress) {
             return ChannelMessageResponse(RestStatus.NOT_IMPLEMENTED, "Email from: address not configured")
         }
         val mimeMessage: MimeMessage
@@ -63,6 +69,12 @@ object SesChannel : NotificationChannel {
         }
     }
 
+    /**
+     * Sending mime message over Amazon SES.
+     * @param refTag ref tag for logging purpose
+     * @param mimeMessage mime message to send to Amazon SES
+     * @return Channel message response
+     */
     private fun sendMimeMessage(refTag: String, mimeMessage: MimeMessage): ChannelMessageResponse {
         return try {
             log.info("Sending Email-SES:$refTag")
@@ -99,10 +111,20 @@ object SesChannel : NotificationChannel {
         }
     }
 
+    /**
+     * Create error string from Amazon SES Exceptions
+     * @param exception SES Exception
+     * @return generated error string
+     */
     private fun getSesExceptionText(exception: SesException): String {
         val httpResponse = exception.awsErrorDetails().sdkHttpResponse()
         return "sendEmail error, SES status:${httpResponse.statusCode()}:${httpResponse.statusText()}"
     }
 
+    /**
+     * Create error string from Amazon SDK Exceptions
+     * @param exception SDK Exception
+     * @return generated error string
+     */
     private fun getSdkExceptionText(exception: SdkException) = "sendEmail error, SDK status:${exception.message}"
 }

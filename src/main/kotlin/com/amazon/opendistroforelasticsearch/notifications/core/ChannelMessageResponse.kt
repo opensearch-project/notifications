@@ -18,6 +18,9 @@ package com.amazon.opendistroforelasticsearch.notifications.core
 
 import org.elasticsearch.rest.RestStatus
 
+/**
+ * Data class for storing channel message response per recipient.
+ */
 class ChannelMessageResponse(
     val statusCode: RestStatus,
     val statusText: String
