@@ -21,7 +21,6 @@ import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageRe
 import com.amazon.opendistroforelasticsearch.notifications.security.SecurityAccess
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import org.apache.logging.log4j.LogManager
-import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.rest.RestStatus
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import software.amazon.awssdk.core.SdkBytes
@@ -51,8 +50,8 @@ object SesChannel : NotificationChannel {
     /**
      * {@inheritDoc}
      */
-    override fun sendMessage(settings: Settings, refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
-        val fromAddress = PluginSettings.EMAIL_FROM_ADDRESS.get(settings)
+    override fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
+        val fromAddress = PluginSettings.emailFromAddress
         if (PluginSettings.UNCONFIGURED_EMAIL_ADDRESS == fromAddress) {
             return ChannelMessageResponse(RestStatus.NOT_IMPLEMENTED, "Email from: address not configured")
         }

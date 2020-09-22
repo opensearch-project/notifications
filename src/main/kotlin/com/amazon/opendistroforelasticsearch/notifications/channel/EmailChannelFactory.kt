@@ -18,7 +18,6 @@ package com.amazon.opendistroforelasticsearch.notifications.channel
 
 import com.amazon.opendistroforelasticsearch.notifications.settings.EmailChannelType
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
-import org.elasticsearch.common.settings.Settings
 
 /**
  * Factory object for creating and providing email channel provider.
@@ -33,7 +32,7 @@ object EmailChannelFactory : ChannelProvider {
     /**
      * {@inheritDoc}
      */
-    override fun getNotificationChannel(settings: Settings, recipient: String): NotificationChannel {
-        return channelMap.getOrDefault(PluginSettings.EMAIL_CHANNEL.get(settings), EmptyChannel)
+    override fun getNotificationChannel(recipient: String): NotificationChannel {
+        return channelMap.getOrDefault(PluginSettings.emailChannel, EmptyChannel)
     }
 }

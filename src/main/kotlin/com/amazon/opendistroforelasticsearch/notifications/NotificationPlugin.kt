@@ -84,6 +84,7 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
     ): Collection<Any> {
         log.debug("$PLUGIN_NAME:createComponents")
         this.clusterService = clusterService
+        PluginSettings.addSettingsUpdateConsumer(clusterService)
         return listOf()
     }
 

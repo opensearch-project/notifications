@@ -18,7 +18,6 @@ package com.amazon.opendistroforelasticsearch.notifications.channel
 
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
-import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.rest.RestStatus
 
 /**
@@ -28,7 +27,7 @@ object EmptyChannel : NotificationChannel {
     /**
      * {@inheritDoc}
      */
-    override fun sendMessage(settings: Settings, refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
+    override fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
         return ChannelMessageResponse(RestStatus.UNPROCESSABLE_ENTITY,
             "No Configured Channel for recipient type:${recipient.substringBefore(':', "empty")}")
     }

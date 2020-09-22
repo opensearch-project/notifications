@@ -19,6 +19,7 @@ package com.amazon.opendistroforelasticsearch.notifications.settings
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.bootstrap.BootstrapInfo
+import org.elasticsearch.cluster.service.ClusterService
 import org.elasticsearch.common.settings.Setting
 import org.elasticsearch.common.settings.Setting.Property.Dynamic
 import org.elasticsearch.common.settings.Setting.Property.NodeScope
@@ -30,26 +31,38 @@ import java.nio.file.Path
  * settings specific to Notifications Plugin.
  */
 object PluginSettings {
+
     /**
      * Setting to choose smtp or SES for sending mail.
      */
-    const val EMAIL_CHANNEL_KEY = "opendistro.notifications.email.channel"
+    private const val EMAIL_CHANNEL_KEY = "opendistro.notifications.email.channel"
 
     /**
      * "From:" email address while sending email.
      */
-    const val EMAIL_FROM_ADDRESS_KEY = "opendistro.notifications.email.fromAddress"
+    private const val EMAIL_FROM_ADDRESS_KEY = "opendistro.notifications.email.fromAddress"
 
     /**
      * Monthly email sending limit from this plugin.
      */
-    const val EMAIL_LIMIT_MONTHLY_KEY = "opendistro.notifications.email.monthlyLimit"
+    private const val EMAIL_LIMIT_MONTHLY_KEY = "opendistro.notifications.email.monthlyLimit"
 
     /**
      * If the "From:" email address is set to below value then email will NOT be submitted to server.
      * any other valid "From:" email address would be submitted to server.
      */
     const val UNCONFIGURED_EMAIL_ADDRESS = "nobody@email.com" // Email will not be sent if email address different than this value
+
+    @Volatile
+    var emailChannel: String
+
+    @Volatile
+    var emailFromAddress: String
+
+    @Volatile
+    var emailMonthlyLimit: Int
+
+    private const val DECIMAL_RADIX: Int = 10
 
     private val log = LogManager.getLogger(javaClass)
     private val defaultSettings: Map<String, String>
@@ -62,29 +75,34 @@ object PluginSettings {
             try {
                 settings = Settings.builder().loadFromPath(defaultSettingYmlFile).build()
             } catch (exception: IOException) {
-                log.warn("Failed to load ${defaultSettingYmlFile.toAbsolutePath()}")
+                log.warn("$PLUGIN_NAME:Failed to load ${defaultSettingYmlFile.toAbsolutePath()}")
             }
         }
+        // Initialize the settings values to default values
+        emailChannel = (settings?.get(EMAIL_CHANNEL_KEY) ?: EmailChannelType.SMTP.stringValue)
+        emailFromAddress = (settings?.get(EMAIL_FROM_ADDRESS_KEY) ?: UNCONFIGURED_EMAIL_ADDRESS)
+        emailMonthlyLimit = Integer.parseInt((settings?.get(EMAIL_LIMIT_MONTHLY_KEY) ?: "200"))
+
         defaultSettings = mapOf(
-            EMAIL_CHANNEL_KEY to (settings?.get(EMAIL_CHANNEL_KEY) ?: EmailChannelType.SMTP.stringValue),
-            EMAIL_FROM_ADDRESS_KEY to (settings?.get(EMAIL_FROM_ADDRESS_KEY) ?: UNCONFIGURED_EMAIL_ADDRESS),
-            EMAIL_LIMIT_MONTHLY_KEY to (settings?.get(EMAIL_LIMIT_MONTHLY_KEY) ?: "200")
+            EMAIL_CHANNEL_KEY to emailChannel,
+            EMAIL_FROM_ADDRESS_KEY to emailFromAddress,
+            EMAIL_LIMIT_MONTHLY_KEY to emailMonthlyLimit.toString(DECIMAL_RADIX)
         )
     }
 
-    val EMAIL_CHANNEL: Setting<String> = Setting.simpleString(
+    private val EMAIL_CHANNEL: Setting<String> = Setting.simpleString(
         EMAIL_CHANNEL_KEY,
         defaultSettings[EMAIL_CHANNEL_KEY],
         NodeScope, Dynamic
     )
 
-    val EMAIL_FROM_ADDRESS: Setting<String> = Setting.simpleString(
+    private val EMAIL_FROM_ADDRESS: Setting<String> = Setting.simpleString(
         EMAIL_FROM_ADDRESS_KEY,
         defaultSettings[EMAIL_FROM_ADDRESS_KEY],
         NodeScope, Dynamic
     )
 
-    val EMAIL_LIMIT_MONTHLY: Setting<Int> = Setting.intSetting(
+    private val EMAIL_LIMIT_MONTHLY: Setting<Int> = Setting.intSetting(
         EMAIL_LIMIT_MONTHLY_KEY,
         Integer.parseInt(defaultSettings[EMAIL_LIMIT_MONTHLY_KEY]),
         NodeScope, Dynamic
@@ -100,5 +118,43 @@ object PluginSettings {
             EMAIL_FROM_ADDRESS,
             EMAIL_LIMIT_MONTHLY
         )
+    }
+
+    fun addSettingsUpdateConsumer(clusterService: ClusterService) {
+        // Update the variables to setting values
+        emailChannel = EMAIL_CHANNEL.get(clusterService.settings)
+        emailFromAddress = EMAIL_FROM_ADDRESS.get(clusterService.settings)
+        emailMonthlyLimit = EMAIL_LIMIT_MONTHLY.get(clusterService.settings)
+
+        // Update the variables to cluster setting values
+        // If the cluster is not yet started then we get default values again
+        val clusterEmailChannel = clusterService.clusterSettings.get(EMAIL_CHANNEL)
+        if (clusterEmailChannel != null) {
+            log.info("$PLUGIN_NAME:$EMAIL_CHANNEL_KEY -autoUpdatedTo-> $clusterEmailChannel")
+            emailChannel = clusterEmailChannel
+        }
+        val clusterEmailFromAddress = clusterService.clusterSettings.get(EMAIL_FROM_ADDRESS)
+        if (clusterEmailFromAddress != null) {
+            log.info("$PLUGIN_NAME:$EMAIL_FROM_ADDRESS_KEY -autoUpdatedTo-> $clusterEmailFromAddress")
+            emailFromAddress = clusterEmailFromAddress
+        }
+        val clusterEmailMonthlyLimit = clusterService.clusterSettings.get(EMAIL_LIMIT_MONTHLY)
+        if (clusterEmailMonthlyLimit != null) {
+            log.info("$PLUGIN_NAME:$EMAIL_LIMIT_MONTHLY_KEY -autoUpdatedTo-> $clusterEmailMonthlyLimit")
+            emailMonthlyLimit = clusterEmailMonthlyLimit
+        }
+
+        clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_CHANNEL) {
+            emailChannel = it
+            log.info("$PLUGIN_NAME:$EMAIL_CHANNEL_KEY -updatedTo-> $it")
+        }
+        clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_FROM_ADDRESS) {
+            emailFromAddress = it
+            log.info("$PLUGIN_NAME:$EMAIL_FROM_ADDRESS_KEY -updatedTo-> $it")
+        }
+        clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_LIMIT_MONTHLY) {
+            emailMonthlyLimit = it
+            log.info("$PLUGIN_NAME:$EMAIL_LIMIT_MONTHLY_KEY -updatedTo-> $it")
+        }
     }
 }

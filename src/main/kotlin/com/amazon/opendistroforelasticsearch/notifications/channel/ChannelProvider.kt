@@ -16,17 +16,14 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.channel
 
-import org.elasticsearch.common.settings.Settings
-
 /**
  * Interface for channel provider for specific recipient depending on its type.
  */
 interface ChannelProvider {
     /**
      * gets notification channel for specific recipient depending on its type (prefix).
-     * @param settings instance reference for settings
      * @param recipient recipient address to send notification to. prefix with channel type e.g. "mailto:email@address.com"
      * @return Notification channel for sending notification for given recipient (depending on its type)
      */
-    fun getNotificationChannel(settings: Settings, recipient: String): NotificationChannel
+    fun getNotificationChannel(recipient: String): NotificationChannel
 }

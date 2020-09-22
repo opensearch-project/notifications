@@ -52,8 +52,8 @@ class SendAction(
             .startArray("recipients")
         var restStatus = RestStatus.OK // Default to success
         message.recipients.forEach {
-            val channel = ChannelFactory.getNotificationChannel(settings, it)
-            val status = channel.sendMessage(settings, message.refTag, it, message.channelMessage)
+            val channel = ChannelFactory.getNotificationChannel(it)
+            val status = channel.sendMessage(message.refTag, it, message.channelMessage)
             if (status.statusCode != RestStatus.OK) {
                 restStatus = RestStatus.MULTI_STATUS // if any of the value != success then return 207
             }
