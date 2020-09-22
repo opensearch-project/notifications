@@ -14,7 +14,7 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.security
+package com.amazon.opendistroforelasticsearch.notifications.security
 
 import org.elasticsearch.SpecialPermission
 import java.io.IOException

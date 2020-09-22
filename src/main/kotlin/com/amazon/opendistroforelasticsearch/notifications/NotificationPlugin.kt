@@ -14,9 +14,10 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification
+package com.amazon.opendistroforelasticsearch.notifications
 
-import com.amazon.opendistroforelasticsearch.notification.resthandler.SendRestHandler
+import com.amazon.opendistroforelasticsearch.notifications.resthandler.SendRestHandler
+import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.ActionResponse
@@ -49,23 +50,13 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
     lateinit var clusterService: ClusterService
 
     companion object {
-        const val PLUGIN_NAME = "opendistro-notification"
-        const val PLUGIN_BASE_URI = "/_opendistro/_notification"
+        const val PLUGIN_NAME = "opendistro-notifications"
+        const val PLUGIN_BASE_URI = "/_opendistro/_notifications"
     }
 
-    override fun getRestHandlers(
-        settings: Settings,
-        restController: RestController,
-        clusterSettings: ClusterSettings,
-        indexScopedSettings: IndexScopedSettings,
-        settingsFilter: SettingsFilter,
-        indexNameExpressionResolver: IndexNameExpressionResolver,
-        nodesInCluster: Supplier<DiscoveryNodes>
-    ): List<RestHandler> {
-        log.debug("$PLUGIN_NAME:getRestHandlers")
-        return listOf(
-            SendRestHandler()
-        )
+    override fun getSettings(): List<Setting<*>> {
+        log.debug("$PLUGIN_NAME:getSettings")
+        return PluginSettings.getAllSettings()
     }
 
     override fun createComponents(
@@ -86,13 +77,23 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
         return listOf()
     }
 
-    override fun getSettings(): List<Setting<*>> {
-        log.debug("$PLUGIN_NAME:getSettings")
-        return listOf()
-    }
-
     override fun getActions(): List<ActionPlugin.ActionHandler<out ActionRequest, out ActionResponse>> {
         log.debug("$PLUGIN_NAME:getActions")
         return listOf()
+    }
+
+    override fun getRestHandlers(
+        settings: Settings,
+        restController: RestController,
+        clusterSettings: ClusterSettings,
+        indexScopedSettings: IndexScopedSettings,
+        settingsFilter: SettingsFilter,
+        indexNameExpressionResolver: IndexNameExpressionResolver,
+        nodesInCluster: Supplier<DiscoveryNodes>
+    ): List<RestHandler> {
+        log.debug("$PLUGIN_NAME:getRestHandlers")
+        return listOf(
+            SendRestHandler(settings)
+        )
     }
 }

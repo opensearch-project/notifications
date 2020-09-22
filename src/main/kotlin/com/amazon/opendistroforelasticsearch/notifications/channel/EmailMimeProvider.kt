@@ -14,9 +14,9 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.channel
+package com.amazon.opendistroforelasticsearch.notifications.channel
 
-import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessage
+import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
 import java.util.Properties
 import javax.mail.Message
 import javax.mail.Session

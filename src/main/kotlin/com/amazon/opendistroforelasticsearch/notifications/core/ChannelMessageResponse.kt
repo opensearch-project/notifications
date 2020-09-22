@@ -14,4 +14,11 @@
  *
  */
 
-rootProject.name = 'opendistro-notifications'
+package com.amazon.opendistroforelasticsearch.notifications.core
+
+import org.elasticsearch.rest.RestStatus
+
+class ChannelMessageResponse(
+    val statusCode: RestStatus,
+    val statusText: String
+)

@@ -14,12 +14,6 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.resthandler
+package com.amazon.opendistroforelasticsearch.notifications.util
 
-import org.elasticsearch.test.ESIntegTestCase
-
-internal class SendRestHandlerIT : ESIntegTestCase() {
-
-    fun sendRestHandler() {
-    }
-}
+annotation class OpenForTesting

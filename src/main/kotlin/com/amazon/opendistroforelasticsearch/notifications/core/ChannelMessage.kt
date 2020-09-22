@@ -14,6 +14,18 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.util
+package com.amazon.opendistroforelasticsearch.notifications.core
 
-annotation class OpenForTesting
+class ChannelMessage(
+    val title: String,
+    val textDescription: String,
+    val htmlDescription: String?,
+    val attachment: Attachment?
+) {
+    class Attachment(
+        val fileName: String,
+        val fileEncoding: String,
+        val fileData: String,
+        val fileContentType: String?
+    )
+}

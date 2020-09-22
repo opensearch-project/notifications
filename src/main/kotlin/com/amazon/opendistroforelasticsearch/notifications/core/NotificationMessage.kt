@@ -14,11 +14,10 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.core
+package com.amazon.opendistroforelasticsearch.notifications.core
 
-import org.elasticsearch.rest.RestStatus
-
-class ChannelMessageResponse(
-    val statusCode: RestStatus,
-    val statusText: String
+class NotificationMessage(
+    val refTag: String,
+    val recipients: List<String>,
+    val channelMessage: ChannelMessage
 )

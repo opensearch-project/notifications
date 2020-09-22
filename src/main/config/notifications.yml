@@ -1,0 +1,6 @@
+# configuration file for the notifications plugin
+opendistro.notifications:
+  email:
+    channel: "ses" # smtp
+    fromAddress: "from@email.com"
+    monthlyLimit: 200

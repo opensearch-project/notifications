@@ -14,11 +14,12 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.channel
+package com.amazon.opendistroforelasticsearch.notifications.resthandler
 
-import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessage
-import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessageResponse
+import org.elasticsearch.test.ESIntegTestCase
 
-interface NotificationChannel {
-    fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse
+internal class SendRestHandlerIT : ESIntegTestCase() {
+
+    fun sendRestHandler() {
+    }
 }

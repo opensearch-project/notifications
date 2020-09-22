@@ -14,10 +14,10 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.core
+package com.amazon.opendistroforelasticsearch.notifications.channel
 
-class NotificationMessage(
-    val refTag: String,
-    val recipients: List<String>,
-    val channelMessage: ChannelMessage
-)
+import org.elasticsearch.common.settings.Settings
+
+interface ChannelProvider {
+    fun getNotificationChannel(settings: Settings, recipient: String): NotificationChannel
+}

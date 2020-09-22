@@ -14,8 +14,9 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.resthandler
+package com.amazon.opendistroforelasticsearch.notifications.resthandler
 
+import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.rest.RestHandler
 import org.elasticsearch.rest.RestRequest.Method.POST
 import org.elasticsearch.test.ESTestCase
@@ -25,17 +26,17 @@ internal class SendRestHandlerTests : ESTestCase() {
 
     @Test
     fun `SendRestHandler name should return send`() {
-        val restHandler = SendRestHandler()
+        val restHandler = SendRestHandler(Settings.EMPTY)
         assertEquals("send", restHandler.name)
     }
 
     @Test
     fun `SendRestHandler routes should return send url`() {
-        val restHandler = SendRestHandler()
+        val restHandler = SendRestHandler(Settings.EMPTY)
         val routes = restHandler.routes()
         val actualRouteSize = routes.size
         val actualRoute = routes[0]
-        val expectedRoute = RestHandler.Route(POST, "/_opendistro/_notification/send")
+        val expectedRoute = RestHandler.Route(POST, "/_opendistro/_notifications/send")
         assertEquals(1, actualRouteSize)
         assertEquals(expectedRoute.method, actualRoute.method)
         assertEquals(expectedRoute.path, actualRoute.path)

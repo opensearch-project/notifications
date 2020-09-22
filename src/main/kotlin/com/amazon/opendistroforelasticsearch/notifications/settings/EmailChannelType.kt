@@ -14,11 +14,9 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.channel
+package com.amazon.opendistroforelasticsearch.notifications.settings
 
-object EmailFactory {
-    const val EMAIL_PREFIX = "mailto:"
-    fun getNotificationChannel(): NotificationChannel {
-        return SesChannel
-    }
+enum class EmailChannelType(val stringValue: String) {
+    SMTP("smtp"),
+    SES("ses")
 }

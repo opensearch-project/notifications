@@ -14,9 +14,9 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.core
+package com.amazon.opendistroforelasticsearch.notifications.core
 
-import com.amazon.opendistroforelasticsearch.notification.NotificationPlugin
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils.ensureExpectedToken
@@ -44,7 +44,7 @@ object RestRequestParser {
                 }
             }
         }
-        if (type != "notification") {
+        if (type != "notifications") {
             throw IllegalArgumentException("Unsupported Request type:$type")
         }
         return message ?: throw IllegalArgumentException("Request params not present")

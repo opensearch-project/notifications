@@ -14,12 +14,14 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.channel
+package com.amazon.opendistroforelasticsearch.notifications.channel
 
-import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessage
-import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessageResponse
-import com.amazon.opendistroforelasticsearch.notification.security.SecurityAccess
+import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
+import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
+import com.amazon.opendistroforelasticsearch.notifications.security.SecurityAccess
+import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import org.apache.logging.log4j.LogManager
+import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.rest.RestStatus
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import software.amazon.awssdk.core.SdkBytes
@@ -42,12 +44,15 @@ import javax.mail.internet.MimeMessage
 
 object SesChannel : NotificationChannel {
     private val log = LogManager.getLogger(javaClass)
-    private const val FROM_ADDRESS = "from@email.com" // TODO: Get from configuration
 
-    override fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
+    override fun sendMessage(settings: Settings, refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
+        val fromAddress = PluginSettings.EMAIL_FROM_ADDRESS.get(settings)
+        if (PluginSettings.UNCOFIGURED_EMAIL_ADDRESS == fromAddress) {
+            return ChannelMessageResponse(RestStatus.NOT_IMPLEMENTED, "Email from: address not configured")
+        }
         val mimeMessage: MimeMessage
         return try {
-            mimeMessage = EmailMimeProvider.prepareMimeMessage(FROM_ADDRESS, recipient, channelMessage)
+            mimeMessage = EmailMimeProvider.prepareMimeMessage(fromAddress, recipient, channelMessage)
             sendMimeMessage(refTag, mimeMessage)
         } catch (addressException: AddressException) {
             ChannelMessageResponse(RestStatus.BAD_REQUEST, "recipient parsing failed with status:${addressException.message}")
