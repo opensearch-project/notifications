@@ -14,21 +14,27 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.channel
+package com.amazon.opendistroforelasticsearch.notifications.channel
 
-import com.amazon.opendistroforelasticsearch.notification.channel.EmailFactory.EMAIL_PREFIX
+import com.amazon.opendistroforelasticsearch.notifications.channel.EmailChannelFactory.EMAIL_PREFIX
 
-object ChannelFactory {
-    private val channelMap = mapOf(EMAIL_PREFIX to EmailFactory.getNotificationChannel())
+/**
+ * Factory object for creating and providing channel provider.
+ */
+object ChannelFactory : ChannelProvider {
+    private val channelMap = mapOf(EMAIL_PREFIX to EmailChannelFactory)
 
-    fun getNotificationChannel(recipient: String): NotificationChannel {
+    /**
+     * {@inheritDoc}
+     */
+    override fun getNotificationChannel(recipient: String): NotificationChannel {
         var mappedChannel: NotificationChannel = EmptyChannel
         if (!recipient.contains(':')) { // if channel info not present
-            mappedChannel = EmailFactory.getNotificationChannel() // Default channel is email
+            mappedChannel = EmailChannelFactory.getNotificationChannel(recipient) // Default channel is email
         } else {
             for (it in channelMap) {
                 if (recipient.startsWith(it.key, true)) {
-                    mappedChannel = it.value
+                    mappedChannel = it.value.getNotificationChannel(recipient)
                     break
                 }
             }

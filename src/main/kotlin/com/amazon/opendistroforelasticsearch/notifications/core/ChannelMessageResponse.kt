@@ -14,15 +14,14 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.channel
+package com.amazon.opendistroforelasticsearch.notifications.core
 
-import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessage
-import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessageResponse
 import org.elasticsearch.rest.RestStatus
 
-object EmptyChannel : NotificationChannel {
-    override fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
-        return ChannelMessageResponse(RestStatus.UNPROCESSABLE_ENTITY,
-            "No Configured Channel for recipient type:${recipient.substringBefore(':', "empty")}")
-    }
-}
+/**
+ * Data class for storing channel message response per recipient.
+ */
+class ChannelMessageResponse(
+    val statusCode: RestStatus,
+    val statusText: String
+)

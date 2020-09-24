@@ -14,26 +14,39 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.action
+package com.amazon.opendistroforelasticsearch.notifications.action
 
-import com.amazon.opendistroforelasticsearch.notification.NotificationPlugin.Companion.PLUGIN_NAME
-import com.amazon.opendistroforelasticsearch.notification.channel.ChannelFactory
-import com.amazon.opendistroforelasticsearch.notification.core.RestRequestParser
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
+import com.amazon.opendistroforelasticsearch.notifications.channel.ChannelFactory
+import com.amazon.opendistroforelasticsearch.notifications.core.RestRequestParser
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.client.node.NodeClient
+import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.xcontent.XContentType
 import org.elasticsearch.rest.BytesRestResponse
 import org.elasticsearch.rest.RestChannel
 import org.elasticsearch.rest.RestRequest
 import org.elasticsearch.rest.RestStatus
 
-class SendAction(private val request: RestRequest, private val client: NodeClient, private val restChannel: RestChannel) {
+/**
+ * Send action for send notification request.
+ */
+class SendAction(
+    private val settings: Settings,
+    private val request: RestRequest,
+    private val client: NodeClient,
+    private val restChannel: RestChannel
+) {
     private val log = LogManager.getLogger(javaClass)
+
+    /**
+     * Send notification for the given [request] on the provided [restChannel].
+     */
     fun send() {
         log.info("$PLUGIN_NAME:send")
         val message = RestRequestParser.parse(request)
         val response = restChannel.newBuilder(XContentType.JSON, false).startObject()
-            .field("type", "notification_response")
+            .field("type", "notifications_response")
             .startObject("params")
             .field("refTag", message.refTag)
             .startArray("recipients")

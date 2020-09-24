@@ -14,9 +14,9 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.channel
+package com.amazon.opendistroforelasticsearch.notifications.channel
 
-import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessage
+import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
 import java.util.Properties
 import javax.mail.Message
 import javax.mail.Session
@@ -25,7 +25,17 @@ import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeMultipart
 import javax.mail.internet.PreencodedMimeBodyPart
 
+/**
+ * Object for creating mime message from the channel message for sending mail.
+ */
 object EmailMimeProvider {
+    /**
+     * Create and prepare mime message to send mail
+     * @param fromAddress "From:" address of the email message
+     * @param recipient "To:" address of the email message
+     * @param channelMessage The message to send notification
+     * @return The created and prepared mime message object
+     */
     fun prepareMimeMessage(fromAddress: String, recipient: String, channelMessage: ChannelMessage): MimeMessage {
         val prop = Properties()
         prop.put("mail.transport.protocol", "smtp")
@@ -78,8 +88,8 @@ object EmailMimeProvider {
             // Add the attachment to the message
             var attachmentMime: MimeBodyPart? = null
             when (channelMessage.attachment.fileEncoding) {
-                "text" -> attachmentMime = getTextAttachmentPart(channelMessage.attachment)
-                "base64" -> attachmentMime = getBinaryAttachmentPart(channelMessage.attachment)
+                "text" -> attachmentMime = createTextAttachmentPart(channelMessage.attachment)
+                "base64" -> attachmentMime = createBinaryAttachmentPart(channelMessage.attachment)
             }
             if (attachmentMime != null) {
                 msg.addBodyPart(attachmentMime)
@@ -88,21 +98,36 @@ object EmailMimeProvider {
         return message
     }
 
+    /**
+     * Extract email address from "mailto:email@address.com" format
+     * @param recipient input email address
+     * @return extracted email address
+     */
     private fun extractEmail(recipient: String): String {
-        if (recipient.startsWith(EmailFactory.EMAIL_PREFIX)) {
-            return recipient.drop(EmailFactory.EMAIL_PREFIX.length)
+        if (recipient.startsWith(EmailChannelFactory.EMAIL_PREFIX)) {
+            return recipient.drop(EmailChannelFactory.EMAIL_PREFIX.length)
         }
         return recipient
     }
 
-    private fun getBinaryAttachmentPart(attachment: ChannelMessage.Attachment): MimeBodyPart {
+    /**
+     * Create a binary attachment part from channel attachment message
+     * @param attachment channel attachment message
+     * @return created mime body part for binary attachment
+     */
+    private fun createBinaryAttachmentPart(attachment: ChannelMessage.Attachment): MimeBodyPart {
         val attachmentMime: MimeBodyPart = PreencodedMimeBodyPart("base64")
         attachmentMime.setContent(attachment.fileData, attachment.fileContentType ?: "application/octet-stream")
         attachmentMime.fileName = attachment.fileName
         return attachmentMime
     }
 
-    private fun getTextAttachmentPart(attachment: ChannelMessage.Attachment): MimeBodyPart {
+    /**
+     * Create a text attachment part from channel attachment message
+     * @param attachment channel attachment message
+     * @return created mime body part for text attachment
+     */
+    private fun createTextAttachmentPart(attachment: ChannelMessage.Attachment): MimeBodyPart {
         val attachmentMime = MimeBodyPart()
         val subContentType = attachment.fileContentType?.substringAfterLast('/') ?: "plain"
         attachmentMime.setText(attachment.fileData, "UTF-8", subContentType)

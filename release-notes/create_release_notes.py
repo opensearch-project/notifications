@@ -6,12 +6,12 @@ import sys
 import fileinput
 import re
 
-link_prefix = "https://github.com/opendistro-for-elasticsearch/notification/pull/"
+link_prefix = "https://github.com/opendistro-for-elasticsearch/notifications/"
 searchExp = re.compile("([\(\[]).*?([\)\]])")
 
 current_date = raw_input("what day is today (e.g. 2020-06-29): ")
 file_path = raw_input("Path to raw note file (e.g., note.md): ")
-plugin_name = "notification"
+plugin_name = "notifications"
 plugin_version = raw_input('Plugin version (x.x.x.x): ')
 
 app_num = int(

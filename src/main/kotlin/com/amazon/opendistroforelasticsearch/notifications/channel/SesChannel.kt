@@ -14,11 +14,12 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.channel
+package com.amazon.opendistroforelasticsearch.notifications.channel
 
-import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessage
-import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessageResponse
-import com.amazon.opendistroforelasticsearch.notification.security.SecurityAccess
+import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
+import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
+import com.amazon.opendistroforelasticsearch.notifications.security.SecurityAccess
+import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.rest.RestStatus
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
@@ -40,14 +41,23 @@ import javax.mail.MessagingException
 import javax.mail.internet.AddressException
 import javax.mail.internet.MimeMessage
 
+/**
+ * Notification channel for sending mail over Amazon SES.
+ */
 object SesChannel : NotificationChannel {
     private val log = LogManager.getLogger(javaClass)
-    private const val FROM_ADDRESS = "from@email.com" // TODO: Get from configuration
 
+    /**
+     * {@inheritDoc}
+     */
     override fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
+        val fromAddress = PluginSettings.emailFromAddress
+        if (PluginSettings.UNCONFIGURED_EMAIL_ADDRESS == fromAddress) {
+            return ChannelMessageResponse(RestStatus.NOT_IMPLEMENTED, "Email from: address not configured")
+        }
         val mimeMessage: MimeMessage
         return try {
-            mimeMessage = EmailMimeProvider.prepareMimeMessage(FROM_ADDRESS, recipient, channelMessage)
+            mimeMessage = EmailMimeProvider.prepareMimeMessage(fromAddress, recipient, channelMessage)
             sendMimeMessage(refTag, mimeMessage)
         } catch (addressException: AddressException) {
             ChannelMessageResponse(RestStatus.BAD_REQUEST, "recipient parsing failed with status:${addressException.message}")
@@ -58,6 +68,12 @@ object SesChannel : NotificationChannel {
         }
     }
 
+    /**
+     * Sending mime message over Amazon SES.
+     * @param refTag ref tag for logging purpose
+     * @param mimeMessage mime message to send to Amazon SES
+     * @return Channel message response
+     */
     private fun sendMimeMessage(refTag: String, mimeMessage: MimeMessage): ChannelMessageResponse {
         return try {
             log.info("Sending Email-SES:$refTag")
@@ -94,10 +110,20 @@ object SesChannel : NotificationChannel {
         }
     }
 
+    /**
+     * Create error string from Amazon SES Exceptions
+     * @param exception SES Exception
+     * @return generated error string
+     */
     private fun getSesExceptionText(exception: SesException): String {
         val httpResponse = exception.awsErrorDetails().sdkHttpResponse()
         return "sendEmail error, SES status:${httpResponse.statusCode()}:${httpResponse.statusText()}"
     }
 
+    /**
+     * Create error string from Amazon SDK Exceptions
+     * @param exception SDK Exception
+     * @return generated error string
+     */
     private fun getSdkExceptionText(exception: SdkException) = "sendEmail error, SDK status:${exception.message}"
 }

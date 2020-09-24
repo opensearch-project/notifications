@@ -14,11 +14,12 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.core
+package com.amazon.opendistroforelasticsearch.notifications.resthandler
 
-import org.elasticsearch.rest.RestStatus
+import org.elasticsearch.test.ESIntegTestCase
 
-class ChannelMessageResponse(
-    val statusCode: RestStatus,
-    val statusText: String
-)
+internal class SendRestHandlerIT : ESIntegTestCase() {
+
+    fun sendRestHandler() {
+    }
+}

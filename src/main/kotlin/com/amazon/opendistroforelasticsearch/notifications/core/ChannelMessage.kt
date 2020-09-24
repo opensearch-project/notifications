@@ -14,12 +14,24 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.resthandler
+package com.amazon.opendistroforelasticsearch.notifications.core
 
-import org.elasticsearch.test.ESIntegTestCase
-
-internal class SendRestHandlerIT : ESIntegTestCase() {
-
-    fun sendRestHandler() {
-    }
+/**
+ * Data class for storing channel message.
+ */
+class ChannelMessage(
+    val title: String,
+    val textDescription: String,
+    val htmlDescription: String?,
+    val attachment: Attachment?
+) {
+    /**
+     * Data class for storing attachment of channel message.
+     */
+    class Attachment(
+        val fileName: String,
+        val fileEncoding: String,
+        val fileData: String,
+        val fileContentType: String?
+    )
 }

@@ -14,11 +14,13 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.channel
+package com.amazon.opendistroforelasticsearch.notifications.core
 
-object EmailFactory {
-    const val EMAIL_PREFIX = "mailto:"
-    fun getNotificationChannel(): NotificationChannel {
-        return SesChannel
-    }
-}
+/**
+ * Data class for storing the notification message.
+ */
+class NotificationMessage(
+    val refTag: String,
+    val recipients: List<String>,
+    val channelMessage: ChannelMessage
+)

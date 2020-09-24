@@ -14,11 +14,22 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.channel
+package com.amazon.opendistroforelasticsearch.notifications.channel
 
-import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessage
-import com.amazon.opendistroforelasticsearch.notification.core.ChannelMessageResponse
+import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
+import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
 
+/**
+ * Interface for sending notification message over a implemented channel.
+ */
 interface NotificationChannel {
+    /**
+     * Sending notification message over this channel.
+     *
+     * @param refTag ref tag for logging purpose
+     * @param recipient recipient address to send notification to
+     * @param channelMessage The message to send notification
+     * @return Channel message response
+     */
     fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse
 }

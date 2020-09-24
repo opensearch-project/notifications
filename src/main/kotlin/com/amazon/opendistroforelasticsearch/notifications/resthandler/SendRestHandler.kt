@@ -14,13 +14,14 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.resthandler
+package com.amazon.opendistroforelasticsearch.notifications.resthandler
 
-import com.amazon.opendistroforelasticsearch.notification.NotificationPlugin.Companion.PLUGIN_BASE_URI
-import com.amazon.opendistroforelasticsearch.notification.NotificationPlugin.Companion.PLUGIN_NAME
-import com.amazon.opendistroforelasticsearch.notification.action.SendAction
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
+import com.amazon.opendistroforelasticsearch.notifications.action.SendAction
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.client.node.NodeClient
+import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.rest.BaseRestHandler
 import org.elasticsearch.rest.BaseRestHandler.RestChannelConsumer
 import org.elasticsearch.rest.RestHandler.Route
@@ -28,26 +29,40 @@ import org.elasticsearch.rest.RestRequest
 import org.elasticsearch.rest.RestRequest.Method.POST
 import java.io.IOException
 
-class SendRestHandler : BaseRestHandler() {
+/**
+ * Rest handler for sending notification.
+ * This handler [SendAction] for sending notification.
+ */
+class SendRestHandler(private val settings: Settings) : BaseRestHandler() {
     private val log = LogManager.getLogger(javaClass)
+
     companion object {
         const val SEND_BASE_URI = "$PLUGIN_BASE_URI/send"
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun getName(): String = "send"
 
+    /**
+     * {@inheritDoc}
+     */
     override fun routes(): List<Route> {
         return listOf(
-                Route(POST, SEND_BASE_URI)
+            Route(POST, SEND_BASE_URI)
         )
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Throws(IOException::class)
     @Suppress("SpreadOperator") // There is no way around dealing with java vararg without spread operator.
     override fun prepareRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
         log.debug("$PLUGIN_NAME:prepareRequest")
         return RestChannelConsumer {
-            SendAction(request, client, it).send()
+            SendAction(settings, request, client, it).send()
         }
     }
 }

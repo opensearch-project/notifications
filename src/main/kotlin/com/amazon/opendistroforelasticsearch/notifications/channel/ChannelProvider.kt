@@ -14,6 +14,16 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.util
+package com.amazon.opendistroforelasticsearch.notifications.channel
 
-annotation class OpenForTesting
+/**
+ * Interface for channel provider for specific recipient depending on its type.
+ */
+interface ChannelProvider {
+    /**
+     * gets notification channel for specific recipient depending on its type (prefix).
+     * @param recipient recipient address to send notification to. prefix with channel type e.g. "mailto:email@address.com"
+     * @return Notification channel for sending notification for given recipient (depending on its type)
+     */
+    fun getNotificationChannel(recipient: String): NotificationChannel
+}

@@ -14,10 +14,12 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notification.core
+package com.amazon.opendistroforelasticsearch.notifications.settings
 
-class NotificationMessage(
-    val refTag: String,
-    val recipients: List<String>,
-    val channelMessage: ChannelMessage
-)
+/**
+ * Enum representing email channel type.
+ */
+enum class EmailChannelType(val stringValue: String) {
+    SMTP("smtp"),
+    SES("ses")
+}
