@@ -21,7 +21,6 @@ import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Co
 import com.amazon.opendistroforelasticsearch.notifications.action.SendAction
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.client.node.NodeClient
-import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.rest.BaseRestHandler
 import org.elasticsearch.rest.BaseRestHandler.RestChannelConsumer
 import org.elasticsearch.rest.RestHandler.Route
@@ -33,7 +32,7 @@ import java.io.IOException
  * Rest handler for sending notification.
  * This handler [SendAction] for sending notification.
  */
-class SendRestHandler(private val settings: Settings) : BaseRestHandler() {
+class SendRestHandler : BaseRestHandler() {
     private val log = LogManager.getLogger(javaClass)
 
     companion object {
@@ -62,7 +61,7 @@ class SendRestHandler(private val settings: Settings) : BaseRestHandler() {
     override fun prepareRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
         log.debug("$PLUGIN_NAME:prepareRequest")
         return RestChannelConsumer {
-            SendAction(settings, request, client, it).send()
+            SendAction(request, client, it).send()
         }
     }
 }

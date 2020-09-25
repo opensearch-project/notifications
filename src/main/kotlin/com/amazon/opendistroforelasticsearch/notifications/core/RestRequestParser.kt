@@ -32,31 +32,13 @@ object RestRequestParser {
      * Parses request and returns object data.
      *
      * @param request the rest request to parse
-     * @return parsed object [NotificationMessage] when type is "notifications"
+     * @return parsed object [NotificationMessage]
      */
     fun parse(request: RestRequest): NotificationMessage {
         log.debug("${NotificationPlugin.PLUGIN_NAME}:RestRequestParser")
-        var type: String? = null
-        var message: NotificationMessage? = null
         val contentParser = request.contentOrSourceParamParser()
-        ensureExpectedToken(XContentParser.Token.START_OBJECT, contentParser.nextToken(), contentParser::getTokenLocation)
-        while (contentParser.nextToken() != XContentParser.Token.END_OBJECT) {
-            val fieldName = contentParser.currentName()
-            contentParser.nextToken()
-            when (fieldName) {
-                "type" -> type = contentParser.text()
-                "params" -> {
-                    message = parseNotificationMessage(contentParser)
-                }
-                else -> {
-                    contentParser.skipChildren()
-                }
-            }
-        }
-        if (type != "notifications") {
-            throw IllegalArgumentException("Unsupported Request type:$type")
-        }
-        return message ?: throw IllegalArgumentException("Request params not present")
+        contentParser.nextToken()
+        return parseNotificationMessage(contentParser)
     }
 
     /**
@@ -65,7 +47,7 @@ object RestRequestParser {
      * @param contentParser opened content parser
      * @return parsed object [NotificationMessage]
      */
-    private fun parseNotificationMessage(contentParser: XContentParser): NotificationMessage? {
+    private fun parseNotificationMessage(contentParser: XContentParser): NotificationMessage {
         var refTag: String? = null
         var title: String? = null
         var textDescription: String? = null

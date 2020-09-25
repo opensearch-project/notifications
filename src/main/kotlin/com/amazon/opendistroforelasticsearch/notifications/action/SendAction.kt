@@ -21,7 +21,6 @@ import com.amazon.opendistroforelasticsearch.notifications.channel.ChannelFactor
 import com.amazon.opendistroforelasticsearch.notifications.core.RestRequestParser
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.client.node.NodeClient
-import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.xcontent.XContentType
 import org.elasticsearch.rest.BytesRestResponse
 import org.elasticsearch.rest.RestChannel
@@ -32,7 +31,6 @@ import org.elasticsearch.rest.RestStatus
  * Send action for send notification request.
  */
 class SendAction(
-    private val settings: Settings,
     private val request: RestRequest,
     private val client: NodeClient,
     private val restChannel: RestChannel
@@ -46,8 +44,6 @@ class SendAction(
         log.info("$PLUGIN_NAME:send")
         val message = RestRequestParser.parse(request)
         val response = restChannel.newBuilder(XContentType.JSON, false).startObject()
-            .field("type", "notifications_response")
-            .startObject("params")
             .field("refTag", message.refTag)
             .startArray("recipients")
         var restStatus = RestStatus.OK // Default to success
@@ -64,7 +60,6 @@ class SendAction(
                 .endObject()
         }
         response.endArray()
-            .endObject()
             .endObject()
         restChannel.sendResponse(BytesRestResponse(restStatus, response))
     }

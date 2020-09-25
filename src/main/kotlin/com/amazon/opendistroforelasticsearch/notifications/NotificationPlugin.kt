@@ -110,7 +110,7 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
     ): List<RestHandler> {
         log.debug("$PLUGIN_NAME:getRestHandlers")
         return listOf(
-            SendRestHandler(settings)
+            SendRestHandler()
         )
     }
 }
