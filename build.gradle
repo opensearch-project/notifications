@@ -16,7 +16,7 @@
 
 buildscript {
     ext {
-        es_version = System.getProperty("es.version", "7.9.0")
+        es_version = System.getProperty("es.version", "7.9.1")
         kotlin_version = System.getProperty("kotlin.version", "1.4.0")
     }
 
