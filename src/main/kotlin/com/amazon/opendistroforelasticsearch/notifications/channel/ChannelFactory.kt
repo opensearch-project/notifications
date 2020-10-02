@@ -16,12 +16,13 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.channel
 
-import com.amazon.opendistroforelasticsearch.notifications.channel.EmailChannelFactory.EMAIL_PREFIX
+import com.amazon.opendistroforelasticsearch.notifications.channel.email.EmailChannelFactory
+import com.amazon.opendistroforelasticsearch.notifications.channel.email.EmailChannelFactory.EMAIL_PREFIX
 
 /**
  * Factory object for creating and providing channel provider.
  */
-object ChannelFactory : ChannelProvider {
+internal object ChannelFactory : ChannelProvider {
     private val channelMap = mapOf(EMAIL_PREFIX to EmailChannelFactory)
 
     /**

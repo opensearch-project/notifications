@@ -19,7 +19,7 @@ package com.amazon.opendistroforelasticsearch.notifications.settings
 /**
  * Enum representing email channel type.
  */
-enum class EmailChannelType(val stringValue: String) {
+internal enum class EmailChannelType(val stringValue: String) {
     SMTP("smtp"),
     SES("ses")
 }

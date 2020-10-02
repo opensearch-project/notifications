@@ -18,16 +18,17 @@ package com.amazon.opendistroforelasticsearch.notifications.channel
 
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
+import com.amazon.opendistroforelasticsearch.notifications.throttle.Counters
 import org.elasticsearch.rest.RestStatus
 
 /**
  * Empty implementation of the notification channel which responds with error for all requests without any operations.
  */
-object EmptyChannel : NotificationChannel {
+internal object EmptyChannel : NotificationChannel {
     /**
      * {@inheritDoc}
      */
-    override fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
+    override fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage, counter: Counters): ChannelMessageResponse {
         return ChannelMessageResponse(RestStatus.UNPROCESSABLE_ENTITY,
             "No Configured Channel for recipient type:${recipient.substringBefore(':', "empty")}")
     }

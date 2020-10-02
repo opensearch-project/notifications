@@ -14,16 +14,25 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notifications.channel
+package com.amazon.opendistroforelasticsearch.notifications.throttle
+
+import java.util.Date
 
 /**
- * Interface for channel provider for specific recipient depending on its type.
+ * Empty implementation of the message counter which responds with IllegalStateException all operations.
  */
-internal interface ChannelProvider {
+internal object EmptyMessageCounter : MessageCounter {
     /**
-     * gets notification channel for specific recipient depending on its type (prefix).
-     * @param recipient recipient address to send notification to. prefix with channel type e.g. "mailto:email@address.com"
-     * @return Notification channel for sending notification for given recipient (depending on its type)
+     * {@inheritDoc}
      */
-    fun getNotificationChannel(recipient: String): NotificationChannel
+    override fun incrementCountersForDay(counterDay: Date, counters: Counters) {
+        throw IllegalStateException("MessageCounter not initialized")
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun getCounterForMonth(counterDay: Date): Counters {
+        throw IllegalStateException("MessageCounter not initialized")
+    }
 }

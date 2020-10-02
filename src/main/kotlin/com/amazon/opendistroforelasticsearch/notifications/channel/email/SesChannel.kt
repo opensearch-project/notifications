@@ -14,12 +14,15 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notifications.channel
+package com.amazon.opendistroforelasticsearch.notifications.channel.email
 
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
+import com.amazon.opendistroforelasticsearch.notifications.channel.NotificationChannel
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
 import com.amazon.opendistroforelasticsearch.notifications.security.SecurityAccess
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
+import com.amazon.opendistroforelasticsearch.notifications.throttle.Counters
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.rest.RestStatus
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
@@ -44,13 +47,30 @@ import javax.mail.internet.MimeMessage
 /**
  * Notification channel for sending mail over Amazon SES.
  */
-object SesChannel : NotificationChannel {
+internal object SesChannel : NotificationChannel {
     private val log = LogManager.getLogger(javaClass)
 
     /**
      * {@inheritDoc}
      */
-    override fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
+    override fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage, counter: Counters): ChannelMessageResponse {
+        val retStatus = sendEmail(refTag, recipient, channelMessage)
+        if (retStatus.statusCode == RestStatus.OK) {
+            counter.emailSentSuccessCount.incrementAndGet()
+        } else {
+            counter.emailSentFailureCount.incrementAndGet()
+        }
+        return retStatus
+    }
+
+    /**
+     * Sending mime message over Amazon SES.
+     * @param refTag ref tag for logging purpose
+     * @param recipient email recipient to send mail to
+     * @param channelMessage email message information to compose email
+     * @return Channel message response
+     */
+    private fun sendEmail(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
         val fromAddress = PluginSettings.emailFromAddress
         if (PluginSettings.UNCONFIGURED_EMAIL_ADDRESS == fromAddress) {
             return ChannelMessageResponse(RestStatus.NOT_IMPLEMENTED, "Email from: address not configured")
@@ -76,13 +96,13 @@ object SesChannel : NotificationChannel {
      */
     private fun sendMimeMessage(refTag: String, mimeMessage: MimeMessage): ChannelMessageResponse {
         return try {
-            log.info("Sending Email-SES:$refTag")
+            log.debug("$PLUGIN_NAME:Sending Email-SES:$refTag")
             val region = Region.US_WEST_2
             val client = SecurityAccess.doPrivileged {
                 SesClient.builder().region(region).credentialsProvider(DefaultCredentialsProvider.create()).build()
             }
             val outputStream = ByteArrayOutputStream()
-            mimeMessage.writeTo(outputStream)
+            SecurityAccess.doPrivileged { mimeMessage.writeTo(outputStream) }
             val data = SdkBytes.fromByteArray(outputStream.toByteArray())
             val rawMessage = RawMessage.builder()
                 .data(data)
@@ -91,7 +111,7 @@ object SesChannel : NotificationChannel {
                 .rawMessage(rawMessage)
                 .build()
             val response = SecurityAccess.doPrivileged { client.sendRawEmail(rawEmailRequest) }
-            log.info("Email-SES:$refTag status:$response")
+            log.info("$PLUGIN_NAME:Email-SES:$refTag status:$response")
             ChannelMessageResponse(RestStatus.OK, "Success")
         } catch (exception: MessageRejectedException) {
             ChannelMessageResponse(RestStatus.SERVICE_UNAVAILABLE, getSesExceptionText(exception))

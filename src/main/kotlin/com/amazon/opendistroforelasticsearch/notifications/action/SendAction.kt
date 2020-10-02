@@ -18,7 +18,16 @@ package com.amazon.opendistroforelasticsearch.notifications.action
 
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
 import com.amazon.opendistroforelasticsearch.notifications.channel.ChannelFactory
+import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
+import com.amazon.opendistroforelasticsearch.notifications.core.NotificationMessage
 import com.amazon.opendistroforelasticsearch.notifications.core.RestRequestParser
+import com.amazon.opendistroforelasticsearch.notifications.throttle.Accountant
+import com.amazon.opendistroforelasticsearch.notifications.throttle.Counters
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.client.node.NodeClient
 import org.elasticsearch.common.xcontent.XContentType
@@ -30,7 +39,7 @@ import org.elasticsearch.rest.RestStatus
 /**
  * Send action for send notification request.
  */
-class SendAction(
+internal class SendAction(
     private val request: RestRequest,
     private val client: NodeClient,
     private val restChannel: RestChannel
@@ -41,26 +50,42 @@ class SendAction(
      * Send notification for the given [request] on the provided [restChannel].
      */
     fun send() {
-        log.info("$PLUGIN_NAME:send")
+        log.debug("$PLUGIN_NAME:send")
         val message = RestRequestParser.parse(request)
         val response = restChannel.newBuilder(XContentType.JSON, false).startObject()
             .field("refTag", message.refTag)
             .startArray("recipients")
+        val counters = Counters()
         var restStatus = RestStatus.OK // Default to success
-        message.recipients.forEach {
-            val channel = ChannelFactory.getNotificationChannel(it)
-            val status = channel.sendMessage(message.refTag, it, message.channelMessage)
-            if (status.statusCode != RestStatus.OK) {
-                restStatus = RestStatus.MULTI_STATUS // if any of the value != success then return 207
+        runBlocking {
+            counters.requestCount.incrementAndGet()
+            // Fire all the email sending in parallel
+            val statusDeferredList = message.recipients.map {
+                async(Dispatchers.IO) { sendMessageToChannel(it, message, counters) }
             }
-            response.startObject()
-                .field("recipient", it)
-                .field("statusCode", status.statusCode.status)
-                .field("statusText", status.statusText)
-                .endObject()
+            val statusList = statusDeferredList.awaitAll()
+            // After all operation are executed, update the counters
+            launch(Dispatchers.IO) { Accountant.incrementCounters(counters) }
+            // Get all the response in sequence
+            statusList.forEach {
+                if (it.second.statusCode != RestStatus.OK) {
+                    restStatus = RestStatus.MULTI_STATUS // if any of the value != success then return 207
+                }
+                response.startObject()
+                    .field("recipient", it.first)
+                    .field("statusCode", it.second.statusCode.status)
+                    .field("statusText", it.second.statusText)
+                    .endObject()
+            }
         }
         response.endArray()
             .endObject()
         restChannel.sendResponse(BytesRestResponse(restStatus, response))
+    }
+
+    private fun sendMessageToChannel(recipient: String, message: NotificationMessage, counters: Counters): Pair<String, ChannelMessageResponse> {
+        val channel = ChannelFactory.getNotificationChannel(recipient)
+        val status = channel.sendMessage(message.refTag, recipient, message.channelMessage, counters)
+        return Pair(recipient, status)
     }
 }

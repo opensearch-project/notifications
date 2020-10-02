@@ -14,16 +14,26 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notifications.channel
+package com.amazon.opendistroforelasticsearch.notifications.throttle
+
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * Interface for channel provider for specific recipient depending on its type.
+ * Counter class to maintain the counting of the items
  */
-internal interface ChannelProvider {
+internal class Counters {
     /**
-     * gets notification channel for specific recipient depending on its type (prefix).
-     * @param recipient recipient address to send notification to. prefix with channel type e.g. "mailto:email@address.com"
-     * @return Notification channel for sending notification for given recipient (depending on its type)
+     * Number of requests.
      */
-    fun getNotificationChannel(recipient: String): NotificationChannel
+    val requestCount = AtomicInteger()
+
+    /**
+     * Number of email sent successfully
+     */
+    val emailSentSuccessCount = AtomicInteger()
+
+    /**
+     * Number of email request failed
+     */
+    val emailSentFailureCount = AtomicInteger()
 }

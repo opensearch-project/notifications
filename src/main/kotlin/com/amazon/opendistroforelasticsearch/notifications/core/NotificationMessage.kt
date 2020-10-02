@@ -19,7 +19,7 @@ package com.amazon.opendistroforelasticsearch.notifications.core
 /**
  * Data class for storing the notification message.
  */
-class NotificationMessage(
+internal data class NotificationMessage(
     val refTag: String,
     val recipients: List<String>,
     val channelMessage: ChannelMessage

@@ -18,6 +18,7 @@ package com.amazon.opendistroforelasticsearch.notifications
 
 import com.amazon.opendistroforelasticsearch.notifications.resthandler.SendRestHandler
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
+import com.amazon.opendistroforelasticsearch.notifications.throttle.Accountant
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.ActionResponse
@@ -85,6 +86,7 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
         log.debug("$PLUGIN_NAME:createComponents")
         this.clusterService = clusterService
         PluginSettings.addSettingsUpdateConsumer(clusterService)
+        Accountant.initialize(client, clusterService)
         return listOf()
     }
 

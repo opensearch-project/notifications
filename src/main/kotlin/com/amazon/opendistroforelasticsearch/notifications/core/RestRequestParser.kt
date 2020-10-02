@@ -16,7 +16,7 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.core
 
-import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils.ensureExpectedToken
@@ -25,7 +25,7 @@ import org.elasticsearch.rest.RestRequest
 /**
  * This object parses the Rest request for notification plugin.
  */
-object RestRequestParser {
+internal object RestRequestParser {
     private val log = LogManager.getLogger(javaClass)
 
     /**
@@ -35,7 +35,7 @@ object RestRequestParser {
      * @return parsed object [NotificationMessage]
      */
     fun parse(request: RestRequest): NotificationMessage {
-        log.debug("${NotificationPlugin.PLUGIN_NAME}:RestRequestParser")
+        log.debug("$PLUGIN_NAME:RestRequestParser")
         val contentParser = request.contentOrSourceParamParser()
         contentParser.nextToken()
         return parseNotificationMessage(contentParser)

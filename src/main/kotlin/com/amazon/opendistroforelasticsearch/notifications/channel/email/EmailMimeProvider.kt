@@ -14,21 +14,23 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notifications.channel
+package com.amazon.opendistroforelasticsearch.notifications.channel.email
 
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
+import java.util.Base64
 import java.util.Properties
+import javax.activation.DataHandler
 import javax.mail.Message
 import javax.mail.Session
 import javax.mail.internet.MimeBodyPart
 import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeMultipart
-import javax.mail.internet.PreencodedMimeBodyPart
+import javax.mail.util.ByteArrayDataSource
 
 /**
  * Object for creating mime message from the channel message for sending mail.
  */
-object EmailMimeProvider {
+internal object EmailMimeProvider {
     /**
      * Create and prepare mime message to send mail
      * @param fromAddress "From:" address of the email message
@@ -116,8 +118,10 @@ object EmailMimeProvider {
      * @return created mime body part for binary attachment
      */
     private fun createBinaryAttachmentPart(attachment: ChannelMessage.Attachment): MimeBodyPart {
-        val attachmentMime: MimeBodyPart = PreencodedMimeBodyPart("base64")
-        attachmentMime.setContent(attachment.fileData, attachment.fileContentType ?: "application/octet-stream")
+        val attachmentMime = MimeBodyPart()
+        val fds = ByteArrayDataSource(Base64.getMimeDecoder().decode(attachment.fileData),
+            attachment.fileContentType ?: "application/octet-stream")
+        attachmentMime.dataHandler = DataHandler(fds)
         attachmentMime.fileName = attachment.fileName
         return attachmentMime
     }

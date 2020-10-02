@@ -18,18 +18,20 @@ package com.amazon.opendistroforelasticsearch.notifications.channel
 
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
+import com.amazon.opendistroforelasticsearch.notifications.throttle.Counters
 
 /**
  * Interface for sending notification message over a implemented channel.
  */
-interface NotificationChannel {
+internal interface NotificationChannel {
     /**
      * Sending notification message over this channel.
      *
      * @param refTag ref tag for logging purpose
      * @param recipient recipient address to send notification to
      * @param channelMessage The message to send notification
+     * @param counter The counter object to update the detail for accounting purpose
      * @return Channel message response
      */
-    fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse
+    fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage, counter: Counters): ChannelMessageResponse
 }

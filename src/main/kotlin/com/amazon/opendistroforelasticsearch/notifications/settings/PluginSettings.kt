@@ -30,7 +30,12 @@ import java.nio.file.Path
 /**
  * settings specific to Notifications Plugin.
  */
-object PluginSettings {
+internal object PluginSettings {
+
+    /**
+     * Operation timeout for network operations.
+     */
+    private const val OPERATION_TIMEOUT_MS_KEY = "opendistro.notifications.general.operationTimeoutMs"
 
     /**
      * Setting to choose smtp or SES for sending mail.
@@ -48,17 +53,47 @@ object PluginSettings {
     private const val EMAIL_LIMIT_MONTHLY_KEY = "opendistro.notifications.email.monthlyLimit"
 
     /**
+     * Default operation timeout for network operations.
+     */
+    private const val DEFAULT_OPERATION_TIMEOUT_MS = 60000L
+
+    /**
+     * Minimum operation timeout for network operations.
+     */
+    private const val MINIMUM_OPERATION_TIMEOUT_MS = 100L
+
+    /**
+     * Default monthly email sending limit from this plugin.
+     */
+    private const val DEFAULT_EMAIL_LIMIT_MONTHLY = 200
+
+    /**
      * If the "From:" email address is set to below value then email will NOT be submitted to server.
      * any other valid "From:" email address would be submitted to server.
      */
     const val UNCONFIGURED_EMAIL_ADDRESS = "nobody@email.com" // Email will not be sent if email address different than this value
 
+    /**
+     * Operation timeout setting in ms for I/O operations
+     */
+    @Volatile
+    var operationTimeoutMs: Long
+
+    /**
+     * Email channel setting [EmailChannelType] in string format
+     */
     @Volatile
     var emailChannel: String
 
+    /**
+     * Email "From:" Address setting
+     */
     @Volatile
     var emailFromAddress: String
 
+    /**
+     * Email monthly throttle limit setting
+     */
     @Volatile
     var emailMonthlyLimit: Int
 
@@ -79,16 +114,25 @@ object PluginSettings {
             }
         }
         // Initialize the settings values to default values
+        operationTimeoutMs = (settings?.get(OPERATION_TIMEOUT_MS_KEY)?.toLong()) ?: DEFAULT_OPERATION_TIMEOUT_MS
         emailChannel = (settings?.get(EMAIL_CHANNEL_KEY) ?: EmailChannelType.SMTP.stringValue)
         emailFromAddress = (settings?.get(EMAIL_FROM_ADDRESS_KEY) ?: UNCONFIGURED_EMAIL_ADDRESS)
-        emailMonthlyLimit = Integer.parseInt((settings?.get(EMAIL_LIMIT_MONTHLY_KEY) ?: "200"))
+        emailMonthlyLimit = (settings?.get(EMAIL_LIMIT_MONTHLY_KEY)?.toInt()) ?: DEFAULT_EMAIL_LIMIT_MONTHLY
 
         defaultSettings = mapOf(
+            OPERATION_TIMEOUT_MS_KEY to operationTimeoutMs.toString(DECIMAL_RADIX),
             EMAIL_CHANNEL_KEY to emailChannel,
             EMAIL_FROM_ADDRESS_KEY to emailFromAddress,
             EMAIL_LIMIT_MONTHLY_KEY to emailMonthlyLimit.toString(DECIMAL_RADIX)
         )
     }
+
+    private val OPERATION_TIMEOUT_MS: Setting<Long> = Setting.longSetting(
+        OPERATION_TIMEOUT_MS_KEY,
+        defaultSettings[OPERATION_TIMEOUT_MS_KEY]!!.toLong(),
+        MINIMUM_OPERATION_TIMEOUT_MS,
+        NodeScope, Dynamic
+    )
 
     private val EMAIL_CHANNEL: Setting<String> = Setting.simpleString(
         EMAIL_CHANNEL_KEY,
@@ -104,7 +148,8 @@ object PluginSettings {
 
     private val EMAIL_LIMIT_MONTHLY: Setting<Int> = Setting.intSetting(
         EMAIL_LIMIT_MONTHLY_KEY,
-        Integer.parseInt(defaultSettings[EMAIL_LIMIT_MONTHLY_KEY]),
+        defaultSettings[EMAIL_LIMIT_MONTHLY_KEY]!!.toInt(),
+        0,
         NodeScope, Dynamic
     )
 
@@ -114,7 +159,8 @@ object PluginSettings {
      * @return list of settings defined in this plugin
      */
     fun getAllSettings(): List<Setting<*>> {
-        return listOf(EMAIL_CHANNEL,
+        return listOf(OPERATION_TIMEOUT_MS,
+            EMAIL_CHANNEL,
             EMAIL_FROM_ADDRESS,
             EMAIL_LIMIT_MONTHLY
         )
@@ -122,28 +168,38 @@ object PluginSettings {
 
     fun addSettingsUpdateConsumer(clusterService: ClusterService) {
         // Update the variables to setting values
+        operationTimeoutMs = OPERATION_TIMEOUT_MS.get(clusterService.settings)
         emailChannel = EMAIL_CHANNEL.get(clusterService.settings)
         emailFromAddress = EMAIL_FROM_ADDRESS.get(clusterService.settings)
         emailMonthlyLimit = EMAIL_LIMIT_MONTHLY.get(clusterService.settings)
 
         // Update the variables to cluster setting values
         // If the cluster is not yet started then we get default values again
+        val clusterOperationTimeoutMs = clusterService.clusterSettings.get(OPERATION_TIMEOUT_MS)
+        if (clusterOperationTimeoutMs != null) {
+            log.debug("$PLUGIN_NAME:$OPERATION_TIMEOUT_MS_KEY -autoUpdatedTo-> $clusterOperationTimeoutMs")
+            operationTimeoutMs = clusterOperationTimeoutMs
+        }
         val clusterEmailChannel = clusterService.clusterSettings.get(EMAIL_CHANNEL)
         if (clusterEmailChannel != null) {
-            log.info("$PLUGIN_NAME:$EMAIL_CHANNEL_KEY -autoUpdatedTo-> $clusterEmailChannel")
+            log.debug("$PLUGIN_NAME:$EMAIL_CHANNEL_KEY -autoUpdatedTo-> $clusterEmailChannel")
             emailChannel = clusterEmailChannel
         }
         val clusterEmailFromAddress = clusterService.clusterSettings.get(EMAIL_FROM_ADDRESS)
         if (clusterEmailFromAddress != null) {
-            log.info("$PLUGIN_NAME:$EMAIL_FROM_ADDRESS_KEY -autoUpdatedTo-> $clusterEmailFromAddress")
+            log.debug("$PLUGIN_NAME:$EMAIL_FROM_ADDRESS_KEY -autoUpdatedTo-> $clusterEmailFromAddress")
             emailFromAddress = clusterEmailFromAddress
         }
         val clusterEmailMonthlyLimit = clusterService.clusterSettings.get(EMAIL_LIMIT_MONTHLY)
         if (clusterEmailMonthlyLimit != null) {
-            log.info("$PLUGIN_NAME:$EMAIL_LIMIT_MONTHLY_KEY -autoUpdatedTo-> $clusterEmailMonthlyLimit")
+            log.debug("$PLUGIN_NAME:$EMAIL_LIMIT_MONTHLY_KEY -autoUpdatedTo-> $clusterEmailMonthlyLimit")
             emailMonthlyLimit = clusterEmailMonthlyLimit
         }
 
+        clusterService.clusterSettings.addSettingsUpdateConsumer(OPERATION_TIMEOUT_MS) {
+            operationTimeoutMs = it
+            log.info("$PLUGIN_NAME:$OPERATION_TIMEOUT_MS_KEY -updatedTo-> $it")
+        }
         clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_CHANNEL) {
             emailChannel = it
             log.info("$PLUGIN_NAME:$EMAIL_CHANNEL_KEY -updatedTo-> $it")

@@ -14,15 +14,18 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notifications.channel
+package com.amazon.opendistroforelasticsearch.notifications.channel.email
 
+import com.amazon.opendistroforelasticsearch.notifications.channel.ChannelProvider
+import com.amazon.opendistroforelasticsearch.notifications.channel.EmptyChannel
+import com.amazon.opendistroforelasticsearch.notifications.channel.NotificationChannel
 import com.amazon.opendistroforelasticsearch.notifications.settings.EmailChannelType
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 
 /**
  * Factory object for creating and providing email channel provider.
  */
-object EmailChannelFactory : ChannelProvider {
+internal object EmailChannelFactory : ChannelProvider {
     const val EMAIL_PREFIX = "mailto:"
     private val channelMap = mapOf(
         EmailChannelType.SMTP.stringValue to EmptyChannel,

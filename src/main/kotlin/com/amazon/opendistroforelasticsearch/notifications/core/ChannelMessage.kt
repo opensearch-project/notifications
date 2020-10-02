@@ -19,7 +19,7 @@ package com.amazon.opendistroforelasticsearch.notifications.core
 /**
  * Data class for storing channel message.
  */
-class ChannelMessage(
+internal data class ChannelMessage(
     val title: String,
     val textDescription: String,
     val htmlDescription: String?,
@@ -28,7 +28,7 @@ class ChannelMessage(
     /**
      * Data class for storing attachment of channel message.
      */
-    class Attachment(
+    internal data class Attachment(
         val fileName: String,
         val fileEncoding: String,
         val fileData: String,

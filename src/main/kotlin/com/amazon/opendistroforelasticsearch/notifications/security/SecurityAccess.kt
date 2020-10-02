@@ -27,7 +27,7 @@ import java.security.PrivilegedExceptionAction
  * Ref:
  * https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugin-authors.html#_java_security_permissions
  */
-object SecurityAccess {
+internal object SecurityAccess {
     /**
      * Execute the operation in privileged mode.
      */

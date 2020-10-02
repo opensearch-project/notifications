@@ -14,11 +14,15 @@
 #
 ##
 
-# configuration file for the notifications plugin
-opendistro.notifications:
-  general:
-    operationTimeoutMs: 60000 # 60 seconds, Minimum 100ms
-  email:
-    channel: "ses" # smtp
-    fromAddress: "from@email.com"
-    monthlyLimit: 200
+# Schema file for the notifications counter index
+dynamic: strict
+properties:
+  counter_day:
+    type: date
+    format: strict_date # "yyyy-MM-dd"
+  request_count: # Total requests to notifications plugin per day
+    type: integer
+  email_sent_success_count: # Total email(per recipient) successfully sent per day
+    type: integer
+  email_sent_failure_count: # Total email sending failed per day
+    type: integer
