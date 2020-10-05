@@ -16,6 +16,7 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.throttle
 
+import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import org.elasticsearch.client.Client
 import org.elasticsearch.cluster.service.ClusterService
 import java.util.Date
@@ -41,5 +42,16 @@ internal object Accountant {
      */
     fun incrementCounters(counters: Counters) {
         messageCounter.incrementCountersForDay(Date(), counters)
+    }
+
+    /**
+     * Check if message quota is available
+     * @param counters the counter object
+     * @return true if message quota is available, false otherwise
+     */
+    fun isMessageQuotaAvailable(counters: Counters): Boolean {
+        val monthlyCounters = messageCounter.getCounterForMonth(Date())
+        monthlyCounters.incrementCountersBy(counters)
+        return monthlyCounters.emailSentSuccessCount.get() <= PluginSettings.emailMonthlyLimit
     }
 }

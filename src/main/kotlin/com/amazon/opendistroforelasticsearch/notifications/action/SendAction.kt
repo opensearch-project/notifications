@@ -54,32 +54,40 @@ internal class SendAction(
         val message = RestRequestParser.parse(request)
         val response = restChannel.newBuilder(XContentType.JSON, false).startObject()
             .field("refTag", message.refTag)
-            .startArray("recipients")
-        val counters = Counters()
         var restStatus = RestStatus.OK // Default to success
         runBlocking {
-            counters.requestCount.incrementAndGet()
-            // Fire all the email sending in parallel
-            val statusDeferredList = message.recipients.map {
-                async(Dispatchers.IO) { sendMessageToChannel(it, message, counters) }
-            }
-            val statusList = statusDeferredList.awaitAll()
-            // After all operation are executed, update the counters
-            launch(Dispatchers.IO) { Accountant.incrementCounters(counters) }
-            // Get all the response in sequence
-            statusList.forEach {
-                if (it.second.statusCode != RestStatus.OK) {
-                    restStatus = RestStatus.MULTI_STATUS // if any of the value != success then return 207
+            val isMessageQuotaAvailableDeferred = async(Dispatchers.IO) { isMessageQuotaAvailable(message) }
+            val isMessageQuotaAvailable = isMessageQuotaAvailableDeferred.await()
+            if (isMessageQuotaAvailable) {
+                response.startArray("recipients")
+                val counters = Counters()
+                counters.requestCount.incrementAndGet()
+                // Fire all the email sending in parallel
+                val statusDeferredList = message.recipients.map {
+                    async(Dispatchers.IO) { sendMessageToChannel(it, message, counters) }
                 }
-                response.startObject()
-                    .field("recipient", it.first)
-                    .field("statusCode", it.second.statusCode.status)
-                    .field("statusText", it.second.statusText)
-                    .endObject()
+                val statusList = statusDeferredList.awaitAll()
+                // After all operation are executed, update the counters
+                launch(Dispatchers.IO) { Accountant.incrementCounters(counters) }
+                // Get all the response in sequence
+                statusList.forEach {
+                    if (it.second.statusCode != RestStatus.OK) {
+                        restStatus = RestStatus.MULTI_STATUS // if any of the value != success then return 207
+                    }
+                    response.startObject()
+                        .field("recipient", it.first)
+                        .field("statusCode", it.second.statusCode.status)
+                        .field("statusText", it.second.statusText)
+                        .endObject()
+                }
+                response.endArray()
+            } else {
+                restStatus = RestStatus.TOO_MANY_REQUESTS
+                response.field("statusCode", restStatus)
+                    .field("statusText", "Message Sending quota not available")
             }
         }
-        response.endArray()
-            .endObject()
+        response.endObject()
         restChannel.sendResponse(BytesRestResponse(restStatus, response))
     }
 
@@ -87,5 +95,13 @@ internal class SendAction(
         val channel = ChannelFactory.getNotificationChannel(recipient)
         val status = channel.sendMessage(message.refTag, recipient, message.channelMessage, counters)
         return Pair(recipient, status)
+    }
+
+    private fun isMessageQuotaAvailable(message: NotificationMessage): Boolean {
+        val counters = Counters()
+        message.recipients.forEach {
+            ChannelFactory.getNotificationChannel(it).updateCounter(message.refTag, it, message.channelMessage, counters)
+        }
+        return Accountant.isMessageQuotaAvailable(counters)
     }
 }

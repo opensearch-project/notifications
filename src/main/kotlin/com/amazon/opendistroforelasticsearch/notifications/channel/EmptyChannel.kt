@@ -32,4 +32,11 @@ internal object EmptyChannel : NotificationChannel {
         return ChannelMessageResponse(RestStatus.UNPROCESSABLE_ENTITY,
             "No Configured Channel for recipient type:${recipient.substringBefore(':', "empty")}")
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun updateCounter(refTag: String, recipient: String, channelMessage: ChannelMessage, counter: Counters) {
+        return
+    }
 }

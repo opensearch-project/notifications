@@ -53,6 +53,13 @@ internal object SesChannel : NotificationChannel {
     /**
      * {@inheritDoc}
      */
+    override fun updateCounter(refTag: String, recipient: String, channelMessage: ChannelMessage, counter: Counters) {
+        counter.emailSentSuccessCount.incrementAndGet()
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     override fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage, counter: Counters): ChannelMessageResponse {
         val retStatus = sendEmail(refTag, recipient, channelMessage)
         if (retStatus.statusCode == RestStatus.OK) {

@@ -26,8 +26,10 @@ import org.elasticsearch.common.xcontent.XContentParser.Token.START_OBJECT
 import org.elasticsearch.common.xcontent.XContentParserUtils
 import org.elasticsearch.index.seqno.SequenceNumbers
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 /**
  * Data class representing the doc for a day.
@@ -47,6 +49,9 @@ internal data class CounterIndexModel(
         private const val EMAIL_SENT_FAILURE_COUNT = "email_sent_failure_count"
         private val DATE_FORMATTER = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
 
+        const val COUNTER_INDEX_MODEL_KEY = COUNTER_DAY_TAG
+        const val MAX_ITEMS_IN_MONTH = 31
+
         /**
          * get the ID for a given date
          * @param day the day to create ID
@@ -54,6 +59,22 @@ internal data class CounterIndexModel(
          */
         fun getIdForDate(day: Date): String {
             return DATE_FORMATTER.format(day)
+        }
+
+        /**
+         * get the ID for beginning of the month of a given Instant
+         * @param day the reference day to create ID
+         * @return ID for the beginning of the month
+         */
+        fun getIdForStartOfMonth(day: Date): String {
+            return getIdForDate(getFirstDateOfMonth(day))
+        }
+
+        private fun getFirstDateOfMonth(date: Date): Date {
+            val cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"), Locale.ROOT)
+            cal.time = date
+            cal[Calendar.DAY_OF_MONTH] = cal.getActualMinimum(Calendar.DAY_OF_MONTH)
+            return cal.time
         }
 
         /**
@@ -76,7 +97,11 @@ internal data class CounterIndexModel(
          * @param primaryTerm the primaryTerm of the document
          * @return created counter index model
          */
-        fun parse(parser: XContentParser, seqNo: Long, primaryTerm: Long): CounterIndexModel {
+        fun parse(
+            parser: XContentParser,
+            seqNo: Long = SequenceNumbers.UNASSIGNED_SEQ_NO,
+            primaryTerm: Long = SequenceNumbers.UNASSIGNED_PRIMARY_TERM
+        ): CounterIndexModel {
             var counterDay: Date? = null
             var requestCount: Int? = null
             var emailSentSuccessCount: Int? = null

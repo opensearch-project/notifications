@@ -36,4 +36,21 @@ internal class Counters {
      * Number of email request failed
      */
     val emailSentFailureCount = AtomicInteger()
+
+    /**
+     * Increment the counters by given counter values
+     * @param counters The counter values to increment
+     */
+    fun incrementCountersBy(counters: Counters) {
+        requestCount.addAndGet(counters.requestCount.get())
+        emailSentSuccessCount.addAndGet(counters.emailSentSuccessCount.get())
+        emailSentFailureCount.addAndGet(counters.emailSentFailureCount.get())
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun toString(): String {
+        return "{requestCount=$requestCount, emailSentSuccessCount=$emailSentSuccessCount, emailSentFailureCount=$emailSentFailureCount}"
+    }
 }

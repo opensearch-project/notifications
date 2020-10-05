@@ -24,6 +24,18 @@ import com.amazon.opendistroforelasticsearch.notifications.throttle.Counters
  * Interface for sending notification message over a implemented channel.
  */
 internal interface NotificationChannel {
+
+    /**
+     * Update the counter if the notification message is over this channel. Do not actually send message.
+     * Used for checking message quotas.
+     *
+     * @param refTag ref tag for logging purpose
+     * @param recipient recipient address to send notification to
+     * @param channelMessage The message to send notification
+     * @param counter The counter object to update the detail for accounting purpose
+     */
+    fun updateCounter(refTag: String, recipient: String, channelMessage: ChannelMessage, counter: Counters)
+
     /**
      * Sending notification message over this channel.
      *
