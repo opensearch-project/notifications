@@ -68,16 +68,21 @@ internal object SesChannel : BaseEmailChannel() {
             }
             val outputStream = ByteArrayOutputStream()
             SecurityAccess.doPrivileged { mimeMessage.writeTo(outputStream) }
-            val data = SdkBytes.fromByteArray(outputStream.toByteArray())
-            val rawMessage = RawMessage.builder()
-                .data(data)
-                .build()
-            val rawEmailRequest = SendRawEmailRequest.builder()
-                .rawMessage(rawMessage)
-                .build()
-            val response = SecurityAccess.doPrivileged { client.sendRawEmail(rawEmailRequest) }
-            log.info("$PLUGIN_NAME:Email-SES:$refTag status:$response")
-            ChannelMessageResponse(RestStatus.OK, "Success")
+            val emailSize = outputStream.size()
+            if (emailSize <= PluginSettings.emailSizeLimit) {
+                val data = SdkBytes.fromByteArray(outputStream.toByteArray())
+                val rawMessage = RawMessage.builder()
+                    .data(data)
+                    .build()
+                val rawEmailRequest = SendRawEmailRequest.builder()
+                    .rawMessage(rawMessage)
+                    .build()
+                val response = SecurityAccess.doPrivileged { client.sendRawEmail(rawEmailRequest) }
+                log.info("$PLUGIN_NAME:Email-SES:$refTag status:$response")
+                ChannelMessageResponse(RestStatus.OK, "Success")
+            } else {
+                ChannelMessageResponse(RestStatus.REQUEST_ENTITY_TOO_LARGE, "Email size($emailSize) larger than ${PluginSettings.emailSizeLimit}")
+            }
         } catch (exception: MessageRejectedException) {
             ChannelMessageResponse(RestStatus.SERVICE_UNAVAILABLE, getSesExceptionText(exception))
         } catch (exception: MailFromDomainNotVerifiedException) {

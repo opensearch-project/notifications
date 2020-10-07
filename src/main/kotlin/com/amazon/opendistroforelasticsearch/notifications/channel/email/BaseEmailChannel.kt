@@ -32,6 +32,11 @@ import javax.mail.internet.MimeMessage
  * Notification channel for sending mail to Email server.
  */
 internal abstract class BaseEmailChannel : NotificationChannel {
+
+    companion object {
+        private const val MINIMUM_EMAIL_HEADER_LENGTH = 160 // minimum value from 100 reference emails
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -64,6 +69,9 @@ internal abstract class BaseEmailChannel : NotificationChannel {
         if (PluginSettings.UNCONFIGURED_EMAIL_ADDRESS == fromAddress) {
             return ChannelMessageResponse(RestStatus.NOT_IMPLEMENTED, "Email from: address not configured")
         }
+        if (isMessageSizeOverLimit(channelMessage)) {
+            return ChannelMessageResponse(RestStatus.REQUEST_ENTITY_TOO_LARGE, "Email size larger than ${PluginSettings.emailSizeLimit}")
+        }
         val mimeMessage: MimeMessage
         return try {
             val session = prepareSession(refTag, recipient, channelMessage)
@@ -76,6 +84,22 @@ internal abstract class BaseEmailChannel : NotificationChannel {
         } catch (ioException: IOException) {
             ChannelMessageResponse(RestStatus.FAILED_DEPENDENCY, "Email message creation failed with status:${ioException.message}")
         }
+    }
+
+    private fun isMessageSizeOverLimit(channelMessage: ChannelMessage): Boolean {
+        val approxAttachmentLength = if (channelMessage.attachment != null) {
+            MINIMUM_EMAIL_HEADER_LENGTH +
+                channelMessage.attachment.fileData.length +
+                channelMessage.attachment.fileName.length
+        } else {
+            0
+        }
+        val approxEmailLength = MINIMUM_EMAIL_HEADER_LENGTH +
+            channelMessage.title.length +
+            channelMessage.textDescription.length +
+            (channelMessage.htmlDescription?.length ?: 0) +
+            approxAttachmentLength
+        return approxEmailLength > PluginSettings.emailSizeLimit
     }
 
     /**

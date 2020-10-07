@@ -23,6 +23,7 @@ opendistro.notifications:
     channel: "smtp" # ses or smtp, provide corresponding sections
     fromAddress: "from@email.com"
     monthlyLimit: 200
+    sizeLimit: 10000000 # 10MB Email size limit
     ses: # Configuration for Amazon SES email delivery
       awsRegion: "us-west-2"
     smtp: # Configuration for SMTP email delivery

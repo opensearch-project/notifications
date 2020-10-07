@@ -64,6 +64,11 @@ internal object PluginSettings {
     private const val EMAIL_LIMIT_MONTHLY_KEY = "$EMAIL_KEY_PREFIX.monthlyLimit"
 
     /**
+     * Email size limit.
+     */
+    private const val EMAIL_SIZE_LIMIT_KEY = "$EMAIL_KEY_PREFIX.sizeLimit"
+
+    /**
      * Amazon SES AWS region to send mail to.
      */
     private const val EMAIL_SES_AWS_REGION_KEY = "$EMAIL_KEY_PREFIX.ses.awsRegion"
@@ -102,6 +107,16 @@ internal object PluginSettings {
      * Default monthly email sending limit from this plugin.
      */
     private const val DEFAULT_EMAIL_LIMIT_MONTHLY = 200
+
+    /**
+     * Default email size limit as 10MB.
+     */
+    private const val DEFAULT_EMAIL_SIZE_LIMIT = 10000000
+
+    /**
+     * Minimum email size limit as 10KB.
+     */
+    private const val MINIMUM_EMAIL_SIZE_LIMIT = 10000
 
     /**
      * Default Amazon SES AWS region.
@@ -154,6 +169,12 @@ internal object PluginSettings {
     var emailMonthlyLimit: Int
 
     /**
+     * Email size limit setting
+     */
+    @Volatile
+    var emailSizeLimit: Int
+
+    /**
      * Amazon SES AWS region setting
      */
     @Volatile
@@ -198,6 +219,7 @@ internal object PluginSettings {
         emailChannel = (settings?.get(EMAIL_CHANNEL_KEY) ?: DEFAULT_EMAIL_CHANNEL)
         emailFromAddress = (settings?.get(EMAIL_FROM_ADDRESS_KEY) ?: UNCONFIGURED_EMAIL_ADDRESS)
         emailMonthlyLimit = (settings?.get(EMAIL_LIMIT_MONTHLY_KEY)?.toInt()) ?: DEFAULT_EMAIL_LIMIT_MONTHLY
+        emailSizeLimit = (settings?.get(EMAIL_SIZE_LIMIT_KEY)?.toInt()) ?: DEFAULT_EMAIL_SIZE_LIMIT
         sesAwsRegion = (settings?.get(EMAIL_SES_AWS_REGION_KEY) ?: DEFAULT_SES_AWS_REGION)
         smtpHost = (settings?.get(EMAIL_SMTP_HOST_KEY) ?: DEFAULT_SMTP_HOST)
         smtpPort = (settings?.get(EMAIL_SMTP_PORT_KEY)?.toInt()) ?: DEFAULT_SMTP_PORT
@@ -208,6 +230,7 @@ internal object PluginSettings {
             EMAIL_CHANNEL_KEY to emailChannel,
             EMAIL_FROM_ADDRESS_KEY to emailFromAddress,
             EMAIL_LIMIT_MONTHLY_KEY to emailMonthlyLimit.toString(DECIMAL_RADIX),
+            EMAIL_SIZE_LIMIT_KEY to emailSizeLimit.toString(DECIMAL_RADIX),
             EMAIL_SES_AWS_REGION_KEY to sesAwsRegion,
             EMAIL_SMTP_HOST_KEY to smtpHost,
             EMAIL_SMTP_PORT_KEY to smtpPort.toString(DECIMAL_RADIX),
@@ -238,6 +261,13 @@ internal object PluginSettings {
         EMAIL_LIMIT_MONTHLY_KEY,
         defaultSettings[EMAIL_LIMIT_MONTHLY_KEY]!!.toInt(),
         0,
+        NodeScope, Dynamic
+    )
+
+    private val EMAIL_SIZE_LIMIT: Setting<Int> = Setting.intSetting(
+        EMAIL_SIZE_LIMIT_KEY,
+        defaultSettings[EMAIL_SIZE_LIMIT_KEY]!!.toInt(),
+        MINIMUM_EMAIL_SIZE_LIMIT,
         NodeScope, Dynamic
     )
 
@@ -276,6 +306,7 @@ internal object PluginSettings {
             EMAIL_CHANNEL,
             EMAIL_FROM_ADDRESS,
             EMAIL_LIMIT_MONTHLY,
+            EMAIL_SIZE_LIMIT,
             EMAIL_SES_AWS_REGION,
             EMAIL_SMTP_HOST,
             EMAIL_SMTP_PORT,
@@ -292,6 +323,7 @@ internal object PluginSettings {
         emailChannel = EMAIL_CHANNEL.get(clusterService.settings)
         emailFromAddress = EMAIL_FROM_ADDRESS.get(clusterService.settings)
         emailMonthlyLimit = EMAIL_LIMIT_MONTHLY.get(clusterService.settings)
+        emailSizeLimit = EMAIL_SIZE_LIMIT.get(clusterService.settings)
         sesAwsRegion = EMAIL_SES_AWS_REGION.get(clusterService.settings)
         smtpHost = EMAIL_SMTP_HOST.get(clusterService.settings)
         smtpPort = EMAIL_SMTP_PORT.get(clusterService.settings)
@@ -322,6 +354,11 @@ internal object PluginSettings {
         if (clusterEmailMonthlyLimit != null) {
             log.debug("$PLUGIN_NAME:$EMAIL_LIMIT_MONTHLY_KEY -autoUpdatedTo-> $clusterEmailMonthlyLimit")
             emailMonthlyLimit = clusterEmailMonthlyLimit
+        }
+        val clusterEmailSizeLimit = clusterService.clusterSettings.get(EMAIL_SIZE_LIMIT)
+        if (clusterEmailSizeLimit != null) {
+            log.debug("$PLUGIN_NAME:$EMAIL_SIZE_LIMIT_KEY -autoUpdatedTo-> $clusterEmailSizeLimit")
+            emailSizeLimit = clusterEmailSizeLimit
         }
         val clusterSesAwsRegion = clusterService.clusterSettings.get(EMAIL_SES_AWS_REGION)
         if (clusterSesAwsRegion != null) {
@@ -370,6 +407,10 @@ internal object PluginSettings {
         clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_LIMIT_MONTHLY) {
             emailMonthlyLimit = it
             log.info("$PLUGIN_NAME:$EMAIL_LIMIT_MONTHLY_KEY -updatedTo-> $it")
+        }
+        clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_SIZE_LIMIT) {
+            emailSizeLimit = it
+            log.info("$PLUGIN_NAME:$EMAIL_SIZE_LIMIT_KEY -updatedTo-> $it")
         }
         clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_SES_AWS_REGION) {
             sesAwsRegion = it
