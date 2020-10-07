@@ -17,7 +17,6 @@
 package com.amazon.opendistroforelasticsearch.notifications.security
 
 import org.elasticsearch.SpecialPermission
-import java.io.IOException
 import java.security.AccessController
 import java.security.PrivilegedActionException
 import java.security.PrivilegedExceptionAction
@@ -31,13 +30,13 @@ internal object SecurityAccess {
     /**
      * Execute the operation in privileged mode.
      */
-    @Throws(IOException::class)
+    @Throws(Exception::class)
     fun <T> doPrivileged(operation: PrivilegedExceptionAction<T>?): T {
         SpecialPermission.check()
         return try {
             AccessController.doPrivileged(operation)
         } catch (e: PrivilegedActionException) {
-            throw (e.cause as IOException?)!!
+            throw (e.cause as Exception?)!!
         }
     }
 }

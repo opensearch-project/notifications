@@ -21,6 +21,7 @@ import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
 import com.amazon.opendistroforelasticsearch.notifications.security.SecurityAccess
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
+import com.sun.mail.util.MailConnectException
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.rest.RestStatus
 import java.util.Properties
@@ -62,6 +63,8 @@ internal object SmtpChannel : BaseEmailChannel() {
             ChannelMessageResponse(RestStatus.OK, "Success")
         } catch (exception: SendFailedException) {
             ChannelMessageResponse(RestStatus.BAD_GATEWAY, getMessagingExceptionText(exception))
+        } catch (exception: MailConnectException) {
+            ChannelMessageResponse(RestStatus.SERVICE_UNAVAILABLE, getMessagingExceptionText(exception))
         } catch (exception: MessagingException) {
             ChannelMessageResponse(RestStatus.FAILED_DEPENDENCY, getMessagingExceptionText(exception))
         }
