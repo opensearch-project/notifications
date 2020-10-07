@@ -20,6 +20,12 @@ opendistro.notifications:
   general:
     operationTimeoutMs: 60000 # 60 seconds, Minimum 100ms
   email:
-    channel: "ses" # smtp
+    channel: "smtp" # ses or smtp, provide corresponding sections
     fromAddress: "from@email.com"
     monthlyLimit: 200
+    ses: # Configuration for Amazon SES email delivery
+      awsRegion: "us-west-2"
+    smtp: # Configuration for SMTP email delivery
+      host: "localhost"
+      port: 587
+      transportMethod: "starttls" # starttls, ssl or plain

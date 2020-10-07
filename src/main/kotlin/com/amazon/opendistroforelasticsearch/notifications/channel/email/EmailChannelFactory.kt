@@ -27,8 +27,8 @@ import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettin
  */
 internal object EmailChannelFactory : ChannelProvider {
     const val EMAIL_PREFIX = "mailto:"
-    private val channelMap = mapOf(
-        EmailChannelType.SMTP.stringValue to EmptyChannel,
+    private val channelMap: Map<String, NotificationChannel> = mapOf(
+        EmailChannelType.SMTP.stringValue to SmtpChannel,
         EmailChannelType.SES.stringValue to SesChannel
     )
 

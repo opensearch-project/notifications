@@ -17,12 +17,10 @@
 package com.amazon.opendistroforelasticsearch.notifications.channel.email
 
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
-import com.amazon.opendistroforelasticsearch.notifications.channel.NotificationChannel
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
 import com.amazon.opendistroforelasticsearch.notifications.security.SecurityAccess
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
-import com.amazon.opendistroforelasticsearch.notifications.throttle.Counters
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.rest.RestStatus
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
@@ -39,72 +37,32 @@ import software.amazon.awssdk.services.ses.model.RawMessage
 import software.amazon.awssdk.services.ses.model.SendRawEmailRequest
 import software.amazon.awssdk.services.ses.model.SesException
 import java.io.ByteArrayOutputStream
-import java.io.IOException
-import javax.mail.MessagingException
-import javax.mail.internet.AddressException
+import java.util.Properties
+import javax.mail.Session
 import javax.mail.internet.MimeMessage
 
 /**
  * Notification channel for sending mail over Amazon SES.
  */
-internal object SesChannel : NotificationChannel {
+internal object SesChannel : BaseEmailChannel() {
     private val log = LogManager.getLogger(javaClass)
 
     /**
      * {@inheritDoc}
      */
-    override fun updateCounter(refTag: String, recipient: String, channelMessage: ChannelMessage, counter: Counters) {
-        counter.emailSentSuccessCount.incrementAndGet()
+    override fun prepareSession(refTag: String, recipient: String, channelMessage: ChannelMessage): Session {
+        val prop = Properties()
+        prop["mail.transport.protocol"] = "smtp"
+        return Session.getInstance(prop)
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage, counter: Counters): ChannelMessageResponse {
-        val retStatus = sendEmail(refTag, recipient, channelMessage)
-        if (retStatus.statusCode == RestStatus.OK) {
-            counter.emailSentSuccessCount.incrementAndGet()
-        } else {
-            counter.emailSentFailureCount.incrementAndGet()
-        }
-        return retStatus
-    }
-
-    /**
-     * Sending mime message over Amazon SES.
-     * @param refTag ref tag for logging purpose
-     * @param recipient email recipient to send mail to
-     * @param channelMessage email message information to compose email
-     * @return Channel message response
-     */
-    private fun sendEmail(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
-        val fromAddress = PluginSettings.emailFromAddress
-        if (PluginSettings.UNCONFIGURED_EMAIL_ADDRESS == fromAddress) {
-            return ChannelMessageResponse(RestStatus.NOT_IMPLEMENTED, "Email from: address not configured")
-        }
-        val mimeMessage: MimeMessage
-        return try {
-            mimeMessage = EmailMimeProvider.prepareMimeMessage(fromAddress, recipient, channelMessage)
-            sendMimeMessage(refTag, mimeMessage)
-        } catch (addressException: AddressException) {
-            ChannelMessageResponse(RestStatus.BAD_REQUEST, "recipient parsing failed with status:${addressException.message}")
-        } catch (messagingException: MessagingException) {
-            ChannelMessageResponse(RestStatus.FAILED_DEPENDENCY, "Email message creation failed with status:${messagingException.message}")
-        } catch (ioException: IOException) {
-            ChannelMessageResponse(RestStatus.FAILED_DEPENDENCY, "Email message creation failed with status:${ioException.message}")
-        }
-    }
-
-    /**
-     * Sending mime message over Amazon SES.
-     * @param refTag ref tag for logging purpose
-     * @param mimeMessage mime message to send to Amazon SES
-     * @return Channel message response
-     */
-    private fun sendMimeMessage(refTag: String, mimeMessage: MimeMessage): ChannelMessageResponse {
+    override fun sendMimeMessage(refTag: String, mimeMessage: MimeMessage): ChannelMessageResponse {
         return try {
             log.debug("$PLUGIN_NAME:Sending Email-SES:$refTag")
-            val region = Region.US_WEST_2
+            val region = Region.of(PluginSettings.sesAwsRegion)
             val client = SecurityAccess.doPrivileged {
                 SesClient.builder().region(region).credentialsProvider(DefaultCredentialsProvider.create()).build()
             }

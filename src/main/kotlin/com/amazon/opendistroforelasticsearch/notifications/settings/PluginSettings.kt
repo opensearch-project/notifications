@@ -24,6 +24,7 @@ import org.elasticsearch.common.settings.Setting
 import org.elasticsearch.common.settings.Setting.Property.Dynamic
 import org.elasticsearch.common.settings.Setting.Property.NodeScope
 import org.elasticsearch.common.settings.Settings
+import software.amazon.awssdk.regions.Region
 import java.io.IOException
 import java.nio.file.Path
 
@@ -33,24 +34,54 @@ import java.nio.file.Path
 internal object PluginSettings {
 
     /**
+     * Settings Key prefix for this plugin.
+     */
+    private const val KEY_PREFIX = "opendistro.notifications"
+
+    /**
+     * Settings Key prefix for this plugin.
+     */
+    private const val EMAIL_KEY_PREFIX = "$KEY_PREFIX.email"
+
+    /**
      * Operation timeout for network operations.
      */
-    private const val OPERATION_TIMEOUT_MS_KEY = "opendistro.notifications.general.operationTimeoutMs"
+    private const val OPERATION_TIMEOUT_MS_KEY = "$KEY_PREFIX.general.operationTimeoutMs"
 
     /**
      * Setting to choose smtp or SES for sending mail.
      */
-    private const val EMAIL_CHANNEL_KEY = "opendistro.notifications.email.channel"
+    private const val EMAIL_CHANNEL_KEY = "$EMAIL_KEY_PREFIX.channel"
 
     /**
      * "From:" email address while sending email.
      */
-    private const val EMAIL_FROM_ADDRESS_KEY = "opendistro.notifications.email.fromAddress"
+    private const val EMAIL_FROM_ADDRESS_KEY = "$EMAIL_KEY_PREFIX.fromAddress"
 
     /**
      * Monthly email sending limit from this plugin.
      */
-    private const val EMAIL_LIMIT_MONTHLY_KEY = "opendistro.notifications.email.monthlyLimit"
+    private const val EMAIL_LIMIT_MONTHLY_KEY = "$EMAIL_KEY_PREFIX.monthlyLimit"
+
+    /**
+     * Amazon SES AWS region to send mail to.
+     */
+    private const val EMAIL_SES_AWS_REGION_KEY = "$EMAIL_KEY_PREFIX.ses.awsRegion"
+
+    /**
+     * SMTP host address to send mail to.
+     */
+    private const val EMAIL_SMTP_HOST_KEY = "$EMAIL_KEY_PREFIX.smtp.host"
+
+    /**
+     * SMTP port number to send mail to.
+     */
+    private const val EMAIL_SMTP_PORT_KEY = "$EMAIL_KEY_PREFIX.smtp.port"
+
+    /**
+     * SMTP Transport method. starttls, ssl or plain.
+     */
+    private const val EMAIL_SMTP_TRANSPORT_METHOD_KEY = "$EMAIL_KEY_PREFIX.smtp.transportMethod"
 
     /**
      * Default operation timeout for network operations.
@@ -63,9 +94,34 @@ internal object PluginSettings {
     private const val MINIMUM_OPERATION_TIMEOUT_MS = 100L
 
     /**
+     * Default email channel.
+     */
+    private val DEFAULT_EMAIL_CHANNEL = EmailChannelType.SMTP.stringValue
+
+    /**
      * Default monthly email sending limit from this plugin.
      */
     private const val DEFAULT_EMAIL_LIMIT_MONTHLY = 200
+
+    /**
+     * Default Amazon SES AWS region.
+     */
+    private val DEFAULT_SES_AWS_REGION = Region.US_WEST_2.id()
+
+    /**
+     * Default SMTP Host name to connect to.
+     */
+    private const val DEFAULT_SMTP_HOST = "localhost"
+
+    /**
+     * Default SMTP port number to connect to.
+     */
+    private const val DEFAULT_SMTP_PORT = 587
+
+    /**
+     * Default SMTP transport method.
+     */
+    private const val DEFAULT_SMTP_TRANSPORT_METHOD = "starttls"
 
     /**
      * If the "From:" email address is set to below value then email will NOT be submitted to server.
@@ -97,6 +153,30 @@ internal object PluginSettings {
     @Volatile
     var emailMonthlyLimit: Int
 
+    /**
+     * Amazon SES AWS region setting
+     */
+    @Volatile
+    var sesAwsRegion: String
+
+    /**
+     * SMTP server host setting
+     */
+    @Volatile
+    var smtpHost: String
+
+    /**
+     * SMTP server port setting
+     */
+    @Volatile
+    var smtpPort: Int
+
+    /**
+     * SMTP server transport method setting
+     */
+    @Volatile
+    var smtpTransportMethod: String
+
     private const val DECIMAL_RADIX: Int = 10
 
     private val log = LogManager.getLogger(javaClass)
@@ -115,15 +195,23 @@ internal object PluginSettings {
         }
         // Initialize the settings values to default values
         operationTimeoutMs = (settings?.get(OPERATION_TIMEOUT_MS_KEY)?.toLong()) ?: DEFAULT_OPERATION_TIMEOUT_MS
-        emailChannel = (settings?.get(EMAIL_CHANNEL_KEY) ?: EmailChannelType.SMTP.stringValue)
+        emailChannel = (settings?.get(EMAIL_CHANNEL_KEY) ?: DEFAULT_EMAIL_CHANNEL)
         emailFromAddress = (settings?.get(EMAIL_FROM_ADDRESS_KEY) ?: UNCONFIGURED_EMAIL_ADDRESS)
         emailMonthlyLimit = (settings?.get(EMAIL_LIMIT_MONTHLY_KEY)?.toInt()) ?: DEFAULT_EMAIL_LIMIT_MONTHLY
+        sesAwsRegion = (settings?.get(EMAIL_SES_AWS_REGION_KEY) ?: DEFAULT_SES_AWS_REGION)
+        smtpHost = (settings?.get(EMAIL_SMTP_HOST_KEY) ?: DEFAULT_SMTP_HOST)
+        smtpPort = (settings?.get(EMAIL_SMTP_PORT_KEY)?.toInt()) ?: DEFAULT_SMTP_PORT
+        smtpTransportMethod = (settings?.get(EMAIL_SMTP_TRANSPORT_METHOD_KEY) ?: DEFAULT_SMTP_TRANSPORT_METHOD)
 
         defaultSettings = mapOf(
             OPERATION_TIMEOUT_MS_KEY to operationTimeoutMs.toString(DECIMAL_RADIX),
             EMAIL_CHANNEL_KEY to emailChannel,
             EMAIL_FROM_ADDRESS_KEY to emailFromAddress,
-            EMAIL_LIMIT_MONTHLY_KEY to emailMonthlyLimit.toString(DECIMAL_RADIX)
+            EMAIL_LIMIT_MONTHLY_KEY to emailMonthlyLimit.toString(DECIMAL_RADIX),
+            EMAIL_SES_AWS_REGION_KEY to sesAwsRegion,
+            EMAIL_SMTP_HOST_KEY to smtpHost,
+            EMAIL_SMTP_PORT_KEY to smtpPort.toString(DECIMAL_RADIX),
+            EMAIL_SMTP_TRANSPORT_METHOD_KEY to smtpTransportMethod
         )
     }
 
@@ -153,6 +241,31 @@ internal object PluginSettings {
         NodeScope, Dynamic
     )
 
+    private val EMAIL_SES_AWS_REGION: Setting<String> = Setting.simpleString(
+        EMAIL_SES_AWS_REGION_KEY,
+        defaultSettings[EMAIL_SES_AWS_REGION_KEY],
+        NodeScope, Dynamic
+    )
+
+    private val EMAIL_SMTP_HOST: Setting<String> = Setting.simpleString(
+        EMAIL_SMTP_HOST_KEY,
+        defaultSettings[EMAIL_SMTP_HOST_KEY],
+        NodeScope, Dynamic
+    )
+
+    private val EMAIL_SMTP_PORT: Setting<Int> = Setting.intSetting(
+        EMAIL_SMTP_PORT_KEY,
+        defaultSettings[EMAIL_SMTP_PORT_KEY]!!.toInt(),
+        0,
+        NodeScope, Dynamic
+    )
+
+    private val EMAIL_SMTP_TRANSPORT_METHOD: Setting<String> = Setting.simpleString(
+        EMAIL_SMTP_TRANSPORT_METHOD_KEY,
+        defaultSettings[EMAIL_SMTP_TRANSPORT_METHOD_KEY],
+        NodeScope, Dynamic
+    )
+
     /**
      * Returns list of additional settings available specific to this plugin.
      *
@@ -162,19 +275,34 @@ internal object PluginSettings {
         return listOf(OPERATION_TIMEOUT_MS,
             EMAIL_CHANNEL,
             EMAIL_FROM_ADDRESS,
-            EMAIL_LIMIT_MONTHLY
+            EMAIL_LIMIT_MONTHLY,
+            EMAIL_SES_AWS_REGION,
+            EMAIL_SMTP_HOST,
+            EMAIL_SMTP_PORT,
+            EMAIL_SMTP_TRANSPORT_METHOD
         )
     }
 
-    fun addSettingsUpdateConsumer(clusterService: ClusterService) {
-        // Update the variables to setting values
+    /**
+     * Update the setting variables to setting values from local settings
+     * @param clusterService cluster service instance
+     */
+    private fun updateSettingValuesFromLocal(clusterService: ClusterService) {
         operationTimeoutMs = OPERATION_TIMEOUT_MS.get(clusterService.settings)
         emailChannel = EMAIL_CHANNEL.get(clusterService.settings)
         emailFromAddress = EMAIL_FROM_ADDRESS.get(clusterService.settings)
         emailMonthlyLimit = EMAIL_LIMIT_MONTHLY.get(clusterService.settings)
+        sesAwsRegion = EMAIL_SES_AWS_REGION.get(clusterService.settings)
+        smtpHost = EMAIL_SMTP_HOST.get(clusterService.settings)
+        smtpPort = EMAIL_SMTP_PORT.get(clusterService.settings)
+        smtpTransportMethod = EMAIL_SMTP_TRANSPORT_METHOD.get(clusterService.settings)
+    }
 
-        // Update the variables to cluster setting values
-        // If the cluster is not yet started then we get default values again
+    /**
+     * Update the setting variables to setting values from cluster settings
+     * @param clusterService cluster service instance
+     */
+    private fun updateSettingValuesFromCluster(clusterService: ClusterService) {
         val clusterOperationTimeoutMs = clusterService.clusterSettings.get(OPERATION_TIMEOUT_MS)
         if (clusterOperationTimeoutMs != null) {
             log.debug("$PLUGIN_NAME:$OPERATION_TIMEOUT_MS_KEY -autoUpdatedTo-> $clusterOperationTimeoutMs")
@@ -195,6 +323,37 @@ internal object PluginSettings {
             log.debug("$PLUGIN_NAME:$EMAIL_LIMIT_MONTHLY_KEY -autoUpdatedTo-> $clusterEmailMonthlyLimit")
             emailMonthlyLimit = clusterEmailMonthlyLimit
         }
+        val clusterSesAwsRegion = clusterService.clusterSettings.get(EMAIL_SES_AWS_REGION)
+        if (clusterSesAwsRegion != null) {
+            log.debug("$PLUGIN_NAME:$EMAIL_SES_AWS_REGION_KEY -autoUpdatedTo-> $clusterSesAwsRegion")
+            sesAwsRegion = clusterSesAwsRegion
+        }
+        val clusterSmtpHost = clusterService.clusterSettings.get(EMAIL_SMTP_HOST)
+        if (clusterSmtpHost != null) {
+            log.debug("$PLUGIN_NAME:$EMAIL_SMTP_HOST_KEY -autoUpdatedTo-> $clusterSmtpHost")
+            smtpHost = clusterSmtpHost
+        }
+        val clusterSmtpPort = clusterService.clusterSettings.get(EMAIL_SMTP_PORT)
+        if (clusterSmtpPort != null) {
+            log.debug("$PLUGIN_NAME:$EMAIL_SMTP_PORT_KEY -autoUpdatedTo-> $clusterSmtpPort")
+            smtpPort = clusterSmtpPort
+        }
+        val clusterSmtpTransportMethod = clusterService.clusterSettings.get(EMAIL_SMTP_TRANSPORT_METHOD)
+        if (clusterSmtpTransportMethod != null) {
+            log.debug("$PLUGIN_NAME:$EMAIL_SMTP_TRANSPORT_METHOD_KEY -autoUpdatedTo-> $clusterSmtpTransportMethod")
+            smtpTransportMethod = clusterSmtpTransportMethod
+        }
+    }
+
+    /**
+     * adds Settings update listeners to all settings.
+     * @param clusterService cluster service instance
+     */
+    fun addSettingsUpdateConsumer(clusterService: ClusterService) {
+        updateSettingValuesFromLocal(clusterService)
+        // Update the variables to cluster setting values
+        // If the cluster is not yet started then we get default values again
+        updateSettingValuesFromCluster(clusterService)
 
         clusterService.clusterSettings.addSettingsUpdateConsumer(OPERATION_TIMEOUT_MS) {
             operationTimeoutMs = it
@@ -211,6 +370,22 @@ internal object PluginSettings {
         clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_LIMIT_MONTHLY) {
             emailMonthlyLimit = it
             log.info("$PLUGIN_NAME:$EMAIL_LIMIT_MONTHLY_KEY -updatedTo-> $it")
+        }
+        clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_SES_AWS_REGION) {
+            sesAwsRegion = it
+            log.info("$PLUGIN_NAME:$EMAIL_SES_AWS_REGION_KEY -updatedTo-> $it")
+        }
+        clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_SMTP_HOST) {
+            smtpHost = it
+            log.info("$PLUGIN_NAME:$EMAIL_SMTP_HOST_KEY -updatedTo-> $it")
+        }
+        clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_SMTP_PORT) {
+            smtpPort = it
+            log.info("$PLUGIN_NAME:$EMAIL_SMTP_PORT_KEY -updatedTo-> $it")
+        }
+        clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_SMTP_TRANSPORT_METHOD) {
+            smtpTransportMethod = it
+            log.info("$PLUGIN_NAME:$EMAIL_SMTP_TRANSPORT_METHOD_KEY -updatedTo-> $it")
         }
     }
 }

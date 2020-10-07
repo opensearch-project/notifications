@@ -18,7 +18,6 @@ package com.amazon.opendistroforelasticsearch.notifications.channel.email
 
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
 import java.util.Base64
-import java.util.Properties
 import javax.activation.DataHandler
 import javax.mail.Message
 import javax.mail.Session
@@ -33,16 +32,13 @@ import javax.mail.util.ByteArrayDataSource
 internal object EmailMimeProvider {
     /**
      * Create and prepare mime message to send mail
+     * @param session The mail session to use to create mime message
      * @param fromAddress "From:" address of the email message
      * @param recipient "To:" address of the email message
      * @param channelMessage The message to send notification
      * @return The created and prepared mime message object
      */
-    fun prepareMimeMessage(fromAddress: String, recipient: String, channelMessage: ChannelMessage): MimeMessage {
-        val prop = Properties()
-        prop.put("mail.transport.protocol", "smtp")
-        val session = Session.getInstance(prop)
-
+    fun prepareMimeMessage(session: Session, fromAddress: String, recipient: String, channelMessage: ChannelMessage): MimeMessage {
         // Create a new MimeMessage object
         val message = MimeMessage(session)
 
