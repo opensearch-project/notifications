@@ -22,6 +22,7 @@ import com.amazon.opendistroforelasticsearch.notifications.throttle.CounterIndex
 import com.amazon.opendistroforelasticsearch.notifications.throttle.CounterIndexModel.Companion.MAX_ITEMS_IN_MONTH
 import com.amazon.opendistroforelasticsearch.notifications.throttle.CounterIndexModel.Companion.getIdForDate
 import com.amazon.opendistroforelasticsearch.notifications.throttle.CounterIndexModel.Companion.getIdForStartOfMonth
+import com.amazon.opendistroforelasticsearch.notifications.util.SecureIndexClient
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.ResourceAlreadyExistsException
 import org.elasticsearch.action.DocWriteResponse
@@ -47,8 +48,13 @@ import java.util.concurrent.TimeUnit
 /**
  * Class for doing ES index operation to maintain counters in cluster.
  */
-internal class CounterIndex(private val client: Client, private val clusterService: ClusterService) : MessageCounter {
+internal class CounterIndex(client: Client, private val clusterService: ClusterService) : MessageCounter {
     private val log = LogManager.getLogger(javaClass)
+    private val client: Client
+
+    init {
+        this.client = SecureIndexClient(client)
+    }
 
     companion object {
         private const val COUNTER_INDEX_NAME = ".opendistro-notifications-counter"
