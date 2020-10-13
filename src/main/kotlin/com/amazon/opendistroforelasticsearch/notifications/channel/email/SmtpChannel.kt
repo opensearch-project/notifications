@@ -58,8 +58,8 @@ internal object SmtpChannel : BaseEmailChannel() {
     override fun sendMimeMessage(refTag: String, mimeMessage: MimeMessage): ChannelMessageResponse {
         return try {
             log.debug("$PLUGIN_NAME:Sending Email-SMTP:$refTag")
-            val response = SecurityAccess.doPrivileged { Transport.send(mimeMessage) }
-            log.info("$PLUGIN_NAME:Email-SMTP:$refTag status:$response")
+            SecurityAccess.doPrivileged { Transport.send(mimeMessage) }
+            log.info("$PLUGIN_NAME:Email-SMTP:$refTag sent")
             ChannelMessageResponse(RestStatus.OK, "Success")
         } catch (exception: SendFailedException) {
             ChannelMessageResponse(RestStatus.BAD_GATEWAY, getMessagingExceptionText(exception))
@@ -75,5 +75,8 @@ internal object SmtpChannel : BaseEmailChannel() {
      * @param exception Messaging Exception
      * @return generated error string
      */
-    private fun getMessagingExceptionText(exception: MessagingException) = "sendEmail error, status:${exception.message}"
+    private fun getMessagingExceptionText(exception: MessagingException): String {
+        log.info("$PLUGIN_NAME:EmailException $exception")
+        return "sendEmail Error, status:${exception.message}"
+    }
 }

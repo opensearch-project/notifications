@@ -14,9 +14,11 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notifications.core
+package com.amazon.opendistroforelasticsearch.notifications.action
 
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
+import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
+import com.amazon.opendistroforelasticsearch.notifications.core.NotificationMessage
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils.ensureExpectedToken

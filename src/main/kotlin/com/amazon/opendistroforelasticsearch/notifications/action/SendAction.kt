@@ -20,7 +20,6 @@ import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Co
 import com.amazon.opendistroforelasticsearch.notifications.channel.ChannelFactory
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
 import com.amazon.opendistroforelasticsearch.notifications.core.NotificationMessage
-import com.amazon.opendistroforelasticsearch.notifications.core.RestRequestParser
 import com.amazon.opendistroforelasticsearch.notifications.throttle.Accountant
 import com.amazon.opendistroforelasticsearch.notifications.throttle.Counters
 import kotlinx.coroutines.Dispatchers
@@ -71,20 +70,28 @@ internal class SendAction(
                 launch(Dispatchers.IO) { Accountant.incrementCounters(counters) }
                 // Get all the response in sequence
                 statusList.forEach {
-                    if (it.second.statusCode != RestStatus.OK) {
-                        restStatus = RestStatus.MULTI_STATUS // if any of the value != success then return 207
+                    val statusCode = it.second.statusCode
+                    val statusText = it.second.statusText
+                    if (statusCode != RestStatus.OK) {
+                        // if any of the value != success then return corresponding status or 207
+                        if (statusCode != restStatus) {
+                            restStatus = RestStatus.MULTI_STATUS
+                        }
                     }
                     response.startObject()
                         .field("recipient", it.first)
-                        .field("statusCode", it.second.statusCode.status)
-                        .field("statusText", it.second.statusText)
+                        .field("statusCode", statusCode.status)
+                        .field("statusText", statusText)
                         .endObject()
+                    log.info("$PLUGIN_NAME:${message.refTag}:statusCode=$statusCode, statusText=$statusText")
                 }
                 response.endArray()
             } else {
                 restStatus = RestStatus.TOO_MANY_REQUESTS
+                val statusText = "Message Sending quota not available"
                 response.field("statusCode", restStatus)
-                    .field("statusText", "Message Sending quota not available")
+                    .field("statusText", statusText)
+                log.info("$PLUGIN_NAME:${message.refTag}:statusCode=$restStatus, statusText=$statusText")
             }
         }
         response.endObject()

@@ -107,7 +107,8 @@ internal object SesChannel : BaseEmailChannel() {
      */
     private fun getSesExceptionText(exception: SesException): String {
         val httpResponse = exception.awsErrorDetails().sdkHttpResponse()
-        return "sendEmail error, SES status:${httpResponse.statusCode()}:${httpResponse.statusText()}"
+        log.info("$PLUGIN_NAME:SesException $exception")
+        return "sendEmail Error, SES status:${httpResponse.statusCode()}:${httpResponse.statusText()}"
     }
 
     /**
@@ -115,5 +116,8 @@ internal object SesChannel : BaseEmailChannel() {
      * @param exception SDK Exception
      * @return generated error string
      */
-    private fun getSdkExceptionText(exception: SdkException) = "sendEmail error, SDK status:${exception.message}"
+    private fun getSdkExceptionText(exception: SdkException): String {
+        log.info("$PLUGIN_NAME:SdkException $exception")
+        return "sendEmail Error, SDK status:${exception.message}"
+    }
 }
