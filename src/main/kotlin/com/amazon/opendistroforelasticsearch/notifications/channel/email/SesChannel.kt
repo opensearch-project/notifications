@@ -16,12 +16,12 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.channel.email
 
-import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
 import com.amazon.opendistroforelasticsearch.notifications.security.SecurityAccess
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
-import org.apache.logging.log4j.LogManager
+import com.amazon.opendistroforelasticsearch.notifications.util.logger
 import org.elasticsearch.rest.RestStatus
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import software.amazon.awssdk.core.SdkBytes
@@ -45,7 +45,7 @@ import javax.mail.internet.MimeMessage
  * Notification channel for sending mail over Amazon SES.
  */
 internal object SesChannel : BaseEmailChannel() {
-    private val log = LogManager.getLogger(javaClass)
+    private val log by logger(javaClass)
 
     /**
      * {@inheritDoc}
@@ -61,7 +61,7 @@ internal object SesChannel : BaseEmailChannel() {
      */
     override fun sendMimeMessage(refTag: String, mimeMessage: MimeMessage): ChannelMessageResponse {
         return try {
-            log.debug("$PLUGIN_NAME:Sending Email-SES:$refTag")
+            log.debug("$LOG_PREFIX:Sending Email-SES:$refTag")
             val region = Region.of(PluginSettings.sesAwsRegion)
             val client = SecurityAccess.doPrivileged {
                 SesClient.builder().region(region).credentialsProvider(DefaultCredentialsProvider.create()).build()
@@ -78,7 +78,7 @@ internal object SesChannel : BaseEmailChannel() {
                     .rawMessage(rawMessage)
                     .build()
                 val response = SecurityAccess.doPrivileged { client.sendRawEmail(rawEmailRequest) }
-                log.info("$PLUGIN_NAME:Email-SES:$refTag status:$response")
+                log.info("$LOG_PREFIX:Email-SES:$refTag status:$response")
                 ChannelMessageResponse(RestStatus.OK, "Success")
             } else {
                 ChannelMessageResponse(RestStatus.REQUEST_ENTITY_TOO_LARGE, "Email size($emailSize) larger than ${PluginSettings.emailSizeLimit}")
@@ -107,7 +107,7 @@ internal object SesChannel : BaseEmailChannel() {
      */
     private fun getSesExceptionText(exception: SesException): String {
         val httpResponse = exception.awsErrorDetails().sdkHttpResponse()
-        log.info("$PLUGIN_NAME:SesException $exception")
+        log.info("$LOG_PREFIX:SesException $exception")
         return "sendEmail Error, SES status:${httpResponse.statusCode()}:${httpResponse.statusText()}"
     }
 
@@ -117,7 +117,7 @@ internal object SesChannel : BaseEmailChannel() {
      * @return generated error string
      */
     private fun getSdkExceptionText(exception: SdkException): String {
-        log.info("$PLUGIN_NAME:SdkException $exception")
+        log.info("$LOG_PREFIX:SdkException $exception")
         return "sendEmail Error, SDK status:${exception.message}"
     }
 }

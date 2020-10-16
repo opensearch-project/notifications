@@ -16,10 +16,10 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.resthandler
 
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
-import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
 import com.amazon.opendistroforelasticsearch.notifications.action.SendAction
-import org.apache.logging.log4j.LogManager
+import com.amazon.opendistroforelasticsearch.notifications.util.logger
 import org.elasticsearch.client.node.NodeClient
 import org.elasticsearch.rest.BaseRestHandler
 import org.elasticsearch.rest.BaseRestHandler.RestChannelConsumer
@@ -32,10 +32,10 @@ import java.io.IOException
  * Rest handler for sending notification.
  * This handler [SendAction] for sending notification.
  */
-class SendRestHandler : BaseRestHandler() {
-    private val log = LogManager.getLogger(javaClass)
+internal class SendRestHandler : BaseRestHandler() {
 
     companion object {
+        private val log by logger(SendRestHandler::class.java)
         const val SEND_BASE_URI = "$PLUGIN_BASE_URI/send"
     }
 
@@ -59,7 +59,7 @@ class SendRestHandler : BaseRestHandler() {
     @Throws(IOException::class)
     @Suppress("SpreadOperator") // There is no way around dealing with java vararg without spread operator.
     override fun prepareRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
-        log.debug("$PLUGIN_NAME:prepareRequest")
+        log.debug("$LOG_PREFIX:prepareRequest")
         return RestChannelConsumer {
             SendAction(request, client, it).send()
         }

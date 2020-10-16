@@ -15,11 +15,8 @@
 #
 ##
 
-# Schema file for the notifications counter index
-# Since we only search based on "counter_day", other fields are not used in mapping to avoid index on those fields.
-# Also "dynamic" is set to "false" so that other fields can be added.
-dynamic: false
-properties:
-  counter_day:
-    type: date
-    format: strict_date # "yyyy-MM-dd"
+# Settings file for the notifications counter index
+index:
+  number_of_shards: "1"
+  auto_expand_replicas: "0-1"
+  number_of_replicas: "0"

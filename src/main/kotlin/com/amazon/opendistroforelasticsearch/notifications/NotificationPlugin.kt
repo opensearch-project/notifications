@@ -19,7 +19,7 @@ package com.amazon.opendistroforelasticsearch.notifications
 import com.amazon.opendistroforelasticsearch.notifications.resthandler.SendRestHandler
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import com.amazon.opendistroforelasticsearch.notifications.throttle.Accountant
-import org.apache.logging.log4j.LogManager
+import com.amazon.opendistroforelasticsearch.notifications.util.logger
 import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.ActionResponse
 import org.elasticsearch.client.Client
@@ -51,11 +51,13 @@ import java.util.function.Supplier
  */
 internal class NotificationPlugin : ActionPlugin, Plugin() {
 
-    private val log = LogManager.getLogger(javaClass)
     lateinit var clusterService: ClusterService // initialized in createComponents()
 
     companion object {
+        private val log by logger(NotificationPlugin::class.java)
+
         const val PLUGIN_NAME = "opendistro-notifications"
+        const val LOG_PREFIX = "notifications"
         const val PLUGIN_BASE_URI = "/_opendistro/_notifications"
     }
 
@@ -63,7 +65,7 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
      * {@inheritDoc}
      */
     override fun getSettings(): List<Setting<*>> {
-        log.debug("$PLUGIN_NAME:getSettings")
+        log.debug("$LOG_PREFIX:getSettings")
         return PluginSettings.getAllSettings()
     }
 
@@ -83,7 +85,7 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
         indexNameExpressionResolver: IndexNameExpressionResolver,
         repositoriesServiceSupplier: Supplier<RepositoriesService>
     ): Collection<Any> {
-        log.debug("$PLUGIN_NAME:createComponents")
+        log.debug("$LOG_PREFIX:createComponents")
         this.clusterService = clusterService
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         Accountant.initialize(client, clusterService)
@@ -94,7 +96,7 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
      * {@inheritDoc}
      */
     override fun getActions(): List<ActionPlugin.ActionHandler<out ActionRequest, out ActionResponse>> {
-        log.debug("$PLUGIN_NAME:getActions")
+        log.debug("$LOG_PREFIX:getActions")
         return listOf()
     }
 
@@ -110,7 +112,7 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
         indexNameExpressionResolver: IndexNameExpressionResolver,
         nodesInCluster: Supplier<DiscoveryNodes>
     ): List<RestHandler> {
-        log.debug("$PLUGIN_NAME:getRestHandlers")
+        log.debug("$LOG_PREFIX:getRestHandlers")
         return listOf(
             SendRestHandler()
         )

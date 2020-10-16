@@ -16,14 +16,14 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.throttle
 
-import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import com.amazon.opendistroforelasticsearch.notifications.throttle.CounterIndexModel.Companion.COUNTER_INDEX_MODEL_KEY
 import com.amazon.opendistroforelasticsearch.notifications.throttle.CounterIndexModel.Companion.MAX_ITEMS_IN_MONTH
 import com.amazon.opendistroforelasticsearch.notifications.throttle.CounterIndexModel.Companion.getIdForDate
 import com.amazon.opendistroforelasticsearch.notifications.throttle.CounterIndexModel.Companion.getIdForStartOfMonth
 import com.amazon.opendistroforelasticsearch.notifications.util.SecureIndexClient
-import org.apache.logging.log4j.LogManager
+import com.amazon.opendistroforelasticsearch.notifications.util.logger
 import org.elasticsearch.ResourceAlreadyExistsException
 import org.elasticsearch.action.DocWriteResponse
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest
@@ -49,7 +49,6 @@ import java.util.concurrent.TimeUnit
  * Class for doing ES index operation to maintain counters in cluster.
  */
 internal class CounterIndex(client: Client, private val clusterService: ClusterService) : MessageCounter {
-    private val log = LogManager.getLogger(javaClass)
     private val client: Client
 
     init {
@@ -57,8 +56,10 @@ internal class CounterIndex(client: Client, private val clusterService: ClusterS
     }
 
     companion object {
+        private val log by logger(CounterIndex::class.java)
         private const val COUNTER_INDEX_NAME = ".opendistro-notifications-counter"
         private const val COUNTER_INDEX_SCHEMA_FILE_NAME = "opendistro-notifications-counter.yml"
+        private const val COUNTER_INDEX_SETTINGS_FILE_NAME = "opendistro-notifications-counter-settings.yml"
         private const val MAPPING_TYPE = "_doc"
     }
 
@@ -93,7 +94,7 @@ internal class CounterIndex(client: Client, private val clusterService: ClusterS
                 retValue.emailSentSuccessCount.addAndGet(modelValues.emailSentSuccessCount)
                 retValue.emailSentFailureCount.addAndGet(modelValues.emailSentFailureCount)
             }
-            log.info("$PLUGIN_NAME:getCounterForMonth:$retValue")
+            log.info("$LOG_PREFIX:getCounterForMonth:$retValue")
         }
         return retValue
     }
@@ -111,10 +112,10 @@ internal class CounterIndex(client: Client, private val clusterService: ClusterS
             isIncremented = try {
                 incrementCounterIndexFor(counterDay, counters)
             } catch (ignored: VersionConflictEngineException) {
-                log.info("$PLUGIN_NAME:VersionConflictEngineException retrying")
+                log.info("$LOG_PREFIX:VersionConflictEngineException retrying")
                 false
             } catch (ignored: DocumentMissingException) {
-                log.info("$PLUGIN_NAME:DocumentMissingException retrying")
+                log.info("$LOG_PREFIX:DocumentMissingException retrying")
                 false
             } catch (exception: Exception) {
                 throw exception
@@ -128,15 +129,17 @@ internal class CounterIndex(client: Client, private val clusterService: ClusterS
     @Suppress("TooGenericExceptionCaught")
     private fun createIndex() {
         val indexMappingSource = CounterIndex::class.java.classLoader.getResource(COUNTER_INDEX_SCHEMA_FILE_NAME)?.readText()!!
+        val indexSettingsSource = CounterIndex::class.java.classLoader.getResource(COUNTER_INDEX_SETTINGS_FILE_NAME)?.readText()!!
         val request = CreateIndexRequest(COUNTER_INDEX_NAME)
             .mapping(MAPPING_TYPE, indexMappingSource, XContentType.YAML)
+            .settings(indexSettingsSource, XContentType.YAML)
         try {
             val actionFuture = client.admin().indices().create(request)
             val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
             if (response.isAcknowledged) {
-                log.info("$PLUGIN_NAME:Index $COUNTER_INDEX_NAME creation Acknowledged")
+                log.info("$LOG_PREFIX:Index $COUNTER_INDEX_NAME creation Acknowledged")
             } else {
-                throw IllegalStateException("$PLUGIN_NAME:Index $COUNTER_INDEX_NAME creation not Acknowledged")
+                throw IllegalStateException("$LOG_PREFIX:Index $COUNTER_INDEX_NAME creation not Acknowledged")
             }
         } catch (exception: Exception) {
             if (exception !is ResourceAlreadyExistsException && exception.cause !is ResourceAlreadyExistsException) {
@@ -193,7 +196,7 @@ internal class CounterIndex(client: Client, private val clusterService: ClusterS
             .create(true)
         val actionFuture = client.index(indexRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        log.debug("$PLUGIN_NAME:CounterIndex createCounterIndex - $counters status:${response.result}")
+        log.debug("$LOG_PREFIX:CounterIndex createCounterIndex - $counters status:${response.result}")
         return response.result == DocWriteResponse.Result.CREATED
     }
 
@@ -213,7 +216,7 @@ internal class CounterIndex(client: Client, private val clusterService: ClusterS
             .fetchSource(true)
         val actionFuture = client.update(updateRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        log.debug("$PLUGIN_NAME:CounterIndex updateCounterIndex - $counterIndexModel status:${response.result}")
+        log.debug("$LOG_PREFIX:CounterIndex updateCounterIndex - $counterIndexModel status:${response.result}")
         return response.result == DocWriteResponse.Result.UPDATED
     }
 
@@ -225,7 +228,7 @@ internal class CounterIndex(client: Client, private val clusterService: ClusterS
      */
     private fun incrementCounterIndexFor(counterDay: Date, counters: Counters): Boolean {
         val currentValue = getCounterIndexFor(counterDay)
-        log.debug("$PLUGIN_NAME:CounterIndex currentValue - $currentValue")
+        log.debug("$LOG_PREFIX:CounterIndex currentValue - $currentValue")
         return if (currentValue.seqNo == SequenceNumbers.UNASSIGNED_SEQ_NO) {
             createCounterIndexFor(counterDay, counters)
         } else {

@@ -16,6 +16,8 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.throttle
 
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
+import com.amazon.opendistroforelasticsearch.notifications.util.logger
 import org.elasticsearch.common.xcontent.ToXContent
 import org.elasticsearch.common.xcontent.ToXContentObject
 import org.elasticsearch.common.xcontent.XContentBuilder
@@ -43,6 +45,7 @@ internal data class CounterIndexModel(
     val primaryTerm: Long = SequenceNumbers.UNASSIGNED_PRIMARY_TERM
 ) : ToXContentObject {
     companion object {
+        private val log by logger(CounterIndexModel::class.java)
         private const val COUNTER_DAY_TAG = "counter_day"
         private const val REQUEST_COUNT_TAG = "request_count"
         private const val EMAIL_SENT_SUCCESS_COUNT = "email_sent_success_count"
@@ -115,7 +118,10 @@ internal data class CounterIndexModel(
                     REQUEST_COUNT_TAG -> requestCount = parser.intValue()
                     EMAIL_SENT_SUCCESS_COUNT -> emailSentSuccessCount = parser.intValue()
                     EMAIL_SENT_FAILURE_COUNT -> emailSentFailureCount = parser.intValue()
-                    else -> throw IllegalArgumentException("CounterIndexModel:Unknown field $fieldName")
+                    else -> {
+                        parser.skipChildren()
+                        log.warn("$LOG_PREFIX:Skipping Unknown field $fieldName")
+                    }
                 }
             }
             counterDay ?: throw IllegalArgumentException("$COUNTER_DAY_TAG field not present")

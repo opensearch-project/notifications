@@ -16,18 +16,18 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.action
 
-import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.notifications.channel.ChannelFactory
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
 import com.amazon.opendistroforelasticsearch.notifications.core.NotificationMessage
 import com.amazon.opendistroforelasticsearch.notifications.throttle.Accountant
 import com.amazon.opendistroforelasticsearch.notifications.throttle.Counters
+import com.amazon.opendistroforelasticsearch.notifications.util.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.apache.logging.log4j.LogManager
 import org.elasticsearch.client.node.NodeClient
 import org.elasticsearch.common.xcontent.XContentType
 import org.elasticsearch.rest.BytesRestResponse
@@ -43,13 +43,16 @@ internal class SendAction(
     private val client: NodeClient,
     private val restChannel: RestChannel
 ) {
-    private val log = LogManager.getLogger(javaClass)
+
+    companion object {
+        private val log by logger(SendAction::class.java)
+    }
 
     /**
      * Send notification for the given [request] on the provided [restChannel].
      */
     fun send() {
-        log.debug("$PLUGIN_NAME:send")
+        log.debug("$LOG_PREFIX:send")
         val message = RestRequestParser.parse(request)
         val response = restChannel.newBuilder(XContentType.JSON, false).startObject()
             .field("refTag", message.refTag)
@@ -83,7 +86,7 @@ internal class SendAction(
                         .field("statusCode", statusCode.status)
                         .field("statusText", statusText)
                         .endObject()
-                    log.info("$PLUGIN_NAME:${message.refTag}:statusCode=$statusCode, statusText=$statusText")
+                    log.info("$LOG_PREFIX:${message.refTag}:statusCode=$statusCode, statusText=$statusText")
                 }
                 response.endArray()
             } else {
@@ -91,7 +94,7 @@ internal class SendAction(
                 val statusText = "Message Sending quota not available"
                 response.field("statusCode", restStatus)
                     .field("statusText", statusText)
-                log.info("$PLUGIN_NAME:${message.refTag}:statusCode=$restStatus, statusText=$statusText")
+                log.info("$LOG_PREFIX:${message.refTag}:statusCode=$restStatus, statusText=$statusText")
             }
         }
         response.endObject()

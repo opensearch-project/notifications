@@ -16,10 +16,11 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.action
 
-import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notifications.core.NotificationMessage
-import org.apache.logging.log4j.LogManager
+import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.notifications.util.stringList
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils.ensureExpectedToken
 import org.elasticsearch.rest.RestRequest
@@ -28,7 +29,7 @@ import org.elasticsearch.rest.RestRequest
  * This object parses the Rest request for notification plugin.
  */
 internal object RestRequestParser {
-    private val log = LogManager.getLogger(javaClass)
+    private val log by logger(javaClass)
 
     /**
      * Parses request and returns object data.
@@ -37,7 +38,7 @@ internal object RestRequestParser {
      * @return parsed object [NotificationMessage]
      */
     fun parse(request: RestRequest): NotificationMessage {
-        log.debug("$PLUGIN_NAME:RestRequestParser")
+        log.debug("$LOG_PREFIX:RestRequestParser")
         val contentParser = request.contentOrSourceParamParser()
         contentParser.nextToken()
         return parseNotificationMessage(contentParser)
@@ -55,22 +56,21 @@ internal object RestRequestParser {
         var textDescription: String? = null
         var htmlDescription: String? = null
         var attachment: ChannelMessage.Attachment? = null
-        val recipients: MutableList<String> = mutableListOf()
+        var recipients: List<String> = listOf()
         ensureExpectedToken(XContentParser.Token.START_OBJECT, contentParser.currentToken(), contentParser::getTokenLocation)
         while (contentParser.nextToken() != XContentParser.Token.END_OBJECT) {
             val fieldName = contentParser.currentName()
             contentParser.nextToken()
             when (fieldName) {
                 "refTag" -> refTag = contentParser.text()
-                "recipients" -> {
-                    parseRecipients(contentParser, recipients)
-                }
+                "recipients" -> recipients = contentParser.stringList()
                 "title" -> title = contentParser.text()
                 "textDescription" -> textDescription = contentParser.text()
                 "htmlDescription" -> htmlDescription = contentParser.text()
                 "attachment" -> attachment = parseAttachment(contentParser)
                 else -> {
                     contentParser.skipChildren()
+                    log.warn("$LOG_PREFIX:Skipping Unknown field $fieldName")
                 }
             }
         }
@@ -83,18 +83,6 @@ internal object RestRequestParser {
         return NotificationMessage(refTag,
             recipients.toList(),
             ChannelMessage(title, textDescription, htmlDescription, attachment))
-    }
-
-    /**
-     * Parse "recipients" section of json
-     * @param contentParser opened content parser
-     * @param recipients parsed recipients added to this mutable list
-     */
-    private fun parseRecipients(contentParser: XContentParser, recipients: MutableList<String>) {
-        ensureExpectedToken(XContentParser.Token.START_ARRAY, contentParser.currentToken(), contentParser::getTokenLocation)
-        while (contentParser.nextToken() != XContentParser.Token.END_ARRAY) {
-            recipients.add(contentParser.text())
-        }
     }
 
     /**
@@ -116,6 +104,10 @@ internal object RestRequestParser {
                 "fileEncoding" -> fileEncoding = contentParser.text()
                 "fileData" -> fileData = contentParser.text()
                 "fileContentType" -> fileContentType = contentParser.text()
+                else -> {
+                    contentParser.skipChildren()
+                    log.warn("$LOG_PREFIX:Skipping Unknown field $dataType")
+                }
             }
         }
         fileName ?: throw IllegalArgumentException("attachment:fileName not present")

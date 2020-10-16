@@ -16,13 +16,13 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.channel.email
 
-import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
 import com.amazon.opendistroforelasticsearch.notifications.security.SecurityAccess
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
+import com.amazon.opendistroforelasticsearch.notifications.util.logger
 import com.sun.mail.util.MailConnectException
-import org.apache.logging.log4j.LogManager
 import org.elasticsearch.rest.RestStatus
 import java.util.Properties
 import javax.mail.MessagingException
@@ -35,7 +35,7 @@ import javax.mail.internet.MimeMessage
  * Notification channel for sending mail over SMTP server.
  */
 internal object SmtpChannel : BaseEmailChannel() {
-    private val log = LogManager.getLogger(javaClass)
+    private val log by logger(javaClass)
 
     /**
      * {@inheritDoc}
@@ -57,9 +57,9 @@ internal object SmtpChannel : BaseEmailChannel() {
      */
     override fun sendMimeMessage(refTag: String, mimeMessage: MimeMessage): ChannelMessageResponse {
         return try {
-            log.debug("$PLUGIN_NAME:Sending Email-SMTP:$refTag")
+            log.debug("$LOG_PREFIX:Sending Email-SMTP:$refTag")
             SecurityAccess.doPrivileged { Transport.send(mimeMessage) }
-            log.info("$PLUGIN_NAME:Email-SMTP:$refTag sent")
+            log.info("$LOG_PREFIX:Email-SMTP:$refTag sent")
             ChannelMessageResponse(RestStatus.OK, "Success")
         } catch (exception: SendFailedException) {
             ChannelMessageResponse(RestStatus.BAD_GATEWAY, getMessagingExceptionText(exception))
@@ -76,7 +76,7 @@ internal object SmtpChannel : BaseEmailChannel() {
      * @return generated error string
      */
     private fun getMessagingExceptionText(exception: MessagingException): String {
-        log.info("$PLUGIN_NAME:EmailException $exception")
+        log.info("$LOG_PREFIX:EmailException $exception")
         return "sendEmail Error, status:${exception.message}"
     }
 }

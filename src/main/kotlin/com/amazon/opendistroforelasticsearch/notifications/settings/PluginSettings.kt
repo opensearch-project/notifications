@@ -16,8 +16,9 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.settings
 
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
-import org.apache.logging.log4j.LogManager
+import com.amazon.opendistroforelasticsearch.notifications.util.logger
 import org.elasticsearch.bootstrap.BootstrapInfo
 import org.elasticsearch.cluster.service.ClusterService
 import org.elasticsearch.common.settings.Setting
@@ -200,7 +201,7 @@ internal object PluginSettings {
 
     private const val DECIMAL_RADIX: Int = 10
 
-    private val log = LogManager.getLogger(javaClass)
+    private val log by logger(javaClass)
     private val defaultSettings: Map<String, String>
 
     init {
@@ -211,7 +212,7 @@ internal object PluginSettings {
             try {
                 settings = Settings.builder().loadFromPath(defaultSettingYmlFile).build()
             } catch (exception: IOException) {
-                log.warn("$PLUGIN_NAME:Failed to load ${defaultSettingYmlFile.toAbsolutePath()}")
+                log.warn("$LOG_PREFIX:Failed to load ${defaultSettingYmlFile.toAbsolutePath()}")
             }
         }
         // Initialize the settings values to default values
@@ -337,47 +338,47 @@ internal object PluginSettings {
     private fun updateSettingValuesFromCluster(clusterService: ClusterService) {
         val clusterOperationTimeoutMs = clusterService.clusterSettings.get(OPERATION_TIMEOUT_MS)
         if (clusterOperationTimeoutMs != null) {
-            log.debug("$PLUGIN_NAME:$OPERATION_TIMEOUT_MS_KEY -autoUpdatedTo-> $clusterOperationTimeoutMs")
+            log.debug("$LOG_PREFIX:$OPERATION_TIMEOUT_MS_KEY -autoUpdatedTo-> $clusterOperationTimeoutMs")
             operationTimeoutMs = clusterOperationTimeoutMs
         }
         val clusterEmailChannel = clusterService.clusterSettings.get(EMAIL_CHANNEL)
         if (clusterEmailChannel != null) {
-            log.debug("$PLUGIN_NAME:$EMAIL_CHANNEL_KEY -autoUpdatedTo-> $clusterEmailChannel")
+            log.debug("$LOG_PREFIX:$EMAIL_CHANNEL_KEY -autoUpdatedTo-> $clusterEmailChannel")
             emailChannel = clusterEmailChannel
         }
         val clusterEmailFromAddress = clusterService.clusterSettings.get(EMAIL_FROM_ADDRESS)
         if (clusterEmailFromAddress != null) {
-            log.debug("$PLUGIN_NAME:$EMAIL_FROM_ADDRESS_KEY -autoUpdatedTo-> $clusterEmailFromAddress")
+            log.debug("$LOG_PREFIX:$EMAIL_FROM_ADDRESS_KEY -autoUpdatedTo-> $clusterEmailFromAddress")
             emailFromAddress = clusterEmailFromAddress
         }
         val clusterEmailMonthlyLimit = clusterService.clusterSettings.get(EMAIL_LIMIT_MONTHLY)
         if (clusterEmailMonthlyLimit != null) {
-            log.debug("$PLUGIN_NAME:$EMAIL_LIMIT_MONTHLY_KEY -autoUpdatedTo-> $clusterEmailMonthlyLimit")
+            log.debug("$LOG_PREFIX:$EMAIL_LIMIT_MONTHLY_KEY -autoUpdatedTo-> $clusterEmailMonthlyLimit")
             emailMonthlyLimit = clusterEmailMonthlyLimit
         }
         val clusterEmailSizeLimit = clusterService.clusterSettings.get(EMAIL_SIZE_LIMIT)
         if (clusterEmailSizeLimit != null) {
-            log.debug("$PLUGIN_NAME:$EMAIL_SIZE_LIMIT_KEY -autoUpdatedTo-> $clusterEmailSizeLimit")
+            log.debug("$LOG_PREFIX:$EMAIL_SIZE_LIMIT_KEY -autoUpdatedTo-> $clusterEmailSizeLimit")
             emailSizeLimit = clusterEmailSizeLimit
         }
         val clusterSesAwsRegion = clusterService.clusterSettings.get(EMAIL_SES_AWS_REGION)
         if (clusterSesAwsRegion != null) {
-            log.debug("$PLUGIN_NAME:$EMAIL_SES_AWS_REGION_KEY -autoUpdatedTo-> $clusterSesAwsRegion")
+            log.debug("$LOG_PREFIX:$EMAIL_SES_AWS_REGION_KEY -autoUpdatedTo-> $clusterSesAwsRegion")
             sesAwsRegion = clusterSesAwsRegion
         }
         val clusterSmtpHost = clusterService.clusterSettings.get(EMAIL_SMTP_HOST)
         if (clusterSmtpHost != null) {
-            log.debug("$PLUGIN_NAME:$EMAIL_SMTP_HOST_KEY -autoUpdatedTo-> $clusterSmtpHost")
+            log.debug("$LOG_PREFIX:$EMAIL_SMTP_HOST_KEY -autoUpdatedTo-> $clusterSmtpHost")
             smtpHost = clusterSmtpHost
         }
         val clusterSmtpPort = clusterService.clusterSettings.get(EMAIL_SMTP_PORT)
         if (clusterSmtpPort != null) {
-            log.debug("$PLUGIN_NAME:$EMAIL_SMTP_PORT_KEY -autoUpdatedTo-> $clusterSmtpPort")
+            log.debug("$LOG_PREFIX:$EMAIL_SMTP_PORT_KEY -autoUpdatedTo-> $clusterSmtpPort")
             smtpPort = clusterSmtpPort
         }
         val clusterSmtpTransportMethod = clusterService.clusterSettings.get(EMAIL_SMTP_TRANSPORT_METHOD)
         if (clusterSmtpTransportMethod != null) {
-            log.debug("$PLUGIN_NAME:$EMAIL_SMTP_TRANSPORT_METHOD_KEY -autoUpdatedTo-> $clusterSmtpTransportMethod")
+            log.debug("$LOG_PREFIX:$EMAIL_SMTP_TRANSPORT_METHOD_KEY -autoUpdatedTo-> $clusterSmtpTransportMethod")
             smtpTransportMethod = clusterSmtpTransportMethod
         }
     }
@@ -394,39 +395,39 @@ internal object PluginSettings {
 
         clusterService.clusterSettings.addSettingsUpdateConsumer(OPERATION_TIMEOUT_MS) {
             operationTimeoutMs = it
-            log.info("$PLUGIN_NAME:$OPERATION_TIMEOUT_MS_KEY -updatedTo-> $it")
+            log.info("$LOG_PREFIX:$OPERATION_TIMEOUT_MS_KEY -updatedTo-> $it")
         }
         clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_CHANNEL) {
             emailChannel = it
-            log.info("$PLUGIN_NAME:$EMAIL_CHANNEL_KEY -updatedTo-> $it")
+            log.info("$LOG_PREFIX:$EMAIL_CHANNEL_KEY -updatedTo-> $it")
         }
         clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_FROM_ADDRESS) {
             emailFromAddress = it
-            log.info("$PLUGIN_NAME:$EMAIL_FROM_ADDRESS_KEY -updatedTo-> $it")
+            log.info("$LOG_PREFIX:$EMAIL_FROM_ADDRESS_KEY -updatedTo-> $it")
         }
         clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_LIMIT_MONTHLY) {
             emailMonthlyLimit = it
-            log.info("$PLUGIN_NAME:$EMAIL_LIMIT_MONTHLY_KEY -updatedTo-> $it")
+            log.info("$LOG_PREFIX:$EMAIL_LIMIT_MONTHLY_KEY -updatedTo-> $it")
         }
         clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_SIZE_LIMIT) {
             emailSizeLimit = it
-            log.info("$PLUGIN_NAME:$EMAIL_SIZE_LIMIT_KEY -updatedTo-> $it")
+            log.info("$LOG_PREFIX:$EMAIL_SIZE_LIMIT_KEY -updatedTo-> $it")
         }
         clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_SES_AWS_REGION) {
             sesAwsRegion = it
-            log.info("$PLUGIN_NAME:$EMAIL_SES_AWS_REGION_KEY -updatedTo-> $it")
+            log.info("$LOG_PREFIX:$EMAIL_SES_AWS_REGION_KEY -updatedTo-> $it")
         }
         clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_SMTP_HOST) {
             smtpHost = it
-            log.info("$PLUGIN_NAME:$EMAIL_SMTP_HOST_KEY -updatedTo-> $it")
+            log.info("$LOG_PREFIX:$EMAIL_SMTP_HOST_KEY -updatedTo-> $it")
         }
         clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_SMTP_PORT) {
             smtpPort = it
-            log.info("$PLUGIN_NAME:$EMAIL_SMTP_PORT_KEY -updatedTo-> $it")
+            log.info("$LOG_PREFIX:$EMAIL_SMTP_PORT_KEY -updatedTo-> $it")
         }
         clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_SMTP_TRANSPORT_METHOD) {
             smtpTransportMethod = it
-            log.info("$PLUGIN_NAME:$EMAIL_SMTP_TRANSPORT_METHOD_KEY -updatedTo-> $it")
+            log.info("$LOG_PREFIX:$EMAIL_SMTP_TRANSPORT_METHOD_KEY -updatedTo-> $it")
         }
     }
 }
