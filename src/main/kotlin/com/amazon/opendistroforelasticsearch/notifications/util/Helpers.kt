@@ -30,6 +30,6 @@ internal fun XContentParser.stringList(): List<String> {
     return retList
 }
 
-fun <T : Any> logger(forClass: Class<T>): Lazy<Logger> {
+internal fun <T : Any> logger(forClass: Class<T>): Lazy<Logger> {
     return lazy { LogManager.getLogger(forClass) }
 }

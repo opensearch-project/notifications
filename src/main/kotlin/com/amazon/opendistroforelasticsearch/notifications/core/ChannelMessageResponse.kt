@@ -16,6 +16,14 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.core
 
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
+import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import org.elasticsearch.common.xcontent.ToXContent
+import org.elasticsearch.common.xcontent.ToXContentObject
+import org.elasticsearch.common.xcontent.XContentBuilder
+import org.elasticsearch.common.xcontent.XContentFactory
+import org.elasticsearch.common.xcontent.XContentParser
+import org.elasticsearch.common.xcontent.XContentParserUtils
 import org.elasticsearch.rest.RestStatus
 
 /**
@@ -24,4 +32,56 @@ import org.elasticsearch.rest.RestStatus
 internal data class ChannelMessageResponse(
     val statusCode: RestStatus,
     val statusText: String
-)
+) : ToXContentObject {
+    internal companion object {
+        private val log by logger(ChannelMessageResponse::class.java)
+        const val STATUS_CODE_TAG = "statusCode"
+        const val STATUS_TEXT_TAG = "statusText"
+
+        /**
+         * Parse the data from parser and create ChannelMessageResponse object
+         * @param parser data referenced at parser
+         * @return created ChannelMessageResponse object
+         */
+        fun parse(parser: XContentParser): ChannelMessageResponse {
+            var statusCode: RestStatus? = null
+            var statusText: String? = null
+            XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser::getTokenLocation)
+            while (XContentParser.Token.END_OBJECT != parser.nextToken()) {
+                val fieldName = parser.currentName()
+                parser.nextToken()
+                when (fieldName) {
+                    STATUS_CODE_TAG -> statusCode = RestStatus.fromCode(parser.intValue())
+                    STATUS_TEXT_TAG -> statusText = parser.text()
+                    else -> {
+                        parser.skipChildren()
+                        log.info("$LOG_PREFIX:ChannelMessageResponse Skipping Unknown field $fieldName")
+                    }
+                }
+            }
+            statusCode ?: throw IllegalArgumentException("$STATUS_CODE_TAG field absent")
+            statusText ?: throw IllegalArgumentException("$STATUS_TEXT_TAG field absent")
+            return ChannelMessageResponse(statusCode, statusText)
+        }
+    }
+
+    /**
+     * create XContentBuilder from this object using [XContentFactory.jsonBuilder()]
+     * @return created XContentBuilder object
+     */
+    fun toXContent(): XContentBuilder? {
+        return toXContent(XContentFactory.jsonBuilder(), ToXContent.EMPTY_PARAMS)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
+        builder!!
+        builder.startObject()
+            .field(STATUS_CODE_TAG, statusCode.status)
+            .field(STATUS_TEXT_TAG, statusText)
+            .endObject()
+        return builder
+    }
+}

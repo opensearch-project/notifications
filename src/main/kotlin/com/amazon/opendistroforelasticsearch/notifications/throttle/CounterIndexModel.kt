@@ -44,7 +44,7 @@ internal data class CounterIndexModel(
     val seqNo: Long = SequenceNumbers.UNASSIGNED_SEQ_NO,
     val primaryTerm: Long = SequenceNumbers.UNASSIGNED_PRIMARY_TERM
 ) : ToXContentObject {
-    companion object {
+    internal companion object {
         private val log by logger(CounterIndexModel::class.java)
         private const val COUNTER_DAY_TAG = "counter_day"
         private const val REQUEST_COUNT_TAG = "request_count"

@@ -53,7 +53,7 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
 
     lateinit var clusterService: ClusterService // initialized in createComponents()
 
-    companion object {
+    internal companion object {
         private val log by logger(NotificationPlugin::class.java)
 
         const val PLUGIN_NAME = "opendistro-notifications"

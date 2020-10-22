@@ -16,25 +16,24 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.resthandler
 
-import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import com.amazon.opendistroforelasticsearch.notifications.action.SendAction
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
 import org.elasticsearch.client.node.NodeClient
-import org.elasticsearch.rest.BaseRestHandler
-import org.elasticsearch.rest.BaseRestHandler.RestChannelConsumer
+import org.elasticsearch.rest.BytesRestResponse
+import org.elasticsearch.rest.RestChannel
 import org.elasticsearch.rest.RestHandler.Route
 import org.elasticsearch.rest.RestRequest
 import org.elasticsearch.rest.RestRequest.Method.POST
-import java.io.IOException
+import org.elasticsearch.rest.RestStatus
 
 /**
  * Rest handler for sending notification.
  * This handler [SendAction] for sending notification.
  */
-internal class SendRestHandler : BaseRestHandler() {
+internal class SendRestHandler : PluginRestHandler() {
 
-    companion object {
+    internal companion object {
         private val log by logger(SendRestHandler::class.java)
         const val SEND_BASE_URI = "$PLUGIN_BASE_URI/send"
     }
@@ -56,12 +55,18 @@ internal class SendRestHandler : BaseRestHandler() {
     /**
      * {@inheritDoc}
      */
-    @Throws(IOException::class)
-    @Suppress("SpreadOperator") // There is no way around dealing with java vararg without spread operator.
-    override fun prepareRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
-        log.debug("$LOG_PREFIX:prepareRequest")
-        return RestChannelConsumer {
-            SendAction(request, client, it).send()
+    override fun responseParams(): Set<String> {
+        return setOf()
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun executeRequest(request: RestRequest, client: NodeClient, channel: RestChannel) {
+        val handler = SendAction(request, client, channel)
+        when (request.method()) {
+            POST -> handler.send()
+            else -> channel.sendResponse(BytesRestResponse(RestStatus.METHOD_NOT_ALLOWED, "${request.method()} is not allowed"))
         }
     }
 }

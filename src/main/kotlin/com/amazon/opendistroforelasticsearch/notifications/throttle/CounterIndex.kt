@@ -55,7 +55,7 @@ internal class CounterIndex(client: Client, private val clusterService: ClusterS
         this.client = SecureIndexClient(client)
     }
 
-    companion object {
+    internal companion object {
         private val log by logger(CounterIndex::class.java)
         private const val COUNTER_INDEX_NAME = ".opendistro-notifications-counter"
         private const val COUNTER_INDEX_SCHEMA_FILE_NAME = "opendistro-notifications-counter.yml"

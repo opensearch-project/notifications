@@ -16,6 +16,9 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.core
 
+import org.elasticsearch.common.xcontent.XContentParser
+import org.elasticsearch.common.xcontent.XContentParserUtils
+
 /**
  * Data class for storing channel message.
  */
@@ -33,5 +36,37 @@ internal data class ChannelMessage(
         val fileEncoding: String,
         val fileData: String,
         val fileContentType: String?
-    )
+    ) {
+        internal companion object {
+            /**
+             * Parse the data from parser and create Attachment object
+             * @param parser data referenced at parser
+             * @return created Attachment object
+             */
+            fun parse(parser: XContentParser): Attachment {
+                var fileName: String? = null
+                var fileEncoding: String? = null
+                var fileData: String? = null
+                var fileContentType: String? = null
+                XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser::getTokenLocation)
+                while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
+                    val dataType = parser.currentName()
+                    parser.nextToken()
+                    when (dataType) {
+                        "fileName" -> fileName = parser.text()
+                        "fileEncoding" -> fileEncoding = parser.text()
+                        "fileData" -> fileData = parser.text()
+                        "fileContentType" -> fileContentType = parser.text()
+                        else -> {
+                            parser.skipChildren()
+                        }
+                    }
+                }
+                fileName ?: throw IllegalArgumentException("attachment:fileName not present")
+                fileEncoding ?: throw IllegalArgumentException("attachment:fileEncoding not present")
+                fileData ?: throw IllegalArgumentException("attachment:fileData not present")
+                return Attachment(fileName, fileEncoding, fileData, fileContentType)
+            }
+        }
+    }
 }
