@@ -21,7 +21,7 @@ jobs:
       - name: Create Artifact Path
         run: |
           mkdir -p notifications-build
-          cp -r ./plugin/build/distributions/*.zip notifications-builds/
+          cp -r ./build/distributions/*.zip notifications-builds/
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1
