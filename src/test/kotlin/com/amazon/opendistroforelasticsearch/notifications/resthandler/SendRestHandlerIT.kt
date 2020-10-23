@@ -16,9 +16,9 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.resthandler
 
-import org.elasticsearch.test.ESIntegTestCase
+import com.amazon.opendistroforelasticsearch.notifications.ODFERestTestCase
 
-internal class SendRestHandlerIT : ESIntegTestCase() {
+internal class SendRestHandlerIT : ODFERestTestCase() {
 
     fun sendRestHandler() {
     }

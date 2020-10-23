@@ -95,6 +95,8 @@ configurations.all {
         force "org.apache.httpcomponents:httpclient:4.5.10" // resolve for awssdk:ses
         force "org.apache.httpcomponents:httpcore:4.4.12" // resolve for awssdk:ses
     }
+    // conflict with spring-jcl
+    exclude group: "commons-logging", module: "commons-logging"
 }
 
 dependencies {
@@ -116,6 +118,9 @@ dependencies {
     testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
     testCompile "org.mockito:mockito-core:2.23.0"
+    testCompile 'com.google.code.gson:gson:2.8.6'
+    testCompile 'org.springframework.integration:spring-integration-mail:5.2.5.RELEASE'
+    testImplementation 'org.springframework.integration:spring-integration-test-support:5.2.5.RELEASE'
 
     ktlint "com.pinterest:ktlint:0.33.0"
 }

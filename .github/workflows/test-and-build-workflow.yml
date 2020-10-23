@@ -33,7 +33,7 @@ jobs:
           java-version: 1.14
 
       - name: Build with Gradle
-        run: ./gradlew build assemble
+        run: ./gradlew build -x :integTestRunner -x :jacocoTestReport # exclude integTest task to avoid permission denied issue
 
       - name: Create Artifact Path
         run: |
