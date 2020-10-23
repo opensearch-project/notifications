@@ -1,0 +1,47 @@
+---
+##
+# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the License.
+# A copy of the License is located at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# or in the "license" file accompanying this file. This file is distributed
+# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+# express or implied. See the License for the specific language governing
+# permissions and limitations under the License.
+#
+##
+
+name: Notifications Test and Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set up JDK 1.14
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.14
+
+      - name: Build with Gradle
+        run: ./gradlew build assemble
+
+      - name: Create Artifact Path
+        run: |
+          mkdir -p notifications-build
+          cp -r ./build/distributions/*.zip notifications-build/
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: notifications
+          path: notifications-build
