@@ -66,6 +66,20 @@ fun verifyResponse(response: JsonObject, refTag: String, recipients: List<String
     }
 }
 
+fun getStatusCode(response: JsonObject): Int {
+    return response
+        .getAsJsonArray("recipients")
+        .get(0).asJsonObject
+        .get("statusCode").asInt
+}
+
+fun getStatusText(response: JsonObject): String {
+    return response
+        .getAsJsonArray("recipients")
+        .get(0).asJsonObject
+        .get("statusText").asString
+}
+
 /** Util class to build Json entity of request body */
 class NotificationsJsonEntity(
     private val refTag: String?,
