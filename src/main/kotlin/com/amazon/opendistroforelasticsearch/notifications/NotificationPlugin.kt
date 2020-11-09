@@ -16,7 +16,8 @@
 
 package com.amazon.opendistroforelasticsearch.notifications
 
-import com.amazon.opendistroforelasticsearch.notifications.resthandler.SendRestHandler
+import com.amazon.opendistroforelasticsearch.notifications.action.SendMessageAction
+import com.amazon.opendistroforelasticsearch.notifications.resthandler.SendMessageRestHandler
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import com.amazon.opendistroforelasticsearch.notifications.throttle.Accountant
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
@@ -97,7 +98,9 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
      */
     override fun getActions(): List<ActionPlugin.ActionHandler<out ActionRequest, out ActionResponse>> {
         log.debug("$LOG_PREFIX:getActions")
-        return listOf()
+        return listOf(
+            ActionPlugin.ActionHandler(SendMessageAction.ACTION_TYPE, SendMessageAction::class.java)
+        )
     }
 
     /**
@@ -114,7 +117,7 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
     ): List<RestHandler> {
         log.debug("$LOG_PREFIX:getRestHandlers")
         return listOf(
-            SendRestHandler()
+            SendMessageRestHandler()
         )
     }
 }

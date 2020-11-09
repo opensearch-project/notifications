@@ -16,8 +16,8 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.channel
 
-import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
-import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
+import com.amazon.opendistroforelasticsearch.notifications.model.ChannelMessage
+import com.amazon.opendistroforelasticsearch.notifications.model.ChannelMessageResponse
 import com.amazon.opendistroforelasticsearch.notifications.throttle.Counters
 
 /**

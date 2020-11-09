@@ -16,11 +16,12 @@
 
 package com.amazon.opendistroforelasticsearch.notifications
 
-import com.amazon.opendistroforelasticsearch.notifications.resthandler.SendRestHandler.Companion.SEND_BASE_URI
+import com.amazon.opendistroforelasticsearch.notifications.resthandler.SendMessageRestHandler.Companion.SEND_BASE_URI
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import com.google.gson.JsonObject
 import org.elasticsearch.client.Request
 import org.elasticsearch.client.RequestOptions
+import org.elasticsearch.client.ResponseException
 import org.junit.After
 import org.junit.Before
 import org.springframework.integration.test.mail.TestMailServer
@@ -71,7 +72,11 @@ abstract class NotificationsRestTestCase : ODFERestTestCase() {
     }
 
     protected fun executeRequest(request: Request): JsonObject {
-        val response = client().performRequest(request)
+        val response = try {
+            client().performRequest(request)
+        } catch (exception: ResponseException) {
+            exception.response
+        }
         val responseBody = getResponseBody(response, true)
         return jsonify(responseBody)
     }

@@ -16,7 +16,7 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.channel.email
 
-import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
+import com.amazon.opendistroforelasticsearch.notifications.model.ChannelMessage
 import java.util.Base64
 import javax.activation.DataHandler
 import javax.mail.Message

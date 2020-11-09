@@ -25,7 +25,7 @@ import com.amazon.opendistroforelasticsearch.notifications.verifyResponse
 import org.elasticsearch.rest.RestStatus
 
 internal class SmtpChannelIT : NotificationsRestTestCase() {
-    private val refTag = "sample raf name"
+    private val refTag = "sample ref name"
     private val title = "sample title"
     private val textDescription = "Description for notification in text"
     private val htmlDescription = "Description for notification in json encode html format"

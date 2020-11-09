@@ -14,8 +14,14 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notifications.core
+package com.amazon.opendistroforelasticsearch.notifications.model
 
+import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
+import com.amazon.opendistroforelasticsearch.notifications.util.fieldIfNotNull
+import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import org.elasticsearch.common.xcontent.ToXContent
+import org.elasticsearch.common.xcontent.ToXContentObject
+import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils
 
@@ -36,8 +42,14 @@ internal data class ChannelMessage(
         val fileEncoding: String,
         val fileData: String,
         val fileContentType: String?
-    ) {
+    ) : ToXContentObject {
         internal companion object {
+            private val log by logger(Attachment::class.java)
+            private const val FILE_NAME_FIELD = "fileName"
+            private const val FILE_ENCODING_FIELD = "fileEncoding"
+            private const val FILE_DATA_FIELD = "fileData"
+            private const val FILE_CONTENT_TYPE_FIELD = "fileContentType"
+
             /**
              * Parse the data from parser and create Attachment object
              * @param parser data referenced at parser
@@ -53,12 +65,13 @@ internal data class ChannelMessage(
                     val dataType = parser.currentName()
                     parser.nextToken()
                     when (dataType) {
-                        "fileName" -> fileName = parser.text()
-                        "fileEncoding" -> fileEncoding = parser.text()
-                        "fileData" -> fileData = parser.text()
-                        "fileContentType" -> fileContentType = parser.text()
+                        FILE_NAME_FIELD -> fileName = parser.text()
+                        FILE_ENCODING_FIELD -> fileEncoding = parser.text()
+                        FILE_DATA_FIELD -> fileData = parser.text()
+                        FILE_CONTENT_TYPE_FIELD -> fileContentType = parser.text()
                         else -> {
                             parser.skipChildren()
+                            log.info("$LOG_PREFIX:Skipping Unknown field $dataType")
                         }
                     }
                 }
@@ -67,6 +80,15 @@ internal data class ChannelMessage(
                 fileData ?: throw IllegalArgumentException("attachment:fileData not present")
                 return Attachment(fileName, fileEncoding, fileData, fileContentType)
             }
+        }
+
+        override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
+            return builder!!.startObject()
+                .field(FILE_NAME_FIELD, fileName)
+                .field(FILE_ENCODING_FIELD, fileEncoding)
+                .field(FILE_DATA_FIELD, fileData)
+                .fieldIfNotNull(FILE_CONTENT_TYPE_FIELD, fileContentType)
+                .endObject()
         }
     }
 }

@@ -17,8 +17,8 @@
 package com.amazon.opendistroforelasticsearch.notifications.channel.email
 
 import com.amazon.opendistroforelasticsearch.notifications.channel.NotificationChannel
-import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
-import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
+import com.amazon.opendistroforelasticsearch.notifications.model.ChannelMessage
+import com.amazon.opendistroforelasticsearch.notifications.model.ChannelMessageResponse
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import com.amazon.opendistroforelasticsearch.notifications.throttle.Counters
 import org.elasticsearch.rest.RestStatus
@@ -67,22 +67,22 @@ internal abstract class BaseEmailChannel : NotificationChannel {
     private fun sendEmail(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
         val fromAddress = PluginSettings.emailFromAddress
         if (PluginSettings.UNCONFIGURED_EMAIL_ADDRESS == fromAddress) {
-            return ChannelMessageResponse(RestStatus.NOT_IMPLEMENTED, "Email from: address not configured")
+            return ChannelMessageResponse(recipient, RestStatus.NOT_IMPLEMENTED, "Email from: address not configured")
         }
         if (isMessageSizeOverLimit(channelMessage)) {
-            return ChannelMessageResponse(RestStatus.REQUEST_ENTITY_TOO_LARGE, "Email size larger than ${PluginSettings.emailSizeLimit}")
+            return ChannelMessageResponse(recipient, RestStatus.REQUEST_ENTITY_TOO_LARGE, "Email size larger than ${PluginSettings.emailSizeLimit}")
         }
         val mimeMessage: MimeMessage
         return try {
             val session = prepareSession(refTag, recipient, channelMessage)
             mimeMessage = EmailMimeProvider.prepareMimeMessage(session, fromAddress, recipient, channelMessage)
-            sendMimeMessage(refTag, mimeMessage)
+            sendMimeMessage(refTag, recipient, mimeMessage)
         } catch (addressException: AddressException) {
-            ChannelMessageResponse(RestStatus.BAD_REQUEST, "recipient parsing failed with status:${addressException.message}")
+            ChannelMessageResponse(recipient, RestStatus.BAD_REQUEST, "recipient parsing failed with status:${addressException.message}")
         } catch (messagingException: MessagingException) {
-            ChannelMessageResponse(RestStatus.FAILED_DEPENDENCY, "Email message creation failed with status:${messagingException.message}")
+            ChannelMessageResponse(recipient, RestStatus.FAILED_DEPENDENCY, "Email message creation failed with status:${messagingException.message}")
         } catch (ioException: IOException) {
-            ChannelMessageResponse(RestStatus.FAILED_DEPENDENCY, "Email message creation failed with status:${ioException.message}")
+            ChannelMessageResponse(recipient, RestStatus.FAILED_DEPENDENCY, "Email message creation failed with status:${ioException.message}")
         }
     }
 
@@ -114,8 +114,9 @@ internal abstract class BaseEmailChannel : NotificationChannel {
     /**
      * Sending Email mime message to server.
      * @param refTag ref tag for logging purpose
+     * @param recipient email recipient to send mail to
      * @param mimeMessage mime message to send to Email server
      * @return Channel message response
      */
-    protected abstract fun sendMimeMessage(refTag: String, mimeMessage: MimeMessage): ChannelMessageResponse
+    protected abstract fun sendMimeMessage(refTag: String, recipient: String, mimeMessage: MimeMessage): ChannelMessageResponse
 }

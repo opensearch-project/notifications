@@ -14,7 +14,7 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notifications.core
+package com.amazon.opendistroforelasticsearch.notifications.model
 
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
@@ -30,13 +30,15 @@ import org.elasticsearch.rest.RestStatus
  * Data class for storing channel message response per recipient.
  */
 internal data class ChannelMessageResponse(
+    val recipient: String,
     val statusCode: RestStatus,
     val statusText: String
 ) : ToXContentObject {
     internal companion object {
         private val log by logger(ChannelMessageResponse::class.java)
-        const val STATUS_CODE_TAG = "statusCode"
-        const val STATUS_TEXT_TAG = "statusText"
+        private const val RECIPIENT_TAG = "recipient"
+        private const val STATUS_CODE_TAG = "statusCode"
+        private const val STATUS_TEXT_TAG = "statusText"
 
         /**
          * Parse the data from parser and create ChannelMessageResponse object
@@ -44,6 +46,7 @@ internal data class ChannelMessageResponse(
          * @return created ChannelMessageResponse object
          */
         fun parse(parser: XContentParser): ChannelMessageResponse {
+            var recipient: String? = null
             var statusCode: RestStatus? = null
             var statusText: String? = null
             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser::getTokenLocation)
@@ -51,6 +54,7 @@ internal data class ChannelMessageResponse(
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
+                    RECIPIENT_TAG -> recipient = parser.text()
                     STATUS_CODE_TAG -> statusCode = RestStatus.fromCode(parser.intValue())
                     STATUS_TEXT_TAG -> statusText = parser.text()
                     else -> {
@@ -59,9 +63,10 @@ internal data class ChannelMessageResponse(
                     }
                 }
             }
+            recipient ?: throw IllegalArgumentException("$RECIPIENT_TAG field absent")
             statusCode ?: throw IllegalArgumentException("$STATUS_CODE_TAG field absent")
             statusText ?: throw IllegalArgumentException("$STATUS_TEXT_TAG field absent")
-            return ChannelMessageResponse(statusCode, statusText)
+            return ChannelMessageResponse(recipient, statusCode, statusText)
         }
     }
 
@@ -79,6 +84,7 @@ internal data class ChannelMessageResponse(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         builder.startObject()
+            .field(RECIPIENT_TAG, recipient)
             .field(STATUS_CODE_TAG, statusCode.status)
             .field(STATUS_TEXT_TAG, statusText)
             .endObject()

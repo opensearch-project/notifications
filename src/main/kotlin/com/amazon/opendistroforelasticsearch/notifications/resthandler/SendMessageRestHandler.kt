@@ -17,11 +17,14 @@
 package com.amazon.opendistroforelasticsearch.notifications.resthandler
 
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
-import com.amazon.opendistroforelasticsearch.notifications.action.SendAction
+import com.amazon.opendistroforelasticsearch.notifications.action.SendMessageAction
+import com.amazon.opendistroforelasticsearch.notifications.model.SendMessageRequest
+import com.amazon.opendistroforelasticsearch.notifications.util.contentParserNextToken
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
 import org.elasticsearch.client.node.NodeClient
+import org.elasticsearch.rest.BaseRestHandler
+import org.elasticsearch.rest.BaseRestHandler.RestChannelConsumer
 import org.elasticsearch.rest.BytesRestResponse
-import org.elasticsearch.rest.RestChannel
 import org.elasticsearch.rest.RestHandler.Route
 import org.elasticsearch.rest.RestRequest
 import org.elasticsearch.rest.RestRequest.Method.POST
@@ -31,17 +34,17 @@ import org.elasticsearch.rest.RestStatus
  * Rest handler for sending notification.
  * This handler [SendAction] for sending notification.
  */
-internal class SendRestHandler : PluginRestHandler() {
+internal class SendMessageRestHandler : BaseRestHandler() {
 
     internal companion object {
-        private val log by logger(SendRestHandler::class.java)
+        private val log by logger(SendMessageRestHandler::class.java)
         const val SEND_BASE_URI = "$PLUGIN_BASE_URI/send"
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun getName(): String = "send"
+    override fun getName(): String = "send_message"
 
     /**
      * {@inheritDoc}
@@ -62,11 +65,16 @@ internal class SendRestHandler : PluginRestHandler() {
     /**
      * {@inheritDoc}
      */
-    override fun executeRequest(request: RestRequest, client: NodeClient, channel: RestChannel) {
-        val handler = SendAction(request, client, channel)
-        when (request.method()) {
-            POST -> handler.send()
-            else -> channel.sendResponse(BytesRestResponse(RestStatus.METHOD_NOT_ALLOWED, "${request.method()} is not allowed"))
+    override fun prepareRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
+        return when (request.method()) {
+            POST -> RestChannelConsumer {
+                client.execute(SendMessageAction.ACTION_TYPE,
+                    SendMessageRequest(request.contentParserNextToken()),
+                    RestResponseToXContentListener(it))
+            }
+            else -> RestChannelConsumer {
+                it.sendResponse(BytesRestResponse(RestStatus.METHOD_NOT_ALLOWED, "${request.method()} is not allowed"))
+            }
         }
     }
 }

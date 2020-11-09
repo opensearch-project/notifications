@@ -17,8 +17,8 @@
 package com.amazon.opendistroforelasticsearch.notifications.channel.email
 
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
-import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
-import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
+import com.amazon.opendistroforelasticsearch.notifications.model.ChannelMessage
+import com.amazon.opendistroforelasticsearch.notifications.model.ChannelMessageResponse
 import com.amazon.opendistroforelasticsearch.notifications.security.SecurityAccess
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
@@ -55,18 +55,18 @@ internal object SmtpChannel : BaseEmailChannel() {
     /**
      * {@inheritDoc}
      */
-    override fun sendMimeMessage(refTag: String, mimeMessage: MimeMessage): ChannelMessageResponse {
+    override fun sendMimeMessage(refTag: String, recipient: String, mimeMessage: MimeMessage): ChannelMessageResponse {
         return try {
             log.debug("$LOG_PREFIX:Sending Email-SMTP:$refTag")
             SecurityAccess.doPrivileged { Transport.send(mimeMessage) }
             log.info("$LOG_PREFIX:Email-SMTP:$refTag sent")
-            ChannelMessageResponse(RestStatus.OK, "Success")
+            ChannelMessageResponse(recipient, RestStatus.OK, "Success")
         } catch (exception: SendFailedException) {
-            ChannelMessageResponse(RestStatus.BAD_GATEWAY, getMessagingExceptionText(exception))
+            ChannelMessageResponse(recipient, RestStatus.BAD_GATEWAY, getMessagingExceptionText(exception))
         } catch (exception: MailConnectException) {
-            ChannelMessageResponse(RestStatus.SERVICE_UNAVAILABLE, getMessagingExceptionText(exception))
+            ChannelMessageResponse(recipient, RestStatus.SERVICE_UNAVAILABLE, getMessagingExceptionText(exception))
         } catch (exception: MessagingException) {
-            ChannelMessageResponse(RestStatus.FAILED_DEPENDENCY, getMessagingExceptionText(exception))
+            ChannelMessageResponse(recipient, RestStatus.FAILED_DEPENDENCY, getMessagingExceptionText(exception))
         }
     }
 

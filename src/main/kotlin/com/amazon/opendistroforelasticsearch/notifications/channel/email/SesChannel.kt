@@ -17,8 +17,8 @@
 package com.amazon.opendistroforelasticsearch.notifications.channel.email
 
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
-import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessage
-import com.amazon.opendistroforelasticsearch.notifications.core.ChannelMessageResponse
+import com.amazon.opendistroforelasticsearch.notifications.model.ChannelMessage
+import com.amazon.opendistroforelasticsearch.notifications.model.ChannelMessageResponse
 import com.amazon.opendistroforelasticsearch.notifications.security.SecurityAccess
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
@@ -59,7 +59,7 @@ internal object SesChannel : BaseEmailChannel() {
     /**
      * {@inheritDoc}
      */
-    override fun sendMimeMessage(refTag: String, mimeMessage: MimeMessage): ChannelMessageResponse {
+    override fun sendMimeMessage(refTag: String, recipient: String, mimeMessage: MimeMessage): ChannelMessageResponse {
         return try {
             log.debug("$LOG_PREFIX:Sending Email-SES:$refTag")
             val region = Region.of(PluginSettings.sesAwsRegion)
@@ -79,24 +79,26 @@ internal object SesChannel : BaseEmailChannel() {
                     .build()
                 val response = SecurityAccess.doPrivileged { client.sendRawEmail(rawEmailRequest) }
                 log.info("$LOG_PREFIX:Email-SES:$refTag status:$response")
-                ChannelMessageResponse(RestStatus.OK, "Success")
+                ChannelMessageResponse(recipient, RestStatus.OK, "Success")
             } else {
-                ChannelMessageResponse(RestStatus.REQUEST_ENTITY_TOO_LARGE, "Email size($emailSize) larger than ${PluginSettings.emailSizeLimit}")
+                ChannelMessageResponse(recipient,
+                    RestStatus.REQUEST_ENTITY_TOO_LARGE,
+                    "Email size($emailSize) larger than ${PluginSettings.emailSizeLimit}")
             }
         } catch (exception: MessageRejectedException) {
-            ChannelMessageResponse(RestStatus.SERVICE_UNAVAILABLE, getSesExceptionText(exception))
+            ChannelMessageResponse(recipient, RestStatus.SERVICE_UNAVAILABLE, getSesExceptionText(exception))
         } catch (exception: MailFromDomainNotVerifiedException) {
-            ChannelMessageResponse(RestStatus.FORBIDDEN, getSesExceptionText(exception))
+            ChannelMessageResponse(recipient, RestStatus.FORBIDDEN, getSesExceptionText(exception))
         } catch (exception: ConfigurationSetDoesNotExistException) {
-            ChannelMessageResponse(RestStatus.NOT_IMPLEMENTED, getSesExceptionText(exception))
+            ChannelMessageResponse(recipient, RestStatus.NOT_IMPLEMENTED, getSesExceptionText(exception))
         } catch (exception: ConfigurationSetSendingPausedException) {
-            ChannelMessageResponse(RestStatus.SERVICE_UNAVAILABLE, getSesExceptionText(exception))
+            ChannelMessageResponse(recipient, RestStatus.SERVICE_UNAVAILABLE, getSesExceptionText(exception))
         } catch (exception: AccountSendingPausedException) {
-            ChannelMessageResponse(RestStatus.INSUFFICIENT_STORAGE, getSesExceptionText(exception))
+            ChannelMessageResponse(recipient, RestStatus.INSUFFICIENT_STORAGE, getSesExceptionText(exception))
         } catch (exception: SesException) {
-            ChannelMessageResponse(RestStatus.FAILED_DEPENDENCY, getSesExceptionText(exception))
+            ChannelMessageResponse(recipient, RestStatus.FAILED_DEPENDENCY, getSesExceptionText(exception))
         } catch (exception: SdkException) {
-            ChannelMessageResponse(RestStatus.FAILED_DEPENDENCY, getSdkExceptionText(exception))
+            ChannelMessageResponse(recipient, RestStatus.FAILED_DEPENDENCY, getSdkExceptionText(exception))
         }
     }
 

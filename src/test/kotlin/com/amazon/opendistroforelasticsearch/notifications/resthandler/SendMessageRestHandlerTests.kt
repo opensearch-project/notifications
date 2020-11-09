@@ -21,17 +21,17 @@ import org.elasticsearch.rest.RestRequest.Method.POST
 import org.elasticsearch.test.ESTestCase
 import org.junit.jupiter.api.Test
 
-internal class SendRestHandlerTests : ESTestCase() {
+internal class SendMessageRestHandlerTests : ESTestCase() {
 
     @Test
     fun `SendRestHandler name should return send`() {
-        val restHandler = SendRestHandler()
-        assertEquals("send", restHandler.name)
+        val restHandler = SendMessageRestHandler()
+        assertEquals("send_message", restHandler.name)
     }
 
     @Test
     fun `SendRestHandler routes should return send url`() {
-        val restHandler = SendRestHandler()
+        val restHandler = SendMessageRestHandler()
         val routes = restHandler.routes()
         val actualRouteSize = routes.size
         val actualRoute = routes[0]

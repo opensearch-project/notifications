@@ -18,7 +18,7 @@ package com.amazon.opendistroforelasticsearch.notifications.resthandler
 
 import com.amazon.opendistroforelasticsearch.notifications.ODFERestTestCase
 
-internal class SendRestHandlerIT : ODFERestTestCase() {
+internal class SendMessageRestHandlerIT : ODFERestTestCase() {
 
     fun sendRestHandler() {
     }
