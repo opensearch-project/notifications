@@ -21,7 +21,6 @@ on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -33,12 +32,14 @@ jobs:
           java-version: 1.14
 
       - name: Build with Gradle
-        run: ./gradlew build -x :integTestRunner -x :jacocoTestReport # exclude integTest task to avoid permission denied issue
+        run: |
+          cd notifications
+          ./gradlew build -x :integTestRunner -x :jacocoTestReport # exclude integTest task to avoid permission denied issue
 
       - name: Create Artifact Path
         run: |
           mkdir -p notifications-build
-          cp -r ./build/distributions/*.zip notifications-build/
+          cp -r ./notifications/build/distributions/*.zip notifications-build/
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1

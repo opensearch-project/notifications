@@ -20,8 +20,8 @@ opendistro.notifications:
   general:
     operationTimeoutMs: 60000 # 60 seconds, Minimum 100ms
   email:
-    channel: "smtp" # ses or smtp, provide corresponding sections
-    fromAddress: "from@email.com"
+    channel: "ses" # ses or smtp, provide corresponding sections
+    fromAddress: "banantha@amazon.com"
     monthlyLimit: 200
     sizeLimit: 10000000 # 10MB Email size limit
     ses: # Configuration for Amazon SES email delivery
