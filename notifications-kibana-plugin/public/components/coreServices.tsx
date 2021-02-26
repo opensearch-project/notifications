@@ -13,16 +13,11 @@
  * permissions and limitations under the License.
  */
 
-import './index.scss';
+import { createContext } from 'react';
+import { CoreStart } from '../../../../src/core/public';
 
-import { opendistroNotificationsKibanaPlugin } from './plugin';
+const CoreServicesContext = createContext<CoreStart | null>(null);
 
-// This exports static code and TypeScript types,
-// as well as, Kibana Platform `plugin()` initializer.
-export function plugin() {
-  return new opendistroNotificationsKibanaPlugin();
-}
-export {
-  opendistroNotificationsKibanaPluginSetup,
-  opendistroNotificationsKibanaPluginStart,
-} from './types';
+const CoreServicesConsumer = CoreServicesContext.Consumer;
+
+export { CoreServicesContext, CoreServicesConsumer };

@@ -13,16 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import './index.scss';
+import ContentPanel from './ContentPanel';
+import ContentPanelActions from './ContentPanelActions';
 
-import { opendistroNotificationsKibanaPlugin } from './plugin';
-
-// This exports static code and TypeScript types,
-// as well as, Kibana Platform `plugin()` initializer.
-export function plugin() {
-  return new opendistroNotificationsKibanaPlugin();
-}
-export {
-  opendistroNotificationsKibanaPluginSetup,
-  opendistroNotificationsKibanaPluginStart,
-} from './types';
+export { ContentPanel, ContentPanelActions };

@@ -1,10 +1,22 @@
 {
-  "name": "opendistroNotificationsKibana",
-  "version": "0.0.0",
-  "private": true,
+  "name": "opendistro_kibana_reports",
+  "version": "1.13.0.0",
+  "description": "Kibana Reporting Plugin",
+  "license": "Apache-2.0",
+  "main": "index.ts",
+  "kibana": {
+    "version": "7.10.2",
+    "templateVersion": "1.0.0"
+  },
   "scripts": {
-    "build": "yarn plugin-helpers build",
-    "plugin-helpers": "node ../../scripts/plugin_helpers",
-    "kbn": "node ../../scripts/kbn"
+    "kbn": "node ../../scripts/kbn",
+    "es": "node ../../scripts/es",
+    "lint": "eslint .",
+    "start": "yarn plugin_helpers start",
+    "build": "yarn plugin_helpers build",
+    "test": "../../node_modules/.bin/jest --config ./test/jest.config.js",
+    "cypress:run": "cypress run",
+    "cypress:open": "cypress open",
+    "plugin_helpers": "node ../../scripts/plugin_helpers"
   }
 }

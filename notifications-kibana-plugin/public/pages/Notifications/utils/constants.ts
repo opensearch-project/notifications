@@ -13,16 +13,19 @@
  * permissions and limitations under the License.
  */
 
-import './index.scss';
+import { SORT_DIRECTION } from '../../../../common';
 
-import { opendistroNotificationsKibanaPlugin } from './plugin';
+export const MAX_NOTIFICATIONS = 1000;
 
-// This exports static code and TypeScript types,
-// as well as, Kibana Platform `plugin()` initializer.
-export function plugin() {
-  return new opendistroNotificationsKibanaPlugin();
-}
-export {
-  opendistroNotificationsKibanaPluginSetup,
-  opendistroNotificationsKibanaPluginStart,
-} from './types';
+export const DEFAULT_PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
+
+export const DEFAULT_QUERY_PARAMS = {
+  from: 0,
+  search: '',
+  size: 5,
+  sortDirection: SORT_DIRECTION.ASC,
+  sortField: 'name',
+  status: 'ALL',
+  source: 'ALL',
+  severity: 'ALL',
+};

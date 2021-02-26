@@ -13,16 +13,8 @@
  * permissions and limitations under the License.
  */
 
-import './index.scss';
+import { NotificationService } from '../services';
 
-import { opendistroNotificationsKibanaPlugin } from './plugin';
-
-// This exports static code and TypeScript types,
-// as well as, Kibana Platform `plugin()` initializer.
-export function plugin() {
-  return new opendistroNotificationsKibanaPlugin();
+export interface BrowserServices {
+  notificationService: NotificationService;
 }
-export {
-  opendistroNotificationsKibanaPluginSetup,
-  opendistroNotificationsKibanaPluginStart,
-} from './types';

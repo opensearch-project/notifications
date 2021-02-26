@@ -13,16 +13,25 @@
  * permissions and limitations under the License.
  */
 
-import './index.scss';
+export const ROUTES = Object.freeze({
+  // notification
+  NOTIFICATIONS: '/notifications',
+  CHANNELS: '/channels',
+  CREATE_CHANNEL: '/create-channel',
+  EDIT_CHANNEL: '/edit-channel',
+});
 
-import { opendistroNotificationsKibanaPlugin } from './plugin';
+export const BREADCRUMBS = Object.freeze({
+  NOTIFICATIONS: { text: 'Notifications', href: '#/' },
+  DASHBOARD: { text: 'Dashboard', href: `#${ROUTES.NOTIFICATIONS}` },
+});
 
-// This exports static code and TypeScript types,
-// as well as, Kibana Platform `plugin()` initializer.
-export function plugin() {
-  return new opendistroNotificationsKibanaPlugin();
-}
-export {
-  opendistroNotificationsKibanaPluginSetup,
-  opendistroNotificationsKibanaPluginStart,
-} from './types';
+export const NOTIFICATION_STATUS = Object.freeze({
+  SENT: 'Sent',
+  ERROR: 'Error',
+});
+
+export const NOTIFICATION_SOURCE = Object.freeze({
+  REPORTING: 'Reporting',
+  ALERTING: 'Alerting',
+});

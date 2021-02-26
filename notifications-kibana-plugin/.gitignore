@@ -1,2 +1,11 @@
-/build
-/target
+npm-debug.log*
+node_modules
+/build/
+/public/app.css
+.idea/
+yarn-error.log
+/coverage/
+.DS_Store
+/cypress/screenshots/
+/cypress/videos/
+target

@@ -13,16 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import './index.scss';
+import { ModalConsumer, ModalProvider } from './Modal';
+import ModalRoot from './ModalRoot';
 
-import { opendistroNotificationsKibanaPlugin } from './plugin';
-
-// This exports static code and TypeScript types,
-// as well as, Kibana Platform `plugin()` initializer.
-export function plugin() {
-  return new opendistroNotificationsKibanaPlugin();
-}
-export {
-  opendistroNotificationsKibanaPluginSetup,
-  opendistroNotificationsKibanaPluginStart,
-} from './types';
+export { ModalConsumer, ModalProvider, ModalRoot };

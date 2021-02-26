@@ -1,7 +1,22 @@
-import React, { useState } from "react";
-import { i18n } from "@kbn/i18n";
-import { FormattedMessage, I18nProvider } from "@kbn/i18n/react";
-import { BrowserRouter as Router } from "react-router-dom";
+/*
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+import React, { useState } from 'react';
+import { i18n } from '@kbn/i18n';
+import { FormattedMessage, I18nProvider } from '@kbn/i18n/react';
+import { BrowserRouter as Router } from 'react-router-dom';
 
 import {
   EuiButton,
@@ -14,37 +29,38 @@ import {
   EuiPageHeader,
   EuiTitle,
   EuiText,
-} from "@elastic/eui";
+} from '@elastic/eui';
 
-import { CoreStart } from "../../../../src/core/public";
-import { NavigationPublicPluginStart } from "../../../../src/plugins/navigation/public";
+import { CoreStart } from '../../../../src/core/public';
+import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/public';
 
-import { PLUGIN_ID, PLUGIN_NAME } from "../../common";
+import { PLUGIN_ID, PLUGIN_NAME } from '../../common';
 
-interface opendistroNotificationsKibanaAppDeps {
+interface OpendistroNotificationsKibanaAppDeps {
   basename: string;
-  notifications: CoreStart["notifications"];
-  http: CoreStart["http"];
+  notifications: CoreStart['notifications'];
+  http: CoreStart['http'];
   navigation: NavigationPublicPluginStart;
+  chrome: CoreStart['chrome'];
 }
 
-export const opendistroNotificationsKibanaApp = ({
+export const OpendistroNotificationsKibanaApp = ({
   basename,
   notifications,
   http,
   navigation,
-}: opendistroNotificationsKibanaAppDeps) => {
+}: OpendistroNotificationsKibanaAppDeps) => {
   // Use React hooks to manage state.
   const [timestamp, setTimestamp] = useState<string | undefined>();
 
   const onClickHandler = () => {
     // Use the core http service to make a response to the server API.
-    http.get("/api/opendistro_notification_kibana/example").then((res) => {
+    http.get('/api/opendistro_notification_kibana/example').then((res) => {
       setTimestamp(res.time);
       // Use the core notifications service to display a success message.
       notifications.toasts.addSuccess(
-        i18n.translate("opendistroNotificationsKibana.dataUpdated", {
-          defaultMessage: "Data updated",
+        i18n.translate('opendistroNotificationsKibana.dataUpdated', {
+          defaultMessage: 'Data updated',
         })
       );
     });
@@ -98,7 +114,7 @@ export const opendistroNotificationsKibanaApp = ({
                       <FormattedMessage
                         id="opendistroNotificationsKibana.timestampText"
                         defaultMessage="Last timestamp: {time}"
-                        values={{ time: timestamp ? timestamp : "Unknown" }}
+                        values={{ time: timestamp ? timestamp : 'Unknown' }}
                       />
                     </p>
                     <EuiButton type="primary" size="s" onClick={onClickHandler}>
