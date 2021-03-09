@@ -19,9 +19,12 @@ package com.amazon.opendistroforelasticsearch.notifications
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import org.elasticsearch.client.Response
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
+import org.elasticsearch.common.io.stream.InputStreamStreamInput
+import org.elasticsearch.common.io.stream.OutputStreamStreamOutput
+import org.elasticsearch.common.io.stream.StreamInput
+import org.elasticsearch.common.io.stream.Writeable
+import org.elasticsearch.common.xcontent.*
+import java.io.*
 import java.nio.charset.StandardCharsets
 import kotlin.test.assertEquals
 
@@ -30,7 +33,8 @@ fun getResponseBody(response: Response, retainNewLines: Boolean): String {
     val sb = StringBuilder()
     response.entity.content.use { `is` ->
         BufferedReader(
-            InputStreamReader(`is`, StandardCharsets.UTF_8)).use { br ->
+            InputStreamReader(`is`, StandardCharsets.UTF_8)
+        ).use { br ->
             var line: String?
             while (br.readLine().also { line = it } != null) {
                 sb.append(line)
@@ -92,8 +96,10 @@ class NotificationsJsonEntity(
 
     var jsonEntityString: String = ""
 
-    private constructor(builder: Builder) : this(builder.refTag, builder.recipients, builder.title,
-        builder.textDescription, builder.htmlDescription, builder.attachment)
+    private constructor(builder: Builder) : this(
+        builder.refTag, builder.recipients, builder.title,
+        builder.textDescription, builder.htmlDescription, builder.attachment
+    )
 
     fun getJsonEntityAsString(): String {
         updateJsonEntity()
@@ -146,4 +152,34 @@ class NotificationsJsonEntity(
 
         fun build() = NotificationsJsonEntity(this)
     }
+}
+
+internal inline fun <reified Request> recreateObject(writeable: Writeable, block: (StreamInput) -> Request): Request {
+    ByteArrayOutputStream().use { byteArrayOutputStream ->
+        OutputStreamStreamOutput(byteArrayOutputStream).use {
+            writeable.writeTo(it)
+            InputStreamStreamInput(ByteArrayInputStream(byteArrayOutputStream.toByteArray())).use { streamInput ->
+                return block(streamInput)
+            }
+        }
+    }
+}
+
+internal fun getJsonString(xContent: ToXContent): String {
+    ByteArrayOutputStream().use { byteArrayOutputStream ->
+        val builder = XContentFactory.jsonBuilder(byteArrayOutputStream)
+        xContent.toXContent(builder, ToXContent.EMPTY_PARAMS)
+        builder.close()
+        return byteArrayOutputStream.toString("UTF8")
+    }
+}
+
+internal inline fun <reified CreateType> createObjectFromJsonString(
+    jsonString: String,
+    block: (XContentParser) -> CreateType
+): CreateType {
+    val parser = XContentType.JSON.xContent()
+        .createParser(NamedXContentRegistry.EMPTY, DeprecationHandler.IGNORE_DEPRECATIONS, jsonString)
+    parser.nextToken()
+    return block(parser)
 }

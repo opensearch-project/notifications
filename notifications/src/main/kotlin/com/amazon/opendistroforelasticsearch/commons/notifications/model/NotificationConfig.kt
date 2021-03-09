@@ -1,0 +1,164 @@
+/*
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ *
+ */
+package com.amazon.opendistroforelasticsearch.commons.notifications.model
+
+import com.amazon.opendistroforelasticsearch.notifications.util.enumSet
+import com.amazon.opendistroforelasticsearch.notifications.util.fieldIfNotNull
+import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.notifications.util.valueOf
+import org.elasticsearch.common.Strings
+import org.elasticsearch.common.io.stream.StreamInput
+import org.elasticsearch.common.io.stream.StreamOutput
+import org.elasticsearch.common.io.stream.Writeable
+import org.elasticsearch.common.xcontent.ToXContent
+import org.elasticsearch.common.xcontent.XContentBuilder
+import org.elasticsearch.common.xcontent.XContentParser
+import org.elasticsearch.common.xcontent.XContentParserUtils
+import java.util.EnumSet
+
+/**
+ * Data class representing Notification config.
+ */
+data class NotificationConfig(
+    val name: String,
+    val configType: ConfigType,
+    val features: EnumSet<Feature>,
+    val isEnabled: Boolean = true,
+    val slack: Slack? = null,
+    val chime: Chime? = null,
+    val webhook: Webhook? = null
+) : Writeable, ToXContent {
+
+    init {
+        require(!Strings.isNullOrEmpty(name)) { "name is null or empty" }
+        when (configType) {
+            ConfigType.Slack -> requireNotNull(slack)
+            ConfigType.Chime -> requireNotNull(chime)
+            ConfigType.Webhook -> requireNotNull(webhook)
+            ConfigType.None -> log.info("Some config field not recognized")
+        }
+    }
+
+    enum class ConfigType { None, Slack, Chime, Webhook }
+    enum class Feature { None, Alerting, IndexManagement, Reports }
+
+    companion object {
+        private val log by logger(NotificationConfig::class.java)
+        private const val NAME_TAG = "name"
+        private const val CONFIG_TYPE_TAG = "configType"
+        private const val FEATURES_TAG = "features"
+        private const val IS_ENABLED_TAG = "isEnabled"
+        private const val SLACK_TAG = "slack"
+        private const val CHIME_TAG = "chime"
+        private const val WEBHOOK_TAG = "webhook"
+
+        /**
+         * reader to create instance of class from writable.
+         */
+        val reader = Writeable.Reader { NotificationConfig(it) }
+
+        /**
+         * Creator used in REST communication.
+         * @param parser XContentParser to deserialize data from.
+         */
+        fun parse(parser: XContentParser): NotificationConfig {
+            var name: String? = null
+            var configType: ConfigType? = null
+            var features: EnumSet<Feature>? = null
+            var isEnabled = true
+            var slack: Slack? = null
+            var chime: Chime? = null
+            var webhook: Webhook? = null
+
+            XContentParserUtils.ensureExpectedToken(
+                XContentParser.Token.START_OBJECT,
+                parser.currentToken(),
+                parser::getTokenLocation
+            )
+            while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
+                val fieldName = parser.currentName()
+                parser.nextToken()
+                when (fieldName) {
+                    NAME_TAG -> name = parser.text()
+                    CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), ConfigType.None)
+                    FEATURES_TAG -> features = parser.enumSet(Feature.None)
+                    IS_ENABLED_TAG -> isEnabled = parser.booleanValue()
+                    SLACK_TAG -> slack = Slack.parse(parser)
+                    CHIME_TAG -> chime = Chime.parse(parser)
+                    WEBHOOK_TAG -> webhook = Webhook.parse(parser)
+                    else -> {
+                        log.info("Unexpected field: $fieldName, while parsing configuration")
+                    }
+                }
+            }
+            name ?: throw IllegalArgumentException("$NAME_TAG field absent")
+            configType ?: throw IllegalArgumentException("$CONFIG_TYPE_TAG field absent")
+            features ?: throw IllegalArgumentException("$FEATURES_TAG field absent")
+            return NotificationConfig(
+                name,
+                configType,
+                features,
+                isEnabled,
+                slack,
+                chime,
+                webhook
+            )
+        }
+    }
+
+    /**
+     * Constructor used in transport action communication.
+     * @param input StreamInput stream to deserialize data from.
+     */
+    constructor(input: StreamInput) : this(
+        name = input.readString(),
+        configType = input.readEnum(ConfigType::class.java),
+        features = input.readEnumSet(Feature::class.java),
+        isEnabled = input.readBoolean(),
+        slack = input.readOptionalWriteable(Slack.reader),
+        chime = input.readOptionalWriteable(Chime.reader),
+        webhook = input.readOptionalWriteable(Webhook.reader)
+    )
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun writeTo(output: StreamOutput) {
+        output.writeString(name)
+        output.writeEnum(configType)
+        output.writeEnumSet(features)
+        output.writeBoolean(isEnabled)
+        output.writeOptionalWriteable(slack)
+        output.writeOptionalWriteable(chime)
+        output.writeOptionalWriteable(webhook)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
+        builder!!
+        return builder.startObject()
+            .field(NAME_TAG, name)
+            .field(CONFIG_TYPE_TAG, configType)
+            .field(FEATURES_TAG, features)
+            .field(IS_ENABLED_TAG, isEnabled)
+            .fieldIfNotNull(SLACK_TAG, slack)
+            .fieldIfNotNull(CHIME_TAG, chime)
+            .fieldIfNotNull(WEBHOOK_TAG, webhook)
+            .endObject()
+    }
+}
