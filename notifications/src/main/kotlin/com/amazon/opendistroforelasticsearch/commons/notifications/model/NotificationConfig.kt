@@ -34,12 +34,16 @@ import java.util.EnumSet
  */
 data class NotificationConfig(
     val name: String,
+    val description: String,
     val configType: ConfigType,
     val features: EnumSet<Feature>,
     val isEnabled: Boolean = true,
     val slack: Slack? = null,
     val chime: Chime? = null,
-    val webhook: Webhook? = null
+    val webhook: Webhook? = null,
+    val email: Email? = null,
+    val smtpAccount: SmtpAccount? = null,
+    val emailGroup: EmailGroup? = null
 ) : Writeable, ToXContent {
 
     init {
@@ -48,22 +52,29 @@ data class NotificationConfig(
             ConfigType.Slack -> requireNotNull(slack)
             ConfigType.Chime -> requireNotNull(chime)
             ConfigType.Webhook -> requireNotNull(webhook)
+            ConfigType.Email -> requireNotNull(email)
+            ConfigType.SmtpAccount -> requireNotNull(smtpAccount)
+            ConfigType.EmailGroup -> requireNotNull(emailGroup)
             ConfigType.None -> log.info("Some config field not recognized")
         }
     }
 
-    enum class ConfigType { None, Slack, Chime, Webhook }
+    enum class ConfigType { None, Slack, Chime, Webhook, Email, SmtpAccount, EmailGroup }
     enum class Feature { None, Alerting, IndexManagement, Reports }
 
     companion object {
         private val log by logger(NotificationConfig::class.java)
         private const val NAME_TAG = "name"
+        private const val DESCRIPTION_TAG = "description"
         private const val CONFIG_TYPE_TAG = "configType"
         private const val FEATURES_TAG = "features"
         private const val IS_ENABLED_TAG = "isEnabled"
         private const val SLACK_TAG = "slack"
         private const val CHIME_TAG = "chime"
         private const val WEBHOOK_TAG = "webhook"
+        private const val EMAIL_TAG = "email"
+        private const val SMTP_ACCOUNT_TAG = "smtpAccount"
+        private const val EMAIL_GROUP_TAG = "emailGroup"
 
         /**
          * reader to create instance of class from writable.
@@ -74,14 +85,19 @@ data class NotificationConfig(
          * Creator used in REST communication.
          * @param parser XContentParser to deserialize data from.
          */
+        @Suppress("ComplexMethod")
         fun parse(parser: XContentParser): NotificationConfig {
             var name: String? = null
+            var description = ""
             var configType: ConfigType? = null
             var features: EnumSet<Feature>? = null
             var isEnabled = true
             var slack: Slack? = null
             var chime: Chime? = null
             var webhook: Webhook? = null
+            var email: Email? = null
+            var smtpAccount: SmtpAccount? = null
+            var emailGroup: EmailGroup? = null
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -93,13 +109,18 @@ data class NotificationConfig(
                 parser.nextToken()
                 when (fieldName) {
                     NAME_TAG -> name = parser.text()
+                    DESCRIPTION_TAG -> description = parser.text()
                     CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), ConfigType.None)
                     FEATURES_TAG -> features = parser.enumSet(Feature.None)
                     IS_ENABLED_TAG -> isEnabled = parser.booleanValue()
                     SLACK_TAG -> slack = Slack.parse(parser)
                     CHIME_TAG -> chime = Chime.parse(parser)
                     WEBHOOK_TAG -> webhook = Webhook.parse(parser)
+                    EMAIL_TAG -> email = Email.parse(parser)
+                    SMTP_ACCOUNT_TAG -> smtpAccount = SmtpAccount.parse(parser)
+                    EMAIL_GROUP_TAG -> emailGroup = EmailGroup.parse(parser)
                     else -> {
+                        parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing configuration")
                     }
                 }
@@ -109,12 +130,16 @@ data class NotificationConfig(
             features ?: throw IllegalArgumentException("$FEATURES_TAG field absent")
             return NotificationConfig(
                 name,
+                description,
                 configType,
                 features,
                 isEnabled,
                 slack,
                 chime,
-                webhook
+                webhook,
+                email,
+                smtpAccount,
+                emailGroup
             )
         }
     }
@@ -125,12 +150,16 @@ data class NotificationConfig(
      */
     constructor(input: StreamInput) : this(
         name = input.readString(),
+        description = input.readString(),
         configType = input.readEnum(ConfigType::class.java),
         features = input.readEnumSet(Feature::class.java),
         isEnabled = input.readBoolean(),
         slack = input.readOptionalWriteable(Slack.reader),
         chime = input.readOptionalWriteable(Chime.reader),
-        webhook = input.readOptionalWriteable(Webhook.reader)
+        webhook = input.readOptionalWriteable(Webhook.reader),
+        email = input.readOptionalWriteable(Email.reader),
+        smtpAccount = input.readOptionalWriteable(SmtpAccount.reader),
+        emailGroup = input.readOptionalWriteable(EmailGroup.reader)
     )
 
     /**
@@ -138,12 +167,16 @@ data class NotificationConfig(
      */
     override fun writeTo(output: StreamOutput) {
         output.writeString(name)
+        output.writeString(description)
         output.writeEnum(configType)
         output.writeEnumSet(features)
         output.writeBoolean(isEnabled)
         output.writeOptionalWriteable(slack)
         output.writeOptionalWriteable(chime)
         output.writeOptionalWriteable(webhook)
+        output.writeOptionalWriteable(email)
+        output.writeOptionalWriteable(smtpAccount)
+        output.writeOptionalWriteable(emailGroup)
     }
 
     /**
@@ -153,12 +186,16 @@ data class NotificationConfig(
         builder!!
         return builder.startObject()
             .field(NAME_TAG, name)
+            .field(DESCRIPTION_TAG, description)
             .field(CONFIG_TYPE_TAG, configType)
             .field(FEATURES_TAG, features)
             .field(IS_ENABLED_TAG, isEnabled)
             .fieldIfNotNull(SLACK_TAG, slack)
             .fieldIfNotNull(CHIME_TAG, chime)
             .fieldIfNotNull(WEBHOOK_TAG, webhook)
+            .fieldIfNotNull(EMAIL_TAG, email)
+            .fieldIfNotNull(SMTP_ACCOUNT_TAG, smtpAccount)
+            .fieldIfNotNull(EMAIL_GROUP_TAG, emailGroup)
             .endObject()
     }
 }

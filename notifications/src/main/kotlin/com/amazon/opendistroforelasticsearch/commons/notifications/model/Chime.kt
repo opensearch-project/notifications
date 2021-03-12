@@ -65,6 +65,7 @@ data class Chime(
                 when (fieldName) {
                     URL_TAG -> url = parser.text()
                     else -> {
+                        parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing Chime destination")
                     }
                 }

@@ -15,8 +15,9 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
+import com.amazon.opendistroforelasticsearch.notifications.util.isValidEmail
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
-import com.amazon.opendistroforelasticsearch.notifications.util.validateUrl
+import com.amazon.opendistroforelasticsearch.notifications.util.stringList
 import org.elasticsearch.common.Strings
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
@@ -27,32 +28,40 @@ import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils
 
 /**
- * Data class representing Slack channel.
+ * Data class representing Email account and default recipients.
  */
-data class Slack(
-    val url: String
+data class Email(
+    val emailAccountID: String,
+    val defaultRecipients: List<String>,
+    val defaultEmailGroupIds: List<String>
 ) : Writeable, ToXContent {
 
     init {
-        require(!Strings.isNullOrEmpty(url)) { "URL is null or empty" }
-        validateUrl(url)
+        require(!Strings.isNullOrEmpty(emailAccountID)) { "emailAccountID is null or empty" }
+        defaultRecipients.forEach {
+            require(isValidEmail(it)) { "Invalid email address" }
+        }
     }
 
     companion object {
-        private val log by logger(Slack::class.java)
-        private const val URL_TAG = "url"
+        private val log by logger(Email::class.java)
+        private const val EMAIL_ACCOUNT_ID_TAG = "emailAccountID"
+        private const val DEFAULT_RECIPIENTS_TAG = "defaultRecipients"
+        private const val DEFAULT_EMAIL_GROUPS_TAG = "defaultEmailGroupIds"
 
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader { Slack(it) }
+        val reader = Writeable.Reader { Email(it) }
 
         /**
          * Creator used in REST communication.
          * @param parser XContentParser to deserialize data from.
          */
-        fun parse(parser: XContentParser): Slack {
-            var url: String? = null
+        fun parse(parser: XContentParser): Email {
+            var emailAccountID: String? = null
+            var recipients: List<String> = listOf()
+            var emailGroupIds: List<String> = listOf()
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -63,15 +72,17 @@ data class Slack(
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    URL_TAG -> url = parser.text()
+                    EMAIL_ACCOUNT_ID_TAG -> emailAccountID = parser.text()
+                    DEFAULT_RECIPIENTS_TAG -> recipients = parser.stringList()
+                    DEFAULT_EMAIL_GROUPS_TAG -> emailGroupIds = parser.stringList()
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing Slack destination")
+                        log.info("Unexpected field: $fieldName, while parsing Email")
                     }
                 }
             }
-            url ?: throw IllegalArgumentException("$URL_TAG field absent")
-            return Slack(url)
+            emailAccountID ?: throw IllegalArgumentException("$EMAIL_ACCOUNT_ID_TAG field absent")
+            return Email(emailAccountID, recipients, emailGroupIds)
         }
     }
 
@@ -80,14 +91,18 @@ data class Slack(
      * @param input StreamInput stream to deserialize data from.
      */
     constructor(input: StreamInput) : this(
-        url = input.readString()
+        emailAccountID = input.readString(),
+        defaultRecipients = input.readStringList(),
+        defaultEmailGroupIds = input.readStringList()
     )
 
     /**
      * {@inheritDoc}
      */
     override fun writeTo(output: StreamOutput) {
-        output.writeString(url)
+        output.writeString(emailAccountID)
+        output.writeStringCollection(defaultRecipients)
+        output.writeStringCollection(defaultEmailGroupIds)
     }
 
     /**
@@ -96,7 +111,9 @@ data class Slack(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(URL_TAG, url)
+            .field(EMAIL_ACCOUNT_ID_TAG, emailAccountID)
+            .field(DEFAULT_RECIPIENTS_TAG, defaultRecipients)
+            .field(DEFAULT_EMAIL_GROUPS_TAG, defaultEmailGroupIds)
             .endObject()
     }
 }

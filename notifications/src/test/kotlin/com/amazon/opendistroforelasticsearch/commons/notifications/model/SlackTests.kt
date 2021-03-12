@@ -20,8 +20,8 @@ import com.amazon.opendistroforelasticsearch.notifications.getJsonString
 import com.amazon.opendistroforelasticsearch.notifications.recreateObject
 import com.fasterxml.jackson.core.JsonParseException
 import org.elasticsearch.test.ESTestCase
-import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.net.MalformedURLException
 
 internal class SlackTests : ESTestCase() {
@@ -52,7 +52,7 @@ internal class SlackTests : ESTestCase() {
     @Test
     fun `Slack should throw exception when invalid json object is passed`() {
         val jsonString = "sample message"
-        assertThrows(JsonParseException::class.java) {
+        assertThrows<JsonParseException> {
             createObjectFromJsonString(jsonString) { Slack.parse(it) }
         }
     }
@@ -61,29 +61,29 @@ internal class SlackTests : ESTestCase() {
     fun `Slack should throw exception when url is replace with url2 in json object`() {
         val sampleSlack = Slack("https://domain.com/sample_url#1234567890")
         val jsonString = "{\"url2\":\"${sampleSlack.url}\"}"
-        assertThrows(IllegalArgumentException::class.java) {
+        assertThrows<IllegalArgumentException> {
             createObjectFromJsonString(jsonString) { Slack.parse(it) }
         }
     }
 
     @Test
     fun `Slack should throw exception when url is not proper`() {
-        assertThrows(MalformedURLException::class.java) {
+        assertThrows<MalformedURLException> {
             Slack("domain.com/sample_url#1234567890")
         }
         val jsonString = "{\"url\":\"domain.com/sample_url\"}"
-        assertThrows(MalformedURLException::class.java) {
+        assertThrows<MalformedURLException> {
             createObjectFromJsonString(jsonString) { Slack.parse(it) }
         }
     }
 
     @Test
     fun `Slack should throw exception when url protocol is not https`() {
-        assertThrows(IllegalArgumentException::class.java) {
+        assertThrows<IllegalArgumentException> {
             Slack("http://domain.com/sample_url#1234567890")
         }
         val jsonString = "{\"url\":\"http://domain.com/sample_url\"}"
-        assertThrows(IllegalArgumentException::class.java) {
+        assertThrows<IllegalArgumentException> {
             createObjectFromJsonString(jsonString) { Slack.parse(it) }
         }
     }
