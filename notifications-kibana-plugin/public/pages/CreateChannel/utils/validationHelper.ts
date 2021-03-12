@@ -13,19 +13,21 @@
  * permissions and limitations under the License.
  */
 
-import { SORT_DIRECTION } from '../../../../common';
+import { EuiComboBoxOptionOption } from "@elastic/eui";
 
-export const MAX_NOTIFICATIONS = 1000;
+// returns true if input is invalid
+export const validateChannelName = (name: string) => {
+  return name.length === 0;
+}
 
-export const DEFAULT_PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
+export const validateSlackWebhook = (url: string) => {
+  return url.length === 0;
+}
 
-export const DEFAULT_QUERY_PARAMS = {
-  from: 0,
-  search: '',
-  size: 5,
-  sortDirection: SORT_DIRECTION.ASC,
-  sortField: 'name',
-  startTime: 'now-7d',
-  endTime: 'now',
-  filters: [],
-};
+export const validateEmailSender = (sender: string) => {
+  return sender.length === 0;
+}
+
+export const validateRecipients = (group: Array<EuiComboBoxOptionOption<string>>) => {
+  return group.length === 0;
+}

@@ -13,19 +13,12 @@
  * permissions and limitations under the License.
  */
 
-import { SORT_DIRECTION } from '../../../../common';
+import Showdown from 'showdown';
 
-export const MAX_NOTIFICATIONS = 1000;
-
-export const DEFAULT_PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
-
-export const DEFAULT_QUERY_PARAMS = {
-  from: 0,
-  search: '',
-  size: 5,
-  sortDirection: SORT_DIRECTION.ASC,
-  sortField: 'name',
-  startTime: 'now-7d',
-  endTime: 'now',
-  filters: [],
-};
+export const converter = new Showdown.Converter({
+  tables: true,
+  simplifiedAutoLink: true,
+  strikethrough: true,
+  tasklists: true,
+  noHeaderId: true,
+});

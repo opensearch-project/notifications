@@ -19,6 +19,7 @@ import {
   EuiFlexItem,
   EuiHorizontalRule,
   EuiPanel,
+  EuiSpacer,
   EuiTitle,
 } from '@elastic/eui';
 
@@ -41,9 +42,9 @@ const ContentPanel: React.SFC<ContentPanelProps> = ({
   actions,
   children,
 }) => (
-  <EuiPanel style={{ paddingLeft: '0px', paddingRight: '0px', ...panelStyles }}>
+  <EuiPanel style={{ ...panelStyles }}>
     <EuiFlexGroup
-      style={{ padding: '0px 10px' }}
+      style={{ padding: '0px 0px' }}
       justifyContent="spaceBetween"
       alignItems="center"
     >
@@ -69,7 +70,7 @@ const ContentPanel: React.SFC<ContentPanelProps> = ({
       ) : null}
     </EuiFlexGroup>
 
-    <EuiHorizontalRule margin="xs" className={horizontalRuleClassName} />
+    <EuiHorizontalRule margin="s" className={horizontalRuleClassName} />
 
     <div style={{ padding: '0px 10px', ...bodyStyles }}>{children}</div>
   </EuiPanel>

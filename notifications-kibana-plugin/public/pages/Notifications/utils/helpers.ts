@@ -17,6 +17,8 @@ import { DEFAULT_QUERY_PARAMS } from './constants';
 import queryString from 'query-string';
 import { SORT_DIRECTION } from '../../../../common';
 import { NotificationItem } from '../../../../models/interfaces';
+import { ShortDate } from '@elastic/eui';
+import { FilterType } from '../component/SearchBar/Filter/Filters';
 
 export type NotificationsQueryParams = {
   from: number;
@@ -24,9 +26,9 @@ export type NotificationsQueryParams = {
   search: string;
   sortDirection: SORT_DIRECTION;
   sortField: string;
-  status: string;
-  severity: string;
-  source: string;
+  startTime: ShortDate;
+  endTime: ShortDate;
+  filters: FilterType[];
 };
 
 export const getURLQueryParams = (location: {
@@ -38,20 +40,26 @@ export const getURLQueryParams = (location: {
     search,
     sortField,
     sortDirection,
-    source,
-    severity,
-    status,
+    startTime,
+    endTime,
+    filters,
   } = queryString.parse(location.search);
+
+  let parsedFilters = DEFAULT_QUERY_PARAMS.filters;
+  if (typeof filters === 'string' && filters.trim().length > 0)
+    try {
+      parsedFilters = JSON.parse(filters);
+    } catch (error) {}
 
   return <NotificationsQueryParams>{
     // @ts-ignore
     from: isNaN(parseInt(from, 10))
       ? DEFAULT_QUERY_PARAMS.from
-      : parseInt(from, 10),
+      : parseInt(from as string, 10),
     // @ts-ignore
     size: isNaN(parseInt(size, 10))
       ? DEFAULT_QUERY_PARAMS.size
-      : parseInt(size, 10),
+      : parseInt(size as string, 10),
     search: typeof search !== 'string' ? DEFAULT_QUERY_PARAMS.search : search,
     sortField:
       typeof sortField !== 'string'
@@ -61,10 +69,13 @@ export const getURLQueryParams = (location: {
       typeof sortDirection !== 'string'
         ? DEFAULT_QUERY_PARAMS.sortDirection
         : sortDirection,
-    source: typeof source !== 'string' ? DEFAULT_QUERY_PARAMS.source : source,
-    status: typeof status !== 'string' ? DEFAULT_QUERY_PARAMS.status : status,
-    severity:
-      typeof severity !== 'string' ? DEFAULT_QUERY_PARAMS.severity : severity,
+    startTime:
+      typeof startTime !== 'string'
+        ? DEFAULT_QUERY_PARAMS.startTime
+        : startTime,
+    endTime:
+      typeof endTime !== 'string' ? DEFAULT_QUERY_PARAMS.endTime : endTime,
+    filters: parsedFilters,
   };
 };
 

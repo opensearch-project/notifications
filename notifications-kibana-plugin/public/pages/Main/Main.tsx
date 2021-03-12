@@ -24,11 +24,18 @@ import { Component } from 'react';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
 import { CoreStart } from '../../../../../src/core/public';
 import Notifications from '../Notifications';
+import { Channels } from '../Channels/Channels';
+import { CreateChannel } from '../CreateChannel/CreateChannel';
+import { ChannelDetails } from '../Channels/ChannelDetails';
+import { EmailGroups } from '../Emails/EmailGroups';
+import { CreateSender } from '../Emails/CreateSender';
+import { CreateRecipientGroup } from '../Emails/CreateRecipientGroup';
 
 enum Navigation {
   Notifications = 'Notifications',
   Dashboard = 'Dashboard',
   Channels = 'Channels',
+  EmailGroups = 'Email groups',
 }
 
 enum Pathname {
@@ -62,6 +69,12 @@ export default class Main extends Component<MainProps, object> {
             href: `#${Pathname.Channels}`,
             isSelected: pathname === Pathname.Channels,
           },
+          {
+            name: Navigation.EmailGroups,
+            id: 3,
+            href: `#${ROUTES.EMAIL_GROUPS}`,
+            isSelected: pathname === ROUTES.EMAIL_GROUPS,
+          },
         ],
       },
     ];
@@ -76,8 +89,13 @@ export default class Main extends Component<MainProps, object> {
                     <ModalRoot services={services} />
                     <EuiPage>
                       {/*Hide side navigation bar when creating or editing rollup job*/}
-                      {pathname != ROUTES.CREATE_CHANNEL &&
-                        pathname != ROUTES.EDIT_CHANNEL && (
+                      {pathname !== ROUTES.CREATE_CHANNEL &&
+                        !pathname.startsWith(ROUTES.EDIT_CHANNEL) &&
+                        !pathname.startsWith(ROUTES.CHANNEL_DETAILS) &&
+                        pathname !== ROUTES.CREATE_SENDER &&
+                        !pathname.startsWith(ROUTES.EDIT_SENDER) &&
+                        pathname !== ROUTES.CREATE_RECIPIENT_GROUP &&
+                        !pathname.startsWith(ROUTES.EDIT_RECIPIENT_GROUP) && (
                           <EuiPageSideBar style={{ minWidth: 150 }}>
                             <EuiSideNav
                               style={{ width: 150 }}
@@ -90,19 +108,25 @@ export default class Main extends Component<MainProps, object> {
                           <Route
                             path={ROUTES.CREATE_CHANNEL}
                             render={(props: RouteComponentProps) => (
-                              <div>create channel page</div>
+                              <CreateChannel {...props} />
                             )}
                           />
                           <Route
-                            path={ROUTES.EDIT_CHANNEL}
-                            render={(props: RouteComponentProps) => (
-                              <div>edit channel page</div>
+                            path={`${ROUTES.EDIT_CHANNEL}/:id`}
+                            render={(props: RouteComponentProps<{id: string}>) => (
+                              <CreateChannel {...props} edit={true} />
                             )}
+                          />
+                          <Route
+                            path={`${ROUTES.CHANNEL_DETAILS}/:id`}
+                            render={(
+                              props: RouteComponentProps<{ id: string }>
+                            ) => <ChannelDetails {...props} />}
                           />
                           <Route
                             path={ROUTES.CHANNELS}
                             render={(props: RouteComponentProps) => (
-                              <div>channel page</div>
+                              <Channels {...props} />
                             )}
                           />
                           <Route
@@ -116,118 +140,36 @@ export default class Main extends Component<MainProps, object> {
                               />
                             )}
                           />
-                          {/* <Route
-                            path={ROUTES.CHANGE_POLICY}
+                          <Route
+                            path={ROUTES.EMAIL_GROUPS}
                             render={(props: RouteComponentProps) => (
-                              <ChangePolicy
-                                {...props}
-                                managedIndexService={
-                                  services.managedIndexService
-                                }
-                                indexService={services.indexService}
-                              />
+                              <EmailGroups {...props} />
                             )}
                           />
                           <Route
-                            path={ROUTES.CREATE_CHANNEL}
+                            path={ROUTES.CREATE_SENDER}
                             render={(props: RouteComponentProps) => (
-                              <CreatePolicy
-                                {...props}
-                                isEdit={false}
-                                policyService={services.policyService}
-                              />
+                              <CreateSender {...props} />
                             )}
                           />
                           <Route
-                            path={ROUTES.EDIT_POLICY}
+                            path={`${ROUTES.EDIT_SENDER}/:id`}
                             render={(props: RouteComponentProps) => (
-                              <CreatePolicy
-                                {...props}
-                                isEdit={true}
-                                policyService={services.policyService}
-                              />
+                              <CreateSender {...props} edit={true} />
                             )}
                           />
                           <Route
-                            path={ROUTES.INDEX_POLICIES}
+                            path={ROUTES.CREATE_RECIPIENT_GROUP}
                             render={(props: RouteComponentProps) => (
-                              <div style={{ padding: '25px 25px' }}>
-                                <Policies
-                                  {...props}
-                                  policyService={services.policyService}
-                                />
-                              </div>
+                              <CreateRecipientGroup {...props} />
                             )}
                           />
                           <Route
-                            path={ROUTES.MANAGED_INDICES}
+                            path={`${ROUTES.EDIT_RECIPIENT_GROUP}/:name`}
                             render={(props: RouteComponentProps) => (
-                              <div>
-                                <ManagedIndices
-                                  {...props}
-                                  managedIndexService={
-                                    services.managedIndexService
-                                  }
-                                />
-                              </div>
+                              <CreateRecipientGroup {...props} edit={true} />
                             )}
                           />
-                          <Route
-                            path={ROUTES.INDICES}
-                            render={(props: RouteComponentProps) => (
-                              <div style={{ padding: '25px 25px' }}>
-                                <Indices
-                                  {...props}
-                                  indexService={services.indexService}
-                                />
-                              </div>
-                            )}
-                          />
-                          <Route
-                            path={ROUTES.ROLLUPS}
-                            render={(props: RouteComponentProps) => (
-                              <div style={{ padding: '25px 25px' }}>
-                                <Rollups
-                                  {...props}
-                                  rollupService={services.rollupService}
-                                />
-                              </div>
-                            )}
-                          />
-                          <Route
-                            path={ROUTES.CREATE_ROLLUP}
-                            render={(props: RouteComponentProps) => (
-                              <div style={{ padding: '25px 25px' }}>
-                                <CreateRollupForm
-                                  {...props}
-                                  rollupService={services.rollupService}
-                                  indexService={services.indexService}
-                                />
-                              </div>
-                            )}
-                          />
-                          <Route
-                            path={ROUTES.EDIT_ROLLUP}
-                            render={(props: RouteComponentProps) => (
-                              <div style={{ padding: '25px 25px' }}>
-                                <EditRollup
-                                  {...props}
-                                  rollupService={services.rollupService}
-                                />
-                              </div>
-                            )}
-                          />
-                          <Route
-                            path={ROUTES.ROLLUP_DETAILS}
-                            render={(props: RouteComponentProps) => (
-                              <div style={{ padding: '25px 25px' }}>
-                                <RollupDetails
-                                  {...props}
-                                  rollupService={services.rollupService}
-                                />
-                              </div>
-                            )}
-                          /> */}
                           <Redirect from="/" to={ROUTES.NOTIFICATIONS} />
                         </Switch>
                       </EuiPageBody>

@@ -17,7 +17,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { HashRouter as Router, Route } from 'react-router-dom';
 import { AppMountParameters, CoreStart } from '../../../src/core/public';
-import { OpendistroNotificationsKibanaApp } from './components/app';
 import { CoreServicesContext } from './components/coreServices';
 import Main from './pages/Main';
 import { NotificationService } from './services';

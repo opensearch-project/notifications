@@ -37,6 +37,12 @@ export class opendistroNotificationsKibanaPlugin
     core.application.register({
       id: PLUGIN_NAME,
       title: 'Notifications',
+      category: {
+        id: 'odfe',
+        label: 'Open Distro for Elasticsearch',
+        order: 2000,
+      },
+      order: 6000,
       async mount(params: AppMountParameters) {
         // Load application bundle
         const { renderApp } = await import('./application');

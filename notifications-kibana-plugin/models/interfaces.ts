@@ -13,6 +13,8 @@
  * permissions and limitations under the License.
  */
 
+import { Direction } from '@elastic/eui';
+
 export interface NotificationItem {
   title: string;
   channel: ChannelOverview; // those will be prepared by kibana server. UI model vs Backend Model
@@ -35,3 +37,46 @@ export interface ChannelOverview {
   name: string;
   type: string;
 }
+
+export interface ChannelItemType {
+  id: string;
+  name: string;
+  enabled: boolean; // active or muted
+  type: string;
+  allowedFeatures: string[];
+  lastUpdatedTime: number;
+  destination: {
+    [type: string]: object;
+  };
+  description?: string;
+}
+
+export interface SenderItemType {
+  id: string;
+  name: string;
+  from: string; // outbound email address
+  host: string;
+  port: string;
+  method: ENCRYPTION_METHOD;
+}
+
+export interface RecipientGroupItemType {
+  id: string;
+  name: string;
+  email: Array<{ email: string }>;
+  description?: string;
+}
+
+export interface TableState<T> {
+  total: number;
+  from: number;
+  size: number;
+  search: string;
+  sortField: any; // keyof T
+  sortDirection: Direction;
+  selectedItems: T[];
+  items: T[];
+  loading: boolean;
+}
+
+export type ENCRYPTION_METHOD = 'SSL' | 'TSL';

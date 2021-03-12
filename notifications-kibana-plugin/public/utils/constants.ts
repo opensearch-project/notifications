@@ -17,13 +17,31 @@ export const ROUTES = Object.freeze({
   // notification
   NOTIFICATIONS: '/notifications',
   CHANNELS: '/channels',
+  CHANNEL_DETAILS: '/channel-details',
   CREATE_CHANNEL: '/create-channel',
   EDIT_CHANNEL: '/edit-channel',
+  EMAIL_GROUPS: '/email-groups',
+  CREATE_SENDER: '/create-sender',
+  EDIT_SENDER: '/edit-sender',
+  CREATE_RECIPIENT_GROUP: '/create-recipient-group',
+  EDIT_RECIPIENT_GROUP: '/edit-recipient-group',
 });
 
 export const BREADCRUMBS = Object.freeze({
   NOTIFICATIONS: { text: 'Notifications', href: '#/' },
   DASHBOARD: { text: 'Dashboard', href: `#${ROUTES.NOTIFICATIONS}` },
+  CHANNELS: { text: 'Channels', href: `#${ROUTES.CHANNELS}` },
+  CHANNEL_DETAILS: { text: 'Channels', href: `#${ROUTES.CHANNEL_DETAILS}` },
+  CREATE_CHANNEL: { text: 'Create channel', href: `#${ROUTES.CREATE_CHANNEL}` },
+  EDIT_CHANNEL: { text: 'Edit channel' },
+  EMAIL_GROUPS: { text: 'Email groups', href: `#${ROUTES.EMAIL_GROUPS}` },
+  CREATE_SENDER: { text: 'Create sender', href: `#${ROUTES.CREATE_SENDER}` },
+  EDIT_SENDER: { text: 'Edit sender' },
+  CREATE_RECIPIENT_GROUP: {
+    text: 'Create recipient group',
+    href: `#${ROUTES.CREATE_RECIPIENT_GROUP}`,
+  },
+  EDIT_RECIPIENT_GROUP: { text: 'Edit recipient group' },
 });
 
 export const NOTIFICATION_STATUS = Object.freeze({
@@ -32,6 +50,29 @@ export const NOTIFICATION_STATUS = Object.freeze({
 });
 
 export const NOTIFICATION_SOURCE = Object.freeze({
-  REPORTING: 'Reporting',
   ALERTING: 'Alerting',
+  ISM: 'ISM',
+  REPORTING: 'Reporting',
+});
+
+export const CHANNEL_TYPE = Object.freeze({
+  SLACK: 'Slack',
+  EMAIL: 'Email',
+  CHIME: 'Chime',
+  CUSTOM_WEBHOOK: 'Custom webhook',
+  SES: 'SES',
+  SNS: 'SNS',
+});
+
+export const CUSTOM_WEBHOOK_ENDPOINT_TYPE = Object.freeze({
+  WEBHOOK_URL: 'Webhook URL',
+  CUSTOM_URL: 'Custom attributes URL with HTTPS',
+});
+
+export const HISTOGRAM_TYPE = Object.freeze({
+  CHANNEL_TYPE: 'Channel types',
+  SOURCE: 'Notification source',
+  STATUS: 'Notification status',
+  SEVERITY: 'Severity',
+  TOP_10_CHANNELS: 'Top 10 channels',
 });
