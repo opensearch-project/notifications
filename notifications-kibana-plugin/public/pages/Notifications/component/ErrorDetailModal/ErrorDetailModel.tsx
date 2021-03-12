@@ -49,7 +49,7 @@ const ErrorDetailModal = ({ detail, onClose }: ErrorDetailModalProps) => {
           </EuiTitle>
           {detail.map((i) => {
             return (
-              <div>
+              <div key={`error-modal-row-${i}`}>
                 <EuiHorizontalRule margin="s" />
                 <p>{i.statusText}</p>
               </div>

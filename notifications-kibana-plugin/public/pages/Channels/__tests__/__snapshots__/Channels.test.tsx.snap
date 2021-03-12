@@ -612,7 +612,7 @@ exports[`<Channels/> spec renders the component 1`] = `
                       >
                         <svg
                           aria-hidden="true"
-                          class="euiIcon euiIcon--medium euiIcon--subdued euiIcon-isLoading"
+                          class="euiIcon euiIcon--medium euiIcon--success euiIcon-isLoading"
                           focusable="false"
                           height="16"
                           role="img"
@@ -624,7 +624,7 @@ exports[`<Channels/> spec renders the component 1`] = `
                       <div
                         class="euiFlexItem euiFlexItem--flexGrowZero"
                       >
-                        Muted
+                        Active
                       </div>
                     </div>
                   </div>
@@ -645,7 +645,7 @@ exports[`<Channels/> spec renders the component 1`] = `
                   <span
                     class="euiTableCellContent__text"
                   >
-                    slack
+                    email
                   </span>
                 </div>
               </td>
@@ -661,7 +661,7 @@ exports[`<Channels/> spec renders the component 1`] = `
                 <div
                   class="euiTableCellContent euiTableCellContent--truncateText euiTableCellContent--overflowingContent"
                 >
-                  Alerting, ISM
+                  Alerting, Reporting
                 </div>
               </td>
               <td
@@ -754,7 +754,7 @@ exports[`<Channels/> spec renders the component 1`] = `
                       >
                         <svg
                           aria-hidden="true"
-                          class="euiIcon euiIcon--medium euiIcon--subdued euiIcon-isLoading"
+                          class="euiIcon euiIcon--medium euiIcon--success euiIcon-isLoading"
                           focusable="false"
                           height="16"
                           role="img"
@@ -766,7 +766,7 @@ exports[`<Channels/> spec renders the component 1`] = `
                       <div
                         class="euiFlexItem euiFlexItem--flexGrowZero"
                       >
-                        Muted
+                        Active
                       </div>
                     </div>
                   </div>
@@ -787,7 +787,7 @@ exports[`<Channels/> spec renders the component 1`] = `
                   <span
                     class="euiTableCellContent__text"
                   >
-                    slack
+                    email
                   </span>
                 </div>
               </td>
@@ -803,7 +803,7 @@ exports[`<Channels/> spec renders the component 1`] = `
                 <div
                   class="euiTableCellContent euiTableCellContent--truncateText euiTableCellContent--overflowingContent"
                 >
-                  Reporting, ISM, Alerting
+                  Alerting, Reporting
                 </div>
               </td>
               <td
@@ -896,7 +896,7 @@ exports[`<Channels/> spec renders the component 1`] = `
                       >
                         <svg
                           aria-hidden="true"
-                          class="euiIcon euiIcon--medium euiIcon--subdued euiIcon-isLoading"
+                          class="euiIcon euiIcon--medium euiIcon--success euiIcon-isLoading"
                           focusable="false"
                           height="16"
                           role="img"
@@ -908,7 +908,7 @@ exports[`<Channels/> spec renders the component 1`] = `
                       <div
                         class="euiFlexItem euiFlexItem--flexGrowZero"
                       >
-                        Muted
+                        Active
                       </div>
                     </div>
                   </div>
@@ -945,7 +945,7 @@ exports[`<Channels/> spec renders the component 1`] = `
                 <div
                   class="euiTableCellContent euiTableCellContent--truncateText euiTableCellContent--overflowingContent"
                 >
-                  ISM, Alerting
+                  Alerting, Reporting
                 </div>
               </td>
               <td
@@ -1087,7 +1087,7 @@ exports[`<Channels/> spec renders the component 1`] = `
                 <div
                   class="euiTableCellContent euiTableCellContent--truncateText euiTableCellContent--overflowingContent"
                 >
-                  Reporting
+                  Alerting, Reporting
                 </div>
               </td>
               <td
@@ -1180,7 +1180,7 @@ exports[`<Channels/> spec renders the component 1`] = `
                       >
                         <svg
                           aria-hidden="true"
-                          class="euiIcon euiIcon--medium euiIcon--subdued euiIcon-isLoading"
+                          class="euiIcon euiIcon--medium euiIcon--success euiIcon-isLoading"
                           focusable="false"
                           height="16"
                           role="img"
@@ -1192,7 +1192,7 @@ exports[`<Channels/> spec renders the component 1`] = `
                       <div
                         class="euiFlexItem euiFlexItem--flexGrowZero"
                       >
-                        Muted
+                        Active
                       </div>
                     </div>
                   </div>
@@ -1229,7 +1229,7 @@ exports[`<Channels/> spec renders the component 1`] = `
                 <div
                   class="euiTableCellContent euiTableCellContent--truncateText euiTableCellContent--overflowingContent"
                 >
-                  ISM, Alerting, Reporting
+                  Alerting, Reporting
                 </div>
               </td>
               <td

@@ -45,12 +45,12 @@ export type FilterValueType = string | number | string[] | number[];
 
 export const getFilterFieldOptions = () => {
   return [
-    'Channel',
-    'Channel type',
-    'Severity',
-    'Source',
-    'Status',
-  ].map((field) => ({ label: field }));
+    { label: 'Channel' },
+    { label: 'Channel type' },
+    { label: 'Severity' },
+    { label: 'Source' },
+    { label: 'Status' },
+  ];
 };
 
 export const getFilterOperatorOptions = (field: FilterFieldType) => {

@@ -15,28 +15,29 @@
 
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
-import { ChannelControls } from '../components/ChannelControls';
+import { CreateSenderForm } from '../components/forms/CreateSenderForm';
 
-describe('<ChannelControls /> spec', () => {
+describe('<CreateSenderForm/> spec', () => {
   it('renders the component', () => {
-    const onSearchChange = jest.fn();
-    const { container } = render(
-      <ChannelControls search="" onSearchChange={onSearchChange} />
-    );
-    expect(container.firstChild).toMatchSnapshot();
-  });
-
-  it('renders the component', () => {
-    const onSearchChange = jest.fn();
+    const setSenderName = jest.fn();
+    const setEmail = jest.fn();
+    const setHost = jest.fn();
+    const setPort = jest.fn();
+    const setEncryption = jest.fn();
     const utils = render(
-      <ChannelControls search="" onSearchChange={onSearchChange} />
+      <CreateSenderForm
+          senderName="test"
+          setSenderName={setSenderName}
+          email="test"
+          setEmail={setEmail}
+          host="test"
+          setHost={setHost}
+          port="test"
+          setPort={setPort}
+          encryption="SSL"
+          setEncryption={setEncryption}
+      />
     );
-    const input = utils.getByPlaceholderText('Search');
-
-    fireEvent.change(input, { target: { value: '+(invalid query' } });
-    expect(onSearchChange).not.toBeCalled();
-
-    fireEvent.change(input, { target: { value: 'test' } });
-    expect(onSearchChange).toBeCalledWith('+test');
+    expect(utils.container.firstChild).toMatchSnapshot();
   });
 });

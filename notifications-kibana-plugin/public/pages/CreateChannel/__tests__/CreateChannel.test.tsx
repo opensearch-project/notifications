@@ -15,28 +15,20 @@
 
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
-import { ChannelControls } from '../components/ChannelControls';
+import { CreateChannel } from '../CreateChannel';
+import { CoreServicesContext } from '../../../components/coreServices';
+import { coreServicesMock } from '../../../../test/mocks/serviceMock';
+import { RouteComponentProps } from 'react-router-dom';
 
-describe('<ChannelControls /> spec', () => {
+describe('<CreateChannel/> spec', () => {
   it('renders the component', () => {
-    const onSearchChange = jest.fn();
-    const { container } = render(
-      <ChannelControls search="" onSearchChange={onSearchChange} />
-    );
-    expect(container.firstChild).toMatchSnapshot();
-  });
-
-  it('renders the component', () => {
-    const onSearchChange = jest.fn();
+    const props = { match: { params: { id: 'test' } } };
     const utils = render(
-      <ChannelControls search="" onSearchChange={onSearchChange} />
+      <CoreServicesContext.Provider value={coreServicesMock}>
+        <CreateChannel {...(props as RouteComponentProps<{ id: string }>)} />
+      </CoreServicesContext.Provider>
     );
-    const input = utils.getByPlaceholderText('Search');
-
-    fireEvent.change(input, { target: { value: '+(invalid query' } });
-    expect(onSearchChange).not.toBeCalled();
-
-    fireEvent.change(input, { target: { value: 'test' } });
-    expect(onSearchChange).toBeCalledWith('+test');
+    expect(utils.container.firstChild).toMatchSnapshot();
   });
+
 });

@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<CreateSenderForm/> spec renders the component 1`] = `
+<div
+  class="euiFormRow"
+  id="random_html_id-row"
+  style="max-width: 650px;"
+>
+  <div
+    class="euiFormRow__labelWrapper"
+  >
+    <label
+      class="euiFormLabel euiFormRow__label"
+      for="random_html_id"
+    >
+      Sender name
+    </label>
+  </div>
+  <div
+    class="euiFormRow__fieldWrapper"
+  >
+    <div
+      class="euiFormControlLayout euiFormControlLayout--fullWidth"
+    >
+      <div
+        class="euiFormControlLayout__childrenWrapper"
+      >
+        <input
+          aria-describedby="random_html_id-help"
+          class="euiFieldText euiFieldText--fullWidth"
+          id="random_html_id"
+          placeholder=""
+          type="text"
+          value="test"
+        />
+      </div>
+    </div>
+    <div
+      class="euiFormHelpText euiFormRow__text"
+      id="random_html_id-help"
+    >
+      Use a unique and descriptive name that's easy to search. The sender name must contain from m to n characters. Valid characters are lowercase a-z, 0-9, and - (hyphen).
+    </div>
+  </div>
+</div>
+`;

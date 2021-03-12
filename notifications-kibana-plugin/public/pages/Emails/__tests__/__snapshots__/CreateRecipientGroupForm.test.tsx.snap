@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<CreateRecipientGroupForm/> spec renders the component 1`] = `
+<div
+  class="euiFormRow"
+  id="random_html_id-row"
+  style="max-width: 650px;"
+>
+  <div
+    class="euiFormRow__labelWrapper"
+  >
+    <label
+      class="euiFormLabel euiFormRow__label"
+      for="random_html_id"
+    >
+      Name
+    </label>
+  </div>
+  <div
+    class="euiFormRow__fieldWrapper"
+  >
+    <div
+      class="euiFormControlLayout euiFormControlLayout--fullWidth"
+    >
+      <div
+        class="euiFormControlLayout__childrenWrapper"
+      >
+        <input
+          aria-describedby="random_html_id-help"
+          class="euiFieldText euiFieldText--fullWidth"
+          id="random_html_id"
+          placeholder="Enter channel name"
+          type="text"
+          value="test"
+        />
+      </div>
+    </div>
+    <div
+      class="euiFormHelpText euiFormRow__text"
+      id="random_html_id-help"
+    >
+      The name must contain 2 to 50 characters. Valid characters are lowercase A-Z, a-z, 0-9, (_) underscore, (-) hyphen and unicode characters.
+    </div>
+  </div>
+</div>
+`;

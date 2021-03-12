@@ -15,28 +15,18 @@
 
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
-import { ChannelControls } from '../components/ChannelControls';
+import { routerComponentPropsMock } from '../../../../test/mocks/routerPropsMock';
+import { coreServicesMock } from '../../../../test/mocks/serviceMock';
+import { CoreServicesContext } from '../../../components/coreServices';
+import { EmailGroups } from '../EmailGroups';
 
-describe('<ChannelControls /> spec', () => {
+describe('<EmailGroups/> spec', () => {
   it('renders the component', () => {
-    const onSearchChange = jest.fn();
-    const { container } = render(
-      <ChannelControls search="" onSearchChange={onSearchChange} />
-    );
-    expect(container.firstChild).toMatchSnapshot();
-  });
-
-  it('renders the component', () => {
-    const onSearchChange = jest.fn();
     const utils = render(
-      <ChannelControls search="" onSearchChange={onSearchChange} />
+      <CoreServicesContext.Provider value={coreServicesMock}>
+        <EmailGroups {...routerComponentPropsMock} />
+      </CoreServicesContext.Provider>
     );
-    const input = utils.getByPlaceholderText('Search');
-
-    fireEvent.change(input, { target: { value: '+(invalid query' } });
-    expect(onSearchChange).not.toBeCalled();
-
-    fireEvent.change(input, { target: { value: 'test' } });
-    expect(onSearchChange).toBeCalledWith('+test');
+    expect(utils.container.firstChild).toMatchSnapshot();
   });
 });
