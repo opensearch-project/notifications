@@ -15,12 +15,12 @@
 
 import React from 'react';
 import { render } from '@testing-library/react';
-import ContentPanel from './ContentPanel';
+import ContentPanel from '../ContentPanel/ContentPanel';
 
 describe('<ContentPanel /> spec', () => {
   it('renders the component', () => {
     const { container } = render(
-      <ContentPanel title="Testing" actions={[<div>one</div>, <div>two</div>]}>
+      <ContentPanel title="Testing" actions={<div>one</div>}>
         <div>Testing ContentPanel</div>
       </ContentPanel>
     );
@@ -35,5 +35,14 @@ describe('<ContentPanel /> spec', () => {
     );
     getByText('one');
     getByText('two');
+  });
+
+  it('renders with empty actions', () => {
+    const { container } = render(
+      <ContentPanel title="Testing">
+        <div>Testing ContentPanel</div>
+      </ContentPanel>
+    );
+    expect(container.firstChild).toMatchSnapshot();
   });
 });

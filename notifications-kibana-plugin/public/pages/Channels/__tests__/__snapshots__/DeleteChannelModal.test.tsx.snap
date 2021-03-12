@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<DeleteChannelModal /> spec renders multiple channels 1`] = `null`;
+
+exports[`<DeleteChannelModal /> spec renders the component 1`] = `null`;

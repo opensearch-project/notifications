@@ -16,15 +16,15 @@
 import React from 'react';
 import { EuiButton, EuiOverlayMask, EuiModal } from '@elastic/eui';
 import { render, fireEvent } from '@testing-library/react';
-import ModalRoot from './ModalRoot';
-import { ModalConsumer, ModalProvider } from './Modal';
+import ModalRoot from '../Modal/ModalRoot';
+import { ModalConsumer, ModalProvider } from '../Modal/Modal';
 import { ServicesConsumer, ServicesContext } from '../../services/services';
-import { browserServicesMock } from '../../../test/mocks';
+import { notificationServiceMock } from '../../../test/mocks/serviceMock';
 
 describe('<ModalRoot /> spec', () => {
   it('renders nothing when not used', () => {
     const { container } = render(
-      <ServicesContext.Provider value={browserServicesMock}>
+      <ServicesContext.Provider value={notificationServiceMock}>
         <ModalProvider>
           <ServicesConsumer>
             {(services) => services && <ModalRoot services={services} />}
@@ -44,7 +44,7 @@ describe('<ModalRoot /> spec', () => {
     );
     const { queryByText, getByTestId, getByLabelText } = render(
       <div>
-        <ServicesContext.Provider value={browserServicesMock}>
+        <ServicesContext.Provider value={notificationServiceMock}>
           <ModalProvider>
             <ServicesConsumer>
               {(services) => services && <ModalRoot services={services} />}

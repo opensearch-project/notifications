@@ -40,7 +40,9 @@ export function NotificationsHistogram(props: NotificationsHistogramProps) {
 
   useEffect(() => {
     const dg = new DataGenerator();
-    setData(dg.generateGroupedSeries(25, 2, 'Channel-'));
+    const data = dg.generateGroupedSeries(25, 2, 'Channel-')
+    data[18].y = 18;
+    setData(data);
   }, []);
 
   return (

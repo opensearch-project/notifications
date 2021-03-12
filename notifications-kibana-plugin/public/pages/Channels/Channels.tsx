@@ -36,8 +36,9 @@ import {
 import { CoreServicesContext } from '../../components/coreServices';
 import { BREADCRUMBS, ROUTES } from '../../utils/constants';
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '../Notifications/utils/constants';
-import { ChannelsControls } from './components/ChannelControls';
-import { ChannelsActions } from './components/ChannelsActions';
+import { ChannelControls } from './components/ChannelControls';
+import { ChannelActions } from './components/ChannelActions';
+import _ from 'lodash';
 
 interface ChannelsProps extends RouteComponentProps {}
 
@@ -61,8 +62,9 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
         id: `${i}`,
         name: 'Channel ' + (i + 1),
         enabled: [true, false][Math.round(Math.random())],
-        type: 'email',
-        allowedFeatures: ['Alerting', 'ISM'],
+        type: ['email', 'slack', 'chime'][Math.round(Math.random() * 2)],
+        allowedFeatures: _.sampleSize(['Alerting', 'ISM', 'Reporting'], Math.round(Math.random() * 2 + 1)),
+        description: 'a sample description',
         lastUpdatedTime: 0,
         destination: {
           slack: {
@@ -197,7 +199,7 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
             <ContentPanelActions
               actions={[
                 {
-                  component: <ChannelsActions selectedItems={selectedItems} />,
+                  component: <ChannelActions selectedItems={selectedItems} />,
                 },
                 {
                   component: (
@@ -213,7 +215,7 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
           title={`Channels (${this.state.total})`}
           titleSize="m"
         >
-          <ChannelsControls
+          <ChannelControls
             search={search}
             onSearchChange={this.onSearchChange}
           />

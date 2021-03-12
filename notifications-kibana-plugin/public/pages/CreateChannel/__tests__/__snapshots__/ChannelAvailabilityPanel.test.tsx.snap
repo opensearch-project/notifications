@@ -1,0 +1,116 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ChannelAvailabilityPanel/> spec renders the component 1`] = `
+<div
+  class="euiPanel euiPanel--paddingMedium"
+>
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
+    style="padding: 0px 0px;"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <h3
+        class="euiTitle euiTitle--small"
+      >
+        Availability
+      </h3>
+    </div>
+  </div>
+  <hr
+    class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginSmall"
+  />
+  <div
+    style="padding: initial;"
+  >
+    <div
+      class="euiFormRow"
+      id="random_html_id-row"
+    >
+      <div
+        class="euiFormRow__labelWrapper"
+      >
+        <label
+          class="euiFormLabel euiFormRow__label"
+          for="random_html_id"
+        >
+          Notification source
+        </label>
+      </div>
+      <div
+        class="euiFormRow__fieldWrapper"
+      >
+        <div
+          class="euiText euiText--extraSmall"
+        >
+          <div
+            class="euiTextColor euiTextColor--subdued"
+          >
+            Select sources where this channel will be available.
+          </div>
+        </div>
+        <div
+          class="euiSpacer euiSpacer--s"
+        />
+        <div>
+          <div
+            class="euiCheckbox euiCheckboxGroup__item"
+          >
+            <input
+              class="euiCheckbox__input"
+              id="ALERTING"
+              type="checkbox"
+            />
+            <div
+              class="euiCheckbox__square"
+            />
+            <label
+              class="euiCheckbox__label"
+              for="ALERTING"
+            >
+              Alerting
+            </label>
+          </div>
+          <div
+            class="euiCheckbox euiCheckboxGroup__item"
+          >
+            <input
+              class="euiCheckbox__input"
+              id="ISM"
+              type="checkbox"
+            />
+            <div
+              class="euiCheckbox__square"
+            />
+            <label
+              class="euiCheckbox__label"
+              for="ISM"
+            >
+              ISM
+            </label>
+          </div>
+          <div
+            class="euiCheckbox euiCheckboxGroup__item"
+          >
+            <input
+              class="euiCheckbox__input"
+              id="REPORTING"
+              type="checkbox"
+            />
+            <div
+              class="euiCheckbox__square"
+            />
+            <label
+              class="euiCheckbox__label"
+              for="REPORTING"
+            >
+              Reporting
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
