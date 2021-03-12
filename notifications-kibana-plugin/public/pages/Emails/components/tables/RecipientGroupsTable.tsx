@@ -39,7 +39,7 @@ import {
   ContentPanelActions,
 } from '../../../../components/ContentPanel';
 import { ModalConsumer } from '../../../../components/Modal';
-import { DeleteSenderModal } from '../modals/DeleteSenderModal';
+import { DeleteRecipientGroupModal } from '../modals/DeleteRecipientGroupModal';
 
 interface RecipientGroupsTableProps {}
 
@@ -174,8 +174,8 @@ export class RecipientGroupsTable extends Component<
                           size="s"
                           disabled={this.state.selectedItems.length === 0}
                           onClick={() =>
-                            onShow(DeleteSenderModal, {
-                              senders: this.state.selectedItems,
+                            onShow(DeleteRecipientGroupModal, {
+                              recipientGroups: this.state.selectedItems,
                             })
                           }
                         >
