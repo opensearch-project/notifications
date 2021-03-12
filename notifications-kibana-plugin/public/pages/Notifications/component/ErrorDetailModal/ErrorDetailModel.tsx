@@ -26,8 +26,9 @@ import {
   EuiHorizontalRule,
 } from '@elastic/eui';
 import { NotificationStatusDetail } from '../../../../../models/interfaces';
+import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 
-interface ErrorDetailModalProps {
+interface ErrorDetailModalProps extends ModalRootProps {
   detail: NotificationStatusDetail[];
   onClose: () => void;
 }

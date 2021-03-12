@@ -37,7 +37,7 @@ import { CoreServicesContext } from '../../../components/coreServices';
 import { NotificationService } from '../../../services';
 import { BREADCRUMBS } from '../../../utils/constants';
 import { getErrorMessage } from '../../../utils/helpers';
-import { NotificationsHistogram } from '../component/NotificationsHistogram';
+import { NotificationsHistogram } from '../component/NotificationsHistogram/NotificationsHistogram';
 import { FilterType } from '../component/SearchBar/Filter/Filters';
 import { NotificationsSearchBar } from '../component/SearchBar/NotificationsSearchBar';
 import { NotificationsTable } from '../table/NotificationsTable';

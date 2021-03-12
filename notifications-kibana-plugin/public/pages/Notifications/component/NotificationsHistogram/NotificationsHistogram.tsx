@@ -26,9 +26,9 @@ import React, { useEffect, useState } from 'react';
 import {
   ContentPanel,
   ContentPanelActions,
-} from '../../../components/ContentPanel';
-import { HISTOGRAM_TYPE } from '../../../utils/constants';
-import { HistogramControls } from './NotificationControls/HistogramControls';
+} from '../../../../components/ContentPanel';
+import { HISTOGRAM_TYPE } from '../../../../utils/constants';
+import { HistogramControls } from './HistogramControls';
 
 interface NotificationsHistogramProps {}
 
