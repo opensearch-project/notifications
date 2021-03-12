@@ -38,7 +38,6 @@ import { BREADCRUMBS, ROUTES } from '../../utils/constants';
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '../Notifications/utils/constants';
 import { ChannelControls } from './components/ChannelControls';
 import { ChannelActions } from './components/ChannelActions';
-import _ from 'lodash';
 
 interface ChannelsProps extends RouteComponentProps {}
 
@@ -61,9 +60,9 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
       items: Array.from({ length: 5 }, (v, i) => ({
         id: `${i}`,
         name: 'Channel ' + (i + 1),
-        enabled: [true, false][Math.round(Math.random())],
-        type: ['email', 'slack', 'chime'][Math.round(Math.random() * 2)],
-        allowedFeatures: _.sampleSize(['Alerting', 'ISM', 'Reporting'], Math.round(Math.random() * 2 + 1)),
+        enabled: true,
+        type: 'email',
+        allowedFeatures: ['Alerting', 'Reporting'],
         description: 'a sample description',
         lastUpdatedTime: 0,
         destination: {

@@ -66,9 +66,7 @@ export class RecipientGroupsTable extends Component<
       items: Array.from({ length: 5 }, (v, i) => ({
         id: i.toString(),
         name: 'Group ' + (i + 1),
-        email: new Array(Math.round(Math.random() * 5) + 1).fill({
-          email: 'no-reply@company.com',
-        }),
+        email: [{ email: 'no-reply@company.com' }],
         description: 'Description ' + i,
       })),
       selectedItems: [],
