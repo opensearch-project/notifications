@@ -13,10 +13,10 @@
  * permissions and limitations under the License.
  */
 
+import { render } from '@testing-library/react';
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
-import { CreateRecipientGroupModal } from '../components/modals/CreateRecipientGroupModal';
 import { notificationServiceMock } from '../../../../test/mocks/serviceMock';
+import { CreateRecipientGroupModal } from '../components/modals/CreateRecipientGroupModal';
 
 describe('<CreateRecipientGroupModal/> spec', () => {
   it('renders the component', () => {

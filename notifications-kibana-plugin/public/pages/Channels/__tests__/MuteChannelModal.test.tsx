@@ -13,10 +13,10 @@
  * permissions and limitations under the License.
  */
 
-import React from 'react';
 import { render } from '@testing-library/react';
-import { MuteChannelModal } from '../components/modals/MuteChannelModal';
+import React from 'react';
 import { notificationServiceMock } from '../../../../test/mocks/serviceMock';
+import { MuteChannelModal } from '../components/modals/MuteChannelModal';
 
 describe('<MuteChannelModal /> spec', () => {
   it('returns if no channels', () => {

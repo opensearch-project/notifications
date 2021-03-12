@@ -13,10 +13,10 @@
  * permissions and limitations under the License.
  */
 
-import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
-import { ChannelActions } from '../components/ChannelActions';
 import { ChannelItemType } from '.notifications/notifications-kibana-plugin/models/interfaces';
+import { fireEvent, render } from '@testing-library/react';
+import React from 'react';
+import { ChannelActions } from '../components/ChannelActions';
 
 describe('<ChannelActions/> spec', () => {
   it('renders the action button', () => {

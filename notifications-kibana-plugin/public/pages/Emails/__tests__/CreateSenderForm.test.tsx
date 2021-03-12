@@ -13,8 +13,8 @@
  * permissions and limitations under the License.
  */
 
+import { render } from '@testing-library/react';
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
 import { CreateSenderForm } from '../components/forms/CreateSenderForm';
 
 describe('<CreateSenderForm/> spec', () => {

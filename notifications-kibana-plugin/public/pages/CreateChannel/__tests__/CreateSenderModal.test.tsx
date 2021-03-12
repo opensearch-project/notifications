@@ -13,10 +13,10 @@
  * permissions and limitations under the License.
  */
 
+import { render } from '@testing-library/react';
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
-import { CreateSenderModal } from '../components/modals/CreateSenderModal';
 import { notificationServiceMock } from '../../../../test/mocks/serviceMock';
+import { CreateSenderModal } from '../components/modals/CreateSenderModal';
 
 describe('<CreateSenderModal/> spec', () => {
   it('renders the component', () => {

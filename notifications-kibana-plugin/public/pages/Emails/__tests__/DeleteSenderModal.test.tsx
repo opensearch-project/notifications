@@ -13,10 +13,10 @@
  * permissions and limitations under the License.
  */
 
-import React from 'react';
 import { render } from '@testing-library/react';
-import { DeleteSenderModal } from '../components/modals/DeleteSenderModal';
+import React from 'react';
 import { notificationServiceMock } from '../../../../test/mocks/serviceMock';
+import { DeleteSenderModal } from '../components/modals/DeleteSenderModal';
 
 describe('<DeleteSenderModal /> spec', () => {
   it('returns if no channels', () => {

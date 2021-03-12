@@ -13,9 +13,9 @@
  * permissions and limitations under the License.
  */
 
-import { notificationServiceMock } from '../../../../test/mocks/serviceMock';
 import { render } from '@testing-library/react';
 import React from 'react';
+import { notificationServiceMock } from '../../../../test/mocks/serviceMock';
 import ErrorDetailModal from '../component/ErrorDetailModal/ErrorDetailModel';
 
 describe('<ErrorDetailModal /> spec', () => {

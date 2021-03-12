@@ -13,12 +13,12 @@
  * permissions and limitations under the License.
  */
 
+import { render } from '@testing-library/react';
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
-import { CreateRecipientGroup } from '../CreateRecipientGroup';
-import { CoreServicesContext } from '../../../components/coreServices';
-import { coreServicesMock } from '../../../../test/mocks/serviceMock';
 import { routerComponentPropsMock } from '../../../../test/mocks/routerPropsMock';
+import { coreServicesMock } from '../../../../test/mocks/serviceMock';
+import { CoreServicesContext } from '../../../components/coreServices';
+import { CreateRecipientGroup } from '../CreateRecipientGroup';
 
 describe('<CreateRecipientGroup/> spec', () => {
   it('renders the component', () => {

@@ -13,8 +13,8 @@
  * permissions and limitations under the License.
  */
 
-import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
+import React from 'react';
 import { ChannelControls } from '../components/ChannelControls';
 
 describe('<ChannelControls /> spec', () => {

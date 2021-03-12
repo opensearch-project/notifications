@@ -13,12 +13,12 @@
  * permissions and limitations under the License.
  */
 
+import { render } from '@testing-library/react';
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
-import { CreateChannel } from '../CreateChannel';
-import { CoreServicesContext } from '../../../components/coreServices';
-import { coreServicesMock } from '../../../../test/mocks/serviceMock';
 import { RouteComponentProps } from 'react-router-dom';
+import { coreServicesMock } from '../../../../test/mocks/serviceMock';
+import { CoreServicesContext } from '../../../components/coreServices';
+import { CreateChannel } from '../CreateChannel';
 
 describe('<CreateChannel/> spec', () => {
   it('renders the component', () => {

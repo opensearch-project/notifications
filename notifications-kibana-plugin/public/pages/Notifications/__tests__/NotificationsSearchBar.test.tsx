@@ -55,11 +55,11 @@ describe('<NotificationsSearchBar /> spec', () => {
       />
     );
     expect(utils.container.firstChild).toMatchSnapshot();
-    
+
     const searchBar = utils.getByPlaceholderText('Search');
     fireEvent.change(searchBar, { target: { value: 'new query' } });
     expect(setSearch).toBeCalledWith('new query');
-    
+
     utils.getByText('Refresh').click();
     expect(refresh).toBeCalled();
   });

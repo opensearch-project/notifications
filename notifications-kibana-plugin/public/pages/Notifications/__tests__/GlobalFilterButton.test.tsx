@@ -13,8 +13,8 @@
  * permissions and limitations under the License.
  */
 
-import { fireEvent, render } from '@testing-library/react';
-import { configure, mount, shallow } from 'enzyme';
+import { render } from '@testing-library/react';
+import { configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import React from 'react';
 import { FilterType } from '../component/SearchBar/Filter/Filters';
@@ -52,18 +52,18 @@ describe('<GlobalFilterButton /> spec', () => {
     const utils = render(
       <GlobalFilterButton filters={filters} setFilters={setFilters} />
     );
-    
-    utils.getByLabelText('Change all filters').click()
-    utils.getByText('Enable all').click()
-    utils.getByLabelText('Change all filters').click()
-    utils.getByText('Disable all').click()
-    utils.getByLabelText('Change all filters').click()
-    utils.getByText('Invert inclusion').click()
-    utils.getByLabelText('Change all filters').click()
-    utils.getByText('Invert enabled/disabled').click()
-    utils.getByLabelText('Change all filters').click()
-    utils.getByText('Remove all').click()
-    
-    expect(setFilters).toBeCalledTimes(5)
+
+    utils.getByLabelText('Change all filters').click();
+    utils.getByText('Enable all').click();
+    utils.getByLabelText('Change all filters').click();
+    utils.getByText('Disable all').click();
+    utils.getByLabelText('Change all filters').click();
+    utils.getByText('Invert inclusion').click();
+    utils.getByLabelText('Change all filters').click();
+    utils.getByText('Invert enabled/disabled').click();
+    utils.getByLabelText('Change all filters').click();
+    utils.getByText('Remove all').click();
+
+    expect(setFilters).toBeCalledTimes(5);
   });
 });

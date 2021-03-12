@@ -13,10 +13,10 @@
  * permissions and limitations under the License.
  */
 
-import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
-import { ChannelAvailabilityPanel } from '../components/ChannelAvailabilityPanel';
+import React from 'react';
 import { NOTIFICATION_SOURCE } from '../../../utils/constants';
+import { ChannelAvailabilityPanel } from '../components/ChannelAvailabilityPanel';
 
 describe('<ChannelAvailabilityPanel/> spec', () => {
   it('renders the component', () => {

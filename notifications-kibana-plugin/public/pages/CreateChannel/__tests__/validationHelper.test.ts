@@ -13,8 +13,12 @@
  * permissions and limitations under the License.
  */
 
-import { validateChannelName, validateEmailSender, validateRecipients, validateSlackWebhook } from "../utils/validationHelper";
-
+import {
+  validateChannelName,
+  validateEmailSender,
+  validateRecipients,
+  validateSlackWebhook,
+} from '../utils/validationHelper';
 
 // TODO add more detailed test cases when validations are finalized by UX
 describe('test create channel validation helpers', () => {
@@ -40,7 +44,7 @@ describe('test create channel validation helpers', () => {
   });
 
   it('validates recipients', () => {
-    const pass = validateRecipients([{label: 'test'}]);
+    const pass = validateRecipients([{ label: 'test' }]);
     const fail = validateRecipients([]);
     expect(pass).toBeTruthy;
     expect(fail).toBeFalsy;

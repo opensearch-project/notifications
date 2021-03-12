@@ -14,7 +14,6 @@
  */
 
 import { fireEvent, render } from '@testing-library/react';
-import React from 'react';
 import { FilterType } from '../component/SearchBar/Filter/Filters';
 import {
   filterToQueryString,
@@ -22,7 +21,7 @@ import {
   getFilterOperatorOptions,
   getOperatorString,
   getValueComponent,
-  isSingleSelection,
+  isSingleSelection
 } from '../component/SearchBar/utils/filterHelpers';
 
 describe('test filter helper functions', () => {
