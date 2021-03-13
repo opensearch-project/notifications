@@ -105,7 +105,7 @@ internal class EmailGroupTests : ESTestCase() {
     }
 
     @Test
-    fun `EmailGroup should throw exception when recipients is replace with recipients2 in json object`() {
+    fun `EmailGroup should throw exception when recipients is replaced with recipients2 in json object`() {
         val sampleEmailGroup = EmailGroup(listOf("email1@email.com", "email2@email.com"))
         val jsonString = """
             {
