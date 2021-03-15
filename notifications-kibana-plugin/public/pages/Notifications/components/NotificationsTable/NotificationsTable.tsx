@@ -88,11 +88,11 @@ export function NotificationsTable(props: NotificationsTableProps) {
       sortable: true,
       // TODO: render the errors detail with a modal
       render: (status, item: NotificationItem) => {
-        const color = status == 'Sent' ? 'success' : 'danger';
-        const label = status == 'Sent' ? 'Sent' : 'Errors';
+        const color = status == 'Success' ? 'success' : 'danger';
+        const label = status == 'Success' ? 'Sent' : 'Errors';
         return (
           <EuiHealth color={color}>
-            {status === 'Sent' ? (
+            {status === 'Success' ? (
               label
             ) : (
               <ModalConsumer>

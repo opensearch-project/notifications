@@ -232,6 +232,52 @@ export default class NotificationService {
             },
           ],
         },
+        {
+          id: '2',
+          title: 'another notification',
+          referenceId: 'alert_id_2',
+          source: 'Alerting',
+          severity: 'High',
+          lastUpdatedTime: 1612229000,
+          tags: ['optional string list'],
+          status: 'Success',
+          statusList: [
+            {
+              configId: '1',
+              configName: 'dev_email_channel',
+              configType: 'Email',
+              emailRecipientStatus: [
+                {
+                  recipient: 'dd@amazon.com',
+                  deliveryStatus: {
+                    statusCode: '500',
+                    statusText: 'Some error',
+                  },
+                },
+                {
+                  recipient: 'zhongnan@amazon.com',
+                  deliveryStatus: {
+                    statusCode: '404',
+                    statusText: 'invalid',
+                  },
+                },
+              ],
+              deliveryStatus: {
+                statusCode: '500',
+                statusText: 'Error',
+              },
+            },
+            {
+              configId: '2',
+              configName: 'manage_slack_channel',
+              configType: 'Slack',
+              deliveryStatus: {
+                statusCode: '200',
+                statusText: 'Success',
+              },
+            },
+          ],
+        },
       ],
       totalNotifications: 6,
     };
