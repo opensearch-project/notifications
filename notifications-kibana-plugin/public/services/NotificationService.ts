@@ -13,7 +13,6 @@
  * permissions and limitations under the License.
  */
 
-import { NODE_API } from '../../common';
 import { HttpSetup } from '../../../../src/core/public';
 import { NotificationItem } from '../../models/interfaces';
 
@@ -188,59 +187,56 @@ export default class NotificationService {
     const raw = {
       notifications: [
         {
-          _id: '1',
+          id: '1',
           title: 'Alert notification on high error rate',
-          channel_ids: ['1a'],
-          reference_id: 'alert_id_1',
+          referenceId: 'alert_id_1',
           source: 'Alerting',
-          status: 'Sent',
           severity: 'High',
-          channel_status: [
+          lastUpdatedTime: 1612229000,
+          tags: ['optional string list'],
+          status: 'Error',
+          statusList: [
             {
-              channel_id: 'manager_slack_channel_id',
-              status_code: 200,
-              status_text: 'Success',
-            },
-          ],
-          tags: ['priority: high'],
-          sent_time: 1612229000,
-        },
-        {
-          _id: '2',
-          title: 'Weekly sales report',
-          channel_ids: ['1a', '2b'],
-          reference_id: 'report_id',
-          source: 'Alerting',
-          overall_status: 'Error',
-          channel_status: [
-            {
-              channel_id: 'dev_email_channel_id',
-              recipients: [
+              configId: '1',
+              configName: 'dev_email_channel',
+              configType: 'Email',
+              emailRecipientStatus: [
                 {
-                  recipient: 'zhongnan@email.com',
-                  status_code: 200,
-                  status_text: 'Success',
+                  recipient: 'dd@amazon.com',
+                  deliveryStatus: {
+                    statusCode: '500',
+                    StatusText: 'Some error',
+                  },
                 },
                 {
-                  recipient: 'david@amazon.com',
-                  status_code: 404,
-                  status_text: 'invalid recipient',
+                  recipient: 'cc@amazon.com',
+                  deliveryStatus: {
+                    statusCode: '404',
+                    StatusText: 'invalid',
+                  },
                 },
               ],
+              deliveryStatus: {
+                statusCode: '500',
+                StatusText: 'Error',
+              },
             },
             {
-              channel_id: 'manager_slack_channel_id',
-              status_code: 200,
-              status_text: 'Success',
+              configId: '2',
+              configName: 'manage_slack_channel',
+              configType: 'Slack',
+              deliveryStatus: {
+                statusCode: '200',
+                StatusText: 'Success',
+              },
             },
           ],
-          severity: 'High',
-          tags: ['priority: high', 'notes: April'],
-          sent_time: 1612229000,
         },
       ],
+      totalNotifications: 6,
     };
 
-    return fakeRes;
+    // return fakeRes;
+    return raw;
   };
 }

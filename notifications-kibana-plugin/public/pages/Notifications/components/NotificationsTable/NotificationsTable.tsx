@@ -22,13 +22,14 @@ import {
 } from '@elastic/eui';
 import { Criteria } from '@elastic/eui/src/components/basic_table/basic_table';
 import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_bar';
-import React, { useState } from 'react';
-import { NotificationItem } from '../../../../../models/interfaces';
+import React from 'react';
+import {
+  ChannelStatus,
+  NotificationItem,
+} from '../../../../../models/interfaces';
 import { ContentPanel } from '../../../../components/ContentPanel';
 import { ModalConsumer } from '../../../../components/Modal';
 import { renderTime } from '../../../../utils/helpers';
-import { navigateToChannelDetail } from '../../utils/helpers';
-import ErrorDetailModal from '../ErrorDetailModal/ErrorDetailModel';
 import { TableFlyout } from './Flyout/TableFlyout';
 
 interface NotificationsTableProps {
@@ -42,20 +43,22 @@ interface NotificationsTableProps {
 }
 
 export function NotificationsTable(props: NotificationsTableProps) {
-  const [flyoutOpen, setFlyoutOpen] = useState(false);
-
   const columns: EuiTableFieldDataColumnType<NotificationItem>[] = [
     {
       field: 'title',
       name: 'Notification title',
       sortable: true,
       truncateText: true,
-      width: '150px',
-      render: (title) => (
-        //TODO: pending UX
-        <EuiLink href="#" target="_blank">
-          {title}
-        </EuiLink>
+      render: (title, item) => (
+        <ModalConsumer>
+          {({ onShow }) => (
+            <EuiLink
+              onClick={() => onShow(TableFlyout, { notificationItem: item })}
+            >
+              {title}
+            </EuiLink>
+          )}
+        </ModalConsumer>
       ),
     },
     {
@@ -63,7 +66,6 @@ export function NotificationsTable(props: NotificationsTableProps) {
       name: 'Notification source',
       sortable: true,
       truncateText: true,
-      width: '150px',
     },
     {
       field: 'severity', // we don't care about the field as we're using the whole item in render
@@ -71,29 +73,23 @@ export function NotificationsTable(props: NotificationsTableProps) {
       sortable: true,
       truncateText: false,
       textOnly: true,
-      width: '150px',
     },
     {
-      field: 'sentTime',
+      field: 'lastUpdateTime',
       name: 'Time sent',
       sortable: true,
       truncateText: false,
       render: renderTime,
       dataType: 'date',
-      width: '150px',
     },
     {
-      field: 'status.overview',
+      field: 'status',
       name: 'Sent status',
       sortable: true,
-      width: '150px',
       // TODO: render the errors detail with a modal
       render: (status, item: NotificationItem) => {
         const color = status == 'Sent' ? 'success' : 'danger';
         const label = status == 'Sent' ? 'Sent' : 'Errors';
-        const {
-          status: { detail },
-        } = item;
         return (
           <EuiHealth color={color}>
             {status === 'Sent' ? (
@@ -101,7 +97,11 @@ export function NotificationsTable(props: NotificationsTableProps) {
             ) : (
               <ModalConsumer>
                 {({ onShow }) => (
-                  <EuiLink onClick={() => onShow(ErrorDetailModal, { detail })}>
+                  <EuiLink
+                    onClick={() =>
+                      onShow(TableFlyout, { notificationItem: item })
+                    }
+                  >
                     {label}
                   </EuiLink>
                 )}
@@ -112,35 +112,27 @@ export function NotificationsTable(props: NotificationsTableProps) {
       },
     },
     {
-      field: 'channel.name',
+      field: 'statusList',
       name: 'Channels',
       sortable: true,
       truncateText: true,
-      width: '150px',
-      render: (name: string, item: NotificationItem) => (
-        <EuiLink onClick={() => navigateToChannelDetail(item)}>{name}</EuiLink>
-      ),
+      render: (status: ChannelStatus[]) =>
+        status.length === 1
+          ? status[0].configName
+          : `${status.length} channels`,
     },
     {
-      field: 'channel.type', // we don't care about the field as we're using the whole item in render
+      field: 'statusList', // we don't care about the field as we're using the whole item in render
       name: 'Channel types',
       sortable: true,
       truncateText: false,
-      textOnly: true,
-      width: '150px',
+      render: (status: ChannelStatus[]) =>
+        status.map((channel) => channel.configType).join(', '),
     },
   ];
 
   return (
     <>
-      <button
-        style={{ border: 'solid red', padding: 3 }}
-        onClick={() => {
-          setFlyoutOpen(true);
-        }}
-      >
-        TEST
-      </button>
       <ContentPanel
         bodyStyles={{ padding: 'initial' }}
         title="Notification History"
@@ -148,7 +140,8 @@ export function NotificationsTable(props: NotificationsTableProps) {
       >
         <EuiBasicTable
           columns={columns}
-          itemId="title"
+          tableLayout="auto"
+          itemId="id"
           isSelectable={true}
           items={props.items}
           noItemsMessage={
@@ -160,7 +153,6 @@ export function NotificationsTable(props: NotificationsTableProps) {
           sorting={props.sorting}
         />
       </ContentPanel>
-      <TableFlyout flyoutOpen={flyoutOpen} setFlyoutOpen={setFlyoutOpen} />
     </>
   );
 }

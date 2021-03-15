@@ -14,29 +14,97 @@
  */
 
 import {
+  EuiButtonEmpty,
+  EuiDescriptionList,
+  EuiFlexGroup,
+  EuiFlexItem,
   EuiFlyout,
   EuiFlyoutBody,
+  EuiFlyoutFooter,
   EuiFlyoutHeader,
+  EuiSpacer,
   EuiTitle,
 } from '@elastic/eui';
 import React from 'react';
+import { NotificationItem } from '../../../../../../models/interfaces';
+import { ModalRootProps } from '../../../../../components/Modal/ModalRoot';
+import { renderTime } from '../../../../../utils/helpers';
+import { ChannelCard } from './ChannelCard';
 
-interface TableFlyoutProps {
-  flyoutOpen: boolean;
-  setFlyoutOpen: (flyoutOpen: boolean) => void;
+interface TableFlyoutProps extends ModalRootProps {
+  notificationItem: NotificationItem;
+  onClose: () => void;
 }
 
 export function TableFlyout(props: TableFlyoutProps) {
   return (
     <>
-      {props.flyoutOpen ? (
-        <EuiFlyout size="s" onClose={() => props.setFlyoutOpen(false)}>
+      {props.notificationItem !== null ? (
+        <EuiFlyout size="s" onClose={props.onClose}>
           <EuiFlyoutHeader hasBorder>
             <EuiTitle>
               <h2>Notification details</h2>
             </EuiTitle>
           </EuiFlyoutHeader>
-          <EuiFlyoutBody>hello</EuiFlyoutBody>
+          <EuiFlyoutBody>
+            <EuiDescriptionList
+              listItems={[
+                {
+                  title: 'Notification',
+                  description: props.notificationItem.title,
+                },
+              ]}
+            />
+            <EuiSpacer />
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiDescriptionList
+                  listItems={[
+                    {
+                      title: 'Source',
+                      description: 'TODO',
+                    },
+                  ]}
+                />
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiDescriptionList
+                  listItems={[
+                    {
+                      title: 'Source type',
+                      description: props.notificationItem.source,
+                    },
+                  ]}
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiSpacer />
+            <EuiDescriptionList
+              listItems={[
+                {
+                  title: 'Time sent',
+                  description: renderTime(
+                    props.notificationItem.lastUpdatedTime
+                  ),
+                },
+              ]}
+            />
+            <EuiSpacer />
+            <EuiTitle size="xs">
+              <h4>Channels sent</h4>
+            </EuiTitle>
+            <EuiSpacer size="s" />
+            <ChannelCard />
+          </EuiFlyoutBody>
+          <EuiFlyoutFooter>
+            <EuiButtonEmpty
+              iconType="cross"
+              onClick={props.onClose}
+              flush="left"
+            >
+              Close
+            </EuiButtonEmpty>
+          </EuiFlyoutFooter>
         </EuiFlyout>
       ) : null}
     </>

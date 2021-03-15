@@ -16,26 +16,31 @@
 import { Direction } from '@elastic/eui';
 
 export interface NotificationItem {
+  id: string;
   title: string;
-  channel: ChannelOverview; // those will be prepared by kibana server. UI model vs Backend Model
-  referenceId: string; // TODO: this should probably be sourcelink, which is created by kibana server using source + ref_id and a dictionary of plugin url
+  referencesId: string; // TODO: this should probably be sourcelink, which is created by kibana server using source + ref_id and a dictionary of plugin url
   source: string;
   severity: string;
-  status: { overview: string; detail: NotificationStatusDetail[] };
-  sentTime: number;
+  tags?: string[];
   lastUpdatedTime: number;
+  status: 'Sent' | 'Error';
+  statusList: ChannelStatus[]; // could be multiple channels in a notification item
 }
 
-export interface NotificationStatusDetail {
-  recipient: string; // if email, this will be email address.
+export interface ChannelStatus {
+  configId: string;
+  configName: string;
+  configType: string;
+  emailRecipientStatus?: {
+    recipient: string;
+    deliveryStatus: DeliveryStatus;
+  }[];
+  deliveryStatus: DeliveryStatus;
+}
+
+export interface DeliveryStatus {
   statusCode: number;
   statusText: string;
-}
-
-export interface ChannelOverview {
-  id: string;
-  name: string;
-  type: string;
 }
 
 export interface ChannelItemType {
