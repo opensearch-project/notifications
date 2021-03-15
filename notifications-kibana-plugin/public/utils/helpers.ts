@@ -6,7 +6,8 @@ export function getErrorMessage(err: any, defaultMessage: string) {
 }
 
 export const renderTime = (time: number): string => {
-  const momentTime = moment(time).local();
+  // time is in seconds
+  const momentTime = moment.unix(time).local();
   if (time && momentTime.isValid()) return momentTime.format('MM/DD/YY h:mm a');
   return '-';
 };
