@@ -25,6 +25,7 @@ import org.elasticsearch.common.xcontent.ToXContent
 import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils
+import java.io.IOException
 
 /**
  * Data class representing Slack channel.
@@ -51,6 +52,8 @@ data class Slack(
          * Creator used in REST communication.
          * @param parser XContentParser to deserialize data from.
          */
+        @JvmStatic
+        @Throws(IOException::class)
         fun parse(parser: XContentParser): Slack {
             var url: String? = null
 

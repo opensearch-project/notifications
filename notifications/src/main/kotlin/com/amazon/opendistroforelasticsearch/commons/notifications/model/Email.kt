@@ -26,6 +26,7 @@ import org.elasticsearch.common.xcontent.ToXContent
 import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils
+import java.io.IOException
 
 /**
  * Data class representing Email account and default recipients.
@@ -58,6 +59,8 @@ data class Email(
          * Creator used in REST communication.
          * @param parser XContentParser to deserialize data from.
          */
+        @JvmStatic
+        @Throws(IOException::class)
         fun parse(parser: XContentParser): Email {
             var emailAccountID: String? = null
             var recipients: List<String> = listOf()

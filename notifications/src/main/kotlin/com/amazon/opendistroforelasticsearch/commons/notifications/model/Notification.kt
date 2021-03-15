@@ -18,6 +18,8 @@ package com.amazon.opendistroforelasticsearch.commons.notifications.model
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
 import com.amazon.opendistroforelasticsearch.notifications.util.objectList
 import com.amazon.opendistroforelasticsearch.notifications.util.stringList
+import com.amazon.opendistroforelasticsearch.notifications.util.valueOf
+import org.elasticsearch.common.Strings
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
 import org.elasticsearch.common.io.stream.Writeable
@@ -25,8 +27,7 @@ import org.elasticsearch.common.xcontent.ToXContent
 import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils
-import com.amazon.opendistroforelasticsearch.notifications.util.valueOf
-import org.elasticsearch.common.Strings
+import java.io.IOException
 
 /**
  * Data class representing Notification.
@@ -66,6 +67,8 @@ data class Notification(
          * @param parser XContentParser to deserialize data from.
          */
         @Suppress("ComplexMethod")
+        @JvmStatic
+        @Throws(IOException::class)
         fun parse(parser: XContentParser): Notification {
             var title: String? = null
             var referenceId: String? = null

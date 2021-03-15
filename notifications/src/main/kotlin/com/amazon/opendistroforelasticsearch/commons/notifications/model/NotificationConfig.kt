@@ -27,6 +27,7 @@ import org.elasticsearch.common.xcontent.ToXContent
 import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils
+import java.io.IOException
 import java.util.EnumSet
 
 /**
@@ -86,6 +87,8 @@ data class NotificationConfig(
          * @param parser XContentParser to deserialize data from.
          */
         @Suppress("ComplexMethod")
+        @JvmStatic
+        @Throws(IOException::class)
         fun parse(parser: XContentParser): NotificationConfig {
             var name: String? = null
             var description = ""

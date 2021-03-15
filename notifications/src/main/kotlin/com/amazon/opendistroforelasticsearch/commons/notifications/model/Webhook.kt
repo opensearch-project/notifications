@@ -25,6 +25,7 @@ import org.elasticsearch.common.xcontent.ToXContent
 import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils
+import java.io.IOException
 
 /**
  * Data class representing Webhook channel.
@@ -51,6 +52,8 @@ data class Webhook(
          * Creator used in REST communication.
          * @param parser XContentParser to deserialize data from.
          */
+        @JvmStatic
+        @Throws(IOException::class)
         fun parse(parser: XContentParser): Webhook {
             var url: String? = null
 
