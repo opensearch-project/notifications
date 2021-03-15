@@ -18,12 +18,12 @@ import { Direction } from '@elastic/eui';
 export interface NotificationItem {
   id: string;
   title: string;
-  referencesId: string; // TODO: this should probably be sourcelink, which is created by kibana server using source + ref_id and a dictionary of plugin url
+  referenceId: string; // TODO: this should probably be sourcelink, which is created by kibana server using source + ref_id and a dictionary of plugin url
   source: string;
   severity: string;
   tags?: string[];
   lastUpdatedTime: number;
-  status: 'Sent' | 'Error';
+  status: string;
   statusList: ChannelStatus[]; // could be multiple channels in a notification item
 }
 
@@ -39,7 +39,7 @@ export interface ChannelStatus {
 }
 
 export interface DeliveryStatus {
-  statusCode: number;
+  statusCode: string;
   statusText: string;
 }
 

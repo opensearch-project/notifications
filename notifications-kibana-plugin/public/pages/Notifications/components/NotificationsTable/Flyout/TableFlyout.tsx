@@ -39,78 +39,70 @@ interface TableFlyoutProps extends ModalRootProps {
 export function TableFlyout(props: TableFlyoutProps) {
   return (
     <>
-      {props.notificationItem !== null ? (
-        <EuiFlyout size="s" onClose={props.onClose}>
-          <EuiFlyoutHeader hasBorder>
-            <EuiTitle>
-              <h2>Notification details</h2>
-            </EuiTitle>
-          </EuiFlyoutHeader>
-          <EuiFlyoutBody>
-            <EuiDescriptionList
-              listItems={[
-                {
-                  title: 'Notification',
-                  description: props.notificationItem.title,
-                },
-              ]}
-            />
-            <EuiSpacer />
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <EuiDescriptionList
-                  listItems={[
-                    {
-                      title: 'Source',
-                      description: 'TODO',
-                    },
-                  ]}
-                />
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiDescriptionList
-                  listItems={[
-                    {
-                      title: 'Source type',
-                      description: props.notificationItem.source,
-                    },
-                  ]}
-                />
-              </EuiFlexItem>
-            </EuiFlexGroup>
-            <EuiSpacer />
-            <EuiDescriptionList
-              listItems={[
-                {
-                  title: 'Time sent',
-                  description: renderTime(
-                    props.notificationItem.lastUpdatedTime
-                  ),
-                },
-              ]}
-            />
-            <EuiSpacer />
-            <EuiTitle size="xs">
-              <h4>Channels sent</h4>
-            </EuiTitle>
-            {props.notificationItem.statusList.map((channelStatus) => (
-              <div key={`channel-card-${channelStatus.configId}`}>
-                <EuiSpacer size="s" />
-                <ChannelCard channel={channelStatus} onClose={props.onClose} />
-              </div>
-            ))}
-          </EuiFlyoutBody>
-          <EuiFlyoutFooter>
-            <EuiButtonEmpty
-              iconType="cross"
-              onClick={props.onClose}
-              flush="left"
-            >
-              Close
-            </EuiButtonEmpty>
-          </EuiFlyoutFooter>
-        </EuiFlyout>
-      ) : null}
+      <EuiFlyout size="s" onClose={props.onClose}>
+        <EuiFlyoutHeader hasBorder>
+          <EuiTitle>
+            <h2>Notification details</h2>
+          </EuiTitle>
+        </EuiFlyoutHeader>
+        <EuiFlyoutBody>
+          <EuiDescriptionList
+            listItems={[
+              {
+                title: 'Notification',
+                description: props.notificationItem.title,
+              },
+            ]}
+          />
+          <EuiSpacer />
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiDescriptionList
+                listItems={[
+                  {
+                    title: 'Source',
+                    description: 'TODO',
+                  },
+                ]}
+              />
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiDescriptionList
+                listItems={[
+                  {
+                    title: 'Source type',
+                    description: props.notificationItem.source,
+                  },
+                ]}
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiSpacer />
+          <EuiDescriptionList
+            listItems={[
+              {
+                title: 'Time sent',
+                description: renderTime(props.notificationItem.lastUpdatedTime),
+              },
+            ]}
+          />
+          <EuiSpacer />
+          <EuiTitle size="xs">
+            <h4>Channels sent</h4>
+          </EuiTitle>
+          {props.notificationItem.statusList.map((channelStatus) => (
+            <div key={`channel-card-${channelStatus.configId}`}>
+              <EuiSpacer size="s" />
+              <ChannelCard channel={channelStatus} onClose={props.onClose} />
+            </div>
+          ))}
+        </EuiFlyoutBody>
+        <EuiFlyoutFooter>
+          <EuiButtonEmpty iconType="cross" onClick={props.onClose} flush="left">
+            Close
+          </EuiButtonEmpty>
+        </EuiFlyoutFooter>
+      </EuiFlyout>
     </>
   );
 }
