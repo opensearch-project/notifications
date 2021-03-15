@@ -93,8 +93,12 @@ export function TableFlyout(props: TableFlyoutProps) {
             <EuiTitle size="xs">
               <h4>Channels sent</h4>
             </EuiTitle>
-            <EuiSpacer size="s" />
-            <ChannelCard />
+            {props.notificationItem.statusList.map((channelStatus) => (
+              <div key={`channel-card-${channelStatus.configId}`}>
+                <EuiSpacer size="s" />
+                <ChannelCard channel={channelStatus} onClose={props.onClose} />
+              </div>
+            ))}
           </EuiFlyoutBody>
           <EuiFlyoutFooter>
             <EuiButtonEmpty

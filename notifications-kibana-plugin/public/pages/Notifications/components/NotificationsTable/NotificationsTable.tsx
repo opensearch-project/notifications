@@ -75,7 +75,7 @@ export function NotificationsTable(props: NotificationsTableProps) {
       textOnly: true,
     },
     {
-      field: 'lastUpdateTime',
+      field: 'lastUpdatedTime',
       name: 'Time sent',
       sortable: true,
       truncateText: false,

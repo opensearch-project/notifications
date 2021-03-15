@@ -205,20 +205,20 @@ export default class NotificationService {
                   recipient: 'dd@amazon.com',
                   deliveryStatus: {
                     statusCode: '500',
-                    StatusText: 'Some error',
+                    statusText: 'Some error',
                   },
                 },
                 {
                   recipient: 'cc@amazon.com',
                   deliveryStatus: {
                     statusCode: '404',
-                    StatusText: 'invalid',
+                    statusText: 'invalid',
                   },
                 },
               ],
               deliveryStatus: {
                 statusCode: '500',
-                StatusText: 'Error',
+                statusText: 'Error',
               },
             },
             {
@@ -227,7 +227,7 @@ export default class NotificationService {
               configType: 'Slack',
               deliveryStatus: {
                 statusCode: '200',
-                StatusText: 'Success',
+                statusText: 'Success',
               },
             },
           ],

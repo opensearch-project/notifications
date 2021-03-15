@@ -23,9 +23,13 @@ import {
   EuiText,
 } from '@elastic/eui';
 import React from 'react';
+import { ChannelStatus } from '../../../../../../models/interfaces';
 import { ROUTES } from '../../../../../utils/constants';
 
-interface ChannelCardProps {}
+interface ChannelCardProps {
+  channel: ChannelStatus;
+  onClose: () => void;
+}
 
 export function ChannelCard(props: ChannelCardProps) {
   const renderList = (
@@ -46,9 +50,9 @@ export function ChannelCard(props: ChannelCardProps) {
     );
   };
 
-  const renderStatus = (status: 'Success' | 'Error') => {
-    const color = status == 'Success' ? 'success' : 'danger';
-    const label = status == 'Success' ? 'Sent' : 'Errors';
+  const renderStatus = (status: string) => {
+    const color = status === 'Success' ? 'success' : 'danger';
+    const label = status === 'Success' ? 'Sent' : 'Errors';
     return (
       <EuiHealth color={color}>
         <EuiText size="s">{label}</EuiText>
@@ -61,20 +65,33 @@ export function ChannelCard(props: ChannelCardProps) {
       <EuiCard
         textAlign="left"
         title={
-          <EuiLink href={`#${ROUTES.CHANNEL_DETAILS}/${'id'}`}>
-            {'Managers'}
+          <EuiLink
+            onClick={() => {
+              location.assign(
+                `#${ROUTES.CHANNEL_DETAILS}/${props.channel.configId}`
+              );
+              props.onClose();
+            }}
+          >
+            {props.channel.configName}
           </EuiLink>
         }
         titleSize="xs"
         description=""
       >
         <EuiFlexGroup>
-          <EuiFlexItem>{renderList('Channel type', 'Email')}</EuiFlexItem>
           <EuiFlexItem>
-            {renderList('Sent status', renderStatus('Success'))}
+            {renderList('Channel type', props.channel.configType)}
+          </EuiFlexItem>
+          <EuiFlexItem>
+            {renderList(
+              'Sent status',
+              renderStatus(props.channel.deliveryStatus.statusText)
+            )}
           </EuiFlexItem>
         </EuiFlexGroup>
-        {renderList('Error details', 'unavailable')}
+        {props.channel.deliveryStatus.statusText !== 'Success' &&
+          renderList('Error details', props.channel.deliveryStatus.statusText)}
       </EuiCard>
     </>
   );
