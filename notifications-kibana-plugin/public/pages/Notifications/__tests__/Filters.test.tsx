@@ -15,7 +15,7 @@
 
 import { render } from '@testing-library/react';
 import React from 'react';
-import { Filters, FilterType } from '../component/SearchBar/Filter/Filters';
+import { Filters, FilterType } from '../components/SearchBar/Filter/Filters';
 
 describe('<Filters /> spec', () => {
   it('renders the component', () => {

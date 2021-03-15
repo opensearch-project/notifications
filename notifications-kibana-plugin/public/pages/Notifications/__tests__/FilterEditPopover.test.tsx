@@ -15,7 +15,7 @@
 
 import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
-import { FilterEditPopover } from '../component/SearchBar/Filter/FilterEditPopover';
+import { FilterEditPopover } from '../components/SearchBar/Filter/FilterEditPopover';
 
 describe('<FilterEditPopover /> spec', () => {
   it('renders the component', () => {

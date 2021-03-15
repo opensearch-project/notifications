@@ -15,7 +15,7 @@
 
 import { render } from '@testing-library/react';
 import React from 'react';
-import { NotificationsHistogram } from '../component/NotificationsHistogram/NotificationsHistogram';
+import { NotificationsHistogram } from '../components/NotificationsHistogram/NotificationsHistogram';
 
 describe('<NotificationsHistogram /> spec', () => {
   it('renders the component', () => {

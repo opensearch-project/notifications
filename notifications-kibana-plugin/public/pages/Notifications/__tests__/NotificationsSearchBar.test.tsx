@@ -15,8 +15,8 @@
 
 import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
-import { FilterType } from '../component/SearchBar/Filter/Filters';
-import { NotificationsSearchBar } from '../component/SearchBar/NotificationsSearchBar';
+import { FilterType } from '../components/SearchBar/Filter/Filters';
+import { NotificationsSearchBar } from '../components/SearchBar/NotificationsSearchBar';
 
 describe('<NotificationsSearchBar /> spec', () => {
   it('renders the component', () => {

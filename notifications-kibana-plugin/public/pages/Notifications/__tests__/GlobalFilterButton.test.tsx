@@ -17,8 +17,8 @@ import { render } from '@testing-library/react';
 import { configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import React from 'react';
-import { FilterType } from '../component/SearchBar/Filter/Filters';
-import { GlobalFilterButton } from '../component/SearchBar/Filter/GlobalFilterButton';
+import { FilterType } from '../components/SearchBar/Filter/Filters';
+import { GlobalFilterButton } from '../components/SearchBar/Filter/GlobalFilterButton';
 
 describe('<GlobalFilterButton /> spec', () => {
   configure({ adapter: new Adapter() });

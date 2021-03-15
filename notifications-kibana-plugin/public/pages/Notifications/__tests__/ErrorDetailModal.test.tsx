@@ -16,7 +16,7 @@
 import { render } from '@testing-library/react';
 import React from 'react';
 import { notificationServiceMock } from '../../../../test/mocks/serviceMock';
-import ErrorDetailModal from '../component/ErrorDetailModal/ErrorDetailModel';
+import ErrorDetailModal from '../components/ErrorDetailModal/ErrorDetailModel';
 
 describe('<ErrorDetailModal /> spec', () => {
   it('renders the component', () => {

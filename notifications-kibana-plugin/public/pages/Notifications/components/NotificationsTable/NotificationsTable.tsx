@@ -13,29 +13,23 @@
  * permissions and limitations under the License.
  */
 
-import { NotificationItem } from '../../../../models/interfaces';
-import { ContentPanel } from '../../../components/ContentPanel';
 import {
   EuiBasicTable,
-  EuiButtonIcon,
-  EuiDescriptionList,
-  EuiFlexGroup,
-  EuiFlexItem,
   EuiHealth,
   EuiLink,
   EuiTableFieldDataColumnType,
-  EuiTableRow,
-  EuiTableRowCell,
   EuiTableSortingType,
-  RIGHT_ALIGNMENT,
 } from '@elastic/eui';
-import React, { useState } from 'react';
 import { Criteria } from '@elastic/eui/src/components/basic_table/basic_table';
 import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_bar';
-import { renderTime } from '../../../utils/helpers';
-import { ModalConsumer } from '../../../components/Modal';
-import ErrorDetailModal from '../component/ErrorDetailModal/ErrorDetailModel';
-import { navigateToChannelDetail } from '../utils/helpers';
+import React, { useState } from 'react';
+import { NotificationItem } from '../../../../../models/interfaces';
+import { ContentPanel } from '../../../../components/ContentPanel';
+import { ModalConsumer } from '../../../../components/Modal';
+import { renderTime } from '../../../../utils/helpers';
+import { navigateToChannelDetail } from '../../utils/helpers';
+import ErrorDetailModal from '../ErrorDetailModal/ErrorDetailModel';
+import { TableFlyout } from './Flyout/TableFlyout';
 
 interface NotificationsTableProps {
   items: NotificationItem[];
@@ -48,21 +42,7 @@ interface NotificationsTableProps {
 }
 
 export function NotificationsTable(props: NotificationsTableProps) {
-  const [itemIdToExpandedRowMap, setItemIdToExpandedRowMap] = useState<{
-    [id: string]: React.ReactNode;
-  }>({});
-
-  const toggleDetails = (item: NotificationItem) => {
-    const itemIdToExpandedRowMapValues = { ...itemIdToExpandedRowMap };
-    if (itemIdToExpandedRowMapValues[item.title]) {
-      delete itemIdToExpandedRowMapValues[item.title];
-    } else {
-      itemIdToExpandedRowMapValues[item.title] = (
-      <div>h</div>
-      );
-    }
-    setItemIdToExpandedRowMap(itemIdToExpandedRowMapValues);
-  };
+  const [flyoutOpen, setFlyoutOpen] = useState(false);
 
   const columns: EuiTableFieldDataColumnType<NotificationItem>[] = [
     {
@@ -79,8 +59,32 @@ export function NotificationsTable(props: NotificationsTableProps) {
       ),
     },
     {
+      field: 'source',
+      name: 'Notification source',
+      sortable: true,
+      truncateText: true,
+      width: '150px',
+    },
+    {
+      field: 'severity', // we don't care about the field as we're using the whole item in render
+      name: 'Severity',
+      sortable: true,
+      truncateText: false,
+      textOnly: true,
+      width: '150px',
+    },
+    {
+      field: 'sentTime',
+      name: 'Time sent',
+      sortable: true,
+      truncateText: false,
+      render: renderTime,
+      dataType: 'date',
+      width: '150px',
+    },
+    {
       field: 'status.overview',
-      name: 'Notification status',
+      name: 'Sent status',
       sortable: true,
       width: '150px',
       // TODO: render the errors detail with a modal
@@ -108,25 +112,8 @@ export function NotificationsTable(props: NotificationsTableProps) {
       },
     },
     {
-      field: 'sentTime',
-      name: 'Time sent',
-      sortable: true,
-      truncateText: false,
-      render: renderTime,
-      dataType: 'date',
-      width: '150px',
-    },
-    {
-      field: 'source',
-      name: 'Notification source',
-      sortable: true,
-      truncateText: true,
-      width: '150px',
-    },
-    // TODO: the following 3 columns
-    {
       field: 'channel.name',
-      name: 'Channel',
+      name: 'Channels',
       sortable: true,
       truncateText: true,
       width: '150px',
@@ -136,41 +123,24 @@ export function NotificationsTable(props: NotificationsTableProps) {
     },
     {
       field: 'channel.type', // we don't care about the field as we're using the whole item in render
-      name: 'Channel type',
+      name: 'Channel types',
       sortable: true,
       truncateText: false,
       textOnly: true,
       width: '150px',
-    },
-    {
-      field: 'severity', // we don't care about the field as we're using the whole item in render
-      name: 'Severity',
-      sortable: true,
-      truncateText: false,
-      textOnly: true,
-      width: '150px',
-    },
-    {
-      field: 'title',
-      name: '',
-      width: '40px',
-      isExpander: true,
-      render: (title, item) => (
-        <EuiButtonIcon
-          onClick={() => toggleDetails(item)}
-          aria-label={
-            itemIdToExpandedRowMap[item.title] ? 'Collapse' : 'Expand'
-          }
-          iconType={
-            itemIdToExpandedRowMap[item.title] ? 'arrowUp' : 'arrowDown'
-          }
-        />
-      ),
     },
   ];
 
   return (
     <>
+      <button
+        style={{ border: 'solid red', padding: 3 }}
+        onClick={() => {
+          setFlyoutOpen(true);
+        }}
+      >
+        TEST
+      </button>
       <ContentPanel
         bodyStyles={{ padding: 'initial' }}
         title="Notification History"
@@ -188,10 +158,9 @@ export function NotificationsTable(props: NotificationsTableProps) {
           onChange={props.onTableChange}
           pagination={props.pagination}
           sorting={props.sorting}
-          itemIdToExpandedRowMap={itemIdToExpandedRowMap}
-          isExpandable={true}
         />
       </ContentPanel>
+      <TableFlyout flyoutOpen={flyoutOpen} setFlyoutOpen={setFlyoutOpen} />
     </>
   );
 }

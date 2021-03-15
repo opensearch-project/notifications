@@ -185,6 +185,62 @@ export default class NotificationService {
       totalNotifications: 6,
     };
 
+    const raw = {
+      notifications: [
+        {
+          _id: '1',
+          title: 'Alert notification on high error rate',
+          channel_ids: ['1a'],
+          reference_id: 'alert_id_1',
+          source: 'Alerting',
+          status: 'Sent',
+          severity: 'High',
+          channel_status: [
+            {
+              channel_id: 'manager_slack_channel_id',
+              status_code: 200,
+              status_text: 'Success',
+            },
+          ],
+          tags: ['priority: high'],
+          sent_time: 1612229000,
+        },
+        {
+          _id: '2',
+          title: 'Weekly sales report',
+          channel_ids: ['1a', '2b'],
+          reference_id: 'report_id',
+          source: 'Alerting',
+          overall_status: 'Error',
+          channel_status: [
+            {
+              channel_id: 'dev_email_channel_id',
+              recipients: [
+                {
+                  recipient: 'zhongnan@email.com',
+                  status_code: 200,
+                  status_text: 'Success',
+                },
+                {
+                  recipient: 'david@amazon.com',
+                  status_code: 404,
+                  status_text: 'invalid recipient',
+                },
+              ],
+            },
+            {
+              channel_id: 'manager_slack_channel_id',
+              status_code: 200,
+              status_text: 'Success',
+            },
+          ],
+          severity: 'High',
+          tags: ['priority: high', 'notes: April'],
+          sent_time: 1612229000,
+        },
+      ],
+    };
+
     return fakeRes;
   };
 }

@@ -14,7 +14,6 @@
  */
 
 import {
-  //@ts-ignore
   Criteria,
   EuiButton,
   EuiFlexGroup,
@@ -37,10 +36,10 @@ import { CoreServicesContext } from '../../../components/coreServices';
 import { NotificationService } from '../../../services';
 import { BREADCRUMBS } from '../../../utils/constants';
 import { getErrorMessage } from '../../../utils/helpers';
-import { NotificationsHistogram } from '../component/NotificationsHistogram/NotificationsHistogram';
-import { FilterType } from '../component/SearchBar/Filter/Filters';
-import { NotificationsSearchBar } from '../component/SearchBar/NotificationsSearchBar';
-import { NotificationsTable } from '../table/NotificationsTable';
+import { NotificationsHistogram } from '../components/NotificationsHistogram/NotificationsHistogram';
+import { NotificationsTable } from '../components/NotificationsTable/NotificationsTable';
+import { FilterType } from '../components/SearchBar/Filter/Filters';
+import { NotificationsSearchBar } from '../components/SearchBar/NotificationsSearchBar';
 import {
   DEFAULT_PAGE_SIZE_OPTIONS,
   DEFAULT_QUERY_PARAMS,

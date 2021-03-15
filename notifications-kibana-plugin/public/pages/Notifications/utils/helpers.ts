@@ -18,7 +18,7 @@ import queryString from 'query-string';
 import { SORT_DIRECTION } from '../../../../common';
 import { NotificationItem } from '../../../../models/interfaces';
 import { ShortDate } from '@elastic/eui';
-import { FilterType } from '../component/SearchBar/Filter/Filters';
+import { FilterType } from '../components/SearchBar/Filter/Filters';
 
 export type NotificationsQueryParams = {
   from: number;

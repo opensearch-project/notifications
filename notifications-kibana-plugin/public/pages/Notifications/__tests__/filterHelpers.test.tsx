@@ -14,15 +14,15 @@
  */
 
 import { fireEvent, render } from '@testing-library/react';
-import { FilterType } from '../component/SearchBar/Filter/Filters';
+import { FilterType } from '../components/SearchBar/Filter/Filters';
 import {
   filterToQueryString,
   getFilterFieldOptions,
   getFilterOperatorOptions,
   getOperatorString,
   getValueComponent,
-  isSingleSelection
-} from '../component/SearchBar/utils/filterHelpers';
+  isSingleSelection,
+} from '../components/SearchBar/utils/filterHelpers';
 
 describe('test filter helper functions', () => {
   it('returns filter field options', () => {
@@ -118,6 +118,6 @@ describe('test filter helper functions', () => {
       },
     ];
     const queryString = filterToQueryString(filters);
-    expect(queryString).toEqual('-(Source:Alerting OR ISM) +(Status:Sent)')
+    expect(queryString).toEqual('-(Source:Alerting OR ISM) +(Status:Sent)');
   });
 });
