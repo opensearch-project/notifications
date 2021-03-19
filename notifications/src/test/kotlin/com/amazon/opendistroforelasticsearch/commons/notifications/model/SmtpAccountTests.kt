@@ -17,7 +17,7 @@ package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
 import com.amazon.opendistroforelasticsearch.notifications.createObjectFromJsonString
 import com.amazon.opendistroforelasticsearch.notifications.getJsonString
-import com.amazon.opendistroforelasticsearch.notifications.recreateObject
+import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
 import com.fasterxml.jackson.core.JsonParseException
 import org.elasticsearch.common.settings.SecureString
 import org.elasticsearch.test.ESTestCase
