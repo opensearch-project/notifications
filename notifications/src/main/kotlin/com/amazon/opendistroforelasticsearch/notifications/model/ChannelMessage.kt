@@ -60,7 +60,7 @@ internal data class ChannelMessage(
                 var fileEncoding: String? = null
                 var fileData: String? = null
                 var fileContentType: String? = null
-                XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser::getTokenLocation)
+                XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser)
                 while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
                     val dataType = parser.currentName()
                     parser.nextToken()

@@ -76,7 +76,7 @@ internal class SendMessageRequest : ActionRequest, ToXContentObject {
         var htmlDescription: String? = null
         var attachment: ChannelMessage.Attachment? = null
         var recipients: List<String> = listOf()
-        XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser::getTokenLocation)
+        XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser)
         while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
             val fieldName = parser.currentName()
             parser.nextToken()

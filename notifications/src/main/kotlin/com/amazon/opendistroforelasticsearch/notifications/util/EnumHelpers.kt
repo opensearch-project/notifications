@@ -31,7 +31,7 @@ inline fun <reified E : Enum<E>> valueOf(type: String, default: E): E {
 
 inline fun <reified E : Enum<E>> XContentParser.enumSet(default: E): EnumSet<E> {
     val retSet: EnumSet<E> = EnumSet.noneOf(E::class.java)
-    XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_ARRAY, currentToken(), this::getTokenLocation)
+    XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_ARRAY, currentToken(), this)
     while (nextToken() != XContentParser.Token.END_ARRAY) {
         retSet.add(valueOf(text(), default))
     }

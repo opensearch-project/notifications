@@ -40,7 +40,7 @@ internal fun RestRequest.contentParserNextToken(): XContentParser {
 
 internal fun XContentParser.stringList(): List<String> {
     val retList: MutableList<String> = mutableListOf()
-    XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_ARRAY, currentToken(), this::getTokenLocation)
+    XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_ARRAY, currentToken(), this)
     while (nextToken() != XContentParser.Token.END_ARRAY) {
         retList.add(text())
     }
@@ -64,7 +64,7 @@ internal fun XContentBuilder.objectIfNotNull(name: String, xContentObject: ToXCo
 
 internal fun <T : ToXContent> XContentParser.objectList(block: (XContentParser) -> T): List<T> {
     val retList: MutableList<T> = mutableListOf()
-    XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_ARRAY, currentToken(), this::getTokenLocation)
+    XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_ARRAY, currentToken(), this)
     while (nextToken() != XContentParser.Token.END_ARRAY) {
         retList.add(block(this))
     }

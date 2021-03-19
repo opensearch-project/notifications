@@ -34,7 +34,7 @@ jobs:
       - name: Build with Gradle
         run: |
           cd notifications
-          ./gradlew build -x :integTestRunner -x :jacocoTestReport # exclude integTest task to avoid permission denied issue
+          ./gradlew build -x :integTest -x :jacocoTestReport # exclude integTest task to avoid permission denied issue
 
       - name: Create Artifact Path
         run: |
