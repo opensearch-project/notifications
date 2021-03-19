@@ -109,7 +109,7 @@ internal data class CounterIndexModel(
             var requestCount: Int? = null
             var emailSentSuccessCount: Int? = null
             var emailSentFailureCount: Int? = null
-            XContentParserUtils.ensureExpectedToken(START_OBJECT, parser.currentToken(), parser::getTokenLocation)
+            XContentParserUtils.ensureExpectedToken(START_OBJECT, parser.currentToken(), parser)
             while (END_OBJECT != parser.nextToken()) {
                 val fieldName = parser.currentName()
                 parser.nextToken()
