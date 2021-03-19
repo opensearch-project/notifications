@@ -21,11 +21,9 @@ import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettin
 import com.google.gson.JsonObject
 import org.elasticsearch.client.Request
 import org.elasticsearch.client.RequestOptions
-import org.elasticsearch.client.ResponseException
 import org.junit.After
 import org.junit.Before
 import org.springframework.integration.test.mail.TestMailServer
-import java.io.IOException
 
 abstract class NotificationsRestTestCase : ODFERestTestCase() {
 
@@ -39,11 +37,7 @@ abstract class NotificationsRestTestCase : ODFERestTestCase() {
 
     @Before
     @Throws(InterruptedException::class)
-    open fun setup() {
-        if (client() == null) {
-            initClient()
-        }
-
+    fun setupNotification() {
         resetFromAddress()
         init()
     }
@@ -69,16 +63,6 @@ abstract class NotificationsRestTestCase : ODFERestTestCase() {
     ): JsonObject {
         val request = buildRequest(refTag, recipients, title, textDescription, htmlDescription, attachment)
         return executeRequest(request)
-    }
-
-    protected fun executeRequest(request: Request): JsonObject {
-        val response = try {
-            client().performRequest(request)
-        } catch (exception: ResponseException) {
-            exception.response
-        }
-        val responseBody = getResponseBody(response, true)
-        return jsonify(responseBody)
     }
 
     protected fun buildRequest(
@@ -128,37 +112,5 @@ abstract class NotificationsRestTestCase : ODFERestTestCase() {
 
     protected fun resetChannelType() {
         setChannelType(PluginSettings.emailChannel)
-    }
-
-    @Throws(IOException::class)
-    protected open fun getAllClusterSettings(): JsonObject? {
-        val request = Request("GET", "/_cluster/settings?flat_settings&include_defaults")
-        val restOptionsBuilder = RequestOptions.DEFAULT.toBuilder()
-        restOptionsBuilder.addHeader("Content-Type", "application/json")
-        request.setOptions(restOptionsBuilder)
-        return executeRequest(request)
-    }
-
-    @Throws(IOException::class)
-    protected fun updateClusterSettings(setting: ClusterSetting): JsonObject? {
-        val request = Request("PUT", "/_cluster/settings")
-        val persistentSetting = "{\"${setting.type}\": {\"${setting.name}\": ${setting.value}}}"
-        request.setJsonEntity(persistentSetting)
-        val restOptionsBuilder = RequestOptions.DEFAULT.toBuilder()
-        restOptionsBuilder.addHeader("Content-Type", "application/json")
-        request.setOptions(restOptionsBuilder)
-        return executeRequest(request)
-    }
-
-    @Throws(IOException::class)
-    protected open fun wipeAllClusterSettings() {
-        updateClusterSettings(ClusterSetting("persistent", "*", null))
-        updateClusterSettings(ClusterSetting("transient", "*", null))
-    }
-
-    protected class ClusterSetting(val type: String, val name: String, var value: Any?) {
-        init {
-            this.value = if (value == null) "null" else "\"" + value + "\""
-        }
     }
 }

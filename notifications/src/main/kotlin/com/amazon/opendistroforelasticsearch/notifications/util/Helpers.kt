@@ -19,6 +19,12 @@ package com.amazon.opendistroforelasticsearch.notifications.util
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import org.elasticsearch.common.io.stream.InputStreamStreamInput
+import org.elasticsearch.common.io.stream.OutputStreamStreamOutput
+import org.elasticsearch.common.io.stream.StreamInput
+import org.elasticsearch.common.io.stream.Writeable
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 
 @Suppress("TooManyFunctions")
 
@@ -31,4 +37,20 @@ internal fun <T : Any> logger(forClass: Class<T>): Lazy<Logger> {
 @Suppress("UNCHECKED_CAST")
 internal fun suppressWarningCast(map: MutableMap<String?, Any?>?): Map<String, String> {
     return map as Map<String, String>
+}
+
+/**
+ * Re create the object from the writeable.
+ * This method needs to be inline and reified so that when this is called from
+ * doExecute() of transport action, the object may be created from other JVM.
+ */
+inline fun <reified Request> recreateObject(writeable: Writeable, block: (StreamInput) -> Request): Request {
+    ByteArrayOutputStream().use { byteArrayOutputStream ->
+        OutputStreamStreamOutput(byteArrayOutputStream).use {
+            writeable.writeTo(it)
+            InputStreamStreamInput(ByteArrayInputStream(byteArrayOutputStream.toByteArray())).use { streamInput ->
+                return block(streamInput)
+            }
+        }
+    }
 }

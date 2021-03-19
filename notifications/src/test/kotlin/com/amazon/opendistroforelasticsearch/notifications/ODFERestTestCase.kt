@@ -16,6 +16,7 @@
 
 package com.amazon.opendistroforelasticsearch.notifications
 
+import com.google.gson.JsonObject
 import org.apache.http.Header
 import org.apache.http.HttpHost
 import org.apache.http.auth.AuthScope
@@ -28,6 +29,8 @@ import org.apache.http.impl.nio.client.HttpAsyncClientBuilder
 import org.apache.http.message.BasicHeader
 import org.apache.http.ssl.SSLContextBuilder
 import org.elasticsearch.client.Request
+import org.elasticsearch.client.RequestOptions
+import org.elasticsearch.client.ResponseException
 import org.elasticsearch.client.RestClient
 import org.elasticsearch.client.RestClientBuilder
 import org.elasticsearch.common.settings.Settings
@@ -38,6 +41,7 @@ import org.elasticsearch.common.xcontent.NamedXContentRegistry
 import org.elasticsearch.common.xcontent.XContentType
 import org.elasticsearch.test.rest.ESRestTestCase
 import org.junit.After
+import org.junit.Before
 import java.io.IOException
 import java.security.cert.X509Certificate
 
@@ -59,15 +63,24 @@ abstract class ODFERestTestCase : ESRestTestCase() {
         return true
     }
 
+    @Before
+    @Throws(InterruptedException::class)
+    fun setupClient() {
+        if (client() == null) {
+            initClient()
+        }
+    }
+
     @Throws(IOException::class)
     @After
-    open fun wipeAllODFEIndices() {
+    fun wipeAllODFEIndices() {
         val response = client().performRequest(Request("GET", "/_cat/indices?format=json&expand_wildcards=all"))
 
         val xContentType = XContentType.fromMediaTypeOrFormat(response.entity.contentType.value)
         xContentType.xContent().createParser(
             NamedXContentRegistry.EMPTY, DeprecationHandler.THROW_UNSUPPORTED_OPERATION,
-            response.entity.content).use { parser ->
+            response.entity.content
+        ).use { parser ->
             for (index in parser.list()) {
                 val jsonObject: Map<*, *> = index as java.util.HashMap<*, *>
                 val indexName: String = jsonObject["index"] as String
@@ -75,8 +88,10 @@ abstract class ODFERestTestCase : ESRestTestCase() {
                 if (".opendistro_security" != indexName) {
                     client().performRequest(Request("DELETE", "/$indexName"))
                 }
-            } }
+            }
+        }
     }
+
     @Throws(IOException::class)
     override fun buildClient(settings: Settings, hosts: Array<HttpHost>): RestClient {
         val builder = RestClient.builder(*hosts)
@@ -90,7 +105,7 @@ abstract class ODFERestTestCase : ESRestTestCase() {
     }
 
     @Throws(IOException::class)
-    protected open fun configureHttpsClient(builder: RestClientBuilder, settings: Settings) {
+    protected fun configureHttpsClient(builder: RestClientBuilder, settings: Settings) {
         val headers = ThreadContext.buildDefaultHeaders(settings)
         val defaultHeaders = arrayOfNulls<Header>(headers.size)
         var i = 0
@@ -116,9 +131,57 @@ abstract class ODFERestTestCase : ESRestTestCase() {
         }
         val socketTimeoutString = settings[CLIENT_SOCKET_TIMEOUT]
         val socketTimeout = TimeValue.parseTimeValue(socketTimeoutString ?: "60s", CLIENT_SOCKET_TIMEOUT)
-        builder.setRequestConfigCallback { conf: RequestConfig.Builder -> conf.setSocketTimeout(Math.toIntExact(socketTimeout.millis)) }
+        builder.setRequestConfigCallback { conf: RequestConfig.Builder ->
+            conf.setSocketTimeout(
+                Math.toIntExact(
+                    socketTimeout.millis
+                )
+            )
+        }
         if (settings.hasValue(CLIENT_PATH_PREFIX)) {
             builder.setPathPrefix(settings[CLIENT_PATH_PREFIX])
+        }
+    }
+
+    @Throws(IOException::class)
+    protected fun updateClusterSettings(setting: ClusterSetting): JsonObject? {
+        val request = Request("PUT", "/_cluster/settings")
+        val persistentSetting = "{\"${setting.type}\": {\"${setting.name}\": ${setting.value}}}"
+        request.setJsonEntity(persistentSetting)
+        val restOptionsBuilder = RequestOptions.DEFAULT.toBuilder()
+        restOptionsBuilder.addHeader("Content-Type", "application/json")
+        request.setOptions(restOptionsBuilder)
+        return executeRequest(request)
+    }
+
+    protected fun executeRequest(request: Request): JsonObject {
+        val response = try {
+            client().performRequest(request)
+        } catch (exception: ResponseException) {
+            exception.response
+        }
+        val responseBody = getResponseBody(response, true)
+        return jsonify(responseBody)
+    }
+
+    @Throws(IOException::class)
+    protected fun getAllClusterSettings(): JsonObject? {
+        val request = Request("GET", "/_cluster/settings?flat_settings&include_defaults")
+        val restOptionsBuilder = RequestOptions.DEFAULT.toBuilder()
+        restOptionsBuilder.addHeader("Content-Type", "application/json")
+        request.setOptions(restOptionsBuilder)
+        return executeRequest(request)
+    }
+
+    @Throws(IOException::class)
+    protected fun wipeAllClusterSettings() {
+        updateClusterSettings(ClusterSetting("persistent", "*", null))
+        updateClusterSettings(ClusterSetting("transient", "*", null))
+    }
+
+    protected class ClusterSetting(val type: String, val name: String, var value: Any?) {
+        init {
+            this.value = if (value == null) "null" else "\"" + value + "\""
         }
     }
 }
