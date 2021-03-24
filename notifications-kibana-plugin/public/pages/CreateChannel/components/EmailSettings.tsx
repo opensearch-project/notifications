@@ -188,10 +188,10 @@ export function EmailSettings(props: EmailSettingsProps) {
                 <EuiButton
                   size="s"
                   onClick={() =>
-                    onShow(CreateRecipientGroupModal, { test: 123 })
+                    onShow(CreateRecipientGroupModal, {})
                   }
                 >
-                  Create email group
+                  Create recipient group
                 </EuiButton>
               )}
             </ModalConsumer>
