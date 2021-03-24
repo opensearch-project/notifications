@@ -14,18 +14,16 @@
  */
 
 import {
-  Criteria,
   EuiButton,
   EuiFlexGroup,
   EuiFlexItem,
   EuiSpacer,
   EuiTableSortingType,
   EuiTitle,
-
-  //@ts-ignore
-  Pagination,
   ShortDate,
 } from '@elastic/eui';
+import { Criteria } from '@elastic/eui/src/components/basic_table/basic_table';
+import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_bar';
 import _ from 'lodash';
 import queryString from 'querystring';
 import React, { Component } from 'react';
@@ -36,6 +34,7 @@ import { CoreServicesContext } from '../../../components/coreServices';
 import { NotificationService } from '../../../services';
 import { BREADCRUMBS } from '../../../utils/constants';
 import { getErrorMessage } from '../../../utils/helpers';
+import { EmptyState } from '../components/EmptyState/EmptyState';
 import { NotificationsHistogram } from '../components/NotificationsHistogram/NotificationsHistogram';
 import { NotificationsTable } from '../components/NotificationsTable/NotificationsTable';
 import { FilterType } from '../components/SearchBar/Filter/Filters';
@@ -153,8 +152,8 @@ export default class Notifications extends Component<
     page: tablePage,
     sort,
   }: Criteria<NotificationItem>): void => {
-    const { index: page, size } = tablePage;
-    const { field: sortField, direction: sortDirection } = sort;
+    const { index: page, size } = tablePage!;
+    const { field: sortField, direction: sortDirection } = sort!;
     this.setState({ from: page * size, size, sortField, sortDirection });
   };
 
@@ -220,6 +219,11 @@ export default class Notifications extends Component<
         field: sortField,
       },
     };
+
+    if (this.state.items.length === 0) {
+      // TODO check if no channels, return <EmptyState channels={false} />
+      return <EmptyState channels />;
+    }
 
     return (
       <div style={{ padding: '0px 25px' }}>

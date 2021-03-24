@@ -216,7 +216,7 @@ export default class NotificationService {
                   },
                 },
               ],
-              deliveryStatus: {
+              deliveryStatus: { // check this on each channel is enough
                 statusCode: '500',
                 statusText: 'Error',
               },
