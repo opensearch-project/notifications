@@ -32,12 +32,13 @@ import java.io.IOException
 data class DeliveryStatus(
     val statusCode: String,
     val statusText: String
-) : Writeable, ToXContent {
+) : BaseModel {
 
     init {
         require(!Strings.isNullOrEmpty(statusCode)) { "StatusCode is null or empty" }
         require(!Strings.isNullOrEmpty(statusText)) { "statusText is null or empty" }
     }
+
     companion object {
         private val log by logger(DeliveryStatus::class.java)
         private const val STATUS_CODE_TAG = "statusCode"

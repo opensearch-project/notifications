@@ -22,18 +22,20 @@ import org.elasticsearch.client.Request
 import org.elasticsearch.client.RequestOptions
 import org.junit.Assert
 
-class CreateNotificationConfigIT : ODFERestTestCase() {
+class NotificationConfigCrudIT : ODFERestTestCase() {
 
     fun `test Create notification config using REST client`() {
         val request = Request("POST", "$PLUGIN_BASE_URI/configs")
         val jsonString = """
         {
-            "name":"name",
-            "description":"description",
-            "configType":"Slack",
-            "features":["IndexManagement"],
-            "isEnabled":true,
-            "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
+            "notificationConfig":{
+                "name":"name",
+                "description":"description",
+                "configType":"Slack",
+                "features":["IndexManagement"],
+                "isEnabled":true,
+                "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
+            }
         }
         """.trimIndent()
         request.setJsonEntity(jsonString)

@@ -32,7 +32,7 @@ import java.io.IOException
  */
 data class EmailGroup(
     val recipients: List<String>
-) : Writeable, ToXContent {
+) : BaseModel {
 
     init {
         recipients.forEach {

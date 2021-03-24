@@ -17,8 +17,8 @@
 package com.amazon.opendistroforelasticsearch.notifications.action
 
 import com.amazon.opendistroforelasticsearch.commons.authuser.User
-import com.amazon.opendistroforelasticsearch.commons.notifications.action.CreateNotificationConfigRequest
-import com.amazon.opendistroforelasticsearch.commons.notifications.action.CreateNotificationConfigResponse
+import com.amazon.opendistroforelasticsearch.commons.notifications.action.DeleteNotificationConfigRequest
+import com.amazon.opendistroforelasticsearch.commons.notifications.action.DeleteNotificationConfigResponse
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.NotificationsActions
 import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
 import org.elasticsearch.action.ActionListener
@@ -30,19 +30,19 @@ import org.elasticsearch.tasks.Task
 import org.elasticsearch.transport.TransportService
 
 /**
- * Create reportDefinition transport action
+ * Delete reportDefinition transport action
  */
-internal class CreateNotificationConfigAction @Inject constructor(
+internal class DeleteNotificationConfigAction @Inject constructor(
     transportService: TransportService,
     client: Client,
     actionFilters: ActionFilters,
     val xContentRegistry: NamedXContentRegistry
-) : PluginBaseAction<CreateNotificationConfigRequest, CreateNotificationConfigResponse>(
-    NotificationsActions.CREATE_NOTIFICATION_CONFIG_NAME,
+) : PluginBaseAction<DeleteNotificationConfigRequest, DeleteNotificationConfigResponse>(
+    NotificationsActions.DELETE_NOTIFICATION_CONFIG_NAME,
     transportService,
     client,
     actionFilters,
-    ::CreateNotificationConfigRequest
+    ::DeleteNotificationConfigRequest
 ) {
 
     /**
@@ -51,11 +51,11 @@ internal class CreateNotificationConfigAction @Inject constructor(
      */
     override fun doExecute(
         task: Task?,
-        request: CreateNotificationConfigRequest,
-        listener: ActionListener<CreateNotificationConfigResponse>
+        request: DeleteNotificationConfigRequest,
+        listener: ActionListener<DeleteNotificationConfigResponse>
     ) {
-        val transformedRequest = request as? CreateNotificationConfigRequest
-            ?: recreateObject(request) { CreateNotificationConfigRequest(it) }
+        val transformedRequest = request as? DeleteNotificationConfigRequest
+            ?: recreateObject(request) { DeleteNotificationConfigRequest(it) }
         super.doExecute(task, transformedRequest, listener)
     }
 
@@ -63,9 +63,9 @@ internal class CreateNotificationConfigAction @Inject constructor(
      * {@inheritDoc}
      */
     override fun executeRequest(
-        request: CreateNotificationConfigRequest,
+        request: DeleteNotificationConfigRequest,
         user: User?
-    ): CreateNotificationConfigResponse {
-        return CreateNotificationConfigResponse("TODO-configId")
+    ): DeleteNotificationConfigResponse {
+        return DeleteNotificationConfigResponse("TODO-configId")
     }
 }

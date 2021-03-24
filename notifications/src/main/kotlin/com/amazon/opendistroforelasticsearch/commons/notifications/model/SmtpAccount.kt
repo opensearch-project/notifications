@@ -40,7 +40,7 @@ data class SmtpAccount(
     val fromAddress: String,
     val username: SecureString? = null,
     val password: SecureString? = null
-) : Writeable, ToXContent {
+) : BaseModel {
 
     init {
         require(!Strings.isNullOrEmpty(host)) { "host is null or empty" }

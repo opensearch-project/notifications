@@ -15,30 +15,38 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.NotificationConfig
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import org.elasticsearch.action.ActionRequest
+import org.elasticsearch.action.ActionRequestValidationException
+import org.elasticsearch.action.ValidateActions
+import org.elasticsearch.common.Strings
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
 import org.elasticsearch.common.io.stream.Writeable
 import org.elasticsearch.common.xcontent.ToXContent
+import org.elasticsearch.common.xcontent.ToXContentObject
 import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.io.IOException
 
 /**
- * Action Response for creating new configuration.
+ * Action request for creating new configuration.
  */
-class CreateNotificationConfigResponse : BaseResponse {
+class UpdateNotificationConfigRequest : ActionRequest, ToXContentObject {
     val configId: String
+    val notificationConfig: NotificationConfig
 
     companion object {
-        private val log by logger(CreateNotificationConfigResponse::class.java)
+        private val log by logger(UpdateNotificationConfigRequest::class.java)
         private const val CONFIG_ID_TAG = "configId"
+        private const val NOTIFICATION_CONFIG_TAG = "notificationConfig"
 
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader { CreateNotificationConfigResponse(it) }
+        val reader = Writeable.Reader { UpdateNotificationConfigRequest(it) }
 
         /**
          * Creator used in REST communication.
@@ -46,8 +54,9 @@ class CreateNotificationConfigResponse : BaseResponse {
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): CreateNotificationConfigResponse {
-            var configId: String? = null
+        fun parse(parser: XContentParser, id: String? = null): UpdateNotificationConfigRequest {
+            var configId: String? = id
+            var notificationConfig: NotificationConfig? = null
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -59,39 +68,17 @@ class CreateNotificationConfigResponse : BaseResponse {
                 parser.nextToken()
                 when (fieldName) {
                     CONFIG_ID_TAG -> configId = parser.text()
+                    NOTIFICATION_CONFIG_TAG -> notificationConfig = NotificationConfig.parse(parser)
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing CreateNotificationConfigResponse")
+                        log.info("Unexpected field: $fieldName, while parsing UpdateNotificationConfigRequest")
                     }
                 }
             }
             configId ?: throw IllegalArgumentException("$CONFIG_ID_TAG field absent")
-            return CreateNotificationConfigResponse(configId)
+            notificationConfig ?: throw IllegalArgumentException("$NOTIFICATION_CONFIG_TAG field absent")
+            return UpdateNotificationConfigRequest(configId, notificationConfig)
         }
-    }
-
-    /**
-     * constructor for creating the class
-     * @param configId the id of the created notification configuration
-     */
-    constructor(configId: String) {
-        this.configId = configId
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Throws(IOException::class)
-    constructor(input: StreamInput) : super(input) {
-        configId = input.readString()
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Throws(IOException::class)
-    override fun writeTo(output: StreamOutput) {
-        output.writeString(configId)
     }
 
     /**
@@ -101,6 +88,47 @@ class CreateNotificationConfigResponse : BaseResponse {
         builder!!
         return builder.startObject()
             .field(CONFIG_ID_TAG, configId)
+            .field(NOTIFICATION_CONFIG_TAG, notificationConfig)
             .endObject()
+    }
+
+    /**
+     * constructor for creating the class
+     * @param configId the id notification config object
+     * @param notificationConfig the notification config object
+     */
+    constructor(configId: String, notificationConfig: NotificationConfig) {
+        this.configId = configId
+        this.notificationConfig = notificationConfig
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Throws(IOException::class)
+    constructor(input: StreamInput) : super(input) {
+        configId = input.readString()
+        notificationConfig = NotificationConfig.reader.read(input)!!
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Throws(IOException::class)
+    override fun writeTo(output: StreamOutput) {
+        super.writeTo(output)
+        output.writeString(configId)
+        notificationConfig.writeTo(output)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun validate(): ActionRequestValidationException? {
+        var validationException: ActionRequestValidationException? = null
+        if (Strings.isNullOrEmpty(configId)) {
+            validationException = ValidateActions.addValidationError("configId is null or empty", validationException)
+        }
+        return validationException
     }
 }

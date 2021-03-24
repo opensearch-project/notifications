@@ -32,7 +32,7 @@ import java.io.IOException
  */
 data class Webhook(
     val url: String
-) : Writeable, ToXContent {
+) : BaseModel {
 
     init {
         require(!Strings.isNullOrEmpty(url)) { "URL is null or empty" }

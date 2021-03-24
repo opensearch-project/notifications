@@ -39,7 +39,7 @@ data class Notification(
     val severity: SeverityType,
     val tags: List<String> = listOf(),
     val statusList: List<NotificationStatus> = listOf()
-) : Writeable, ToXContent {
+) : BaseModel {
 
     init {
         require(!Strings.isNullOrEmpty(title)) { "name is null or empty" }

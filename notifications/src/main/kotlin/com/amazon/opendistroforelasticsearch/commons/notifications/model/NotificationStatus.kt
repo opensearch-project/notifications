@@ -39,7 +39,7 @@ data class NotificationStatus(
     val configType: NotificationConfig.ConfigType,
     val emailRecipientStatus: List<EmailRecipientStatus> = listOf(),
     val deliveryStatus: DeliveryStatus? = null
-) : Writeable, ToXContent {
+) : BaseModel {
 
     init {
         require(!Strings.isNullOrEmpty(configId)) { "config id is null or empty" }

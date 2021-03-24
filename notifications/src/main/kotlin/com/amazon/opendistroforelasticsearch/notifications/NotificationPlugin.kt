@@ -18,7 +18,10 @@ package com.amazon.opendistroforelasticsearch.notifications
 
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.NotificationsActions
 import com.amazon.opendistroforelasticsearch.notifications.action.CreateNotificationConfigAction
+import com.amazon.opendistroforelasticsearch.notifications.action.DeleteNotificationConfigAction
+import com.amazon.opendistroforelasticsearch.notifications.action.GetNotificationConfigAction
 import com.amazon.opendistroforelasticsearch.notifications.action.SendMessageAction
+import com.amazon.opendistroforelasticsearch.notifications.action.UpdateNotificationConfigAction
 import com.amazon.opendistroforelasticsearch.notifications.resthandler.NotificationConfigRestHandler
 import com.amazon.opendistroforelasticsearch.notifications.resthandler.SendMessageRestHandler
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
@@ -103,7 +106,10 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
         log.debug("$LOG_PREFIX:getActions")
         return listOf(
             ActionPlugin.ActionHandler(SendMessageAction.ACTION_TYPE, SendMessageAction::class.java),
-            ActionPlugin.ActionHandler(NotificationsActions.CREATE_NOTIFICATION_CONFIG_ACTION_TYPE, CreateNotificationConfigAction::class.java)
+            ActionPlugin.ActionHandler(NotificationsActions.CREATE_NOTIFICATION_CONFIG_ACTION_TYPE, CreateNotificationConfigAction::class.java),
+            ActionPlugin.ActionHandler(NotificationsActions.UPDATE_NOTIFICATION_CONFIG_ACTION_TYPE, UpdateNotificationConfigAction::class.java),
+            ActionPlugin.ActionHandler(NotificationsActions.DELETE_NOTIFICATION_CONFIG_ACTION_TYPE, DeleteNotificationConfigAction::class.java),
+            ActionPlugin.ActionHandler(NotificationsActions.GET_NOTIFICATION_CONFIG_ACTION_TYPE, GetNotificationConfigAction::class.java)
         )
     }
 

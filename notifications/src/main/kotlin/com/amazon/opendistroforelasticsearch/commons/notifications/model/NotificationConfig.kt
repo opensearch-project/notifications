@@ -45,7 +45,7 @@ data class NotificationConfig(
     val email: Email? = null,
     val smtpAccount: SmtpAccount? = null,
     val emailGroup: EmailGroup? = null
-) : Writeable, ToXContent {
+) : BaseModel {
 
     init {
         require(!Strings.isNullOrEmpty(name)) { "name is null or empty" }

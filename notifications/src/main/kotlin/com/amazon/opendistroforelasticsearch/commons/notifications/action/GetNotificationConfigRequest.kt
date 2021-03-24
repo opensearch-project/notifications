@@ -15,11 +15,16 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
+import com.amazon.opendistroforelasticsearch.notifications.util.fieldIfNotNull
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import org.elasticsearch.action.ActionRequest
+import org.elasticsearch.action.ActionRequestValidationException
+import org.elasticsearch.action.ValidateActions
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
 import org.elasticsearch.common.io.stream.Writeable
 import org.elasticsearch.common.xcontent.ToXContent
+import org.elasticsearch.common.xcontent.ToXContentObject
 import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils
@@ -28,17 +33,22 @@ import java.io.IOException
 /**
  * Action Response for creating new configuration.
  */
-class CreateNotificationConfigResponse : BaseResponse {
-    val configId: String
+class GetNotificationConfigRequest : ActionRequest, ToXContentObject {
+    val fromIndex: Int
+    val maxItems: Int
+    val configId: String?
 
     companion object {
-        private val log by logger(CreateNotificationConfigResponse::class.java)
+        private val log by logger(GetNotificationConfigRequest::class.java)
+        const val DEFAULT_MAX_ITEMS = 1000
+        const val FROM_INDEX_TAG = "fromIndex"
+        const val MAX_ITEMS_TAG = "maxItems"
         private const val CONFIG_ID_TAG = "configId"
 
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader { CreateNotificationConfigResponse(it) }
+        val reader = Writeable.Reader { GetNotificationConfigRequest(it) }
 
         /**
          * Creator used in REST communication.
@@ -46,7 +56,9 @@ class CreateNotificationConfigResponse : BaseResponse {
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): CreateNotificationConfigResponse {
+        fun parse(parser: XContentParser): GetNotificationConfigRequest {
+            var fromIndex = 0
+            var maxItems = DEFAULT_MAX_ITEMS
             var configId: String? = null
 
             XContentParserUtils.ensureExpectedToken(
@@ -58,23 +70,26 @@ class CreateNotificationConfigResponse : BaseResponse {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
+                    FROM_INDEX_TAG -> fromIndex = parser.intValue()
+                    MAX_ITEMS_TAG -> maxItems = parser.intValue()
                     CONFIG_ID_TAG -> configId = parser.text()
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing CreateNotificationConfigResponse")
+                        log.info("Unexpected field: $fieldName, while parsing GetNotificationConfigRequest")
                     }
                 }
             }
-            configId ?: throw IllegalArgumentException("$CONFIG_ID_TAG field absent")
-            return CreateNotificationConfigResponse(configId)
+            return GetNotificationConfigRequest(fromIndex, maxItems, configId)
         }
     }
 
     /**
      * constructor for creating the class
-     * @param configId the id of the created notification configuration
+     * @param configId the id of the notification configuration
      */
-    constructor(configId: String) {
+    constructor(fromIndex: Int = 0, maxItems: Int = DEFAULT_MAX_ITEMS, configId: String? = null) {
+        this.fromIndex = fromIndex
+        this.maxItems = maxItems
         this.configId = configId
     }
 
@@ -83,7 +98,9 @@ class CreateNotificationConfigResponse : BaseResponse {
      */
     @Throws(IOException::class)
     constructor(input: StreamInput) : super(input) {
-        configId = input.readString()
+        fromIndex = input.readInt()
+        maxItems = input.readInt()
+        configId = input.readOptionalString()
     }
 
     /**
@@ -91,7 +108,10 @@ class CreateNotificationConfigResponse : BaseResponse {
      */
     @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
-        output.writeString(configId)
+        super.writeTo(output)
+        output.writeInt(fromIndex)
+        output.writeInt(maxItems)
+        output.writeOptionalString(configId)
     }
 
     /**
@@ -100,7 +120,23 @@ class CreateNotificationConfigResponse : BaseResponse {
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(CONFIG_ID_TAG, configId)
+            .field(FROM_INDEX_TAG, fromIndex)
+            .field(MAX_ITEMS_TAG, maxItems)
+            .fieldIfNotNull(CONFIG_ID_TAG, configId)
             .endObject()
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun validate(): ActionRequestValidationException? {
+        var validationException: ActionRequestValidationException? = null
+        if (fromIndex < 0) {
+            validationException = ValidateActions.addValidationError("fromIndex is -ve", validationException)
+        }
+        if (maxItems <= 0) {
+            validationException = ValidateActions.addValidationError("maxItems is not +ve", validationException)
+        }
+        return validationException
     }
 }

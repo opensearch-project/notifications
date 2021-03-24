@@ -35,7 +35,7 @@ data class Email(
     val emailAccountID: String,
     val defaultRecipients: List<String>,
     val defaultEmailGroupIds: List<String>
-) : Writeable, ToXContent {
+) : BaseModel {
 
     init {
         require(!Strings.isNullOrEmpty(emailAccountID)) { "emailAccountID is null or empty" }

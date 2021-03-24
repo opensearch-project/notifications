@@ -13,9 +13,8 @@
  * permissions and limitations under the License.
  *
  */
-package com.amazon.opendistroforelasticsearch.commons.notifications.model
+package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
-import com.amazon.opendistroforelasticsearch.commons.notifications.action.CreateNotificationConfigResponse
 import com.amazon.opendistroforelasticsearch.notifications.createObjectFromJsonString
 import com.amazon.opendistroforelasticsearch.notifications.getJsonString
 import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
@@ -24,52 +23,59 @@ import org.elasticsearch.test.ESTestCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-internal class CreateNotificationConfigResponseTests : ESTestCase() {
+internal class DeleteNotificationConfigResponseTests : ESTestCase() {
 
     @Test
-    fun `Create response serialize and deserialize transport object should be equal`() {
-        val configResponse = CreateNotificationConfigResponse("sample_config_id")
-        val recreatedObject = recreateObject(configResponse) { CreateNotificationConfigResponse(it) }
+    fun `Delete response serialize and deserialize transport object should be equal`() {
+        val configResponse = DeleteNotificationConfigResponse("sample_config_id")
+        val recreatedObject = recreateObject(configResponse) { DeleteNotificationConfigResponse(it) }
         assertEquals(configResponse.configId, recreatedObject.configId)
     }
 
     @Test
-    fun `Create response serialize and deserialize using json object should be equal`() {
-        val configResponse = CreateNotificationConfigResponse("sample_config_id")
+    fun `Delete response serialize and deserialize using json object should be equal`() {
+        val configResponse = DeleteNotificationConfigResponse("sample_config_id")
         val jsonString = getJsonString(configResponse)
-        val recreatedObject = createObjectFromJsonString(jsonString) { CreateNotificationConfigResponse.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { DeleteNotificationConfigResponse.parse(it) }
         assertEquals(configResponse.configId, recreatedObject.configId)
     }
 
     @Test
-    fun `Create response should deserialize json object using parser`() {
+    fun `Delete response should deserialize json object using parser`() {
         val configId = "sample_config_id"
         val jsonString = "{\"configId\":\"$configId\"}"
-        val recreatedObject = createObjectFromJsonString(jsonString) { CreateNotificationConfigResponse.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { DeleteNotificationConfigResponse.parse(it) }
         assertEquals(configId, recreatedObject.configId)
     }
 
     @Test
-    fun `Create response should throw exception when invalid json object is passed`() {
+    fun `Delete response should throw exception when invalid json object is passed`() {
         val jsonString = "sample message"
         assertThrows<JsonParseException> {
-            createObjectFromJsonString(jsonString) { CreateNotificationConfigResponse.parse(it) }
+            createObjectFromJsonString(jsonString) { DeleteNotificationConfigResponse.parse(it) }
         }
     }
 
     @Test
-    fun `Create response should throw exception when configId is replace with configId2 in json object`() {
+    fun `Delete response should throw exception when configId is replace with configId2 in json object`() {
         val jsonString = "{\"configId2\":\"sample_config_id\"}"
         assertThrows<IllegalArgumentException> {
-            createObjectFromJsonString(jsonString) { CreateNotificationConfigResponse.parse(it) }
+            createObjectFromJsonString(jsonString) { DeleteNotificationConfigResponse.parse(it) }
         }
     }
 
     @Test
-    fun `Create response should safely ignore extra field in json object`() {
+    fun `Delete response should safely ignore extra field in json object`() {
         val configId = "sample_config_id"
-        val jsonString = "{\"configId\":\"$configId\", \"another\":\"field\"}"
-        val recreatedObject = createObjectFromJsonString(jsonString) { CreateNotificationConfigResponse.parse(it) }
+        val jsonString = """
+        {
+            "configId":"$configId",
+            "extra_field_1":["extra", "value"],
+            "extra_field_2":{"extra":"value"},
+            "extra_field_3":"extra value 3"
+        }
+        """.trimIndent()
+        val recreatedObject = createObjectFromJsonString(jsonString) { DeleteNotificationConfigResponse.parse(it) }
         assertEquals(configId, recreatedObject.configId)
     }
 }

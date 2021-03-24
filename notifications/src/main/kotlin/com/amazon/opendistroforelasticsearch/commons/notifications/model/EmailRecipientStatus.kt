@@ -33,7 +33,7 @@ import java.io.IOException
 data class EmailRecipientStatus(
     val recipient: String,
     val deliveryStatus: DeliveryStatus
-) : Writeable, ToXContent {
+) : BaseModel {
 
     init {
         require(isValidEmail(recipient)) { "Invalid email address" }

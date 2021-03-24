@@ -13,9 +13,15 @@
  * permissions and limitations under the License.
  *
  */
-package com.amazon.opendistroforelasticsearch.commons.notifications.model
+package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
-import com.amazon.opendistroforelasticsearch.commons.notifications.action.CreateNotificationConfigRequest
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.Chime
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.Email
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.EmailGroup
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.NotificationConfig
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.Slack
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.SmtpAccount
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.Webhook
 import com.amazon.opendistroforelasticsearch.notifications.createObjectFromJsonString
 import com.amazon.opendistroforelasticsearch.notifications.getJsonString
 import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
@@ -80,12 +86,14 @@ internal class CreateNotificationConfigRequestTests : ESTestCase() {
 
         val jsonString = """
         {
-            "name":"name",
-            "description":"description",
-            "configType":"Slack",
-            "features":["IndexManagement"],
-            "isEnabled":true,
-            "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
+            "notificationConfig":{
+                "name":"name",
+                "description":"description",
+                "configType":"Slack",
+                "features":["IndexManagement"],
+                "isEnabled":true,
+                "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
+            }
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { CreateNotificationConfigRequest.parse(it) }
@@ -114,14 +122,17 @@ internal class CreateNotificationConfigRequestTests : ESTestCase() {
 
         val jsonString = """
         {
-            "name":"name",
-            "description":"description",
-            "configType":"Slack",
-            "features":["IndexManagement"],
-            "isEnabled":true,
-            "slack":{"url":"https://domain.com/sample_slack_url#1234567890"},
-            "extra_field_1":["value 1", "value 2"],
-            "extra_field_2":"extra value 2"
+            "notificationConfig":{
+                "name":"name",
+                "description":"description",
+                "configType":"Slack",
+                "features":["IndexManagement"],
+                "isEnabled":true,
+                "slack":{"url":"https://domain.com/sample_slack_url#1234567890"},
+                "extra_field_1":["extra", "value"],
+                "extra_field_2":{"extra":"value"},
+                "extra_field_3":"extra value 3"
+            }
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { CreateNotificationConfigRequest.parse(it) }

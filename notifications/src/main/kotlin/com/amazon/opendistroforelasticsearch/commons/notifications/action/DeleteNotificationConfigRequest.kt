@@ -16,10 +16,13 @@
 package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import org.elasticsearch.action.ActionRequest
+import org.elasticsearch.action.ActionRequestValidationException
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
 import org.elasticsearch.common.io.stream.Writeable
 import org.elasticsearch.common.xcontent.ToXContent
+import org.elasticsearch.common.xcontent.ToXContentObject
 import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils
@@ -28,17 +31,17 @@ import java.io.IOException
 /**
  * Action Response for creating new configuration.
  */
-class CreateNotificationConfigResponse : BaseResponse {
+class DeleteNotificationConfigRequest : ActionRequest, ToXContentObject {
     val configId: String
 
     companion object {
-        private val log by logger(CreateNotificationConfigResponse::class.java)
+        private val log by logger(DeleteNotificationConfigRequest::class.java)
         private const val CONFIG_ID_TAG = "configId"
 
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader { CreateNotificationConfigResponse(it) }
+        val reader = Writeable.Reader { DeleteNotificationConfigRequest(it) }
 
         /**
          * Creator used in REST communication.
@@ -46,7 +49,7 @@ class CreateNotificationConfigResponse : BaseResponse {
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): CreateNotificationConfigResponse {
+        fun parse(parser: XContentParser): DeleteNotificationConfigRequest {
             var configId: String? = null
 
             XContentParserUtils.ensureExpectedToken(
@@ -61,18 +64,18 @@ class CreateNotificationConfigResponse : BaseResponse {
                     CONFIG_ID_TAG -> configId = parser.text()
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing CreateNotificationConfigResponse")
+                        log.info("Unexpected field: $fieldName, while parsing DeleteNotificationConfigRequest")
                     }
                 }
             }
             configId ?: throw IllegalArgumentException("$CONFIG_ID_TAG field absent")
-            return CreateNotificationConfigResponse(configId)
+            return DeleteNotificationConfigRequest(configId)
         }
     }
 
     /**
      * constructor for creating the class
-     * @param configId the id of the created notification configuration
+     * @param configId the id of the notification configuration
      */
     constructor(configId: String) {
         this.configId = configId
@@ -91,6 +94,7 @@ class CreateNotificationConfigResponse : BaseResponse {
      */
     @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
+        super.writeTo(output)
         output.writeString(configId)
     }
 
@@ -102,5 +106,12 @@ class CreateNotificationConfigResponse : BaseResponse {
         return builder.startObject()
             .field(CONFIG_ID_TAG, configId)
             .endObject()
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun validate(): ActionRequestValidationException? {
+        return null
     }
 }

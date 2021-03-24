@@ -16,14 +16,17 @@
 package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.NotificationConfig
+import com.amazon.opendistroforelasticsearch.notifications.util.logger
 import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.ActionRequestValidationException
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
+import org.elasticsearch.common.io.stream.Writeable
 import org.elasticsearch.common.xcontent.ToXContent
 import org.elasticsearch.common.xcontent.ToXContentObject
 import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.common.xcontent.XContentParser
+import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.io.IOException
 
 /**
@@ -33,6 +36,13 @@ class CreateNotificationConfigRequest : ActionRequest, ToXContentObject {
     val notificationConfig: NotificationConfig
 
     companion object {
+        private val log by logger(CreateNotificationConfigResponse::class.java)
+        private const val NOTIFICATION_CONFIG_TAG = "notificationConfig"
+
+        /**
+         * reader to create instance of class from writable.
+         */
+        val reader = Writeable.Reader { CreateNotificationConfigRequest(it) }
 
         /**
          * Creator used in REST communication.
@@ -41,7 +51,26 @@ class CreateNotificationConfigRequest : ActionRequest, ToXContentObject {
         @JvmStatic
         @Throws(IOException::class)
         fun parse(parser: XContentParser): CreateNotificationConfigRequest {
-            return CreateNotificationConfigRequest(NotificationConfig.parse(parser))
+            var notificationConfig: NotificationConfig? = null
+
+            XContentParserUtils.ensureExpectedToken(
+                XContentParser.Token.START_OBJECT,
+                parser.currentToken(),
+                parser
+            )
+            while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
+                val fieldName = parser.currentName()
+                parser.nextToken()
+                when (fieldName) {
+                    NOTIFICATION_CONFIG_TAG -> notificationConfig = NotificationConfig.parse(parser)
+                    else -> {
+                        parser.skipChildren()
+                        log.info("Unexpected field: $fieldName, while parsing CreateNotificationConfigRequest")
+                    }
+                }
+            }
+            notificationConfig ?: throw IllegalArgumentException("$NOTIFICATION_CONFIG_TAG field absent")
+            return CreateNotificationConfigRequest(notificationConfig)
         }
     }
 
@@ -49,7 +78,10 @@ class CreateNotificationConfigRequest : ActionRequest, ToXContentObject {
      * {@inheritDoc}
      */
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
-        return notificationConfig.toXContent(builder, params)
+        builder!!
+        return builder.startObject()
+            .field(NOTIFICATION_CONFIG_TAG, notificationConfig)
+            .endObject()
     }
 
     /**
