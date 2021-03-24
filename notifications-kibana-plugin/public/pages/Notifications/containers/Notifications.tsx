@@ -28,11 +28,10 @@ import _ from 'lodash';
 import queryString from 'querystring';
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import { PLUGIN_NAME } from '../../../../common';
 import { NotificationItem, TableState } from '../../../../models/interfaces';
 import { CoreServicesContext } from '../../../components/coreServices';
 import { NotificationService } from '../../../services';
-import { BREADCRUMBS, ROUTES } from '../../../utils/constants';
+import { BREADCRUMBS, HISTOGRAM_TYPE, ROUTES } from '../../../utils/constants';
 import { getErrorMessage } from '../../../utils/helpers';
 import { EmptyState } from '../components/EmptyState/EmptyState';
 import { NotificationsHistogram } from '../components/NotificationsHistogram/NotificationsHistogram';
@@ -53,6 +52,7 @@ interface NotificationsState extends TableState<NotificationItem> {
   startTime: ShortDate;
   endTime: ShortDate;
   filters: FilterType[];
+  histogramType: keyof typeof HISTOGRAM_TYPE;
 }
 
 export default class Notifications extends Component<
@@ -73,6 +73,7 @@ export default class Notifications extends Component<
       startTime,
       endTime,
       filters,
+      histogramType,
     } = getURLQueryParams(this.props.location);
 
     this.state = {
@@ -88,6 +89,7 @@ export default class Notifications extends Component<
       startTime,
       endTime,
       filters,
+      histogramType,
     };
 
     this.getNotifications = _.debounce(this.getNotifications, 500, {
@@ -125,6 +127,7 @@ export default class Notifications extends Component<
       startTime: state.startTime,
       endTime: state.endTime,
       filters: JSON.stringify(state.filters),
+      histogramType: state.histogramType,
     };
   }
 
@@ -178,6 +181,9 @@ export default class Notifications extends Component<
   };
   setFilters = (filters: FilterType[]) => {
     this.setState({ from: 0, filters });
+  };
+  setHistogramType = (histogramType: keyof typeof HISTOGRAM_TYPE) => {
+    this.setState({ histogramType });
   };
 
   // onClickModalEdit = (item: NotificationItem, onClose: () => void): void => {
@@ -259,7 +265,10 @@ export default class Notifications extends Component<
         />
 
         <EuiSpacer />
-        <NotificationsHistogram />
+        <NotificationsHistogram
+          histogramType={this.state.histogramType}
+          setHistogramType={this.setHistogramType}
+        />
 
         <EuiSpacer />
         <NotificationsTable

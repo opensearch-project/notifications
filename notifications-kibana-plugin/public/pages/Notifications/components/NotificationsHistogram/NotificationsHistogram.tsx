@@ -30,12 +30,12 @@ import {
 import { HISTOGRAM_TYPE } from '../../../../utils/constants';
 import { HistogramControls } from './HistogramControls';
 
-interface NotificationsHistogramProps {}
+interface NotificationsHistogramProps {
+  histogramType: keyof typeof HISTOGRAM_TYPE;
+  setHistogramType: (histogramType: keyof typeof HISTOGRAM_TYPE) => void;
+}
 
 export function NotificationsHistogram(props: NotificationsHistogramProps) {
-  const [histogramType, setHistogramType] = useState<
-    keyof typeof HISTOGRAM_TYPE
-  >('CHANNEL_TYPE');
   const [data, setData] = useState<Datum[]>([]);
 
   useEffect(() => {
@@ -54,8 +54,8 @@ export function NotificationsHistogram(props: NotificationsHistogramProps) {
               {
                 component: (
                   <HistogramControls
-                    histogramType={histogramType}
-                    setHistogramType={setHistogramType}
+                    histogramType={props.histogramType}
+                    setHistogramType={props.setHistogramType}
                   />
                 ),
               },
@@ -64,7 +64,7 @@ export function NotificationsHistogram(props: NotificationsHistogramProps) {
         }
         bodyStyles={{ padding: 'initial' }}
         title={`Notifications by ${HISTOGRAM_TYPE[
-          histogramType
+          props.histogramType
         ].toLowerCase()}`}
         titleSize="m"
       >

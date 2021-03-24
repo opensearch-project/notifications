@@ -13,12 +13,13 @@
  * permissions and limitations under the License.
  */
 
-import { DEFAULT_QUERY_PARAMS } from './constants';
+import { ShortDate } from '@elastic/eui';
 import queryString from 'query-string';
 import { SORT_DIRECTION } from '../../../../common';
 import { NotificationItem } from '../../../../models/interfaces';
-import { ShortDate } from '@elastic/eui';
+import { HISTOGRAM_TYPE } from '../../../utils/constants';
 import { FilterType } from '../components/SearchBar/Filter/Filters';
+import { DEFAULT_QUERY_PARAMS } from './constants';
 
 export type NotificationsQueryParams = {
   from: number;
@@ -29,6 +30,7 @@ export type NotificationsQueryParams = {
   startTime: ShortDate;
   endTime: ShortDate;
   filters: FilterType[];
+  histogramType: keyof typeof HISTOGRAM_TYPE;
 };
 
 export const getURLQueryParams = (location: {
@@ -43,6 +45,7 @@ export const getURLQueryParams = (location: {
     startTime,
     endTime,
     filters,
+    histogramType,
   } = queryString.parse(location.search);
 
   let parsedFilters = DEFAULT_QUERY_PARAMS.filters;
@@ -76,6 +79,10 @@ export const getURLQueryParams = (location: {
     endTime:
       typeof endTime !== 'string' ? DEFAULT_QUERY_PARAMS.endTime : endTime,
     filters: parsedFilters,
+    histogramType:
+      typeof histogramType !== 'string'
+        ? DEFAULT_QUERY_PARAMS.histogramType
+        : histogramType,
   };
 };
 

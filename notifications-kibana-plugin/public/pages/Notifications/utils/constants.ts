@@ -28,4 +28,5 @@ export const DEFAULT_QUERY_PARAMS = {
   startTime: 'now-7d',
   endTime: 'now',
   filters: [],
+  histogramType: 'CHANNEL_TYPE',
 };
