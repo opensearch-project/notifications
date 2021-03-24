@@ -33,9 +33,9 @@ export type NotificationsQueryParams = {
   histogramType: keyof typeof HISTOGRAM_TYPE;
 };
 
-export const getURLQueryParams = (location: {
-  search: string;
-}): NotificationsQueryParams => {
+export const getURLQueryParams = (
+  queryParams: string
+): NotificationsQueryParams => {
   const {
     from,
     size,
@@ -46,7 +46,7 @@ export const getURLQueryParams = (location: {
     endTime,
     filters,
     histogramType,
-  } = queryString.parse(location.search);
+  } = queryString.parse(queryParams);
 
   let parsedFilters = DEFAULT_QUERY_PARAMS.filters;
   if (typeof filters === 'string' && filters.trim().length > 0)

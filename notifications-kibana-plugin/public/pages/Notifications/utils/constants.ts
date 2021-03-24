@@ -13,6 +13,7 @@
  * permissions and limitations under the License.
  */
 
+import { HISTOGRAM_TYPE } from '../../../utils/constants';
 import { SORT_DIRECTION } from '../../../../common';
 
 export const MAX_NOTIFICATIONS = 1000;
@@ -28,5 +29,5 @@ export const DEFAULT_QUERY_PARAMS = {
   startTime: 'now-7d',
   endTime: 'now',
   filters: [],
-  histogramType: 'CHANNEL_TYPE',
+  histogramType: Object.values(HISTOGRAM_TYPE)[0]
 };

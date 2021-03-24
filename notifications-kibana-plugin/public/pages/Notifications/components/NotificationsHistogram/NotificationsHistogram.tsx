@@ -22,6 +22,7 @@ import {
   Settings,
 } from '@elastic/charts';
 import { euiPaletteColorBlind, EuiSpacer } from '@elastic/eui';
+import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import {
   ContentPanel,
@@ -40,7 +41,7 @@ export function NotificationsHistogram(props: NotificationsHistogramProps) {
 
   useEffect(() => {
     const dg = new DataGenerator();
-    const data = dg.generateGroupedSeries(25, 2, 'Channel-')
+    const data = dg.generateGroupedSeries(25, 2, 'Channel-');
     data[18].y = 18;
     setData(data);
   }, []);
@@ -63,9 +64,11 @@ export function NotificationsHistogram(props: NotificationsHistogramProps) {
           />
         }
         bodyStyles={{ padding: 'initial' }}
-        title={`Notifications by ${HISTOGRAM_TYPE[
-          props.histogramType
-        ].toLowerCase()}`}
+        title={`Notifications by ${_.get(
+          HISTOGRAM_TYPE,
+          props.histogramType,
+          Object.values(HISTOGRAM_TYPE)[0]
+        ).toLowerCase()}`}
         titleSize="m"
       >
         <EuiSpacer />

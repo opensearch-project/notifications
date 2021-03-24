@@ -64,6 +64,9 @@ export default class Notifications extends Component<
   constructor(props: NotificationsProps) {
     super(props);
 
+    const urlParams =
+      this.props.location.search ||
+      localStorage.getItem('NotificationsQueryParams');
     const {
       from,
       size,
@@ -74,7 +77,7 @@ export default class Notifications extends Component<
       endTime,
       filters,
       histogramType,
-    } = getURLQueryParams(this.props.location);
+    } = getURLQueryParams(urlParams);
 
     this.state = {
       total: 0,
@@ -138,6 +141,7 @@ export default class Notifications extends Component<
       const queryObject = Notifications.getQueryObjectFromState(this.state);
       const queryParamsString = queryString.stringify(queryObject);
       history.replace({ ...this.props.location, search: queryParamsString });
+      localStorage.setItem('NotificationsQueryParams', queryParamsString);
       const getNotificationsResponse = await notificationService.getNotifications(
         queryObject
       );
