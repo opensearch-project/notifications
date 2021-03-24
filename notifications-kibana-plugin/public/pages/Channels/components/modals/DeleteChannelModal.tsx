@@ -16,6 +16,7 @@
 import {
   EuiButton,
   EuiButtonEmpty,
+  EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
   EuiModal,
@@ -24,9 +25,10 @@ import {
   EuiModalHeader,
   EuiModalHeaderTitle,
   EuiOverlayMask,
-  EuiText
+  EuiSpacer,
+  EuiText,
 } from '@elastic/eui';
-import React from 'react';
+import React, { useState } from 'react';
 import { ChannelItemType } from '../../../../../models/interfaces';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 
@@ -38,11 +40,14 @@ interface DeleteChannelModalProps extends ModalRootProps {
 export const DeleteChannelModal = (props: DeleteChannelModalProps) => {
   if (!props.channels.length) return null;
 
-  const plural = props.channels.length >= 2;
-  const name = plural
-    ? `${props.channels.length} channels`
-    : props.channels[0].name;
-  const message = `Delete ${name} permanently? This action cannot be undone.`;
+  const [input, setInput] = useState('');
+  const num = props.channels.length;
+  const name = num >= 2 ? `${num} channels` : props.channels[0].name;
+  const message = `Delete ${
+    num >= 2 ? 'the following channels' : name
+  } permanently? Any notify actions will no longer be able to send notifications using ${
+    num >= 2 ? 'these channels' : 'this channel'
+  }.`;
 
   return (
     <EuiOverlayMask>
@@ -52,6 +57,28 @@ export const DeleteChannelModal = (props: DeleteChannelModalProps) => {
         </EuiModalHeader>
         <EuiModalBody>
           <EuiText>{message}</EuiText>
+          {num >= 2 && (
+            <>
+              <EuiSpacer />
+              {props.channels.map((channel, i) => (
+                <EuiText
+                  key={`channel-list-item-${i}`}
+                  style={{ marginLeft: 20 }}
+                >
+                  <li>{channel.name}</li>
+                </EuiText>
+              ))}
+            </>
+          )}
+          <EuiSpacer />
+          <EuiText>
+            To confirm delete, type <i>delete</i> in the field.
+          </EuiText>
+          <EuiFieldText
+            placeholder="delete"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
         </EuiModalBody>
         <EuiModalFooter>
           <EuiFlexGroup justifyContent="flexEnd">
@@ -59,7 +86,12 @@ export const DeleteChannelModal = (props: DeleteChannelModalProps) => {
               <EuiButtonEmpty onClick={props.onClose}>Cancel</EuiButtonEmpty>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiButton fill color="danger" onClick={props.onClose}>
+              <EuiButton
+                fill
+                color="danger"
+                onClick={props.onClose}
+                disabled={input !== 'delete'}
+              >
                 Delete
               </EuiButton>
             </EuiFlexItem>
