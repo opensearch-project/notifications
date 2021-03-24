@@ -46,7 +46,7 @@ export function NotificationsTable(props: NotificationsTableProps) {
   const columns: EuiTableFieldDataColumnType<NotificationItem>[] = [
     {
       field: 'title',
-      name: 'Notification title',
+      name: 'Notification',
       sortable: true,
       truncateText: true,
       render: (title, item) => (
@@ -63,7 +63,7 @@ export function NotificationsTable(props: NotificationsTableProps) {
     },
     {
       field: 'source',
-      name: 'Notification source',
+      name: 'Source type',
       sortable: true,
       truncateText: true,
     },

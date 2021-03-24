@@ -32,7 +32,7 @@ import { PLUGIN_NAME } from '../../../../common';
 import { NotificationItem, TableState } from '../../../../models/interfaces';
 import { CoreServicesContext } from '../../../components/coreServices';
 import { NotificationService } from '../../../services';
-import { BREADCRUMBS } from '../../../utils/constants';
+import { BREADCRUMBS, ROUTES } from '../../../utils/constants';
 import { getErrorMessage } from '../../../utils/helpers';
 import { EmptyState } from '../components/EmptyState/EmptyState';
 import { NotificationsHistogram } from '../components/NotificationsHistogram/NotificationsHistogram';
@@ -235,12 +235,12 @@ export default class Notifications extends Component<
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButton
-              href={`${PLUGIN_NAME}#/create-channel`}
+              href={`#${ROUTES.CHANNELS}`}
               data-test-subj="createChannelButton"
               fill
               size="s"
             >
-              Create Channel
+              Manage channels
             </EuiButton>
           </EuiFlexItem>
         </EuiFlexGroup>

@@ -51,7 +51,7 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
     super(props);
 
     this.state = {
-      total: 1,
+      total: 5,
       from: 0,
       size: 5,
       search: '',

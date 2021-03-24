@@ -24,7 +24,7 @@ export const DEFAULT_QUERY_PARAMS = {
   search: '',
   size: 5,
   sortDirection: SORT_DIRECTION.ASC,
-  sortField: 'name',
+  sortField: 'lastUpdatedTime',
   startTime: 'now-7d',
   endTime: 'now',
   filters: [],
