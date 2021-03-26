@@ -41,6 +41,7 @@ import { ChannelNamePanel } from './components/ChannelNamePanel';
 import { CustomWebhookSettings } from './components/CustomWebhookSettings';
 import { EmailSettings } from './components/EmailSettings';
 import { SlackSettings } from './components/SlackSettings';
+import { SNSSettings } from './components/SNSSettings';
 import {
   validateChannelName,
   validateEmailSender,
@@ -113,6 +114,8 @@ export function CreateChannel(props: CreateChannelsProps) {
   const [webhookHeaders, setWebhookHeaders] = useState<HeaderType[]>([
     { key: 'Content-Type', value: 'application/json' },
   ]);
+  const [snsArn, setSnsArn] = useState(''); // SNS topic ARN
+  const [iamArn, setIamArn] = useState(''); // IAM role ARN (optional for ODFE)
 
   const [
     sourceCheckboxIdToSelectedMap,
@@ -151,8 +154,9 @@ export function CreateChannel(props: CreateChannelsProps) {
         channelType === 'SLACK' && validateSlackWebhook(slackWebhook),
       sender: channelType === 'EMAIL' && validateEmailSender(sender),
       recipients:
-        channelType === 'EMAIL' || channelType === 'SES' &&
-        validateRecipients(selectedRecipientGroupOptions),
+        channelType === 'EMAIL' ||
+        (channelType === 'SES' &&
+          validateRecipients(selectedRecipientGroupOptions)),
     };
     setInputErrors(errors);
     return !Object.values(errors).reduce(
@@ -233,6 +237,14 @@ export function CreateChannel(props: CreateChannelsProps) {
               setWebhookParams={setWebhookParams}
               webhookHeaders={webhookHeaders}
               setWebhookHeaders={setWebhookHeaders}
+            />
+          ) : channelType === 'SNS' ? (
+            <SNSSettings
+              isOdfe={true}
+              snsArn={snsArn}
+              setSnsArn={setSnsArn}
+              iamArn={iamArn}
+              setIamArn={setIamArn}
             />
           ) : null}
         </ContentPanel>
