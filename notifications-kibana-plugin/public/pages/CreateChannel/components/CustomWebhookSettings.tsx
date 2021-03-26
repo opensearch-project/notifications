@@ -82,7 +82,7 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
             onChange={(e) => props.setCustomURLPort(e.target.value)}
           />
         </EuiFormRow>
-        <EuiFormRow label="Path" helpText="Query parameters">
+        <EuiFormRow label="Path">
           <EuiFieldText
             placeholder=""
             value={props.customURLPath}
@@ -117,7 +117,7 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
         ? renderWebhook()
         : renderCustomURL()}
 
-      <EuiSpacer />
+      <EuiSpacer size="xxl" />
       <WebhookHeaders
         headers={props.webhookHeaders}
         setHeaders={props.setWebhookHeaders}

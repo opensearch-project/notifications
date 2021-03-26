@@ -109,9 +109,7 @@ export function CreateChannel(props: CreateChannelsProps) {
   const [customURLHost, setCustomURLHost] = useState('');
   const [customURLPort, setCustomURLPort] = useState('');
   const [customURLPath, setCustomURLPath] = useState('');
-  const [webhookParams, setWebhookParams] = useState<HeaderType[]>([
-    { key: '', value: '' },
-  ]);
+  const [webhookParams, setWebhookParams] = useState<HeaderType[]>([]);
   const [webhookHeaders, setWebhookHeaders] = useState<HeaderType[]>([
     { key: 'Content-Type', value: 'application/json' },
   ]);
@@ -153,7 +151,7 @@ export function CreateChannel(props: CreateChannelsProps) {
         channelType === 'SLACK' && validateSlackWebhook(slackWebhook),
       sender: channelType === 'EMAIL' && validateEmailSender(sender),
       recipients:
-        channelType === 'EMAIL' &&
+        channelType === 'EMAIL' || channelType === 'SES' &&
         validateRecipients(selectedRecipientGroupOptions),
     };
     setInputErrors(errors);
@@ -199,8 +197,9 @@ export function CreateChannel(props: CreateChannelsProps) {
               slackWebhook={slackWebhook}
               setSlackWebhook={setSlackWebhook}
             />
-          ) : channelType === 'EMAIL' ? (
+          ) : channelType === 'EMAIL' || channelType === 'SES' ? (
             <EmailSettings
+              isAmazonSES={channelType === 'SES'}
               headerFooterCheckboxIdToSelectedMap={
                 headerFooterCheckboxIdToSelectedMap
               }

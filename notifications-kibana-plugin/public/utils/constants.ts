@@ -62,8 +62,8 @@ export const CHANNEL_TYPE = Object.freeze({
   EMAIL: 'Email',
   CHIME: 'Chime',
   CUSTOM_WEBHOOK: 'Custom webhook',
-  SES: 'SES',
-  SNS: 'SNS',
+  SES: 'Amazon SES',
+  SNS: 'Amazon SNS',
 });
 
 export const CUSTOM_WEBHOOK_ENDPOINT_TYPE = Object.freeze({
