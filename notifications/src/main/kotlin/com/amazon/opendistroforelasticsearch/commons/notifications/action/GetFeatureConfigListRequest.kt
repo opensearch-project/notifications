@@ -15,11 +15,12 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.NotificationConfig
 import com.amazon.opendistroforelasticsearch.notifications.util.fieldIfNotNull
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.notifications.util.valueOf
 import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.ActionRequestValidationException
-import org.elasticsearch.action.ValidateActions
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
 import org.elasticsearch.common.io.stream.Writeable
@@ -31,24 +32,25 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.io.IOException
 
 /**
- * Action Response for creating new configuration.
+ * This request is plugin-only call. i.e. REST interface is not exposed.
+ * Also the library will remove the user context while making this call
+ * so that user making this call need not have to set permission to this API.
+ * Hence the request also contains tenant info for space isolation.
  */
-class GetNotificationConfigRequest : ActionRequest, ToXContentObject {
-    val fromIndex: Int
-    val maxItems: Int
-    val configId: String?
+class GetFeatureConfigListRequest : ActionRequest, ToXContentObject {
+    val feature: NotificationConfig.Feature
+    val threadContext: String?
 
     companion object {
-        private val log by logger(GetNotificationConfigRequest::class.java)
-        const val DEFAULT_MAX_ITEMS = 1000
-        const val FROM_INDEX_TAG = "fromIndex"
-        const val MAX_ITEMS_TAG = "maxItems"
-        private const val CONFIG_ID_TAG = "configId"
+        private val log by logger(GetFeatureConfigListRequest::class.java)
+
+        private const val FEATURE_TAG = "feature"
+        private const val THREAD_CONTEXT_TAG = "context"
 
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader { GetNotificationConfigRequest(it) }
+        val reader = Writeable.Reader { GetFeatureConfigListRequest(it) }
 
         /**
          * Creator used in REST communication.
@@ -56,10 +58,9 @@ class GetNotificationConfigRequest : ActionRequest, ToXContentObject {
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): GetNotificationConfigRequest {
-            var fromIndex = 0
-            var maxItems = DEFAULT_MAX_ITEMS
-            var configId: String? = null
+        fun parse(parser: XContentParser): GetFeatureConfigListRequest {
+            var feature: NotificationConfig.Feature? = null
+            var threadContext: String? = null
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -70,29 +71,30 @@ class GetNotificationConfigRequest : ActionRequest, ToXContentObject {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    FROM_INDEX_TAG -> fromIndex = parser.intValue()
-                    MAX_ITEMS_TAG -> maxItems = parser.intValue()
-                    CONFIG_ID_TAG -> configId = parser.text()
+                    FEATURE_TAG -> feature = valueOf(parser.text(), NotificationConfig.Feature.None)
+                    THREAD_CONTEXT_TAG -> threadContext = parser.text()
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing GetNotificationConfigRequest")
+                        log.info("Unexpected field: $fieldName, while parsing GetFeatureConfigListRequest")
                     }
                 }
             }
-            return GetNotificationConfigRequest(fromIndex, maxItems, configId)
+            feature ?: throw IllegalArgumentException("$FEATURE_TAG field absent")
+            return GetFeatureConfigListRequest(
+                feature,
+                threadContext
+            )
         }
     }
 
     /**
      * constructor for creating the class
-     * @param fromIndex the starting index for paginated response
-     * @param maxItems the maximum number of items to return for paginated response
-     * @param configId the id of the notification configuration
+     * @param feature the caller plugin feature
+     * @param threadContext the user info thread context
      */
-    constructor(fromIndex: Int = 0, maxItems: Int = DEFAULT_MAX_ITEMS, configId: String? = null) {
-        this.fromIndex = fromIndex
-        this.maxItems = maxItems
-        this.configId = configId
+    constructor(feature: NotificationConfig.Feature, threadContext: String?) {
+        this.feature = feature
+        this.threadContext = threadContext
     }
 
     /**
@@ -100,9 +102,8 @@ class GetNotificationConfigRequest : ActionRequest, ToXContentObject {
      */
     @Throws(IOException::class)
     constructor(input: StreamInput) : super(input) {
-        fromIndex = input.readInt()
-        maxItems = input.readInt()
-        configId = input.readOptionalString()
+        feature = input.readEnum(NotificationConfig.Feature::class.java)
+        threadContext = input.readOptionalString()
     }
 
     /**
@@ -111,9 +112,8 @@ class GetNotificationConfigRequest : ActionRequest, ToXContentObject {
     @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
         super.writeTo(output)
-        output.writeInt(fromIndex)
-        output.writeInt(maxItems)
-        output.writeOptionalString(configId)
+        output.writeEnum(feature)
+        output.writeOptionalString(threadContext)
     }
 
     /**
@@ -122,9 +122,8 @@ class GetNotificationConfigRequest : ActionRequest, ToXContentObject {
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(FROM_INDEX_TAG, fromIndex)
-            .field(MAX_ITEMS_TAG, maxItems)
-            .fieldIfNotNull(CONFIG_ID_TAG, configId)
+            .field(FEATURE_TAG, feature)
+            .fieldIfNotNull(THREAD_CONTEXT_TAG, threadContext)
             .endObject()
     }
 
@@ -132,13 +131,6 @@ class GetNotificationConfigRequest : ActionRequest, ToXContentObject {
      * {@inheritDoc}
      */
     override fun validate(): ActionRequestValidationException? {
-        var validationException: ActionRequestValidationException? = null
-        if (fromIndex < 0) {
-            validationException = ValidateActions.addValidationError("fromIndex is -ve", validationException)
-        }
-        if (maxItems <= 0) {
-            validationException = ValidateActions.addValidationError("maxItems is not +ve", validationException)
-        }
-        return validationException
+        return null
     }
 }

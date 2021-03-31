@@ -22,17 +22,17 @@ import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.xcontent.XContentParser
 
 /**
- * NotificationConfig search results
+ * FeatureConfig search results
  */
-class NotificationConfigSearchResult : SearchResults<NotificationConfigInfo> {
+class FeatureConfigList : SearchResults<FeatureConfig> {
     companion object {
-        private const val NOTIFICATION_CONFIG_LIST_TAG = "notificationConfigList"
+        private const val FEATURE_CONFIG_LIST_TAG = "featureConfigList"
     }
 
     /**
      * single item result constructor
      */
-    constructor(objectItem: NotificationConfigInfo) : super(NOTIFICATION_CONFIG_LIST_TAG, objectItem)
+    constructor(objectItem: FeatureConfig) : super(FEATURE_CONFIG_LIST_TAG, objectItem)
 
     /**
      * all param constructor
@@ -41,19 +41,19 @@ class NotificationConfigSearchResult : SearchResults<NotificationConfigInfo> {
         startIndex: Long,
         totalHits: Long,
         totalHitRelation: TotalHits.Relation,
-        objectList: List<NotificationConfigInfo>
-    ) : super(startIndex, totalHits, totalHitRelation, NOTIFICATION_CONFIG_LIST_TAG, objectList)
+        objectList: List<FeatureConfig>
+    ) : super(startIndex, totalHits, totalHitRelation, FEATURE_CONFIG_LIST_TAG, objectList)
 
     /**
      * Constructor used in transport action communication.
      * @param input StreamInput stream to deserialize data from.
      */
-    constructor(input: StreamInput) : super(input, NotificationConfigInfo.reader)
+    constructor(input: StreamInput) : super(input, FeatureConfig.reader)
 
     /**
      * Construct object from XContentParser
      */
-    constructor(parser: XContentParser) : super(parser, NOTIFICATION_CONFIG_LIST_TAG)
+    constructor(parser: XContentParser) : super(parser, FEATURE_CONFIG_LIST_TAG)
 
     /**
      * Construct object from SearchResponse
@@ -62,13 +62,13 @@ class NotificationConfigSearchResult : SearchResults<NotificationConfigInfo> {
         from,
         response,
         searchHitParser,
-        NOTIFICATION_CONFIG_LIST_TAG
+        FEATURE_CONFIG_LIST_TAG
     )
 
     /**
      * {@inheritDoc}
      */
-    override fun parseItem(parser: XContentParser): NotificationConfigInfo {
-        return NotificationConfigInfo.parse(parser)
+    override fun parseItem(parser: XContentParser): FeatureConfig {
+        return FeatureConfig.parse(parser)
     }
 }
