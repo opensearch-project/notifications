@@ -58,7 +58,7 @@ integTest {
 
 jacocoTestReport {
     dependsOn integTest, test
-    executionData dummyTest.jacoco.destinationFile, dummyIntegTest.jacoco.destinationFile
+    executionData dummyTest.jacoco.destinationFile // remove dummyIntegTest for now, because the trick doesn't seem working fully
     sourceDirectories.from = "src/main/kotlin"
     classDirectories.from = sourceSets.main.output
     reports {
