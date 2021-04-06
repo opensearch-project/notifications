@@ -91,7 +91,7 @@ internal class SendMessageAction @Inject constructor(
 
     private fun sendMessageToChannel(recipient: String, sendMessageRequest: SendMessageRequest, counters: Counters): ChannelMessageResponse {
         val channel = ChannelFactory.getNotificationChannel(recipient)
-        return channel.sendMessage(sendMessageRequest.refTag, recipient, sendMessageRequest.channelMessage, counters)
+        return channel.sendMessage(sendMessageRequest.refTag, recipient, sendMessageRequest.title, sendMessageRequest.channelMessage, counters)
     }
 
     private fun isMessageQuotaAvailable(sendMessageRequest: SendMessageRequest): Boolean {

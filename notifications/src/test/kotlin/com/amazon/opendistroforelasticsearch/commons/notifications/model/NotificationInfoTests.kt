@@ -22,90 +22,90 @@ import org.elasticsearch.test.ESTestCase
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-internal class NotificationTests : ESTestCase() {
+internal class NotificationInfoTests : ESTestCase() {
 
     @Test
     fun `Notification serialize and deserialize should be equal`() {
-        val sampleNotification = Notification(
+        val sampleNotification = NotificationInfo(
             "title",
             "referenceId",
-            Notification.SourceType.Alerting,
-            severity = Notification.SeverityType.Info
+            Feature.Alerting,
+            severity = SeverityType.Info
         )
-        val recreatedObject = recreateObject(sampleNotification) { Notification(it) }
+        val recreatedObject = recreateObject(sampleNotification) { NotificationInfo(it) }
         assertEquals(sampleNotification, recreatedObject)
     }
 
     @Test
     fun `Notification serialize and deserialize using json should be equal`() {
-        val sampleNotification = Notification(
+        val sampleNotification = NotificationInfo(
             "title",
             "referenceId",
-            Notification.SourceType.Alerting,
-            severity = Notification.SeverityType.Info
+            Feature.Alerting,
+            severity = SeverityType.Info
         )
 
         val jsonString = getJsonString(sampleNotification)
-        val recreatedObject = createObjectFromJsonString(jsonString) { Notification.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { NotificationInfo.parse(it) }
         assertEquals(sampleNotification, recreatedObject)
     }
 
     @Test
     fun `Notification should safely ignore extra field in json object`() {
-        val sampleNotification = Notification(
+        val sampleNotification = NotificationInfo(
             "title",
             "referenceId",
-            Notification.SourceType.Alerting,
+            Feature.Alerting,
             tags = listOf("tag1", "tag2"),
-            severity = Notification.SeverityType.Info
+            severity = SeverityType.Info
         )
         val jsonString = """
         { 
             "title":"title",
             "referenceId":"referenceId",
-            "source":"Alerting",
+            "feature":"Alerting",
             "severity":"Info",
             "tags":["tag1", "tag2"],
-            "statusList":[],
-            "extraField": "extra value"
+            "extra_field_1":["extra", "value"],
+            "extra_field_2":{"extra":"value"},
+            "extra_field_3":"extra value 3"
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { Notification.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { NotificationInfo.parse(it) }
         assertEquals(sampleNotification, recreatedObject)
     }
 
     @Test
-    fun `Notification should safely ignore unknown source type in json object`() {
-        val sampleNotification = Notification(
+    fun `Notification should safely ignore unknown feature type in json object`() {
+        val sampleNotification = NotificationInfo(
             "title",
             "referenceId",
-            Notification.SourceType.None,
+            Feature.None,
             tags = listOf("tag1", "tag2"),
-            severity = Notification.SeverityType.Info
+            severity = SeverityType.Info
         )
         val jsonString = """
         {
             "title":"title",
             "referenceId":"referenceId",
-            "source": "NewSource",
+            "feature": "NewFeature",
             "severity":"Info",
-            "tags":["tag1", "tag2"],
-            "statusList":[]
+            "tags":["tag1", "tag2"]
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { Notification.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { NotificationInfo.parse(it) }
         assertEquals(sampleNotification, recreatedObject)
     }
 
     @Test
     fun `Notification throw exception if name is empty`() {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
-            Notification(
+            NotificationInfo(
                 "",
                 "referenceId",
-                Notification.SourceType.Alerting,
+                Feature.Alerting,
                 tags = listOf("tag1", "tag2"),
-                severity = Notification.SeverityType.Info
+                severity = SeverityType.Info
             )
         }
     }

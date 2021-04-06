@@ -15,7 +15,7 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
-import com.amazon.opendistroforelasticsearch.commons.notifications.model.NotificationConfig
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.Feature
 import com.amazon.opendistroforelasticsearch.notifications.util.fieldIfNotNull
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
 import com.amazon.opendistroforelasticsearch.notifications.util.valueOf
@@ -37,12 +37,12 @@ import java.io.IOException
  * so that user making this call need not have to set permission to this API.
  * Hence the request also contains tenant info for space isolation.
  */
-class GetFeatureConfigListRequest : ActionRequest, ToXContentObject {
-    val feature: NotificationConfig.Feature
+class GetFeatureChannelListRequest : ActionRequest, ToXContentObject {
+    val feature: Feature
     val threadContext: String?
 
     companion object {
-        private val log by logger(GetFeatureConfigListRequest::class.java)
+        private val log by logger(GetFeatureChannelListRequest::class.java)
 
         private const val FEATURE_TAG = "feature"
         private const val THREAD_CONTEXT_TAG = "context"
@@ -50,7 +50,7 @@ class GetFeatureConfigListRequest : ActionRequest, ToXContentObject {
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader { GetFeatureConfigListRequest(it) }
+        val reader = Writeable.Reader { GetFeatureChannelListRequest(it) }
 
         /**
          * Creator used in REST communication.
@@ -58,8 +58,8 @@ class GetFeatureConfigListRequest : ActionRequest, ToXContentObject {
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): GetFeatureConfigListRequest {
-            var feature: NotificationConfig.Feature? = null
+        fun parse(parser: XContentParser): GetFeatureChannelListRequest {
+            var feature: Feature? = null
             var threadContext: String? = null
 
             XContentParserUtils.ensureExpectedToken(
@@ -71,16 +71,16 @@ class GetFeatureConfigListRequest : ActionRequest, ToXContentObject {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    FEATURE_TAG -> feature = valueOf(parser.text(), NotificationConfig.Feature.None)
+                    FEATURE_TAG -> feature = valueOf(parser.text(), Feature.None)
                     THREAD_CONTEXT_TAG -> threadContext = parser.text()
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing GetFeatureConfigListRequest")
+                        log.info("Unexpected field: $fieldName, while parsing GetFeatureChannelListRequest")
                     }
                 }
             }
             feature ?: throw IllegalArgumentException("$FEATURE_TAG field absent")
-            return GetFeatureConfigListRequest(
+            return GetFeatureChannelListRequest(
                 feature,
                 threadContext
             )
@@ -92,7 +92,7 @@ class GetFeatureConfigListRequest : ActionRequest, ToXContentObject {
      * @param feature the caller plugin feature
      * @param threadContext the user info thread context
      */
-    constructor(feature: NotificationConfig.Feature, threadContext: String?) {
+    constructor(feature: Feature, threadContext: String?) {
         this.feature = feature
         this.threadContext = threadContext
     }
@@ -102,7 +102,7 @@ class GetFeatureConfigListRequest : ActionRequest, ToXContentObject {
      */
     @Throws(IOException::class)
     constructor(input: StreamInput) : super(input) {
-        feature = input.readEnum(NotificationConfig.Feature::class.java)
+        feature = input.readEnum(Feature::class.java)
         threadContext = input.readOptionalString()
     }
 

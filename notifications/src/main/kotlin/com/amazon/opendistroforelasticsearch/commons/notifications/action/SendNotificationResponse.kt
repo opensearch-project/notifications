@@ -13,10 +13,9 @@
  * permissions and limitations under the License.
  *
  */
-package com.amazon.opendistroforelasticsearch.commons.notifications.model
+package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
-import com.amazon.opendistroforelasticsearch.notifications.util.objectList
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
 import org.elasticsearch.common.io.stream.Writeable
@@ -27,22 +26,19 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.io.IOException
 
 /**
- * Data class representing Notification.
+ * Action Response for send notification.
  */
-data class NotificationStatus(
-    val notificationInfo: NotificationInfo,
-    val statusList: List<ChannelStatus> = listOf()
-) : BaseModel {
+class SendNotificationResponse : BaseResponse {
+    val notificationId: String
 
     companion object {
-        private val log by logger(NotificationStatus::class.java)
-        private const val NOTIFICATION_INFO_TAG = "notificationInfo"
-        private const val STATUS_LIST_TAG = "statusList"
+        private val log by logger(SendNotificationResponse::class.java)
+        private const val NOTIFICATION_ID_TAG = "notificationId"
 
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader { NotificationStatus(it) }
+        val reader = Writeable.Reader { SendNotificationResponse(it) }
 
         /**
          * Creator used in REST communication.
@@ -50,9 +46,8 @@ data class NotificationStatus(
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): NotificationStatus {
-            var notificationInfo: NotificationInfo? = null
-            var statusList: List<ChannelStatus> = listOf()
+        fun parse(parser: XContentParser): SendNotificationResponse {
+            var notificationId: String? = null
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -63,38 +58,40 @@ data class NotificationStatus(
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    NOTIFICATION_INFO_TAG -> notificationInfo = NotificationInfo.parse(parser)
-                    STATUS_LIST_TAG -> statusList = parser.objectList { ChannelStatus.parse(it) }
+                    NOTIFICATION_ID_TAG -> notificationId = parser.text()
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing notification")
+                        log.info("Unexpected field: $fieldName, while parsing SendNotificationResponse")
                     }
                 }
             }
-            notificationInfo ?: throw IllegalArgumentException("$NOTIFICATION_INFO_TAG field absent")
-
-            return NotificationStatus(
-                notificationInfo,
-                statusList
-            )
+            notificationId ?: throw IllegalArgumentException("$NOTIFICATION_ID_TAG field absent")
+            return SendNotificationResponse(notificationId)
         }
     }
 
     /**
-     * Constructor used in transport action communication.
-     * @param input StreamInput stream to deserialize data from.
+     * constructor for creating the class
+     * @param configId the id of the created notification configuration
      */
-    constructor(input: StreamInput) : this(
-        notificationInfo = NotificationInfo.reader.read(input),
-        statusList = input.readList(ChannelStatus.reader)
-    )
+    constructor(configId: String) {
+        this.notificationId = configId
+    }
 
     /**
      * {@inheritDoc}
      */
+    @Throws(IOException::class)
+    constructor(input: StreamInput) : super(input) {
+        notificationId = input.readString()
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
-        notificationInfo.writeTo(output)
-        output.writeList(statusList)
+        output.writeString(notificationId)
     }
 
     /**
@@ -103,8 +100,7 @@ data class NotificationStatus(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(NOTIFICATION_INFO_TAG, notificationInfo)
-            .field(STATUS_LIST_TAG, statusList)
+            .field(NOTIFICATION_ID_TAG, notificationId)
             .endObject()
     }
 }

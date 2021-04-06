@@ -16,7 +16,6 @@
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
-import com.amazon.opendistroforelasticsearch.notifications.util.objectList
 import com.amazon.opendistroforelasticsearch.notifications.util.stringList
 import com.amazon.opendistroforelasticsearch.notifications.util.valueOf
 import org.elasticsearch.common.Strings
@@ -32,50 +31,43 @@ import java.io.IOException
 /**
  * Data class representing Notification.
  */
-data class Notification(
+data class NotificationInfo(
     val title: String,
     val referenceId: String,
-    val source: SourceType,
-    val severity: SeverityType,
-    val tags: List<String> = listOf(),
-    val statusList: List<NotificationStatus> = listOf()
+    val feature: Feature,
+    val severity: SeverityType = SeverityType.Info,
+    val tags: List<String> = listOf()
 ) : BaseModel {
 
     init {
         require(!Strings.isNullOrEmpty(title)) { "name is null or empty" }
     }
 
-    enum class SourceType { None, Alerting, IndexManagement, Reports }
-    enum class SeverityType { None, High, Info, Critical }
-
     companion object {
-        private val log by logger(Notification::class.java)
+        private val log by logger(NotificationInfo::class.java)
         private const val TITLE_TAG = "title"
         private const val REFERENCE_ID_TAG = "referenceId"
-        private const val SOURCE_TAG = "source"
+        private const val FEATURE_TAG = "feature"
         private const val SEVERITY_TAG = "severity"
         private const val TAGS_TAG = "tags"
-        private const val STATUS_LIST_TAG = "statusList"
 
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader { Notification(it) }
+        val reader = Writeable.Reader { NotificationInfo(it) }
 
         /**
          * Creator used in REST communication.
          * @param parser XContentParser to deserialize data from.
          */
-        @Suppress("ComplexMethod")
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): Notification {
+        fun parse(parser: XContentParser): NotificationInfo {
             var title: String? = null
             var referenceId: String? = null
-            var source: SourceType? = null
+            var feature: Feature? = null
             var severity: SeverityType = SeverityType.Info
             var tags: List<String> = emptyList()
-            var statusList: List<NotificationStatus> = listOf()
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -88,27 +80,25 @@ data class Notification(
                 when (fieldName) {
                     TITLE_TAG -> title = parser.text()
                     REFERENCE_ID_TAG -> referenceId = parser.text()
-                    SOURCE_TAG -> source = valueOf(parser.text(), SourceType.None)
+                    FEATURE_TAG -> feature = valueOf(parser.text(), Feature.None)
                     SEVERITY_TAG -> severity = valueOf(parser.text(), SeverityType.None)
                     TAGS_TAG -> tags = parser.stringList()
-                    STATUS_LIST_TAG -> statusList = parser.objectList { NotificationStatus.parse(it) }
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing notification")
+                        log.info("Unexpected field: $fieldName, while parsing NotificationInfo")
                     }
                 }
             }
             title ?: throw IllegalArgumentException("$TITLE_TAG field absent")
             referenceId ?: throw IllegalArgumentException("$REFERENCE_ID_TAG field absent")
-            source ?: throw IllegalArgumentException("$SOURCE_TAG field absent")
+            feature ?: throw IllegalArgumentException("$FEATURE_TAG field absent")
 
-            return Notification(
+            return NotificationInfo(
                 title,
                 referenceId,
-                source,
+                feature,
                 severity,
-                tags,
-                statusList
+                tags
             )
         }
     }
@@ -120,10 +110,9 @@ data class Notification(
     constructor(input: StreamInput) : this(
         title = input.readString(),
         referenceId = input.readString(),
-        source = input.readEnum(SourceType::class.java),
+        feature = input.readEnum(Feature::class.java),
         severity = input.readEnum(SeverityType::class.java),
-        tags = input.readStringList(),
-        statusList = input.readList(NotificationStatus.reader)
+        tags = input.readStringList()
     )
 
     /**
@@ -132,10 +121,9 @@ data class Notification(
     override fun writeTo(output: StreamOutput) {
         output.writeString(title)
         output.writeString(referenceId)
-        output.writeEnum(source)
+        output.writeEnum(feature)
         output.writeEnum(severity)
         output.writeStringCollection(tags)
-        output.writeList(statusList)
     }
 
     /**
@@ -146,10 +134,9 @@ data class Notification(
         return builder.startObject()
             .field(TITLE_TAG, title)
             .field(REFERENCE_ID_TAG, referenceId)
-            .field(SOURCE_TAG, source)
+            .field(FEATURE_TAG, feature)
             .field(SEVERITY_TAG, severity)
             .field(TAGS_TAG, tags)
-            .field(STATUS_LIST_TAG, statusList)
             .endObject()
     }
 }

@@ -16,8 +16,10 @@
 package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.Chime
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.ConfigType
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.Email
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.EmailGroup
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.Feature
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.NotificationConfig
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.Slack
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.SmtpAccount
@@ -43,8 +45,8 @@ internal class CreateNotificationConfigRequestTests : ESTestCase() {
         return NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Webhook,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Webhook,
+            EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
             slack = sampleSlack,
             chime = sampleChime,
@@ -78,8 +80,8 @@ internal class CreateNotificationConfigRequestTests : ESTestCase() {
         val config = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Slack,
+            EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
             slack = sampleSlack
         )
@@ -114,8 +116,8 @@ internal class CreateNotificationConfigRequestTests : ESTestCase() {
         val config = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Slack,
+            EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
             slack = sampleSlack
         )

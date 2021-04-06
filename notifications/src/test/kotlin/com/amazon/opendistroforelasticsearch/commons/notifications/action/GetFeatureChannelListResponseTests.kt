@@ -15,9 +15,9 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
-import com.amazon.opendistroforelasticsearch.commons.notifications.model.FeatureConfig
-import com.amazon.opendistroforelasticsearch.commons.notifications.model.FeatureConfigList
-import com.amazon.opendistroforelasticsearch.commons.notifications.model.NotificationConfig
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.ConfigType
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.FeatureChannel
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.FeatureChannelList
 import com.amazon.opendistroforelasticsearch.notifications.createObjectFromJsonString
 import com.amazon.opendistroforelasticsearch.notifications.getJsonString
 import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
@@ -26,11 +26,11 @@ import org.elasticsearch.test.ESTestCase
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-internal class GetFeatureConfigListResponseTests : ESTestCase() {
+internal class GetFeatureChannelListResponseTests : ESTestCase() {
 
     private fun assertSearchResultEquals(
-        expected: FeatureConfigList,
-        actual: FeatureConfigList
+        expected: FeatureChannelList,
+        actual: FeatureChannelList
     ) {
         assertEquals(expected.startIndex, actual.startIndex)
         assertEquals(expected.totalHits, actual.totalHits)
@@ -41,112 +41,112 @@ internal class GetFeatureConfigListResponseTests : ESTestCase() {
 
     @Test
     fun `Get Response serialize and deserialize with config object should be equal`() {
-        val sampleConfig = FeatureConfig(
+        val sampleConfig = FeatureChannel(
             "configId",
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack
+            ConfigType.Slack
         )
-        val searchResult = FeatureConfigList(sampleConfig)
-        val getResponse = GetFeatureConfigListResponse(searchResult)
-        val recreatedObject = recreateObject(getResponse) { GetFeatureConfigListResponse(it) }
+        val searchResult = FeatureChannelList(sampleConfig)
+        val getResponse = GetFeatureChannelListResponse(searchResult)
+        val recreatedObject = recreateObject(getResponse) { GetFeatureChannelListResponse(it) }
         assertSearchResultEquals(searchResult, recreatedObject.searchResult)
     }
 
     @Test
     fun `Get Response serialize and deserialize with multiple config object should be equal`() {
-        val sampleConfig1 = FeatureConfig(
+        val sampleConfig1 = FeatureChannel(
             "configId1",
             "name1",
             "description1",
-            NotificationConfig.ConfigType.Slack
+            ConfigType.Slack
         )
-        val sampleConfig2 = FeatureConfig(
+        val sampleConfig2 = FeatureChannel(
             "configId2",
             "name2",
             "description2",
-            NotificationConfig.ConfigType.Chime
+            ConfigType.Chime
         )
-        val sampleConfig3 = FeatureConfig(
+        val sampleConfig3 = FeatureChannel(
             "configId3",
             "name3",
             "description3",
-            NotificationConfig.ConfigType.Webhook
+            ConfigType.Webhook
         )
-        val searchResult = FeatureConfigList(
+        val searchResult = FeatureChannelList(
             100,
             1000,
             TotalHits.Relation.GREATER_THAN_OR_EQUAL_TO,
             listOf(sampleConfig1, sampleConfig2, sampleConfig3)
         )
-        val getResponse = GetFeatureConfigListResponse(searchResult)
-        val recreatedObject = recreateObject(getResponse) { GetFeatureConfigListResponse(it) }
+        val getResponse = GetFeatureChannelListResponse(searchResult)
+        val recreatedObject = recreateObject(getResponse) { GetFeatureChannelListResponse(it) }
         assertSearchResultEquals(searchResult, recreatedObject.searchResult)
     }
 
     @Test
     fun `Get Response serialize and deserialize using json config object should be equal`() {
-        val sampleConfig = FeatureConfig(
+        val sampleConfig = FeatureChannel(
             "configId",
             "name",
             "description",
-            NotificationConfig.ConfigType.EmailGroup
+            ConfigType.EmailGroup
         )
-        val searchResult = FeatureConfigList(sampleConfig)
-        val getResponse = GetFeatureConfigListResponse(searchResult)
+        val searchResult = FeatureChannelList(sampleConfig)
+        val getResponse = GetFeatureChannelListResponse(searchResult)
         val jsonString = getJsonString(getResponse)
-        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureConfigListResponse.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureChannelListResponse.parse(it) }
         assertSearchResultEquals(searchResult, recreatedObject.searchResult)
     }
 
     @Test
     fun `Get Response serialize and deserialize using json with multiple config object should be equal`() {
-        val sampleConfig1 = FeatureConfig(
+        val sampleConfig1 = FeatureChannel(
             "configId1",
             "name1",
             "description1",
-            NotificationConfig.ConfigType.Slack
+            ConfigType.Slack
         )
-        val sampleConfig2 = FeatureConfig(
+        val sampleConfig2 = FeatureChannel(
             "configId2",
             "name2",
             "description2",
-            NotificationConfig.ConfigType.Chime
+            ConfigType.Chime
         )
-        val sampleConfig3 = FeatureConfig(
+        val sampleConfig3 = FeatureChannel(
             "configId3",
             "name3",
             "description3",
-            NotificationConfig.ConfigType.Webhook
+            ConfigType.Webhook
         )
-        val searchResult = FeatureConfigList(
+        val searchResult = FeatureChannelList(
             100,
             1000,
             TotalHits.Relation.GREATER_THAN_OR_EQUAL_TO,
             listOf(sampleConfig1, sampleConfig2, sampleConfig3)
         )
-        val getResponse = GetFeatureConfigListResponse(searchResult)
+        val getResponse = GetFeatureChannelListResponse(searchResult)
         val jsonString = getJsonString(getResponse)
-        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureConfigListResponse.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureChannelListResponse.parse(it) }
         assertSearchResultEquals(searchResult, recreatedObject.searchResult)
     }
 
     @Test
     fun `Get Response should use isEnabled=true if absent in json object`() {
-        val sampleConfig = FeatureConfig(
+        val sampleConfig = FeatureChannel(
             "configId",
             "name",
             "description",
-            NotificationConfig.ConfigType.Email,
+            ConfigType.Email,
             true
         )
-        val searchResult = FeatureConfigList(sampleConfig)
+        val searchResult = FeatureChannelList(sampleConfig)
         val jsonString = """
         {
             "startIndex":"0",
             "totalHits":"1",
             "totalHitRelation":"eq",
-            "featureConfigList":[
+            "featureChannelList":[
                 {
                     "configId":"configId",
                     "name":"name",
@@ -156,25 +156,25 @@ internal class GetFeatureConfigListResponseTests : ESTestCase() {
             ]
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureConfigListResponse.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureChannelListResponse.parse(it) }
         assertSearchResultEquals(searchResult, recreatedObject.searchResult)
     }
 
     @Test
     fun `Get Response should safely ignore extra field in json object`() {
-        val sampleConfig = FeatureConfig(
+        val sampleConfig = FeatureChannel(
             "configId",
             "name",
             "description",
-            NotificationConfig.ConfigType.Email
+            ConfigType.Email
         )
-        val searchResult = FeatureConfigList(sampleConfig)
+        val searchResult = FeatureChannelList(sampleConfig)
         val jsonString = """
         {
             "startIndex":"0",
             "totalHits":"1",
             "totalHitRelation":"eq",
-            "featureConfigList":[
+            "featureChannelList":[
                 {
                     "configId":"configId",
                     "name":"name",
@@ -188,22 +188,22 @@ internal class GetFeatureConfigListResponseTests : ESTestCase() {
             "extra_field_3":"extra value 3"
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureConfigListResponse.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureChannelListResponse.parse(it) }
         assertSearchResultEquals(searchResult, recreatedObject.searchResult)
     }
 
     @Test
     fun `Get Response should safely fallback to default if startIndex, totalHits or totalHitRelation field absent in json object`() {
-        val sampleConfig = FeatureConfig(
+        val sampleConfig = FeatureChannel(
             "configId",
             "name",
             "description",
-            NotificationConfig.ConfigType.Email
+            ConfigType.Email
         )
-        val searchResult = FeatureConfigList(sampleConfig)
+        val searchResult = FeatureChannelList(sampleConfig)
         val jsonString = """
         {
-            "featureConfigList":[
+            "featureChannelList":[
                 {
                     "configId":"configId",
                     "name":"name",
@@ -214,12 +214,12 @@ internal class GetFeatureConfigListResponseTests : ESTestCase() {
             ]
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureConfigListResponse.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureChannelListResponse.parse(it) }
         assertSearchResultEquals(searchResult, recreatedObject.searchResult)
     }
 
     @Test
-    fun `Get Response should throw exception if featureConfigList is absent in json`() {
+    fun `Get Response should throw exception if featureChannelList is absent in json`() {
         val jsonString = """
         {
             "startIndex":"0",
@@ -228,7 +228,7 @@ internal class GetFeatureConfigListResponseTests : ESTestCase() {
         }
         """.trimIndent()
         Assertions.assertThrows(IllegalArgumentException::class.java) {
-            createObjectFromJsonString(jsonString) { GetFeatureConfigListResponse.parse(it) }
+            createObjectFromJsonString(jsonString) { GetFeatureChannelListResponse.parse(it) }
         }
     }
 }

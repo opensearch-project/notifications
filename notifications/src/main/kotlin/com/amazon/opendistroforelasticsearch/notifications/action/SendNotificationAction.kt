@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package com.amazon.opendistroforelasticsearch.notifications.action
 
 import com.amazon.opendistroforelasticsearch.commons.authuser.User
-import com.amazon.opendistroforelasticsearch.commons.notifications.action.GetNotificationConfigRequest
-import com.amazon.opendistroforelasticsearch.commons.notifications.action.GetNotificationConfigResponse
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.NotificationsActions
+import com.amazon.opendistroforelasticsearch.commons.notifications.action.SendNotificationRequest
+import com.amazon.opendistroforelasticsearch.commons.notifications.action.SendNotificationResponse
 import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
 import org.elasticsearch.action.ActionListener
 import org.elasticsearch.action.support.ActionFilters
@@ -30,19 +30,19 @@ import org.elasticsearch.tasks.Task
 import org.elasticsearch.transport.TransportService
 
 /**
- * Get notification config transport action
+ * Send Notification transport action
  */
-internal class GetNotificationConfigAction @Inject constructor(
+internal class SendNotificationAction @Inject constructor(
     transportService: TransportService,
     client: Client,
     actionFilters: ActionFilters,
     val xContentRegistry: NamedXContentRegistry
-) : PluginBaseAction<GetNotificationConfigRequest, GetNotificationConfigResponse>(
-    NotificationsActions.GET_NOTIFICATION_CONFIG_NAME,
+) : PluginBaseAction<SendNotificationRequest, SendNotificationResponse>(
+    NotificationsActions.SEND_NOTIFICATION_NAME,
     transportService,
     client,
     actionFilters,
-    ::GetNotificationConfigRequest
+    ::SendNotificationRequest
 ) {
 
     /**
@@ -51,11 +51,11 @@ internal class GetNotificationConfigAction @Inject constructor(
      */
     override fun doExecute(
         task: Task?,
-        request: GetNotificationConfigRequest,
-        listener: ActionListener<GetNotificationConfigResponse>
+        request: SendNotificationRequest,
+        listener: ActionListener<SendNotificationResponse>
     ) {
-        val transformedRequest = request as? GetNotificationConfigRequest
-            ?: recreateObject(request) { GetNotificationConfigRequest(it) }
+        val transformedRequest = request as? SendNotificationRequest
+            ?: recreateObject(request) { SendNotificationRequest(it) }
         super.doExecute(task, transformedRequest, listener)
     }
 
@@ -63,9 +63,9 @@ internal class GetNotificationConfigAction @Inject constructor(
      * {@inheritDoc}
      */
     override fun executeRequest(
-        request: GetNotificationConfigRequest,
+        request: SendNotificationRequest,
         user: User?
-    ): GetNotificationConfigResponse {
-        TODO()
+    ): SendNotificationResponse {
+        return SendNotificationResponse("TODO-notificationId")
     }
 }

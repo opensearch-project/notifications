@@ -17,8 +17,8 @@
 package com.amazon.opendistroforelasticsearch.notifications.action
 
 import com.amazon.opendistroforelasticsearch.commons.authuser.User
-import com.amazon.opendistroforelasticsearch.commons.notifications.action.GetNotificationConfigRequest
-import com.amazon.opendistroforelasticsearch.commons.notifications.action.GetNotificationConfigResponse
+import com.amazon.opendistroforelasticsearch.commons.notifications.action.GetFeatureChannelListRequest
+import com.amazon.opendistroforelasticsearch.commons.notifications.action.GetFeatureChannelListResponse
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.NotificationsActions
 import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
 import org.elasticsearch.action.ActionListener
@@ -30,19 +30,19 @@ import org.elasticsearch.tasks.Task
 import org.elasticsearch.transport.TransportService
 
 /**
- * Get notification config transport action
+ * Get feature channel list transport action
  */
-internal class GetNotificationConfigAction @Inject constructor(
+internal class GetFeatureChannelListAction @Inject constructor(
     transportService: TransportService,
     client: Client,
     actionFilters: ActionFilters,
     val xContentRegistry: NamedXContentRegistry
-) : PluginBaseAction<GetNotificationConfigRequest, GetNotificationConfigResponse>(
-    NotificationsActions.GET_NOTIFICATION_CONFIG_NAME,
+) : PluginBaseAction<GetFeatureChannelListRequest, GetFeatureChannelListResponse>(
+    NotificationsActions.GET_FEATURE_CHANNEL_LIST_NAME,
     transportService,
     client,
     actionFilters,
-    ::GetNotificationConfigRequest
+    ::GetFeatureChannelListRequest
 ) {
 
     /**
@@ -51,11 +51,11 @@ internal class GetNotificationConfigAction @Inject constructor(
      */
     override fun doExecute(
         task: Task?,
-        request: GetNotificationConfigRequest,
-        listener: ActionListener<GetNotificationConfigResponse>
+        request: GetFeatureChannelListRequest,
+        listener: ActionListener<GetFeatureChannelListResponse>
     ) {
-        val transformedRequest = request as? GetNotificationConfigRequest
-            ?: recreateObject(request) { GetNotificationConfigRequest(it) }
+        val transformedRequest = request as? GetFeatureChannelListRequest
+            ?: recreateObject(request) { GetFeatureChannelListRequest(it) }
         super.doExecute(task, transformedRequest, listener)
     }
 
@@ -63,9 +63,9 @@ internal class GetNotificationConfigAction @Inject constructor(
      * {@inheritDoc}
      */
     override fun executeRequest(
-        request: GetNotificationConfigRequest,
+        request: GetFeatureChannelListRequest,
         user: User?
-    ): GetNotificationConfigResponse {
+    ): GetFeatureChannelListResponse {
         TODO()
     }
 }

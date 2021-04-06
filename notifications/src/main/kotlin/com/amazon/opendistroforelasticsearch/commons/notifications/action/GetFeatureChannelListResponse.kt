@@ -15,7 +15,7 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
-import com.amazon.opendistroforelasticsearch.commons.notifications.model.FeatureConfigList
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.FeatureChannelList
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
 import org.elasticsearch.common.io.stream.Writeable
@@ -27,15 +27,15 @@ import java.io.IOException
 /**
  * Action Response for creating new configuration.
  */
-class GetFeatureConfigListResponse : BaseResponse {
-    val searchResult: FeatureConfigList
+class GetFeatureChannelListResponse : BaseResponse {
+    val searchResult: FeatureChannelList
 
     companion object {
 
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader { GetFeatureConfigListResponse(it) }
+        val reader = Writeable.Reader { GetFeatureChannelListResponse(it) }
 
         /**
          * Creator used in REST communication.
@@ -43,8 +43,8 @@ class GetFeatureConfigListResponse : BaseResponse {
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): GetFeatureConfigListResponse {
-            return GetFeatureConfigListResponse(FeatureConfigList(parser))
+        fun parse(parser: XContentParser): GetFeatureChannelListResponse {
+            return GetFeatureChannelListResponse(FeatureChannelList(parser))
         }
     }
 
@@ -52,7 +52,7 @@ class GetFeatureConfigListResponse : BaseResponse {
      * constructor for creating the class
      * @param searchResult the notification configuration list
      */
-    constructor(searchResult: FeatureConfigList) {
+    constructor(searchResult: FeatureChannelList) {
         this.searchResult = searchResult
     }
 
@@ -61,7 +61,7 @@ class GetFeatureConfigListResponse : BaseResponse {
      */
     @Throws(IOException::class)
     constructor(input: StreamInput) : super(input) {
-        searchResult = FeatureConfigList(input)
+        searchResult = FeatureChannelList(input)
     }
 
     /**

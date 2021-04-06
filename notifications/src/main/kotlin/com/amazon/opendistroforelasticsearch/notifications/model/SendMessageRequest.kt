@@ -16,11 +16,11 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.model
 
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.notifications.util.createJsonParser
 import com.amazon.opendistroforelasticsearch.notifications.util.fieldIfNotNull
 import com.amazon.opendistroforelasticsearch.notifications.util.logger
-import com.amazon.opendistroforelasticsearch.notifications.util.objectIfNotNull
 import com.amazon.opendistroforelasticsearch.notifications.util.stringList
 import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.ActionRequestValidationException
@@ -40,6 +40,7 @@ import java.io.IOException
 internal class SendMessageRequest : ActionRequest, ToXContentObject {
     val refTag: String
     val recipients: List<String>
+    val title: String
     val channelMessage: ChannelMessage
 
     companion object {
@@ -55,10 +56,12 @@ internal class SendMessageRequest : ActionRequest, ToXContentObject {
     constructor(
         refTag: String,
         recipients: List<String>,
+        title: String,
         channelMessage: ChannelMessage
     ) : super() {
         this.refTag = refTag
         this.recipients = recipients
+        this.title = title
         this.channelMessage = channelMessage
     }
 
@@ -101,7 +104,8 @@ internal class SendMessageRequest : ActionRequest, ToXContentObject {
         textDescription ?: throw IllegalArgumentException("$TEXT_DESCRIPTION_FIELD not present")
         this.refTag = refTag
         this.recipients = recipients
-        this.channelMessage = ChannelMessage(title, textDescription, htmlDescription, attachment)
+        this.title = title
+        this.channelMessage = ChannelMessage(textDescription, htmlDescription, attachment)
     }
 
     /**
@@ -127,10 +131,10 @@ internal class SendMessageRequest : ActionRequest, ToXContentObject {
         return builder!!.startObject()
             .field(REF_TAG_FIELD, refTag)
             .field(RECIPIENTS_FIELD, recipients)
-            .field(TITLE_FIELD, channelMessage.title)
+            .field(TITLE_FIELD, title)
             .field(TEXT_DESCRIPTION_FIELD, channelMessage.textDescription)
             .fieldIfNotNull(HTML_DESCRIPTION_FIELD, channelMessage.htmlDescription)
-            .objectIfNotNull(ATTACHMENT_FIELD, channelMessage.attachment)
+            .fieldIfNotNull(ATTACHMENT_FIELD, channelMessage.attachment)
             .endObject()
     }
 

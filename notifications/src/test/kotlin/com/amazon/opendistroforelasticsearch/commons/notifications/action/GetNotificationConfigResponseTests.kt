@@ -16,6 +16,8 @@
 package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.Chime
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.ConfigType
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.Feature
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.NotificationConfig
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.NotificationConfigInfo
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.NotificationConfigSearchResult
@@ -49,8 +51,8 @@ internal class GetNotificationConfigResponseTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack,
-            EnumSet.of(NotificationConfig.Feature.Reports),
+            ConfigType.Slack,
+            EnumSet.of(Feature.Reports),
             slack = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
@@ -71,8 +73,8 @@ internal class GetNotificationConfigResponseTests : ESTestCase() {
         val sampleConfig1 = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack,
-            EnumSet.of(NotificationConfig.Feature.Reports),
+            ConfigType.Slack,
+            EnumSet.of(Feature.Reports),
             slack = Slack("https://domain.com/sample_url#1234567890")
         )
         val configInfo1 = NotificationConfigInfo(
@@ -85,8 +87,8 @@ internal class GetNotificationConfigResponseTests : ESTestCase() {
         val sampleConfig2 = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Chime,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Chime,
+            EnumSet.of(Feature.IndexManagement),
             chime = Chime("https://domain.com/sample_url#1234567890")
         )
         val configInfo2 = NotificationConfigInfo(
@@ -115,8 +117,8 @@ internal class GetNotificationConfigResponseTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack,
-            EnumSet.of(NotificationConfig.Feature.Reports),
+            ConfigType.Slack,
+            EnumSet.of(Feature.Reports),
             slack = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
@@ -140,8 +142,8 @@ internal class GetNotificationConfigResponseTests : ESTestCase() {
         val sampleConfig1 = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack,
-            EnumSet.of(NotificationConfig.Feature.Reports),
+            ConfigType.Slack,
+            EnumSet.of(Feature.Reports),
             slack = Slack("https://domain.com/sample_url#1234567890")
         )
         val configInfo1 = NotificationConfigInfo(
@@ -154,8 +156,8 @@ internal class GetNotificationConfigResponseTests : ESTestCase() {
         val sampleConfig2 = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Chime,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Chime,
+            EnumSet.of(Feature.IndexManagement),
             chime = Chime("https://domain.com/sample_url#1234567890")
         )
         val configInfo2 = NotificationConfigInfo(
@@ -185,8 +187,8 @@ internal class GetNotificationConfigResponseTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Slack,
+            EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
             slack = sampleSlack
         )
@@ -236,8 +238,8 @@ internal class GetNotificationConfigResponseTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Slack,
+            EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
             slack = sampleSlack
         )

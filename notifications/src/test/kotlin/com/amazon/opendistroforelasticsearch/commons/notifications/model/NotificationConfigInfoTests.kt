@@ -32,8 +32,8 @@ internal class NotificationConfigInfoTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack,
-            EnumSet.of(NotificationConfig.Feature.Reports),
+            ConfigType.Slack,
+            EnumSet.of(Feature.Reports),
             slack = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
@@ -55,8 +55,8 @@ internal class NotificationConfigInfoTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack,
-            EnumSet.of(NotificationConfig.Feature.Reports),
+            ConfigType.Slack,
+            EnumSet.of(Feature.Reports),
             slack = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
@@ -79,8 +79,8 @@ internal class NotificationConfigInfoTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Slack,
+            EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
             slack = sampleSlack
         )
@@ -118,8 +118,8 @@ internal class NotificationConfigInfoTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Slack,
+            EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
             slack = sampleSlack
         )
@@ -159,8 +159,8 @@ internal class NotificationConfigInfoTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack,
-            EnumSet.of(NotificationConfig.Feature.Reports),
+            ConfigType.Slack,
+            EnumSet.of(Feature.Reports),
             slack = sampleSlack
         )
         Assertions.assertThrows(IllegalArgumentException::class.java) {

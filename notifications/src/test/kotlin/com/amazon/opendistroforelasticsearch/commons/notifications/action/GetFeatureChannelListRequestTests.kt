@@ -15,7 +15,7 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
-import com.amazon.opendistroforelasticsearch.commons.notifications.model.NotificationConfig
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.Feature
 import com.amazon.opendistroforelasticsearch.notifications.createObjectFromJsonString
 import com.amazon.opendistroforelasticsearch.notifications.getJsonString
 import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
@@ -24,11 +24,11 @@ import org.elasticsearch.test.ESTestCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-internal class GetFeatureConfigListRequestTests : ESTestCase() {
+internal class GetFeatureChannelListRequestTests : ESTestCase() {
 
     private fun assertGetRequestEquals(
-        expected: GetFeatureConfigListRequest,
-        actual: GetFeatureConfigListRequest
+        expected: GetFeatureChannelListRequest,
+        actual: GetFeatureChannelListRequest
     ) {
         assertEquals(expected.feature, actual.feature)
         assertEquals(expected.threadContext, actual.threadContext)
@@ -36,17 +36,17 @@ internal class GetFeatureConfigListRequestTests : ESTestCase() {
 
     @Test
     fun `Get request serialize and deserialize transport object should be equal`() {
-        val configRequest = GetFeatureConfigListRequest(NotificationConfig.Feature.Reports, "sample-thread-context")
-        val recreatedObject = recreateObject(configRequest) { GetFeatureConfigListRequest(it) }
+        val configRequest = GetFeatureChannelListRequest(Feature.Reports, "sample-thread-context")
+        val recreatedObject = recreateObject(configRequest) { GetFeatureChannelListRequest(it) }
         assertGetRequestEquals(configRequest, recreatedObject)
     }
 
     @Test
     fun `Get request serialize and deserialize using json object should be equal`() {
         val configRequest =
-            GetFeatureConfigListRequest(NotificationConfig.Feature.IndexManagement, "sample-thread-context")
+            GetFeatureChannelListRequest(Feature.IndexManagement, "sample-thread-context")
         val jsonString = getJsonString(configRequest)
-        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureConfigListRequest.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureChannelListRequest.parse(it) }
         assertGetRequestEquals(configRequest, recreatedObject)
     }
 
@@ -54,13 +54,13 @@ internal class GetFeatureConfigListRequestTests : ESTestCase() {
     fun `Get request should throw exception when invalid json object is passed`() {
         val jsonString = "sample message"
         assertThrows<JsonParseException> {
-            createObjectFromJsonString(jsonString) { GetFeatureConfigListRequest.parse(it) }
+            createObjectFromJsonString(jsonString) { GetFeatureChannelListRequest.parse(it) }
         }
     }
 
     @Test
     fun `Get request should safely ignore extra field in json object`() {
-        val configRequest = GetFeatureConfigListRequest(NotificationConfig.Feature.Alerting, "sample-thread-context")
+        val configRequest = GetFeatureChannelListRequest(Feature.Alerting, "sample-thread-context")
         val jsonString = """
         {
             "feature":"${configRequest.feature}",
@@ -70,19 +70,19 @@ internal class GetFeatureConfigListRequestTests : ESTestCase() {
             "extra_field_3":"extra value 3"
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureConfigListRequest.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureChannelListRequest.parse(it) }
         assertGetRequestEquals(configRequest, recreatedObject)
     }
 
     @Test
     fun `Get request should safely ignore thread context is absent in json object`() {
-        val configRequest = GetFeatureConfigListRequest(NotificationConfig.Feature.Reports, null)
+        val configRequest = GetFeatureChannelListRequest(Feature.Reports, null)
         val jsonString = """
         {
             "feature":"${configRequest.feature}"
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureConfigListRequest.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureChannelListRequest.parse(it) }
         assertGetRequestEquals(configRequest, recreatedObject)
     }
 
@@ -94,7 +94,7 @@ internal class GetFeatureConfigListRequestTests : ESTestCase() {
         }
         """.trimIndent()
         assertThrows<IllegalArgumentException> {
-            createObjectFromJsonString(jsonString) { GetFeatureConfigListRequest.parse(it) }
+            createObjectFromJsonString(jsonString) { GetFeatureChannelListRequest.parse(it) }
         }
     }
 }

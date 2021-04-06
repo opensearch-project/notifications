@@ -60,9 +60,6 @@ data class NotificationConfig(
         }
     }
 
-    enum class ConfigType { None, Slack, Chime, Webhook, Email, SmtpAccount, EmailGroup }
-    enum class Feature { None, Alerting, IndexManagement, Reports }
-
     companion object {
         private val log by logger(NotificationConfig::class.java)
         private const val NAME_TAG = "name"

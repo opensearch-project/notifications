@@ -15,13 +15,13 @@
  */
 package com.amazon.opendistroforelasticsearch.notifications.resthandler
 
+import com.amazon.opendistroforelasticsearch.commons.notifications.NotificationsPluginInterface
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.CreateNotificationConfigRequest
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.DeleteNotificationConfigRequest
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.GetNotificationConfigRequest
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.GetNotificationConfigRequest.Companion.DEFAULT_MAX_ITEMS
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.GetNotificationConfigRequest.Companion.FROM_INDEX_TAG
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.GetNotificationConfigRequest.Companion.MAX_ITEMS_TAG
-import com.amazon.opendistroforelasticsearch.commons.notifications.action.NotificationsActions
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.UpdateNotificationConfigRequest
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import com.amazon.opendistroforelasticsearch.notifications.util.contentParserNextToken
@@ -112,14 +112,14 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
     override fun executeRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
         return when (request.method()) {
             POST -> RestChannelConsumer {
-                NotificationsActions.createNotificationConfig(
+                NotificationsPluginInterface.createNotificationConfig(
                     client,
                     CreateNotificationConfigRequest.parse(request.contentParserNextToken()),
                     RestToXContentListener(it)
                 )
             }
             PUT -> RestChannelConsumer {
-                NotificationsActions.updateNotificationConfig(
+                NotificationsPluginInterface.updateNotificationConfig(
                     client,
                     UpdateNotificationConfigRequest.parse(
                         request.contentParserNextToken(),
@@ -129,7 +129,7 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
                 )
             }
             DELETE -> RestChannelConsumer {
-                NotificationsActions.deleteNotificationConfig(
+                NotificationsPluginInterface.deleteNotificationConfig(
                     client,
                     DeleteNotificationConfigRequest(request.param(CONFIG_ID_FIELD)),
                     RestToXContentListener(it)
@@ -140,7 +140,7 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
                 val fromIndex = request.param(FROM_INDEX_TAG)?.toIntOrNull() ?: 0
                 val maxItems = request.param(MAX_ITEMS_TAG)?.toIntOrNull() ?: DEFAULT_MAX_ITEMS
                 RestChannelConsumer {
-                    NotificationsActions.getNotificationConfig(
+                    NotificationsPluginInterface.getNotificationConfig(
                         client,
                         GetNotificationConfigRequest(fromIndex, maxItems, configId),
                         RestToXContentListener(it)

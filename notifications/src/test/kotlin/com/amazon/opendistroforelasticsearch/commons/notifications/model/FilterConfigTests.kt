@@ -26,63 +26,63 @@ internal class FilterConfigTests : ESTestCase() {
 
     @Test
     fun `Config serialize and deserialize with default isEnabled flag should be equal`() {
-        val sampleConfig = FeatureConfig(
+        val sampleConfig = FeatureChannel(
             "configId",
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack
+            ConfigType.Slack
         )
-        val recreatedObject = recreateObject(sampleConfig) { FeatureConfig(it) }
+        val recreatedObject = recreateObject(sampleConfig) { FeatureChannel(it) }
         assertEquals(sampleConfig, recreatedObject)
     }
 
     @Test
     fun `Config serialize and deserialize with isEnabled=false should be equal`() {
-        val sampleConfig = FeatureConfig(
+        val sampleConfig = FeatureChannel(
             "configId",
             "name",
             "description",
-            NotificationConfig.ConfigType.Chime,
+            ConfigType.Chime,
             false
         )
-        val recreatedObject = recreateObject(sampleConfig) { FeatureConfig(it) }
+        val recreatedObject = recreateObject(sampleConfig) { FeatureChannel(it) }
         assertEquals(sampleConfig, recreatedObject)
     }
 
     @Test
     fun `Config serialize and deserialize using json object with default isEnabled flag should be equal`() {
-        val sampleConfig = FeatureConfig(
+        val sampleConfig = FeatureChannel(
             "configId",
             "name",
             "description",
-            NotificationConfig.ConfigType.Webhook
+            ConfigType.Webhook
         )
         val jsonString = getJsonString(sampleConfig)
-        val recreatedObject = createObjectFromJsonString(jsonString) { FeatureConfig.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { FeatureChannel.parse(it) }
         assertEquals(sampleConfig, recreatedObject)
     }
 
     @Test
     fun `Config serialize and deserialize using json object with isEnabled=false should be equal`() {
-        val sampleConfig = FeatureConfig(
+        val sampleConfig = FeatureChannel(
             "configId",
             "name",
             "description",
-            NotificationConfig.ConfigType.EmailGroup,
+            ConfigType.EmailGroup,
             false
         )
         val jsonString = getJsonString(sampleConfig)
-        val recreatedObject = createObjectFromJsonString(jsonString) { FeatureConfig.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { FeatureChannel.parse(it) }
         assertEquals(sampleConfig, recreatedObject)
     }
 
     @Test
     fun `Config should safely ignore extra field in json object`() {
-        val sampleConfig = FeatureConfig(
+        val sampleConfig = FeatureChannel(
             "configId",
             "name",
             "description",
-            NotificationConfig.ConfigType.Email
+            ConfigType.Email
         )
         val jsonString = """
         {
@@ -96,17 +96,17 @@ internal class FilterConfigTests : ESTestCase() {
             "extra_field_3":"extra value 3"
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { FeatureConfig.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { FeatureChannel.parse(it) }
         assertEquals(sampleConfig, recreatedObject)
     }
 
     @Test
     fun `Config should safely ignore unknown config type in json object`() {
-        val sampleConfig = FeatureConfig(
+        val sampleConfig = FeatureChannel(
             "configId",
             "name",
             "description",
-            NotificationConfig.ConfigType.None
+            ConfigType.None
         )
         val jsonString = """
         {
@@ -116,18 +116,18 @@ internal class FilterConfigTests : ESTestCase() {
             "configType":"NewConfig"
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { FeatureConfig.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { FeatureChannel.parse(it) }
         assertEquals(sampleConfig, recreatedObject)
     }
 
     @Test
     fun `Config throw exception if configId is empty`() {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
-            FeatureConfig(
+            FeatureChannel(
                 "",
                 "name",
                 "description",
-                NotificationConfig.ConfigType.EmailGroup
+                ConfigType.EmailGroup
             )
         }
     }
@@ -135,11 +135,11 @@ internal class FilterConfigTests : ESTestCase() {
     @Test
     fun `Config throw exception if name is empty`() {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
-            FeatureConfig(
+            FeatureChannel(
                 "configId",
                 "",
                 "description",
-                NotificationConfig.ConfigType.EmailGroup
+                ConfigType.EmailGroup
             )
         }
     }

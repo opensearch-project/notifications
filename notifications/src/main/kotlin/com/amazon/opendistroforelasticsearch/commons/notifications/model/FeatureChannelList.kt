@@ -22,17 +22,17 @@ import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.xcontent.XContentParser
 
 /**
- * FeatureConfig search results
+ * FeatureChannel search results
  */
-class FeatureConfigList : SearchResults<FeatureConfig> {
+class FeatureChannelList : SearchResults<FeatureChannel> {
     companion object {
-        private const val FEATURE_CONFIG_LIST_TAG = "featureConfigList"
+        private const val FEATURE_CONFIG_LIST_TAG = "featureChannelList"
     }
 
     /**
      * single item result constructor
      */
-    constructor(objectItem: FeatureConfig) : super(FEATURE_CONFIG_LIST_TAG, objectItem)
+    constructor(objectItem: FeatureChannel) : super(FEATURE_CONFIG_LIST_TAG, objectItem)
 
     /**
      * all param constructor
@@ -41,14 +41,14 @@ class FeatureConfigList : SearchResults<FeatureConfig> {
         startIndex: Long,
         totalHits: Long,
         totalHitRelation: TotalHits.Relation,
-        objectList: List<FeatureConfig>
+        objectList: List<FeatureChannel>
     ) : super(startIndex, totalHits, totalHitRelation, FEATURE_CONFIG_LIST_TAG, objectList)
 
     /**
      * Constructor used in transport action communication.
      * @param input StreamInput stream to deserialize data from.
      */
-    constructor(input: StreamInput) : super(input, FeatureConfig.reader)
+    constructor(input: StreamInput) : super(input, FeatureChannel.reader)
 
     /**
      * Construct object from XContentParser
@@ -68,7 +68,7 @@ class FeatureConfigList : SearchResults<FeatureConfig> {
     /**
      * {@inheritDoc}
      */
-    override fun parseItem(parser: XContentParser): FeatureConfig {
-        return FeatureConfig.parse(parser)
+    override fun parseItem(parser: XContentParser): FeatureChannel {
+        return FeatureChannel.parse(parser)
     }
 }

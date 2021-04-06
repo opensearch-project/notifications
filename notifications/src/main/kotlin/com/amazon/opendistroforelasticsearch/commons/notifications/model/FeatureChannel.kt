@@ -30,11 +30,11 @@ import java.io.IOException
 /**
  * Data class representing Notification config for exposed for other plugins.
  */
-data class FeatureConfig(
+data class FeatureChannel(
     val configId: String,
     val name: String,
     val description: String,
-    val configType: NotificationConfig.ConfigType,
+    val configType: ConfigType,
     val isEnabled: Boolean = true
 ) : BaseModel {
 
@@ -44,7 +44,7 @@ data class FeatureConfig(
     }
 
     companion object {
-        private val log by logger(FeatureConfig::class.java)
+        private val log by logger(FeatureChannel::class.java)
         private const val CONFIG_ID_TAG = "configId"
         private const val NAME_TAG = "name"
         private const val DESCRIPTION_TAG = "description"
@@ -54,7 +54,7 @@ data class FeatureConfig(
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader { FeatureConfig(it) }
+        val reader = Writeable.Reader { FeatureChannel(it) }
 
         /**
          * Creator used in REST communication.
@@ -63,11 +63,11 @@ data class FeatureConfig(
         @Suppress("ComplexMethod")
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): FeatureConfig {
+        fun parse(parser: XContentParser): FeatureChannel {
             var configId: String? = null
             var name: String? = null
             var description = ""
-            var configType: NotificationConfig.ConfigType? = null
+            var configType: ConfigType? = null
             var isEnabled = true
 
             XContentParserUtils.ensureExpectedToken(
@@ -82,7 +82,7 @@ data class FeatureConfig(
                     CONFIG_ID_TAG -> configId = parser.text()
                     NAME_TAG -> name = parser.text()
                     DESCRIPTION_TAG -> description = parser.text()
-                    CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), NotificationConfig.ConfigType.None)
+                    CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), ConfigType.None)
                     IS_ENABLED_TAG -> isEnabled = parser.booleanValue()
                     else -> {
                         parser.skipChildren()
@@ -93,7 +93,7 @@ data class FeatureConfig(
             configId ?: throw IllegalArgumentException("$CONFIG_ID_TAG field absent")
             name ?: throw IllegalArgumentException("$NAME_TAG field absent")
             configType ?: throw IllegalArgumentException("$CONFIG_TYPE_TAG field absent")
-            return FeatureConfig(
+            return FeatureChannel(
                 configId,
                 name,
                 description,
@@ -111,7 +111,7 @@ data class FeatureConfig(
         configId = input.readString(),
         name = input.readString(),
         description = input.readString(),
-        configType = input.readEnum(NotificationConfig.ConfigType::class.java),
+        configType = input.readEnum(ConfigType::class.java),
         isEnabled = input.readBoolean()
     )
 

@@ -24,40 +24,40 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-internal class NotificationStatusTests : ESTestCase() {
+internal class ChannelStatusTests : ESTestCase() {
 
     @Test
     fun `Notification Status serialize and deserialize should be equal`() {
-        val sampleStatus = NotificationStatus(
+        val sampleStatus = ChannelStatus(
             "configId",
             "name",
-            NotificationConfig.ConfigType.Slack,
+            ConfigType.Slack,
             deliveryStatus = DeliveryStatus("404", "invalid recipient")
         )
-        val recreatedObject = recreateObject(sampleStatus) { NotificationStatus(it) }
+        val recreatedObject = recreateObject(sampleStatus) { ChannelStatus(it) }
         assertEquals(sampleStatus, recreatedObject)
     }
 
     @Test
     fun `Notification Status serialize and deserialize using json should be equal`() {
-        val sampleStatus = NotificationStatus(
+        val sampleStatus = ChannelStatus(
             "configId",
             "name",
-            NotificationConfig.ConfigType.Slack,
+            ConfigType.Slack,
             deliveryStatus = DeliveryStatus("404", "invalid recipient")
         )
 
         val jsonString = getJsonString(sampleStatus)
-        val recreatedObject = createObjectFromJsonString(jsonString) { NotificationStatus.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { ChannelStatus.parse(it) }
         assertEquals(sampleStatus, recreatedObject)
     }
 
     @Test
     fun `Notification Status should safely ignore extra field in json object`() {
-        val sampleStatus = NotificationStatus(
+        val sampleStatus = ChannelStatus(
             "configId",
             "name",
-            NotificationConfig.ConfigType.Slack,
+            ConfigType.Slack,
             deliveryStatus = DeliveryStatus("404", "invalid recipient")
         )
         val jsonString = """
@@ -71,10 +71,12 @@ internal class NotificationStatusTests : ESTestCase() {
                 "statusCode":"404",
                 "statusText":"invalid recipient"
            },
-           "extraField": "extra field"
+           "extra_field_1":["extra", "value"],
+           "extra_field_2":{"extra":"value"},
+           "extra_field_3":"extra value 3"
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { NotificationStatus.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { ChannelStatus.parse(it) }
         assertEquals(sampleStatus, recreatedObject)
     }
 
@@ -83,13 +85,18 @@ internal class NotificationStatusTests : ESTestCase() {
         val jsonString = """
         {
            "configId":"configId",
-           "configType":"Slack",
+           "configType":"Email",
            "configName":"name",
+           "deliveryStatus":
+           {
+                "statusCode":"404",
+                "statusText":"invalid recipient"
+           },
            "emailRecipientStatus":[]
         }
         """.trimIndent()
         assertThrows<IllegalArgumentException> {
-            createObjectFromJsonString(jsonString) { NotificationStatus.parse(it) }
+            createObjectFromJsonString(jsonString) { ChannelStatus.parse(it) }
         }
     }
 
@@ -97,17 +104,50 @@ internal class NotificationStatusTests : ESTestCase() {
     fun `Notification should throw exception when invalid json object is passed`() {
         val jsonString = "sample message"
         assertThrows<JsonParseException> {
-            createObjectFromJsonString(jsonString) { Notification.parse(it) }
+            createObjectFromJsonString(jsonString) { NotificationInfo.parse(it) }
         }
     }
 
     @Test
     fun `Notification throw exception if deliveryStatus is empty for config type Slack`() {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
-            NotificationStatus(
+            ChannelStatus(
                 "configId",
                 "name",
-                NotificationConfig.ConfigType.Slack
+                ConfigType.Slack
+            )
+        }
+    }
+
+    @Test
+    fun `Notification throw exception if deliveryStatus is empty for config type Chime`() {
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            ChannelStatus(
+                "configId",
+                "name",
+                ConfigType.Chime
+            )
+        }
+    }
+
+    @Test
+    fun `Notification throw exception if deliveryStatus is empty for config type Webhook`() {
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            ChannelStatus(
+                "configId",
+                "name",
+                ConfigType.Webhook
+            )
+        }
+    }
+
+    @Test
+    fun `Notification throw exception if emailRecipientStatus is empty for config type Email`() {
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            ChannelStatus(
+                "configId",
+                "name",
+                ConfigType.Email
             )
         }
     }
