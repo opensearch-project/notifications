@@ -13,15 +13,14 @@
  * permissions and limitations under the License.
  */
 
-import React from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiHorizontalRule,
   EuiPanel,
-  EuiSpacer,
   EuiTitle,
 } from '@elastic/eui';
+import React from 'react';
 
 interface ContentPanelProps {
   title?: string;

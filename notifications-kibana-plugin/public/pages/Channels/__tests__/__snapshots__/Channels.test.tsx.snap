@@ -14,7 +14,7 @@ exports[`<Channels/> spec renders the component 1`] = `
       <h3
         class="euiTitle euiTitle--medium"
       >
-        Channels (1)
+        Channels (5)
       </h3>
     </div>
     <div
