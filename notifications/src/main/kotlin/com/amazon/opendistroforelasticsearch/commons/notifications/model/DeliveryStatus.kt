@@ -15,7 +15,7 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import org.elasticsearch.common.Strings
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput

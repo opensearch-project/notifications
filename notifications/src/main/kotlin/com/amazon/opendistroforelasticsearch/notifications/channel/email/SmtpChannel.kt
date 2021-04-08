@@ -21,7 +21,7 @@ import com.amazon.opendistroforelasticsearch.commons.notifications.model.Channel
 import com.amazon.opendistroforelasticsearch.notifications.model.ChannelMessageResponse
 import com.amazon.opendistroforelasticsearch.notifications.security.SecurityAccess
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import com.sun.mail.util.MailConnectException
 import org.elasticsearch.rest.RestStatus
 import java.util.Properties

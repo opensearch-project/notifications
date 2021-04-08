@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notifications.util
+package com.amazon.opendistroforelasticsearch.commons.utils
 
-import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.elasticsearch.common.io.stream.InputStreamStreamInput
@@ -27,8 +26,6 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
 @Suppress("TooManyFunctions")
-
-val logHelper by logger(NotificationPlugin::class.java)
 
 internal fun <T : Any> logger(forClass: Class<T>): Lazy<Logger> {
     return lazy { LogManager.getLogger(forClass) }

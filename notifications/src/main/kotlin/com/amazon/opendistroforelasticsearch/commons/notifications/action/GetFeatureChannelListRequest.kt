@@ -16,9 +16,9 @@
 package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.Feature
-import com.amazon.opendistroforelasticsearch.notifications.util.fieldIfNotNull
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
-import com.amazon.opendistroforelasticsearch.notifications.util.valueOf
+import com.amazon.opendistroforelasticsearch.commons.utils.fieldIfNotNull
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.valueOf
 import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.ActionRequestValidationException
 import org.elasticsearch.common.io.stream.StreamInput
@@ -71,7 +71,7 @@ class GetFeatureChannelListRequest : ActionRequest, ToXContentObject {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    FEATURE_TAG -> feature = valueOf(parser.text(), Feature.None)
+                    FEATURE_TAG -> feature = valueOf(parser.text(), Feature.None, log)
                     THREAD_CONTEXT_TAG -> threadContext = parser.text()
                     else -> {
                         parser.skipChildren()

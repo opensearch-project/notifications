@@ -20,7 +20,7 @@ import com.amazon.opendistroforelasticsearch.commons.authuser.User
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.GetFeatureChannelListRequest
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.GetFeatureChannelListResponse
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.NotificationsActions
-import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
+import com.amazon.opendistroforelasticsearch.commons.utils.recreateObject
 import org.elasticsearch.action.ActionListener
 import org.elasticsearch.action.support.ActionFilters
 import org.elasticsearch.client.Client

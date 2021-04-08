@@ -19,16 +19,17 @@ import com.amazon.opendistroforelasticsearch.commons.notifications.model.Channel
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.Feature
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.NotificationInfo
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.SeverityType
-import com.amazon.opendistroforelasticsearch.notifications.createObjectFromJsonString
-import com.amazon.opendistroforelasticsearch.notifications.getJsonString
-import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
+import com.amazon.opendistroforelasticsearch.commons.utils.createObjectFromJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.getJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.recreateObject
 import com.fasterxml.jackson.core.JsonParseException
-import org.elasticsearch.test.ESTestCase
-import org.junit.Assert
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-internal class SendNotificationRequestTests : ESTestCase() {
+internal class SendNotificationRequestTests {
 
     private fun assertGetRequestEquals(
         expected: SendNotificationRequest,
@@ -38,7 +39,7 @@ internal class SendNotificationRequestTests : ESTestCase() {
         assertEquals(expected.channelMessage, actual.channelMessage)
         assertEquals(expected.channelIds, actual.channelIds)
         assertEquals(expected.threadContext, actual.threadContext)
-        Assert.assertNull(actual.validate())
+        assertNull(actual.validate())
     }
 
     @Test
@@ -255,6 +256,6 @@ internal class SendNotificationRequestTests : ESTestCase() {
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { SendNotificationRequest.parse(it) }
-        Assert.assertNotNull(recreatedObject.validate())
+        assertNotNull(recreatedObject.validate())
     }
 }

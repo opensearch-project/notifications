@@ -15,10 +15,10 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
-import com.amazon.opendistroforelasticsearch.notifications.util.fieldIfNotNull
-import com.amazon.opendistroforelasticsearch.notifications.util.isValidEmail
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
-import com.amazon.opendistroforelasticsearch.notifications.util.valueOf
+import com.amazon.opendistroforelasticsearch.commons.utils.fieldIfNotNull
+import com.amazon.opendistroforelasticsearch.commons.utils.isValidEmail
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.valueOf
 import org.elasticsearch.common.Strings
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
@@ -86,7 +86,7 @@ data class SmtpAccount(
                 when (fieldName) {
                     HOST_FIELD -> host = parser.text()
                     PORT_FIELD -> port = parser.intValue()
-                    METHOD_FIELD -> method = valueOf(parser.text(), MethodType.None)
+                    METHOD_FIELD -> method = valueOf(parser.text(), MethodType.None, log)
                     FROM_ADDRESS_FIELD -> fromAddress = parser.text()
                     USERNAME_FIELD -> username = SecureString(parser.text().toCharArray())
                     PASSWORD_FIELD -> password = SecureString(parser.text().toCharArray())

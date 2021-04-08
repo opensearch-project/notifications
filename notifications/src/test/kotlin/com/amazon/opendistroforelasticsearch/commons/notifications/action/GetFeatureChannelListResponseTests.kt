@@ -18,15 +18,15 @@ package com.amazon.opendistroforelasticsearch.commons.notifications.action
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.ConfigType
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.FeatureChannel
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.FeatureChannelList
-import com.amazon.opendistroforelasticsearch.notifications.createObjectFromJsonString
-import com.amazon.opendistroforelasticsearch.notifications.getJsonString
-import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
+import com.amazon.opendistroforelasticsearch.commons.utils.createObjectFromJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.getJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.recreateObject
 import org.apache.lucene.search.TotalHits
-import org.elasticsearch.test.ESTestCase
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-internal class GetFeatureChannelListResponseTests : ESTestCase() {
+internal class GetFeatureChannelListResponseTests {
 
     private fun assertSearchResultEquals(
         expected: FeatureChannelList,

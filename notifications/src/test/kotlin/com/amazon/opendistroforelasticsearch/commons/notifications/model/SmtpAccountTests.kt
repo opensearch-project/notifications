@@ -15,16 +15,16 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
-import com.amazon.opendistroforelasticsearch.notifications.createObjectFromJsonString
-import com.amazon.opendistroforelasticsearch.notifications.getJsonString
-import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
+import com.amazon.opendistroforelasticsearch.commons.utils.createObjectFromJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.getJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.recreateObject
 import com.fasterxml.jackson.core.JsonParseException
 import org.elasticsearch.common.settings.SecureString
-import org.elasticsearch.test.ESTestCase
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-internal class SmtpAccountTests : ESTestCase() {
+internal class SmtpAccountTests {
 
     @Test
     fun `SmtpAccount serialize and deserialize transport object should be equal`() {
@@ -35,7 +35,8 @@ internal class SmtpAccountTests : ESTestCase() {
 
     @Test
     fun `SmtpAccount serialize and deserialize transport object should be equal with credentials`() {
-        val sampleSmtpAccount = SmtpAccount("domain.com",
+        val sampleSmtpAccount = SmtpAccount(
+            "domain.com",
             1234, SmtpAccount.MethodType.StartTls,
             "from@domain.com",
             SecureString("username".toCharArray()),
@@ -55,7 +56,8 @@ internal class SmtpAccountTests : ESTestCase() {
 
     @Test
     fun `SmtpAccount serialize and deserialize using json object should be equal with credentials`() {
-        val sampleSmtpAccount = SmtpAccount("domain.com",
+        val sampleSmtpAccount = SmtpAccount(
+            "domain.com",
             1234, SmtpAccount.MethodType.StartTls,
             "from@domain.com",
             SecureString("username".toCharArray()),
@@ -83,7 +85,8 @@ internal class SmtpAccountTests : ESTestCase() {
 
     @Test
     fun `SmtpAccount should deserialize json object using parser with credentials`() {
-        val sampleSmtpAccount = SmtpAccount("domain.com",
+        val sampleSmtpAccount = SmtpAccount(
+            "domain.com",
             1234, SmtpAccount.MethodType.StartTls,
             "from@domain.com",
             SecureString("given_username".toCharArray()),
@@ -130,7 +133,8 @@ internal class SmtpAccountTests : ESTestCase() {
 
     @Test
     fun `SmtpAccount should safely ignore extra field in json object`() {
-        val sampleSmtpAccount = SmtpAccount("domain.com",
+        val sampleSmtpAccount = SmtpAccount(
+            "domain.com",
             1234, SmtpAccount.MethodType.Ssl,
             "from@domain.com",
             SecureString("given_username".toCharArray()),

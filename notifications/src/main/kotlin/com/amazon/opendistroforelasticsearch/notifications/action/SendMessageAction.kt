@@ -24,7 +24,7 @@ import com.amazon.opendistroforelasticsearch.notifications.model.SendMessageRequ
 import com.amazon.opendistroforelasticsearch.notifications.model.SendMessageResponse
 import com.amazon.opendistroforelasticsearch.notifications.throttle.Accountant
 import com.amazon.opendistroforelasticsearch.notifications.throttle.Counters
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

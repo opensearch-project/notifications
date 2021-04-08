@@ -16,7 +16,7 @@
 
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import org.apache.lucene.search.TotalHits.Relation
 import org.apache.lucene.search.TotalHits.Relation.EQUAL_TO
 import org.apache.lucene.search.TotalHits.Relation.GREATER_THAN_OR_EQUAL_TO

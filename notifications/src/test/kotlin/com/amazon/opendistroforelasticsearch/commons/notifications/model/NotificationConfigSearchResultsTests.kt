@@ -15,17 +15,17 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
-import com.amazon.opendistroforelasticsearch.notifications.createObjectFromJsonString
-import com.amazon.opendistroforelasticsearch.notifications.getJsonString
-import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
+import com.amazon.opendistroforelasticsearch.commons.utils.createObjectFromJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.getJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.recreateObject
 import org.apache.lucene.search.TotalHits
-import org.elasticsearch.test.ESTestCase
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.EnumSet
 
-internal class NotificationConfigSearchResultsTests : ESTestCase() {
+internal class NotificationConfigSearchResultsTests {
 
     private fun assertSearchResultEquals(
         expected: NotificationConfigSearchResult,

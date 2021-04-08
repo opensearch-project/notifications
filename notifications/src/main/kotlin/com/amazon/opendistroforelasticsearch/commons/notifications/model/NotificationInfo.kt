@@ -15,9 +15,9 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
-import com.amazon.opendistroforelasticsearch.notifications.util.stringList
-import com.amazon.opendistroforelasticsearch.notifications.util.valueOf
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.stringList
+import com.amazon.opendistroforelasticsearch.commons.utils.valueOf
 import org.elasticsearch.common.Strings
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
@@ -80,8 +80,8 @@ data class NotificationInfo(
                 when (fieldName) {
                     TITLE_TAG -> title = parser.text()
                     REFERENCE_ID_TAG -> referenceId = parser.text()
-                    FEATURE_TAG -> feature = valueOf(parser.text(), Feature.None)
-                    SEVERITY_TAG -> severity = valueOf(parser.text(), SeverityType.None)
+                    FEATURE_TAG -> feature = valueOf(parser.text(), Feature.None, log)
+                    SEVERITY_TAG -> severity = valueOf(parser.text(), SeverityType.None, log)
                     TAGS_TAG -> tags = parser.stringList()
                     else -> {
                         parser.skipChildren()

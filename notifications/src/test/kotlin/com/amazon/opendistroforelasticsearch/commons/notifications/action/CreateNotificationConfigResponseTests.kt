@@ -15,15 +15,15 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
-import com.amazon.opendistroforelasticsearch.notifications.createObjectFromJsonString
-import com.amazon.opendistroforelasticsearch.notifications.getJsonString
-import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
+import com.amazon.opendistroforelasticsearch.commons.utils.createObjectFromJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.getJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.recreateObject
 import com.fasterxml.jackson.core.JsonParseException
-import org.elasticsearch.test.ESTestCase
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-internal class CreateNotificationConfigResponseTests : ESTestCase() {
+internal class CreateNotificationConfigResponseTests {
 
     @Test
     fun `Create response serialize and deserialize transport object should be equal`() {

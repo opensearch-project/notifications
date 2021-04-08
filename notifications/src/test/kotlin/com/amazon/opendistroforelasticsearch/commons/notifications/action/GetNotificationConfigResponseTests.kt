@@ -22,17 +22,17 @@ import com.amazon.opendistroforelasticsearch.commons.notifications.model.Notific
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.NotificationConfigInfo
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.NotificationConfigSearchResult
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.Slack
-import com.amazon.opendistroforelasticsearch.notifications.createObjectFromJsonString
-import com.amazon.opendistroforelasticsearch.notifications.getJsonString
-import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
+import com.amazon.opendistroforelasticsearch.commons.utils.createObjectFromJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.getJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.recreateObject
 import org.apache.lucene.search.TotalHits
-import org.elasticsearch.test.ESTestCase
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.EnumSet
 
-internal class GetNotificationConfigResponseTests : ESTestCase() {
+internal class GetNotificationConfigResponseTests {
 
     private fun assertSearchResultEquals(
         expected: NotificationConfigSearchResult,

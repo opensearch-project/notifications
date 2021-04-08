@@ -15,8 +15,8 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.action
 
-import com.amazon.opendistroforelasticsearch.notifications.util.fieldIfNotNull
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.fieldIfNotNull
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.ActionRequestValidationException
 import org.elasticsearch.action.ValidateActions

@@ -17,8 +17,8 @@
 package com.amazon.opendistroforelasticsearch.notifications.model
 
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
-import com.amazon.opendistroforelasticsearch.notifications.util.createJsonParser
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.createJsonParser
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
 import org.elasticsearch.common.xcontent.ToXContent

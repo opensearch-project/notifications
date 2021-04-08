@@ -16,9 +16,8 @@
 
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
-import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
-import com.amazon.opendistroforelasticsearch.notifications.util.fieldIfNotNull
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.fieldIfNotNull
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import org.elasticsearch.common.Strings
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
@@ -80,7 +79,7 @@ data class ChannelMessage(
                     ATTACHMENT_TAG -> attachment = Attachment.parse(parser)
                     else -> {
                         parser.skipChildren()
-                        log.info("$LOG_PREFIX:Skipping Unknown field $fieldName")
+                        log.info("Skipping Unknown field $fieldName")
                     }
                 }
             }
@@ -171,7 +170,7 @@ data class ChannelMessage(
                         FILE_CONTENT_TYPE_TAG -> fileContentType = parser.text()
                         else -> {
                             parser.skipChildren()
-                            log.info("$LOG_PREFIX:Skipping Unknown field $dataType")
+                            log.info("Skipping Unknown field $dataType")
                         }
                     }
                 }

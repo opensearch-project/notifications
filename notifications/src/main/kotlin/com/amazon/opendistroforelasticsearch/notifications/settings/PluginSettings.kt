@@ -18,7 +18,7 @@ package com.amazon.opendistroforelasticsearch.notifications.settings
 
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import org.elasticsearch.bootstrap.BootstrapInfo
 import org.elasticsearch.cluster.service.ClusterService
 import org.elasticsearch.common.settings.Setting

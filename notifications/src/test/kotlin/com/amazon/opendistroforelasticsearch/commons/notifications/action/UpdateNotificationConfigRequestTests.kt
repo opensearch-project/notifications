@@ -24,16 +24,17 @@ import com.amazon.opendistroforelasticsearch.commons.notifications.model.Notific
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.Slack
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.SmtpAccount
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.Webhook
-import com.amazon.opendistroforelasticsearch.notifications.createObjectFromJsonString
-import com.amazon.opendistroforelasticsearch.notifications.getJsonString
-import com.amazon.opendistroforelasticsearch.notifications.util.recreateObject
+import com.amazon.opendistroforelasticsearch.commons.utils.createObjectFromJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.getJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.recreateObject
 import com.fasterxml.jackson.core.JsonParseException
-import org.elasticsearch.test.ESTestCase
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.EnumSet
 
-internal class UpdateNotificationConfigRequestTests : ESTestCase() {
+internal class UpdateNotificationConfigRequestTests {
 
     private fun createAllContentConfigObject(): NotificationConfig {
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")

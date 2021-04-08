@@ -28,7 +28,7 @@ import com.amazon.opendistroforelasticsearch.notifications.resthandler.Notificat
 import com.amazon.opendistroforelasticsearch.notifications.resthandler.SendMessageRestHandler
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import com.amazon.opendistroforelasticsearch.notifications.throttle.Accountant
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.ActionResponse
 import org.elasticsearch.client.Client

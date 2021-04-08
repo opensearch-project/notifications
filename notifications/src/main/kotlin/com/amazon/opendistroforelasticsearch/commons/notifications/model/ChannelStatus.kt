@@ -16,10 +16,10 @@
 
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
-import com.amazon.opendistroforelasticsearch.notifications.util.fieldIfNotNull
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
-import com.amazon.opendistroforelasticsearch.notifications.util.objectList
-import com.amazon.opendistroforelasticsearch.notifications.util.valueOf
+import com.amazon.opendistroforelasticsearch.commons.utils.fieldIfNotNull
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.objectList
+import com.amazon.opendistroforelasticsearch.commons.utils.valueOf
 import org.elasticsearch.common.Strings
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
@@ -93,7 +93,7 @@ data class ChannelStatus(
                 when (fieldName) {
                     CONFIG_NAME_TAG -> configName = parser.text()
                     CONFIG_ID_TAG -> configId = parser.text()
-                    CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), ConfigType.None)
+                    CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), ConfigType.None, log)
                     EMAIL_RECIPIENT_STATUS_TAG -> emailRecipientStatus = parser.objectList { EmailRecipientStatus.parse(it) }
                     STATUS_DETAIL_TAG -> deliveryStatus = DeliveryStatus.parse(parser)
                     else -> {
@@ -126,7 +126,7 @@ data class ChannelStatus(
         configType = input.readEnum(ConfigType::class.java),
         emailRecipientStatus = input.readList(EmailRecipientStatus.reader),
         deliveryStatus = input.readOptionalWriteable(DeliveryStatus.reader)
-        )
+    )
 
     /**
      * {@inheritDoc}

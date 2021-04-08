@@ -15,10 +15,10 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
-import com.amazon.opendistroforelasticsearch.notifications.util.enumSet
-import com.amazon.opendistroforelasticsearch.notifications.util.fieldIfNotNull
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
-import com.amazon.opendistroforelasticsearch.notifications.util.valueOf
+import com.amazon.opendistroforelasticsearch.commons.utils.enumSet
+import com.amazon.opendistroforelasticsearch.commons.utils.fieldIfNotNull
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.valueOf
 import org.elasticsearch.common.Strings
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
@@ -110,8 +110,8 @@ data class NotificationConfig(
                 when (fieldName) {
                     NAME_TAG -> name = parser.text()
                     DESCRIPTION_TAG -> description = parser.text()
-                    CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), ConfigType.None)
-                    FEATURES_TAG -> features = parser.enumSet(Feature.None)
+                    CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), ConfigType.None, log)
+                    FEATURES_TAG -> features = parser.enumSet(Feature.None, log)
                     IS_ENABLED_TAG -> isEnabled = parser.booleanValue()
                     SLACK_TAG -> slack = Slack.parse(parser)
                     CHIME_TAG -> chime = Chime.parse(parser)

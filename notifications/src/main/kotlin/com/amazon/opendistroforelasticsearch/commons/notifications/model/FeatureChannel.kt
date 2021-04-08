@@ -15,8 +15,8 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
-import com.amazon.opendistroforelasticsearch.notifications.util.valueOf
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.valueOf
 import org.elasticsearch.common.Strings
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
@@ -82,7 +82,7 @@ data class FeatureChannel(
                     CONFIG_ID_TAG -> configId = parser.text()
                     NAME_TAG -> name = parser.text()
                     DESCRIPTION_TAG -> description = parser.text()
-                    CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), ConfigType.None)
+                    CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), ConfigType.None, log)
                     IS_ENABLED_TAG -> isEnabled = parser.booleanValue()
                     else -> {
                         parser.skipChildren()

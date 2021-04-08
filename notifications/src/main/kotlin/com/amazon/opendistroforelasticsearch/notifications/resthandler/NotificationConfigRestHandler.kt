@@ -24,7 +24,7 @@ import com.amazon.opendistroforelasticsearch.commons.notifications.action.GetNot
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.GetNotificationConfigRequest.Companion.MAX_ITEMS_TAG
 import com.amazon.opendistroforelasticsearch.commons.notifications.action.UpdateNotificationConfigRequest
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
-import com.amazon.opendistroforelasticsearch.notifications.util.contentParserNextToken
+import com.amazon.opendistroforelasticsearch.commons.utils.contentParserNextToken
 import org.elasticsearch.client.node.NodeClient
 import org.elasticsearch.rest.BaseRestHandler.RestChannelConsumer
 import org.elasticsearch.rest.BytesRestResponse

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -14,26 +14,27 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notifications.util
+package com.amazon.opendistroforelasticsearch.commons.utils
 
+import org.apache.logging.log4j.Logger
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.util.EnumSet
 
-inline fun <reified E : Enum<E>> valueOf(type: String, default: E): E {
+inline fun <reified E : Enum<E>> valueOf(type: String, default: E, logHelper: Logger): E {
     return try {
         java.lang.Enum.valueOf(E::class.java, type)
     } catch (e: IllegalArgumentException) {
-        logHelper.info("Enum value $type is not recognized, defaulting to $default")
+        logHelper.info("${e.message}:Enum value $type is not recognized, defaulting to $default")
         default
     }
 }
 
-inline fun <reified E : Enum<E>> XContentParser.enumSet(default: E): EnumSet<E> {
+inline fun <reified E : Enum<E>> XContentParser.enumSet(default: E, logHelper: Logger): EnumSet<E> {
     val retSet: EnumSet<E> = EnumSet.noneOf(E::class.java)
     XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_ARRAY, currentToken(), this)
     while (nextToken() != XContentParser.Token.END_ARRAY) {
-        retSet.add(valueOf(text(), default))
+        retSet.add(valueOf(text(), default, logHelper))
     }
     return retSet
 }

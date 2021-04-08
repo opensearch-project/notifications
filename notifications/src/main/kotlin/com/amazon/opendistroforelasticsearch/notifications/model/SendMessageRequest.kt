@@ -18,10 +18,10 @@ package com.amazon.opendistroforelasticsearch.notifications.model
 
 import com.amazon.opendistroforelasticsearch.commons.notifications.model.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
-import com.amazon.opendistroforelasticsearch.notifications.util.createJsonParser
-import com.amazon.opendistroforelasticsearch.notifications.util.fieldIfNotNull
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
-import com.amazon.opendistroforelasticsearch.notifications.util.stringList
+import com.amazon.opendistroforelasticsearch.commons.utils.createJsonParser
+import com.amazon.opendistroforelasticsearch.commons.utils.fieldIfNotNull
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.stringList
 import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.ActionRequestValidationException
 import org.elasticsearch.common.io.stream.StreamInput
