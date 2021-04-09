@@ -16,7 +16,7 @@
 ##
 
 # configuration file for the notifications plugin
-opendistro.notifications:
+opensearch.notifications:
   general:
     operationTimeoutMs: 60000 # 60 seconds, Minimum 100ms
   email:
