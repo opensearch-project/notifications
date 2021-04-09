@@ -1,15 +1,4 @@
 /*
- * SPDX-License-Identifier: Apache-2.0
- *
- * The OpenSearch Contributors require contributions made to
- * this file be licensed under the Apache-2.0 license or a
- * compatible open source license.
- *
- * Modifications Copyright OpenSearch Contributors. See
- * GitHub history for details.
- */
-
-/*
  * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
@@ -25,4 +14,16 @@
  *
  */
 
-rootProject.name = 'opensearch-notifications'
+package com.amazon.opensearch.notifications.channel
+
+/**
+ * Interface for channel provider for specific recipient depending on its type.
+ */
+internal interface ChannelProvider {
+    /**
+     * gets notification channel for specific recipient depending on its type (prefix).
+     * @param recipient recipient address to send notification to. prefix with channel type e.g. "mailto:email@address.com"
+     * @return Notification channel for sending notification for given recipient (depending on its type)
+     */
+    fun getNotificationChannel(recipient: String): NotificationChannel
+}
