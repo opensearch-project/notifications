@@ -50,14 +50,14 @@ export function ChannelActions(props: ChannelActionsProps) {
     {
       label: 'Mute',
       disabled:
-        props.selectedItems.length !== 1 || props.selectedItems[0].enabled,
+        props.selectedItems.length !== 1 || !props.selectedItems[0].enabled,
       modal: MuteChannelModal,
       modalParams: { mute: true },
     },
     {
       label: 'Unmute',
       disabled:
-        props.selectedItems.length !== 1 || !props.selectedItems[0].enabled,
+        props.selectedItems.length !== 1 || props.selectedItems[0].enabled,
       modal: MuteChannelModal,
       modalParams: { mute: false },
     },

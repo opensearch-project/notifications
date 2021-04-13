@@ -1,0 +1,62 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<HistogramControls /> spec renders the component 1`] = `
+<div
+  class="euiPopover euiPopover--anchorDownCenter euiPopover--displayBlock euiSuperSelect euiSuperSelect--fullWidth"
+>
+  <div
+    class="euiPopover__anchor"
+  >
+    <input
+      type="hidden"
+      value="CHANNEL_TYPE"
+    />
+    <div
+      class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
+    >
+      <label
+        class="euiFormLabel euiFormControlLayout__prepend"
+      >
+        Slice by
+      </label>
+      <div
+        class="euiFormControlLayout__childrenWrapper"
+      >
+        <span
+          class="euiScreenReaderOnly"
+          id="random_html_id"
+        >
+          Select an option: Channel types, is selected
+        </span>
+        <button
+          aria-haspopup="true"
+          aria-labelledby="undefined random_html_id"
+          class="euiSuperSelectControl euiSuperSelectControl--fullWidth euiSuperSelectControl--inGroup"
+          style="width: 300px;"
+          type="button"
+        >
+          Channel types
+        </button>
+        <div
+          class="euiFormControlLayoutIcons euiFormControlLayoutIcons--right"
+        >
+          <span
+            class="euiFormControlLayoutCustomIcon"
+          >
+            <svg
+              aria-hidden="true"
+              class="euiIcon euiIcon--medium euiIcon-isLoading euiFormControlLayoutCustomIcon__icon"
+              focusable="false"
+              height="16"
+              role="img"
+              viewBox="0 0 16 16"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            />
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

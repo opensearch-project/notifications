@@ -26,9 +26,9 @@ import React, { useEffect, useState } from 'react';
 import {
   ContentPanel,
   ContentPanelActions,
-} from '../../../components/ContentPanel';
-import { HISTOGRAM_TYPE } from '../../../utils/constants';
-import { HistogramControls } from './NotificationControls/HistogramControls';
+} from '../../../../components/ContentPanel';
+import { HISTOGRAM_TYPE } from '../../../../utils/constants';
+import { HistogramControls } from './HistogramControls';
 
 interface NotificationsHistogramProps {}
 
@@ -40,7 +40,9 @@ export function NotificationsHistogram(props: NotificationsHistogramProps) {
 
   useEffect(() => {
     const dg = new DataGenerator();
-    setData(dg.generateGroupedSeries(25, 2, 'Channel-'));
+    const data = dg.generateGroupedSeries(25, 2, 'Channel-')
+    data[18].y = 18;
+    setData(data);
   }, []);
 
   return (

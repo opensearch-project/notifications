@@ -13,27 +13,20 @@
  * permissions and limitations under the License.
  */
 
-import React from 'react';
 import { render } from '@testing-library/react';
-import ContentPanel from './ContentPanel';
+import React from 'react';
+import { routerComponentPropsMock } from '../../../../test/mocks/routerPropsMock';
+import { coreServicesMock } from '../../../../test/mocks/serviceMock';
+import { CoreServicesContext } from '../../../components/coreServices';
+import { EmailGroups } from '../EmailGroups';
 
-describe('<ContentPanel /> spec', () => {
+describe('<EmailGroups/> spec', () => {
   it('renders the component', () => {
-    const { container } = render(
-      <ContentPanel title="Testing" actions={[<div>one</div>, <div>two</div>]}>
-        <div>Testing ContentPanel</div>
-      </ContentPanel>
+    const utils = render(
+      <CoreServicesContext.Provider value={coreServicesMock}>
+        <EmailGroups {...routerComponentPropsMock} />
+      </CoreServicesContext.Provider>
     );
-    expect(container.firstChild).toMatchSnapshot();
-  });
-
-  it('renders actions', () => {
-    const { getByText } = render(
-      <ContentPanel title="Testing" actions={[<div>one</div>, <div>two</div>]}>
-        <div>Testing ContentPanel</div>
-      </ContentPanel>
-    );
-    getByText('one');
-    getByText('two');
+    expect(utils.container.firstChild).toMatchSnapshot();
   });
 });

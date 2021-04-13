@@ -53,7 +53,7 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
     label: value,
   }));
 
-  const renderWehbook = () => {
+  const renderWebhook = () => {
     return (
       <EuiFormRow label="Webhook URL">
         <EuiFieldText
@@ -114,7 +114,7 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
         />
       </EuiFormRow>
       {props.webhookTypeIdSelected === 'WEBHOOK_URL'
-        ? renderWehbook()
+        ? renderWebhook()
         : renderCustomURL()}
 
       <EuiSpacer />

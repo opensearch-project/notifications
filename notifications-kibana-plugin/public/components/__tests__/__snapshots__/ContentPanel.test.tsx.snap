@@ -3,11 +3,10 @@
 exports[`<ContentPanel /> spec renders the component 1`] = `
 <div
   class="euiPanel euiPanel--paddingMedium"
-  style="padding-left: 0px; padding-right: 0px;"
 >
   <div
     class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
-    style="padding: 0px 10px;"
+    style="padding: 0px 0px;"
   >
     <div
       class="euiFlexItem"
@@ -31,18 +30,42 @@ exports[`<ContentPanel /> spec renders the component 1`] = `
             one
           </div>
         </div>
-        <div
-          class="euiFlexItem"
-        >
-          <div>
-            two
-          </div>
-        </div>
       </div>
     </div>
   </div>
   <hr
-    class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginXSmall"
+    class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginSmall"
+  />
+  <div
+    style="padding: 0px 10px;"
+  >
+    <div>
+      Testing ContentPanel
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPanel /> spec renders with empty actions 1`] = `
+<div
+  class="euiPanel euiPanel--paddingMedium"
+>
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
+    style="padding: 0px 0px;"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <h3
+        class="euiTitle euiTitle--large"
+      >
+        Testing
+      </h3>
+    </div>
+  </div>
+  <hr
+    class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginSmall"
   />
   <div
     style="padding: 0px 10px;"

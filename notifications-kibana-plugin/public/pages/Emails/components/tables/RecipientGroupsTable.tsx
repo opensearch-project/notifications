@@ -39,7 +39,7 @@ import {
   ContentPanelActions,
 } from '../../../../components/ContentPanel';
 import { ModalConsumer } from '../../../../components/Modal';
-import { DeleteSenderModal } from '../modals/DeleteSenderModal';
+import { DeleteRecipientGroupModal } from '../modals/DeleteRecipientGroupModal';
 
 interface RecipientGroupsTableProps {}
 
@@ -66,9 +66,7 @@ export class RecipientGroupsTable extends Component<
       items: Array.from({ length: 5 }, (v, i) => ({
         id: i.toString(),
         name: 'Group ' + (i + 1),
-        email: new Array(Math.round(Math.random() * 5) + 1).fill({
-          email: 'no-reply@company.com',
-        }),
+        email: [{ email: 'no-reply@company.com' }],
         description: 'Description ' + i,
       })),
       selectedItems: [],
@@ -176,8 +174,8 @@ export class RecipientGroupsTable extends Component<
                           size="s"
                           disabled={this.state.selectedItems.length === 0}
                           onClick={() =>
-                            onShow(DeleteSenderModal, {
-                              senders: this.state.selectedItems,
+                            onShow(DeleteRecipientGroupModal, {
+                              recipientGroups: this.state.selectedItems,
                             })
                           }
                         >

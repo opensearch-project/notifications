@@ -1,0 +1,160 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Filters /> spec renders the component 1`] = `
+<div
+  class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+  style="min-height: 32px;"
+>
+  <div
+    class="euiFlexItem euiFlexItem--flexGrowZero"
+  >
+    <div
+      class="euiPopover euiPopover--anchorRightUp euiPopover--withTitle"
+    >
+      <div
+        class="euiPopover__anchor"
+      >
+        <button
+          aria-label="Change all filters"
+          class="euiButtonIcon euiButtonIcon--primary"
+          title="Change all filters"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonIcon__icon"
+            focusable="false"
+            height="16"
+            role="img"
+            viewBox="0 0 16 16"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          />
+        </button>
+      </div>
+    </div>
+  </div>
+  <div
+    class="euiFlexItem euiFlexItem--flexGrowZero"
+  >
+    <div
+      class="euiPopover euiPopover--anchorDownCenter"
+    >
+      <div
+        class="euiPopover__anchor"
+      >
+        <span
+          class="euiBadge euiBadge--iconRight globalFilterItem globalFilterItem-isDisabled"
+          style="background-color: rgb(231, 233, 240); color: rgb(0, 0, 0);"
+        >
+          <span
+            class="euiBadge__content"
+          >
+            <button
+              aria-label="Open filter settings"
+              class="euiBadge__childButton"
+              title="Channel: test"
+            >
+              Channel: test
+            </button>
+            <button
+              aria-label="Remove filter"
+              class="euiBadge__iconButton"
+              title="Remove filter"
+            >
+              <svg
+                aria-hidden="true"
+                class="euiIcon euiIcon--small euiIcon-isLoading euiBadge__icon"
+                focusable="false"
+                height="16"
+                role="img"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              />
+            </button>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div
+    class="euiFlexItem euiFlexItem--flexGrowZero"
+  >
+    <div
+      class="euiPopover euiPopover--anchorDownCenter"
+    >
+      <div
+        class="euiPopover__anchor"
+      >
+        <span
+          class="euiBadge euiBadge--hollow euiBadge--iconRight globalFilterItem globalFilterItem-isExcluded"
+        >
+          <span
+            class="euiBadge__content"
+          >
+            <button
+              aria-label="Open filter settings"
+              class="euiBadge__childButton"
+              title="NOT Source: is one of Alerting, ISM"
+            >
+              <span
+                class="euiTextColor euiTextColor--danger"
+              >
+                NOT 
+              </span>
+              <span
+                class="euiTextColor euiTextColor--default"
+              >
+                Source: is one of Alerting, ISM
+              </span>
+            </button>
+            <button
+              aria-label="Remove filter"
+              class="euiBadge__iconButton"
+              title="Remove filter"
+            >
+              <svg
+                aria-hidden="true"
+                class="euiIcon euiIcon--small euiIcon-isLoading euiBadge__icon"
+                focusable="false"
+                height="16"
+                role="img"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              />
+            </button>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div
+    class="euiFlexItem euiFlexItem--flexGrowZero"
+  >
+    <div
+      class="euiPopover euiPopover--anchorDownLeft euiPopover--withTitle"
+    >
+      <div
+        class="euiPopover__anchor"
+      >
+        <button
+          class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall"
+          type="button"
+        >
+          <span
+            class="euiButtonContent euiButtonEmpty__content"
+          >
+            <span
+              class="euiButtonEmpty__text"
+            >
+              + Add filter
+            </span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
