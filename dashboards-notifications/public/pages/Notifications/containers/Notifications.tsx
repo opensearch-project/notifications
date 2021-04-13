@@ -14,33 +14,37 @@
  */
 
 import {
-  //@ts-ignore
-  Criteria,
   EuiButton,
   EuiFlexGroup,
   EuiFlexItem,
   EuiSpacer,
   EuiTableSortingType,
   EuiTitle,
-
-  //@ts-ignore
-  Pagination,
   ShortDate,
 } from '@elastic/eui';
+import { Criteria } from '@elastic/eui/src/components/basic_table/basic_table';
+import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_bar';
 import _ from 'lodash';
 import queryString from 'querystring';
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import { PLUGIN_NAME } from '../../../../common';
 import { NotificationItem, TableState } from '../../../../models/interfaces';
 import { CoreServicesContext } from '../../../components/coreServices';
 import { NotificationService } from '../../../services';
-import { BREADCRUMBS } from '../../../utils/constants';
+import { BREADCRUMBS, HISTOGRAM_TYPE, ROUTES } from '../../../utils/constants';
 import { getErrorMessage } from '../../../utils/helpers';
+<<<<<<< HEAD:dashboards-notifications/public/pages/Notifications/containers/Notifications.tsx
 import { NotificationsHistogram } from '../component/NotificationsHistogram/NotificationsHistogram';
 import { FilterType } from '../component/SearchBar/Filter/Filters';
 import { NotificationsSearchBar } from '../component/SearchBar/NotificationsSearchBar';
 import { NotificationsTable } from '../table/NotificationsTable';
+=======
+import { EmptyState } from '../components/EmptyState/EmptyState';
+import { NotificationsHistogram } from '../components/NotificationsHistogram/NotificationsHistogram';
+import { NotificationsTable } from '../components/NotificationsTable/NotificationsTable';
+import { FilterType } from '../components/SearchBar/Filter/Filters';
+import { NotificationsSearchBar } from '../components/SearchBar/NotificationsSearchBar';
+>>>>>>> table-flyout:notifications-kibana-plugin/public/pages/Notifications/containers/Notifications.tsx
 import {
   DEFAULT_PAGE_SIZE_OPTIONS,
   DEFAULT_QUERY_PARAMS,
@@ -55,6 +59,7 @@ interface NotificationsState extends TableState<NotificationItem> {
   startTime: ShortDate;
   endTime: ShortDate;
   filters: FilterType[];
+  histogramType: keyof typeof HISTOGRAM_TYPE;
 }
 
 export default class Notifications extends Component<
@@ -66,6 +71,9 @@ export default class Notifications extends Component<
   constructor(props: NotificationsProps) {
     super(props);
 
+    const urlParams =
+      this.props.location.search ||
+      localStorage.getItem('NotificationsQueryParams');
     const {
       from,
       size,
@@ -75,7 +83,8 @@ export default class Notifications extends Component<
       startTime,
       endTime,
       filters,
-    } = getURLQueryParams(this.props.location);
+      histogramType,
+    } = getURLQueryParams(urlParams);
 
     this.state = {
       total: 0,
@@ -90,6 +99,7 @@ export default class Notifications extends Component<
       startTime,
       endTime,
       filters,
+      histogramType,
     };
 
     this.getNotifications = _.debounce(this.getNotifications, 500, {
@@ -127,6 +137,7 @@ export default class Notifications extends Component<
       startTime: state.startTime,
       endTime: state.endTime,
       filters: JSON.stringify(state.filters),
+      histogramType: state.histogramType,
     };
   }
 
@@ -137,6 +148,7 @@ export default class Notifications extends Component<
       const queryObject = Notifications.getQueryObjectFromState(this.state);
       const queryParamsString = queryString.stringify(queryObject);
       history.replace({ ...this.props.location, search: queryParamsString });
+      localStorage.setItem('NotificationsQueryParams', queryParamsString);
       const getNotificationsResponse = await notificationService.getNotifications(
         queryObject
       );
@@ -154,8 +166,8 @@ export default class Notifications extends Component<
     page: tablePage,
     sort,
   }: Criteria<NotificationItem>): void => {
-    const { index: page, size } = tablePage;
-    const { field: sortField, direction: sortDirection } = sort;
+    const { index: page, size } = tablePage!;
+    const { field: sortField, direction: sortDirection } = sort!;
     this.setState({ from: page * size, size, sortField, sortDirection });
   };
 
@@ -180,6 +192,9 @@ export default class Notifications extends Component<
   };
   setFilters = (filters: FilterType[]) => {
     this.setState({ from: 0, filters });
+  };
+  setHistogramType = (histogramType: keyof typeof HISTOGRAM_TYPE) => {
+    this.setState({ histogramType });
   };
 
   // onClickModalEdit = (item: NotificationItem, onClose: () => void): void => {
@@ -222,6 +237,11 @@ export default class Notifications extends Component<
       },
     };
 
+    if (this.state.items.length === 0) {
+      // TODO check if no channels, return <EmptyState channels={false} />
+      return <EmptyState channels />;
+    }
+
     return (
       <div style={{ padding: '0px 25px' }}>
         <EuiFlexGroup alignItems="center">
@@ -232,12 +252,12 @@ export default class Notifications extends Component<
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButton
-              href={`${PLUGIN_NAME}#/create-channel`}
+              href={`#${ROUTES.CHANNELS}`}
               data-test-subj="createChannelButton"
               fill
               size="s"
             >
-              Create Channel
+              Manage channels
             </EuiButton>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -256,7 +276,10 @@ export default class Notifications extends Component<
         />
 
         <EuiSpacer />
-        <NotificationsHistogram />
+        <NotificationsHistogram
+          histogramType={this.state.histogramType}
+          setHistogramType={this.setHistogramType}
+        />
 
         <EuiSpacer />
         <NotificationsTable

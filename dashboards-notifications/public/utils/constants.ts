@@ -12,6 +12,8 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
+ 
+export const DOCUMENTATION_LINK = '';
 
 export const ROUTES = Object.freeze({
   // notification
@@ -60,8 +62,8 @@ export const CHANNEL_TYPE = Object.freeze({
   EMAIL: 'Email',
   CHIME: 'Chime',
   CUSTOM_WEBHOOK: 'Custom webhook',
-  SES: 'SES',
-  SNS: 'SNS',
+  SES: 'Amazon SES',
+  SNS: 'Amazon SNS',
 });
 
 export const CUSTOM_WEBHOOK_ENDPOINT_TYPE = Object.freeze({

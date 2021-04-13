@@ -16,6 +16,7 @@
 import {
   EuiButton,
   EuiButtonEmpty,
+  EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
   EuiModal,
@@ -24,9 +25,10 @@ import {
   EuiModalHeader,
   EuiModalHeaderTitle,
   EuiOverlayMask,
+  EuiSpacer,
   EuiText,
 } from '@elastic/eui';
-import React from 'react';
+import React, { useState } from 'react';
 import { SenderItemType } from '../../../../../models/interfaces';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 
@@ -38,13 +40,14 @@ interface DeleteSenderModalProps extends ModalRootProps {
 export const DeleteSenderModal = (props: DeleteSenderModalProps) => {
   if (!props.senders.length) return null;
 
-  const plural = props.senders.length >= 2;
-  const name = plural
-    ? `${props.senders.length} senders`
-    : props.senders[0].name;
-  const message = `Delete ${name} permanently? Any channels using ${
-    plural ? 'these' : 'this'
-  } email sender${plural ? 's' : ''} will not be able to send notifications.`;
+  const [input, setInput] = useState('');
+  const num = props.senders.length;
+  const name = num >= 2 ? `${num} senders` : props.senders[0].name;
+  const message = `Delete ${
+    num >= 2 ? 'the following senders' : name
+  } permanently? Any channels using ${
+    num >= 2 ? 'these email senders' : 'this email sender'
+  } will not be able to send notifications.`;
 
   return (
     <EuiOverlayMask>
@@ -54,6 +57,28 @@ export const DeleteSenderModal = (props: DeleteSenderModalProps) => {
         </EuiModalHeader>
         <EuiModalBody>
           <EuiText>{message}</EuiText>
+          {num >= 2 && (
+            <>
+              <EuiSpacer />
+              {props.senders.map((sender, i) => (
+                <EuiText
+                  key={`sender-list-item-${i}`}
+                  style={{ marginLeft: 20 }}
+                >
+                  <li>{sender.name}</li>
+                </EuiText>
+              ))}
+            </>
+          )}
+          <EuiSpacer />
+          <EuiText>
+            To confirm delete, type <i>delete</i> in the field.
+          </EuiText>
+          <EuiFieldText
+            placeholder="delete"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
         </EuiModalBody>
         <EuiModalFooter>
           <EuiFlexGroup justifyContent="flexEnd">
@@ -61,7 +86,12 @@ export const DeleteSenderModal = (props: DeleteSenderModalProps) => {
               <EuiButtonEmpty onClick={props.onClose}>Cancel</EuiButtonEmpty>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiButton fill color="danger" onClick={props.onClose}>
+              <EuiButton
+                fill
+                color="danger"
+                onClick={props.onClose}
+                disabled={input !== 'delete'}
+              >
                 Delete
               </EuiButton>
             </EuiFlexItem>

@@ -21,7 +21,6 @@ import { CoreServicesContext } from './components/coreServices';
 import Main from './pages/Main';
 import { NotificationService } from './services';
 import { ServicesContext } from './services/services';
-import { AppPluginStartDependencies } from './types';
 
 export const renderApp = (coreStart: CoreStart, params: AppMountParameters) => {
   const http = coreStart.http;

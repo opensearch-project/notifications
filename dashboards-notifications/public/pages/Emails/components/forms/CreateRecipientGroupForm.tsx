@@ -87,7 +87,7 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
           <EuiTextArea
             fullWidth
             placeholder="Description"
-            style={{ height: '2.8rem' }}
+            style={{ height: '5.5rem' }}
             value={props.description}
             onChange={(e) => props.setDescription(e.target.value)}
           />

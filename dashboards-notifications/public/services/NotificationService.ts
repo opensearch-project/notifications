@@ -13,7 +13,6 @@
  * permissions and limitations under the License.
  */
 
-import { NODE_API } from '../../common';
 import { HttpSetup } from '../../../../src/core/public';
 import { NotificationItem } from '../../models/interfaces';
 
@@ -185,6 +184,105 @@ export default class NotificationService {
       totalNotifications: 6,
     };
 
-    return fakeRes;
+    const raw = {
+      notifications: [
+        {
+          id: '1',
+          title: 'Alert notification on high error rate',
+          referenceId: 'alert_id_1',
+          source: 'Alerting',
+          severity: 'High',
+          lastUpdatedTime: 1612229000,
+          tags: ['optional string list'],
+          status: 'Error',
+          statusList: [
+            {
+              configId: '1',
+              configName: 'dev_email_channel',
+              configType: 'Email',
+              emailRecipientStatus: [
+                {
+                  recipient: 'dd@amazon.com',
+                  deliveryStatus: {
+                    statusCode: '500',
+                    statusText: 'Some error',
+                  },
+                },
+                {
+                  recipient: 'cc@amazon.com',
+                  deliveryStatus: {
+                    statusCode: '404',
+                    statusText: 'invalid',
+                  },
+                },
+              ],
+              deliveryStatus: { // check this on each channel is enough
+                statusCode: '500',
+                statusText: 'Error',
+              },
+            },
+            {
+              configId: '2',
+              configName: 'manage_slack_channel',
+              configType: 'Slack',
+              deliveryStatus: {
+                statusCode: '200',
+                statusText: 'Success',
+              },
+            },
+          ],
+        },
+        {
+          id: '2',
+          title: 'another notification',
+          referenceId: 'alert_id_2',
+          source: 'Alerting',
+          severity: 'High',
+          lastUpdatedTime: 1612229000,
+          tags: ['optional string list'],
+          status: 'Success',
+          statusList: [
+            {
+              configId: '1',
+              configName: 'dev_email_channel',
+              configType: 'Email',
+              emailRecipientStatus: [
+                {
+                  recipient: 'dd@amazon.com',
+                  deliveryStatus: {
+                    statusCode: '500',
+                    statusText: 'Some error',
+                  },
+                },
+                {
+                  recipient: 'zhongnan@amazon.com',
+                  deliveryStatus: {
+                    statusCode: '404',
+                    statusText: 'invalid',
+                  },
+                },
+              ],
+              deliveryStatus: {
+                statusCode: '500',
+                statusText: 'Error',
+              },
+            },
+            {
+              configId: '2',
+              configName: 'manage_slack_channel',
+              configType: 'Slack',
+              deliveryStatus: {
+                statusCode: '200',
+                statusText: 'Success',
+              },
+            },
+          ],
+        },
+      ],
+      totalNotifications: 6,
+    };
+
+    // return fakeRes;
+    return raw;
   };
 }
