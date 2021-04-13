@@ -41,11 +41,7 @@ export function NotificationsHistogram(props: NotificationsHistogramProps) {
 
   useEffect(() => {
     const dg = new DataGenerator();
-<<<<<<< HEAD:dashboards-notifications/public/pages/Notifications/component/NotificationsHistogram/NotificationsHistogram.tsx
-    const data = dg.generateGroupedSeries(25, 2, 'Channel-')
-=======
     const data = dg.generateGroupedSeries(25, 2, 'Channel-');
->>>>>>> table-flyout:dashboards-notifications/public/pages/Notifications/components/NotificationsHistogram/NotificationsHistogram.tsx
     data[18].y = 18;
     setData(data);
   }, []);
