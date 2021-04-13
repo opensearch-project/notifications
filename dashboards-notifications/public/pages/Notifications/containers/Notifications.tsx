@@ -33,18 +33,11 @@ import { CoreServicesContext } from '../../../components/coreServices';
 import { NotificationService } from '../../../services';
 import { BREADCRUMBS, HISTOGRAM_TYPE, ROUTES } from '../../../utils/constants';
 import { getErrorMessage } from '../../../utils/helpers';
-<<<<<<< HEAD:dashboards-notifications/public/pages/Notifications/containers/Notifications.tsx
-import { NotificationsHistogram } from '../component/NotificationsHistogram/NotificationsHistogram';
-import { FilterType } from '../component/SearchBar/Filter/Filters';
-import { NotificationsSearchBar } from '../component/SearchBar/NotificationsSearchBar';
-import { NotificationsTable } from '../table/NotificationsTable';
-=======
 import { EmptyState } from '../components/EmptyState/EmptyState';
 import { NotificationsHistogram } from '../components/NotificationsHistogram/NotificationsHistogram';
 import { NotificationsTable } from '../components/NotificationsTable/NotificationsTable';
 import { FilterType } from '../components/SearchBar/Filter/Filters';
 import { NotificationsSearchBar } from '../components/SearchBar/NotificationsSearchBar';
->>>>>>> table-flyout:notifications-kibana-plugin/public/pages/Notifications/containers/Notifications.tsx
 import {
   DEFAULT_PAGE_SIZE_OPTIONS,
   DEFAULT_QUERY_PARAMS,
