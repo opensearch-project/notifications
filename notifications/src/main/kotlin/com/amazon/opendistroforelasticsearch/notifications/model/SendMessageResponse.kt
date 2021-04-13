@@ -17,8 +17,8 @@
 package com.amazon.opendistroforelasticsearch.notifications.model
 
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
-import com.amazon.opendistroforelasticsearch.notifications.util.createJsonParser
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.createJsonParser
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
 import org.elasticsearch.common.xcontent.ToXContent
@@ -49,7 +49,7 @@ internal class SendMessageResponse : BaseResponse {
          */
         private fun parseRecipientResponseList(parser: XContentParser): List<ChannelMessageResponse> {
             val retList: MutableList<ChannelMessageResponse> = mutableListOf()
-            XContentParserUtils.ensureExpectedToken(Token.START_ARRAY, parser.currentToken(), parser::getTokenLocation)
+            XContentParserUtils.ensureExpectedToken(Token.START_ARRAY, parser.currentToken(), parser)
             while (parser.nextToken() != Token.END_ARRAY) {
                 retList.add(ChannelMessageResponse.parse(parser))
             }
@@ -72,7 +72,7 @@ internal class SendMessageResponse : BaseResponse {
     constructor(parser: XContentParser) : super() {
         var refTag: String? = null
         var channelMessageResponseList: List<ChannelMessageResponse>? = null
-        XContentParserUtils.ensureExpectedToken(Token.START_OBJECT, parser.currentToken(), parser::getTokenLocation)
+        XContentParserUtils.ensureExpectedToken(Token.START_OBJECT, parser.currentToken(), parser)
         while (Token.END_OBJECT != parser.nextToken()) {
             val fieldName = parser.currentName()
             parser.nextToken()

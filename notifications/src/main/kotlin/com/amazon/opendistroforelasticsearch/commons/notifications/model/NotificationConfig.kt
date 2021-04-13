@@ -15,10 +15,10 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
-import com.amazon.opendistroforelasticsearch.notifications.util.enumSet
-import com.amazon.opendistroforelasticsearch.notifications.util.fieldIfNotNull
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
-import com.amazon.opendistroforelasticsearch.notifications.util.valueOf
+import com.amazon.opendistroforelasticsearch.commons.utils.enumSet
+import com.amazon.opendistroforelasticsearch.commons.utils.fieldIfNotNull
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.valueOf
 import org.elasticsearch.common.Strings
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
@@ -27,6 +27,7 @@ import org.elasticsearch.common.xcontent.ToXContent
 import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils
+import java.io.IOException
 import java.util.EnumSet
 
 /**
@@ -44,7 +45,7 @@ data class NotificationConfig(
     val email: Email? = null,
     val smtpAccount: SmtpAccount? = null,
     val emailGroup: EmailGroup? = null
-) : Writeable, ToXContent {
+) : BaseModel {
 
     init {
         require(!Strings.isNullOrEmpty(name)) { "name is null or empty" }
@@ -58,9 +59,6 @@ data class NotificationConfig(
             ConfigType.None -> log.info("Some config field not recognized")
         }
     }
-
-    enum class ConfigType { None, Slack, Chime, Webhook, Email, SmtpAccount, EmailGroup }
-    enum class Feature { None, Alerting, IndexManagement, Reports }
 
     companion object {
         private val log by logger(NotificationConfig::class.java)
@@ -86,6 +84,8 @@ data class NotificationConfig(
          * @param parser XContentParser to deserialize data from.
          */
         @Suppress("ComplexMethod")
+        @JvmStatic
+        @Throws(IOException::class)
         fun parse(parser: XContentParser): NotificationConfig {
             var name: String? = null
             var description = ""
@@ -102,7 +102,7 @@ data class NotificationConfig(
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
                 parser.currentToken(),
-                parser::getTokenLocation
+                parser
             )
             while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
                 val fieldName = parser.currentName()
@@ -110,8 +110,8 @@ data class NotificationConfig(
                 when (fieldName) {
                     NAME_TAG -> name = parser.text()
                     DESCRIPTION_TAG -> description = parser.text()
-                    CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), ConfigType.None)
-                    FEATURES_TAG -> features = parser.enumSet(Feature.None)
+                    CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), ConfigType.None, log)
+                    FEATURES_TAG -> features = parser.enumSet(Feature.None, log)
                     IS_ENABLED_TAG -> isEnabled = parser.booleanValue()
                     SLACK_TAG -> slack = Slack.parse(parser)
                     CHIME_TAG -> chime = Chime.parse(parser)

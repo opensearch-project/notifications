@@ -16,8 +16,8 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.channel.email
 
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notifications.channel.NotificationChannel
-import com.amazon.opendistroforelasticsearch.notifications.model.ChannelMessage
 import com.amazon.opendistroforelasticsearch.notifications.model.ChannelMessageResponse
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import com.amazon.opendistroforelasticsearch.notifications.throttle.Counters
@@ -47,8 +47,14 @@ internal abstract class BaseEmailChannel : NotificationChannel {
     /**
      * {@inheritDoc}
      */
-    override fun sendMessage(refTag: String, recipient: String, channelMessage: ChannelMessage, counter: Counters): ChannelMessageResponse {
-        val retStatus = sendEmail(refTag, recipient, channelMessage)
+    override fun sendMessage(
+        refTag: String,
+        recipient: String,
+        title: String,
+        channelMessage: ChannelMessage,
+        counter: Counters
+    ): ChannelMessageResponse {
+        val retStatus = sendEmail(refTag, recipient, title, channelMessage)
         if (retStatus.statusCode == RestStatus.OK) {
             counter.emailSentSuccessCount.incrementAndGet()
         } else {
@@ -61,21 +67,22 @@ internal abstract class BaseEmailChannel : NotificationChannel {
      * Sending Email message to server.
      * @param refTag ref tag for logging purpose
      * @param recipient email recipient to send mail to
+     * @param title email subject to send
      * @param channelMessage email message information to compose email
      * @return Channel message response
      */
-    private fun sendEmail(refTag: String, recipient: String, channelMessage: ChannelMessage): ChannelMessageResponse {
+    private fun sendEmail(refTag: String, recipient: String, title: String, channelMessage: ChannelMessage): ChannelMessageResponse {
         val fromAddress = PluginSettings.emailFromAddress
         if (PluginSettings.UNCONFIGURED_EMAIL_ADDRESS == fromAddress) {
             return ChannelMessageResponse(recipient, RestStatus.NOT_IMPLEMENTED, "Email from: address not configured")
         }
-        if (isMessageSizeOverLimit(channelMessage)) {
+        if (isMessageSizeOverLimit(title, channelMessage)) {
             return ChannelMessageResponse(recipient, RestStatus.REQUEST_ENTITY_TOO_LARGE, "Email size larger than ${PluginSettings.emailSizeLimit}")
         }
         val mimeMessage: MimeMessage
         return try {
             val session = prepareSession(refTag, recipient, channelMessage)
-            mimeMessage = EmailMimeProvider.prepareMimeMessage(session, fromAddress, recipient, channelMessage)
+            mimeMessage = EmailMimeProvider.prepareMimeMessage(session, fromAddress, recipient, title, channelMessage)
             sendMimeMessage(refTag, recipient, mimeMessage)
         } catch (addressException: AddressException) {
             ChannelMessageResponse(recipient, RestStatus.BAD_REQUEST, "recipient parsing failed with status:${addressException.message}")
@@ -86,7 +93,7 @@ internal abstract class BaseEmailChannel : NotificationChannel {
         }
     }
 
-    private fun isMessageSizeOverLimit(channelMessage: ChannelMessage): Boolean {
+    private fun isMessageSizeOverLimit(title: String, channelMessage: ChannelMessage): Boolean {
         val approxAttachmentLength = if (channelMessage.attachment != null) {
             MINIMUM_EMAIL_HEADER_LENGTH +
                 channelMessage.attachment.fileData.length +
@@ -95,7 +102,7 @@ internal abstract class BaseEmailChannel : NotificationChannel {
             0
         }
         val approxEmailLength = MINIMUM_EMAIL_HEADER_LENGTH +
-            channelMessage.title.length +
+            title.length +
             channelMessage.textDescription.length +
             (channelMessage.htmlDescription?.length ?: 0) +
             approxAttachmentLength

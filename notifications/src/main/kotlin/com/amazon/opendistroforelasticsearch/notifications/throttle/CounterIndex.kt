@@ -23,7 +23,7 @@ import com.amazon.opendistroforelasticsearch.notifications.throttle.CounterIndex
 import com.amazon.opendistroforelasticsearch.notifications.throttle.CounterIndexModel.Companion.getIdForDate
 import com.amazon.opendistroforelasticsearch.notifications.throttle.CounterIndexModel.Companion.getIdForStartOfMonth
 import com.amazon.opendistroforelasticsearch.notifications.util.SecureIndexClient
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import org.elasticsearch.ResourceAlreadyExistsException
 import org.elasticsearch.action.DocWriteResponse
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest

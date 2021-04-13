@@ -16,7 +16,7 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.channel.email
 
-import com.amazon.opendistroforelasticsearch.notifications.model.ChannelMessage
+import com.amazon.opendistroforelasticsearch.commons.notifications.model.ChannelMessage
 import java.util.Base64
 import javax.activation.DataHandler
 import javax.mail.Message
@@ -35,10 +35,11 @@ internal object EmailMimeProvider {
      * @param session The mail session to use to create mime message
      * @param fromAddress "From:" address of the email message
      * @param recipient "To:" address of the email message
+     * @param title The title to send notification
      * @param channelMessage The message to send notification
      * @return The created and prepared mime message object
      */
-    fun prepareMimeMessage(session: Session, fromAddress: String, recipient: String, channelMessage: ChannelMessage): MimeMessage {
+    fun prepareMimeMessage(session: Session, fromAddress: String, recipient: String, title: String, channelMessage: ChannelMessage): MimeMessage {
         // Create a new MimeMessage object
         val message = MimeMessage(session)
 
@@ -49,7 +50,7 @@ internal object EmailMimeProvider {
         message.setRecipients(Message.RecipientType.TO, extractEmail(recipient))
 
         // Add Subject:
-        message.setSubject(channelMessage.title, "UTF-8")
+        message.setSubject(title, "UTF-8")
 
         // Create a multipart/alternative child container
         val msgBody = MimeMultipart("alternative")

@@ -34,7 +34,14 @@ jobs:
       - name: Build with Gradle
         run: |
           cd notifications
-          ./gradlew build -x :integTestRunner -x :jacocoTestReport # exclude integTest task to avoid permission denied issue
+          ./gradlew build -x :integTest # exclude integTest task to avoid permission denied issue
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          flags: notifications-es
+          directory: notifications/
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Create Artifact Path
         run: |

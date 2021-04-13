@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.notifications.util
+package com.amazon.opendistroforelasticsearch.commons.utils
 
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.xcontent.DeprecationHandler
@@ -40,7 +40,7 @@ internal fun RestRequest.contentParserNextToken(): XContentParser {
 
 internal fun XContentParser.stringList(): List<String> {
     val retList: MutableList<String> = mutableListOf()
-    XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_ARRAY, currentToken(), this::getTokenLocation)
+    XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_ARRAY, currentToken(), this)
     while (nextToken() != XContentParser.Token.END_ARRAY) {
         retList.add(text())
     }
@@ -60,4 +60,13 @@ internal fun XContentBuilder.objectIfNotNull(name: String, xContentObject: ToXCo
         xContentObject.toXContent(this, ToXContent.EMPTY_PARAMS)
     }
     return this
+}
+
+internal fun <T : ToXContent> XContentParser.objectList(block: (XContentParser) -> T): List<T> {
+    val retList: MutableList<T> = mutableListOf()
+    XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_ARRAY, currentToken(), this)
+    while (nextToken() != XContentParser.Token.END_ARRAY) {
+        retList.add(block(this))
+    }
+    return retList
 }

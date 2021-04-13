@@ -19,12 +19,9 @@ package com.amazon.opendistroforelasticsearch.notifications
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import org.elasticsearch.client.Response
-import org.elasticsearch.common.io.stream.InputStreamStreamInput
-import org.elasticsearch.common.io.stream.OutputStreamStreamOutput
-import org.elasticsearch.common.io.stream.StreamInput
-import org.elasticsearch.common.io.stream.Writeable
-import org.elasticsearch.common.xcontent.*
-import java.io.*
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import kotlin.test.assertEquals
 
@@ -152,34 +149,4 @@ class NotificationsJsonEntity(
 
         fun build() = NotificationsJsonEntity(this)
     }
-}
-
-internal inline fun <reified Request> recreateObject(writeable: Writeable, block: (StreamInput) -> Request): Request {
-    ByteArrayOutputStream().use { byteArrayOutputStream ->
-        OutputStreamStreamOutput(byteArrayOutputStream).use {
-            writeable.writeTo(it)
-            InputStreamStreamInput(ByteArrayInputStream(byteArrayOutputStream.toByteArray())).use { streamInput ->
-                return block(streamInput)
-            }
-        }
-    }
-}
-
-internal fun getJsonString(xContent: ToXContent): String {
-    ByteArrayOutputStream().use { byteArrayOutputStream ->
-        val builder = XContentFactory.jsonBuilder(byteArrayOutputStream)
-        xContent.toXContent(builder, ToXContent.EMPTY_PARAMS)
-        builder.close()
-        return byteArrayOutputStream.toString("UTF8")
-    }
-}
-
-internal inline fun <reified CreateType> createObjectFromJsonString(
-    jsonString: String,
-    block: (XContentParser) -> CreateType
-): CreateType {
-    val parser = XContentType.JSON.xContent()
-        .createParser(NamedXContentRegistry.EMPTY, DeprecationHandler.IGNORE_DEPRECATIONS, jsonString)
-    parser.nextToken()
-    return block(parser)
 }

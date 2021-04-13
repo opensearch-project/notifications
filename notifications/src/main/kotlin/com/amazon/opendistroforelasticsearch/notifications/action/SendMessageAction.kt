@@ -16,6 +16,7 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.action
 
+import com.amazon.opendistroforelasticsearch.commons.authuser.User
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.notifications.channel.ChannelFactory
 import com.amazon.opendistroforelasticsearch.notifications.model.ChannelMessageResponse
@@ -23,7 +24,7 @@ import com.amazon.opendistroforelasticsearch.notifications.model.SendMessageRequ
 import com.amazon.opendistroforelasticsearch.notifications.model.SendMessageResponse
 import com.amazon.opendistroforelasticsearch.notifications.throttle.Accountant
 import com.amazon.opendistroforelasticsearch.notifications.throttle.Counters
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -42,11 +43,12 @@ import org.elasticsearch.transport.TransportService
  */
 internal class SendMessageAction @Inject constructor(
     transportService: TransportService,
-    val client: Client,
+    client: Client,
     actionFilters: ActionFilters,
     val xContentRegistry: NamedXContentRegistry
 ) : PluginBaseAction<SendMessageRequest, SendMessageResponse>(NAME,
     transportService,
+    client,
     actionFilters,
     ::SendMessageRequest) {
     companion object {
@@ -58,7 +60,7 @@ internal class SendMessageAction @Inject constructor(
     /**
      * {@inheritDoc}
      */
-    override fun executeRequest(request: SendMessageRequest): SendMessageResponse {
+    override fun executeRequest(request: SendMessageRequest, user: User?): SendMessageResponse {
         log.debug("$LOG_PREFIX:send")
         if (!isMessageQuotaAvailable(request)) {
             log.info("$LOG_PREFIX:${request.refTag}:Message Sending quota not available")
@@ -89,7 +91,7 @@ internal class SendMessageAction @Inject constructor(
 
     private fun sendMessageToChannel(recipient: String, sendMessageRequest: SendMessageRequest, counters: Counters): ChannelMessageResponse {
         val channel = ChannelFactory.getNotificationChannel(recipient)
-        return channel.sendMessage(sendMessageRequest.refTag, recipient, sendMessageRequest.channelMessage, counters)
+        return channel.sendMessage(sendMessageRequest.refTag, recipient, sendMessageRequest.title, sendMessageRequest.channelMessage, counters)
     }
 
     private fun isMessageQuotaAvailable(sendMessageRequest: SendMessageRequest): Boolean {

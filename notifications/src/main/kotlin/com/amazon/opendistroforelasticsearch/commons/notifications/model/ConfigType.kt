@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,10 +13,9 @@
  * permissions and limitations under the License.
  *
  */
-
-package com.amazon.opendistroforelasticsearch.notifications.util
+package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
 /**
- * Annotation to elevate access for testing purpose.
+ * Enum for Notification config type
  */
-annotation class OpenForTesting
+enum class ConfigType { None, Slack, Chime, Webhook, Email, SmtpAccount, EmailGroup }

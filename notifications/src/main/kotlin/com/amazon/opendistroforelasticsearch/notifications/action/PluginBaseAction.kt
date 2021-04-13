@@ -16,8 +16,10 @@
 
 package com.amazon.opendistroforelasticsearch.notifications.action
 
+import com.amazon.opendistroforelasticsearch.commons.ConfigConstants
+import com.amazon.opendistroforelasticsearch.commons.authuser.User
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,6 +30,7 @@ import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.ActionResponse
 import org.elasticsearch.action.support.ActionFilters
 import org.elasticsearch.action.support.HandledTransportAction
+import org.elasticsearch.client.Client
 import org.elasticsearch.common.io.stream.Writeable
 import org.elasticsearch.index.IndexNotFoundException
 import org.elasticsearch.index.engine.VersionConflictEngineException
@@ -40,6 +43,7 @@ import java.io.IOException
 internal abstract class PluginBaseAction<Request : ActionRequest, Response : ActionResponse>(
     name: String,
     transportService: TransportService,
+    val client: Client,
     actionFilters: ActionFilters,
     requestReader: Writeable.Reader<Request>
 ) : HandledTransportAction<Request, Response>(name, transportService, actionFilters, requestReader) {
@@ -57,9 +61,11 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
         request: Request,
         listener: ActionListener<Response>
     ) {
+        val userStr: String? = client.threadPool().threadContext.getTransient<String>(ConfigConstants.OPENDISTRO_SECURITY_USER_INFO_THREAD_CONTEXT)
+        val user: User? = User.parse(userStr)
         scope.launch {
             try {
-                listener.onResponse(executeRequest(request))
+                listener.onResponse(executeRequest(request, user))
             } catch (exception: ElasticsearchStatusException) {
                 log.warn("$LOG_PREFIX:ElasticsearchStatusException:", exception)
                 listener.onFailure(exception)
@@ -95,7 +101,8 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
     /**
      * Execute the transport request
      * @param request the request to execute
+     * @param user the user context given by security plugin
      * @return the response to return.
      */
-    abstract fun executeRequest(request: Request): Response
+    abstract fun executeRequest(request: Request, user: User?): Response
 }

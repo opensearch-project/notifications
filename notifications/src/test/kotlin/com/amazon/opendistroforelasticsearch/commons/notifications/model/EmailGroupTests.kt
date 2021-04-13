@@ -15,16 +15,16 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
-import com.amazon.opendistroforelasticsearch.notifications.createObjectFromJsonString
-import com.amazon.opendistroforelasticsearch.notifications.getJsonString
-import com.amazon.opendistroforelasticsearch.notifications.recreateObject
+import com.amazon.opendistroforelasticsearch.commons.utils.createObjectFromJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.getJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.recreateObject
 import com.fasterxml.jackson.core.JsonParseException
-import org.elasticsearch.test.ESTestCase
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 
-internal class EmailGroupTests : ESTestCase() {
+internal class EmailGroupTests {
 
     private fun checkValidEmailAddress(emailAddress: String) {
         assertDoesNotThrow("should accept $emailAddress") {
@@ -105,7 +105,7 @@ internal class EmailGroupTests : ESTestCase() {
     }
 
     @Test
-    fun `EmailGroup should throw exception when recipients is replace with recipients2 in json object`() {
+    fun `EmailGroup should throw exception when recipients is replaced with recipients2 in json object`() {
         val sampleEmailGroup = EmailGroup(listOf("email1@email.com", "email2@email.com"))
         val jsonString = """
             {

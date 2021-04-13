@@ -46,19 +46,19 @@ task dummyIntegTest(type: Test) {
     enabled = false
     workingDir = file("/") // Force absolute path to jacoco agent jar
     jacoco {
-        destinationFile = file("${jacocoDir}/integTestRunner.exec")
+        destinationFile = file("${jacocoDir}/integTest.exec")
         destinationFile.parentFile.mkdirs()
         jmx = true
     }
 }
 
-integTest.runner {
+integTest {
     systemProperty 'jacoco.dir', "${jacocoDir}"
 }
 
 jacocoTestReport {
     dependsOn integTest, test
-    executionData dummyTest.jacoco.destinationFile, dummyIntegTest.jacoco.destinationFile
+    executionData dummyTest.jacoco.destinationFile // remove dummyIntegTest for now, because the trick doesn't seem working fully
     sourceDirectories.from = "src/main/kotlin"
     classDirectories.from = sourceSets.main.output
     reports {
@@ -69,7 +69,7 @@ jacocoTestReport {
 
 allprojects{
     afterEvaluate {
-        jacocoTestReport.dependsOn integTest.runner
+        jacocoTestReport.dependsOn integTest
 
         testClusters.integTest {
             jvmArgs " ${dummyIntegTest.jacoco.getAsJvmArg()}".replace('javaagent:','javaagent:/')

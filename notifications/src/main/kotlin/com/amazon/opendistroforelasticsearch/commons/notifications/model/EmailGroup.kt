@@ -15,9 +15,9 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
-import com.amazon.opendistroforelasticsearch.notifications.util.isValidEmail
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
-import com.amazon.opendistroforelasticsearch.notifications.util.stringList
+import com.amazon.opendistroforelasticsearch.commons.utils.isValidEmail
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.stringList
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
 import org.elasticsearch.common.io.stream.Writeable
@@ -25,13 +25,14 @@ import org.elasticsearch.common.xcontent.ToXContent
 import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils
+import java.io.IOException
 
 /**
  * Data class representing Email group.
  */
 data class EmailGroup(
     val recipients: List<String>
-) : Writeable, ToXContent {
+) : BaseModel {
 
     init {
         recipients.forEach {
@@ -52,13 +53,15 @@ data class EmailGroup(
          * Creator used in REST communication.
          * @param parser XContentParser to deserialize data from.
          */
+        @JvmStatic
+        @Throws(IOException::class)
         fun parse(parser: XContentParser): EmailGroup {
             var recipients: List<String>? = null
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
                 parser.currentToken(),
-                parser::getTokenLocation
+                parser
             )
             while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
                 val fieldName = parser.currentName()

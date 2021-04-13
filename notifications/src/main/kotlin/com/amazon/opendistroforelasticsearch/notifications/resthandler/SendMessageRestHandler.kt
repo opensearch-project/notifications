@@ -19,8 +19,8 @@ package com.amazon.opendistroforelasticsearch.notifications.resthandler
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import com.amazon.opendistroforelasticsearch.notifications.action.SendMessageAction
 import com.amazon.opendistroforelasticsearch.notifications.model.SendMessageRequest
-import com.amazon.opendistroforelasticsearch.notifications.util.contentParserNextToken
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.contentParserNextToken
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import org.elasticsearch.client.node.NodeClient
 import org.elasticsearch.rest.BaseRestHandler
 import org.elasticsearch.rest.BaseRestHandler.RestChannelConsumer

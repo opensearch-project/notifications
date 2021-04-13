@@ -16,11 +16,19 @@
 
 package com.amazon.opendistroforelasticsearch.notifications
 
+import com.amazon.opendistroforelasticsearch.commons.notifications.action.NotificationsActions
+import com.amazon.opendistroforelasticsearch.notifications.action.CreateNotificationConfigAction
+import com.amazon.opendistroforelasticsearch.notifications.action.DeleteNotificationConfigAction
+import com.amazon.opendistroforelasticsearch.notifications.action.GetFeatureChannelListAction
+import com.amazon.opendistroforelasticsearch.notifications.action.GetNotificationConfigAction
 import com.amazon.opendistroforelasticsearch.notifications.action.SendMessageAction
+import com.amazon.opendistroforelasticsearch.notifications.action.SendNotificationAction
+import com.amazon.opendistroforelasticsearch.notifications.action.UpdateNotificationConfigAction
+import com.amazon.opendistroforelasticsearch.notifications.resthandler.NotificationConfigRestHandler
 import com.amazon.opendistroforelasticsearch.notifications.resthandler.SendMessageRestHandler
 import com.amazon.opendistroforelasticsearch.notifications.settings.PluginSettings
 import com.amazon.opendistroforelasticsearch.notifications.throttle.Accountant
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.ActionResponse
 import org.elasticsearch.client.Client
@@ -99,7 +107,13 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
     override fun getActions(): List<ActionPlugin.ActionHandler<out ActionRequest, out ActionResponse>> {
         log.debug("$LOG_PREFIX:getActions")
         return listOf(
-            ActionPlugin.ActionHandler(SendMessageAction.ACTION_TYPE, SendMessageAction::class.java)
+            ActionPlugin.ActionHandler(SendMessageAction.ACTION_TYPE, SendMessageAction::class.java),
+            ActionPlugin.ActionHandler(NotificationsActions.CREATE_NOTIFICATION_CONFIG_ACTION_TYPE, CreateNotificationConfigAction::class.java),
+            ActionPlugin.ActionHandler(NotificationsActions.UPDATE_NOTIFICATION_CONFIG_ACTION_TYPE, UpdateNotificationConfigAction::class.java),
+            ActionPlugin.ActionHandler(NotificationsActions.DELETE_NOTIFICATION_CONFIG_ACTION_TYPE, DeleteNotificationConfigAction::class.java),
+            ActionPlugin.ActionHandler(NotificationsActions.GET_NOTIFICATION_CONFIG_ACTION_TYPE, GetNotificationConfigAction::class.java),
+            ActionPlugin.ActionHandler(NotificationsActions.GET_FEATURE_CHANNEL_LIST_ACTION_TYPE, GetFeatureChannelListAction::class.java),
+            ActionPlugin.ActionHandler(NotificationsActions.SEND_NOTIFICATION_ACTION_TYPE, SendNotificationAction::class.java)
         )
     }
 
@@ -117,7 +131,8 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
     ): List<RestHandler> {
         log.debug("$LOG_PREFIX:getRestHandlers")
         return listOf(
-            SendMessageRestHandler()
+            SendMessageRestHandler(),
+            NotificationConfigRestHandler()
         )
     }
 }

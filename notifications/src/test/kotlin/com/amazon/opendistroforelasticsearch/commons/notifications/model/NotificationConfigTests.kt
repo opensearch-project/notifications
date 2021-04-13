@@ -15,15 +15,15 @@
  */
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
-import com.amazon.opendistroforelasticsearch.notifications.createObjectFromJsonString
-import com.amazon.opendistroforelasticsearch.notifications.getJsonString
-import com.amazon.opendistroforelasticsearch.notifications.recreateObject
-import org.elasticsearch.test.ESTestCase
+import com.amazon.opendistroforelasticsearch.commons.utils.createObjectFromJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.getJsonString
+import com.amazon.opendistroforelasticsearch.commons.utils.recreateObject
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.EnumSet
 
-internal class NotificationConfigTests : ESTestCase() {
+internal class NotificationConfigTests {
 
     @Test
     fun `Config serialize and deserialize with slack object should be equal`() {
@@ -31,8 +31,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack,
-            EnumSet.of(NotificationConfig.Feature.Reports),
+            ConfigType.Slack,
+            EnumSet.of(Feature.Reports),
             slack = sampleSlack
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
@@ -45,8 +45,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Slack,
-            EnumSet.of(NotificationConfig.Feature.Reports),
+            ConfigType.Slack,
+            EnumSet.of(Feature.Reports),
             slack = sampleSlack
         )
         val jsonString = getJsonString(sampleConfig)
@@ -60,8 +60,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Chime,
-            EnumSet.of(NotificationConfig.Feature.Alerting),
+            ConfigType.Chime,
+            EnumSet.of(Feature.Alerting),
             chime = sampleChime
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
@@ -74,8 +74,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Chime,
-            EnumSet.of(NotificationConfig.Feature.Alerting),
+            ConfigType.Chime,
+            EnumSet.of(Feature.Alerting),
             chime = sampleChime
         )
         val jsonString = getJsonString(sampleConfig)
@@ -89,8 +89,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Webhook,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Webhook,
+            EnumSet.of(Feature.IndexManagement),
             webhook = sampleWebhook
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
@@ -103,8 +103,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Webhook,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Webhook,
+            EnumSet.of(Feature.IndexManagement),
             webhook = sampleWebhook
         )
         val jsonString = getJsonString(sampleConfig)
@@ -118,8 +118,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Email,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Email,
+            EnumSet.of(Feature.IndexManagement),
             email = sampleEmail
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
@@ -132,8 +132,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Email,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Email,
+            EnumSet.of(Feature.IndexManagement),
             email = sampleEmail
         )
         val jsonString = getJsonString(sampleConfig)
@@ -147,8 +147,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.SmtpAccount,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.SmtpAccount,
+            EnumSet.of(Feature.IndexManagement),
             smtpAccount = smtpAccount
         )
         val jsonString = getJsonString(sampleConfig)
@@ -162,8 +162,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.SmtpAccount,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.SmtpAccount,
+            EnumSet.of(Feature.IndexManagement),
             smtpAccount = sampleSmtpAccount
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
@@ -176,8 +176,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.EmailGroup,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.EmailGroup,
+            EnumSet.of(Feature.IndexManagement),
             emailGroup = sampleEmailGroup
         )
         val jsonString = getJsonString(sampleConfig)
@@ -191,8 +191,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.EmailGroup,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.EmailGroup,
+            EnumSet.of(Feature.IndexManagement),
             emailGroup = sampleEmailGroup
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
@@ -210,8 +210,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Webhook,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Webhook,
+            EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
             slack = sampleSlack,
             chime = sampleChime,
@@ -235,8 +235,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Webhook,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Webhook,
+            EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
             slack = sampleSlack,
             chime = sampleChime,
@@ -261,8 +261,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Webhook,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Webhook,
+            EnumSet.of(Feature.IndexManagement),
             isEnabled = false,
             slack = sampleSlack,
             chime = sampleChime,
@@ -286,8 +286,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Webhook,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Webhook,
+            EnumSet.of(Feature.IndexManagement),
             isEnabled = false,
             slack = sampleSlack,
             chime = sampleChime,
@@ -309,8 +309,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Webhook,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.Webhook,
+            EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
             slack = sampleSlack,
             chime = sampleChime,
@@ -342,8 +342,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.None,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement),
+            ConfigType.None,
+            EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
             slack = sampleSlack,
             chime = sampleChime,
@@ -375,8 +375,8 @@ internal class NotificationConfigTests : ESTestCase() {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            NotificationConfig.ConfigType.Webhook,
-            EnumSet.of(NotificationConfig.Feature.IndexManagement, NotificationConfig.Feature.None),
+            ConfigType.Webhook,
+            EnumSet.of(Feature.IndexManagement, Feature.None),
             isEnabled = true,
             slack = sampleSlack,
             chime = sampleChime,
@@ -404,8 +404,8 @@ internal class NotificationConfigTests : ESTestCase() {
             NotificationConfig(
                 "name",
                 "description",
-                NotificationConfig.ConfigType.Slack,
-                EnumSet.of(NotificationConfig.Feature.IndexManagement)
+                ConfigType.Slack,
+                EnumSet.of(Feature.IndexManagement)
             )
         }
     }
@@ -416,8 +416,8 @@ internal class NotificationConfigTests : ESTestCase() {
             NotificationConfig(
                 "name",
                 "description",
-                NotificationConfig.ConfigType.Chime,
-                EnumSet.of(NotificationConfig.Feature.IndexManagement)
+                ConfigType.Chime,
+                EnumSet.of(Feature.IndexManagement)
             )
         }
     }
@@ -428,8 +428,8 @@ internal class NotificationConfigTests : ESTestCase() {
             NotificationConfig(
                 "name",
                 "description",
-                NotificationConfig.ConfigType.Webhook,
-                EnumSet.of(NotificationConfig.Feature.IndexManagement)
+                ConfigType.Webhook,
+                EnumSet.of(Feature.IndexManagement)
             )
         }
     }
@@ -440,8 +440,8 @@ internal class NotificationConfigTests : ESTestCase() {
             NotificationConfig(
                 "name",
                 "description",
-                NotificationConfig.ConfigType.Email,
-                EnumSet.of(NotificationConfig.Feature.IndexManagement)
+                ConfigType.Email,
+                EnumSet.of(Feature.IndexManagement)
             )
         }
     }
@@ -452,8 +452,8 @@ internal class NotificationConfigTests : ESTestCase() {
             NotificationConfig(
                 "name",
                 "description",
-                NotificationConfig.ConfigType.SmtpAccount,
-                EnumSet.of(NotificationConfig.Feature.IndexManagement)
+                ConfigType.SmtpAccount,
+                EnumSet.of(Feature.IndexManagement)
             )
         }
     }
@@ -464,8 +464,8 @@ internal class NotificationConfigTests : ESTestCase() {
             NotificationConfig(
                 "name",
                 "description",
-                NotificationConfig.ConfigType.EmailGroup,
-                EnumSet.of(NotificationConfig.Feature.IndexManagement)
+                ConfigType.EmailGroup,
+                EnumSet.of(Feature.IndexManagement)
             )
         }
     }

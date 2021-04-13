@@ -17,7 +17,7 @@
 package com.amazon.opendistroforelasticsearch.notifications.throttle
 
 import com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
 import org.elasticsearch.common.xcontent.ToXContent
 import org.elasticsearch.common.xcontent.ToXContentObject
 import org.elasticsearch.common.xcontent.XContentBuilder
@@ -109,7 +109,7 @@ internal data class CounterIndexModel(
             var requestCount: Int? = null
             var emailSentSuccessCount: Int? = null
             var emailSentFailureCount: Int? = null
-            XContentParserUtils.ensureExpectedToken(START_OBJECT, parser.currentToken(), parser::getTokenLocation)
+            XContentParserUtils.ensureExpectedToken(START_OBJECT, parser.currentToken(), parser)
             while (END_OBJECT != parser.nextToken()) {
                 val fieldName = parser.currentName()
                 parser.nextToken()

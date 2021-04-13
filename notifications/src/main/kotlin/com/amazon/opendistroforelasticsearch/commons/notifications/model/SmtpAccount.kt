@@ -1,9 +1,24 @@
+/*
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ *
+ */
 package com.amazon.opendistroforelasticsearch.commons.notifications.model
 
-import com.amazon.opendistroforelasticsearch.notifications.util.fieldIfNotNull
-import com.amazon.opendistroforelasticsearch.notifications.util.isValidEmail
-import com.amazon.opendistroforelasticsearch.notifications.util.logger
-import com.amazon.opendistroforelasticsearch.notifications.util.valueOf
+import com.amazon.opendistroforelasticsearch.commons.utils.fieldIfNotNull
+import com.amazon.opendistroforelasticsearch.commons.utils.isValidEmail
+import com.amazon.opendistroforelasticsearch.commons.utils.logger
+import com.amazon.opendistroforelasticsearch.commons.utils.valueOf
 import org.elasticsearch.common.Strings
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
@@ -25,7 +40,7 @@ data class SmtpAccount(
     val fromAddress: String,
     val username: SecureString? = null,
     val password: SecureString? = null
-) : Writeable, ToXContent {
+) : BaseModel {
 
     init {
         require(!Strings.isNullOrEmpty(host)) { "host is null or empty" }
@@ -63,7 +78,7 @@ data class SmtpAccount(
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
                 parser.currentToken(),
-                parser::getTokenLocation
+                parser
             )
             while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
                 val fieldName = parser.currentName()
@@ -71,7 +86,7 @@ data class SmtpAccount(
                 when (fieldName) {
                     HOST_FIELD -> host = parser.text()
                     PORT_FIELD -> port = parser.intValue()
-                    METHOD_FIELD -> method = valueOf(parser.text(), MethodType.None)
+                    METHOD_FIELD -> method = valueOf(parser.text(), MethodType.None, log)
                     FROM_ADDRESS_FIELD -> fromAddress = parser.text()
                     USERNAME_FIELD -> username = SecureString(parser.text().toCharArray())
                     PASSWORD_FIELD -> password = SecureString(parser.text().toCharArray())
