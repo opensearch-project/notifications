@@ -1,4 +1,4 @@
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface opendistroNotificationsKibanaPluginSetup {}
+export interface opendistroNotificationsOpenSearchDashboardsPluginSetup {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface opendistroNotificationsKibanaPluginStart {}
+export interface opendistroNotificationsOpenSearchDashboardsPluginStart {}

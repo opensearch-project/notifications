@@ -15,9 +15,9 @@
 
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 
-export interface opendistroNotificationsKibanaPluginSetup {}
+export interface opendistroNotificationsOpenSearchDashboardsPluginSetup {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface opendistroNotificationsKibanaPluginStart {}
+export interface opendistroNotificationsOpenSearchDashboardsPluginStart {}
 
 export interface AppPluginStartDependencies {
   navigation: NavigationPublicPluginStart;

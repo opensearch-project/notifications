@@ -20,19 +20,19 @@ import {
   Plugin,
 } from '../../../src/core/public';
 import {
-  opendistroNotificationsKibanaPluginSetup,
-  opendistroNotificationsKibanaPluginStart,
+  opendistroNotificationsOpenSearchDashboardsPluginSetup,
+  opendistroNotificationsOpenSearchDashboardsPluginStart,
   AppPluginStartDependencies,
 } from './types';
 import { PLUGIN_NAME } from '../common';
 
-export class opendistroNotificationsKibanaPlugin
+export class opendistroNotificationsOpenSearchDashboardsPlugin
   implements
     Plugin<
-      opendistroNotificationsKibanaPluginSetup,
-      opendistroNotificationsKibanaPluginStart
+      opendistroNotificationsOpenSearchDashboardsPluginSetup,
+      opendistroNotificationsOpenSearchDashboardsPluginStart
     > {
-  public setup(core: CoreSetup): opendistroNotificationsKibanaPluginSetup {
+  public setup(core: CoreSetup): opendistroNotificationsOpenSearchDashboardsPluginSetup {
     // Register an application into the side navigation menu
     core.application.register({
       id: PLUGIN_NAME,
@@ -46,7 +46,7 @@ export class opendistroNotificationsKibanaPlugin
       async mount(params: AppMountParameters) {
         // Load application bundle
         const { renderApp } = await import('./application');
-        // Get start services as specified in kibana.json
+        // Get start services as specified in opensearch_dashboards.json
         const [coreStart, depsStart] = await core.getStartServices();
         // Render the application
         return renderApp(coreStart, params);
@@ -57,7 +57,7 @@ export class opendistroNotificationsKibanaPlugin
     return {};
   }
 
-  public start(core: CoreStart): opendistroNotificationsKibanaPluginStart {
+  public start(core: CoreStart): opendistroNotificationsOpenSearchDashboardsPluginStart {
     return {};
   }
 

@@ -104,7 +104,7 @@ export function CreateSenderForm(props: CreateSenderModalProps) {
         helpText={
           <div>
             SSL or TSL is recommended for security. SSL and TSL requires
-            validation by adding the following two fields to Elasticsearch
+            validation by adding the following two fields to OpenSearch
             keystore:
             <br />
             opendistro.alerting.destination.mail.adminTest.username: [username]

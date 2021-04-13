@@ -7,16 +7,16 @@ import {
 } from "../../../src/core/server";
 
 import {
-  opendistroNotificationsKibanaPluginSetup,
-  opendistroNotificationsKibanaPluginStart,
+  opendistroNotificationsOpenSearchDashboardsPluginSetup,
+  opendistroNotificationsOpenSearchDashboardsPluginStart,
 } from "./types";
 import { defineRoutes } from "./routes";
 
-export class opendistroNotificationsKibanaPlugin
+export class opendistroNotificationsOpenSearchDashboardsPlugin
   implements
     Plugin<
-      opendistroNotificationsKibanaPluginSetup,
-      opendistroNotificationsKibanaPluginStart
+      opendistroNotificationsOpenSearchDashboardsPluginSetup,
+      opendistroNotificationsOpenSearchDashboardsPluginStart
     > {
   private readonly logger: Logger;
 
@@ -25,7 +25,7 @@ export class opendistroNotificationsKibanaPlugin
   }
 
   public setup(core: CoreSetup) {
-    this.logger.debug("opendistroNotificationsKibana: Setup");
+    this.logger.debug("opendistroNotificationsOpenSearchDashboards: Setup");
     const router = core.http.createRouter();
 
     // Register server side APIs
@@ -35,7 +35,7 @@ export class opendistroNotificationsKibanaPlugin
   }
 
   public start(core: CoreStart) {
-    this.logger.debug("opendistroNotificationsKibana: Started");
+    this.logger.debug("opendistroNotificationsOpenSearchDashboards: Started");
     return {};
   }
 

@@ -1,4 +1,4 @@
-# opendistroNotificationsKibana
+# opendistroNotificationsOpenSearchDashboards
 
 A Kibana plugin
 
@@ -11,7 +11,7 @@ See the [kibana contributing guide](https://github.com/elastic/kibana/blob/maste
 ## Scripts
 
 <dl>
-  <dt><code>yarn kbn bootstrap</code></dt>
+  <dt><code>yarn osd bootstrap</code></dt>
   <dd>Execute this to install node_modules and setup the dependencies in your plugin and in Kibana</dd>
 
   <dt><code>yarn plugin-helpers build</code></dt>

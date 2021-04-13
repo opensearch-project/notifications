@@ -17,8 +17,8 @@ import { Direction } from '@elastic/eui';
 
 export interface NotificationItem {
   title: string;
-  channel: ChannelOverview; // those will be prepared by kibana server. UI model vs Backend Model
-  referenceId: string; // TODO: this should probably be sourcelink, which is created by kibana server using source + ref_id and a dictionary of plugin url
+  channel: ChannelOverview; // those will be prepared by OpenSearch Dashboards server. UI model vs Backend Model
+  referenceId: string; // TODO: this should probably be sourcelink, which is created by OpenSearch Dashboards server using source + ref_id and a dictionary of plugin url
   source: string;
   severity: string;
   status: { overview: string; detail: NotificationStatusDetail[] };

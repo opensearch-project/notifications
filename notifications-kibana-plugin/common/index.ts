@@ -13,8 +13,8 @@
  * permissions and limitations under the License.
  */
 
-export const PLUGIN_ID = 'opendistroNotificationsKibana';
-export const PLUGIN_NAME = 'opendistro_notifications_kibana';
+export const PLUGIN_ID = 'opendistroNotificationsOpenSearchDashboards';
+export const PLUGIN_NAME = 'opendistro-notifications-opensearch-dashboards';
 
 export enum SORT_DIRECTION {
   ASC = 'asc',

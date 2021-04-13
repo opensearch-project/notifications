@@ -1,14 +1,14 @@
 import { PluginInitializerContext } from "../../../src/core/server";
-import { opendistroNotificationsKibanaPlugin } from "./plugin";
+import { opendistroNotificationsOpenSearchDashboardsPlugin } from "./plugin";
 
 //  This exports static code and TypeScript types,
-//  as well as, Kibana Platform `plugin()` initializer.
+//  as well as, OpenSearch Dashboards Platform `plugin()` initializer.
 
 export function plugin(initializerContext: PluginInitializerContext) {
-  return new opendistroNotificationsKibanaPlugin(initializerContext);
+  return new opendistroNotificationsOpenSearchDashboardsPlugin(initializerContext);
 }
 
 export {
-  opendistroNotificationsKibanaPluginSetup,
-  opendistroNotificationsKibanaPluginStart,
+  opendistroNotificationsOpenSearchDashboardsPluginSetup,
+  opendistroNotificationsOpenSearchDashboardsPluginStart,
 } from "./types";

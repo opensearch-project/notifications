@@ -15,14 +15,14 @@
 
 import './index.scss';
 
-import { opendistroNotificationsKibanaPlugin } from './plugin';
+import { opendistroNotificationsOpenSearchDashboardsPlugin } from './plugin';
 
 // This exports static code and TypeScript types,
-// as well as, Kibana Platform `plugin()` initializer.
+// as well as, OpenSearch Dashboards Platform `plugin()` initializer.
 export function plugin() {
-  return new opendistroNotificationsKibanaPlugin();
+  return new opendistroNotificationsOpenSearchDashboardsPlugin();
 }
 export {
-  opendistroNotificationsKibanaPluginSetup,
-  opendistroNotificationsKibanaPluginStart,
+  opendistroNotificationsOpenSearchDashboardsPluginSetup,
+  opendistroNotificationsOpenSearchDashboardsPluginStart,
 } from './types';
