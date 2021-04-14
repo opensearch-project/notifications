@@ -22,17 +22,15 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
+  EuiMarkdownEditor,
   EuiSpacer,
   EuiSuperSelect,
   EuiSuperSelectOption,
   EuiText,
 } from '@elastic/eui';
 import React, { useContext, useState } from 'react';
-import ReactMde from 'react-mde';
-import 'react-mde/lib/styles/css/react-mde-all.css';
 import { ModalConsumer } from '../../../components/Modal';
 import { CreateChannelContext } from '../CreateChannel';
-import { converter } from '../utils';
 import {
   validateEmailSender,
   validateRecipients,
@@ -71,12 +69,6 @@ export function EmailSettings(props: EmailSettingsProps) {
     },
   ];
 
-  const [selectedTabFooter, setSelectedTabFooter] = React.useState<
-    'write' | 'preview'
-  >('write');
-  const [selectedTabHeader, setSelectedTabHeader] = React.useState<
-    'write' | 'preview'
-  >('write');
   const senderOptions: Array<EuiSuperSelectOption<string>> = [
     {
       value: 'Admin',
@@ -233,36 +225,20 @@ export function EmailSettings(props: EmailSettingsProps) {
 
       {props.headerFooterCheckboxIdToSelectedMap.header && (
         <EuiFormRow label="Header" fullWidth={true}>
-          <ReactMde
+          <EuiMarkdownEditor
+            aria-labelledby="email-header-markdown-editor"
             value={props.emailHeader}
             onChange={props.setEmailHeader}
-            selectedTab={selectedTabHeader}
-            onTabChange={setSelectedTabHeader}
-            toolbarCommands={[
-              ['header', 'bold', 'italic', 'strikethrough'],
-              ['unordered-list', 'ordered-list', 'checked-list'],
-            ]}
-            generateMarkdownPreview={(markdown) =>
-              Promise.resolve(converter.makeHtml(markdown))
-            }
           />
         </EuiFormRow>
       )}
 
       {props.headerFooterCheckboxIdToSelectedMap.footer && (
         <EuiFormRow label="Footer" fullWidth={true}>
-          <ReactMde
+          <EuiMarkdownEditor
+            aria-labelledby="email-footer-markdown-editor"
             value={props.emailFooter}
             onChange={props.setEmailFooter}
-            selectedTab={selectedTabFooter}
-            onTabChange={setSelectedTabFooter}
-            toolbarCommands={[
-              ['header', 'bold', 'italic', 'strikethrough'],
-              ['unordered-list', 'ordered-list', 'checked-list'],
-            ]}
-            generateMarkdownPreview={(markdown) =>
-              Promise.resolve(converter.makeHtml(markdown))
-            }
           />
         </EuiFormRow>
       )}

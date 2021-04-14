@@ -20,8 +20,6 @@
     "plugin_helpers": "node ../../scripts/plugin_helpers"
   },
   "dependencies": {
-    "react-mde": "^10.2.1",
-    "showdown": "^1.9.1"
   },
   "devDependencies": {
     "@types/enzyme-adapter-react-16": "^1.0.6",
