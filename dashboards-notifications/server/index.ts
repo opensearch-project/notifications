@@ -1,14 +1,14 @@
 import { PluginInitializerContext } from "../../../src/core/server";
-import { opendistroNotificationsOpenSearchDashboardsPlugin } from "./plugin";
+import { notificationsDashboardsPlugin } from "./plugin";
 
 //  This exports static code and TypeScript types,
 //  as well as, OpenSearch Dashboards Platform `plugin()` initializer.
 
 export function plugin(initializerContext: PluginInitializerContext) {
-  return new opendistroNotificationsOpenSearchDashboardsPlugin(initializerContext);
+  return new notificationsDashboardsPlugin(initializerContext);
 }
 
 export {
-  opendistroNotificationsOpenSearchDashboardsPluginSetup,
-  opendistroNotificationsOpenSearchDashboardsPluginStart,
+  notificationsDashboardsPluginSetup,
+  notificationsDashboardsPluginStart,
 } from "./types";

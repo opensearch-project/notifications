@@ -4,6 +4,6 @@ extends: '@elastic/kibana'
 settings:
   import/resolver:
     '@osd/eslint-import-resolver-kibana':
-      rootPackageName: 'opendistro-notifications-opensearch-dashboards'
+      rootPackageName: 'notifications-dashboards'
       pluginPaths:
         - .
