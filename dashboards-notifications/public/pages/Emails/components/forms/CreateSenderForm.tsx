@@ -19,12 +19,14 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
+  EuiLink,
   EuiSpacer,
   EuiSuperSelect,
   EuiSuperSelectOption,
 } from '@elastic/eui';
 import React from 'react';
 import { ENCRYPTION_METHOD } from '../../../../../models/interfaces';
+import { DOCUMENTATION_LINK } from '../../../../utils/constants';
 
 interface CreateSenderModalProps {
   senderName: string;
@@ -56,22 +58,22 @@ export function CreateSenderForm(props: CreateSenderModalProps) {
       <EuiFormRow
         label="Sender name"
         style={{ maxWidth: '650px' }}
-        helpText="Use a unique and descriptive name that's easy to search. The sender name must contain from m to n characters. Valid characters are lowercase a-z, 0-9, and - (hyphen)."
+        helpText="Use a unique, descriptive name. The sender name must contain from m to n characters. Valid characters are lowercase a-z, 0-9, and - (hyphen)."
       >
         <EuiFieldText
           fullWidth
-          placeholder=""
+          placeholder="Enter sender name"
           value={props.senderName}
           onChange={(e) => props.setSenderName(e.target.value)}
         />
       </EuiFormRow>
 
       <EuiSpacer size="m" />
-      <EuiFlexGroup gutterSize="s" style={{maxWidth: '658px'}}>
+      <EuiFlexGroup gutterSize="s" style={{ maxWidth: '658px' }}>
         <EuiFlexItem grow={4}>
           <EuiFormRow label="Email address">
             <EuiFieldText
-              placeholder=""
+              placeholder="Enter email address"
               value={props.email}
               onChange={(e) => props.setEmail(e.target.value)}
             />
@@ -80,7 +82,7 @@ export function CreateSenderForm(props: CreateSenderModalProps) {
         <EuiFlexItem grow={4}>
           <EuiFormRow label="Host">
             <EuiFieldText
-              placeholder=""
+              placeholder="Enter host"
               value={props.host}
               onChange={(e) => props.setHost(e.target.value)}
             />
@@ -89,7 +91,7 @@ export function CreateSenderForm(props: CreateSenderModalProps) {
         <EuiFlexItem grow={2}>
           <EuiFormRow label="Port">
             <EuiFieldNumber
-              placeholder=""
+              placeholder="Enter port"
               value={props.port}
               onChange={(e) => props.setPort(e.target.value)}
             />
@@ -103,9 +105,9 @@ export function CreateSenderForm(props: CreateSenderModalProps) {
         style={{ maxWidth: '650px' }}
         helpText={
           <div>
-            SSL or TSL is recommended for security. SSL and TSL requires
-            validation by adding the following two fields to OpenSearch
-            keystore:
+            SSL or TLS is recommended for security. To use either one, you must
+            add the following fields to the Elasticsearch keystore on each node.{' '}
+            <EuiLink href={DOCUMENTATION_LINK}>Learn more</EuiLink>
             <br />
             opendistro.alerting.destination.mail.adminTest.username: [username]
             <br />

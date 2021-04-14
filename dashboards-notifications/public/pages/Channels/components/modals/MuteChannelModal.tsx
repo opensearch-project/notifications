@@ -53,7 +53,7 @@ export const MuteChannelModal = (props: MuteChannelModalProps) => {
         <EuiModalBody>
           <EuiText>
             This channel will stop sending notifications to its recipients.
-            However, this channel is still available from selection.
+            However, the channel remains available for selection.
           </EuiText>
         </EuiModalBody>
         <EuiModalFooter>

@@ -72,7 +72,7 @@ export const CUSTOM_WEBHOOK_ENDPOINT_TYPE = Object.freeze({
 });
 
 export const HISTOGRAM_TYPE = Object.freeze({
-  CHANNEL_TYPE: 'Channel types',
+  CHANNEL_TYPE: 'Channel type',
   SOURCE: 'Notification source',
   STATUS: 'Notification status',
   SEVERITY: 'Severity',

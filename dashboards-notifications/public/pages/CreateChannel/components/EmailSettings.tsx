@@ -167,7 +167,7 @@ export function EmailSettings(props: EmailSettingsProps) {
             isInvalid={context.inputErrors.recipients}
           >
             <EuiComboBox
-              placeholder=""
+              placeholder="Email address, email group name"
               fullWidth
               options={recipientGroupOptions}
               selectedOptions={props.selectedRecipientGroupOptions}

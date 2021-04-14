@@ -16,6 +16,7 @@
 import { EuiSearchBar } from '@elastic/eui';
 import { FieldValueSelectionFilterConfigType } from '@elastic/eui/src/components/search_bar/filters/field_value_selection_filter';
 import React from 'react';
+import { CHANNEL_TYPE } from '../../../../public/utils/constants';
 
 interface ChannelControlsProps {
   search: string;
@@ -40,9 +41,12 @@ export const ChannelControls = (props: ChannelControlsProps) => {
       field: 'type',
       multiSelect: 'or',
       options: [
-        { name: 'Slack', value: 'slack' },
-        { name: 'Chime', value: 'chime' },
-        { name: 'Email', value: 'email' },
+        { name: CHANNEL_TYPE.SLACK, value: 'slack' },
+        { name: CHANNEL_TYPE.EMAIL, value: 'email' },
+        { name: CHANNEL_TYPE.CHIME, value: 'chime' },
+        { name: CHANNEL_TYPE.CUSTOM_WEBHOOK, value: 'custom_webhook' },
+        { name: CHANNEL_TYPE.SES, value: 'ses' },
+        { name: CHANNEL_TYPE.SNS, value: 'sns' },
       ],
     },
     {

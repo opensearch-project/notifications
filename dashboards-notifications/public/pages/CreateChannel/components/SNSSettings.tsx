@@ -36,7 +36,7 @@ export function SNSSettings(props: SNSSettingsProps) {
       <EuiSpacer />
       <EuiFormRow label="SNS topic ARN">
         <EuiFieldText
-          placeholder=""
+          placeholder="ARN key"
           value={props.snsArn}
           onChange={(e) => props.setSnsArn(e.target.value)}
         />

@@ -65,7 +65,7 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
       >
         <EuiFieldText
           fullWidth
-          placeholder="Enter channel name"
+          placeholder="Enter recipient group name"
           value={props.name}
           onChange={(e) => props.setName(e.target.value)}
         />

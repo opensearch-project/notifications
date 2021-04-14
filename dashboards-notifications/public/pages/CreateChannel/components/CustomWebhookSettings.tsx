@@ -57,7 +57,7 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
     return (
       <EuiFormRow label="Webhook URL">
         <EuiFieldText
-          placeholder=""
+          placeholder="Enter webhook URL"
           value={props.webhookURL}
           onChange={(e) => props.setWebhookURL(e.target.value)}
         />
@@ -70,21 +70,21 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
       <>
         <EuiFormRow label="Host">
           <EuiFieldText
-            placeholder=""
+            placeholder="Enter host name"
             value={props.customURLHost}
             onChange={(e) => props.setCustomURLHost(e.target.value)}
           />
         </EuiFormRow>
         <EuiFormRow label="Port">
           <EuiFieldNumber
-            placeholder=""
+            placeholder="Enter port"
             value={props.customURLPort}
             onChange={(e) => props.setCustomURLPort(e.target.value)}
           />
         </EuiFormRow>
         <EuiFormRow label="Path">
           <EuiFieldText
-            placeholder=""
+            placeholder="Enter path"
             value={props.customURLPath}
             onChange={(e) => props.setCustomURLPath(e.target.value)}
           />

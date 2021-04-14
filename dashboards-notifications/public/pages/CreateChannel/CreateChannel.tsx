@@ -23,6 +23,7 @@ import {
   EuiSpacer,
   EuiSuperSelect,
   EuiSuperSelectOption,
+  EuiText,
   EuiTitle,
 } from '@elastic/eui';
 import queryString from 'query-string';
@@ -193,12 +194,16 @@ export function CreateChannel(props: CreateChannelsProps) {
           titleSize="s"
         >
           <EuiFormRow label="Channel type">
-            <EuiSuperSelect
-              options={channelTypeOptions}
-              valueOfSelected={channelType}
-              onChange={setChannelType}
-              disabled={props.edit}
-            />
+            {props.edit ? (
+              <EuiText>{CHANNEL_TYPE[channelType]}</EuiText>
+            ) : (
+              <EuiSuperSelect
+                options={channelTypeOptions}
+                valueOfSelected={channelType}
+                onChange={setChannelType}
+                disabled={props.edit}
+              />
+            )}
           </EuiFormRow>
           {channelType === 'SLACK' ? (
             <SlackSettings
