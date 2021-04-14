@@ -20,7 +20,7 @@ export const validateChannelName = (name: string) => {
   return name.length === 0;
 }
 
-export const validateSlackWebhook = (url: string) => {
+export const validateWebhook = (url: string) => {
   return url.length === 0;
 }
 

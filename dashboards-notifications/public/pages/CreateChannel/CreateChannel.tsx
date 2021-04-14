@@ -38,6 +38,7 @@ import {
 } from '../../utils/constants';
 import { ChannelAvailabilityPanel } from './components/ChannelAvailabilityPanel';
 import { ChannelNamePanel } from './components/ChannelNamePanel';
+import { ChimeSettings } from './components/ChimeSettings';
 import { CustomWebhookSettings } from './components/CustomWebhookSettings';
 import { EmailSettings } from './components/EmailSettings';
 import { SlackSettings } from './components/SlackSettings';
@@ -46,7 +47,7 @@ import {
   validateChannelName,
   validateEmailSender,
   validateRecipients,
-  validateSlackWebhook,
+  validateWebhook,
 } from './utils/validationHelper';
 
 interface CreateChannelsProps extends RouteComponentProps<{ id?: string }> {
@@ -56,6 +57,7 @@ interface CreateChannelsProps extends RouteComponentProps<{ id?: string }> {
 export type CreateChannelInputErrorsType = {
   name: boolean;
   slackWebhook: boolean;
+  chimeWebhook: boolean;
   sender: boolean;
   recipients: boolean;
 };
@@ -88,6 +90,7 @@ export function CreateChannel(props: CreateChannelsProps) {
   const [channelType, setChannelType] = useState(channelTypeOptions[0].value);
 
   const [slackWebhook, setSlackWebhook] = useState('');
+  const [chimeWebhook, setChimeWebhook] = useState('');
 
   const [
     headerFooterCheckboxIdToSelectedMap,
@@ -127,6 +130,7 @@ export function CreateChannel(props: CreateChannelsProps) {
   const [inputErrors, setInputErrors] = useState<CreateChannelInputErrorsType>({
     name: false,
     slackWebhook: false,
+    chimeWebhook: false,
     sender: false,
     recipients: false,
   });
@@ -150,8 +154,8 @@ export function CreateChannel(props: CreateChannelsProps) {
   const validateInput = (): boolean => {
     const errors = {
       name: validateChannelName(name),
-      slackWebhook:
-        channelType === 'SLACK' && validateSlackWebhook(slackWebhook),
+      slackWebhook: channelType === 'SLACK' && validateWebhook(slackWebhook),
+      chimeWebhook: channelType === 'CHIME' && validateWebhook(chimeWebhook),
       sender: channelType === 'EMAIL' && validateEmailSender(sender),
       recipients:
         channelType === 'EMAIL' ||
@@ -200,6 +204,11 @@ export function CreateChannel(props: CreateChannelsProps) {
             <SlackSettings
               slackWebhook={slackWebhook}
               setSlackWebhook={setSlackWebhook}
+            />
+          ) : channelType === 'CHIME' ? (
+            <ChimeSettings
+              chimeWebhook={chimeWebhook}
+              setChimeWebhook={setChimeWebhook}
             />
           ) : channelType === 'EMAIL' || channelType === 'SES' ? (
             <EmailSettings

@@ -18,32 +18,32 @@ import React, { useContext } from 'react';
 import { CreateChannelContext } from '../CreateChannel';
 import { validateWebhook } from '../utils/validationHelper';
 
-interface SlackSettingsProps {
-  slackWebhook: string;
-  setSlackWebhook: (url: string) => void;
+interface ChimeSettingsProps {
+  chimeWebhook: string;
+  setChimeWebhook: (url: string) => void;
 }
 
-export function SlackSettings(props: SlackSettingsProps) {
+export function ChimeSettings(props: ChimeSettingsProps) {
   const context = useContext(CreateChannelContext)!;
 
   return (
     <EuiFormRow
-      label="Slack webhook URL"
+      label="Webhook URL"
       style={{ maxWidth: '700px' }}
-      error="Slack webhook URL is required."
-      isInvalid={context.inputErrors.slackWebhook}
+      error="Chime webhook URL is required."
+      isInvalid={context.inputErrors.chimeWebhook}
     >
       <EuiFieldText
         fullWidth
-        placeholder="https://hook.slack.com/services/T0000000000/B0000000/XXXXXXXXXXXXXXX"
-        value={props.slackWebhook}
-        onChange={(e) => props.setSlackWebhook(e.target.value)}
+        placeholder="Enter Chime webhook URL"
+        value={props.chimeWebhook}
+        onChange={(e) => props.setChimeWebhook(e.target.value)}
         onBlur={() => {
-          const error = validateWebhook(props.slackWebhook);
-          if (error !== context.inputErrors.slackWebhook) {
+          const error = validateWebhook(props.chimeWebhook);
+          if (error !== context.inputErrors.chimeWebhook) {
             context.setInputErrors({
               ...context.inputErrors,
-              slackWebhook: error,
+              chimeWebhook: error,
             });
           }
         }}
