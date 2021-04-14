@@ -7,16 +7,16 @@ import {
 } from "../../../src/core/server";
 
 import {
-  opendistroNotificationsOpenSearchDashboardsPluginSetup,
-  opendistroNotificationsOpenSearchDashboardsPluginStart,
+  notificationsDashboardsPluginSetup,
+  notificationsDashboardsPluginStart,
 } from "./types";
 import { defineRoutes } from "./routes";
 
-export class opendistroNotificationsOpenSearchDashboardsPlugin
+export class notificationsDashboardsPlugin
   implements
     Plugin<
-      opendistroNotificationsOpenSearchDashboardsPluginSetup,
-      opendistroNotificationsOpenSearchDashboardsPluginStart
+      notificationsDashboardsPluginSetup,
+      notificationsDashboardsPluginStart
     > {
   private readonly logger: Logger;
 
@@ -25,7 +25,7 @@ export class opendistroNotificationsOpenSearchDashboardsPlugin
   }
 
   public setup(core: CoreSetup) {
-    this.logger.debug("opendistroNotificationsOpenSearchDashboards: Setup");
+    this.logger.debug("notificationsDashboards: Setup");
     const router = core.http.createRouter();
 
     // Register server side APIs
@@ -35,7 +35,7 @@ export class opendistroNotificationsOpenSearchDashboardsPlugin
   }
 
   public start(core: CoreStart) {
-    this.logger.debug("opendistroNotificationsOpenSearchDashboards: Started");
+    this.logger.debug("notificationsDashboards: Started");
     return {};
   }
 

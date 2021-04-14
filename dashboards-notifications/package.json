@@ -1,5 +1,5 @@
 {
-  "name": "opendistro-notifications-opensearch-dashboards",
+  "name": "notifications-dashboards",
   "version": "1.15.0.0",
   "description": "OpenSearch Dashboards Notifications Plugin",
   "license": "Apache-2.0",

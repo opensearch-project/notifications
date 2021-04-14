@@ -20,19 +20,19 @@ import {
   Plugin,
 } from '../../../src/core/public';
 import {
-  opendistroNotificationsOpenSearchDashboardsPluginSetup,
-  opendistroNotificationsOpenSearchDashboardsPluginStart,
+  notificationsDashboardsPluginSetup,
+  notificationsDashboardsPluginStart,
   AppPluginStartDependencies,
 } from './types';
 import { PLUGIN_NAME } from '../common';
 
-export class opendistroNotificationsOpenSearchDashboardsPlugin
+export class notificationsDashboardsPlugin
   implements
     Plugin<
-      opendistroNotificationsOpenSearchDashboardsPluginSetup,
-      opendistroNotificationsOpenSearchDashboardsPluginStart
+      notificationsDashboardsPluginSetup,
+      notificationsDashboardsPluginStart
     > {
-  public setup(core: CoreSetup): opendistroNotificationsOpenSearchDashboardsPluginSetup {
+  public setup(core: CoreSetup): notificationsDashboardsPluginSetup {
     // Register an application into the side navigation menu
     core.application.register({
       id: PLUGIN_NAME,
@@ -57,7 +57,7 @@ export class opendistroNotificationsOpenSearchDashboardsPlugin
     return {};
   }
 
-  public start(core: CoreStart): opendistroNotificationsOpenSearchDashboardsPluginStart {
+  public start(core: CoreStart): notificationsDashboardsPluginStart {
     return {};
   }
 

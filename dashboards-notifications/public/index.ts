@@ -15,14 +15,14 @@
 
 import './index.scss';
 
-import { opendistroNotificationsOpenSearchDashboardsPlugin } from './plugin';
+import { notificationsDashboardsPlugin } from './plugin';
 
 // This exports static code and TypeScript types,
 // as well as, OpenSearch Dashboards Platform `plugin()` initializer.
 export function plugin() {
-  return new opendistroNotificationsOpenSearchDashboardsPlugin();
+  return new notificationsDashboardsPlugin();
 }
 export {
-  opendistroNotificationsOpenSearchDashboardsPluginSetup,
-  opendistroNotificationsOpenSearchDashboardsPluginStart,
+  notificationsDashboardsPluginSetup,
+  notificationsDashboardsPluginStart,
 } from './types';

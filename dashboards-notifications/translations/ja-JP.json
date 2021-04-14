@@ -76,6 +76,6 @@
     }
   },
   "messages": {
-    "opendistroNotificationsOpenSearchDashboards.buttonText": "Translate me to Japanese"
+    "notificationsDashboards.buttonText": "Translate me to Japanese"
   }
 }
