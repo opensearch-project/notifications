@@ -58,7 +58,7 @@ export function ChannelDetails(props: ChannelDetailsProps) {
       id,
       name: 'Ops_channel',
       enabled: true,
-      type: 'Slack',
+      type: 'Email',
       allowedFeatures: ['Alerting', 'Reporting'],
       lastUpdatedTime: new Date().getTime(),
       description: 'This group will send to all operational team members.',

@@ -13,10 +13,13 @@
  * permissions and limitations under the License.
  */
 
+import { EuiLink } from '@elastic/eui';
 import React from 'react';
 import { ChannelItemType } from '../../../../../models/interfaces';
+import { ModalConsumer } from '../../../../components/Modal';
 import { CHANNEL_TYPE } from '../../../../utils/constants';
 import { ListItemType } from '../../types';
+import { DetailsListModal } from '../modals/DetailsListModal';
 import { ChannelDetailItems } from './ChannelDetailItems';
 
 interface ChannelSettingsDetailsProps {
@@ -25,47 +28,83 @@ interface ChannelSettingsDetailsProps {
 
 export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
   if (!props.channel) return null;
-  let settingsList: Array<ListItemType>;
+
+  const settingsList: Array<ListItemType> = [
+    {
+      title: 'Channel type',
+      description: props.channel.type,
+    },
+  ];
+
   if (props.channel.type === CHANNEL_TYPE.SLACK) {
-    settingsList = [
-      {
-        title: 'Channel type',
-        description: CHANNEL_TYPE.SLACK,
-      },
-      {
-        title: 'Webhook URL',
-        description: props.channel.destination.slack.url || '-',
-      },
-    ];
+    settingsList.push(
+      ...[
+        {
+          title: 'Webhook URL',
+          description: props.channel.destination.slack.url || '-',
+        },
+      ]
+    );
   } else if (props.channel.type === CHANNEL_TYPE.CHIME) {
-    settingsList = [
-      {
-        title: 'Channel type',
-        description: CHANNEL_TYPE.CHIME,
-      },
-      {
-        title: 'Webhook URL',
-        description: props.channel.destination.chime.url || '-',
-      },
-    ];
-  } else {
-    const recipients = props.channel.destination.email.email_account_id;
-    settingsList = [
-      {
-      {
-        title: 'Channel type',
-        description: CHANNEL_TYPE.EMAIL,
-      },
-      {
-        title: 'Sender',
-        description: props.channel.destination.email.email_account_id || '-',
-      },
-      {
-        title: 'Default recipients',
-        description: 
-      },
-      }
-    ]
+    settingsList.push(
+      ...[
+        {
+          title: 'Webhook URL',
+          description: props.channel.destination.chime.url || '-',
+        },
+      ]
+    );
+  } else if (props.channel.type === CHANNEL_TYPE.EMAIL) {
+    const recipients = props.channel.destination.email.recipients;
+    const recipientsDescription = (
+      <>
+        {recipients.slice(0, 5).join(', ')}
+        {recipients.length > 5 && (
+          <>
+            {' '}
+            <ModalConsumer>
+              {({ onShow }) => (
+                <EuiLink
+                  onClick={() =>
+                    onShow(DetailsListModal, {
+                      header: `Default recipients (${recipients.length})`,
+                      title: 'Recipients',
+                      items: recipients,
+                    })
+                  }
+                >
+                  {recipients.length - 5} more
+                </EuiLink>
+              )}
+            </ModalConsumer>
+          </>
+        )}
+      </>
+    );
+    settingsList.push(
+      ...[
+        {
+          title: 'Sender',
+          description: props.channel.destination.email.email_account_id || '-',
+        },
+        {
+          title: 'Default recipients',
+          description: recipientsDescription,
+        },
+        {
+          title: 'Email header',
+          description: props.channel.destination.email.header
+            ? 'Enabled'
+            : 'Disabled',
+        },
+        {
+          title: 'Email footer',
+          description: props.channel.destination.email.footer
+            ? 'Enabled'
+            : 'Disabled',
+        },
+      ]
+    );
   }
 
   return (
