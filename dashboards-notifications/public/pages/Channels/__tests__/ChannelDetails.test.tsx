@@ -18,7 +18,7 @@ import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { coreServicesMock } from '../../../../test/mocks/serviceMock';
 import { CoreServicesContext } from '../../../components/coreServices';
-import { ChannelDetails } from '../ChannelDetails';
+import { ChannelDetails } from '../components/details/ChannelDetails';
 
 describe('<ChannelDetails/> spec', () => {
   it('renders the component', () => {

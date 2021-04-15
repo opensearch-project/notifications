@@ -26,7 +26,7 @@ import { CoreStart } from '../../../../../src/core/public';
 import Notifications from '../Notifications';
 import { Channels } from '../Channels/Channels';
 import { CreateChannel } from '../CreateChannel/CreateChannel';
-import { ChannelDetails } from '../Channels/ChannelDetails';
+import { ChannelDetails } from '../Channels/components/details/ChannelDetails';
 import { EmailGroups } from '../Emails/EmailGroups';
 import { CreateSender } from '../Emails/CreateSender';
 import { CreateRecipientGroup } from '../Emails/CreateRecipientGroup';

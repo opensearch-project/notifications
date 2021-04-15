@@ -23,20 +23,20 @@ import {
 } from '@elastic/eui';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import { ChannelItemType } from '../../../models/interfaces';
+import { ChannelItemType } from '../../../../../models/interfaces';
 import {
   ContentPanel,
   ContentPanelActions,
-} from '../../components/ContentPanel';
-import { CoreServicesContext } from '../../components/coreServices';
-import { ModalConsumer } from '../../components/Modal';
-import { BREADCRUMBS, ROUTES } from '../../utils/constants';
-import { renderTime } from '../../utils/helpers';
-import { ChannelDetailItems } from './components/details/ChannelDetailItems';
-import { ChannelSettingsDetails } from './components/details/ChannelSettingsDetails';
-import { DeleteChannelModal } from './components/modals/DeleteChannelModal';
-import { MuteChannelModal } from './components/modals/MuteChannelModal';
-import { ListItemType } from './types';
+} from '../../../../components/ContentPanel';
+import { CoreServicesContext } from '../../../../components/coreServices';
+import { ModalConsumer } from '../../../../components/Modal';
+import { BREADCRUMBS, ROUTES } from '../../../../utils/constants';
+import { renderTime } from '../../../../utils/helpers';
+import { ChannelDetailItems } from './ChannelDetailItems';
+import { ChannelSettingsDetails } from './ChannelSettingsDetails';
+import { DeleteChannelModal } from '../modals/DeleteChannelModal';
+import { MuteChannelModal } from '../modals/MuteChannelModal';
+import { ListItemType } from '../../types';
 
 interface ChannelDetailsProps extends RouteComponentProps<{ id: string }> {}
 
