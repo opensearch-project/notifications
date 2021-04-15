@@ -58,7 +58,7 @@ export function ChannelDetails(props: ChannelDetailsProps) {
       id,
       name: 'Ops_channel',
       enabled: true,
-      type: 'Amazon SNS',
+      type: 'CUSTOM_WEBHOOK',
       allowedFeatures: ['Alerting', 'Reporting'],
       lastUpdatedTime: new Date().getTime(),
       description: 'This group will send to all operational team members.',
@@ -90,6 +90,32 @@ export function ChannelDetails(props: ChannelDetailsProps) {
           topic_arn: 'arn:aws:sns:us-east-1:24586493349034:es-alerting-test',
           role_arn: 'arn:aws:sns:us-east-1:24586493349034:es-alerting-test',
         },
+        custom_webhook: {
+          host: 'https:hooks.myhost.com',
+          port: 21,
+          path: 'custompath',
+          parameters: {
+            Parameter1: 'value1',
+            Parameter2: 'value2',
+            Parameter3: 'value3',
+            Parameter4: 'value4',
+            Parameter5: 'value5',
+            Parameter6: 'value6',
+            Parameter7: 'value7',
+            Parameter8: 'value8',
+          },
+          headers: {
+            'Content-Type': 'application/JSON',
+            Header1: 'value1',
+            Header2: 'value2',
+            Header3: 'value3',
+            Header4: 'value4',
+            Header5: 'value5',
+            Header6: 'value6',
+            Header7: 'value7',
+            Header8: 'value8',
+          }
+        }
       },
     });
   }, []);

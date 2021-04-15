@@ -30,6 +30,40 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
   if (!props.channel) return null;
 
   const settingsList: Array<ListItemType> = [];
+  const getListModalComponent = (
+    list: string[],
+    header: string,
+    title: string,
+    separator = ', '
+  ) => {
+    return (
+      <>
+        <div style={{ whiteSpace: 'pre-line' }}>
+          {list.slice(0, 5).join(separator)}
+        </div>
+        {list.length > 5 && (
+          <>
+            {' '}
+            <ModalConsumer>
+              {({ onShow }) => (
+                <EuiLink
+                  onClick={() =>
+                    onShow(DetailsListModal, {
+                      header: `${header} (${list.length})`,
+                      title: title,
+                      items: list,
+                    })
+                  }
+                >
+                  {list.length - 5} more
+                </EuiLink>
+              )}
+            </ModalConsumer>
+          </>
+        )}
+      </>
+    );
+  };
 
   if (props.channel.type === 'SLACK') {
     settingsList.push(
@@ -75,31 +109,10 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
       ]
     );
   } else if (props.channel.type === 'EMAIL') {
-    const recipients = props.channel.destination.email.recipients;
-    const recipientsDescription = (
-      <>
-        {recipients.slice(0, 5).join(', ')}
-        {recipients.length > 5 && (
-          <>
-            {' '}
-            <ModalConsumer>
-              {({ onShow }) => (
-                <EuiLink
-                  onClick={() =>
-                    onShow(DetailsListModal, {
-                      header: `Default recipients (${recipients.length})`,
-                      title: 'Recipients',
-                      items: recipients,
-                    })
-                  }
-                >
-                  {recipients.length - 5} more
-                </EuiLink>
-              )}
-            </ModalConsumer>
-          </>
-        )}
-      </>
+    const recipientsDescription = getListModalComponent(
+      props.channel.destination.email.recipients,
+      'Default recipients',
+      'Recipients'
     );
     settingsList.push(
       ...[
@@ -126,6 +139,51 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
           description: props.channel.destination.email.footer
             ? 'Enabled'
             : 'Disabled',
+        },
+      ]
+    );
+  } else if (props.channel.type === 'CUSTOM_WEBHOOK') {
+    const parametersDescription = getListModalComponent(
+      Object.entries(props.channel.destination.custom_webhook.parameters).map(
+        ([key, value]) => `${key}: ${value}`
+      ),
+      'Query parameters',
+      'Parameters',
+      '\n'
+    );
+    const headersDescription = getListModalComponent(
+      Object.entries(props.channel.destination.custom_webhook.headers).map(
+        ([key, value]) => `${key}: ${value}`
+      ),
+      'Webhook headers',
+      'Headers',
+      '\n'
+    );
+    settingsList.push(
+      ...[
+        {
+          title: 'Channel type',
+          description: CHANNEL_TYPE.CUSTOM_WEBHOOK,
+        },
+        {
+          title: 'Host',
+          description: props.channel.destination.custom_webhook.host || '-',
+        },
+        {
+          title: 'Port',
+          description: props.channel.destination.custom_webhook.port || '-',
+        },
+        {
+          title: 'Path',
+          description: props.channel.destination.custom_webhook.path || '-',
+        },
+        {
+          title: 'Query parameters',
+          description: parametersDescription,
+        },
+        {
+          title: 'Webhook headers',
+          description: headersDescription,
         },
       ]
     );

@@ -59,6 +59,7 @@ export function ChannelDetailItems(props: ChannelDetailItemsProps) {
               </EuiFlexItem>
             ))}
           </EuiFlexGroup>
+          <EuiSpacer size="m" />
         </div>
       ))}
     </>
