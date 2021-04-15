@@ -32,11 +32,11 @@ import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalConsumer } from '../../../../components/Modal';
 import { BREADCRUMBS, ROUTES } from '../../../../utils/constants';
 import { renderTime } from '../../../../utils/helpers';
-import { ChannelDetailItems } from './ChannelDetailItems';
-import { ChannelSettingsDetails } from './ChannelSettingsDetails';
-import { DeleteChannelModal } from '../modals/DeleteChannelModal';
-import { MuteChannelModal } from '../modals/MuteChannelModal';
 import { ListItemType } from '../../types';
+import { MuteChannelModal } from '../modals/MuteChannelModal';
+import { ChannelDetailItems } from './ChannelDetailItems';
+import { ChannelDetailsActions } from './ChannelDetailsActions';
+import { ChannelSettingsDetails } from './ChannelSettingsDetails';
 
 interface ChannelDetailsProps extends RouteComponentProps<{ id: string }> {}
 
@@ -114,8 +114,8 @@ export function ChannelDetails(props: ChannelDetailsProps) {
             Header6: 'value6',
             Header7: 'value7',
             Header8: 'value8',
-          }
-        }
+          },
+        },
       },
     });
   }, []);
@@ -162,23 +162,13 @@ export function ChannelDetails(props: ChannelDetailsProps) {
           )}
         </EuiFlexItem>
         <EuiFlexItem />
-        <ModalConsumer>
-          {({ onShow }) => (
-            <>
-              <EuiFlexItem grow={false}>
-                <EuiButton
-                  size="s"
-                  color="danger"
-                  onClick={() =>
-                    onShow(DeleteChannelModal, {
-                      channels: [channel],
-                    })
-                  }
-                >
-                  Delete
-                </EuiButton>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
+        <>
+          <EuiFlexItem grow={false}>
+            {channel && <ChannelDetailsActions channel={channel} />}
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <ModalConsumer>
+              {({ onShow }) => (
                 <EuiButton
                   size="s"
                   iconType={channel?.enabled ? 'bellSlash' : 'bell'}
@@ -191,10 +181,10 @@ export function ChannelDetails(props: ChannelDetailsProps) {
                 >
                   {channel?.enabled ? 'Mute channel' : 'Unmute channel'}
                 </EuiButton>
-              </EuiFlexItem>
-            </>
-          )}
-        </ModalConsumer>
+              )}
+            </ModalConsumer>
+          </EuiFlexItem>
+        </>
       </EuiFlexGroup>
 
       <EuiSpacer />
