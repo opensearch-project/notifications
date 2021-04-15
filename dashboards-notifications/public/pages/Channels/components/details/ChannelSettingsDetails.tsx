@@ -29,32 +29,52 @@ interface ChannelSettingsDetailsProps {
 export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
   if (!props.channel) return null;
 
-  const settingsList: Array<ListItemType> = [
-    {
-      title: 'Channel type',
-      description: props.channel.type,
-    },
-  ];
+  const settingsList: Array<ListItemType> = [];
 
-  if (props.channel.type === CHANNEL_TYPE.SLACK) {
+  if (props.channel.type === 'SLACK') {
     settingsList.push(
       ...[
+        {
+          title: 'Channel type',
+          description: CHANNEL_TYPE.SLACK,
+        },
         {
           title: 'Webhook URL',
           description: props.channel.destination.slack.url || '-',
         },
       ]
     );
-  } else if (props.channel.type === CHANNEL_TYPE.CHIME) {
+  } else if (props.channel.type === 'CHIME') {
     settingsList.push(
       ...[
+        {
+          title: 'Channel type',
+          description: CHANNEL_TYPE.CHIME,
+        },
         {
           title: 'Webhook URL',
           description: props.channel.destination.chime.url || '-',
         },
       ]
     );
-  } else if (props.channel.type === CHANNEL_TYPE.EMAIL) {
+  } else if (props.channel.type === 'SNS') {
+    settingsList.push(
+      ...[
+        {
+          title: 'Channel type',
+          description: CHANNEL_TYPE.SNS,
+        },
+        {
+          title: 'SNS topic ARN',
+          description: props.channel.destination.sns.topic_arn || '-',
+        },
+        {
+          title: 'IAM role ARN',
+          description: props.channel.destination.sns.role_arn || '-',
+        },
+      ]
+    );
+  } else if (props.channel.type === 'EMAIL') {
     const recipients = props.channel.destination.email.recipients;
     const recipientsDescription = (
       <>
@@ -83,6 +103,10 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
     );
     settingsList.push(
       ...[
+        {
+          title: 'Channel type',
+          description: CHANNEL_TYPE.EMAIL,
+        },
         {
           title: 'Sender',
           description: props.channel.destination.email.email_account_id || '-',

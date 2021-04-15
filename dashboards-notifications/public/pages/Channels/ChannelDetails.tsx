@@ -58,7 +58,7 @@ export function ChannelDetails(props: ChannelDetailsProps) {
       id,
       name: 'Ops_channel',
       enabled: true,
-      type: 'Email',
+      type: 'Amazon SNS',
       allowedFeatures: ['Alerting', 'Reporting'],
       lastUpdatedTime: new Date().getTime(),
       description: 'This group will send to all operational team members.',
@@ -87,8 +87,8 @@ export function ChannelDetails(props: ChannelDetailsProps) {
           from: 'ses@test.com',
         },
         sns: {
-          topic_arn: '',
-          role_arn: '',
+          topic_arn: 'arn:aws:sns:us-east-1:24586493349034:es-alerting-test',
+          role_arn: 'arn:aws:sns:us-east-1:24586493349034:es-alerting-test',
         },
       },
     });
