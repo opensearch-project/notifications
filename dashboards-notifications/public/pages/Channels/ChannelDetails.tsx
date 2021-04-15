@@ -13,10 +13,8 @@
  * permissions and limitations under the License.
  */
 
-import { ChannelItemType } from '../../../models/interfaces';
 import {
   EuiButton,
-  EuiDescriptionList,
   EuiFlexGroup,
   EuiFlexItem,
   EuiHealth,
@@ -25,6 +23,7 @@ import {
 } from '@elastic/eui';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import { ChannelItemType } from '../../../models/interfaces';
 import {
   ContentPanel,
   ContentPanelActions,
@@ -32,14 +31,12 @@ import {
 import { CoreServicesContext } from '../../components/coreServices';
 import { ModalConsumer } from '../../components/Modal';
 import { BREADCRUMBS, ROUTES } from '../../utils/constants';
+import { renderTime } from '../../utils/helpers';
+import { ChannelDetailItems } from './components/details/ChannelDetailItems';
+import { ChannelSettingsDetails } from './components/details/ChannelSettingsDetails';
 import { DeleteChannelModal } from './components/modals/DeleteChannelModal';
 import { MuteChannelModal } from './components/modals/MuteChannelModal';
-import { renderTime } from '../../utils/helpers';
-
-interface ListItemType {
-  title: NonNullable<React.ReactNode>;
-  description: NonNullable<React.ReactNode>;
-}
+import { ListItemType } from './types';
 
 interface ChannelDetailsProps extends RouteComponentProps<{ id: string }> {}
 
@@ -61,7 +58,7 @@ export function ChannelDetails(props: ChannelDetailsProps) {
       id,
       name: 'Ops_channel',
       enabled: true,
-      type: 'Email',
+      type: 'Slack',
       allowedFeatures: ['Alerting', 'Reporting'],
       lastUpdatedTime: new Date().getTime(),
       description: 'This group will send to all operational team members.',
@@ -70,11 +67,34 @@ export function ChannelDetails(props: ChannelDetailsProps) {
           url:
             'https://hooks.slack.com/services/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',
         },
+        chime: {
+          url: 'https://chime',
+        },
+        email: {
+          email_account_id: 'robot@gmail.com',
+          recipients: [
+            'Team 2',
+            'cyberadmin@company.com',
+            'Ops_team_weekly',
+            'Team 5',
+            'bot@company.com',
+            'Team 7',
+            'security_pos@company.com',
+          ],
+        },
+        ses: {
+          source_arn: '',
+          from: 'ses@test.com',
+        },
+        sns: {
+          topic_arn: '',
+          role_arn: '',
+        },
       },
     });
   }, []);
 
-  const channelDescriptionList: Array<ListItemType> = [
+  const nameList: Array<ListItemType> = [
     {
       title: 'Channel name',
       description: channel?.name || '-',
@@ -87,49 +107,14 @@ export function ChannelDetails(props: ChannelDetailsProps) {
       title: 'Last updated',
       description: renderTime(channel?.lastUpdatedTime || -1),
     },
-    {
-      title: 'Channel type',
-      description: channel?.type || '-',
-    },
-    {
-      title: 'Sender',
-      description: 'robot@gmail.com',
-    },
-    {
-      title: 'Default recipients',
-      description: 'Team2, cyberadmin@company.com',
-    },
-    {
-      title: 'Email header',
-      description: 'Disabled',
-    },
-    {
-      title: 'Email footer',
-      description: 'Disabled',
-    },
+  ];
+
+  const sources: Array<ListItemType> = [
     {
       title: 'Notification sources',
       description: channel?.allowedFeatures.join(', ') || '-',
     },
   ];
-
-  // list is displayed horizontally on the UI, 4 items per row
-  // group items into an array of rows
-  const channelDescriptionListGroup = channelDescriptionList
-    .concat(
-      new Array(
-        Math.ceil(channelDescriptionList.length / 4) * 4 -
-          channelDescriptionList.length
-      ).fill(null)
-    )
-    .reduce(
-      (rows: Array<Array<ListItemType>>, item: ListItemType, i: number) => {
-        if (i % 4 === 0) rows.push([item]);
-        else rows[rows.length - 1].push(item);
-        return rows;
-      },
-      []
-    );
 
   return (
     <>
@@ -209,19 +194,25 @@ export function ChannelDetails(props: ChannelDetailsProps) {
           />
         }
       >
-        {channelDescriptionListGroup.map((row, rowIndex) => (
-          <div key={`channel-description-row-${rowIndex}`}>
-            <EuiSpacer />
-            <EuiFlexGroup>
-              {row.map((item, itemIndex) => (
-                <EuiFlexItem key={`channel-description-item-${itemIndex}`}>
-                  {item && <EuiDescriptionList listItems={[item]} />}
-                </EuiFlexItem>
-              ))}
-            </EuiFlexGroup>
-            <EuiSpacer />
-          </div>
-        ))}
+        <EuiSpacer size="m" />
+        <EuiTitle size="s">
+          <h4>Name and description</h4>
+        </EuiTitle>
+        <ChannelDetailItems listItems={nameList} />
+
+        <EuiSpacer size="xxl" />
+        <EuiTitle size="s">
+          <h4>Settings</h4>
+        </EuiTitle>
+        <ChannelSettingsDetails channel={channel} />
+
+        <EuiSpacer size="xxl" />
+        <EuiTitle size="s">
+          <h4>Availability</h4>
+        </EuiTitle>
+        <ChannelDetailItems listItems={sources} />
+
+        <EuiSpacer />
       </ContentPanel>
     </>
   );

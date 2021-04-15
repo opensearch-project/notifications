@@ -51,7 +51,7 @@ export interface ChannelItemType {
   allowedFeatures: string[];
   lastUpdatedTime: number;
   destination: {
-    [type: string]: object;
+    [type: string]: any;
   };
   description?: string;
 }
