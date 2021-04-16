@@ -13,7 +13,6 @@
  * permissions and limitations under the License.
  */
 
-import { ENCRYPTION_METHOD } from '../../../models/interfaces';
 import {
   EuiButton,
   EuiButtonEmpty,
@@ -24,10 +23,17 @@ import {
 } from '@elastic/eui';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import { ENCRYPTION_METHOD } from '../../../models/interfaces';
 import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
 import { BREADCRUMBS, ROUTES } from '../../utils/constants';
 import { CreateSenderForm } from './components/forms/CreateSenderForm';
+import {
+  validateEmail,
+  validateHost,
+  validatePort,
+  validateSenderName,
+} from './utils/validationHelper';
 
 interface CreateSenderProps extends RouteComponentProps {
   edit?: boolean;
@@ -40,6 +46,14 @@ export function CreateSender(props: CreateSenderProps) {
   const [host, setHost] = useState('');
   const [port, setPort] = useState('465');
   const [encryption, setEncryption] = useState<ENCRYPTION_METHOD>('SSL');
+  const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>(
+    {
+      senderName: [],
+      email: [],
+      host: [],
+      port: [],
+    }
+  );
 
   useEffect(() => {
     context.chrome.setBreadcrumbs([
@@ -54,6 +68,20 @@ export function CreateSender(props: CreateSenderProps) {
       setEmail('test mail');
     }
   }, []);
+
+  const isInputValid = (): boolean => {
+    const errors: { [key: string]: string[] } = {
+      senderName: validateSenderName(senderName),
+      email: validateEmail(email),
+      host: validateHost(host),
+      port: validatePort(port),
+    };
+    setInputErrors(errors);
+    return !Object.values(errors).reduce(
+      (errorFlag, error) => errorFlag || error.length > 0,
+      false
+    );
+  };
 
   return (
     <>
@@ -79,6 +107,8 @@ export function CreateSender(props: CreateSenderProps) {
           setPort={setPort}
           encryption={encryption}
           setEncryption={setEncryption}
+          inputErrors={inputErrors}
+          setInputErrors={setInputErrors}
         />
       </ContentPanel>
 
@@ -90,7 +120,14 @@ export function CreateSender(props: CreateSenderProps) {
           </EuiButtonEmpty>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiButton fill size="s">
+          <EuiButton
+            size="s"
+            fill
+            onClick={() => {
+              if (!isInputValid()) return;
+              location.assign(`#${ROUTES.EMAIL_GROUPS}`);
+            }}
+          >
             {props.edit ? 'Save' : 'Create'}
           </EuiButton>
         </EuiFlexItem>

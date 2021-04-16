@@ -143,7 +143,11 @@ export function EmailSettings(props: EmailSettingsProps) {
                   {({ onShow }) => (
                     <EuiButton
                       size="s"
-                      onClick={() => onShow(CreateSenderModal, { test: 123 })}
+                      onClick={() =>
+                        onShow(CreateSenderModal, {
+                          setSender: props.setSender,
+                        })
+                      }
                     >
                       Create sender
                     </EuiButton>

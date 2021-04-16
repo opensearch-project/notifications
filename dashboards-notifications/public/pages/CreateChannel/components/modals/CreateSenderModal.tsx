@@ -27,8 +27,15 @@ import React, { useState } from 'react';
 import { ENCRYPTION_METHOD } from '../../../../../models/interfaces';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 import { CreateSenderForm } from '../../../Emails/components/forms/CreateSenderForm';
+import {
+  validateEmail,
+  validateHost,
+  validatePort,
+  validateSenderName,
+} from '../../../Emails/utils/validationHelper';
 
 interface CreateSenderModalProps extends ModalRootProps {
+  setSender: (sender: string) => void;
   onClose: () => void;
 }
 
@@ -38,6 +45,26 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
   const [host, setHost] = useState('');
   const [port, setPort] = useState('465');
   const [encryption, setEncryption] = useState<ENCRYPTION_METHOD>('SSL');
+  const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>({
+    senderName: [],
+    email: [],
+    host: [],
+    port: [],
+  });
+
+  const isInputValid = (): boolean => {
+    const errors: { [key: string]: string[] } = {
+      senderName: validateSenderName(senderName),
+      email: validateEmail(email),
+      host: validateHost(host),
+      port: validatePort(port),
+    };
+    setInputErrors(errors);
+    return !Object.values(errors).reduce(
+      (errorFlag, error) => errorFlag || error.length > 0,
+      false
+    );
+  };
 
   return (
     <EuiOverlayMask>
@@ -58,6 +85,8 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
             setPort={setPort}
             encryption={encryption}
             setEncryption={setEncryption}
+            inputErrors={inputErrors}
+            setInputErrors={setInputErrors}
           />
         </EuiModalBody>
 
@@ -65,7 +94,15 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
           <EuiButtonEmpty onClick={props.onClose} size="s">
             Cancel
           </EuiButtonEmpty>
-          <EuiButton fill onClick={props.onClose} size="s">
+          <EuiButton
+            fill
+            onClick={() => {
+              if (!isInputValid()) return;
+              props.setSender(senderName);
+              props.onClose();
+            }}
+            size="s"
+          >
             Create
           </EuiButton>
         </EuiModalFooter>
