@@ -101,7 +101,10 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
             fill
             onClick={() => {
               if (!isInputValid()) return;
-              props.addSenderOptionAndSelect({ value: senderName });
+              props.addSenderOptionAndSelect({
+                value: senderName,
+                inputDisplay: senderName,
+              });
               props.onClose();
             }}
             size="s"
