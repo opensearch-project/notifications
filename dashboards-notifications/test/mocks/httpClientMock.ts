@@ -13,7 +13,7 @@
  *   permissions and limitations under the License.
  */
 
-import { HttpSetup } from "kibana/public";
+import { HttpSetup } from "opensearch-dashboards/public";
 
 const httpClientMock = jest.fn() as any;
 
