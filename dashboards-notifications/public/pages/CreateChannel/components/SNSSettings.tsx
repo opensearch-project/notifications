@@ -20,7 +20,9 @@ import {
   EuiSpacer,
   EuiText,
 } from '@elastic/eui';
-import React from 'react';
+import React, { useContext } from 'react';
+import { CreateChannelContext } from '../CreateChannel';
+import { validateArn } from '../utils/validationHelper';
 
 interface SNSSettingsProps {
   isOdfe: boolean;
@@ -31,14 +33,25 @@ interface SNSSettingsProps {
 }
 
 export function SNSSettings(props: SNSSettingsProps) {
+  const context = useContext(CreateChannelContext)!;
   return (
     <>
       <EuiSpacer />
-      <EuiFormRow label="SNS topic ARN">
+      <EuiFormRow
+        label="SNS topic ARN"
+        error={context.inputErrors.snsArn.join(' ')}
+        isInvalid={context.inputErrors.snsArn.length > 0}
+      >
         <EuiFieldText
           placeholder="ARN key"
           value={props.snsArn}
           onChange={(e) => props.setSnsArn(e.target.value)}
+          onBlur={() => {
+            context.setInputErrors({
+              ...context.inputErrors,
+              snsArn: validateArn(props.snsArn),
+            });
+          }}
         />
       </EuiFormRow>
 
@@ -83,11 +96,21 @@ export function SNSSettings(props: SNSSettingsProps) {
           </EuiCallOut>
         </>
       ) : (
-        <EuiFormRow label="IAM role ARN">
+        <EuiFormRow
+          label="IAM role ARN"
+          error={context.inputErrors.iamArn.join(' ')}
+          isInvalid={context.inputErrors.iamArn.length > 0}
+        >
           <EuiFieldText
             placeholder="ARN key"
             value={props.iamArn}
             onChange={(e) => props.setIamArn(e.target.value)}
+            onBlur={() => {
+              context.setInputErrors({
+                ...context.inputErrors,
+                iamArn: validateArn(props.iamArn),
+              });
+            }}
           />
         </EuiFormRow>
       )}

@@ -45,33 +45,32 @@ import { EmailSettings } from './components/EmailSettings';
 import { SlackSettings } from './components/SlackSettings';
 import { SNSSettings } from './components/SNSSettings';
 import {
+  validateArn,
   validateChannelName,
+  validateCustomURLHost,
+  validateCustomURLPort,
   validateEmailSender,
   validateRecipients,
-  validateWebhook,
+  validateWebhookURL,
 } from './utils/validationHelper';
 
 interface CreateChannelsProps extends RouteComponentProps<{ id?: string }> {
   edit?: boolean;
 }
 
-export type CreateChannelInputErrorsType = {
-  name: boolean;
-  slackWebhook: boolean;
-  chimeWebhook: boolean;
-  sender: boolean;
-  recipients: boolean;
-};
+type InputErrorsType = { [key: string]: string[] };
 
 export const CreateChannelContext = createContext<{
   edit?: boolean;
-  inputErrors: CreateChannelInputErrorsType;
-  setInputErrors: (errors: CreateChannelInputErrorsType) => void;
+  inputErrors: InputErrorsType;
+  setInputErrors: (errors: InputErrorsType) => void;
 } | null>(null);
 
 export type HeaderType = { key: string; value: string };
 
 export function CreateChannel(props: CreateChannelsProps) {
+  const isOdfe = true;
+
   const coreContext = useContext(CoreServicesContext)!;
   const id = props.match.params.id;
   const prevURL =
@@ -128,12 +127,17 @@ export function CreateChannel(props: CreateChannelsProps) {
     [x: string]: boolean;
   }>({});
 
-  const [inputErrors, setInputErrors] = useState<CreateChannelInputErrorsType>({
-    name: false,
-    slackWebhook: false,
-    chimeWebhook: false,
-    sender: false,
-    recipients: false,
+  const [inputErrors, setInputErrors] = useState<InputErrorsType>({
+    name: [],
+    slackWebhook: [],
+    chimeWebhook: [],
+    sender: [],
+    recipients: [],
+    webhookURL: [],
+    customURLHost: [],
+    customURLPort: [],
+    snsArn: [],
+    iamArn: [],
   });
 
   useEffect(() => {
@@ -151,21 +155,40 @@ export function CreateChannel(props: CreateChannelsProps) {
     }
   }, []);
 
-  // returns whether inputs passed validation
-  const validateInput = (): boolean => {
-    const errors = {
+  const isInputValid = (): boolean => {
+    const errors: InputErrorsType = {
       name: validateChannelName(name),
-      slackWebhook: channelType === 'SLACK' && validateWebhook(slackWebhook),
-      chimeWebhook: channelType === 'CHIME' && validateWebhook(chimeWebhook),
-      sender: channelType === 'EMAIL' && validateEmailSender(sender),
-      recipients:
-        channelType === 'EMAIL' ||
-        (channelType === 'SES' &&
-          validateRecipients(selectedRecipientGroupOptions)),
+      slackWebhook: [],
+      chimeWebhook: [],
+      sender: [],
+      recipients: [],
+      webhookURL: [],
+      customURLHost: [],
+      customURLPort: [],
+      snsArn: [],
+      iamArn: [],
     };
+    if (channelType === 'SLACK') {
+      errors.slackWebhook = validateWebhookURL(slackWebhook);
+    } else if (channelType === 'CHIME') {
+      errors.chimeWebhook = validateWebhookURL(chimeWebhook);
+    } else if (channelType === 'EMAIL') {
+      errors.sender = validateEmailSender(sender);
+      errors.recipients = validateRecipients(selectedRecipientGroupOptions);
+    } else if (channelType === 'CUSTOM_WEBHOOK') {
+      if (webhookTypeIdSelected === 'WEBHOOK_URL') {
+        errors.webhookURL = validateWebhookURL(webhookURL);
+      } else {
+        errors.customURLHost = validateCustomURLHost(customURLHost);
+        errors.customURLPort = validateCustomURLPort(customURLPort);
+      }
+    } else if (channelType === 'SNS') {
+      errors.snsArn = validateArn(snsArn);
+      if (!isOdfe) errors.iamArn = validateArn(iamArn);
+    }
     setInputErrors(errors);
     return !Object.values(errors).reduce(
-      (errorFlag, curr) => errorFlag || curr,
+      (errorFlag, error) => errorFlag || error.length > 0,
       false
     );
   };
@@ -254,7 +277,7 @@ export function CreateChannel(props: CreateChannelsProps) {
             />
           ) : channelType === 'SNS' ? (
             <SNSSettings
-              isOdfe={true}
+              isOdfe={isOdfe}
               snsArn={snsArn}
               setSnsArn={setSnsArn}
               iamArn={iamArn}
@@ -284,7 +307,7 @@ export function CreateChannel(props: CreateChannelsProps) {
               size="s"
               fill
               onClick={() => {
-                if (!validateInput()) return;
+                if (!isInputValid()) return;
                 location.assign(prevURL);
               }}
             >

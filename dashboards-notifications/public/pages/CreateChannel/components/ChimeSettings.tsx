@@ -16,7 +16,7 @@
 import { EuiFieldText, EuiFormRow } from '@elastic/eui';
 import React, { useContext } from 'react';
 import { CreateChannelContext } from '../CreateChannel';
-import { validateWebhook } from '../utils/validationHelper';
+import { validateWebhookURL } from '../utils/validationHelper';
 
 interface ChimeSettingsProps {
   chimeWebhook: string;
@@ -30,8 +30,8 @@ export function ChimeSettings(props: ChimeSettingsProps) {
     <EuiFormRow
       label="Webhook URL"
       style={{ maxWidth: '700px' }}
-      error="Chime webhook URL is required."
-      isInvalid={context.inputErrors.chimeWebhook}
+      error={context.inputErrors.chimeWebhook.join(' ')}
+      isInvalid={context.inputErrors.chimeWebhook.length > 0}
     >
       <EuiFieldText
         fullWidth
@@ -39,13 +39,10 @@ export function ChimeSettings(props: ChimeSettingsProps) {
         value={props.chimeWebhook}
         onChange={(e) => props.setChimeWebhook(e.target.value)}
         onBlur={() => {
-          const error = validateWebhook(props.chimeWebhook);
-          if (error !== context.inputErrors.chimeWebhook) {
-            context.setInputErrors({
-              ...context.inputErrors,
-              chimeWebhook: error,
-            });
-          }
+          context.setInputErrors({
+            ...context.inputErrors,
+            chimeWebhook: validateWebhookURL(props.chimeWebhook),
+          });
         }}
       />
     </EuiFormRow>

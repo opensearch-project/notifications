@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import { EuiFieldText, EuiFormRow, EuiText, EuiTextArea } from '@elastic/eui';
+import { EuiFieldText, EuiFormRow, EuiTextArea } from '@elastic/eui';
 import React, { useContext } from 'react';
 import { ContentPanel } from '../../../components/ContentPanel';
 import { CreateChannelContext } from '../CreateChannel';
@@ -37,21 +37,18 @@ export function ChannelNamePanel(props: ChannelNamePanelProps) {
       >
         <EuiFormRow
           label="Name"
-          error="Name is required."
-          isInvalid={context.inputErrors.name}
+          error={context.inputErrors.name.join(' ')}
+          isInvalid={context.inputErrors.name.length > 0}
         >
           <EuiFieldText
             placeholder="Enter channel name"
             value={props.name}
             onChange={(e) => props.setName(e.target.value)}
             onBlur={() => {
-              const error = validateChannelName(props.name);
-              if (error !== context.inputErrors.name) {
-                context.setInputErrors({
-                  ...context.inputErrors,
-                  name: error,
-                });
-              }
+              context.setInputErrors({
+                ...context.inputErrors,
+                name: validateChannelName(props.name),
+              });
             }}
           />
         </EuiFormRow>

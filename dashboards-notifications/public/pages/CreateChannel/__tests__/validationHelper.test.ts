@@ -17,7 +17,7 @@ import {
   validateChannelName,
   validateEmailSender,
   validateRecipients,
-  validateWebhook,
+  validateWebhookURL,
 } from '../utils/validationHelper';
 
 // TODO add more detailed test cases when validations are finalized by UX
@@ -30,8 +30,8 @@ describe('test create channel validation helpers', () => {
   });
 
   it('validates slack webhook', () => {
-    const pass = validateWebhook('test');
-    const fail = validateWebhook('');
+    const pass = validateWebhookURL('test');
+    const fail = validateWebhookURL('');
     expect(pass).toBeTruthy;
     expect(fail).toBeFalsy;
   });

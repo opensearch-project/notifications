@@ -120,8 +120,8 @@ export function EmailSettings(props: EmailSettingsProps) {
               <EuiFormRow
                 label="Sender"
                 helpText={`A destination only allows one sender. Use "Create sender" to create a sender with its email address, host, port, encryption method.`}
-                error="Sender is required."
-                isInvalid={context.inputErrors.sender}
+                error={context.inputErrors.sender.join(' ')}
+                isInvalid={context.inputErrors.sender.length > 0}
               >
                 <EuiSuperSelect
                   fullWidth
@@ -129,13 +129,10 @@ export function EmailSettings(props: EmailSettingsProps) {
                   valueOfSelected={props.sender}
                   onChange={props.setSender}
                   onBlur={() => {
-                    const error = validateEmailSender(props.sender);
-                    if (error !== context.inputErrors.sender) {
-                      context.setInputErrors({
-                        ...context.inputErrors,
-                        sender: error,
-                      });
-                    }
+                    context.setInputErrors({
+                      ...context.inputErrors,
+                      sender: validateEmailSender(props.sender),
+                    });
                   }}
                 />
               </EuiFormRow>
@@ -163,8 +160,8 @@ export function EmailSettings(props: EmailSettingsProps) {
           <EuiFormRow
             label="Default recipients"
             helpText={`Add recipient(s) using an email address or pre-created email group. Use "Create email group" to create an email group.`}
-            error="Recipient is required."
-            isInvalid={context.inputErrors.recipients}
+            error={context.inputErrors.recipients.join(' ')}
+            isInvalid={context.inputErrors.recipients.length > 0}
           >
             <EuiComboBox
               placeholder="Email address, email group name"
@@ -175,15 +172,12 @@ export function EmailSettings(props: EmailSettingsProps) {
               onCreateOption={onCreateEmailOption}
               isClearable={true}
               onBlur={() => {
-                const error = validateRecipients(
-                  props.selectedRecipientGroupOptions
-                );
-                if (error !== context.inputErrors.recipients) {
-                  context.setInputErrors({
-                    ...context.inputErrors,
-                    recipients: error,
-                  });
-                }
+                context.setInputErrors({
+                  ...context.inputErrors,
+                  recipients: validateRecipients(
+                    props.selectedRecipientGroupOptions
+                  ),
+                });
               }}
             />
           </EuiFormRow>
