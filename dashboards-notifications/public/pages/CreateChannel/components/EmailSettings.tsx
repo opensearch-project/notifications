@@ -69,13 +69,17 @@ export function EmailSettings(props: EmailSettingsProps) {
     },
   ];
 
-  const senderOptions: Array<EuiSuperSelectOption<string>> = [
+  const [senderOptions, setSenderOptions] = useState<
+    Array<EuiSuperSelectOption<string>>
+  >([
     {
       value: 'Admin',
       inputDisplay: 'Admin',
     },
-  ];
-  const [recipientGroupOptions, setRecipientGroupOptions] = useState([
+  ]);
+  const [recipientGroupOptions, setRecipientGroupOptions] = useState<
+    Array<EuiComboBoxOptionOption<string>>
+  >([
     {
       label: 'no-reply@company.com',
     },
@@ -145,7 +149,12 @@ export function EmailSettings(props: EmailSettingsProps) {
                       size="s"
                       onClick={() =>
                         onShow(CreateSenderModal, {
-                          setSender: props.setSender,
+                          addSenderOptionAndSelect: (
+                            newOption: EuiSuperSelectOption<string>
+                          ) => {
+                            setSenderOptions([...senderOptions, newOption]);
+                            props.setSender(newOption.value);
+                          },
                         })
                       }
                     >
@@ -192,7 +201,22 @@ export function EmailSettings(props: EmailSettingsProps) {
               {({ onShow }) => (
                 <EuiButton
                   size="s"
-                  onClick={() => onShow(CreateRecipientGroupModal, {})}
+                  onClick={() =>
+                    onShow(CreateRecipientGroupModal, {
+                      addRecipientGroupOptionAndSelect: (
+                        newOption: EuiComboBoxOptionOption<string>
+                      ) => {
+                        setRecipientGroupOptions([
+                          ...recipientGroupOptions,
+                          newOption,
+                        ]);
+                        props.setSelectedRecipientGroupOptions([
+                          ...props.selectedRecipientGroupOptions,
+                          newOption,
+                        ]);
+                      },
+                    })
+                  }
                 >
                   Create recipient group
                 </EuiButton>

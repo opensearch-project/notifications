@@ -28,6 +28,10 @@ import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
 import { BREADCRUMBS, ROUTES } from '../../utils/constants';
 import { CreateRecipientGroupForm } from './components/forms/CreateRecipientGroupForm';
+import {
+  validateRecipientGroupEmails,
+  validateRecipientGroupName,
+} from './utils/validationHelper';
 
 interface CreateRecipientGroupProps extends RouteComponentProps {
   edit?: boolean;
@@ -45,6 +49,22 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
       label: 'no-reply@company.com',
     },
   ]);
+  const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>({
+    name: [],
+    emailOptions: [],
+  });
+
+  const isInputValid = (): boolean => {
+    const errors: { [key: string]: string[] } = {
+      name: validateRecipientGroupName(name),
+      emailOptions: validateRecipientGroupEmails(emailOptions),
+    };
+    setInputErrors(errors);
+    return !Object.values(errors).reduce(
+      (errorFlag, error) => errorFlag || error.length > 0,
+      false
+    );
+  };
 
   useEffect(() => {
     context.chrome.setBreadcrumbs([
@@ -84,6 +104,8 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
           setSelectedEmailOptions={setSelectedEmailOptions}
           emailOptions={emailOptions}
           setEmailOptions={setEmailOptions}
+          inputErrors={inputErrors}
+          setInputErrors={setInputErrors}
         />
       </ContentPanel>
       <EuiSpacer />
@@ -94,7 +116,14 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
           </EuiButtonEmpty>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiButton fill size="s">
+          <EuiButton
+            fill
+            size="s"
+            onClick={() => {
+              if (!isInputValid()) return;
+              location.assign(`#${ROUTES.EMAIL_GROUPS}`);
+            }}
+          >
             {props.edit ? 'Save' : 'Create'}
           </EuiButton>
         </EuiFlexItem>

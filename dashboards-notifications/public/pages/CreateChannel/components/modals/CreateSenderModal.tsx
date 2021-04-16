@@ -22,6 +22,7 @@ import {
   EuiModalHeader,
   EuiModalHeaderTitle,
   EuiOverlayMask,
+  EuiSuperSelectOption,
 } from '@elastic/eui';
 import React, { useState } from 'react';
 import { ENCRYPTION_METHOD } from '../../../../../models/interfaces';
@@ -35,7 +36,9 @@ import {
 } from '../../../Emails/utils/validationHelper';
 
 interface CreateSenderModalProps extends ModalRootProps {
-  setSender: (sender: string) => void;
+  addSenderOptionAndSelect: (
+    senderOption: EuiSuperSelectOption<string>
+  ) => void;
   onClose: () => void;
 }
 
@@ -98,7 +101,7 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
             fill
             onClick={() => {
               if (!isInputValid()) return;
-              props.setSender(senderName);
+              props.addSenderOptionAndSelect({ value: senderName });
               props.onClose();
             }}
             size="s"

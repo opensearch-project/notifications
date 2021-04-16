@@ -23,6 +23,10 @@ import {
   EuiTextArea,
 } from '@elastic/eui';
 import React from 'react';
+import {
+  validateRecipientGroupEmails,
+  validateRecipientGroupName,
+} from '../../utils/validationHelper';
 
 interface CreateRecipientGroupFormProps {
   name: string;
@@ -35,6 +39,8 @@ interface CreateRecipientGroupFormProps {
   ) => void;
   emailOptions: Array<{ label: string }>;
   setEmailOptions: (options: Array<{ label: string }>) => void;
+  inputErrors: { [key: string]: string[] };
+  setInputErrors: (errors: { [key: string]: string[] }) => void;
 }
 
 export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
@@ -62,12 +68,20 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
         label="Name"
         style={{ maxWidth: '650px' }}
         helpText="The name must contain 2 to 50 characters. Valid characters are lowercase A-Z, a-z, 0-9, (_) underscore, (-) hyphen and unicode characters."
+        error={props.inputErrors.name.join(' ')}
+        isInvalid={props.inputErrors.name.length > 0}
       >
         <EuiFieldText
           fullWidth
           placeholder="Enter recipient group name"
           value={props.name}
           onChange={(e) => props.setName(e.target.value)}
+          onBlur={() => {
+            props.setInputErrors({
+              ...props.inputErrors,
+              name: validateRecipientGroupName(props.name),
+            });
+          }}
         />
       </EuiFormRow>
 
@@ -95,7 +109,12 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
       </EuiFormRow>
 
       <EuiSpacer size="m" />
-      <EuiFormRow label="Emails" style={{ maxWidth: '650px' }}>
+      <EuiFormRow
+        label="Emails"
+        style={{ maxWidth: '650px' }}
+        error={props.inputErrors.emailOptions.join(' ')}
+        isInvalid={props.inputErrors.emailOptions.length > 0}
+      >
         <EuiComboBox
           placeholder="Email addresses"
           fullWidth
@@ -104,6 +123,14 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
           onChange={props.setSelectedEmailOptions}
           onCreateOption={onCreateEmailOption}
           isClearable={true}
+          onBlur={() => {
+            props.setInputErrors({
+              ...props.inputErrors,
+              emailOptions: validateRecipientGroupEmails(
+                props.selectedEmailOptions
+              ),
+            });
+          }}
         />
       </EuiFormRow>
 

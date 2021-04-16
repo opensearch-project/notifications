@@ -13,6 +13,8 @@
  * permissions and limitations under the License.
  */
 
+import { EuiComboBoxOptionOption } from '@elastic/eui';
+
 export const validateSenderName = (name: string) => {
   const errors = [];
   if (name.length === 0) errors.push('Invalid sender name.');
@@ -36,5 +38,19 @@ export const validatePort = (port: string) => {
   const portNum = parseInt(port);
   if (isNaN(portNum) || portNum < 0 || portNum > 65535)
     errors.push('Invalid port.');
+  return errors;
+};
+
+export const validateRecipientGroupName = (name: string) => {
+  const errors = [];
+  if (name.length === 0) errors.push('Invalid recipient group name.');
+  return errors;
+};
+
+export const validateRecipientGroupEmails = (
+  emails: Array<EuiComboBoxOptionOption<string>>
+) => {
+  const errors = [];
+  if (emails.length === 0) errors.push('Invalid email addresses.');
   return errors;
 };

@@ -27,8 +27,15 @@ import {
 import React, { useState } from 'react';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 import { CreateRecipientGroupForm } from '../../../Emails/components/forms/CreateRecipientGroupForm';
+import {
+  validateRecipientGroupEmails,
+  validateRecipientGroupName,
+} from '../../../Emails/utils/validationHelper';
 
 interface CreateRecipientGroupModalProps extends ModalRootProps {
+  addRecipientGroupOptionAndSelect: (
+    recipientGroupOption: EuiComboBoxOptionOption<string>
+  ) => void;
   onClose: () => void;
 }
 
@@ -45,6 +52,22 @@ export function CreateRecipientGroupModal(
       label: 'no-reply@company.com',
     },
   ]);
+  const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>({
+    name: [],
+    emailOptions: [],
+  });
+
+  const isInputValid = (): boolean => {
+    const errors: { [key: string]: string[] } = {
+      name: validateRecipientGroupName(name),
+      emailOptions: validateRecipientGroupEmails(emailOptions),
+    };
+    setInputErrors(errors);
+    return !Object.values(errors).reduce(
+      (errorFlag, error) => errorFlag || error.length > 0,
+      false
+    );
+  };
 
   return (
     <EuiOverlayMask>
@@ -63,6 +86,8 @@ export function CreateRecipientGroupModal(
             setSelectedEmailOptions={setSelectedEmailOptions}
             emailOptions={emailOptions}
             setEmailOptions={setEmailOptions}
+            inputErrors={inputErrors}
+            setInputErrors={setInputErrors}
           />
         </EuiModalBody>
 
@@ -70,7 +95,15 @@ export function CreateRecipientGroupModal(
           <EuiButtonEmpty onClick={props.onClose} size="s">
             Cancel
           </EuiButtonEmpty>
-          <EuiButton fill onClick={props.onClose} size="s">
+          <EuiButton
+            fill
+            onClick={() => {
+              if (!isInputValid()) return;
+              props.addRecipientGroupOptionAndSelect({ label: name });
+              props.onClose();
+            }}
+            size="s"
+          >
             Create
           </EuiButton>
         </EuiModalFooter>
