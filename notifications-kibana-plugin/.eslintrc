@@ -1,9 +1,0 @@
----
-extends: '@elastic/kibana'
-
-settings:
-  import/resolver:
-    '@kbn/eslint-import-resolver-kibana':
-      rootPackageName: 'opendistro_notifications_kibana_plugin'
-      pluginPaths:
-        - .

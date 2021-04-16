@@ -1,0 +1,9 @@
+---
+extends: '@elastic/kibana'
+
+settings:
+  import/resolver:
+    '@osd/eslint-import-resolver-kibana':
+      rootPackageName: 'notifications-dashboards'
+      pluginPaths:
+        - .
