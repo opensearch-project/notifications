@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import { CoreStart } from 'kibana/public';
+import { CoreStart } from 'opensearch-dashboards/public';
 import { NotificationService } from '../../public/services';
 import httpClientMock from './httpClientMock';
 
