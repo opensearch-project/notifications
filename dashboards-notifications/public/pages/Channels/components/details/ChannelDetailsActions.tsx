@@ -20,8 +20,9 @@ import {
   EuiTextColor,
 } from '@elastic/eui';
 import { TextColor } from '@elastic/eui/src/components/text/text_color';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ChannelItemType } from '../../../../../models/interfaces';
+import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalConsumer } from '../../../../components/Modal';
 import { ROUTES } from '../../../../utils/constants';
 import { DeleteChannelModal } from '../modals/DeleteChannelModal';
@@ -32,6 +33,7 @@ interface ChannelDetailsActionsParams {
   modal?: React.ReactNode;
   modalParams?: object;
   href?: string;
+  action?: () => void;
 }
 
 interface ChannelDetailsActionsProps {
@@ -39,6 +41,7 @@ interface ChannelDetailsActionsProps {
 }
 
 export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
+  const coreContext = useContext(CoreServicesContext)!;
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const actions: ChannelDetailsActionsParams[] = [
@@ -48,12 +51,19 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
     },
     {
       label: 'Send test message',
-      modal: DeleteChannelModal,
+      action: () => {
+        coreContext.notifications.toasts.addSuccess(
+          'Successfully sent a test message.'
+        );
+      },
     },
     {
       label: 'Delete',
       color: 'danger',
       modal: DeleteChannelModal,
+      modalParams: {
+        href: `#${ROUTES.CHANNELS}`
+      }
     },
   ];
 
@@ -87,6 +97,7 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
                   });
                 }
                 if (params.href) location.assign(params.href);
+                if (params.action) params.action();
               }}
             >
               {params.color ? (

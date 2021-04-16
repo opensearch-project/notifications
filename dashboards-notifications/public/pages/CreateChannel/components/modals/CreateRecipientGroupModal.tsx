@@ -24,7 +24,8 @@ import {
   EuiModalHeaderTitle,
   EuiOverlayMask,
 } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 import { CreateRecipientGroupForm } from '../../../Emails/components/forms/CreateRecipientGroupForm';
 import {
@@ -42,6 +43,7 @@ interface CreateRecipientGroupModalProps extends ModalRootProps {
 export function CreateRecipientGroupModal(
   props: CreateRecipientGroupModalProps
 ) {
+  const coreContext = useContext(CoreServicesContext)!;
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedEmailOptions, setSelectedEmailOptions] = useState<
@@ -98,7 +100,15 @@ export function CreateRecipientGroupModal(
           <EuiButton
             fill
             onClick={() => {
-              if (!isInputValid()) return;
+              if (!isInputValid()) {
+                coreContext.notifications.toasts.addDanger(
+                  'Some fields are invalid, please check your inputs.'
+                );
+                return;
+              }
+              coreContext.notifications.toasts.addSuccess(
+                `${name} successfully created. You can select ${name} from the list of recipient groups.`
+              );
               props.addRecipientGroupOptionAndSelect({ label: name });
               props.onClose();
             }}

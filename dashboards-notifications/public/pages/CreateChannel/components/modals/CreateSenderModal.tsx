@@ -24,8 +24,9 @@ import {
   EuiOverlayMask,
   EuiSuperSelectOption,
 } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ENCRYPTION_METHOD } from '../../../../../models/interfaces';
+import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 import { CreateSenderForm } from '../../../Emails/components/forms/CreateSenderForm';
 import {
@@ -43,6 +44,7 @@ interface CreateSenderModalProps extends ModalRootProps {
 }
 
 export function CreateSenderModal(props: CreateSenderModalProps) {
+  const coreContext = useContext(CoreServicesContext)!;
   const [senderName, setSenderName] = useState('');
   const [email, setEmail] = useState('');
   const [host, setHost] = useState('');
@@ -100,7 +102,15 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
           <EuiButton
             fill
             onClick={() => {
-              if (!isInputValid()) return;
+              if (!isInputValid()) {
+                coreContext.notifications.toasts.addDanger(
+                  'Some fields are invalid, please check your inputs.'
+                );
+                return;
+              }
+              coreContext.notifications.toasts.addSuccess(
+                `${senderName} sender successfully created. You can select ${senderName} from the list of senders.`
+              );
               props.addSenderOptionAndSelect({
                 value: senderName,
                 inputDisplay: senderName,

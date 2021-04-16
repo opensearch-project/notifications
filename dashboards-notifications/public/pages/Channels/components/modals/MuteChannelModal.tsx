@@ -26,8 +26,9 @@ import {
   EuiOverlayMask,
   EuiText,
 } from '@elastic/eui';
-import React from 'react';
+import React, { useContext } from 'react';
 import { ChannelItemType } from '../../../../../models/interfaces';
+import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 
 interface MuteChannelModalProps extends ModalRootProps {
@@ -39,8 +40,13 @@ interface MuteChannelModalProps extends ModalRootProps {
 export const MuteChannelModal = (props: MuteChannelModalProps) => {
   if (props.channels.length !== 1) return null;
 
+  const coreContext = useContext(CoreServicesContext)!;
+
   // do not show modal on unmute
   if (!props.mute) {
+    coreContext.notifications.toasts.addSuccess(
+      `${props.channels[0].name} successfully unmuted.`
+    );
     return null;
   }
 
@@ -62,7 +68,15 @@ export const MuteChannelModal = (props: MuteChannelModalProps) => {
               <EuiButtonEmpty onClick={props.onClose}>Cancel</EuiButtonEmpty>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiButton fill onClick={props.onClose}>
+              <EuiButton
+                fill
+                onClick={() => {
+                  coreContext.notifications.toasts.addSuccess(
+                    `${props.channels[0].name} successfully muted.`
+                  );
+                  props.onClose();
+                }}
+              >
                 Mute
               </EuiButton>
             </EuiFlexItem>

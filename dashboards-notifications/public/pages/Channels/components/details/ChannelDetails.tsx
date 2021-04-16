@@ -41,12 +41,12 @@ import { ChannelSettingsDetails } from './ChannelSettingsDetails';
 interface ChannelDetailsProps extends RouteComponentProps<{ id: string }> {}
 
 export function ChannelDetails(props: ChannelDetailsProps) {
-  const context = useContext(CoreServicesContext)!;
+  const coreContext = useContext(CoreServicesContext)!;
   const id = props.match.params.id;
   const [channel, setChannel] = useState<ChannelItemType>();
 
   useEffect(() => {
-    context.chrome.setBreadcrumbs([
+    coreContext.chrome.setBreadcrumbs([
       BREADCRUMBS.NOTIFICATIONS,
       BREADCRUMBS.CHANNELS,
       {

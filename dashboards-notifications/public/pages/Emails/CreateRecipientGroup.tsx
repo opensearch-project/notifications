@@ -38,7 +38,7 @@ interface CreateRecipientGroupProps extends RouteComponentProps {
 }
 
 export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
-  const context = useContext(CoreServicesContext)!;
+  const coreContext = useContext(CoreServicesContext)!;
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedEmailOptions, setSelectedEmailOptions] = useState<
@@ -67,7 +67,7 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
   };
 
   useEffect(() => {
-    context.chrome.setBreadcrumbs([
+    coreContext.chrome.setBreadcrumbs([
       BREADCRUMBS.NOTIFICATIONS,
       BREADCRUMBS.EMAIL_GROUPS,
       props.edit
@@ -120,7 +120,15 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
             fill
             size="s"
             onClick={() => {
-              if (!isInputValid()) return;
+              if (!isInputValid()) {
+                coreContext.notifications.toasts.addDanger(
+                  'Some fields are invalid, please check your inputs.'
+                );
+                return;
+              }
+              coreContext.notifications.toasts.addSuccess(
+                `${name} successfully created.`
+              );
               location.assign(`#${ROUTES.EMAIL_GROUPS}`);
             }}
           >

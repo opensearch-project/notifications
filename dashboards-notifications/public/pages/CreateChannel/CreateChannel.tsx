@@ -300,14 +300,31 @@ export function CreateChannel(props: CreateChannelsProps) {
             </EuiButtonEmpty>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButton size="s">Send test message</EuiButton>
+            <EuiButton
+              size="s"
+              onClick={() => {
+                coreContext.notifications.toasts.addSuccess(
+                  'Successfully sent a test message.'
+                );
+              }}
+            >
+              Send test message
+            </EuiButton>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButton
               size="s"
               fill
               onClick={() => {
-                if (!isInputValid()) return;
+                if (!isInputValid()) {
+                  coreContext.notifications.toasts.addDanger(
+                    'Some fields are invalid, please check your inputs.'
+                  );
+                  return;
+                }
+                coreContext.notifications.toasts.addSuccess(
+                  `${name} successfully created.`
+                );
                 location.assign(prevURL);
               }}
             >

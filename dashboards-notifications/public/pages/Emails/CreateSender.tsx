@@ -40,23 +40,21 @@ interface CreateSenderProps extends RouteComponentProps {
 }
 
 export function CreateSender(props: CreateSenderProps) {
-  const context = useContext(CoreServicesContext)!;
+  const coreContext = useContext(CoreServicesContext)!;
   const [senderName, setSenderName] = useState('');
   const [email, setEmail] = useState('');
   const [host, setHost] = useState('');
   const [port, setPort] = useState('465');
   const [encryption, setEncryption] = useState<ENCRYPTION_METHOD>('SSL');
-  const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>(
-    {
-      senderName: [],
-      email: [],
-      host: [],
-      port: [],
-    }
-  );
+  const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>({
+    senderName: [],
+    email: [],
+    host: [],
+    port: [],
+  });
 
   useEffect(() => {
-    context.chrome.setBreadcrumbs([
+    coreContext.chrome.setBreadcrumbs([
       BREADCRUMBS.NOTIFICATIONS,
       BREADCRUMBS.EMAIL_GROUPS,
       props.edit ? BREADCRUMBS.EDIT_SENDER : BREADCRUMBS.CREATE_SENDER,
@@ -124,7 +122,15 @@ export function CreateSender(props: CreateSenderProps) {
             size="s"
             fill
             onClick={() => {
-              if (!isInputValid()) return;
+              if (!isInputValid()) {
+                coreContext.notifications.toasts.addDanger(
+                  'Some fields are invalid, please check your inputs.'
+                );
+                return;
+              }
+              coreContext.notifications.toasts.addSuccess(
+                `${senderName} sender successfully created.`
+              );
               location.assign(`#${ROUTES.EMAIL_GROUPS}`);
             }}
           >

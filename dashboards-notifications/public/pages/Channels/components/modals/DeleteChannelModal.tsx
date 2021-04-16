@@ -28,18 +28,21 @@ import {
   EuiSpacer,
   EuiText,
 } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ChannelItemType } from '../../../../../models/interfaces';
+import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 
 interface DeleteChannelModalProps extends ModalRootProps {
   channels: ChannelItemType[];
+  href?: string;
   onClose: () => void;
 }
 
 export const DeleteChannelModal = (props: DeleteChannelModalProps) => {
   if (!props.channels.length) return null;
 
+  const coreContext = useContext(CoreServicesContext)!;
   const [input, setInput] = useState('');
   const num = props.channels.length;
   const name = num >= 2 ? `${num} channels` : props.channels[0].name;
@@ -89,7 +92,17 @@ export const DeleteChannelModal = (props: DeleteChannelModalProps) => {
               <EuiButton
                 fill
                 color="danger"
-                onClick={props.onClose}
+                onClick={() => {
+                  coreContext.notifications.toasts.addSuccess(
+                    `${
+                      props.channels.length > 1
+                        ? props.channels.length + ' channels'
+                        : props.channels[0].name
+                    } successfully deleted.`
+                  );
+                  props.onClose();
+                  if (props.href) location.assign(props.href);
+                }}
                 disabled={input !== 'delete'}
               >
                 Delete
