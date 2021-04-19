@@ -78,7 +78,7 @@ check.dependsOn jacocoTestReport
 opensearchplugin {
     name 'opensearch-notifications'
     description 'OpenSearch Notifications Plugin'
-    classname 'com.amazon.opensearch.notifications.NotificationPlugin'
+    classname 'org.opensearch.notifications.NotificationPlugin'
     extendedPlugins = []
 }
 
@@ -93,7 +93,7 @@ repositories {
 }
 
 allOpen {
-    annotation("com.amazon.opensearch.notifications.util.OpenForTesting")
+    annotation("org.opensearch.notifications.util.OpenForTesting")
 }
 
 configurations {
@@ -131,7 +131,7 @@ ext {
 }
 
 allprojects {
-    group = "com.amazon.opensearch"
+    group = "org.opensearch"
     version = "${openSearchVersion}.0"
 
     plugins.withId('java') {
@@ -262,7 +262,7 @@ testClusters.integTest {
     // Cluster shrink exception thrown if we try to set numberOfNodes to 1, so only apply if > 1
     if (_numNodes > 1) numberOfNodes = _numNodes
     // When running integration tests it doesn't forward the --debug-jvm to the cluster anymore
-    // i.e. we have to use a custom property to flag when we want to debug opensearch JVM
+    // i.e. we have to use a custom property to flag when we want to debug OpenSearch JVM
     // since we also support multi node integration tests we increase debugPort per node
     if (System.getProperty("cluster.debug") != null) {
         def debugPort = 5005
