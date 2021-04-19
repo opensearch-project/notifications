@@ -1,10 +1,10 @@
 [![codecov](https://codecov.io/gh/opendistro-for-elasticsearch/notifications/branch/develop/graph/badge.svg?token=VV8JDA5DKY)](https://codecov.io/gh/opendistro-for-elasticsearch/notifications)
 
 
-# Notifications plugin for Open Distro
+# Notifications plugin for OpenSearch
 
 ## Overview
-Notifications plugin for Open Distro enables other plugins to send notifications via Email, Slack, Amazon Chime, Custom web-hook etc channels
+Notifications plugin for OpenSearch enables other plugins to send notifications via Email, Slack, Amazon Chime, Custom web-hook etc channels
 
 ## Highlights
 
@@ -25,7 +25,7 @@ Please see our [documentation](https://opendistro.github.io/for-elasticsearch-do
 
 ### Setup email notification using localhost email relay/server
 
-1. Run local email server on the machine where ES is running. e.g. for Mac, run command `sudo postfix start`
+1. Run local email server on the machine where OpenSearch is running. e.g. for Mac, run command `sudo postfix start`
 1. Verify that local email server does not require any authentication (Make sure server is listening on local port only)
 1. Update the `notification.yml` configuration file according to your setup
 
@@ -44,7 +44,7 @@ While using Amazon SES as email channel for sending mail, use below procedure fo
 This project uses following tools
 
 1. [Gradle](https://docs.gradle.org/current/userguide/userguide.html) build system. Gradle comes with an excellent documentation that should be your first stop when trying to figure out how to operate or modify the build.
-1. Elastic build tools for Gradle.  These tools are idiosyncratic and don't always follow the conventions and instructions for building regular Java code using Gradle. If you encounter such a situation, the Elastic build tools [source code](https://github.com/elastic/elasticsearch/tree/master/buildSrc/src/main/groovy/org/elasticsearch/gradle) is your best bet for figuring out what's going on.
+1. OpenSearch build tools for Gradle.  These tools are idiosyncratic and don't always follow the conventions and instructions for building regular Java code using Gradle. If you encounter such a situation, the OpenSearch build tools is your best bet for figuring out what's going on.
 
 ### Building from the command line
 
@@ -63,18 +63,18 @@ When launching a cluster using above commands, logs are placed in `notifications
 
 1. Setup a local ODFE cluster with security plugin.
 - `./gradlew build`
-- `./gradlew integTest -Dtests.rest.cluster=localhost:9200 -Dtests.cluster=localhost:9200 -Dtests.clustername=es-integrationtest -Dhttps=true -Duser=admin -Dpassword=admin`
-- `./gradlew integTestRunner -Dtests.rest.cluster=localhost:9200 -Dtests.cluster=localhost:9200 -Dtests.clustername=es-integrationtest -Dhttps=true -Duser=admin -Dpassword=admin --tests "<test name>"`
+- `./gradlew integTest -Dtests.rest.cluster=localhost:9200 -Dtests.cluster=localhost:9200 -Dtests.clustername=opensearch-integrationtest -Dhttps=true -Duser=admin -Dpassword=admin`
+- `./gradlew integTestRunner -Dtests.rest.cluster=localhost:9200 -Dtests.cluster=localhost:9200 -Dtests.clustername=opensearch-integrationtest -Dhttps=true -Duser=admin -Dpassword=admin --tests "<test name>"`
 
 ### Debugging
 
-Sometimes it's useful to attach a debugger to either the Elasticsearch cluster, or the integ tests to see what's going on. When running unit tests, hit **Debug** from the IDE's gutter to debug the tests.
+Sometimes it's useful to attach a debugger to either the OpenSearch cluster, or the integ tests to see what's going on. When running unit tests, hit **Debug** from the IDE's gutter to debug the tests.
 You must start your debugger to listen for remote JVM before running the below commands.
 
 To debug code running in an actual server, run:
 
 ```
-./gradlew integTest -Des.debug # to start a cluster and run integ tests
+./gradlew integTest -Dopensearch.debug # to start a cluster and run integ tests
 ```
 
 OR
@@ -83,7 +83,7 @@ OR
 ./gradlew run --debug-jvm # to just start a cluster that can be debugged
 ```
 
-The Elasticsearch server JVM will launch suspended and wait for a debugger to attach to `localhost:5005` before starting the Elasticsearch server.
+The OpenSearch server JVM will launch suspended and wait for a debugger to attach to `localhost:5005` before starting the OpenSearch server.
 The IDE needs to listen for the remote JVM. If using Intellij you must set your debug-configuration to "Listen to remote JVM" and make sure "Auto Restart" is checked.
 You must start your debugger to listen for remote JVM before running the commands.
 
@@ -98,7 +98,7 @@ The test runner JVM will start suspended and wait for a debugger to attach to `l
 
 ### Advanced: Launching multi-node clusters locally
 
-Sometimes you need to launch a cluster with more than one Elasticsearch server process.
+Sometimes you need to launch a cluster with more than one OpenSearch server process.
 
 You can do this by running `./gradlew run -PnumNodes=<numberOfNodesYouWant>`
 
