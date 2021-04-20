@@ -52,9 +52,22 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
     {
       label: 'Send test message',
       action: () => {
-        coreContext.notifications.toasts.addSuccess(
-          'Successfully sent a test message.'
-        );
+        if (Math.random() < 0.5) {
+          coreContext.notifications.toasts.addSuccess(
+            'Successfully sent a test message.'
+          );
+        } else {
+          const error: Error = {
+            name: 'Error details',
+            message:
+              'Message cannot be sent. Security_team (PagerDuty) webhook is invalid.',
+            stack: `TypeError: Failed to fetch\n\tat Fetch.fetchResponse (http://localhost:5601/9007199254740991/bundles/core/core.entry.js:17006:13)\n\tat async interceptResponse (http://localhost:5601/9007199254740991/bundles/core/core.entry.js:17444:10)\n\tat async http://localhost:5601/9007199254740991/bundles/core/core.entry.js:16930:39`,
+          };
+          coreContext.notifications.toasts.addError(error, {
+            title: 'Failed to send the test message.',
+            toastMessage: 'View error details and adjust the channel settings.',
+          });
+        }
       },
     },
     {
@@ -62,8 +75,8 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
       color: 'danger',
       modal: DeleteChannelModal,
       modalParams: {
-        href: `#${ROUTES.CHANNELS}`
-      }
+        href: `#${ROUTES.CHANNELS}`,
+      },
     },
   ];
 
