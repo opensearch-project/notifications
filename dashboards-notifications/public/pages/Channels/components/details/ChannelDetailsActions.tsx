@@ -47,7 +47,7 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
   const actions: ChannelDetailsActionsParams[] = [
     {
       label: 'Edit',
-      href: `#${ROUTES.EDIT_CHANNEL}/${props.channel.id}`,
+      href: `#${ROUTES.EDIT_CHANNEL}/${props.channel.id}?from=details`,
     },
     {
       label: 'Send test message',

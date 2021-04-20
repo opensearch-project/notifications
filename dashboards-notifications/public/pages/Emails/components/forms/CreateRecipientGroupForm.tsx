@@ -112,8 +112,8 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
           </EuiText>
           <EuiTextArea
             fullWidth
-            placeholder="Description"
-            style={{ height: '5.5rem' }}
+            placeholder="What is the purpose of this recipient group?"
+            style={{ height: '4.1rem' }}
             value={props.description}
             onChange={(e) => props.setDescription(e.target.value)}
           />
@@ -134,6 +134,7 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
           selectedOptions={props.selectedEmailOptions}
           onChange={props.setSelectedEmailOptions}
           onCreateOption={onCreateEmailOption}
+          customOptionText={'Add {searchValue} as a default recipient'}
           isClearable={true}
           isInvalid={props.inputErrors.emailOptions.length > 0}
           onBlur={() => {

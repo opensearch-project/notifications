@@ -146,7 +146,7 @@ export function NotificationsTable(props: NotificationsTableProps) {
     <>
       <ContentPanel
         bodyStyles={{ padding: 'initial' }}
-        title="Notification History"
+        title="Notification history"
         titleSize="m"
       >
         <EuiBasicTable

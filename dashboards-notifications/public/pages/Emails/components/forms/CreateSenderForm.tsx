@@ -105,7 +105,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
             isInvalid={props.inputErrors.email.length > 0}
           >
             <EuiFieldText
-              placeholder="Enter email address"
+              placeholder="name@example.com"
               value={props.email}
               onChange={(e) => props.setEmail(e.target.value)}
               isInvalid={props.inputErrors.email.length > 0}
@@ -125,7 +125,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
             isInvalid={props.inputErrors.host.length > 0}
           >
             <EuiFieldText
-              placeholder="Enter host"
+              placeholder="smtp.example.com"
               value={props.host}
               onChange={(e) => props.setHost(e.target.value)}
               isInvalid={props.inputErrors.host.length > 0}
@@ -145,7 +145,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
             isInvalid={props.inputErrors.port.length > 0}
           >
             <EuiFieldNumber
-              placeholder="Enter port"
+              placeholder="465"
               value={props.port}
               onChange={(e) => props.setPort(e.target.value)}
               isInvalid={props.inputErrors.port.length > 0}

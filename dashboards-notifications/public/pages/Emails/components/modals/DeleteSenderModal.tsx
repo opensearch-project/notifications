@@ -39,8 +39,9 @@ import {
   EuiSpacer,
   EuiText,
 } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { SenderItemType } from '../../../../../models/interfaces';
+import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 
 interface DeleteSenderModalProps extends ModalRootProps {
@@ -51,6 +52,7 @@ interface DeleteSenderModalProps extends ModalRootProps {
 export const DeleteSenderModal = (props: DeleteSenderModalProps) => {
   if (!props.senders.length) return null;
 
+  const coreContext = useContext(CoreServicesContext)!;
   const [input, setInput] = useState('');
   const num = props.senders.length;
   const name = num >= 2 ? `${num} senders` : props.senders[0].name;
@@ -100,7 +102,16 @@ export const DeleteSenderModal = (props: DeleteSenderModalProps) => {
               <EuiButton
                 fill
                 color="danger"
-                onClick={props.onClose}
+                onClick={() => {
+                  coreContext.notifications.toasts.addSuccess(
+                    `${
+                      props.senders.length > 1
+                        ? props.senders.length + ' senders'
+                        : props.senders[0].name
+                    } successfully deleted.`
+                  );
+                  props.onClose();
+                }}
                 disabled={input !== 'delete'}
               >
                 Delete

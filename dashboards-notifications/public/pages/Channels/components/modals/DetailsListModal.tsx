@@ -35,7 +35,6 @@ interface DetailsListModalProps extends ModalRootProps {
 }
 
 export function DetailsListModal(props: DetailsListModalProps) {
-  console.log('props', props);
   return (
     <>
       <EuiOverlayMask>

@@ -113,7 +113,7 @@ export function CreateRecipientGroupModal(
             onClick={() => {
               if (!isInputValid()) {
                 coreContext.notifications.toasts.addDanger(
-                  'Some fields are invalid, please check your inputs.'
+                  'Some fields are invalid. Fix all highlighted error(s) before continuing.'
                 );
                 return;
               }

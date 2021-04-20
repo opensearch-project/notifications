@@ -133,12 +133,12 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
             onClick={() => {
               if (!isInputValid()) {
                 coreContext.notifications.toasts.addDanger(
-                  'Some fields are invalid, please check your inputs.'
+                  'Some fields are invalid. Fix all highlighted error(s) before continuing.'
                 );
                 return;
               }
               coreContext.notifications.toasts.addSuccess(
-                `${name} successfully created.`
+                `${name} successfully ${props.edit ? 'updated' : 'created'}.`
               );
               location.assign(`#${ROUTES.EMAIL_GROUPS}`);
             }}

@@ -74,7 +74,7 @@ export function ChannelNamePanel(props: ChannelNamePanelProps) {
           <>
             <EuiTextArea
               placeholder="What is the purpose of this channel?"
-              style={{ height: '2.8rem' }}
+              style={{ height: '4.1rem' }}
               value={props.description}
               onChange={(e) => props.setDescription(e.target.value)}
             />

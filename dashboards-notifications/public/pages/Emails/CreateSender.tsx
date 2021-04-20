@@ -55,7 +55,7 @@ export function CreateSender(props: CreateSenderProps) {
   const [senderName, setSenderName] = useState('');
   const [email, setEmail] = useState('');
   const [host, setHost] = useState('');
-  const [port, setPort] = useState('465');
+  const [port, setPort] = useState('');
   const [encryption, setEncryption] = useState<ENCRYPTION_METHOD>('SSL');
   const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>({
     senderName: [],
@@ -135,12 +135,14 @@ export function CreateSender(props: CreateSenderProps) {
             onClick={() => {
               if (!isInputValid()) {
                 coreContext.notifications.toasts.addDanger(
-                  'Some fields are invalid, please check your inputs.'
+                  'Some fields are invalid. Fix all highlighted error(s) before continuing.'
                 );
                 return;
               }
               coreContext.notifications.toasts.addSuccess(
-                `${senderName} sender successfully created.`
+                `${senderName} sender successfully ${
+                  props.edit ? 'updated' : 'created'
+                }.`
               );
               location.assign(`#${ROUTES.EMAIL_GROUPS}`);
             }}

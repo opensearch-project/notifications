@@ -78,7 +78,7 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
         isInvalid={context.inputErrors.webhookURL.length > 0}
       >
         <EuiFieldText
-          placeholder="Enter webhook URL"
+          placeholder="https://name.example.com/XXXXX..."
           value={props.webhookURL}
           onChange={(e) => props.setWebhookURL(e.target.value)}
           isInvalid={context.inputErrors.webhookURL.length > 0}
@@ -102,7 +102,7 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
           isInvalid={context.inputErrors.customURLHost.length > 0}
         >
           <EuiFieldText
-            placeholder="Enter host name"
+            placeholder="name.example.com"
             value={props.customURLHost}
             onChange={(e) => props.setCustomURLHost(e.target.value)}
             isInvalid={context.inputErrors.customURLHost.length > 0}
@@ -115,7 +115,11 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
           />
         </EuiFormRow>
         <EuiFormRow
-          label="Port"
+          label={
+            <span>
+              Port - <i style={{ fontWeight: 'normal' }}>optional</i>
+            </span>
+          }
           error={context.inputErrors.customURLPort.join(' ')}
           isInvalid={context.inputErrors.customURLPort.length > 0}
         >
@@ -132,7 +136,13 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
             }}
           />
         </EuiFormRow>
-        <EuiFormRow label="Path">
+        <EuiFormRow
+          label={
+            <span>
+              Path - <i style={{ fontWeight: 'normal' }}>optional</i>
+            </span>
+          }
+        >
           <EuiFieldText
             placeholder="Enter path"
             value={props.customURLPath}

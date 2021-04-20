@@ -44,25 +44,16 @@ export function EmptyState(props: EmptyStateProps) {
           body={
             <EuiText>
               <div>
-                Create a channel and then configure notify actions from
-                supported Kibana features such as Alerting and Index Management.
-              </div>
-              <br />
-              <div>
-                Dashboard will generate insights on the notifications sent to
-                all of your channels.
-              </div>
-              <br />
-              <div>
-                Read about{' '}
+                Create a channel, and then configure actions to get
+                notifications from features like Alerting and Index Management.{' '}
                 <EuiLink href={DOCUMENTATION_LINK} target="_blank" external>
-                  Get started with Notifications
+                  Learn more
                 </EuiLink>
               </div>
             </EuiText>
           }
           actions={
-            <EuiButton href={`#${ROUTES.CREATE_CHANNEL}`} size="s">
+            <EuiButton href={`#${ROUTES.CREATE_CHANNEL}`} size="s" fill>
               Create channel
             </EuiButton>
           }

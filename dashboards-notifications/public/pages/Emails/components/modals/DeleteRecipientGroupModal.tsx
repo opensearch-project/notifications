@@ -39,8 +39,9 @@ import {
   EuiSpacer,
   EuiText,
 } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { RecipientGroupItemType } from '../../../../../models/interfaces';
+import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 
 interface DeleteRecipientGroupModalProps extends ModalRootProps {
@@ -53,6 +54,7 @@ export const DeleteRecipientGroupModal = (
 ) => {
   if (!props.recipientGroups.length) return null;
 
+  const coreContext = useContext(CoreServicesContext)!;
   const [input, setInput] = useState('');
   const num = props.recipientGroups.length;
   const name =
@@ -103,7 +105,16 @@ export const DeleteRecipientGroupModal = (
               <EuiButton
                 fill
                 color="danger"
-                onClick={props.onClose}
+                onClick={() => {
+                  coreContext.notifications.toasts.addSuccess(
+                    `${
+                      props.recipientGroups.length > 1
+                        ? props.recipientGroups.length + ' recipient groups'
+                        : props.recipientGroups[0].name
+                    } successfully deleted.`
+                  );
+                  props.onClose();
+                }}
                 disabled={input !== 'delete'}
               >
                 Delete

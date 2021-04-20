@@ -35,7 +35,7 @@ export function ChimeSettings(props: ChimeSettingsProps) {
     >
       <EuiFieldText
         fullWidth
-        placeholder="Enter Chime webhook URL"
+        placeholder="https://hooks.chime.aws/incomingwebhooks/XXXXX..."
         value={props.chimeWebhook}
         onChange={(e) => props.setChimeWebhook(e.target.value)}
         isInvalid={context.inputErrors.chimeWebhook.length > 0}
