@@ -25,12 +25,6 @@
  */
 
 import {
-  RecipientGroupItemType,
-  TableState,
-} from '../../../../../models/interfaces';
-import { Component } from 'react';
-import { CoreServicesContext } from '../../../../components/coreServices';
-import {
   EuiBasicTable,
   EuiButton,
   EuiEmptyPrompt,
@@ -39,17 +33,23 @@ import {
   EuiTableFieldDataColumnType,
   EuiTableSortingType,
 } from '@elastic/eui';
-import { SORT_DIRECTION } from '../../../../../common';
-import { ROUTES } from '../../../../utils/constants';
-import React from 'react';
 import { Criteria } from '@elastic/eui/src/components/basic_table/basic_table';
 import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_bar';
-import { DEFAULT_PAGE_SIZE_OPTIONS } from '../../../Notifications/utils/constants';
+import React, { Component } from 'react';
+import { SORT_DIRECTION } from '../../../../../common';
+import {
+  RecipientGroupItemType,
+  TableState,
+} from '../../../../../models/interfaces';
 import {
   ContentPanel,
   ContentPanelActions,
 } from '../../../../components/ContentPanel';
 import { ModalConsumer } from '../../../../components/Modal';
+import { ServicesContext } from '../../../../services';
+import { ROUTES } from '../../../../utils/constants';
+import { getErrorMessage } from '../../../../utils/helpers';
+import { DEFAULT_PAGE_SIZE_OPTIONS } from '../../../Notifications/utils/constants';
 import { DeleteRecipientGroupModal } from '../modals/DeleteRecipientGroupModal';
 
 interface RecipientGroupsTableProps {}
@@ -61,25 +61,20 @@ export class RecipientGroupsTable extends Component<
   RecipientGroupsTableProps,
   RecipientGroupsTableState
 > {
-  static contextType = CoreServicesContext;
+  static contextType = ServicesContext;
   columns: EuiTableFieldDataColumnType<RecipientGroupItemType>[];
 
   constructor(props: RecipientGroupsTableProps) {
     super(props);
 
     this.state = {
-      total: 5,
+      total: 0,
       from: 0,
       size: 5,
       search: '',
       sortField: 'name',
       sortDirection: SORT_DIRECTION.ASC,
-      items: Array.from({ length: 5 }, (v, i) => ({
-        id: i.toString(),
-        name: 'Group ' + (i + 1),
-        email: [{ email: 'no-reply@company.com' }],
-        description: 'Description ' + i,
-      })),
+      items: [],
       selectedItems: [],
       loading: true,
     };
@@ -110,9 +105,27 @@ export class RecipientGroupsTable extends Component<
     ];
   }
 
-  // TODO send request on component mount
-  // async componentDidMount() {
-  // }
+  async componentDidMount() {
+    this.setState({ loading: true });
+    try {
+      const queryObject = {
+        from: this.state.from,
+        size: this.state.size,
+        search: this.state.search,
+        sortField: this.state.sortField,
+        sortDirection: this.state.sortDirection,
+      };
+      const recipientGroups = await this.context.notificationService.getRecipientGroups(
+        queryObject
+      );
+      this.setState({ items: recipientGroups, total: recipientGroups.length });
+    } catch (error) {
+      this.context.notifications.toasts.addDanger(
+        getErrorMessage(error, 'There was a problem loading senders.')
+      );
+    }
+    this.setState({ loading: false });
+  }
 
   onTableChange = ({
     page: tablePage,

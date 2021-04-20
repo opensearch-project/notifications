@@ -37,6 +37,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { ENCRYPTION_METHOD } from '../../../models/interfaces';
 import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
+import { ServicesContext } from '../../services';
 import { BREADCRUMBS, ROUTES } from '../../utils/constants';
 import { CreateSenderForm } from './components/forms/CreateSenderForm';
 import {
@@ -46,12 +47,14 @@ import {
   validateSenderName,
 } from './utils/validationHelper';
 
-interface CreateSenderProps extends RouteComponentProps {
+interface CreateSenderProps extends RouteComponentProps<{ id?: string }> {
   edit?: boolean;
 }
 
 export function CreateSender(props: CreateSenderProps) {
   const coreContext = useContext(CoreServicesContext)!;
+  const servicesContext = useContext(ServicesContext)!;
+
   const [senderName, setSenderName] = useState('');
   const [email, setEmail] = useState('');
   const [host, setHost] = useState('');
@@ -73,10 +76,21 @@ export function CreateSender(props: CreateSenderProps) {
     window.scrollTo(0, 0);
 
     if (props.edit) {
-      setSenderName('test');
-      setEmail('test mail');
+      getSender();
     }
   }, []);
+
+  const getSender = async () => {
+    const id = props.match.params?.id;
+    if (typeof id !== 'string') return;
+
+    const response = await servicesContext.notificationService.getSender(id);
+    setSenderName(response.name);
+    setEmail(response.from);
+    setHost(response.host);
+    setPort(response.port);
+    setEncryption(response.method as ENCRYPTION_METHOD);
+  };
 
   const isInputValid = (): boolean => {
     const errors: { [key: string]: string[] } = {

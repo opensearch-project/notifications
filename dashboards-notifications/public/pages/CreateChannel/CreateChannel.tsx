@@ -42,6 +42,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
+import { ServicesContext } from '../../services';
 import {
   BREADCRUMBS,
   CHANNEL_TYPE,
@@ -83,6 +84,7 @@ export function CreateChannel(props: CreateChannelsProps) {
   const isOdfe = true;
 
   const coreContext = useContext(CoreServicesContext)!;
+  const servicesContext = useContext(ServicesContext)!;
   const id = props.match.params.id;
   const prevURL =
     props.edit && queryString.parse(props.location.search).from === 'details'
@@ -109,13 +111,19 @@ export function CreateChannel(props: CreateChannelsProps) {
   ] = useState<{
     [x: string]: boolean;
   }>({});
-  const [emailHeader, setEmailHeader] = useState('');
-  const [emailFooter, setEmailFooter] = useState('');
+  const [emailHeader, setEmailHeader] = useState(
+    `Example header in markdown:\n## Company XYZ\n### Operations team alerts`
+  );
+  const [emailFooter, setEmailFooter] = useState(
+    `Example footer in markdown:\n### Operations team alerts\nContact the team [ops@company.com](mailto://ops@company.com).`
+  );
   const [sender, setSender] = useState('');
   const [
     selectedRecipientGroupOptions,
     setSelectedRecipientGroupOptions,
   ] = useState<Array<EuiComboBoxOptionOption<string>>>([]);
+
+  const [sesSender, setSesSender] = useState('');
 
   const [webhookTypeIdSelected, setWebhookTypeIdSelected] = useState<
     keyof typeof CUSTOM_WEBHOOK_ENDPOINT_TYPE
@@ -128,8 +136,8 @@ export function CreateChannel(props: CreateChannelsProps) {
   const [webhookHeaders, setWebhookHeaders] = useState<HeaderType[]>([
     { key: 'Content-Type', value: 'application/json' },
   ]);
-  const [snsArn, setSnsArn] = useState(''); // SNS topic ARN
-  const [iamArn, setIamArn] = useState(''); // IAM role ARN (optional for ODFE)
+  const [topicArn, setTopicArn] = useState(''); // SNS topic ARN
+  const [roleArn, setRoleArn] = useState(''); // IAM role ARN (optional for ODFE)
 
   const [
     sourceCheckboxIdToSelectedMap,
@@ -147,8 +155,9 @@ export function CreateChannel(props: CreateChannelsProps) {
     webhookURL: [],
     customURLHost: [],
     customURLPort: [],
-    snsArn: [],
-    iamArn: [],
+    topicArn: [],
+    roleArn: [],
+    sesSender: [],
   });
 
   useEffect(() => {
@@ -160,11 +169,53 @@ export function CreateChannel(props: CreateChannelsProps) {
     window.scrollTo(0, 0);
 
     if (props.edit) {
-      setName('test');
-      setDescription('test desc');
-      setSlackWebhook('hxxp');
+      getChannel();
     }
   }, []);
+
+  const getChannel = async () => {
+    const id = props.match.params.id;
+    if (typeof id !== 'string') return;
+
+    const response = await servicesContext.notificationService.getChannel(id);
+    const type = response.type as keyof typeof CHANNEL_TYPE;
+    setName(response.name);
+    setDescription(response.description);
+    setChannelType(type);
+    setSourceCheckboxIdToSelectedMap(
+      Object.fromEntries(
+        response.allowedFeatures.map((feature) => [feature, true])
+      )
+    );
+
+    if (!response.destination) return;
+
+    if (type === 'SLACK') {
+      setSlackWebhook(response.destination.slack?.url || '');
+    } else if (type === 'CHIME') {
+      setChimeWebhook(response.destination.chime?.url || '');
+    } else if (type === 'SNS') {
+      setTopicArn(response.destination.sns?.topic_arn || '');
+      setRoleArn(response.destination.sns?.role_arn || '');
+    } else if (type === 'EMAIL') {
+      setSender(response.destination.email?.email_account_id || '');
+      setSelectedRecipientGroupOptions(
+        response.destination.email?.recipients.map((recipient) => ({
+          label: recipient,
+        })) || []
+      );
+      setHeaderFooterCheckboxIdToSelectedMap({
+        header: !!response.destination.email?.header,
+        footer: !!response.destination.email?.footer,
+      });
+      setEmailHeader(response.destination.email?.header || '');
+      setEmailFooter(response.destination.email?.footer || '');
+    } else if (type === 'CUSTOM_WEBHOOK') {
+      // TODO
+    } else if (type === 'SES') {
+      // TODO
+    }
+  };
 
   const isInputValid = (): boolean => {
     const errors: InputErrorsType = {
@@ -176,8 +227,9 @@ export function CreateChannel(props: CreateChannelsProps) {
       webhookURL: [],
       customURLHost: [],
       customURLPort: [],
-      snsArn: [],
-      iamArn: [],
+      topicArn: [],
+      roleArn: [],
+      sesSender: [],
     };
     if (channelType === 'SLACK') {
       errors.slackWebhook = validateWebhookURL(slackWebhook);
@@ -194,8 +246,8 @@ export function CreateChannel(props: CreateChannelsProps) {
         errors.customURLPort = validateCustomURLPort(customURLPort);
       }
     } else if (channelType === 'SNS') {
-      errors.snsArn = validateArn(snsArn);
-      if (!isOdfe) errors.iamArn = validateArn(iamArn);
+      errors.topicArn = validateArn(topicArn);
+      if (!isOdfe) errors.roleArn = validateArn(roleArn);
     }
     setInputErrors(errors);
     return !Object.values(errors).reduce(
@@ -229,7 +281,7 @@ export function CreateChannel(props: CreateChannelsProps) {
         >
           <EuiFormRow label="Channel type">
             {props.edit ? (
-              <EuiText>{CHANNEL_TYPE[channelType]}</EuiText>
+              <EuiText size="s">{CHANNEL_TYPE[channelType]}</EuiText>
             ) : (
               <EuiSuperSelect
                 options={channelTypeOptions}
@@ -268,6 +320,8 @@ export function CreateChannel(props: CreateChannelsProps) {
               setSelectedRecipientGroupOptions={
                 setSelectedRecipientGroupOptions
               }
+              sesSender={sesSender}
+              setSesSender={setSesSender}
             />
           ) : channelType === 'CUSTOM_WEBHOOK' ? (
             <CustomWebhookSettings
@@ -289,10 +343,10 @@ export function CreateChannel(props: CreateChannelsProps) {
           ) : channelType === 'SNS' ? (
             <SNSSettings
               isOdfe={isOdfe}
-              snsArn={snsArn}
-              setSnsArn={setSnsArn}
-              iamArn={iamArn}
-              setIamArn={setIamArn}
+              topicArn={topicArn}
+              setTopicArn={setTopicArn}
+              roleArn={roleArn}
+              setRoleArn={setRoleArn}
             />
           ) : null}
         </ContentPanel>

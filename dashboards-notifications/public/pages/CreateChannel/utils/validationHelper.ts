@@ -34,7 +34,7 @@ export const validateChannelName = (name: string) => {
 
 export const validateWebhookURL = (url: string) => {
   const errors = [];
-  if (url.length === 0) errors.push('Invalid webhook URL.');
+  if (url.length === 0 || !url.match(/https?:\/\/.+/)) errors.push('Invalid webhook URL.');
   return errors;
 };
 

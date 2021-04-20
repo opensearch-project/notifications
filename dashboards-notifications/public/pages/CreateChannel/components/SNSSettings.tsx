@@ -26,10 +26,10 @@ import { validateArn } from '../utils/validationHelper';
 
 interface SNSSettingsProps {
   isOdfe: boolean;
-  snsArn: string;
-  setSnsArn: (snsArn: string) => void;
-  iamArn: string;
-  setIamArn: (iamArn: string) => void;
+  topicArn: string;
+  setTopicArn: (topicArn: string) => void;
+  roleArn: string;
+  setRoleArn: (roleArn: string) => void;
 }
 
 export function SNSSettings(props: SNSSettingsProps) {
@@ -39,18 +39,18 @@ export function SNSSettings(props: SNSSettingsProps) {
       <EuiSpacer />
       <EuiFormRow
         label="SNS topic ARN"
-        error={context.inputErrors.snsArn.join(' ')}
-        isInvalid={context.inputErrors.snsArn.length > 0}
+        error={context.inputErrors.topicArn.join(' ')}
+        isInvalid={context.inputErrors.topicArn.length > 0}
       >
         <EuiFieldText
           placeholder="ARN key"
-          value={props.snsArn}
-          onChange={(e) => props.setSnsArn(e.target.value)}
-          isInvalid={context.inputErrors.snsArn.length > 0}
+          value={props.topicArn}
+          onChange={(e) => props.setTopicArn(e.target.value)}
+          isInvalid={context.inputErrors.topicArn.length > 0}
           onBlur={() => {
             context.setInputErrors({
               ...context.inputErrors,
-              snsArn: validateArn(props.snsArn),
+              topicArn: validateArn(props.topicArn),
             });
           }}
         />
@@ -73,8 +73,8 @@ export function SNSSettings(props: SNSSettingsProps) {
               <EuiSpacer size="s" />
               <EuiFieldText
                 placeholder="ARN key"
-                value={props.iamArn}
-                onChange={(e) => props.setIamArn(e.target.value)}
+                value={props.roleArn}
+                onChange={(e) => props.setRoleArn(e.target.value)}
               />
             </>
           </EuiFormRow>
@@ -99,18 +99,18 @@ export function SNSSettings(props: SNSSettingsProps) {
       ) : (
         <EuiFormRow
           label="IAM role ARN"
-          error={context.inputErrors.iamArn.join(' ')}
-          isInvalid={context.inputErrors.iamArn.length > 0}
+          error={context.inputErrors.roleArn.join(' ')}
+          isInvalid={context.inputErrors.roleArn.length > 0}
         >
           <EuiFieldText
             placeholder="ARN key"
-            value={props.iamArn}
-            onChange={(e) => props.setIamArn(e.target.value)}
-            isInvalid={context.inputErrors.iamArn.length > 0}
+            value={props.roleArn}
+            onChange={(e) => props.setRoleArn(e.target.value)}
+            isInvalid={context.inputErrors.roleArn.length > 0}
             onBlur={() => {
               context.setInputErrors({
                 ...context.inputErrors,
-                iamArn: validateArn(props.iamArn),
+                roleArn: validateArn(props.roleArn),
               });
             }}
           />

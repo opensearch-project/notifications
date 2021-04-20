@@ -80,7 +80,8 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
     );
   };
 
-  if (props.channel.type === 'SLACK') {
+  const type = props.channel.type as keyof typeof CHANNEL_TYPE;
+  if (type === 'SLACK') {
     settingsList.push(
       ...[
         {
@@ -93,7 +94,7 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
         },
       ]
     );
-  } else if (props.channel.type === 'CHIME') {
+  } else if (type === 'CHIME') {
     settingsList.push(
       ...[
         {
@@ -106,7 +107,7 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
         },
       ]
     );
-  } else if (props.channel.type === 'SNS') {
+  } else if (type === 'SNS') {
     settingsList.push(
       ...[
         {
@@ -123,7 +124,7 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
         },
       ]
     );
-  } else if (props.channel.type === 'EMAIL') {
+  } else if (type === 'EMAIL') {
     const recipientsDescription = getModalComponent(
       props.channel.destination.email.recipients,
       'Default recipients',
@@ -157,7 +158,7 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
         },
       ]
     );
-  } else if (props.channel.type === 'CUSTOM_WEBHOOK') {
+  } else if (type === 'CUSTOM_WEBHOOK') {
     const parametersDescription = getModalComponent(
       Object.entries(props.channel.destination.custom_webhook.parameters).map(
         ([key, value]) => ({ key, value } as HeaderItemType)
@@ -201,6 +202,40 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
         {
           title: 'Webhook headers',
           description: headersDescription,
+        },
+      ]
+    );
+  } else if (type === 'SES') {
+    const recipientsDescription = getModalComponent(
+      props.channel.destination.ses.recipients,
+      'Default recipients',
+      'Recipients'
+    );
+    settingsList.push(
+      ...[
+        {
+          title: 'Channel type',
+          description: CHANNEL_TYPE.SES,
+        },
+        {
+          title: 'Sender',
+          description: props.channel.destination.ses.email_account_id || '-',
+        },
+        {
+          title: 'Default recipients',
+          description: recipientsDescription,
+        },
+        {
+          title: 'Email header',
+          description: props.channel.destination.ses.header
+            ? 'Enabled'
+            : 'Disabled',
+        },
+        {
+          title: 'Email footer',
+          description: props.channel.destination.ses.footer
+            ? 'Enabled'
+            : 'Disabled',
         },
       ]
     );

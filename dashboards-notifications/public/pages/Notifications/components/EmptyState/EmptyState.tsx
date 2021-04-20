@@ -30,8 +30,7 @@ export function EmptyState(props: EmptyStateProps) {
           title={<h2>No notifications insights to display</h2>}
           body={
             <EuiText>
-              Adjust your filter settings or create a channel and then configure
-              notify actions from supported Kibana features.{' '}
+              Adjust your filter or create a channel.{' '}
               <EuiLink href={DOCUMENTATION_LINK} target="_blank" external>
                 Learn more
               </EuiLink>

@@ -24,9 +24,6 @@
  * permissions and limitations under the License.
  */
 
-import { SenderItemType, TableState } from '../../../../../models/interfaces';
-import { Component } from 'react';
-import { CoreServicesContext } from '../../../../components/coreServices';
 import {
   EuiBasicTable,
   EuiButton,
@@ -36,17 +33,20 @@ import {
   EuiTableFieldDataColumnType,
   EuiTableSortingType,
 } from '@elastic/eui';
-import { SORT_DIRECTION } from '../../../../../common';
-import { ROUTES } from '../../../../utils/constants';
-import React from 'react';
 import { Criteria } from '@elastic/eui/src/components/basic_table/basic_table';
 import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_bar';
-import { DEFAULT_PAGE_SIZE_OPTIONS } from '../../../Notifications/utils/constants';
+import React, { Component } from 'react';
+import { SORT_DIRECTION } from '../../../../../common';
+import { SenderItemType, TableState } from '../../../../../models/interfaces';
 import {
   ContentPanel,
   ContentPanelActions,
 } from '../../../../components/ContentPanel';
 import { ModalConsumer } from '../../../../components/Modal';
+import { ServicesContext } from '../../../../services';
+import { ROUTES } from '../../../../utils/constants';
+import { getErrorMessage } from '../../../../utils/helpers';
+import { DEFAULT_PAGE_SIZE_OPTIONS } from '../../../Notifications/utils/constants';
 import { DeleteSenderModal } from '../modals/DeleteSenderModal';
 
 interface SendersTableProps {}
@@ -57,27 +57,20 @@ export class SendersTable extends Component<
   SendersTableProps,
   SendersTableState
 > {
-  static contextType = CoreServicesContext;
+  static contextType = ServicesContext;
   columns: EuiTableFieldDataColumnType<SenderItemType>[];
 
   constructor(props: SendersTableProps) {
     super(props);
 
     this.state = {
-      total: 5,
+      total: 0,
       from: 0,
       size: 5,
       search: '',
       sortField: 'name',
       sortDirection: SORT_DIRECTION.ASC,
-      items: Array.from({ length: 5 }, (v, i) => ({
-        id: `${i}`,
-        name: 'Sender ' + (i + 1),
-        from: 'no-reply@company.com',
-        host: 'smtp.company.com',
-        port: '25',
-        method: 'SSL',
-      })),
+      items: [],
       selectedItems: [],
       loading: true,
     };
@@ -121,9 +114,27 @@ export class SendersTable extends Component<
     ];
   }
 
-  // TODO send request on component mount
-  // async componentDidMount() {
-  // }
+  async componentDidMount() {
+    this.setState({ loading: true });
+    try {
+      const queryObject = {
+        from: this.state.from,
+        size: this.state.size,
+        search: this.state.search,
+        sortField: this.state.sortField,
+        sortDirection: this.state.sortDirection,
+      };
+      const senders = await this.context.notificationService.getSenders(
+        queryObject
+      );
+      this.setState({ items: senders, total: senders.length });
+    } catch (error) {
+      this.context.notifications.toasts.addDanger(
+        getErrorMessage(error, 'There was a problem loading senders.')
+      );
+    }
+    this.setState({ loading: false });
+  }
 
   onTableChange = ({
     page: tablePage,

@@ -30,6 +30,7 @@ import {
   EuiCheckboxGroupOption,
   EuiComboBox,
   EuiComboBoxOptionOption,
+  EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
@@ -37,7 +38,6 @@ import {
   EuiSpacer,
   EuiSuperSelect,
   EuiSuperSelectOption,
-  EuiText,
 } from '@elastic/eui';
 import React, { useContext, useState } from 'react';
 import { ModalConsumer } from '../../../components/Modal';
@@ -65,6 +65,8 @@ interface EmailSettingsProps {
   setSelectedRecipientGroupOptions: (
     options: Array<EuiComboBoxOptionOption<string>>
   ) => void;
+  sesSender: string;
+  setSesSender: (sesSender: string) => void;
 }
 
 export function EmailSettings(props: EmailSettingsProps) {
@@ -120,10 +122,25 @@ export function EmailSettings(props: EmailSettingsProps) {
     <>
       {props.isAmazonSES ? (
         <>
-          <EuiFormRow label="Sender">
-            <EuiText size="s">
-              To configure sender account, modify your elasticsearch.yml
-            </EuiText>
+          <EuiFormRow
+            label="Sender"
+            helpText="Enter a sender email address that has been verified by Amazon SES."
+            error={context.inputErrors.sesSender.join(' ')}
+            isInvalid={context.inputErrors.sesSender.length > 0}
+          >
+            <EuiFieldText
+              fullWidth
+              placeholder="Enter a sender email address"
+              value={props.sesSender}
+              onChange={(e) => props.setSesSender(e.target.value)}
+              isInvalid={context.inputErrors.slackWebhook.length > 0}
+              onBlur={() => {
+                context.setInputErrors({
+                  ...context.inputErrors,
+                  sesSender: validateEmailSender(props.sesSender),
+                });
+              }}
+            />
           </EuiFormRow>
           <EuiSpacer size="m" />
         </>

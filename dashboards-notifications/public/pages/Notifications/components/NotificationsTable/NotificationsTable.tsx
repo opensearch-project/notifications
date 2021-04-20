@@ -33,6 +33,7 @@ import {
 } from '@elastic/eui';
 import { Criteria } from '@elastic/eui/src/components/basic_table/basic_table';
 import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_bar';
+import _ from 'lodash';
 import React from 'react';
 import {
   ChannelStatus,
@@ -40,6 +41,7 @@ import {
 } from '../../../../../models/interfaces';
 import { ContentPanel } from '../../../../components/ContentPanel';
 import { ModalConsumer } from '../../../../components/Modal';
+import { NOTIFICATION_SOURCE } from '../../../../utils/constants';
 import { renderTime } from '../../../../utils/helpers';
 import { TableFlyout } from './Flyout/TableFlyout';
 
@@ -77,6 +79,7 @@ export function NotificationsTable(props: NotificationsTableProps) {
       name: 'Source type',
       sortable: true,
       truncateText: true,
+      render: (source) => _.get(NOTIFICATION_SOURCE, source, '-'),
     },
     {
       field: 'severity', // we don't care about the field as we're using the whole item in render
@@ -97,7 +100,6 @@ export function NotificationsTable(props: NotificationsTableProps) {
       field: 'status',
       name: 'Sent status',
       sortable: true,
-      // TODO: render the errors detail with a modal
       render: (status, item: NotificationItem) => {
         const color = status == 'Success' ? 'success' : 'danger';
         const label = status == 'Success' ? 'Sent' : 'Errors';

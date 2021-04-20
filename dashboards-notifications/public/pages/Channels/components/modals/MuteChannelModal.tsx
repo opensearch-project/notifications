@@ -45,22 +45,12 @@ import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 interface MuteChannelModalProps extends ModalRootProps {
   channels: ChannelItemType[];
   onClose: () => void;
-  mute: boolean;
 }
 
 export const MuteChannelModal = (props: MuteChannelModalProps) => {
   if (props.channels.length !== 1) return null;
 
   const coreContext = useContext(CoreServicesContext)!;
-
-  // do not show modal on unmute
-  if (!props.mute) {
-    coreContext.notifications.toasts.addSuccess(
-      `${props.channels[0].name} successfully unmuted.`
-    );
-    return null;
-  }
-
   return (
     <EuiOverlayMask>
       <EuiModal onClose={props.onClose} maxWidth={500}>

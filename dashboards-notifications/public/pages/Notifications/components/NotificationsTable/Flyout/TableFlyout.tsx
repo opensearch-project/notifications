@@ -22,12 +22,15 @@ import {
   EuiFlyoutBody,
   EuiFlyoutFooter,
   EuiFlyoutHeader,
+  EuiLink,
   EuiSpacer,
   EuiTitle,
 } from '@elastic/eui';
+import _ from 'lodash';
 import React from 'react';
 import { NotificationItem } from '../../../../../../models/interfaces';
 import { ModalRootProps } from '../../../../../components/Modal/ModalRoot';
+import { NOTIFICATION_SOURCE } from '../../../../../utils/constants';
 import { renderTime } from '../../../../../utils/helpers';
 import { ChannelCard } from './ChannelCard';
 
@@ -61,7 +64,12 @@ export function TableFlyout(props: TableFlyoutProps) {
                 listItems={[
                   {
                     title: 'Source',
-                    description: 'TODO',
+                    // TODO source plugin link
+                    description: (
+                      <EuiLink href="#" target="_blank" external>
+                        new monitor
+                      </EuiLink>
+                    ),
                   },
                 ]}
               />
@@ -71,7 +79,11 @@ export function TableFlyout(props: TableFlyoutProps) {
                 listItems={[
                   {
                     title: 'Source type',
-                    description: props.notificationItem.source,
+                    description: _.get(
+                      NOTIFICATION_SOURCE,
+                      props.notificationItem.source,
+                      '-'
+                    ),
                   },
                 ]}
               />

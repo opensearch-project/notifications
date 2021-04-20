@@ -24,6 +24,7 @@
  * permissions and limitations under the License.
  */
 
+import { Datum } from '@elastic/charts';
 import {
   EuiButton,
   EuiFlexGroup,
@@ -62,8 +63,9 @@ interface NotificationsProps extends RouteComponentProps {
 interface NotificationsState extends TableState<NotificationItem> {
   startTime: ShortDate;
   endTime: ShortDate;
-  filters: FilterType[];
+  filters: Array<FilterType>;
   histogramType: keyof typeof HISTOGRAM_TYPE;
+  histogramData: Array<Datum>;
 }
 
 export default class Notifications extends Component<
@@ -104,6 +106,7 @@ export default class Notifications extends Component<
       endTime,
       filters,
       histogramType,
+      histogramData: [],
     };
 
     this.getNotifications = _.debounce(this.getNotifications, 500, {
@@ -156,8 +159,15 @@ export default class Notifications extends Component<
       const getNotificationsResponse = await notificationService.getNotifications(
         queryObject
       );
+      const getHistogramResponse = await notificationService.getHistogram(
+        queryObject
+      );
       const { notifications, totalNotifications } = getNotificationsResponse;
-      this.setState({ items: notifications, total: totalNotifications });
+      this.setState({
+        items: notifications,
+        total: totalNotifications,
+        histogramData: getHistogramResponse,
+      });
     } catch (err) {
       this.context.notifications.toasts.addDanger(
         getErrorMessage(err, 'There was a problem loading notifications.')
@@ -241,9 +251,9 @@ export default class Notifications extends Component<
       },
     };
 
+    // TODO check if no channels
     if (this.state.items.length === 0) {
-      // TODO check if no channels, return <EmptyState channels={false} />
-      return <EmptyState channels />;
+      return <EmptyState channels={false} />;
     }
 
     return (
@@ -279,19 +289,27 @@ export default class Notifications extends Component<
           refresh={this.getNotifications}
         />
 
-        <EuiSpacer />
-        <NotificationsHistogram
-          histogramType={this.state.histogramType}
-          setHistogramType={this.setHistogramType}
-        />
+        {/* TODO: change back to items.length > 0 */}
+        {this.state.search.length === 0 ? (
+          <>
+            <EuiSpacer />
+            <NotificationsHistogram
+              histogramType={this.state.histogramType}
+              setHistogramType={this.setHistogramType}
+              histogramData={this.state.histogramData}
+            />
 
-        <EuiSpacer />
-        <NotificationsTable
-          items={items}
-          onTableChange={this.onTableChange}
-          pagination={pagination}
-          sorting={sorting}
-        />
+            <EuiSpacer />
+            <NotificationsTable
+              items={items}
+              onTableChange={this.onTableChange}
+              pagination={pagination}
+              sorting={sorting}
+            />
+          </>
+        ) : (
+          <EmptyState channels />
+        )}
       </div>
     );
   }

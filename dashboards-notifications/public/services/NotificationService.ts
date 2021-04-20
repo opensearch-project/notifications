@@ -26,6 +26,13 @@
 
 import { HttpSetup } from '../../../../src/core/public';
 import { NotificationItem } from '../../models/interfaces';
+import {
+  MOCK_CHANNELS,
+  MOCK_GET_HISTOGRAM,
+  MOCK_NOTIFICATIONS,
+  MOCK_RECIPIENT_GROUPS,
+  MOCK_SENDERS,
+} from './mockData';
 
 export interface GetNotificationsResponse {
   totalNotifications: number;
@@ -46,254 +53,34 @@ export default class NotificationService {
     //   query: queryObject,
     // });
     // return response;
+    return MOCK_NOTIFICATIONS;
+  };
 
-    const fakeRes = {
-      notifications: [
-        {
-          title: 'title 1',
-          channel: {
-            id: 'c_id_1',
-            name: 'c_name_1',
-            type: 'slack',
-          },
-          source: 'reporting',
-          severity: '1',
-          status: {
-            overview: 'Sent',
-            detail: [
-              {
-                recipient: 'slack',
-                statusText: 'Success',
-                statusCode: '200',
-              },
-            ],
-          },
-          sentTime: 1614234267001,
-          lastUpdatedTime: 1614230526,
-        },
-        {
-          title: 'title 2',
-          channel: {
-            id: 'c_id_2',
-            name: 'c_name_2',
-            type: 'email',
-          },
-          source: 'alerting',
-          severity: '2',
-          status: {
-            overview: 'Error',
-            detail: [
-              {
-                recipient: 'sd@amazon.com',
-                statusText: 'failed',
-                statusCode: '500',
-              },
-              {
-                recipient: 'david@amazon.com',
-                statusText: 'no recipient',
-                statusCode: '404',
-              },
-            ],
-          },
-          sentTime: 1614120516,
-          lastUpdatedTime: 1614130526,
-        },
-        {
-          title: 'title 3',
-          channel: {
-            id: 'c_id_3',
-            name: 'c_name_3',
-            type: 'chime',
-          },
-          source: 'reporting',
-          severity: '1',
-          status: {
-            overview: 'Sent',
-            detail: [
-              {
-                recipient: 'chime',
-                statusText: 'Success',
-                statusCode: '200',
-              },
-            ],
-          },
-          sentTime: 1614220006,
-          lastUpdatedTime: 1614230116,
-        },
-        {
-          title: 'title 4',
-          channel: {
-            id: 'c_id_1',
-            name: 'c_name_1',
-            type: 'slack',
-          },
-          source: 'reporting',
-          severity: '1',
-          status: {
-            overview: 'Sent',
-            detail: [
-              {
-                recipient: 'slack',
-                statusText: 'Success',
-                statusCode: '200',
-              },
-            ],
-          },
-          sentTime: 1614220516,
-          lastUpdatedTime: 1614230526,
-        },
-        {
-          title: 'title 5',
-          channel: {
-            id: 'c_id_2',
-            name: 'c_name_2',
-            type: 'email',
-          },
-          source: 'alerting',
-          severity: '2',
-          status: {
-            overview: 'Error',
-            detail: [
-              {
-                recipient: 'sd@amazon.com',
-                statusText: 'failed',
-                statusCode: '500',
-              },
-              {
-                recipient: 'david@amazon.com',
-                statusText: 'no recipient',
-                statusCode: '404',
-              },
-            ],
-          },
-          sentTime: 1614120516,
-          lastUpdatedTime: 1614130526,
-        },
-        {
-          title: 'title 6',
-          channel: {
-            id: 'c_id_3',
-            name: 'c_name_3',
-            type: 'chime',
-          },
-          source: 'reporting',
-          severity: '1',
-          status: {
-            overview: 'Sent',
-            detail: [
-              {
-                recipient: 'chime',
-                statusText: 'Success',
-                statusCode: '200',
-              },
-            ],
-          },
-          sentTime: 1614220006,
-          lastUpdatedTime: 1614230116,
-        },
-      ],
-      totalNotifications: 6,
-    };
+  getHistogram = async (queryObject: object) => {
+    return MOCK_GET_HISTOGRAM();
+  };
 
-    const raw = {
-      notifications: [
-        {
-          id: '1',
-          title: 'Alert notification on high error rate',
-          referenceId: 'alert_id_1',
-          source: 'Alerting',
-          severity: 'High',
-          lastUpdatedTime: 1612229000,
-          tags: ['optional string list'],
-          status: 'Error',
-          statusList: [
-            {
-              configId: '1',
-              configName: 'dev_email_channel',
-              configType: 'Email',
-              emailRecipientStatus: [
-                {
-                  recipient: 'dd@amazon.com',
-                  deliveryStatus: {
-                    statusCode: '500',
-                    statusText: 'Some error',
-                  },
-                },
-                {
-                  recipient: 'cc@amazon.com',
-                  deliveryStatus: {
-                    statusCode: '404',
-                    statusText: 'invalid',
-                  },
-                },
-              ],
-              deliveryStatus: { // check this on each channel is enough
-                statusCode: '500',
-                statusText: 'Error',
-              },
-            },
-            {
-              configId: '2',
-              configName: 'manage_slack_channel',
-              configType: 'Slack',
-              deliveryStatus: {
-                statusCode: '200',
-                statusText: 'Success',
-              },
-            },
-          ],
-        },
-        {
-          id: '2',
-          title: 'another notification',
-          referenceId: 'alert_id_2',
-          source: 'Alerting',
-          severity: 'High',
-          lastUpdatedTime: 1612229000,
-          tags: ['optional string list'],
-          status: 'Success',
-          statusList: [
-            {
-              configId: '1',
-              configName: 'dev_email_channel',
-              configType: 'Email',
-              emailRecipientStatus: [
-                {
-                  recipient: 'dd@amazon.com',
-                  deliveryStatus: {
-                    statusCode: '500',
-                    statusText: 'Some error',
-                  },
-                },
-                {
-                  recipient: 'zhongnan@amazon.com',
-                  deliveryStatus: {
-                    statusCode: '404',
-                    statusText: 'invalid',
-                  },
-                },
-              ],
-              deliveryStatus: {
-                statusCode: '500',
-                statusText: 'Error',
-              },
-            },
-            {
-              configId: '2',
-              configName: 'manage_slack_channel',
-              configType: 'Slack',
-              deliveryStatus: {
-                statusCode: '200',
-                statusText: 'Success',
-              },
-            },
-          ],
-        },
-      ],
-      totalNotifications: 6,
-    };
+  getChannels = async (queryObject: object) => {
+    return MOCK_CHANNELS;
+  };
 
-    // return fakeRes;
-    return raw;
+  getChannel = async (id: string) => {
+    return MOCK_CHANNELS[parseInt(id)];
+  };
+
+  getSenders = async (queryObject: object) => {
+    return MOCK_SENDERS;
+  };
+
+  getSender = async (id: string) => {
+    return MOCK_SENDERS[parseInt(id)];
+  };
+
+  getRecipientGroups = async (queryObject: object) => {
+    return MOCK_RECIPIENT_GROUPS;
+  };
+
+  getRecipientGroup = async (id: string) => {
+    return MOCK_RECIPIENT_GROUPS[parseInt(id)];
   };
 }

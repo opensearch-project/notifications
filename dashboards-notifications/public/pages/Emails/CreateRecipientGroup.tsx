@@ -37,6 +37,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
+import { ServicesContext } from '../../services';
 import { BREADCRUMBS, ROUTES } from '../../utils/constants';
 import { CreateRecipientGroupForm } from './components/forms/CreateRecipientGroupForm';
 import {
@@ -44,12 +45,15 @@ import {
   validateRecipientGroupName,
 } from './utils/validationHelper';
 
-interface CreateRecipientGroupProps extends RouteComponentProps {
+interface CreateRecipientGroupProps
+  extends RouteComponentProps<{ id?: string }> {
   edit?: boolean;
 }
 
 export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
   const coreContext = useContext(CoreServicesContext)!;
+  const servicesContext = useContext(ServicesContext)!;
+
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedEmailOptions, setSelectedEmailOptions] = useState<
@@ -88,10 +92,20 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
     window.scrollTo(0, 0);
 
     if (props.edit) {
-      setName('test');
-      setDescription('test desc');
+      getRecipientGroup();
     }
   }, []);
+
+  const getRecipientGroup = async () => {
+    const id = props.match.params?.id;
+    if (typeof id !== 'string') return;
+    const response = await servicesContext.notificationService.getRecipientGroup(
+      id
+    );
+    setName(response.name);
+    setDescription(response.description);
+    setSelectedEmailOptions(response.email.map((email) => ({ label: email.email })));
+  };
 
   return (
     <>

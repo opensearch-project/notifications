@@ -28,13 +28,15 @@ import {
   Axis,
   BarSeries,
   Chart,
-  DataGenerator,
   Datum,
+  niceTimeFormatByDay,
+  ScaleType,
   Settings,
+  timeFormatter,
 } from '@elastic/charts';
 import { euiPaletteColorBlind, EuiSpacer } from '@elastic/eui';
 import _ from 'lodash';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   ContentPanel,
   ContentPanelActions,
@@ -45,18 +47,12 @@ import { HistogramControls } from './HistogramControls';
 interface NotificationsHistogramProps {
   histogramType: keyof typeof HISTOGRAM_TYPE;
   setHistogramType: (histogramType: keyof typeof HISTOGRAM_TYPE) => void;
+  histogramData: Array<Datum>;
 }
 
 export function NotificationsHistogram(props: NotificationsHistogramProps) {
-  const [data, setData] = useState<Datum[]>([]);
-
-  useEffect(() => {
-    const dg = new DataGenerator();
-    const data = dg.generateGroupedSeries(25, 2, 'Channel-');
-    data[18].y = 18;
-    setData(data);
-  }, []);
-
+  console.log('props', props);
+  const formatter = timeFormatter(niceTimeFormatByDay(1));
   return (
     <>
       <ContentPanel
@@ -95,13 +91,14 @@ export function NotificationsHistogram(props: NotificationsHistogramProps) {
           <BarSeries
             id="status"
             name="Status"
-            data={data}
+            data={props.histogramData}
             xAccessor={'x'}
             yAccessors={['y']}
             splitSeriesAccessors={['g']}
             stackAccessors={['g']}
+            xScaleType={ScaleType.Time}
           />
-          <Axis id="bottom-axis" position="bottom" />
+          <Axis id="bottom-axis" position="bottom" tickFormat={formatter} />
           <Axis id="left-axis" position="left" showGridLines />
         </Chart>
       </ContentPanel>

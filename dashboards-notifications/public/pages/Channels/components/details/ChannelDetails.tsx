@@ -41,6 +41,7 @@ import {
 } from '../../../../components/ContentPanel';
 import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalConsumer } from '../../../../components/Modal';
+import { ServicesContext } from '../../../../services';
 import { BREADCRUMBS, ROUTES } from '../../../../utils/constants';
 import { renderTime } from '../../../../utils/helpers';
 import { ListItemType } from '../../types';
@@ -53,6 +54,7 @@ interface ChannelDetailsProps extends RouteComponentProps<{ id: string }> {}
 
 export function ChannelDetails(props: ChannelDetailsProps) {
   const coreContext = useContext(CoreServicesContext)!;
+  const servicesContext = useContext(ServicesContext)!;
   const id = props.match.params.id;
   const [channel, setChannel] = useState<ChannelItemType>();
 
@@ -65,71 +67,13 @@ export function ChannelDetails(props: ChannelDetailsProps) {
         href: `${BREADCRUMBS.CHANNEL_DETAILS.href}/${id}`,
       },
     ]);
-    setChannel({
-      id,
-      name: 'Ops_channel',
-      enabled: true,
-      type: 'CUSTOM_WEBHOOK',
-      allowedFeatures: ['Alerting', 'Reporting'],
-      lastUpdatedTime: new Date().getTime(),
-      description: 'This group will send to all operational team members.',
-      destination: {
-        slack: {
-          url:
-            'https://hooks.slack.com/services/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',
-        },
-        chime: {
-          url: 'https://chime',
-        },
-        email: {
-          email_account_id: 'robot@gmail.com',
-          recipients: [
-            'Team 2',
-            'cyberadmin@company.com',
-            'Ops_team_weekly',
-            'Team 5',
-            'bot@company.com',
-            'Team 7',
-            'security_pos@company.com',
-          ],
-        },
-        ses: {
-          source_arn: '',
-          from: 'ses@test.com',
-        },
-        sns: {
-          topic_arn: 'arn:aws:sns:us-east-1:24586493349034:es-alerting-test',
-          role_arn: 'arn:aws:sns:us-east-1:24586493349034:es-alerting-test',
-        },
-        custom_webhook: {
-          host: 'https:hooks.myhost.com',
-          port: 21,
-          path: 'custompath',
-          parameters: {
-            Parameter1: 'value1',
-            Parameter2: 'value2',
-            Parameter3: 'value3',
-            Parameter4: 'value4',
-            Parameter5: 'value5',
-            Parameter6: 'value6',
-            Parameter7: 'value7',
-            Parameter8: 'value8',
-          },
-          headers: {
-            'Content-Type': 'application/JSON',
-            Header1: 'value1',
-            Header2: 'value2',
-            Header3: 'value3',
-            Header4: 'value4',
-            Header5: 'value5',
-            Header6: 'value6',
-            Header7: 'value7',
-            Header8: 'value8',
-          },
-        },
-      },
-    });
+    refresh();
   }, []);
+
+  const refresh = async () => {
+    const response = await servicesContext.notificationService.getChannel(id);
+    setChannel(response);
+  };
 
   const nameList: Array<ListItemType> = [
     {
@@ -183,12 +127,16 @@ export function ChannelDetails(props: ChannelDetailsProps) {
                 <EuiButton
                   size="s"
                   iconType={channel?.enabled ? 'bellSlash' : 'bell'}
-                  onClick={() =>
-                    onShow(MuteChannelModal, {
-                      channels: [channel],
-                      mute: channel?.enabled,
-                    })
-                  }
+                  onClick={() => {
+                    if (!channel) return;
+                    if (channel.enabled) {
+                      onShow(MuteChannelModal, { channels: [channel] });
+                    } else {
+                      coreContext.notifications.toasts.addSuccess(
+                        `${channel.name} successfully unmuted.`
+                      );
+                    }
+                  }}
                 >
                   {channel?.enabled ? 'Mute channel' : 'Unmute channel'}
                 </EuiButton>

@@ -36,6 +36,7 @@ import {
 } from '@elastic/eui';
 import { Criteria } from '@elastic/eui/src/components/basic_table/basic_table';
 import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_bar';
+import _ from 'lodash';
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { SORT_DIRECTION } from '../../../common';
@@ -45,12 +46,21 @@ import {
   ContentPanelActions,
 } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
-import { BREADCRUMBS, ROUTES } from '../../utils/constants';
+import { NotificationService } from '../../services';
+import {
+  BREADCRUMBS,
+  CHANNEL_TYPE,
+  NOTIFICATION_SOURCE,
+  ROUTES,
+} from '../../utils/constants';
+import { getErrorMessage } from '../../utils/helpers';
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '../Notifications/utils/constants';
-import { ChannelControls } from './components/ChannelControls';
 import { ChannelActions } from './components/ChannelActions';
+import { ChannelControls } from './components/ChannelControls';
 
-interface ChannelsProps extends RouteComponentProps {}
+interface ChannelsProps extends RouteComponentProps {
+  notificationService: NotificationService;
+}
 
 interface ChannelsState extends TableState<ChannelItemType> {}
 
@@ -68,21 +78,7 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
       search: '',
       sortField: 'name',
       sortDirection: SORT_DIRECTION.ASC,
-      items: Array.from({ length: 5 }, (v, i) => ({
-        id: `${i}`,
-        name: 'Channel ' + (i + 1),
-        enabled: true,
-        type: 'email',
-        allowedFeatures: ['Alerting', 'Reporting'],
-        description: 'a sample description',
-        lastUpdatedTime: 0,
-        destination: {
-          slack: {
-            url:
-              'https://hooks.slack.com/services/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',
-          },
-        },
-      })),
+      items: [],
       selectedItems: [],
       loading: true,
     };
@@ -117,6 +113,7 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
         sortable: true,
         truncateText: false,
         width: '150px',
+        render: (type: string) => _.get(CHANNEL_TYPE, type, '-'),
       },
       {
         field: 'allowedFeatures',
@@ -124,7 +121,10 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
         sortable: true,
         truncateText: true,
         width: '150px',
-        render: (features: string[]) => features.join(', '),
+        render: (features: string[]) =>
+          features
+            .map((feature) => _.get(NOTIFICATION_SOURCE, feature, '-'))
+            .join(', '),
       },
       {
         field: 'description',
@@ -142,7 +142,29 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
       BREADCRUMBS.CHANNELS,
     ]);
     window.scrollTo(0, 0);
-    // await this.getNotifications();
+    await this.getChannels();
+  }
+
+  async getChannels() {
+    this.setState({ loading: true });
+    try {
+      const queryObject = {
+        from: this.state.from,
+        size: this.state.size,
+        search: this.state.search,
+        sortField: this.state.sortField,
+        sortDirection: this.state.sortDirection,
+      };
+      const channels = await this.props.notificationService.getChannels(
+        queryObject
+      );
+      this.setState({ items: channels });
+    } catch (error) {
+      this.context.notifications.toasts.addDanger(
+        getErrorMessage(error, 'There was a problem loading channels.')
+      );
+    }
+    this.setState({ loading: false });
   }
 
   onTableChange = ({
