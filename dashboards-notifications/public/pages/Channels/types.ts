@@ -28,3 +28,8 @@ export interface ListItemType {
   title: NonNullable<React.ReactNode>;
   description: NonNullable<React.ReactNode>;
 }
+
+export interface HeaderItemType {
+  key: string;
+  value: string;
+}

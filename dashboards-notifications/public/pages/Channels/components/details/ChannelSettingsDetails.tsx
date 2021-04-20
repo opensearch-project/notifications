@@ -18,8 +18,9 @@ import React from 'react';
 import { ChannelItemType } from '../../../../../models/interfaces';
 import { ModalConsumer } from '../../../../components/Modal';
 import { CHANNEL_TYPE } from '../../../../utils/constants';
-import { ListItemType } from '../../types';
+import { HeaderItemType, ListItemType } from '../../types';
 import { DetailsListModal } from '../modals/DetailsListModal';
+import { DetailsTableModal } from '../modals/DetailsTableModal';
 import { ChannelDetailItems } from './ChannelDetailItems';
 
 interface ChannelSettingsDetailsProps {
@@ -30,32 +31,46 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
   if (!props.channel) return null;
 
   const settingsList: Array<ListItemType> = [];
-  const getListModalComponent = (
-    list: string[],
+  const getModalComponent = (
+    items: string[] | HeaderItemType[],
     header: string,
-    title: string,
-    separator = ', '
+    title?: string,
+    separator = ', ',
+    isParameters?: boolean
   ) => {
     return (
       <>
         <div style={{ whiteSpace: 'pre-line' }}>
-          {list.slice(0, 5).join(separator)}
+          {items
+            .slice(0, 5)
+            .map((item: string | HeaderItemType) =>
+              typeof item === 'string' ? item : `${item.key}: ${item.value}`
+            )
+            .join(separator)}
         </div>
-        {list.length > 5 && (
+        {items.length > 5 && (
           <>
             {' '}
             <ModalConsumer>
               {({ onShow }) => (
                 <EuiLink
-                  onClick={() =>
-                    onShow(DetailsListModal, {
-                      header: `${header} (${list.length})`,
-                      title: title,
-                      items: list,
-                    })
+                  onClick={
+                    typeof items[0] === 'string'
+                      ? () =>
+                          onShow(DetailsListModal, {
+                            header: `${header} (${items.length})`,
+                            title: title,
+                            items: items,
+                          })
+                      : () =>
+                          onShow(DetailsTableModal, {
+                            header: `${header} (${items.length})`,
+                            isParameters,
+                            items: items,
+                          })
                   }
                 >
-                  {list.length - 5} more
+                  {items.length - 5} more
                 </EuiLink>
               )}
             </ModalConsumer>
@@ -109,7 +124,7 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
       ]
     );
   } else if (props.channel.type === 'EMAIL') {
-    const recipientsDescription = getListModalComponent(
+    const recipientsDescription = getModalComponent(
       props.channel.destination.email.recipients,
       'Default recipients',
       'Recipients'
@@ -143,21 +158,23 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
       ]
     );
   } else if (props.channel.type === 'CUSTOM_WEBHOOK') {
-    const parametersDescription = getListModalComponent(
+    const parametersDescription = getModalComponent(
       Object.entries(props.channel.destination.custom_webhook.parameters).map(
-        ([key, value]) => `${key}: ${value}`
+        ([key, value]) => ({ key, value } as HeaderItemType)
       ),
       'Query parameters',
-      'Parameters',
-      '\n'
+      undefined,
+      '\n',
+      true
     );
-    const headersDescription = getListModalComponent(
+    const headersDescription = getModalComponent(
       Object.entries(props.channel.destination.custom_webhook.headers).map(
-        ([key, value]) => `${key}: ${value}`
+        ([key, value]) => ({ key, value } as HeaderItemType)
       ),
       'Webhook headers',
-      'Headers',
-      '\n'
+      undefined,
+      '\n',
+      false
     );
     settingsList.push(
       ...[
