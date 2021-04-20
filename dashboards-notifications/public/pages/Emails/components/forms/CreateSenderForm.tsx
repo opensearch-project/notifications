@@ -86,6 +86,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
           placeholder="Enter sender name"
           value={props.senderName}
           onChange={(e) => props.setSenderName(e.target.value)}
+          isInvalid={props.inputErrors.senderName.length > 0}
           onBlur={() => {
             props.setInputErrors({
               ...props.inputErrors,
@@ -107,6 +108,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
               placeholder="Enter email address"
               value={props.email}
               onChange={(e) => props.setEmail(e.target.value)}
+              isInvalid={props.inputErrors.email.length > 0}
               onBlur={() => {
                 props.setInputErrors({
                   ...props.inputErrors,
@@ -126,6 +128,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
               placeholder="Enter host"
               value={props.host}
               onChange={(e) => props.setHost(e.target.value)}
+              isInvalid={props.inputErrors.host.length > 0}
               onBlur={() => {
                 props.setInputErrors({
                   ...props.inputErrors,
@@ -145,6 +148,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
               placeholder="Enter port"
               value={props.port}
               onChange={(e) => props.setPort(e.target.value)}
+              isInvalid={props.inputErrors.port.length > 0}
               onBlur={() => {
                 props.setInputErrors({
                   ...props.inputErrors,

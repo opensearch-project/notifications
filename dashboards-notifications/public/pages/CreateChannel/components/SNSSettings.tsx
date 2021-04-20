@@ -46,6 +46,7 @@ export function SNSSettings(props: SNSSettingsProps) {
           placeholder="ARN key"
           value={props.snsArn}
           onChange={(e) => props.setSnsArn(e.target.value)}
+          isInvalid={context.inputErrors.snsArn.length > 0}
           onBlur={() => {
             context.setInputErrors({
               ...context.inputErrors,
@@ -105,6 +106,7 @@ export function SNSSettings(props: SNSSettingsProps) {
             placeholder="ARN key"
             value={props.iamArn}
             onChange={(e) => props.setIamArn(e.target.value)}
+            isInvalid={context.inputErrors.iamArn.length > 0}
             onBlur={() => {
               context.setInputErrors({
                 ...context.inputErrors,

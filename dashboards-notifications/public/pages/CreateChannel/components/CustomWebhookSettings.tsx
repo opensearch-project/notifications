@@ -81,6 +81,7 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
           placeholder="Enter webhook URL"
           value={props.webhookURL}
           onChange={(e) => props.setWebhookURL(e.target.value)}
+          isInvalid={context.inputErrors.webhookURL.length > 0}
           onBlur={() => {
             context.setInputErrors({
               ...context.inputErrors,
@@ -104,6 +105,7 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
             placeholder="Enter host name"
             value={props.customURLHost}
             onChange={(e) => props.setCustomURLHost(e.target.value)}
+            isInvalid={context.inputErrors.customURLHost.length > 0}
             onBlur={() => {
               context.setInputErrors({
                 ...context.inputErrors,
@@ -121,6 +123,7 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
             placeholder="Enter port"
             value={props.customURLPort}
             onChange={(e) => props.setCustomURLPort(e.target.value)}
+            isInvalid={context.inputErrors.customURLPort.length > 0}
             onBlur={() => {
               context.setInputErrors({
                 ...context.inputErrors,

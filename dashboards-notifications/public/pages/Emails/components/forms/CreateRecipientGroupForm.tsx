@@ -87,6 +87,7 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
           placeholder="Enter recipient group name"
           value={props.name}
           onChange={(e) => props.setName(e.target.value)}
+          isInvalid={props.inputErrors.name.length > 0}
           onBlur={() => {
             props.setInputErrors({
               ...props.inputErrors,
@@ -134,6 +135,7 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
           onChange={props.setSelectedEmailOptions}
           onCreateOption={onCreateEmailOption}
           isClearable={true}
+          isInvalid={props.inputErrors.emailOptions.length > 0}
           onBlur={() => {
             props.setInputErrors({
               ...props.inputErrors,

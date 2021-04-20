@@ -49,6 +49,7 @@ export function SlackSettings(props: SlackSettingsProps) {
         placeholder="https://hook.slack.com/services/T0000000000/B0000000/XXXXXXXXXXXXXXX"
         value={props.slackWebhook}
         onChange={(e) => props.setSlackWebhook(e.target.value)}
+        isInvalid={context.inputErrors.slackWebhook.length > 0}
         onBlur={() => {
           context.setInputErrors({
             ...context.inputErrors,

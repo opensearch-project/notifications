@@ -38,6 +38,7 @@ export function ChimeSettings(props: ChimeSettingsProps) {
         placeholder="Enter Chime webhook URL"
         value={props.chimeWebhook}
         onChange={(e) => props.setChimeWebhook(e.target.value)}
+        isInvalid={context.inputErrors.chimeWebhook.length > 0}
         onBlur={() => {
           context.setInputErrors({
             ...context.inputErrors,

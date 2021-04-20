@@ -55,6 +55,7 @@ export function ChannelNamePanel(props: ChannelNamePanelProps) {
             placeholder="Enter channel name"
             value={props.name}
             onChange={(e) => props.setName(e.target.value)}
+            isInvalid={context.inputErrors.name.length > 0}
             onBlur={() => {
               context.setInputErrors({
                 ...context.inputErrors,

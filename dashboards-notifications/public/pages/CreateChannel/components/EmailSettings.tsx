@@ -143,6 +143,7 @@ export function EmailSettings(props: EmailSettingsProps) {
                   options={senderOptions}
                   valueOfSelected={props.sender}
                   onChange={props.setSender}
+                  isInvalid={context.inputErrors.sender.length > 0}
                   onBlur={() => {
                     context.setInputErrors({
                       ...context.inputErrors,
@@ -195,6 +196,7 @@ export function EmailSettings(props: EmailSettingsProps) {
               onChange={props.setSelectedRecipientGroupOptions}
               onCreateOption={onCreateEmailOption}
               isClearable={true}
+              isInvalid={context.inputErrors.recipients.length > 0}
               onBlur={() => {
                 context.setInputErrors({
                   ...context.inputErrors,
