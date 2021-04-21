@@ -43,7 +43,7 @@ import java.io.IOException
  */
 data class Slack(
     val url: String
-) : BaseModel {
+) : BaseChannelData {
 
     init {
         require(!Strings.isNullOrEmpty(url)) { "URL is null or empty" }

@@ -43,7 +43,7 @@ import java.io.IOException
  */
 data class EmailGroup(
     val recipients: List<String>
-) : BaseModel {
+) : BaseChannelData {
 
     init {
         recipients.forEach {

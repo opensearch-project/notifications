@@ -51,7 +51,7 @@ data class SmtpAccount(
     val fromAddress: String,
     val username: SecureString? = null,
     val password: SecureString? = null
-) : BaseModel {
+) : BaseChannelData {
 
     init {
         require(!Strings.isNullOrEmpty(host)) { "host is null or empty" }
