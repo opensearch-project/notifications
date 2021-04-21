@@ -107,7 +107,7 @@ export const DeleteSenderModal = (props: DeleteSenderModalProps) => {
                     `${
                       props.senders.length > 1
                         ? props.senders.length + ' senders'
-                        : props.senders[0].name
+                        : 'Sender ' + props.senders[0].name
                     } successfully deleted.`
                   );
                   props.onClose();

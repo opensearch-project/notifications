@@ -110,7 +110,7 @@ export const DeleteRecipientGroupModal = (
                     `${
                       props.recipientGroups.length > 1
                         ? props.recipientGroups.length + ' recipient groups'
-                        : props.recipientGroups[0].name
+                        : 'Recipient group ' + props.recipientGroups[0].name
                     } successfully deleted.`
                   );
                   props.onClose();

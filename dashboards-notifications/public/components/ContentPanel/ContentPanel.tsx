@@ -36,6 +36,7 @@ import React from 'react';
 interface ContentPanelProps {
   title?: string;
   titleSize?: 'xxxs' | 'xxs' | 'xs' | 's' | 'm' | 'l';
+  total?: number;
   bodyStyles?: object;
   panelStyles?: object;
   horizontalRuleClassName?: string;
@@ -46,6 +47,7 @@ interface ContentPanelProps {
 const ContentPanel: React.SFC<ContentPanelProps> = ({
   title = '',
   titleSize = 'l',
+  total = undefined,
   bodyStyles = {},
   panelStyles = {},
   horizontalRuleClassName = '',
@@ -60,7 +62,14 @@ const ContentPanel: React.SFC<ContentPanelProps> = ({
     >
       <EuiFlexItem>
         <EuiTitle size={titleSize}>
-          <h3>{title}</h3>
+          <h3>
+            {title}
+            {total !== undefined ? (
+              <span
+                style={{ color: '#9f9f9f', fontWeight: 300 }}
+              >{` (${total})`}</span>
+            ) : null}
+          </h3>
         </EuiTitle>
       </EuiFlexItem>
       {actions ? (

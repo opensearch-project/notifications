@@ -105,7 +105,7 @@ export function CreateRecipientGroupModal(
         </EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButtonEmpty onClick={props.onClose} size="s">
+          <EuiButtonEmpty onClick={props.onClose}>
             Cancel
           </EuiButtonEmpty>
           <EuiButton
@@ -118,12 +118,11 @@ export function CreateRecipientGroupModal(
                 return;
               }
               coreContext.notifications.toasts.addSuccess(
-                `${name} successfully created. You can select ${name} from the list of recipient groups.`
+                `Recipient group ${name} successfully created. You can select ${name} from the list of recipient groups.`
               );
               props.addRecipientGroupOptionAndSelect({ label: name });
               props.onClose();
             }}
-            size="s"
           >
             Create
           </EuiButton>

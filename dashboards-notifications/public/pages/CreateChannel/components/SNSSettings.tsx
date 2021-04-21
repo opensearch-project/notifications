@@ -17,10 +17,12 @@ import {
   EuiCallOut,
   EuiFieldText,
   EuiFormRow,
+  EuiLink,
   EuiSpacer,
   EuiText,
 } from '@elastic/eui';
 import React, { useContext } from 'react';
+import { DOCUMENTATION_LINK } from '../../../utils/constants';
 import { CreateChannelContext } from '../CreateChannel';
 import { validateArn } from '../utils/validationHelper';
 
@@ -80,19 +82,16 @@ export function SNSSettings(props: SNSSettingsProps) {
           </EuiFormRow>
           <EuiSpacer />
           <EuiCallOut
-            title="Using Amazon SNS outside of AWS network"
+            title="Using Amazon SNS outside of AWS"
             style={{ maxWidth: 720 }}
           >
             <div>
-              If your cluster is not running on AWS network, IAM user access and
-              secret key credentials are required.
-              <br />
-              Add the following fields to Elastic Keystore:
-              <br />
-              <br />
-              opendistro.alerting.destination.sns.access.key: [accessKey]
-              <br />
-              opendistro.alerting.destination.sns.secret.key: [secretKey]
+              If your cluster is not running on AWS, you must add your access
+              key, secret key, and optional session token to the Elasticsearch
+              keystore.{' '}
+              <EuiLink href={DOCUMENTATION_LINK} target="_blank" external>
+                Learn more
+              </EuiLink>
             </div>
           </EuiCallOut>
         </>

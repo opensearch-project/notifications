@@ -52,7 +52,7 @@ export function EmptyState(props: EmptyStateProps) {
             </EuiText>
           }
           actions={
-            <EuiButton href={`#${ROUTES.CREATE_CHANNEL}`} size="s" fill>
+            <EuiButton href={`#${ROUTES.CREATE_CHANNEL}`} fill>
               Create channel
             </EuiButton>
           }

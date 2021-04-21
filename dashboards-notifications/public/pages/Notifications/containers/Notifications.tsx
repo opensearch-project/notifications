@@ -269,7 +269,6 @@ export default class Notifications extends Component<
               href={`#${ROUTES.CHANNELS}`}
               data-test-subj="createChannelButton"
               fill
-              size="s"
             >
               Manage channels
             </EuiButton>

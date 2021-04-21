@@ -30,6 +30,7 @@ import {
   EuiEmptyPrompt,
   EuiFieldSearch,
   EuiHorizontalRule,
+  EuiLink,
   EuiTableFieldDataColumnType,
   EuiTableSortingType,
 } from '@elastic/eui';
@@ -49,6 +50,7 @@ import { ModalConsumer } from '../../../../components/Modal';
 import { ServicesContext } from '../../../../services';
 import { ROUTES } from '../../../../utils/constants';
 import { getErrorMessage } from '../../../../utils/helpers';
+import { DetailsListModal } from '../../../Channels/components/modals/DetailsListModal';
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '../../../Notifications/utils/constants';
 import { DeleteRecipientGroupModal } from '../modals/DeleteRecipientGroupModal';
 
@@ -92,15 +94,42 @@ export class RecipientGroupsTable extends Component<
         name: 'Email addresses',
         sortable: true,
         truncateText: true,
-        width: '150px',
-        render: (emails: string[]) => emails.length,
+        width: '450px',
+        render: (emailObjects: Array<{ email: string }>) => {
+          const emails = emailObjects.map((email) => email.email);
+          return (
+            <div>
+              {emails.slice(0, 5).join(', ')}
+              {emails.length > 5 && (
+                <span>
+                  {' '}
+                  <ModalConsumer>
+                    {({ onShow }) => (
+                      <EuiLink
+                        onClick={() =>
+                          onShow(DetailsListModal, {
+                            header: `Email addresses (${emails.length})`,
+                            title: 'Email addresses',
+                            items: emails,
+                          })
+                        }
+                      >
+                        {emails.length - 5} more
+                      </EuiLink>
+                    )}
+                  </ModalConsumer>
+                </span>
+              )}
+            </div>
+          );
+        },
       },
       {
         field: 'description',
         name: 'Description',
         sortable: true,
         truncateText: true,
-        width: '150px',
+        width: '300px',
       },
     ];
   }
@@ -195,7 +224,6 @@ export class RecipientGroupsTable extends Component<
                     <ModalConsumer>
                       {({ onShow }) => (
                         <EuiButton
-                          size="s"
                           disabled={this.state.selectedItems.length === 0}
                           onClick={() =>
                             onShow(DeleteRecipientGroupModal, {
@@ -212,7 +240,6 @@ export class RecipientGroupsTable extends Component<
                 {
                   component: (
                     <EuiButton
-                      size="s"
                       disabled={this.state.selectedItems.length !== 1}
                       onClick={() =>
                         location.assign(
@@ -226,11 +253,7 @@ export class RecipientGroupsTable extends Component<
                 },
                 {
                   component: (
-                    <EuiButton
-                      size="s"
-                      fill
-                      href={`#${ROUTES.CREATE_RECIPIENT_GROUP}`}
-                    >
+                    <EuiButton fill href={`#${ROUTES.CREATE_RECIPIENT_GROUP}`}>
                       Create recipient group
                     </EuiButton>
                   ),
@@ -239,8 +262,9 @@ export class RecipientGroupsTable extends Component<
             />
           }
           bodyStyles={{ padding: 'initial' }}
-          title={`Recipient groups (${this.state.total})`}
+          title="Recipient groups"
           titleSize="m"
+          total={this.state.total}
         >
           <EuiFieldSearch
             fullWidth={true}

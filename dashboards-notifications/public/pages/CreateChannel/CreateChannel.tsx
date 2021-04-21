@@ -276,19 +276,24 @@ export function CreateChannel(props: CreateChannelsProps) {
         <EuiSpacer />
         <ContentPanel
           bodyStyles={{ padding: 'initial' }}
-          title="Settings"
+          title="Configurations"
           titleSize="s"
         >
           <EuiFormRow label="Channel type">
             {props.edit ? (
               <EuiText size="s">{CHANNEL_TYPE[channelType]}</EuiText>
             ) : (
-              <EuiSuperSelect
-                options={channelTypeOptions}
-                valueOfSelected={channelType}
-                onChange={setChannelType}
-                disabled={props.edit}
-              />
+              <>
+                <EuiText size="xs" color="subdued">
+                  Channel type cannot be changed after the channel is created.
+                </EuiText>
+                <EuiSuperSelect
+                  options={channelTypeOptions}
+                  valueOfSelected={channelType}
+                  onChange={setChannelType}
+                  disabled={props.edit}
+                />
+              </>
             )}
           </EuiFormRow>
           {channelType === 'SLACK' ? (
@@ -360,13 +365,10 @@ export function CreateChannel(props: CreateChannelsProps) {
         <EuiSpacer />
         <EuiFlexGroup gutterSize="m" justifyContent="flexEnd">
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty size="s" href={prevURL}>
-              Cancel
-            </EuiButtonEmpty>
+            <EuiButtonEmpty href={prevURL}>Cancel</EuiButtonEmpty>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButton
-              size="s"
               onClick={() => {
                 if (!isInputValid()) {
                   coreContext.notifications.toasts.addDanger(
@@ -398,7 +400,6 @@ export function CreateChannel(props: CreateChannelsProps) {
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButton
-              size="s"
               fill
               onClick={() => {
                 if (!isInputValid()) {
@@ -408,7 +409,9 @@ export function CreateChannel(props: CreateChannelsProps) {
                   return;
                 }
                 coreContext.notifications.toasts.addSuccess(
-                  `${name} successfully ${props.edit ? 'updated' : 'created'}.`
+                  `Channel ${name} successfully ${
+                    props.edit ? 'updated' : 'created'
+                  }.`
                 );
                 location.assign(prevURL);
               }}

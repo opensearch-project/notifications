@@ -77,7 +77,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
       <EuiFormRow
         label="Sender name"
         style={{ maxWidth: '650px' }}
-        helpText="Use a unique, descriptive name. The sender name must contain from m to n characters. Valid characters are lowercase a-z, 0-9, and - (hyphen)."
+        helpText="Use a unique, descriptive name. The sender name must contain from 2 to 50 characters. Valid characters are lowercase a-z, 0-9, and - (hyphen)."
         error={props.inputErrors.senderName.join(' ')}
         isInvalid={props.inputErrors.senderName.length > 0}
       >
@@ -168,7 +168,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
           <div>
             SSL or TLS is recommended for security. To use either one, you must
             add the following fields to the Elasticsearch keystore on each node.{' '}
-            <EuiLink href={DOCUMENTATION_LINK}>Learn more</EuiLink>
+            <EuiLink href={DOCUMENTATION_LINK} target="_blank" external>Learn more</EuiLink>
             <br />
             opendistro.alerting.destination.mail.adminTest.username: [username]
             <br />

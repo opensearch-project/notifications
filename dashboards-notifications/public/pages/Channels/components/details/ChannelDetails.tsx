@@ -32,17 +32,19 @@ import {
   EuiSpacer,
   EuiTitle,
 } from '@elastic/eui';
+import _ from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { ChannelItemType } from '../../../../../models/interfaces';
-import {
-  ContentPanel,
-  ContentPanelActions,
-} from '../../../../components/ContentPanel';
+import { ContentPanel } from '../../../../components/ContentPanel';
 import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalConsumer } from '../../../../components/Modal';
 import { ServicesContext } from '../../../../services';
-import { BREADCRUMBS, ROUTES } from '../../../../utils/constants';
+import {
+  BREADCRUMBS,
+  NOTIFICATION_SOURCE,
+  ROUTES,
+} from '../../../../utils/constants';
 import { renderTime } from '../../../../utils/helpers';
 import { ListItemType } from '../../types';
 import { MuteChannelModal } from '../modals/MuteChannelModal';
@@ -62,10 +64,6 @@ export function ChannelDetails(props: ChannelDetailsProps) {
     coreContext.chrome.setBreadcrumbs([
       BREADCRUMBS.NOTIFICATIONS,
       BREADCRUMBS.CHANNELS,
-      {
-        text: channel?.name || 'Ops_channel',
-        href: `${BREADCRUMBS.CHANNEL_DETAILS.href}/${id}`,
-      },
     ]);
     refresh();
   }, []);
@@ -73,6 +71,14 @@ export function ChannelDetails(props: ChannelDetailsProps) {
   const refresh = async () => {
     const response = await servicesContext.notificationService.getChannel(id);
     setChannel(response);
+    coreContext.chrome.setBreadcrumbs([
+      BREADCRUMBS.NOTIFICATIONS,
+      BREADCRUMBS.CHANNELS,
+      {
+        text: response?.name || '',
+        href: `${BREADCRUMBS.CHANNEL_DETAILS.href}/${id}`,
+      },
+    ]);
   };
 
   const nameList: Array<ListItemType> = [
@@ -93,7 +99,10 @@ export function ChannelDetails(props: ChannelDetailsProps) {
   const sources: Array<ListItemType> = [
     {
       title: 'Notification sources',
-      description: channel?.allowedFeatures.join(', ') || '-',
+      description:
+        channel?.allowedFeatures
+          .map((source) => _.get(NOTIFICATION_SOURCE, source, '-'))
+          .join(', ') || '-',
     },
   ];
 
@@ -117,77 +126,67 @@ export function ChannelDetails(props: ChannelDetailsProps) {
           )}
         </EuiFlexItem>
         <EuiFlexItem />
-        <>
-          <EuiFlexItem grow={false}>
-            {channel && <ChannelDetailsActions channel={channel} />}
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <ModalConsumer>
-              {({ onShow }) => (
-                <EuiButton
-                  size="s"
-                  iconType={channel?.enabled ? 'bellSlash' : 'bell'}
-                  onClick={() => {
-                    if (!channel) return;
-                    if (channel.enabled) {
-                      onShow(MuteChannelModal, { channels: [channel] });
-                    } else {
-                      coreContext.notifications.toasts.addSuccess(
-                        `${channel.name} successfully unmuted.`
-                      );
-                    }
-                  }}
-                >
-                  {channel?.enabled ? 'Mute channel' : 'Unmute channel'}
-                </EuiButton>
-              )}
-            </ModalConsumer>
-          </EuiFlexItem>
-        </>
+        <EuiFlexItem grow={false}>
+          {channel && <ChannelDetailsActions channel={channel} />}
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <ModalConsumer>
+            {({ onShow }) => (
+              <EuiButton
+                iconType={channel?.enabled ? 'bellSlash' : 'bell'}
+                onClick={() => {
+                  if (!channel) return;
+                  if (channel.enabled) {
+                    onShow(MuteChannelModal, { channels: [channel] });
+                  } else {
+                    coreContext.notifications.toasts.addSuccess(
+                      `Channel ${channel.name} successfully unmuted.`
+                    );
+                  }
+                }}
+              >
+                {channel?.enabled ? 'Mute channel' : 'Unmute channel'}
+              </EuiButton>
+            )}
+          </ModalConsumer>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButton href={`#${ROUTES.EDIT_CHANNEL}/${id}?from=details`}>
+            Edit
+          </EuiButton>
+        </EuiFlexItem>
       </EuiFlexGroup>
 
       <EuiSpacer />
       <ContentPanel
         bodyStyles={{ padding: 'initial' }}
-        title="Channel configuration"
+        title="Name and description"
         titleSize="s"
         panelStyles={{ maxWidth: 1300 }}
-        actions={
-          <ContentPanelActions
-            actions={[
-              {
-                component: (
-                  <EuiButton
-                    size="s"
-                    href={`#${ROUTES.EDIT_CHANNEL}/${id}?from=details`}
-                  >
-                    Edit
-                  </EuiButton>
-                ),
-              },
-            ]}
-          />
-        }
       >
-        <EuiSpacer size="m" />
-        <EuiTitle size="s">
-          <h4>Name and description</h4>
-        </EuiTitle>
         <ChannelDetailItems listItems={nameList} />
+      </ContentPanel>
 
-        <EuiSpacer size="xxl" />
-        <EuiTitle size="s">
-          <h4>Settings</h4>
-        </EuiTitle>
+      <EuiSpacer />
+
+      <ContentPanel
+        bodyStyles={{ padding: 'initial' }}
+        title="Configurations"
+        titleSize="s"
+        panelStyles={{ maxWidth: 1300 }}
+      >
         <ChannelSettingsDetails channel={channel} />
+      </ContentPanel>
 
-        <EuiSpacer size="xxl" />
-        <EuiTitle size="s">
-          <h4>Availability</h4>
-        </EuiTitle>
+      <EuiSpacer />
+
+      <ContentPanel
+        bodyStyles={{ padding: 'initial' }}
+        title="Availability"
+        titleSize="s"
+        panelStyles={{ maxWidth: 1300 }}
+      >
         <ChannelDetailItems listItems={sources} />
-
-        <EuiSpacer />
       </ContentPanel>
     </>
   );

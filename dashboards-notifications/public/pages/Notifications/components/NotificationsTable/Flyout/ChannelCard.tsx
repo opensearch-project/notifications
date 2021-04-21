@@ -52,7 +52,7 @@ export function ChannelCard(props: ChannelCardProps) {
 
   const renderStatus = (status: string) => {
     const color = status === 'Success' ? 'success' : 'danger';
-    const label = status === 'Success' ? 'Sent' : 'Errors';
+    const label = status === 'Success' ? 'Sent' : 'Error';
     return (
       <EuiHealth color={color}>
         <EuiText size="s">{label}</EuiText>

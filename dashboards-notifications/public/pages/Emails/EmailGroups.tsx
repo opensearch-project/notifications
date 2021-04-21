@@ -47,7 +47,7 @@ export function EmailGroups(props: EmailGroupsProps) {
   return (
     <>
       <EuiTitle size="l">
-        <h1>Email senders and groups</h1>
+        <h1>Email senders and recipient groups</h1>
       </EuiTitle>
 
       <EuiSpacer />

@@ -72,7 +72,7 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
     super(props);
 
     this.state = {
-      total: 5,
+      total: 0,
       from: 0,
       size: 5,
       search: '',
@@ -158,7 +158,7 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
       const channels = await this.props.notificationService.getChannels(
         queryObject
       );
-      this.setState({ items: channels });
+      this.setState({ items: channels, total: channels.length });
     } catch (error) {
       this.context.notifications.toasts.addDanger(
         getErrorMessage(error, 'There was a problem loading channels.')
@@ -235,7 +235,7 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
                 },
                 {
                   component: (
-                    <EuiButton size="s" fill href={`#${ROUTES.CREATE_CHANNEL}`}>
+                    <EuiButton fill href={`#${ROUTES.CREATE_CHANNEL}`}>
                       Create channel
                     </EuiButton>
                   ),
@@ -244,8 +244,9 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
             />
           }
           bodyStyles={{ padding: 'initial' }}
-          title={`Channels (${this.state.total})`}
+          title="Channels"
           titleSize="m"
+          total={this.state.total}
         >
           <ChannelControls
             search={search}

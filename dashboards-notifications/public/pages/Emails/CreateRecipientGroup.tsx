@@ -136,14 +136,13 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
       <EuiSpacer />
       <EuiFlexGroup justifyContent="flexEnd" style={{ maxWidth: 1024 }}>
         <EuiFlexItem grow={false}>
-          <EuiButtonEmpty size="s" href={`#${ROUTES.EMAIL_GROUPS}`}>
+          <EuiButtonEmpty href={`#${ROUTES.EMAIL_GROUPS}`}>
             Cancel
           </EuiButtonEmpty>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiButton
             fill
-            size="s"
             onClick={() => {
               if (!isInputValid()) {
                 coreContext.notifications.toasts.addDanger(
@@ -152,7 +151,7 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
                 return;
               }
               coreContext.notifications.toasts.addSuccess(
-                `${name} successfully ${props.edit ? 'updated' : 'created'}.`
+                `Recipient group ${name} successfully ${props.edit ? 'updated' : 'created'}.`
               );
               location.assign(`#${ROUTES.EMAIL_GROUPS}`);
             }}

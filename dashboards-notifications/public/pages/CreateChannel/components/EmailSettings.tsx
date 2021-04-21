@@ -175,7 +175,6 @@ export function EmailSettings(props: EmailSettingsProps) {
                 <ModalConsumer>
                   {({ onShow }) => (
                     <EuiButton
-                      size="s"
                       onClick={() =>
                         onShow(CreateSenderModal, {
                           addSenderOptionAndSelect: (
@@ -206,12 +205,13 @@ export function EmailSettings(props: EmailSettingsProps) {
             isInvalid={context.inputErrors.recipients.length > 0}
           >
             <EuiComboBox
-              placeholder="Email address, email group name"
+              placeholder="Email address, recipient group name"
               fullWidth
               options={recipientGroupOptions}
               selectedOptions={props.selectedRecipientGroupOptions}
               onChange={props.setSelectedRecipientGroupOptions}
               onCreateOption={onCreateEmailOption}
+              customOptionText={'Add {searchValue} as a default recipient'}
               isClearable={true}
               isInvalid={context.inputErrors.recipients.length > 0}
               onBlur={() => {
@@ -230,7 +230,6 @@ export function EmailSettings(props: EmailSettingsProps) {
             <ModalConsumer>
               {({ onShow }) => (
                 <EuiButton
-                  size="s"
                   onClick={() =>
                     onShow(CreateRecipientGroupModal, {
                       addRecipientGroupOptionAndSelect: (

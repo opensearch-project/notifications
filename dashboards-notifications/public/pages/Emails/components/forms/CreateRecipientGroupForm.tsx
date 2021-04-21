@@ -127,25 +127,30 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
         error={props.inputErrors.emailOptions.join(' ')}
         isInvalid={props.inputErrors.emailOptions.length > 0}
       >
-        <EuiComboBox
-          placeholder="Email addresses"
-          fullWidth
-          options={props.emailOptions}
-          selectedOptions={props.selectedEmailOptions}
-          onChange={props.setSelectedEmailOptions}
-          onCreateOption={onCreateEmailOption}
-          customOptionText={'Add {searchValue} as a default recipient'}
-          isClearable={true}
-          isInvalid={props.inputErrors.emailOptions.length > 0}
-          onBlur={() => {
-            props.setInputErrors({
-              ...props.inputErrors,
-              emailOptions: validateRecipientGroupEmails(
-                props.selectedEmailOptions
-              ),
-            });
-          }}
-        />
+        <>
+          <EuiText size="xs" color="subdued">
+            Select or type in one or more email addresses.
+          </EuiText>
+          <EuiComboBox
+            placeholder="Email addresses"
+            fullWidth
+            options={props.emailOptions}
+            selectedOptions={props.selectedEmailOptions}
+            onChange={props.setSelectedEmailOptions}
+            onCreateOption={onCreateEmailOption}
+            customOptionText={'Add {searchValue} as an email address'}
+            isClearable={true}
+            isInvalid={props.inputErrors.emailOptions.length > 0}
+            onBlur={() => {
+              props.setInputErrors({
+                ...props.inputErrors,
+                emailOptions: validateRecipientGroupEmails(
+                  props.selectedEmailOptions
+                ),
+              });
+            }}
+          />
+        </>
       </EuiFormRow>
 
       <EuiSpacer size="m" />

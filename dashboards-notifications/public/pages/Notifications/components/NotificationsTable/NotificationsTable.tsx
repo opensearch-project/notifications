@@ -102,7 +102,7 @@ export function NotificationsTable(props: NotificationsTableProps) {
       sortable: true,
       render: (status, item: NotificationItem) => {
         const color = status == 'Success' ? 'success' : 'danger';
-        const label = status == 'Success' ? 'Sent' : 'Errors';
+        const label = status == 'Success' ? 'Sent' : 'Error';
         return (
           <EuiHealth color={color}>
             {status === 'Success' ? (

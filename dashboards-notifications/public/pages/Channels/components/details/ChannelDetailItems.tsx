@@ -30,11 +30,11 @@ export function ChannelDetailItems(props: ChannelDetailItemsProps) {
   const getPaddedDescriptionList = (list: Array<ListItemType>) => {
     return list
       .concat(
-        new Array(Math.ceil(list.length / 4) * 4 - list.length).fill(null)
+        new Array(Math.ceil(list.length / 3) * 3 - list.length).fill(null)
       )
       .reduce(
         (rows: Array<Array<ListItemType>>, item: ListItemType, i: number) => {
-          if (i % 4 === 0) rows.push([item]);
+          if (i % 3 === 0) rows.push([item]);
           else rows[rows.length - 1].push(item);
           return rows;
         },
@@ -46,7 +46,7 @@ export function ChannelDetailItems(props: ChannelDetailItemsProps) {
     <>
       {getPaddedDescriptionList(props.listItems).map((row, rowIndex) => (
         <div key={`channel-description-row-${rowIndex}`}>
-          <EuiSpacer />
+          <EuiSpacer size="s" />
           <EuiFlexGroup>
             {row.map((item, itemIndex) => (
               <EuiFlexItem key={`channel-description-item-${itemIndex}`}>

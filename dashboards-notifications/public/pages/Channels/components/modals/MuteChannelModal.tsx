@@ -60,7 +60,7 @@ export const MuteChannelModal = (props: MuteChannelModalProps) => {
         <EuiModalBody>
           <EuiText>
             This channel will stop sending notifications to its recipients.
-            However, the channel remains available for selection.
+            However, the channel will remain available for selection.
           </EuiText>
         </EuiModalBody>
         <EuiModalFooter>
@@ -73,7 +73,7 @@ export const MuteChannelModal = (props: MuteChannelModalProps) => {
                 fill
                 onClick={() => {
                   coreContext.notifications.toasts.addSuccess(
-                    `${props.channels[0].name} successfully muted.`
+                    `Channel ${props.channels[0].name} successfully muted.`
                   );
                   props.onClose();
                 }}

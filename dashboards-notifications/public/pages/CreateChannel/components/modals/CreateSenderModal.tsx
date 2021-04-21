@@ -84,7 +84,7 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
 
   return (
     <EuiOverlayMask>
-      <EuiModal onClose={props.onClose} style={{ width: 650 }}>
+      <EuiModal onClose={props.onClose} style={{ width: 750 }}>
         <EuiModalHeader>
           <EuiModalHeaderTitle>Create sender</EuiModalHeaderTitle>
         </EuiModalHeader>
@@ -107,7 +107,7 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
         </EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButtonEmpty onClick={props.onClose} size="s">
+          <EuiButtonEmpty onClick={props.onClose}>
             Cancel
           </EuiButtonEmpty>
           <EuiButton
@@ -120,7 +120,7 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
                 return;
               }
               coreContext.notifications.toasts.addSuccess(
-                `${senderName} sender successfully created. You can select ${senderName} from the list of senders.`
+                `Sender ${senderName} successfully created. You can select ${senderName} from the list of senders.`
               );
               props.addSenderOptionAndSelect({
                 value: senderName,
@@ -128,7 +128,6 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
               });
               props.onClose();
             }}
-            size="s"
           >
             Create
           </EuiButton>

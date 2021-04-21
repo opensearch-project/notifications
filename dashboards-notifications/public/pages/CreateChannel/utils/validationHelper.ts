@@ -34,7 +34,8 @@ export const validateChannelName = (name: string) => {
 
 export const validateWebhookURL = (url: string) => {
   const errors = [];
-  if (url.length === 0 || !url.match(/https?:\/\/.+/)) errors.push('Invalid webhook URL.');
+  if (url.length === 0) errors.push('Webhook URL cannot be empty');
+  else if (!url.match(/https?:\/\/.+/)) errors.push('Invalid webhook URL.');
   return errors;
 };
 
@@ -52,12 +53,13 @@ export const validateWebhookValue = (value: string) => {
 
 export const validateCustomURLHost = (host: string) => {
   const errors = [];
-  if (host.length === 0) errors.push('Invalid host.');
+  if (host.length === 0) errors.push('Host cannot be empty.');
   return errors;
 };
 
 export const validateCustomURLPort = (port: string) => {
-  const errors = [];
+  const errors: string[] = [];
+  if (port.length === 0) return errors;
   const portNum = parseInt(port);
   if (isNaN(portNum) || portNum < 0 || portNum > 65535)
     errors.push('Invalid port.');
@@ -80,6 +82,6 @@ export const validateRecipients = (
 
 export const validateArn = (arn: string) => {
   const errors = [];
-  if (arn.length === 0) errors.push('Invalid ARN format.');
+  if (arn.length === 0) errors.push('ARN key cannot be empty.');
   return errors;
 };

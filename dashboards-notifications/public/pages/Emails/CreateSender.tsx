@@ -138,13 +138,12 @@ export function CreateSender(props: CreateSenderProps) {
       <EuiSpacer />
       <EuiFlexGroup justifyContent="flexEnd" style={{ maxWidth: 1024 }}>
         <EuiFlexItem grow={false}>
-          <EuiButtonEmpty size="s" href={`#${ROUTES.EMAIL_GROUPS}`}>
+          <EuiButtonEmpty href={`#${ROUTES.EMAIL_GROUPS}`}>
             Cancel
           </EuiButtonEmpty>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiButton
-            size="s"
             fill
             onClick={() => {
               if (!isInputValid()) {
@@ -154,7 +153,7 @@ export function CreateSender(props: CreateSenderProps) {
                 return;
               }
               coreContext.notifications.toasts.addSuccess(
-                `${senderName} sender successfully ${
+                `Sender ${senderName} successfully ${
                   props.edit ? 'updated' : 'created'
                 }.`
               );

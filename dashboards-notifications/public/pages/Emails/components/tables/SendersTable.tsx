@@ -81,35 +81,35 @@ export class SendersTable extends Component<
         name: 'Name',
         sortable: true,
         truncateText: true,
-        width: '150px',
+        width: '200px',
       },
       {
         field: 'from',
         name: 'Outbound email address',
         sortable: true,
         truncateText: true,
-        width: '150px',
+        width: '200px',
       },
       {
         field: 'host',
         name: 'Host',
         sortable: true,
         truncateText: true,
-        width: '150px',
+        width: '200px',
       },
       {
         field: 'port',
         name: 'Port',
         sortable: true,
         truncateText: true,
-        width: '150px',
+        width: '200px',
       },
       {
         field: 'method',
         name: 'Encryption method',
         sortable: true,
         truncateText: true,
-        width: '150px',
+        width: '200px',
       },
     ];
   }
@@ -204,7 +204,6 @@ export class SendersTable extends Component<
                     <ModalConsumer>
                       {({ onShow }) => (
                         <EuiButton
-                          size="s"
                           disabled={this.state.selectedItems.length === 0}
                           onClick={() =>
                             onShow(DeleteSenderModal, {
@@ -221,7 +220,6 @@ export class SendersTable extends Component<
                 {
                   component: (
                     <EuiButton
-                      size="s"
                       disabled={this.state.selectedItems.length !== 1}
                       onClick={() =>
                         location.assign(
@@ -235,7 +233,7 @@ export class SendersTable extends Component<
                 },
                 {
                   component: (
-                    <EuiButton size="s" fill href={`#${ROUTES.CREATE_SENDER}`}>
+                    <EuiButton fill href={`#${ROUTES.CREATE_SENDER}`}>
                       Create sender
                     </EuiButton>
                   ),
@@ -244,8 +242,9 @@ export class SendersTable extends Component<
             />
           }
           bodyStyles={{ padding: 'initial' }}
-          title={`Senders (${this.state.total})`}
+          title="Senders"
           titleSize="m"
+          total={this.state.total}
         >
           <EuiFieldSearch
             fullWidth={true}
@@ -264,7 +263,7 @@ export class SendersTable extends Component<
             noItemsMessage={
               <EuiEmptyPrompt
                 title={<h2>No senders to display</h2>}
-                body="Setup outbound email server by creating a sender. You will select a sender when configuring email channels."
+                body="Set up outbound email server by creating a sender. You will select a sender when configuring email channels."
                 actions={
                   <EuiButton href={`#${ROUTES.CREATE_CHANNEL}`}>
                     Create sender

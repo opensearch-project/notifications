@@ -17,13 +17,13 @@ import { EuiComboBoxOptionOption } from '@elastic/eui';
 
 export const validateSenderName = (name: string) => {
   const errors = [];
-  if (name.length === 0) errors.push('Invalid sender name.');
+  if (name.length === 0) errors.push('Sender name cannot be empty.');
   return errors;
 };
 
 export const validateEmail = (email: string) => {
   const errors = [];
-  if (email.length === 0) errors.push('Invalid email address.');
+  if (email.length === 0) errors.push('Email address cannot be empty.');
   return errors;
 };
 
@@ -36,14 +36,15 @@ export const validateHost = (host: string) => {
 export const validatePort = (port: string) => {
   const errors = [];
   const portNum = parseInt(port);
-  if (isNaN(portNum) || portNum < 0 || portNum > 65535)
+  if (port.length === 0) errors.push('Port cannot be empty.');
+  else if (isNaN(portNum) || portNum < 0 || portNum > 65535)
     errors.push('Invalid port.');
   return errors;
 };
 
 export const validateRecipientGroupName = (name: string) => {
   const errors = [];
-  if (name.length === 0) errors.push('Invalid recipient group name.');
+  if (name.length === 0) errors.push('Recipient group name cannot be empty.');
   return errors;
 };
 
@@ -51,6 +52,6 @@ export const validateRecipientGroupEmails = (
   emails: Array<EuiComboBoxOptionOption<string>>
 ) => {
   const errors = [];
-  if (emails.length === 0) errors.push('Invalid email addresses.');
+  if (emails.length === 0) errors.push('Email addresses cannot be empty.');
   return errors;
 };

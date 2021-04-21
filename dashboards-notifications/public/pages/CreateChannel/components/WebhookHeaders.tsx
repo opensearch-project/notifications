@@ -99,7 +99,6 @@ export function WebhookHeaders(props: WebhookHeadersProps) {
               <EuiFlexItem>
                 <EuiFormRow hasEmptyLabelSpace>
                   <EuiButton
-                    size="s"
                     onClick={() => {
                       const newHeaders = [...props.headers];
                       newHeaders.splice(i, 1);
@@ -118,7 +117,6 @@ export function WebhookHeaders(props: WebhookHeadersProps) {
 
       <EuiSpacer size="m" />
       <EuiButton
-        size="s"
         onClick={() => {
           props.setHeaders([...props.headers, { key: '', value: '' }]);
         }}

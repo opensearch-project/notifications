@@ -108,7 +108,7 @@ export const DeleteChannelModal = (props: DeleteChannelModalProps) => {
                     `${
                       props.channels.length > 1
                         ? props.channels.length + ' channels'
-                        : props.channels[0].name
+                        : 'Channel ' + props.channels[0].name
                     } successfully deleted.`
                   );
                   props.onClose();

@@ -73,7 +73,7 @@ export function ChannelActions(props: ChannelActionsProps) {
         props.selectedItems.length !== 1 || props.selectedItems[0].enabled,
       action: () => {
         coreContext.notifications.toasts.addSuccess(
-          `${props.selectedItems[0].name} successfully unmuted.`
+          `Channel ${props.selectedItems[0].name} successfully unmuted.`
         );
       },
     },
@@ -88,7 +88,6 @@ export function ChannelActions(props: ChannelActionsProps) {
             <EuiButton
               iconType="arrowDown"
               iconSide="right"
-              size="s"
               disabled={props.selectedItems.length === 0}
               onClick={() => setIsPopoverOpen(!isPopoverOpen)}
             >
