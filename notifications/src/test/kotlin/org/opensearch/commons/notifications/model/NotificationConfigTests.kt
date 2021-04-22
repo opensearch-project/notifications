@@ -44,7 +44,7 @@ internal class NotificationConfigTests {
             "description",
             ConfigType.Slack,
             EnumSet.of(Feature.Reports),
-            slack = sampleSlack
+            channelDataList = listOf(sampleSlack)
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
         assertEquals(sampleConfig, recreatedObject)
@@ -58,7 +58,7 @@ internal class NotificationConfigTests {
             "description",
             ConfigType.Slack,
             EnumSet.of(Feature.Reports),
-            slack = sampleSlack
+            channelDataList = listOf(sampleSlack)
         )
         val jsonString = getJsonString(sampleConfig)
         val recreatedObject = createObjectFromJsonString(jsonString) { NotificationConfig.parse(it) }
@@ -73,7 +73,7 @@ internal class NotificationConfigTests {
             "description",
             ConfigType.Chime,
             EnumSet.of(Feature.Alerting),
-            chime = sampleChime
+            channelDataList = listOf(sampleChime)
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
         assertEquals(sampleConfig, recreatedObject)
@@ -87,7 +87,7 @@ internal class NotificationConfigTests {
             "description",
             ConfigType.Chime,
             EnumSet.of(Feature.Alerting),
-            chime = sampleChime
+            channelDataList = listOf(sampleChime)
         )
         val jsonString = getJsonString(sampleConfig)
         val recreatedObject = createObjectFromJsonString(jsonString) { NotificationConfig.parse(it) }
@@ -102,7 +102,7 @@ internal class NotificationConfigTests {
             "description",
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement),
-            webhook = sampleWebhook
+            channelDataList = listOf(sampleWebhook)
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
         assertEquals(sampleConfig, recreatedObject)
@@ -116,7 +116,7 @@ internal class NotificationConfigTests {
             "description",
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement),
-            webhook = sampleWebhook
+            channelDataList = listOf(sampleWebhook)
         )
         val jsonString = getJsonString(sampleConfig)
         val recreatedObject = createObjectFromJsonString(jsonString) { NotificationConfig.parse(it) }
@@ -131,7 +131,7 @@ internal class NotificationConfigTests {
             "description",
             ConfigType.Email,
             EnumSet.of(Feature.IndexManagement),
-            email = sampleEmail
+            channelDataList = listOf(sampleEmail)
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
         assertEquals(sampleConfig, recreatedObject)
@@ -145,7 +145,7 @@ internal class NotificationConfigTests {
             "description",
             ConfigType.Email,
             EnumSet.of(Feature.IndexManagement),
-            email = sampleEmail
+            channelDataList = listOf(sampleEmail)
         )
         val jsonString = getJsonString(sampleConfig)
         val recreatedObject = createObjectFromJsonString(jsonString) { NotificationConfig.parse(it) }
@@ -160,7 +160,7 @@ internal class NotificationConfigTests {
             "description",
             ConfigType.SmtpAccount,
             EnumSet.of(Feature.IndexManagement),
-            smtpAccount = smtpAccount
+            channelDataList = listOf(smtpAccount)
         )
         val jsonString = getJsonString(sampleConfig)
         val recreatedObject = createObjectFromJsonString(jsonString) { NotificationConfig.parse(it) }
@@ -175,7 +175,7 @@ internal class NotificationConfigTests {
             "description",
             ConfigType.SmtpAccount,
             EnumSet.of(Feature.IndexManagement),
-            smtpAccount = sampleSmtpAccount
+            channelDataList = listOf(sampleSmtpAccount)
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
         assertEquals(sampleConfig, recreatedObject)
@@ -189,7 +189,7 @@ internal class NotificationConfigTests {
             "description",
             ConfigType.EmailGroup,
             EnumSet.of(Feature.IndexManagement),
-            emailGroup = sampleEmailGroup
+            channelDataList = listOf(sampleEmailGroup)
         )
         val jsonString = getJsonString(sampleConfig)
         val recreatedObject = createObjectFromJsonString(jsonString) { NotificationConfig.parse(it) }
@@ -204,7 +204,7 @@ internal class NotificationConfigTests {
             "description",
             ConfigType.EmailGroup,
             EnumSet.of(Feature.IndexManagement),
-            emailGroup = sampleEmailGroup
+            channelDataList = listOf(sampleEmailGroup)
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
         assertEquals(sampleConfig, recreatedObject)
@@ -218,18 +218,15 @@ internal class NotificationConfigTests {
         val sampleEmail = Email("id_1234567890", listOf("email@domain.com"), listOf("groupId"))
         val sampleSmtpAccount = SmtpAccount("domain.com", 1234, SmtpAccount.MethodType.Ssl, "from@domain.com")
         val sampleEmailGroup = EmailGroup(listOf("email@domain.com"))
+        val channelDataList = listOf(sampleChime, sampleSlack, sampleEmail,
+                sampleEmailGroup,sampleWebhook,sampleSmtpAccount )
         val sampleConfig = NotificationConfig(
             "name",
             "description",
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            slack = sampleSlack,
-            chime = sampleChime,
-            webhook = sampleWebhook,
-            email = sampleEmail,
-            smtpAccount = sampleSmtpAccount,
-            emailGroup = sampleEmailGroup
+            channelDataList = channelDataList
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
         assertEquals(sampleConfig, recreatedObject)
@@ -243,18 +240,15 @@ internal class NotificationConfigTests {
         val sampleEmail = Email("id_1234567890", listOf("email@domain.com"), listOf("groupId"))
         val sampleSmtpAccount = SmtpAccount("domain.com", 1234, SmtpAccount.MethodType.Ssl, "from@domain.com")
         val sampleEmailGroup = EmailGroup(listOf("email@domain.com"))
+        val channelDataList = listOf(sampleChime, sampleSlack, sampleEmail,
+                sampleEmailGroup,sampleWebhook,sampleSmtpAccount )
         val sampleConfig = NotificationConfig(
             "name",
             "description",
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            slack = sampleSlack,
-            chime = sampleChime,
-            webhook = sampleWebhook,
-            email = sampleEmail,
-            smtpAccount = sampleSmtpAccount,
-            emailGroup = sampleEmailGroup
+            channelDataList = channelDataList
         )
         val jsonString = getJsonString(sampleConfig)
         val recreatedObject = createObjectFromJsonString(jsonString) { NotificationConfig.parse(it) }
@@ -269,18 +263,15 @@ internal class NotificationConfigTests {
         val sampleEmail = Email("id_1234567890", listOf("email@domain.com"), listOf("groupId"))
         val sampleSmtpAccount = SmtpAccount("domain.com", 1234, SmtpAccount.MethodType.Ssl, "from@domain.com")
         val sampleEmailGroup = EmailGroup(listOf("email@domain.com"))
+        val channelDataList = listOf(sampleChime, sampleSlack, sampleEmail,
+                sampleEmailGroup,sampleWebhook,sampleSmtpAccount )
         val sampleConfig = NotificationConfig(
             "name",
             "description",
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = false,
-            slack = sampleSlack,
-            chime = sampleChime,
-            webhook = sampleWebhook,
-            email = sampleEmail,
-            smtpAccount = sampleSmtpAccount,
-            emailGroup = sampleEmailGroup
+            channelDataList = channelDataList
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
         assertEquals(sampleConfig, recreatedObject)
@@ -294,18 +285,15 @@ internal class NotificationConfigTests {
         val sampleEmail = Email("id_1234567890", listOf("email@domain.com"), listOf("groupId"))
         val sampleSmtpAccount = SmtpAccount("domain.com", 1234, SmtpAccount.MethodType.Ssl, "from@domain.com")
         val sampleEmailGroup = EmailGroup(listOf("email@domain.com"))
+        val channelDataList = listOf(sampleChime, sampleSlack, sampleEmail,
+                sampleEmailGroup,sampleWebhook,sampleSmtpAccount )
         val sampleConfig = NotificationConfig(
             "name",
             "description",
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = false,
-            slack = sampleSlack,
-            chime = sampleChime,
-            webhook = sampleWebhook,
-            email = sampleEmail,
-            smtpAccount = sampleSmtpAccount,
-            emailGroup = sampleEmailGroup
+            channelDataList = channelDataList
         )
         val jsonString = getJsonString(sampleConfig)
         val recreatedObject = createObjectFromJsonString(jsonString) { NotificationConfig.parse(it) }
@@ -317,15 +305,14 @@ internal class NotificationConfigTests {
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
         val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
         val sampleWebhook = Webhook("https://domain.com/sample_webhook_url#1234567890")
+        val channelDataList = listOf(sampleChime, sampleSlack, sampleWebhook )
         val sampleConfig = NotificationConfig(
             "name",
             "description",
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            slack = sampleSlack,
-            chime = sampleChime,
-            webhook = sampleWebhook
+            channelDataList = channelDataList
         )
         val jsonString = """
         {
@@ -350,15 +337,14 @@ internal class NotificationConfigTests {
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
         val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
         val sampleWebhook = Webhook("https://domain.com/sample_webhook_url#1234567890")
+        val channelDataList = listOf(sampleChime, sampleSlack, sampleWebhook )
         val sampleConfig = NotificationConfig(
             "name",
             "description",
             ConfigType.None,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            slack = sampleSlack,
-            chime = sampleChime,
-            webhook = sampleWebhook
+            channelDataList = channelDataList
         )
         val jsonString = """
         {
@@ -383,15 +369,14 @@ internal class NotificationConfigTests {
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
         val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
         val sampleWebhook = Webhook("https://domain.com/sample_webhook_url#1234567890")
+        val channelDataList = listOf(sampleChime, sampleSlack, sampleWebhook )
         val sampleConfig = NotificationConfig(
             "name",
             "description",
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement, Feature.None),
             isEnabled = true,
-            slack = sampleSlack,
-            chime = sampleChime,
-            webhook = sampleWebhook
+            channelDataList = channelDataList
         )
         val jsonString = """
         {

@@ -54,18 +54,15 @@ internal class UpdateNotificationConfigRequestTests {
         val sampleEmail = Email("id_1234567890", listOf("email@domain.com"), listOf("groupId"))
         val sampleSmtpAccount = SmtpAccount("domain.com", 1234, SmtpAccount.MethodType.Ssl, "from@domain.com")
         val sampleEmailGroup = EmailGroup(listOf("email@domain.com"))
+        val channelDataList = listOf(sampleSlack, sampleChime, sampleWebhook,
+                sampleSmtpAccount, sampleEmailGroup, sampleEmail)
         return NotificationConfig(
             "name",
             "description",
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            slack = sampleSlack,
-            chime = sampleChime,
-            webhook = sampleWebhook,
-            email = sampleEmail,
-            smtpAccount = sampleSmtpAccount,
-            emailGroup = sampleEmailGroup
+            channelDataList = channelDataList
         )
     }
 
@@ -97,7 +94,7 @@ internal class UpdateNotificationConfigRequestTests {
             ConfigType.Slack,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            slack = sampleSlack
+            channelDataList = listOf(sampleSlack)
         )
 
         val jsonString = """
@@ -135,7 +132,7 @@ internal class UpdateNotificationConfigRequestTests {
             ConfigType.Slack,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            slack = sampleSlack
+            channelDataList = listOf(sampleSlack)
         )
 
         val jsonString = """
