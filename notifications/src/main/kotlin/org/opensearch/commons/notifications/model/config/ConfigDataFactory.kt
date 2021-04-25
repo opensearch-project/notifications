@@ -27,7 +27,6 @@
 
 package org.opensearch.commons.notifications.model.config
 
-import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.commons.notifications.model.ConfigType
 
 /**

@@ -28,7 +28,6 @@
 package org.opensearch.commons.notifications.model.config
 
 import org.opensearch.common.io.stream.Writeable.Reader
-import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.commons.notifications.model.NotificationConfig.Companion.CHIME_TAG
 import org.opensearch.commons.notifications.model.NotificationConfig.Companion.EMAIL_GROUP_TAG
 import org.opensearch.commons.notifications.model.NotificationConfig.Companion.EMAIL_TAG
