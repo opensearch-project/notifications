@@ -48,7 +48,7 @@ internal class ChimeTests {
     fun `Chime serialize and deserialize using json object should be equal`() {
         val sampleChime = Chime("https://domain.com/sample_url#1234567890")
         val jsonString = getJsonString(sampleChime)
-        val recreatedObject = createObjectFromJsonString(jsonString) { Chime.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { Chime.parse(it.map()) }
         assertEquals(sampleChime, recreatedObject)
     }
 
@@ -56,7 +56,7 @@ internal class ChimeTests {
     fun `Chime should deserialize json object using parser`() {
         val sampleChime = Chime("https://domain.com/sample_url#1234567890")
         val jsonString = "{\"url\":\"${sampleChime.url}\"}"
-        val recreatedObject = createObjectFromJsonString(jsonString) { Chime.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { Chime.parse(it.map()) }
         assertEquals(sampleChime, recreatedObject)
     }
 
@@ -64,7 +64,7 @@ internal class ChimeTests {
     fun `Chime should throw exception when invalid json object is passed`() {
         val jsonString = "sample message"
         assertThrows<JsonParseException> {
-            createObjectFromJsonString(jsonString) { Chime.parse(it) }
+            createObjectFromJsonString(jsonString) { Chime.parse(it.map()) }
         }
     }
 
@@ -73,7 +73,7 @@ internal class ChimeTests {
         val sampleChime = Chime("https://domain.com/sample_url#1234567890")
         val jsonString = "{\"url2\":\"${sampleChime.url}\"}"
         assertThrows<IllegalArgumentException> {
-            createObjectFromJsonString(jsonString) { Chime.parse(it) }
+            createObjectFromJsonString(jsonString) { Chime.parse(it.map()) }
         }
     }
 
@@ -84,7 +84,7 @@ internal class ChimeTests {
         }
         val jsonString = "{\"url\":\"domain.com/sample_url\"}"
         assertThrows<MalformedURLException> {
-            createObjectFromJsonString(jsonString) { Chime.parse(it) }
+            createObjectFromJsonString(jsonString) { Chime.parse(it.map()) }
         }
     }
 
@@ -95,7 +95,7 @@ internal class ChimeTests {
         }
         val jsonString = "{\"url\":\"http://domain.com/sample_url\"}"
         assertThrows<IllegalArgumentException> {
-            createObjectFromJsonString(jsonString) { Chime.parse(it) }
+            createObjectFromJsonString(jsonString) { Chime.parse(it.map()) }
         }
     }
 
@@ -103,7 +103,7 @@ internal class ChimeTests {
     fun `Chime should safely ignore extra field in json object`() {
         val sampleChime = Chime("https://domain.com/sample_url#1234567890")
         val jsonString = "{\"url\":\"${sampleChime.url}\", \"another\":\"field\"}"
-        val recreatedObject = createObjectFromJsonString(jsonString) { Chime.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { Chime.parse(it.map()) }
         assertEquals(sampleChime, recreatedObject)
     }
 }

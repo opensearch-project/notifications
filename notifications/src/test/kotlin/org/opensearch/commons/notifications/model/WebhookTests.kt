@@ -48,7 +48,7 @@ internal class WebhookTests {
     fun `Webhook serialize and deserialize using json object should be equal`() {
         val sampleWebhook = Webhook("https://domain.com/sample_url#1234567890")
         val jsonString = getJsonString(sampleWebhook)
-        val recreatedObject = createObjectFromJsonString(jsonString) { Webhook.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { Webhook.parse(it.map()) }
         assertEquals(sampleWebhook, recreatedObject)
     }
 
@@ -56,7 +56,7 @@ internal class WebhookTests {
     fun `Webhook should deserialize json object using parser`() {
         val sampleWebhook = Webhook("https://domain.com/sample_url#1234567890")
         val jsonString = "{\"url\":\"${sampleWebhook.url}\"}"
-        val recreatedObject = createObjectFromJsonString(jsonString) { Webhook.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { Webhook.parse(it.map()) }
         assertEquals(sampleWebhook, recreatedObject)
     }
 
@@ -64,7 +64,7 @@ internal class WebhookTests {
     fun `Webhook should throw exception when invalid json object is passed`() {
         val jsonString = "sample message"
         assertThrows<JsonParseException> {
-            createObjectFromJsonString(jsonString) { Webhook.parse(it) }
+            createObjectFromJsonString(jsonString) { Webhook.parse(it.map()) }
         }
     }
 
@@ -73,7 +73,7 @@ internal class WebhookTests {
         val sampleWebhook = Webhook("https://domain.com/sample_url#1234567890")
         val jsonString = "{\"url2\":\"${sampleWebhook.url}\"}"
         assertThrows<IllegalArgumentException> {
-            createObjectFromJsonString(jsonString) { Webhook.parse(it) }
+            createObjectFromJsonString(jsonString) { Webhook.parse(it.map()) }
         }
     }
 
@@ -84,7 +84,7 @@ internal class WebhookTests {
         }
         val jsonString = "{\"url\":\"domain.com/sample_url\"}"
         assertThrows<MalformedURLException> {
-            createObjectFromJsonString(jsonString) { Webhook.parse(it) }
+            createObjectFromJsonString(jsonString) { Webhook.parse(it.map()) }
         }
     }
 
@@ -95,7 +95,7 @@ internal class WebhookTests {
         }
         val jsonString = "{\"url\":\"http://domain.com/sample_url\"}"
         assertThrows<IllegalArgumentException> {
-            createObjectFromJsonString(jsonString) { Webhook.parse(it) }
+            createObjectFromJsonString(jsonString) { Webhook.parse(it.map()) }
         }
     }
 
@@ -103,7 +103,7 @@ internal class WebhookTests {
     fun `Webhook should safely ignore extra field in json object`() {
         val sampleWebhook = Webhook("https://domain.com/sample_url#1234567890")
         val jsonString = "{\"url\":\"${sampleWebhook.url}\", \"another\":\"field\"}"
-        val recreatedObject = createObjectFromJsonString(jsonString) { Webhook.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { Webhook.parse(it.map()) }
         assertEquals(sampleWebhook, recreatedObject)
     }
 }

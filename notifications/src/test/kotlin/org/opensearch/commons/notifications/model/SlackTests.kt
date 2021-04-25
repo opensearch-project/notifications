@@ -48,7 +48,7 @@ internal class SlackTests {
     fun `Slack serialize and deserialize using json object should be equal`() {
         val sampleSlack = Slack("https://domain.com/sample_url#1234567890")
         val jsonString = getJsonString(sampleSlack)
-        val recreatedObject = createObjectFromJsonString(jsonString) { Slack.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { Slack.parse(it.map()) }
         assertEquals(sampleSlack, recreatedObject)
     }
 
@@ -56,7 +56,7 @@ internal class SlackTests {
     fun `Slack should deserialize json object using parser`() {
         val sampleSlack = Slack("https://domain.com/sample_url#1234567890")
         val jsonString = "{\"url\":\"${sampleSlack.url}\"}"
-        val recreatedObject = createObjectFromJsonString(jsonString) { Slack.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { Slack.parse(it.map()) }
         assertEquals(sampleSlack, recreatedObject)
     }
 
@@ -64,7 +64,7 @@ internal class SlackTests {
     fun `Slack should throw exception when invalid json object is passed`() {
         val jsonString = "sample message"
         assertThrows<JsonParseException> {
-            createObjectFromJsonString(jsonString) { Slack.parse(it) }
+            createObjectFromJsonString(jsonString) { Slack.parse(it.map()) }
         }
     }
 
@@ -73,7 +73,7 @@ internal class SlackTests {
         val sampleSlack = Slack("https://domain.com/sample_url#1234567890")
         val jsonString = "{\"url2\":\"${sampleSlack.url}\"}"
         assertThrows<IllegalArgumentException> {
-            createObjectFromJsonString(jsonString) { Slack.parse(it) }
+            createObjectFromJsonString(jsonString) { Slack.parse(it.map()) }
         }
     }
 
@@ -84,7 +84,7 @@ internal class SlackTests {
         }
         val jsonString = "{\"url\":\"domain.com/sample_url\"}"
         assertThrows<MalformedURLException> {
-            createObjectFromJsonString(jsonString) { Slack.parse(it) }
+            createObjectFromJsonString(jsonString) { Slack.parse(it.map()) }
         }
     }
 
@@ -95,7 +95,7 @@ internal class SlackTests {
         }
         val jsonString = "{\"url\":\"http://domain.com/sample_url\"}"
         assertThrows<IllegalArgumentException> {
-            createObjectFromJsonString(jsonString) { Slack.parse(it) }
+            createObjectFromJsonString(jsonString) { Slack.parse(it.map()) }
         }
     }
 
@@ -103,7 +103,7 @@ internal class SlackTests {
     fun `Slack should safely ignore extra field in json object`() {
         val sampleSlack = Slack("https://domain.com/sample_url#1234567890")
         val jsonString = "{\"url\":\"${sampleSlack.url}\", \"another\":\"field\"}"
-        val recreatedObject = createObjectFromJsonString(jsonString) { Slack.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { Slack.parse(it.map()) }
         assertEquals(sampleSlack, recreatedObject)
     }
 }

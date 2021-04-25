@@ -96,7 +96,7 @@ internal class EmailTests {
             listOf("sample_group_id_1", "sample_group_id_2")
         )
         val jsonString = getJsonString(sampleEmail)
-        val recreatedObject = createObjectFromJsonString(jsonString) { Email.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { Email.parse(it.map()) }
         assertEquals(sampleEmail, recreatedObject)
     }
 
@@ -120,7 +120,7 @@ internal class EmailTests {
                 ]
              }"
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { Email.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { Email.parse(it.map()) }
         assertEquals(sampleEmail, recreatedObject)
     }
 
@@ -128,7 +128,7 @@ internal class EmailTests {
     fun `Email should throw exception when invalid json object is passed`() {
         val jsonString = "sample message"
         assertThrows<JsonParseException> {
-            createObjectFromJsonString(jsonString) { Email.parse(it) }
+            createObjectFromJsonString(jsonString) { Email.parse(it.map()) }
         }
     }
 
@@ -153,7 +153,7 @@ internal class EmailTests {
              }"
         """.trimIndent()
         assertThrows<IllegalArgumentException> {
-            createObjectFromJsonString(jsonString) { Email.parse(it) }
+            createObjectFromJsonString(jsonString) { Email.parse(it.map()) }
         }
     }
 
@@ -165,7 +165,7 @@ internal class EmailTests {
                 "emailAccountID":"${sampleEmail.emailAccountID}"
             }"
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { Email.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { Email.parse(it.map()) }
         assertEquals(sampleEmail, recreatedObject)
     }
 
@@ -185,7 +185,7 @@ internal class EmailTests {
                 "another":"field"
             }"
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { Email.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { Email.parse(it.map()) }
         assertEquals(sampleEmail, recreatedObject)
     }
 }

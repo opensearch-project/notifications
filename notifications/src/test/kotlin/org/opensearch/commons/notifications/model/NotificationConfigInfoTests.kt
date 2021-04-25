@@ -45,7 +45,7 @@ internal class NotificationConfigInfoTests {
             "description",
             ConfigType.Slack,
             EnumSet.of(Feature.Reports),
-            channelDataList = listOf(sampleSlack)
+            configData = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
             "configId",
@@ -68,7 +68,7 @@ internal class NotificationConfigInfoTests {
             "description",
             ConfigType.Slack,
             EnumSet.of(Feature.Reports),
-            channelDataList =  listOf(sampleSlack)
+            configData = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
             "configId",
@@ -93,7 +93,7 @@ internal class NotificationConfigInfoTests {
             ConfigType.Slack,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            channelDataList =  listOf(sampleSlack)
+            configData = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
             "config-Id",
@@ -132,7 +132,7 @@ internal class NotificationConfigInfoTests {
             ConfigType.Slack,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            channelDataList =  listOf(sampleSlack)
+            configData = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
             "config-Id",
@@ -172,7 +172,7 @@ internal class NotificationConfigInfoTests {
             "description",
             ConfigType.Slack,
             EnumSet.of(Feature.Reports),
-            channelDataList =  listOf(sampleSlack)
+            configData = sampleSlack
         )
         Assertions.assertThrows(IllegalArgumentException::class.java) {
             NotificationConfigInfo(

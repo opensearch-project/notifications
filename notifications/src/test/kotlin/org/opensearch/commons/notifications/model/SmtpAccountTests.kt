@@ -61,7 +61,7 @@ internal class SmtpAccountTests {
     fun `SmtpAccount serialize and deserialize using json object should be equal`() {
         val sampleSmtpAccount = SmtpAccount("domain.com", 1234, SmtpAccount.MethodType.Ssl, "from@domain.com")
         val jsonString = getJsonString(sampleSmtpAccount)
-        val recreatedObject = createObjectFromJsonString(jsonString) { SmtpAccount.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { SmtpAccount.parse(it.map()) }
         assertEquals(sampleSmtpAccount, recreatedObject)
     }
 
@@ -75,7 +75,7 @@ internal class SmtpAccountTests {
             SecureString("password".toCharArray())
         )
         val jsonString = getJsonString(sampleSmtpAccount)
-        val recreatedObject = createObjectFromJsonString(jsonString) { SmtpAccount.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { SmtpAccount.parse(it.map()) }
         assertEquals(sampleSmtpAccount, recreatedObject)
     }
 
@@ -90,7 +90,7 @@ internal class SmtpAccountTests {
             "fromAddress":"from@domain.com"
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { SmtpAccount.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { SmtpAccount.parse(it.map()) }
         assertEquals(sampleSmtpAccount, recreatedObject)
     }
 
@@ -113,7 +113,7 @@ internal class SmtpAccountTests {
             "password":"given_password"
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { SmtpAccount.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { SmtpAccount.parse(it.map()) }
         assertEquals(sampleSmtpAccount, recreatedObject)
     }
 
@@ -121,7 +121,7 @@ internal class SmtpAccountTests {
     fun `SmtpAccount should throw exception when invalid json object is passed`() {
         val jsonString = "sample message"
         assertThrows<JsonParseException> {
-            createObjectFromJsonString(jsonString) { SmtpAccount.parse(it) }
+            createObjectFromJsonString(jsonString) { SmtpAccount.parse(it.map()) }
         }
     }
 
@@ -138,7 +138,7 @@ internal class SmtpAccountTests {
         }
         """.trimIndent()
         assertThrows<IllegalArgumentException> {
-            createObjectFromJsonString(jsonString) { SmtpAccount.parse(it) }
+            createObjectFromJsonString(jsonString) { SmtpAccount.parse(it.map()) }
         }
     }
 
@@ -163,7 +163,7 @@ internal class SmtpAccountTests {
             "extra_field_2":"extra value 2"
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { SmtpAccount.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { SmtpAccount.parse(it.map()) }
         assertEquals(sampleSmtpAccount, recreatedObject)
     }
 }

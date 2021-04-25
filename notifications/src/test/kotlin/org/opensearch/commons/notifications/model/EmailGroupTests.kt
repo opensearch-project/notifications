@@ -88,7 +88,7 @@ internal class EmailGroupTests {
     fun `EmailGroup serialize and deserialize using json object should be equal`() {
         val sampleEmailGroup = EmailGroup(listOf("email1@email.com", "email2@email.com"))
         val jsonString = getJsonString(sampleEmailGroup)
-        val recreatedObject = createObjectFromJsonString(jsonString) { EmailGroup.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { EmailGroup.parse(it.map()) }
         assertEquals(sampleEmailGroup, recreatedObject)
     }
 
@@ -103,7 +103,7 @@ internal class EmailGroupTests {
                 ]
              }"
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { EmailGroup.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { EmailGroup.parse(it.map()) }
         assertEquals(sampleEmailGroup, recreatedObject)
     }
 
@@ -111,7 +111,7 @@ internal class EmailGroupTests {
     fun `EmailGroup should throw exception when invalid json object is passed`() {
         val jsonString = "sample message"
         assertThrows<JsonParseException> {
-            createObjectFromJsonString(jsonString) { EmailGroup.parse(it) }
+            createObjectFromJsonString(jsonString) { EmailGroup.parse(it.map()) }
         }
     }
 
@@ -127,7 +127,7 @@ internal class EmailGroupTests {
              }"
         """.trimIndent()
         assertThrows<IllegalArgumentException> {
-            createObjectFromJsonString(jsonString) { EmailGroup.parse(it) }
+            createObjectFromJsonString(jsonString) { EmailGroup.parse(it.map()) }
         }
     }
 
@@ -135,7 +135,7 @@ internal class EmailGroupTests {
     fun `EmailGroup should safely ignore extra field in json object`() {
         val sampleEmailGroup = EmailGroup(listOf("email@email.com"))
         val jsonString = "{\"recipients\":[\"${sampleEmailGroup.recipients[0]}\"], \"another\":\"field\"}"
-        val recreatedObject = createObjectFromJsonString(jsonString) { EmailGroup.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { EmailGroup.parse(it.map()) }
         assertEquals(sampleEmailGroup, recreatedObject)
     }
 }
