@@ -33,6 +33,7 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.model.config.BaseConfigData
 import org.opensearch.commons.utils.isValidEmail
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.stringList
@@ -42,8 +43,8 @@ import java.io.IOException
  * Data class representing Email group.
  */
 data class EmailGroup(
-    val recipients: List<String>
-) : BaseChannelData {
+        val recipients: List<String>
+) : BaseConfigData {
 
     init {
         recipients.forEach {
@@ -66,26 +67,16 @@ data class EmailGroup(
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): EmailGroup {
-            var recipients: List<String>? = null
-
-            XContentParserUtils.ensureExpectedToken(
-                XContentParser.Token.START_OBJECT,
-                parser.currentToken(),
-                parser
-            )
-            while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
-                val fieldName = parser.currentName()
-                parser.nextToken()
-                when (fieldName) {
-                    RECIPIENTS_TAG -> recipients = parser.stringList()
-                    else -> {
-                        parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing EmailGroup")
-                    }
-                }
+        fun parse(configDataMap: Map<String, Any>): EmailGroup {
+            if (!configDataMap.containsKey(RECIPIENTS_TAG)) {
+                throw IllegalArgumentException("${RECIPIENTS_TAG} field absent")
             }
-            recipients ?: throw IllegalArgumentException("$RECIPIENTS_TAG field absent")
+
+            val tempRecipients = configDataMap.get(RECIPIENTS_TAG)
+            var recipients: List<String> = listOf()
+            if (tempRecipients is List<*>) {
+                recipients = tempRecipients.filterIsInstance<String>()
+            }
             return EmailGroup(recipients)
         }
     }
@@ -95,7 +86,7 @@ data class EmailGroup(
      * @param input StreamInput stream to deserialize data from.
      */
     constructor(input: StreamInput) : this(
-        recipients = input.readStringList()
+            recipients = input.readStringList()
     )
 
     /**
@@ -111,7 +102,7 @@ data class EmailGroup(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(RECIPIENTS_TAG, recipients)
-            .endObject()
+                .field(RECIPIENTS_TAG, recipients)
+                .endObject()
     }
 }

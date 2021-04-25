@@ -34,6 +34,7 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.model.config.BaseConfigData
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.validateUrl
 import java.io.IOException
@@ -42,8 +43,8 @@ import java.io.IOException
  * Data class representing Slack channel.
  */
 data class Slack(
-    val url: String
-) : BaseChannelData {
+        val url: String
+) : BaseConfigData {
 
     init {
         require(!Strings.isNullOrEmpty(url)) { "URL is null or empty" }
@@ -65,26 +66,11 @@ data class Slack(
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): Slack {
-            var url: String? = null
-
-            XContentParserUtils.ensureExpectedToken(
-                XContentParser.Token.START_OBJECT,
-                parser.currentToken(),
-                parser
-            )
-            while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
-                val fieldName = parser.currentName()
-                parser.nextToken()
-                when (fieldName) {
-                    URL_TAG -> url = parser.text()
-                    else -> {
-                        parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing Slack destination")
-                    }
-                }
+        fun parse(configDataMap: Map<String, Any>): Slack {
+            if (!configDataMap.containsKey(URL_TAG)) {
+                throw IllegalArgumentException("$URL_TAG field absent")
             }
-            url ?: throw IllegalArgumentException("$URL_TAG field absent")
+            val url: String = configDataMap[URL_TAG] as String
             return Slack(url)
         }
     }
@@ -94,7 +80,7 @@ data class Slack(
      * @param input StreamInput stream to deserialize data from.
      */
     constructor(input: StreamInput) : this(
-        url = input.readString()
+            url = input.readString()
     )
 
     /**
@@ -110,7 +96,7 @@ data class Slack(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(URL_TAG, url)
-            .endObject()
+                .field(URL_TAG, url)
+                .endObject()
     }
 }

@@ -35,6 +35,7 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.model.config.BaseConfigData
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.isValidEmail
 import org.opensearch.commons.utils.logger
@@ -45,13 +46,13 @@ import java.io.IOException
  * Data class representing SMTP account channel.
  */
 data class SmtpAccount(
-    val host: String,
-    val port: Int,
-    val method: MethodType,
-    val fromAddress: String,
-    val username: SecureString? = null,
-    val password: SecureString? = null
-) : BaseChannelData {
+        val host: String,
+        val port: Int,
+        val method: MethodType,
+        val fromAddress: String,
+        val username: SecureString? = null,
+        val password: SecureString? = null
+) : BaseConfigData {
 
     init {
         require(!Strings.isNullOrEmpty(host)) { "host is null or empty" }
@@ -78,46 +79,29 @@ data class SmtpAccount(
 
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): SmtpAccount {
-            var host: String? = null
-            var port: Int? = null
-            var method: MethodType? = null
-            var fromAddress: String? = null
+        fun parse(configDataMap: Map<String, Any>): SmtpAccount {
+            configDataMap[HOST_FIELD] ?: throw IllegalArgumentException("$HOST_FIELD field absent")
+            configDataMap[PORT_FIELD] ?: throw IllegalArgumentException("$PORT_FIELD field absent")
+            configDataMap[METHOD_FIELD] ?: throw IllegalArgumentException("$METHOD_FIELD field absent")
+            configDataMap[FROM_ADDRESS_FIELD] ?: throw IllegalArgumentException("$FROM_ADDRESS_FIELD field absent")
+
             var username: SecureString? = null
             var password: SecureString? = null
-
-            XContentParserUtils.ensureExpectedToken(
-                XContentParser.Token.START_OBJECT,
-                parser.currentToken(),
-                parser
-            )
-            while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
-                val fieldName = parser.currentName()
-                parser.nextToken()
-                when (fieldName) {
-                    HOST_FIELD -> host = parser.text()
-                    PORT_FIELD -> port = parser.intValue()
-                    METHOD_FIELD -> method = valueOf(parser.text(), MethodType.None, log)
-                    FROM_ADDRESS_FIELD -> fromAddress = parser.text()
-                    USERNAME_FIELD -> username = SecureString(parser.text().toCharArray())
-                    PASSWORD_FIELD -> password = SecureString(parser.text().toCharArray())
-                    else -> {
-                        parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing SmtpAccount")
-                    }
-                }
+            if (configDataMap.containsKey(USERNAME_FIELD)) {
+                username = SecureString((configDataMap[USERNAME_FIELD] as String).toCharArray())
             }
-            host ?: throw IllegalArgumentException("$HOST_FIELD field absent")
-            port ?: throw IllegalArgumentException("$PORT_FIELD field absent")
-            method ?: throw IllegalArgumentException("$METHOD_FIELD field absent")
-            fromAddress ?: throw IllegalArgumentException("$FROM_ADDRESS_FIELD field absent")
+
+            if (configDataMap.containsKey(PASSWORD_FIELD)) {
+                password = SecureString((configDataMap[PASSWORD_FIELD] as String).toCharArray())
+            }
+
             return SmtpAccount(
-                host,
-                port,
-                method,
-                fromAddress,
-                username,
-                password
+                    configDataMap[HOST_FIELD] as String,
+                    configDataMap[PORT_FIELD] as Int,
+                    valueOf(configDataMap[METHOD_FIELD] as String, MethodType.None, log),
+                    configDataMap[FROM_ADDRESS_FIELD] as String,
+                    username,
+                    password
             )
         }
     }
@@ -129,11 +113,11 @@ data class SmtpAccount(
         builder!!
         builder.startObject()
         builder.field(HOST_FIELD, host)
-            .field(PORT_FIELD, port)
-            .field(METHOD_FIELD, method)
-            .field(FROM_ADDRESS_FIELD, fromAddress)
-            .fieldIfNotNull(USERNAME_FIELD, username?.toString())
-            .fieldIfNotNull(PASSWORD_FIELD, password?.toString())
+                .field(PORT_FIELD, port)
+                .field(METHOD_FIELD, method)
+                .field(FROM_ADDRESS_FIELD, fromAddress)
+                .fieldIfNotNull(USERNAME_FIELD, username?.toString())
+                .fieldIfNotNull(PASSWORD_FIELD, password?.toString())
         return builder.endObject()
     }
 
@@ -142,12 +126,12 @@ data class SmtpAccount(
      * @param input StreamInput stream to deserialize data from.
      */
     constructor(input: StreamInput) : this(
-        host = input.readString(),
-        port = input.readInt(),
-        method = input.readEnum(MethodType::class.java),
-        fromAddress = input.readString(),
-        username = input.readOptionalSecureString(),
-        password = input.readOptionalSecureString()
+            host = input.readString(),
+            port = input.readInt(),
+            method = input.readEnum(MethodType::class.java),
+            fromAddress = input.readString(),
+            username = input.readOptionalSecureString(),
+            password = input.readOptionalSecureString()
     )
 
     /**

@@ -34,6 +34,7 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.model.config.BaseConfigData
 import org.opensearch.commons.utils.isValidEmail
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.stringList
@@ -43,10 +44,10 @@ import java.io.IOException
  * Data class representing Email account and default recipients.
  */
 data class Email(
-    val emailAccountID: String,
-    val defaultRecipients: List<String>,
-    val defaultEmailGroupIds: List<String>
-) : BaseChannelData {
+        val emailAccountID: String,
+        val defaultRecipients: List<String>,
+        val defaultEmailGroupIds: List<String>
+) : BaseConfigData {
 
     init {
         require(!Strings.isNullOrEmpty(emailAccountID)) { "emailAccountID is null or empty" }
@@ -72,31 +73,26 @@ data class Email(
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): Email {
-            var emailAccountID: String? = null
-            var recipients: List<String> = listOf()
-            var emailGroupIds: List<String> = listOf()
-
-            XContentParserUtils.ensureExpectedToken(
-                XContentParser.Token.START_OBJECT,
-                parser.currentToken(),
-                parser
-            )
-            while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
-                val fieldName = parser.currentName()
-                parser.nextToken()
-                when (fieldName) {
-                    EMAIL_ACCOUNT_ID_TAG -> emailAccountID = parser.text()
-                    DEFAULT_RECIPIENTS_TAG -> recipients = parser.stringList()
-                    DEFAULT_EMAIL_GROUPS_TAG -> emailGroupIds = parser.stringList()
-                    else -> {
-                        parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing Email")
-                    }
-                }
+        fun parse(configDataMap: Map<String, Any>): Email {
+            if (!configDataMap.containsKey(EMAIL_ACCOUNT_ID_TAG)) {
+                throw IllegalArgumentException("${Email.EMAIL_ACCOUNT_ID_TAG} field absent")
             }
-            emailAccountID ?: throw IllegalArgumentException("$EMAIL_ACCOUNT_ID_TAG field absent")
-            return Email(emailAccountID, recipients, emailGroupIds)
+
+            val tempRecipients = configDataMap.getOrDefault(DEFAULT_RECIPIENTS_TAG, listOf<String>())
+            var recipients: List<String> = listOf()
+            if (tempRecipients is List<*>) {
+                recipients = tempRecipients.filterIsInstance<String>()
+            }
+
+
+            var emailRecipients: List<String> = listOf()
+            val tempEmailGroupIds = configDataMap.getOrDefault(DEFAULT_EMAIL_GROUPS_TAG, listOf<String>())
+            if (tempEmailGroupIds is List<*>) {
+                emailRecipients = tempEmailGroupIds.filterIsInstance<String>()
+            }
+
+            val emailAccountID: String = configDataMap.get(EMAIL_ACCOUNT_ID_TAG) as String
+            return Email(emailAccountID, recipients, emailRecipients)
         }
     }
 
@@ -105,9 +101,9 @@ data class Email(
      * @param input StreamInput stream to deserialize data from.
      */
     constructor(input: StreamInput) : this(
-        emailAccountID = input.readString(),
-        defaultRecipients = input.readStringList(),
-        defaultEmailGroupIds = input.readStringList()
+            emailAccountID = input.readString(),
+            defaultRecipients = input.readStringList(),
+            defaultEmailGroupIds = input.readStringList()
     )
 
     /**
@@ -125,9 +121,9 @@ data class Email(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(EMAIL_ACCOUNT_ID_TAG, emailAccountID)
-            .field(DEFAULT_RECIPIENTS_TAG, defaultRecipients)
-            .field(DEFAULT_EMAIL_GROUPS_TAG, defaultEmailGroupIds)
-            .endObject()
+                .field(EMAIL_ACCOUNT_ID_TAG, emailAccountID)
+                .field(DEFAULT_RECIPIENTS_TAG, defaultRecipients)
+                .field(DEFAULT_EMAIL_GROUPS_TAG, defaultEmailGroupIds)
+                .endObject()
     }
 }
