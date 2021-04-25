@@ -25,7 +25,7 @@
  *
  */
 
-package org.opensearch.commons.notifications.model
+package org.opensearch.commons.notifications.model.config
 
 import org.opensearch.common.io.stream.Writeable.Reader
 import org.opensearch.common.xcontent.XContentParser
@@ -35,172 +35,241 @@ import org.opensearch.commons.notifications.model.NotificationConfig.Companion.E
 import org.opensearch.commons.notifications.model.NotificationConfig.Companion.SLACK_TAG
 import org.opensearch.commons.notifications.model.NotificationConfig.Companion.SMTP_ACCOUNT_TAG
 import org.opensearch.commons.notifications.model.NotificationConfig.Companion.WEBHOOK_TAG
+import org.opensearch.commons.notifications.model.Slack
+import org.opensearch.commons.notifications.model.Chime
+import org.opensearch.commons.notifications.model.Email
+import org.opensearch.commons.notifications.model.EmailGroup
+import org.opensearch.commons.notifications.model.SmtpAccount
+import org.opensearch.commons.notifications.model.Webhook
+import org.opensearch.commons.notifications.model.ConfigType
 import java.lang.UnsupportedOperationException
-import kotlin.reflect.KClass
 
 
 val SlackChannelProperties = object : ChannelProperties {
+
+    /**
+     * {@inheritDoc}
+     */
     override fun getChannelTag(): String {
         return SLACK_TAG
     }
 
-    override fun getChannelReader(): Reader<Slack> {
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigDataReader(): Reader<Slack> {
         return Slack.reader
     }
 
-    override fun createChannelData(parser: XContentParser): Slack {
-        return Slack.parse(parser)
+    /**
+     * {@inheritDoc}
+     */
+    override fun createConfigData(configDataMap: Map<String, Any>): Slack {
+        return Slack.parse(configDataMap)
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun getConfigType(): ConfigType {
         return ConfigType.Slack
     }
-
-    override fun getDataClass(): KClass<Slack> {
-        return Slack::class
-    }
-
 }
 
 
 val ChimeChannelProperties = object : ChannelProperties {
+
+    /**
+     * {@inheritDoc}
+     */
     override fun getChannelTag(): String {
         return CHIME_TAG
     }
 
-    override fun getChannelReader(): Reader<Chime> {
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigDataReader(): Reader<Chime> {
         return Chime.reader
     }
 
-    override fun createChannelData(parser: XContentParser): Chime {
-        return Chime.parse(parser)
+    /**
+     * {@inheritDoc}
+     */
+    override fun createConfigData(configDataMap: Map<String, Any>): Chime {
+        return Chime.parse(configDataMap)
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun getConfigType(): ConfigType {
         return ConfigType.Chime
     }
 
-    override fun getDataClass(): KClass<Chime> {
-        return Chime::class
-    }
 }
 
 
 val EmailChannelProperties = object : ChannelProperties {
+
+    /**
+     * {@inheritDoc}
+     */
     override fun getChannelTag(): String {
         return EMAIL_TAG
     }
 
-    override fun getChannelReader(): Reader<Email> {
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigDataReader(): Reader<Email> {
         return Email.reader
     }
 
-    override fun createChannelData(parser: XContentParser): Email {
-        return Email.parse(parser)
+    /**
+     * {@inheritDoc}
+     */
+    override fun createConfigData(configDataMap: Map<String, Any>): Email {
+        return Email.parse(configDataMap)
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun getConfigType(): ConfigType {
         return ConfigType.Email
-    }
-
-    override fun getDataClass(): KClass<Email> {
-        return Email::class
     }
 }
 
 
 val EmailGroupChannelProperties = object : ChannelProperties {
+
+    /**
+     * {@inheritDoc}
+     */
     override fun getChannelTag(): String {
         return EMAIL_GROUP_TAG
     }
 
-    override fun getChannelReader(): Reader<EmailGroup> {
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigDataReader(): Reader<EmailGroup> {
         return EmailGroup.reader
     }
 
-    override fun createChannelData(parser: XContentParser): EmailGroup {
-        return EmailGroup.parse(parser)
+    /**
+     * {@inheritDoc}
+     */
+    override fun createConfigData(configDataMap: Map<String, Any>): EmailGroup {
+        return EmailGroup.parse(configDataMap)
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun getConfigType(): ConfigType {
         return ConfigType.EmailGroup
-    }
-
-    override fun getDataClass(): KClass<EmailGroup> {
-        return EmailGroup::class
     }
 }
 
 
 val SmtpAccountChannelProperties = object : ChannelProperties {
+
+    /**
+     * {@inheritDoc}
+     */
     override fun getChannelTag(): String {
         return SMTP_ACCOUNT_TAG
     }
 
-    override fun getChannelReader(): Reader<SmtpAccount> {
-        return SmtpAccount.reader
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigDataReader(): Reader<SmtpAccount> {
+        return Reader { SmtpAccount(it) }
     }
 
-    override fun createChannelData(parser: XContentParser): SmtpAccount {
-        return SmtpAccount.parse(parser)
+    /**
+     * {@inheritDoc}
+     */
+    override fun createConfigData(configDataMap: Map<String, Any>): SmtpAccount {
+        return SmtpAccount.parse(configDataMap)
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun getConfigType(): ConfigType {
         return ConfigType.SmtpAccount
-    }
-
-    override fun getDataClass(): KClass<SmtpAccount> {
-        return SmtpAccount::class
     }
 }
 
 
 val WebhookChannelProperties = object : ChannelProperties {
+
+    /**
+     * {@inheritDoc}
+     */
     override fun getChannelTag(): String {
         return WEBHOOK_TAG
     }
 
-    override fun getChannelReader(): Reader<Webhook> {
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigDataReader(): Reader<Webhook> {
         return Webhook.reader
     }
 
-    override fun createChannelData(parser: XContentParser): Webhook {
-        return Webhook.parse(parser)
+    /**
+     * {@inheritDoc}
+     */
+    override fun createConfigData(configDataMap: Map<String, Any>): Webhook {
+        return Webhook.parse(configDataMap)
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun getConfigType(): ConfigType {
         return ConfigType.Webhook
-    }
-
-    override fun getDataClass(): KClass<Webhook> {
-        return Webhook::class
     }
 }
 
 
 val NoOpProperties = object : ChannelProperties {
+
+    /**
+     * {@inheritDoc}
+     */
     override fun getChannelTag(): String {
         throw UnsupportedOperationException()
     }
 
-    override fun getChannelReader(): Reader<Webhook> {
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigDataReader(): Reader<Webhook> {
         throw UnsupportedOperationException()
     }
 
-    override fun createChannelData(parser: XContentParser): Webhook {
+    /**
+     * {@inheritDoc}
+     */
+    override fun createConfigData(configDataMap: Map<String, Any>): Webhook {
         throw UnsupportedOperationException()
     }
 
+    /**
+     * {@inheritDoc}
+     */
     override fun getConfigType(): ConfigType {
         return ConfigType.None
     }
-
-    override fun getDataClass(): KClass<out BaseChannelData> {
-        throw UnsupportedOperationException()
-    }
 }
 
-val CHANNEL_PROPERTIES: List<ChannelProperties> = listOf(
+val CONFIG_PROPERTIES: List<ChannelProperties> = listOf(
         SlackChannelProperties,
         ChimeChannelProperties,
         WebhookChannelProperties,
@@ -210,18 +279,37 @@ val CHANNEL_PROPERTIES: List<ChannelProperties> = listOf(
         NoOpProperties
 )
 
-val DATA_CLASS_VS_CHANNEL_PROPERTIES: Map<KClass<out BaseChannelData>, ChannelProperties> = CHANNEL_PROPERTIES
+val CONFIG_TYPE_VS_PROPERTIES: Map<ConfigType, ChannelProperties> = CONFIG_PROPERTIES
         .filter { c -> c.getConfigType() != ConfigType.None }
         .associate { c ->
-            c.getDataClass() to c
+            c.getConfigType() to c
         }
 
-
+/**
+ * Properties for ConfigTypes.
+ * This interface is used to provide contract accross configTypes without reading into config data classes.
+ */
 interface ChannelProperties {
+
+    /**
+     * @return ChannelTag for concrete ConfigType
+     */
     fun getChannelTag(): String
-    fun getChannelReader(): Reader<out BaseChannelData>
-    fun createChannelData(parser: XContentParser): BaseChannelData
+
+    /**
+     * @return Reader for concrete ConfigType.
+     */
+    fun getConfigDataReader(): Reader<out BaseConfigData>
+
+    /**
+     * Create ConfigData for provided parser, by calling data class' parse.
+     * @return Created ConfigData
+     */
+    fun createConfigData(configDataMap: Map<String, Any>): BaseConfigData
+
+    /**
+     * @return ConfigType for concrete implementation
+     */
     fun getConfigType(): ConfigType
-    fun getDataClass(): KClass<out BaseChannelData>
 }
 

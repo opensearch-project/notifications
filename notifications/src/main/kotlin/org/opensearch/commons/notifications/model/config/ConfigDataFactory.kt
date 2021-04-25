@@ -25,27 +25,18 @@
  *
  */
 
-package org.opensearch.commons.notifications.model
+package org.opensearch.commons.notifications.model.config
 
 import org.opensearch.common.xcontent.XContentParser
+import org.opensearch.commons.notifications.model.ConfigType
 
-
-val tagVsProperty = CHANNEL_PROPERTIES
-        .filter {prop -> prop.getConfigType() != ConfigType.None}
-        .associate { prop ->
-    prop.getChannelTag() to prop
-}
-
-internal fun createChannelData(fieldName: String, parser: XContentParser): BaseChannelData? {
-    val property = tagVsProperty[fieldName]
-    if (property == null || property.getConfigType() == ConfigType.None) {
-        return null
-    }
-
-    return property.createChannelData(parser)
-}
-
-internal fun isValidChannelTag(fieldName: String): Boolean {
-    return tagVsProperty.containsKey(fieldName)
+/**
+ * Create ConfigData using parser.
+ * @param tag tag corresponding to the parser
+ * @param parser to be passed to data class' parse method
+ * @return generated ConfigData
+ */
+internal fun createConfigData(configType: ConfigType, map: Map<String, Any>): BaseConfigData? {
+    return CONFIG_TYPE_VS_PROPERTIES[configType]?.createConfigData(map)
 }
 
