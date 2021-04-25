@@ -33,8 +33,6 @@ import org.opensearch.common.io.stream.Writeable
 import org.opensearch.common.settings.SecureString
 import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
-import org.opensearch.common.xcontent.XContentParser
-import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.model.config.BaseConfigData
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.isValidEmail

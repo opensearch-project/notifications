@@ -27,7 +27,6 @@
 package org.opensearch.commons.notifications.model
 
 import org.opensearch.common.Strings
-import org.opensearch.common.io.stream.StreamInput
 import org.opensearch.common.io.stream.StreamOutput
 import org.opensearch.common.io.stream.Writeable
 import org.opensearch.common.xcontent.ToXContent
@@ -42,7 +41,6 @@ import org.opensearch.commons.utils.enumSet
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.valueOf
 import java.io.IOException
-import java.util.ArrayList
 import java.util.EnumSet
 
 /**
