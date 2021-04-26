@@ -35,7 +35,6 @@ import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.model.config.BaseConfigData
 import org.opensearch.commons.notifications.model.config.CONFIG_PROPERTIES
-import org.opensearch.commons.notifications.model.config.CONFIG_TYPE_VS_PROPERTIES
 import org.opensearch.commons.notifications.model.config.createConfigData
 import org.opensearch.commons.utils.enumSet
 import org.opensearch.commons.utils.logger
@@ -52,7 +51,7 @@ data class NotificationConfig(
         val configType: ConfigType,
         val features: EnumSet<Feature>,
         val isEnabled: Boolean = true,
-        val configData: BaseConfigData,
+        val configData: BaseConfigData
 ) : BaseModel {
 
     init {
@@ -71,12 +70,6 @@ data class NotificationConfig(
         const val FEATURES_TAG = "features"
         const val IS_ENABLED_TAG = "isEnabled"
         const val CONFIG_DATA_TAG = "configData"
-        const val SLACK_TAG = "slack"
-        const val CHIME_TAG = "chime"
-        const val WEBHOOK_TAG = "webhook"
-        const val EMAIL_TAG = "email"
-        const val SMTP_ACCOUNT_TAG = "smtpAccount"
-        const val EMAIL_GROUP_TAG = "emailGroup"
 
         /**
          * reader to create instance of class from writable.
@@ -168,7 +161,6 @@ data class NotificationConfig(
      */
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
 
-        val configDataTag = CONFIG_TYPE_VS_PROPERTIES[configType]?.getChannelTag()
         builder!!
         return builder.startObject()
                 .field(NAME_TAG, name)
@@ -176,7 +168,7 @@ data class NotificationConfig(
                 .field(CONFIG_TYPE_TAG, configType)
                 .field(FEATURES_TAG, features)
                 .field(IS_ENABLED_TAG, isEnabled)
-                .field(configDataTag, configData)
+                .field(CONFIG_DATA_TAG, configData)
                 .endObject()
     }
 }

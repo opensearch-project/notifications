@@ -28,12 +28,6 @@
 package org.opensearch.commons.notifications.model.config
 
 import org.opensearch.common.io.stream.Writeable.Reader
-import org.opensearch.commons.notifications.model.NotificationConfig.Companion.CHIME_TAG
-import org.opensearch.commons.notifications.model.NotificationConfig.Companion.EMAIL_GROUP_TAG
-import org.opensearch.commons.notifications.model.NotificationConfig.Companion.EMAIL_TAG
-import org.opensearch.commons.notifications.model.NotificationConfig.Companion.SLACK_TAG
-import org.opensearch.commons.notifications.model.NotificationConfig.Companion.SMTP_ACCOUNT_TAG
-import org.opensearch.commons.notifications.model.NotificationConfig.Companion.WEBHOOK_TAG
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.Email
@@ -44,14 +38,7 @@ import org.opensearch.commons.notifications.model.ConfigType
 import java.lang.UnsupportedOperationException
 
 
-val SlackChannelProperties = object : ChannelProperties {
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun getChannelTag(): String {
-        return SLACK_TAG
-    }
+val SlackChannelProperties = object : ConfigDataProperties {
 
     /**
      * {@inheritDoc}
@@ -76,14 +63,7 @@ val SlackChannelProperties = object : ChannelProperties {
 }
 
 
-val ChimeChannelProperties = object : ChannelProperties {
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun getChannelTag(): String {
-        return CHIME_TAG
-    }
+val ChimeChannelProperties = object : ConfigDataProperties {
 
     /**
      * {@inheritDoc}
@@ -109,14 +89,7 @@ val ChimeChannelProperties = object : ChannelProperties {
 }
 
 
-val EmailChannelProperties = object : ChannelProperties {
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun getChannelTag(): String {
-        return EMAIL_TAG
-    }
+val EmailChannelProperties = object : ConfigDataProperties {
 
     /**
      * {@inheritDoc}
@@ -141,14 +114,7 @@ val EmailChannelProperties = object : ChannelProperties {
 }
 
 
-val EmailGroupChannelProperties = object : ChannelProperties {
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun getChannelTag(): String {
-        return EMAIL_GROUP_TAG
-    }
+val EmailGroupChannelProperties = object : ConfigDataProperties {
 
     /**
      * {@inheritDoc}
@@ -173,14 +139,7 @@ val EmailGroupChannelProperties = object : ChannelProperties {
 }
 
 
-val SmtpAccountChannelProperties = object : ChannelProperties {
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun getChannelTag(): String {
-        return SMTP_ACCOUNT_TAG
-    }
+val SmtpAccountChannelProperties = object : ConfigDataProperties {
 
     /**
      * {@inheritDoc}
@@ -205,14 +164,7 @@ val SmtpAccountChannelProperties = object : ChannelProperties {
 }
 
 
-val WebhookChannelProperties = object : ChannelProperties {
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun getChannelTag(): String {
-        return WEBHOOK_TAG
-    }
+val WebhookChannelProperties = object : ConfigDataProperties {
 
     /**
      * {@inheritDoc}
@@ -237,14 +189,7 @@ val WebhookChannelProperties = object : ChannelProperties {
 }
 
 
-val NoOpProperties = object : ChannelProperties {
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun getChannelTag(): String {
-        throw UnsupportedOperationException()
-    }
+val NoOpProperties = object : ConfigDataProperties {
 
     /**
      * {@inheritDoc}
@@ -268,7 +213,7 @@ val NoOpProperties = object : ChannelProperties {
     }
 }
 
-val CONFIG_PROPERTIES: List<ChannelProperties> = listOf(
+val CONFIG_PROPERTIES: List<ConfigDataProperties> = listOf(
         SlackChannelProperties,
         ChimeChannelProperties,
         WebhookChannelProperties,
@@ -278,7 +223,7 @@ val CONFIG_PROPERTIES: List<ChannelProperties> = listOf(
         NoOpProperties
 )
 
-val CONFIG_TYPE_VS_PROPERTIES: Map<ConfigType, ChannelProperties> = CONFIG_PROPERTIES
+val CONFIG_TYPE_VS_PROPERTIES: Map<ConfigType, ConfigDataProperties> = CONFIG_PROPERTIES
         .filter { c -> c.getConfigType() != ConfigType.None }
         .associate { c ->
             c.getConfigType() to c
@@ -288,12 +233,7 @@ val CONFIG_TYPE_VS_PROPERTIES: Map<ConfigType, ChannelProperties> = CONFIG_PROPE
  * Properties for ConfigTypes.
  * This interface is used to provide contract accross configTypes without reading into config data classes.
  */
-interface ChannelProperties {
-
-    /**
-     * @return ChannelTag for concrete ConfigType
-     */
-    fun getChannelTag(): String
+interface ConfigDataProperties {
 
     /**
      * @return Reader for concrete ConfigType.

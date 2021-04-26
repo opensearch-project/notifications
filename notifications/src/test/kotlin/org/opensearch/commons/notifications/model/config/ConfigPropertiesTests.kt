@@ -14,17 +14,11 @@ import kotlin.test.assertEquals
 
 internal class ConfigPropertiesTests {
 
-    @Test
-    fun `Create config data from config type slack`() {
-        assertEquals(CONFIG_TYPE_VS_PROPERTIES.get(ConfigType.Slack)!!.getChannelTag(), "slack")
-    }
-
 
     @Test
     fun `Validate config property reader slack`() {
         assertEquals(CONFIG_TYPE_VS_PROPERTIES.get(ConfigType.Slack)!!.getConfigDataReader(), Slack.reader)
     }
-
 
     @Test
     fun `Validate config data parse  slack`() {
@@ -34,13 +28,6 @@ internal class ConfigPropertiesTests {
                 .Slack)!!.createConfigData(it.map()) }
         assertEquals(sampleSlack, recreatedObject)
     }
-
-
-    @Test
-    fun `Create config data from config type chime`() {
-        assertEquals(CONFIG_TYPE_VS_PROPERTIES.get(ConfigType.Chime)!!.getChannelTag(), "chime")
-    }
-
 
     @Test
     fun `Validate config property reader chime`() {
@@ -57,11 +44,6 @@ internal class ConfigPropertiesTests {
     }
 
     @Test
-    fun `Create config data from config type webhook`() {
-        assertEquals(CONFIG_TYPE_VS_PROPERTIES.get(ConfigType.Webhook)!!.getChannelTag(), "webhook")
-    }
-
-    @Test
     fun `Validate config property reader webhook`() {
         assertEquals(CONFIG_TYPE_VS_PROPERTIES.get(ConfigType.Webhook)!!.getConfigDataReader(), Webhook.reader)
     }
@@ -74,12 +56,6 @@ internal class ConfigPropertiesTests {
                 .Webhook)!!.createConfigData(it.map()) }
         assertEquals(sampleWebhook, recreatedObject)
     }
-
-    @Test
-    fun `Create config data from config type email`() {
-        assertEquals(CONFIG_TYPE_VS_PROPERTIES.get(ConfigType.Email)!!.getChannelTag(), "email")
-    }
-
 
     @Test
     fun `Validate config property reader email`() {
@@ -101,11 +77,6 @@ internal class ConfigPropertiesTests {
     }
 
     @Test
-    fun `Create config data from config type EmailGroup`() {
-        assertEquals(CONFIG_TYPE_VS_PROPERTIES.get(ConfigType.EmailGroup)!!.getChannelTag(), "emailGroup")
-    }
-
-    @Test
     fun `Validate config property reader EmailGroup`() {
         assertEquals(CONFIG_TYPE_VS_PROPERTIES.get(ConfigType.EmailGroup)!!.getConfigDataReader(), EmailGroup.reader)
     }
@@ -117,11 +88,6 @@ internal class ConfigPropertiesTests {
         val recreatedObject = createObjectFromJsonString(jsonString) { CONFIG_TYPE_VS_PROPERTIES.get(ConfigType
                 .EmailGroup)!!.createConfigData(it.map()) }
         assertEquals(sampleEmailGroup, recreatedObject)
-    }
-
-    @Test
-    fun `Create config data from config type SmtpAccount`() {
-        assertEquals(CONFIG_TYPE_VS_PROPERTIES.get(ConfigType.SmtpAccount)!!.getChannelTag(), "emailGroup")
     }
 
     @Test
