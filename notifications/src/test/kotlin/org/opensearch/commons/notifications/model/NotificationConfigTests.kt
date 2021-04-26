@@ -211,68 +211,6 @@ internal class NotificationConfigTests {
     }
 
     @Test
-    fun `Config serialize and deserialize with multiple objects should be equal`() {
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
-        val sampleConfig = NotificationConfig(
-            "name",
-            "description",
-            ConfigType.Webhook,
-            EnumSet.of(Feature.IndexManagement),
-            isEnabled = true,
-            sampleSlack
-        )
-        val recreatedObject = recreateObject(sampleConfig) { NotificationConfig.reader.read(it) }
-        assertEquals(sampleConfig, recreatedObject)
-    }
-
-    @Test
-    fun `Config serialize and deserialize with multiple json objects should be equal`() {
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
-        val sampleConfig = NotificationConfig(
-            "name",
-            "description",
-            ConfigType.Webhook,
-            EnumSet.of(Feature.IndexManagement),
-            isEnabled = true,
-            sampleSlack
-        )
-        val jsonString = getJsonString(sampleConfig)
-        val recreatedObject = createObjectFromJsonString(jsonString) { NotificationConfig.parse(it) }
-        assertEquals(sampleConfig, recreatedObject)
-    }
-
-    @Test
-    fun `Config serialize and deserialize with disabled multiple objects should be equal`() {
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
-        val sampleConfig = NotificationConfig(
-            "name",
-            "description",
-            ConfigType.Webhook,
-            EnumSet.of(Feature.IndexManagement),
-            isEnabled = false,
-            configData = sampleSlack
-        )
-        val recreatedObject = recreateObject(sampleConfig) { NotificationConfig.reader.read(it) }
-        assertEquals(sampleConfig, recreatedObject)
-    }
-
-    @Test
-    fun `Config serialize and deserialize with disabled multiple json objects should be equal`() {
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
-        val sampleConfig = NotificationConfig(
-            "name",
-            "description",
-            ConfigType.Webhook,
-            EnumSet.of(Feature.IndexManagement),
-            isEnabled = false,
-            sampleSlack
-        )
-        val jsonString = getJsonString(sampleConfig)
-        val recreatedObject = createObjectFromJsonString(jsonString) { NotificationConfig.parse(it) }
-        assertEquals(sampleConfig, recreatedObject)
-    }
-
-    @Test
     fun `Config should safely ignore extra field in json object`() {
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
         val sampleConfig = NotificationConfig(
