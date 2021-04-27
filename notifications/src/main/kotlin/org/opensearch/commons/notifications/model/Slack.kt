@@ -34,6 +34,7 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.URL_TAG
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.validateUrl
 import java.io.IOException
@@ -52,7 +53,6 @@ data class Slack(
 
     companion object {
         private val log by logger(Slack::class.java)
-        private const val URL_TAG = "url"
 
         /**
          * reader to create instance of class from writable.

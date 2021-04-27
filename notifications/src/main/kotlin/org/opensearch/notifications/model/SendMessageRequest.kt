@@ -59,8 +59,8 @@ internal class SendMessageRequest : ActionRequest, ToXContentObject {
         private const val REF_TAG_FIELD = "refTag"
         private const val RECIPIENTS_FIELD = "recipients"
         private const val TITLE_FIELD = "title"
-        private const val TEXT_DESCRIPTION_FIELD = "textDescription"
-        private const val HTML_DESCRIPTION_FIELD = "htmlDescription"
+        private const val TEXT_DESCRIPTION_FIELD = "text_description"
+        private const val HTML_DESCRIPTION_FIELD = "html_description"
         private const val ATTACHMENT_FIELD = "attachment"
     }
 

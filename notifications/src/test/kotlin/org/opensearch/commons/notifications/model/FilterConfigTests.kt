@@ -38,7 +38,7 @@ internal class FilterConfigTests {
     @Test
     fun `Config serialize and deserialize with default isEnabled flag should be equal`() {
         val sampleConfig = FeatureChannel(
-            "configId",
+            "config_id",
             "name",
             "description",
             ConfigType.Slack
@@ -50,7 +50,7 @@ internal class FilterConfigTests {
     @Test
     fun `Config serialize and deserialize with isEnabled=false should be equal`() {
         val sampleConfig = FeatureChannel(
-            "configId",
+            "config_id",
             "name",
             "description",
             ConfigType.Chime,
@@ -63,7 +63,7 @@ internal class FilterConfigTests {
     @Test
     fun `Config serialize and deserialize using json object with default isEnabled flag should be equal`() {
         val sampleConfig = FeatureChannel(
-            "configId",
+            "config_id",
             "name",
             "description",
             ConfigType.Webhook
@@ -76,7 +76,7 @@ internal class FilterConfigTests {
     @Test
     fun `Config serialize and deserialize using json object with isEnabled=false should be equal`() {
         val sampleConfig = FeatureChannel(
-            "configId",
+            "config_id",
             "name",
             "description",
             ConfigType.EmailGroup,
@@ -90,18 +90,18 @@ internal class FilterConfigTests {
     @Test
     fun `Config should safely ignore extra field in json object`() {
         val sampleConfig = FeatureChannel(
-            "configId",
+            "config_id",
             "name",
             "description",
             ConfigType.Email
         )
         val jsonString = """
         {
-            "configId":"configId",
+            "config_id":"config_id",
             "name":"name",
             "description":"description",
-            "configType":"Email",
-            "isEnabled":true,
+            "config_type":"Email",
+            "is_enabled":true,
             "extra_field_1":["extra", "value"],
             "extra_field_2":{"extra":"value"},
             "extra_field_3":"extra value 3"
@@ -114,17 +114,17 @@ internal class FilterConfigTests {
     @Test
     fun `Config should safely ignore unknown config type in json object`() {
         val sampleConfig = FeatureChannel(
-            "configId",
+            "config_id",
             "name",
             "description",
             ConfigType.None
         )
         val jsonString = """
         {
-            "configId":"configId",
+            "config_id":"config_id",
             "name":"name",
             "description":"description",
-            "configType":"NewConfig"
+            "config_type":"NewConfig"
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { FeatureChannel.parse(it) }
@@ -147,7 +147,7 @@ internal class FilterConfigTests {
     fun `Config throw exception if name is empty`() {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
             FeatureChannel(
-                "configId",
+                "config_id",
                 "",
                 "description",
                 ConfigType.EmailGroup

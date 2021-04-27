@@ -34,6 +34,17 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.CHIME_TAG
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TYPE_TAG
+import org.opensearch.commons.notifications.NotificationConstants.DESCRIPTION_TAG
+import org.opensearch.commons.notifications.NotificationConstants.EMAIL_GROUP_TAG
+import org.opensearch.commons.notifications.NotificationConstants.EMAIL_TAG
+import org.opensearch.commons.notifications.NotificationConstants.FEATURES_TAG
+import org.opensearch.commons.notifications.NotificationConstants.IS_ENABLED_TAG
+import org.opensearch.commons.notifications.NotificationConstants.NAME_TAG
+import org.opensearch.commons.notifications.NotificationConstants.SLACK_TAG
+import org.opensearch.commons.notifications.NotificationConstants.SMTP_ACCOUNT_TAG
+import org.opensearch.commons.notifications.NotificationConstants.WEBHOOK_TAG
 import org.opensearch.commons.utils.enumSet
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.logger
@@ -73,17 +84,6 @@ data class NotificationConfig(
 
     companion object {
         private val log by logger(NotificationConfig::class.java)
-        private const val NAME_TAG = "name"
-        private const val DESCRIPTION_TAG = "description"
-        private const val CONFIG_TYPE_TAG = "configType"
-        private const val FEATURES_TAG = "features"
-        private const val IS_ENABLED_TAG = "isEnabled"
-        private const val SLACK_TAG = "slack"
-        private const val CHIME_TAG = "chime"
-        private const val WEBHOOK_TAG = "webhook"
-        private const val EMAIL_TAG = "email"
-        private const val SMTP_ACCOUNT_TAG = "smtpAccount"
-        private const val EMAIL_GROUP_TAG = "emailGroup"
 
         /**
          * reader to create instance of class from writable.

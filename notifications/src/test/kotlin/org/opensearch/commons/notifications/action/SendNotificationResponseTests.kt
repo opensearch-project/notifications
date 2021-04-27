@@ -54,7 +54,7 @@ internal class SendNotificationResponseTests {
     @Test
     fun `Create response should deserialize json object using parser`() {
         val notificationId = "sample_notification_id"
-        val jsonString = "{\"notificationId\":\"$notificationId\"}"
+        val jsonString = "{\"notification_id\":\"$notificationId\"}"
         val recreatedObject = createObjectFromJsonString(jsonString) { SendNotificationResponse.parse(it) }
         assertEquals(notificationId, recreatedObject.notificationId)
     }
@@ -69,7 +69,7 @@ internal class SendNotificationResponseTests {
 
     @Test
     fun `Create response should throw exception when notificationId is replace with notificationId2 in json object`() {
-        val jsonString = "{\"notificationId2\":\"sample_notification_id\"}"
+        val jsonString = "{\"notification_id2\":\"sample_notification_id\"}"
         assertThrows<IllegalArgumentException> {
             createObjectFromJsonString(jsonString) { SendNotificationResponse.parse(it) }
         }
@@ -80,7 +80,7 @@ internal class SendNotificationResponseTests {
         val notificationId = "sample_notification_id"
         val jsonString = """
         {
-            "notificationId":"$notificationId",
+            "notification_id":"$notificationId",
             "extra_field_1":["extra", "value"],
             "extra_field_2":{"extra":"value"},
             "extra_field_3":"extra value 3"

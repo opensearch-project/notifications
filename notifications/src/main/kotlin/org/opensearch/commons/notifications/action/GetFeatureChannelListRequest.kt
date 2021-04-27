@@ -36,6 +36,8 @@ import org.opensearch.common.xcontent.ToXContentObject
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_TAG
+import org.opensearch.commons.notifications.NotificationConstants.THREAD_CONTEXT_TAG
 import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.logger
@@ -54,9 +56,6 @@ class GetFeatureChannelListRequest : ActionRequest, ToXContentObject {
 
     companion object {
         private val log by logger(GetFeatureChannelListRequest::class.java)
-
-        private const val FEATURE_TAG = "feature"
-        private const val THREAD_CONTEXT_TAG = "context"
 
         /**
          * reader to create instance of class from writable.

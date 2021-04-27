@@ -70,10 +70,10 @@ fun verifyResponse(response: JsonObject, refTag: String, recipients: List<String
         val recipient = item.asJsonObject.get("recipient").asString
         assert(recipients.contains(recipient))
 
-        val statusCode = item.asJsonObject.get("statusCode").asInt
+        val statusCode = item.asJsonObject.get("status_code").asInt
         assertEquals(200, statusCode)
 
-        val statusText = item.asJsonObject.get("statusText").asString
+        val statusText = item.asJsonObject.get("status_text").asString
         assertEquals("Success", statusText)
     }
 }
@@ -82,14 +82,14 @@ fun getStatusCode(response: JsonObject): Int {
     return response
         .getAsJsonArray("recipients")
         .get(0).asJsonObject
-        .get("statusCode").asInt
+        .get("status_code").asInt
 }
 
 fun getStatusText(response: JsonObject): String {
     return response
         .getAsJsonArray("recipients")
         .get(0).asJsonObject
-        .get("statusText").asString
+        .get("status_text").asString
 }
 
 /** Util class to build Json entity of request body */
@@ -121,8 +121,8 @@ class NotificationsJsonEntity(
                       "refTag": "$refTag",
                       "recipients": ${listToString(recipients)},
                       "title": "$title",
-                      "textDescription": "$textDescription",
-                      "htmlDescription": "$htmlDescription",
+                      "text_description": "$textDescription",
+                      "html_description": "$htmlDescription",
                       "attachment": $attachment
                     }
                 """.trimIndent()

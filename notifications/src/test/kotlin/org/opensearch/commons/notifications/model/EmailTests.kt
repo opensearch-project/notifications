@@ -109,12 +109,12 @@ internal class EmailTests {
         )
         val jsonString = """
             {
-                "emailAccountID":"${sampleEmail.emailAccountID}",
-                "defaultRecipients":[
+                "email_account_id":"${sampleEmail.emailAccountID}",
+                "default_recipients":[
                     "${sampleEmail.defaultRecipients[0]}",
                     "${sampleEmail.defaultRecipients[1]}"
                 ],
-                "defaultEmailGroupIds":[
+                "default_email_group_ids":[
                     "${sampleEmail.defaultEmailGroupIds[0]}",
                     "${sampleEmail.defaultEmailGroupIds[1]}"
                 ]
@@ -141,12 +141,12 @@ internal class EmailTests {
         )
         val jsonString = """
             {
-                "emailAccountID2":"${sampleEmail.emailAccountID}",
-                "defaultRecipients":[
+                "email_account_id2":"${sampleEmail.emailAccountID}",
+                "default_recipients":[
                     "${sampleEmail.defaultRecipients[0]}",
                     "${sampleEmail.defaultRecipients[1]}"
                 ],
-                "defaultEmailGroupIds":[
+                "default_email_group_ids":[
                     "${sampleEmail.defaultEmailGroupIds[0]}",
                     "${sampleEmail.defaultEmailGroupIds[1]}"
                 ]
@@ -162,7 +162,7 @@ internal class EmailTests {
         val sampleEmail = Email("sampleAccountId", listOf(), listOf())
         val jsonString = """
             {
-                "emailAccountID":"${sampleEmail.emailAccountID}"
+                "email_account_id":"${sampleEmail.emailAccountID}"
             }"
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { Email.parse(it) }
@@ -174,12 +174,12 @@ internal class EmailTests {
         val sampleEmail = Email("sampleAccountId", listOf(), listOf())
         val jsonString = """
             {
-                "emailAccountID":"${sampleEmail.emailAccountID}",
-                "defaultRecipients2":[
+                "email_account_id":"${sampleEmail.emailAccountID}",
+                "default_recipients2":[
                     "email1@email.com",
                     "email2@email.com"
                 ],
-                "defaultEmailGroupIds2":[
+                "default_email_group_ids2":[
                     "sample_group_id_1"
                 ],
                 "another":"field"

@@ -37,6 +37,10 @@ import org.opensearch.common.xcontent.ToXContentObject
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
+import org.opensearch.commons.notifications.NotificationConstants.DEFAULT_MAX_ITEMS
+import org.opensearch.commons.notifications.NotificationConstants.FROM_INDEX_TAG
+import org.opensearch.commons.notifications.NotificationConstants.MAX_ITEMS_TAG
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.logger
 import java.io.IOException
@@ -51,10 +55,6 @@ class GetNotificationConfigRequest : ActionRequest, ToXContentObject {
 
     companion object {
         private val log by logger(GetNotificationConfigRequest::class.java)
-        const val DEFAULT_MAX_ITEMS = 1000
-        const val FROM_INDEX_TAG = "fromIndex"
-        const val MAX_ITEMS_TAG = "maxItems"
-        private const val CONFIG_ID_TAG = "configId"
 
         /**
          * reader to create instance of class from writable.

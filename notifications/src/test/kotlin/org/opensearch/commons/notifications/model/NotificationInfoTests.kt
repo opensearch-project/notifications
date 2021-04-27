@@ -39,7 +39,7 @@ internal class NotificationInfoTests {
     fun `Notification serialize and deserialize should be equal`() {
         val sampleNotification = NotificationInfo(
             "title",
-            "referenceId",
+            "reference_id",
             Feature.Alerting,
             severity = SeverityType.Info
         )
@@ -51,7 +51,7 @@ internal class NotificationInfoTests {
     fun `Notification serialize and deserialize using json should be equal`() {
         val sampleNotification = NotificationInfo(
             "title",
-            "referenceId",
+            "reference_id",
             Feature.Alerting,
             severity = SeverityType.Info
         )
@@ -65,7 +65,7 @@ internal class NotificationInfoTests {
     fun `Notification should safely ignore extra field in json object`() {
         val sampleNotification = NotificationInfo(
             "title",
-            "referenceId",
+            "reference_id",
             Feature.Alerting,
             tags = listOf("tag1", "tag2"),
             severity = SeverityType.Info
@@ -73,7 +73,7 @@ internal class NotificationInfoTests {
         val jsonString = """
         { 
             "title":"title",
-            "referenceId":"referenceId",
+            "reference_id":"reference_id",
             "feature":"Alerting",
             "severity":"Info",
             "tags":["tag1", "tag2"],
@@ -90,7 +90,7 @@ internal class NotificationInfoTests {
     fun `Notification should safely ignore unknown feature type in json object`() {
         val sampleNotification = NotificationInfo(
             "title",
-            "referenceId",
+            "reference_id",
             Feature.None,
             tags = listOf("tag1", "tag2"),
             severity = SeverityType.Info
@@ -98,7 +98,7 @@ internal class NotificationInfoTests {
         val jsonString = """
         {
             "title":"title",
-            "referenceId":"referenceId",
+            "reference_id":"reference_id",
             "feature": "NewFeature",
             "severity":"Info",
             "tags":["tag1", "tag2"]
@@ -113,7 +113,7 @@ internal class NotificationInfoTests {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
             NotificationInfo(
                 "",
-                "referenceId",
+                "reference_id",
                 Feature.Alerting,
                 tags = listOf("tag1", "tag2"),
                 severity = SeverityType.Info

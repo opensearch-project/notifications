@@ -65,9 +65,9 @@ internal class GetNotificationConfigRequestTests {
         val configRequest = GetNotificationConfigRequest(10, 100, "sample_config_id")
         val jsonString = """
         {
-            "fromIndex":"10",
-            "maxItems":"100",
-            "configId":"${configRequest.configId}"
+            "from_index":"10",
+            "max_items":"100",
+            "config_id":"${configRequest.configId}"
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }
@@ -79,8 +79,8 @@ internal class GetNotificationConfigRequestTests {
         val configRequest = GetNotificationConfigRequest(20, 200)
         val jsonString = """
         {
-            "fromIndex":"20",
-            "maxItems":"200"
+            "from_index":"20",
+            "max_items":"200"
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }
@@ -92,8 +92,8 @@ internal class GetNotificationConfigRequestTests {
         val configRequest = GetNotificationConfigRequest(maxItems = 100, configId = "sample_config_id")
         val jsonString = """
         {
-            "maxItems":"100",
-            "configId":"${configRequest.configId}"
+            "max_items":"100",
+            "config_id":"${configRequest.configId}"
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }
@@ -105,8 +105,8 @@ internal class GetNotificationConfigRequestTests {
         val configRequest = GetNotificationConfigRequest(fromIndex = 10, configId = "sample_config_id")
         val jsonString = """
         {
-            "fromIndex":"10",
-            "configId":"${configRequest.configId}"
+            "from_index":"10",
+            "config_id":"${configRequest.configId}"
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }
@@ -137,7 +137,7 @@ internal class GetNotificationConfigRequestTests {
         val configRequest = GetNotificationConfigRequest(configId = "sample_config_id")
         val jsonString = """
         {
-            "configId":"${configRequest.configId}",
+            "config_id":"${configRequest.configId}",
             "extra_field_1":["extra", "value"],
             "extra_field_2":{"extra":"value"},
             "extra_field_3":"extra value 3"

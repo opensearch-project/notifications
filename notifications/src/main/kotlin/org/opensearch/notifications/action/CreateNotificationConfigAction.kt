@@ -41,7 +41,7 @@ import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 
 /**
- * Create reportDefinition transport action
+ * Create NotificationConfig transport action
  */
 internal class CreateNotificationConfigAction @Inject constructor(
     transportService: TransportService,
@@ -66,11 +66,7 @@ internal class CreateNotificationConfigAction @Inject constructor(
         listener: ActionListener<CreateNotificationConfigResponse>
     ) {
         val transformedRequest = request as? CreateNotificationConfigRequest
-            ?: recreateObject(request) {
-                CreateNotificationConfigRequest(
-                    it
-                )
-            }
+            ?: recreateObject(request) { CreateNotificationConfigRequest(it) }
         super.doExecute(task, transformedRequest, listener)
     }
 
@@ -81,6 +77,6 @@ internal class CreateNotificationConfigAction @Inject constructor(
         request: CreateNotificationConfigRequest,
         user: User?
     ): CreateNotificationConfigResponse {
-        return CreateNotificationConfigResponse("TODO-configId")
+        return NotificationConfigActions.create(request, user)
     }
 }

@@ -34,6 +34,8 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.STATUS_CODE_TAG
+import org.opensearch.commons.notifications.NotificationConstants.STATUS_TEXT_TAG
 import org.opensearch.commons.utils.logger
 import java.io.IOException
 
@@ -52,8 +54,6 @@ data class DeliveryStatus(
 
     companion object {
         private val log by logger(DeliveryStatus::class.java)
-        private const val STATUS_CODE_TAG = "statusCode"
-        private const val STATUS_TEXT_TAG = "statusText"
 
         /**
          * reader to create instance of class from writable.

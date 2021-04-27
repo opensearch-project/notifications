@@ -33,6 +33,7 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.utils.logger
 import java.io.IOException
 
@@ -44,7 +45,6 @@ class DeleteNotificationConfigResponse : BaseResponse {
 
     companion object {
         private val log by logger(DeleteNotificationConfigResponse::class.java)
-        private const val CONFIG_ID_TAG = "configId"
 
         /**
          * reader to create instance of class from writable.

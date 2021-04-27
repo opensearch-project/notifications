@@ -53,7 +53,7 @@ internal class GetFeatureChannelListResponseTests {
     @Test
     fun `Get Response serialize and deserialize with config object should be equal`() {
         val sampleConfig = FeatureChannel(
-            "configId",
+            "config_id",
             "name",
             "description",
             ConfigType.Slack
@@ -67,19 +67,19 @@ internal class GetFeatureChannelListResponseTests {
     @Test
     fun `Get Response serialize and deserialize with multiple config object should be equal`() {
         val sampleConfig1 = FeatureChannel(
-            "configId1",
+            "config_id1",
             "name1",
             "description1",
             ConfigType.Slack
         )
         val sampleConfig2 = FeatureChannel(
-            "configId2",
+            "config_id2",
             "name2",
             "description2",
             ConfigType.Chime
         )
         val sampleConfig3 = FeatureChannel(
-            "configId3",
+            "config_id3",
             "name3",
             "description3",
             ConfigType.Webhook
@@ -98,7 +98,7 @@ internal class GetFeatureChannelListResponseTests {
     @Test
     fun `Get Response serialize and deserialize using json config object should be equal`() {
         val sampleConfig = FeatureChannel(
-            "configId",
+            "config_id",
             "name",
             "description",
             ConfigType.EmailGroup
@@ -113,19 +113,19 @@ internal class GetFeatureChannelListResponseTests {
     @Test
     fun `Get Response serialize and deserialize using json with multiple config object should be equal`() {
         val sampleConfig1 = FeatureChannel(
-            "configId1",
+            "config_id1",
             "name1",
             "description1",
             ConfigType.Slack
         )
         val sampleConfig2 = FeatureChannel(
-            "configId2",
+            "config_id2",
             "name2",
             "description2",
             ConfigType.Chime
         )
         val sampleConfig3 = FeatureChannel(
-            "configId3",
+            "config_id3",
             "name3",
             "description3",
             ConfigType.Webhook
@@ -145,7 +145,7 @@ internal class GetFeatureChannelListResponseTests {
     @Test
     fun `Get Response should use isEnabled=true if absent in json object`() {
         val sampleConfig = FeatureChannel(
-            "configId",
+            "config_id",
             "name",
             "description",
             ConfigType.Email,
@@ -154,15 +154,15 @@ internal class GetFeatureChannelListResponseTests {
         val searchResult = FeatureChannelList(sampleConfig)
         val jsonString = """
         {
-            "startIndex":"0",
-            "totalHits":"1",
-            "totalHitRelation":"eq",
-            "featureChannelList":[
+            "start_index":"0",
+            "total_hits":"1",
+            "total_hit_relation":"eq",
+            "feature_channel_list":[
                 {
-                    "configId":"configId",
+                    "config_id":"config_id",
                     "name":"name",
                     "description":"description",
-                    "configType":"Email"
+                    "config_type":"Email"
                 }
             ]
         }
@@ -174,7 +174,7 @@ internal class GetFeatureChannelListResponseTests {
     @Test
     fun `Get Response should safely ignore extra field in json object`() {
         val sampleConfig = FeatureChannel(
-            "configId",
+            "config_id",
             "name",
             "description",
             ConfigType.Email
@@ -182,16 +182,16 @@ internal class GetFeatureChannelListResponseTests {
         val searchResult = FeatureChannelList(sampleConfig)
         val jsonString = """
         {
-            "startIndex":"0",
-            "totalHits":"1",
-            "totalHitRelation":"eq",
-            "featureChannelList":[
+            "start_index":"0",
+            "total_hits":"1",
+            "total_hit_relation":"eq",
+            "feature_channel_list":[
                 {
-                    "configId":"configId",
+                    "config_id":"config_id",
                     "name":"name",
                     "description":"description",
-                    "configType":"Email",
-                    "isEnabled":true
+                    "config_type":"Email",
+                    "is_enabled":true
                 }
             ],
             "extra_field_1":["extra", "value"],
@@ -206,7 +206,7 @@ internal class GetFeatureChannelListResponseTests {
     @Test
     fun `Get Response should safely fallback to default if startIndex, totalHits or totalHitRelation field absent in json object`() {
         val sampleConfig = FeatureChannel(
-            "configId",
+            "config_id",
             "name",
             "description",
             ConfigType.Email
@@ -214,13 +214,13 @@ internal class GetFeatureChannelListResponseTests {
         val searchResult = FeatureChannelList(sampleConfig)
         val jsonString = """
         {
-            "featureChannelList":[
+            "feature_channel_list":[
                 {
-                    "configId":"configId",
+                    "config_id":"config_id",
                     "name":"name",
                     "description":"description",
-                    "configType":"Email",
-                    "isEnabled":true
+                    "config_type":"Email",
+                    "is_enabled":true
                 }
             ]
         }
@@ -233,9 +233,9 @@ internal class GetFeatureChannelListResponseTests {
     fun `Get Response should throw exception if featureChannelList is absent in json`() {
         val jsonString = """
         {
-            "startIndex":"0",
-            "totalHits":"1",
-            "totalHitRelation":"eq"
+            "start_index":"0",
+            "total_hits":"1",
+            "total_hit_relation":"eq"
         }
         """.trimIndent()
         Assertions.assertThrows(IllegalArgumentException::class.java) {
