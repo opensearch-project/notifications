@@ -11,96 +11,154 @@ import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.utils.createObjectFromJsonString
 import org.opensearch.commons.utils.getJsonString
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 internal class ConfigPropertiesTests {
-
-
     @Test
     fun `Validate config property reader slack`() {
-        assertEquals(CONFIG_TYPE_VS_PROPERTIES.get(ConfigType.Slack)!!.getConfigDataReader(), Slack.reader)
+        assertEquals(ConfigPropertiesUtils.getReaderForConfigType(ConfigType.Slack), Slack.reader)
     }
 
     @Test
-    fun `Validate config data parse  slack`() {
-        val sampleSlack = Slack("https://domain.com/sample_url#1234567890")
-        val jsonString = getJsonString(sampleSlack)
-        val recreatedObject = createObjectFromJsonString(jsonString) { CONFIG_TYPE_VS_PROPERTIES.get(ConfigType
-                .Slack)!!.createConfigData(it.map()) }
-        assertEquals(sampleSlack, recreatedObject)
+    fun `Validate tag for slack`() {
+        assertTrue(ConfigPropertiesUtils.isValidConfigTag("slack"))
+    }
+
+    @Test
+    fun `Validate config type for tag`() {
+        assertEquals(ConfigPropertiesUtils.getConfigTypeForTag("slack"), ConfigType.Slack)
+    }
+
+    @Test
+    fun `Validate tag for given config type`() {
+        assertEquals(ConfigPropertiesUtils.getTagForConfigType(ConfigType.Slack), "slack")
     }
 
     @Test
     fun `Validate config property reader chime`() {
-        assertEquals(CONFIG_TYPE_VS_PROPERTIES.get(ConfigType.Chime)!!.getConfigDataReader(), Chime.reader)
+        assertEquals(
+            ConfigPropertiesUtils.getReaderForConfigType(ConfigType.Chime)!!, Chime
+                .reader
+        )
     }
 
     @Test
-    fun `Validate config data parse chime`() {
-        val sampleChime = Chime("https://domain.com/sample_url#1234567890")
-        val jsonString = getJsonString(sampleChime)
-        val recreatedObject = createObjectFromJsonString(jsonString) { CONFIG_TYPE_VS_PROPERTIES.get(ConfigType
-                .Chime)!!.createConfigData(it.map()) }
-        assertEquals(sampleChime, recreatedObject)
+    fun `Validate tag for chime`() {
+        assertTrue(ConfigPropertiesUtils.isValidConfigTag("chime"))
+    }
+
+    @Test
+    fun `Validate config type for chime tag`() {
+        assertEquals(ConfigPropertiesUtils.getConfigTypeForTag("chime"), ConfigType.Chime)
+    }
+
+    @Test
+    fun `Validate tag for given chime config type`() {
+        assertEquals(ConfigPropertiesUtils.getTagForConfigType(ConfigType.Chime), "chime")
     }
 
     @Test
     fun `Validate config property reader webhook`() {
-        assertEquals(CONFIG_TYPE_VS_PROPERTIES.get(ConfigType.Webhook)!!.getConfigDataReader(), Webhook.reader)
+        assertEquals(
+            ConfigPropertiesUtils.getReaderForConfigType(ConfigType.Webhook),
+            Webhook.reader
+        )
     }
 
     @Test
-    fun `Validate config data parse webhook`() {
-        val sampleWebhook = Webhook("https://domain.com/sample_url#1234567890")
-        val jsonString = getJsonString(sampleWebhook)
-        val recreatedObject = createObjectFromJsonString(jsonString) { CONFIG_TYPE_VS_PROPERTIES.get(ConfigType
-                .Webhook)!!.createConfigData(it.map()) }
-        assertEquals(sampleWebhook, recreatedObject)
+    fun `Validate tag for webhook`() {
+        assertTrue(ConfigPropertiesUtils.isValidConfigTag("webhook"))
+    }
+
+    @Test
+    fun `Validate config type for webhook tag`() {
+        assertEquals(ConfigPropertiesUtils.getConfigTypeForTag("webhook"), ConfigType.Webhook)
+    }
+
+    @Test
+    fun `Validate tag for given webhook config type`() {
+        assertEquals(ConfigPropertiesUtils.getTagForConfigType(ConfigType.Webhook), "webhook")
     }
 
     @Test
     fun `Validate config property reader email`() {
-        assertEquals(CONFIG_TYPE_VS_PROPERTIES.get(ConfigType.Email)!!.getConfigDataReader(), Email.reader)
+        assertEquals(
+            ConfigPropertiesUtils.getReaderForConfigType(ConfigType.Email), Email
+                .reader
+        )
     }
 
+    @Test
+    fun `Validate tag for email`() {
+        assertTrue(ConfigPropertiesUtils.isValidConfigTag("email"))
+    }
 
     @Test
-    fun `Validate config data parse email`() {
-        val sampleEmail = Email(
-                "sampleAccountId",
-                listOf("email1@email.com", "email2@email.com"),
-                listOf("sample_group_id_1", "sample_group_id_2")
-        )
-        val jsonString = getJsonString(sampleEmail)
-        val recreatedObject = createObjectFromJsonString(jsonString) { CONFIG_TYPE_VS_PROPERTIES.get(ConfigType
-                .Email)!!.createConfigData(it.map()) }
-        assertEquals(sampleEmail, recreatedObject)
+    fun `Validate config type for email tag`() {
+        assertEquals(ConfigPropertiesUtils.getConfigTypeForTag("email"), ConfigType.Email)
+    }
+
+    @Test
+    fun `Validate tag for given email config type`() {
+        assertEquals(ConfigPropertiesUtils.getTagForConfigType(ConfigType.Email), "email")
     }
 
     @Test
     fun `Validate config property reader EmailGroup`() {
-        assertEquals(CONFIG_TYPE_VS_PROPERTIES.get(ConfigType.EmailGroup)!!.getConfigDataReader(), EmailGroup.reader)
+        assertEquals(
+            ConfigPropertiesUtils.getReaderForConfigType(ConfigType.EmailGroup),
+            EmailGroup.reader
+        )
+    }
+
+    @Test
+    fun `Validate tag for emailGroup`() {
+        assertTrue(ConfigPropertiesUtils.isValidConfigTag("emailGroup"))
+    }
+
+    @Test
+    fun `Validate config type for emailGroup tag`() {
+        assertEquals(ConfigPropertiesUtils.getConfigTypeForTag("emailGroup"), ConfigType.EmailGroup)
+    }
+
+    @Test
+    fun `Validate tag for given emailGroup config type`() {
+        assertEquals(ConfigPropertiesUtils.getTagForConfigType(ConfigType.EmailGroup), "emailGroup")
     }
 
     @Test
     fun `Validate config data parse EmailGroup`() {
         val sampleEmailGroup = EmailGroup(listOf("email1@email.com", "email2@email.com"))
         val jsonString = getJsonString(sampleEmailGroup)
-        val recreatedObject = createObjectFromJsonString(jsonString) { CONFIG_TYPE_VS_PROPERTIES.get(ConfigType
-                .EmailGroup)!!.createConfigData(it.map()) }
+        val recreatedObject = createObjectFromJsonString(jsonString) {
+            CONFIG_TYPE_VS_PROPERTIES.get(
+                ConfigType
+                    .EmailGroup
+            )!!.createConfigData(it.map())
+        }
         assertEquals(sampleEmailGroup, recreatedObject)
     }
 
     @Test
     fun `Validate config property reader SmtpAccount`() {
-        assertEquals(CONFIG_TYPE_VS_PROPERTIES.get(ConfigType.SmtpAccount)!!.getConfigDataReader(), EmailGroup.reader)
+        assertEquals(
+            ConfigPropertiesUtils.getReaderForConfigType(ConfigType.SmtpAccount),
+            SmtpAccount.reader
+        )
     }
 
     @Test
-    fun `Validate config data parse SmtpAccount`() {
-        val sampleSmtpAccount = SmtpAccount("domain.com", 1234, SmtpAccount.MethodType.Ssl, "from@domain.com")
-        val jsonString = getJsonString(sampleSmtpAccount)
-        val recreatedObject = createObjectFromJsonString(jsonString) { CONFIG_TYPE_VS_PROPERTIES.get(ConfigType
-                .SmtpAccount)!!.createConfigData(it.map()) }
-        assertEquals(sampleSmtpAccount, recreatedObject)
+    fun `Validate tag for smtmAccount`() {
+        assertTrue(ConfigPropertiesUtils.isValidConfigTag("smtpAccount"))
+    }
+
+    @Test
+    fun `Validate config type for smtpAccount tag`() {
+        assertEquals(ConfigPropertiesUtils.getConfigTypeForTag("smtpAccount"), ConfigType.SmtpAccount)
+    }
+
+    @Test
+    fun `Validate tag for given smtpAccount config type`() {
+        assertEquals(ConfigPropertiesUtils.getTagForConfigType(ConfigType.SmtpAccount), "smtpAccount")
     }
 }

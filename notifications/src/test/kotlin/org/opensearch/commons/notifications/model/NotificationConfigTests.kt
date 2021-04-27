@@ -26,7 +26,6 @@
  */
 package org.opensearch.commons.notifications.model
 
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.opensearch.commons.utils.createObjectFromJsonString
@@ -212,14 +211,14 @@ internal class NotificationConfigTests {
 
     @Test
     fun `Config should safely ignore extra field in json object`() {
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+        val sampleWebhook = Webhook("https://domain.com/sample_webhook_url#1234567890")
         val sampleConfig = NotificationConfig(
             "name",
             "description",
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            sampleSlack
+            sampleWebhook
         )
         val jsonString = """
         {
@@ -240,44 +239,15 @@ internal class NotificationConfigTests {
     }
 
     @Test
-    fun `Config should safely ignore unknown config type in json object`() {
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
-        val sampleConfig = NotificationConfig(
-            "name",
-            "description",
-            ConfigType.None,
-            EnumSet.of(Feature.IndexManagement),
-            isEnabled = true,
-            sampleSlack
-        )
-        val jsonString = """
-        {
-            "name":"name",
-            "description":"description",
-            "configType":"NewConfig",
-            "features":["IndexManagement"],
-            "isEnabled":true,
-            "slack":{"url":"https://domain.com/sample_slack_url#1234567890"},
-            "chime":{"url":"https://domain.com/sample_chime_url#1234567890"},
-            "webhook":{"url":"https://domain.com/sample_webhook_url#1234567890"},
-            "newConfig1":{"newField1":"new value 1"},
-            "newConfig2":{"newField2":"new value 2"}
-        }
-        """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { NotificationConfig.parse(it) }
-        assertEquals(sampleConfig, recreatedObject)
-    }
-
-    @Test
     fun `Config should safely ignore unknown feature type in json object`() {
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+        val sampleWebhook = Webhook("https://domain.com/sample_webhook_url#1234567890")
         val sampleConfig = NotificationConfig(
             "name",
             "description",
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement, Feature.None),
             isEnabled = true,
-            sampleSlack
+            sampleWebhook
         )
         val jsonString = """
         {

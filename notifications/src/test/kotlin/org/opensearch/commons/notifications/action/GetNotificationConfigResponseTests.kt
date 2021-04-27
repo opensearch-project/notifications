@@ -169,7 +169,7 @@ internal class GetNotificationConfigResponseTests {
             "description",
             ConfigType.Chime,
             EnumSet.of(Feature.IndexManagement),
-            configData =  Chime("https://domain.com/sample_url#1234567890")
+            configData = Chime("https://domain.com/sample_url#1234567890")
         )
         val configInfo2 = NotificationConfigInfo(
             "configId2",

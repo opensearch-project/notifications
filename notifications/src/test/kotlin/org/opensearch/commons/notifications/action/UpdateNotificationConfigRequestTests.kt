@@ -31,14 +31,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
-import org.opensearch.commons.notifications.model.Email
-import org.opensearch.commons.notifications.model.EmailGroup
 import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
-import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.commons.utils.createObjectFromJsonString
 import org.opensearch.commons.utils.getJsonString
@@ -48,14 +44,14 @@ import java.util.EnumSet
 internal class UpdateNotificationConfigRequestTests {
 
     private fun createAllContentConfigObject(): NotificationConfig {
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+        val sampleWebhook = Webhook("https://domain.com/sample_webhook_url#1234567890")
         return NotificationConfig(
             "name",
             "description",
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            configData = sampleSlack
+            configData = sampleWebhook
         )
     }
 
