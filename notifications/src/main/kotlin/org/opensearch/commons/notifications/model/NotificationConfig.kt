@@ -34,24 +34,27 @@ import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.model.config.BaseConfigData
-import org.opensearch.commons.notifications.model.config.CONFIG_PROPERTIES
+import org.opensearch.commons.notifications.model.config.ConfigPropertiesUtils.getConfigTypeForTag
+import org.opensearch.commons.notifications.model.config.ConfigPropertiesUtils.getReaderForConfigType
+import org.opensearch.commons.notifications.model.config.ConfigPropertiesUtils.getTagForConfigType
+import org.opensearch.commons.notifications.model.config.ConfigPropertiesUtils.isValidConfigTag
 import org.opensearch.commons.notifications.model.config.createConfigData
 import org.opensearch.commons.utils.enumSet
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.valueOf
 import java.io.IOException
-import java.util.EnumSet
+import java.util.*
 
 /**
  * Data class representing Notification config.
  */
 data class NotificationConfig(
-        val name: String,
-        val description: String,
-        val configType: ConfigType,
-        val features: EnumSet<Feature>,
-        val isEnabled: Boolean = true,
-        val configData: BaseConfigData
+    val name: String,
+    val description: String,
+    val configType: ConfigType,
+    val features: EnumSet<Feature>,
+    val isEnabled: Boolean = true,
+    val configData: BaseConfigData?
 ) : BaseModel {
 
     init {
@@ -69,7 +72,12 @@ data class NotificationConfig(
         const val CONFIG_TYPE_TAG = "configType"
         const val FEATURES_TAG = "features"
         const val IS_ENABLED_TAG = "isEnabled"
-        const val CONFIG_DATA_TAG = "configData"
+        const val SLACK_TAG = "slack"
+        const val CHIME_TAG = "chime"
+        const val WEBHOOK_TAG = "webhook"
+        const val EMAIL_TAG = "email"
+        const val SMTP_ACCOUNT_TAG = "smtpAccount"
+        const val EMAIL_GROUP_TAG = "emailGroup"
 
         /**
          * reader to create instance of class from writable.
@@ -80,9 +88,7 @@ data class NotificationConfig(
             val configType = input.readEnum(ConfigType::class.java)
             val features = input.readEnumSet(Feature::class.java)
             val isEnabled = input.readBoolean()
-            val configData = input.readOptionalWriteable(CONFIG_PROPERTIES.first { c ->
-                c.getConfigType() == configType
-            }.getConfigDataReader())
+            val configData = input.readOptionalWriteable(getReaderForConfigType(configType))
 
             NotificationConfig(name, description, configType, features, isEnabled, configData!!)
         }
@@ -100,25 +106,27 @@ data class NotificationConfig(
             var configType: ConfigType? = null
             var features: EnumSet<Feature>? = null
             var isEnabled = true
-            val configData: BaseConfigData?
-
-
+            var configData: BaseConfigData? = null
             XContentParserUtils.ensureExpectedToken(
-                    XContentParser.Token.START_OBJECT,
-                    parser.currentToken(),
-                    parser
+                XContentParser.Token.START_OBJECT,
+                parser.currentToken(),
+                parser
             )
-            var tempConfigDataMap: Map<String, Any>? = null
+            val tempConfigDataMap: EnumMap<ConfigType, Map<String, Any>>? = EnumMap(ConfigType::class.java)
             while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
                 val fieldName = parser.currentName()
                 parser.nextToken()
+                if (isValidConfigTag(fieldName)) {
+                    tempConfigDataMap!![getConfigTypeForTag(fieldName)] = parser.map()
+                    continue
+                }
+
                 when (fieldName) {
                     NAME_TAG -> name = parser.text()
                     DESCRIPTION_TAG -> description = parser.text()
                     CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), ConfigType.None, log)
                     FEATURES_TAG -> features = parser.enumSet(Feature.None, log)
                     IS_ENABLED_TAG -> isEnabled = parser.booleanValue()
-                    CONFIG_DATA_TAG -> tempConfigDataMap = parser.map()
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing configuration")
@@ -128,21 +136,26 @@ data class NotificationConfig(
             name ?: throw IllegalArgumentException("$NAME_TAG field absent")
             configType ?: throw IllegalArgumentException("$CONFIG_TYPE_TAG field absent")
             features ?: throw IllegalArgumentException("$FEATURES_TAG field absent")
-            tempConfigDataMap ?: throw IllegalArgumentException("$CONFIG_DATA_TAG field absent")
-
-            configData = createConfigData(configType, tempConfigDataMap)!!
+            log.info("here")
+            log.info(configType)
+            log.info(tempConfigDataMap)
+            if (configType != ConfigType.None) {
+                if (!tempConfigDataMap!!.containsKey(configType)) {
+                    throw IllegalArgumentException("$configType data field absent")
+                }
+                configData = createConfigData(configType, tempConfigDataMap[configType] as Map<String, Any>)!!
+            }
 
             return NotificationConfig(
-                    name,
-                    description,
-                    configType,
-                    features,
-                    isEnabled,
-                    configData
+                name,
+                description,
+                configType,
+                features,
+                isEnabled,
+                configData
             )
         }
     }
-
 
     /**
      * {@inheritDoc}
@@ -160,15 +173,14 @@ data class NotificationConfig(
      * {@inheritDoc}
      */
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
-
         builder!!
         return builder.startObject()
-                .field(NAME_TAG, name)
-                .field(DESCRIPTION_TAG, description)
-                .field(CONFIG_TYPE_TAG, configType)
-                .field(FEATURES_TAG, features)
-                .field(IS_ENABLED_TAG, isEnabled)
-                .field(CONFIG_DATA_TAG, configData)
-                .endObject()
+            .field(NAME_TAG, name)
+            .field(DESCRIPTION_TAG, description)
+            .field(CONFIG_TYPE_TAG, configType)
+            .field(FEATURES_TAG, features)
+            .field(IS_ENABLED_TAG, isEnabled)
+            .field(getTagForConfigType(configType), configData)
+            .endObject()
     }
 }
