@@ -54,7 +54,7 @@ internal class DeleteNotificationConfigResponseTests {
     @Test
     fun `Delete response should deserialize json object using parser`() {
         val configId = "sample_config_id"
-        val jsonString = "{\"configId\":\"$configId\"}"
+        val jsonString = "{\"config_id\":\"$configId\"}"
         val recreatedObject = createObjectFromJsonString(jsonString) { DeleteNotificationConfigResponse.parse(it) }
         assertEquals(configId, recreatedObject.configId)
     }
@@ -69,7 +69,7 @@ internal class DeleteNotificationConfigResponseTests {
 
     @Test
     fun `Delete response should throw exception when configId is replace with configId2 in json object`() {
-        val jsonString = "{\"configId2\":\"sample_config_id\"}"
+        val jsonString = "{\"config_id2\":\"sample_config_id\"}"
         assertThrows<IllegalArgumentException> {
             createObjectFromJsonString(jsonString) { DeleteNotificationConfigResponse.parse(it) }
         }
@@ -80,7 +80,7 @@ internal class DeleteNotificationConfigResponseTests {
         val configId = "sample_config_id"
         val jsonString = """
         {
-            "configId":"$configId",
+            "config_id":"$configId",
             "extra_field_1":["extra", "value"],
             "extra_field_2":{"extra":"value"},
             "extra_field_3":"extra value 3"

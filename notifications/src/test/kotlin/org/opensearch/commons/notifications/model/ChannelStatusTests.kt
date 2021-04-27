@@ -40,7 +40,7 @@ internal class ChannelStatusTests {
     @Test
     fun `Notification Status serialize and deserialize should be equal`() {
         val sampleStatus = ChannelStatus(
-            "configId",
+            "config_id",
             "name",
             ConfigType.Slack,
             deliveryStatus = DeliveryStatus("404", "invalid recipient")
@@ -52,7 +52,7 @@ internal class ChannelStatusTests {
     @Test
     fun `Notification Status serialize and deserialize using json should be equal`() {
         val sampleStatus = ChannelStatus(
-            "configId",
+            "config_id",
             "name",
             ConfigType.Slack,
             deliveryStatus = DeliveryStatus("404", "invalid recipient")
@@ -66,21 +66,21 @@ internal class ChannelStatusTests {
     @Test
     fun `Notification Status should safely ignore extra field in json object`() {
         val sampleStatus = ChannelStatus(
-            "configId",
+            "config_id",
             "name",
             ConfigType.Slack,
             deliveryStatus = DeliveryStatus("404", "invalid recipient")
         )
         val jsonString = """
         {
-           "configId":"configId",
-           "configType":"Slack",
-           "configName":"name",
-           "emailRecipientStatus":[],
-           "deliveryStatus":
+           "config_id":"config_id",
+           "config_type":"Slack",
+           "config_name":"name",
+           "email_recipient_status":[],
+           "delivery_status":
            {
-                "statusCode":"404",
-                "statusText":"invalid recipient"
+                "status_code":"404",
+                "status_text":"invalid recipient"
            },
            "extra_field_1":["extra", "value"],
            "extra_field_2":{"extra":"value"},
@@ -95,15 +95,15 @@ internal class ChannelStatusTests {
     fun `Notification Status should throw exception when config type is email with empty emailRecipientList`() {
         val jsonString = """
         {
-           "configId":"configId",
-           "configType":"Email",
-           "configName":"name",
-           "deliveryStatus":
+           "config_id":"config_id",
+           "config_type":"Email",
+           "config_name":"name",
+           "delivery_status":
            {
-                "statusCode":"404",
-                "statusText":"invalid recipient"
+                "status_code":"404",
+                "status_text":"invalid recipient"
            },
-           "emailRecipientStatus":[]
+           "email_recipient_status":[]
         }
         """.trimIndent()
         assertThrows<IllegalArgumentException> {
@@ -123,7 +123,7 @@ internal class ChannelStatusTests {
     fun `Notification throw exception if deliveryStatus is empty for config type Slack`() {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
             ChannelStatus(
-                "configId",
+                "config_id",
                 "name",
                 ConfigType.Slack
             )
@@ -134,7 +134,7 @@ internal class ChannelStatusTests {
     fun `Notification throw exception if deliveryStatus is empty for config type Chime`() {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
             ChannelStatus(
-                "configId",
+                "config_id",
                 "name",
                 ConfigType.Chime
             )
@@ -145,7 +145,7 @@ internal class ChannelStatusTests {
     fun `Notification throw exception if deliveryStatus is empty for config type Webhook`() {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
             ChannelStatus(
-                "configId",
+                "config_id",
                 "name",
                 ConfigType.Webhook
             )
@@ -156,7 +156,7 @@ internal class ChannelStatusTests {
     fun `Notification throw exception if emailRecipientStatus is empty for config type Email`() {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
             ChannelStatus(
-                "configId",
+                "config_id",
                 "name",
                 ConfigType.Email
             )

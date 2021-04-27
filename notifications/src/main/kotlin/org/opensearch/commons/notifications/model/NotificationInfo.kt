@@ -34,6 +34,11 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_TAG
+import org.opensearch.commons.notifications.NotificationConstants.REFERENCE_ID_TAG
+import org.opensearch.commons.notifications.NotificationConstants.SEVERITY_TAG
+import org.opensearch.commons.notifications.NotificationConstants.TAGS_TAG
+import org.opensearch.commons.notifications.NotificationConstants.TITLE_TAG
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.stringList
 import org.opensearch.commons.utils.valueOf
@@ -56,11 +61,6 @@ data class NotificationInfo(
 
     companion object {
         private val log by logger(NotificationInfo::class.java)
-        private const val TITLE_TAG = "title"
-        private const val REFERENCE_ID_TAG = "referenceId"
-        private const val FEATURE_TAG = "feature"
-        private const val SEVERITY_TAG = "severity"
-        private const val TAGS_TAG = "tags"
 
         /**
          * reader to create instance of class from writable.

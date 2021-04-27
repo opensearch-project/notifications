@@ -24,50 +24,40 @@
  * permissions and limitations under the License.
  *
  */
-package org.opensearch.commons.notifications.model
+package org.opensearch.notifications.model
 
-import org.opensearch.common.io.stream.StreamInput
-import org.opensearch.common.io.stream.StreamOutput
-import org.opensearch.common.io.stream.Writeable
 import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
+import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
-import org.opensearch.commons.notifications.NotificationConstants.RECIPIENTS_TAG
-import org.opensearch.commons.utils.isValidEmail
+import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.utils.logger
-import org.opensearch.commons.utils.stringList
 import java.io.IOException
 
 /**
- * Data class representing Email group.
+ * Data class representing Notification config.
  */
-data class EmailGroup(
-    val recipients: List<String>
-) : BaseModel {
-
-    init {
-        recipients.forEach {
-            require(isValidEmail(it)) { "Invalid email address" }
-        }
-    }
+data class NotificationConfigDoc(
+    val metadata: DocMetadata,
+    val config: NotificationConfig
+) : ToXContent {
 
     companion object {
-        private val log by logger(EmailGroup::class.java)
+        private val log by logger(NotificationConfigDoc::class.java)
+        private const val METADATA_TAG = "metadata"
+        private const val CONFIG_TAG = "config"
 
         /**
-         * reader to create instance of class from writable.
-         */
-        val reader = Writeable.Reader { EmailGroup(it) }
-
-        /**
-         * Creator used in REST communication.
-         * @param parser XContentParser to deserialize data from.
+         * Parse the data from parser and create object
+         * @param parser data referenced at parser
+         * @return created object
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): EmailGroup {
-            var recipients: List<String>? = null
+        fun parse(parser: XContentParser): NotificationConfigDoc {
+            var metadata: DocMetadata? = null
+            var config: NotificationConfig? = null
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -78,31 +68,30 @@ data class EmailGroup(
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    RECIPIENTS_TAG -> recipients = parser.stringList()
+                    METADATA_TAG -> metadata = DocMetadata.parse(parser)
+                    CONFIG_TAG -> config = NotificationConfig.parse(parser)
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing EmailGroup")
+                        log.info("Unexpected field: $fieldName, while parsing configuration doc")
                     }
                 }
             }
-            recipients ?: throw IllegalArgumentException("$RECIPIENTS_TAG field absent")
-            return EmailGroup(recipients)
+            metadata ?: throw IllegalArgumentException("$METADATA_TAG field absent")
+            config ?: throw IllegalArgumentException("$CONFIG_TAG field absent")
+            return NotificationConfigDoc(
+                metadata,
+                config
+            )
         }
     }
 
     /**
-     * Constructor used in transport action communication.
-     * @param input StreamInput stream to deserialize data from.
+     * create XContentBuilder from this object using [XContentFactory.jsonBuilder()]
+     * @param params XContent parameters
+     * @return created XContentBuilder object
      */
-    constructor(input: StreamInput) : this(
-        recipients = input.readStringList()
-    )
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun writeTo(output: StreamOutput) {
-        output.writeStringCollection(recipients)
+    fun toXContent(params: ToXContent.Params = ToXContent.EMPTY_PARAMS): XContentBuilder {
+        return toXContent(XContentFactory.jsonBuilder(), params)
     }
 
     /**
@@ -111,7 +100,8 @@ data class EmailGroup(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(RECIPIENTS_TAG, recipients)
+            .field(METADATA_TAG, metadata)
+            .field(CONFIG_TAG, config)
             .endObject()
     }
 }

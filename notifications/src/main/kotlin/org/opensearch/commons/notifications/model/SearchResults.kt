@@ -38,6 +38,9 @@ import org.opensearch.common.xcontent.ToXContent.Params
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.START_INDEX_TAG
+import org.opensearch.commons.notifications.NotificationConstants.TOTAL_HITS_TAG
+import org.opensearch.commons.notifications.NotificationConstants.TOTAL_HIT_RELATION_TAG
 import org.opensearch.commons.utils.logger
 import org.opensearch.search.SearchHit
 
@@ -48,15 +51,12 @@ abstract class SearchResults<ItemClass : BaseModel> : BaseModel {
     val objectListFieldName: String
     val objectList: List<ItemClass>
 
-    interface SearchHitParser {
-        fun <ItemClass> parse(it: SearchHit): ItemClass
+    interface SearchHitParser<ItemClass> {
+        fun parse(searchHit: SearchHit): ItemClass
     }
 
     companion object {
         private val log by logger(SearchResults::class.java)
-        private const val START_INDEX_TAG = "startIndex"
-        private const val TOTAL_HITS_TAG = "totalHits"
-        private const val TOTAL_HIT_RELATION_TAG = "totalHitRelation"
         private fun convertRelation(totalHitRelation: Relation): String {
             return if (totalHitRelation == EQUAL_TO) {
                 "eq"
@@ -99,7 +99,12 @@ abstract class SearchResults<ItemClass : BaseModel> : BaseModel {
         this.objectList = objectList
     }
 
-    constructor(from: Long, response: SearchResponse, searchHitParser: SearchHitParser, objectListFieldName: String) {
+    constructor(
+        from: Long,
+        response: SearchResponse,
+        searchHitParser: SearchHitParser<ItemClass>,
+        objectListFieldName: String
+    ) {
         val mutableList: MutableList<ItemClass> = mutableListOf()
         response.hits.forEach {
             mutableList.add(searchHitParser.parse(it))

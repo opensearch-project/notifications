@@ -31,14 +31,12 @@ import org.apache.lucene.search.TotalHits
 import org.opensearch.action.search.SearchResponse
 import org.opensearch.common.io.stream.StreamInput
 import org.opensearch.common.xcontent.XContentParser
+import org.opensearch.commons.notifications.NotificationConstants.NOTIFICATION_CONFIG_LIST_TAG
 
 /**
  * NotificationConfig search results
  */
 class NotificationConfigSearchResult : SearchResults<NotificationConfigInfo> {
-    companion object {
-        private const val NOTIFICATION_CONFIG_LIST_TAG = "notificationConfigList"
-    }
 
     /**
      * single item result constructor
@@ -69,7 +67,7 @@ class NotificationConfigSearchResult : SearchResults<NotificationConfigInfo> {
     /**
      * Construct object from SearchResponse
      */
-    constructor(from: Long, response: SearchResponse, searchHitParser: SearchHitParser) : super(
+    constructor(from: Long, response: SearchResponse, searchHitParser: SearchHitParser<NotificationConfigInfo>) : super(
         from,
         response,
         searchHitParser,

@@ -34,6 +34,9 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.DEFAULT_EMAIL_GROUPS_TAG
+import org.opensearch.commons.notifications.NotificationConstants.DEFAULT_RECIPIENTS_TAG
+import org.opensearch.commons.notifications.NotificationConstants.EMAIL_ACCOUNT_ID_TAG
 import org.opensearch.commons.utils.isValidEmail
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.stringList
@@ -57,9 +60,6 @@ data class Email(
 
     companion object {
         private val log by logger(Email::class.java)
-        private const val EMAIL_ACCOUNT_ID_TAG = "emailAccountID"
-        private const val DEFAULT_RECIPIENTS_TAG = "defaultRecipients"
-        private const val DEFAULT_EMAIL_GROUPS_TAG = "defaultEmailGroupIds"
 
         /**
          * reader to create instance of class from writable.

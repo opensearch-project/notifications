@@ -34,6 +34,11 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TYPE_TAG
+import org.opensearch.commons.notifications.NotificationConstants.DESCRIPTION_TAG
+import org.opensearch.commons.notifications.NotificationConstants.IS_ENABLED_TAG
+import org.opensearch.commons.notifications.NotificationConstants.NAME_TAG
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.valueOf
 import java.io.IOException
@@ -56,11 +61,6 @@ data class FeatureChannel(
 
     companion object {
         private val log by logger(FeatureChannel::class.java)
-        private const val CONFIG_ID_TAG = "configId"
-        private const val NAME_TAG = "name"
-        private const val DESCRIPTION_TAG = "description"
-        private const val CONFIG_TYPE_TAG = "configType"
-        private const val IS_ENABLED_TAG = "isEnabled"
 
         /**
          * reader to create instance of class from writable.

@@ -39,12 +39,12 @@ class NotificationConfigCrudIT : ODFERestTestCase() {
         val request = Request("POST", "$PLUGIN_BASE_URI/configs")
         val jsonString = """
         {
-            "notificationConfig":{
+            "notification_config":{
                 "name":"name",
                 "description":"description",
-                "configType":"Slack",
+                "config_type":"Slack",
                 "features":["IndexManagement"],
-                "isEnabled":true,
+                "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
             }
         }
@@ -54,6 +54,6 @@ class NotificationConfigCrudIT : ODFERestTestCase() {
         restOptionsBuilder.addHeader("Content-Type", "application/json")
         request.setOptions(restOptionsBuilder)
         val retVal = executeRequest(request)
-        Assert.assertNotNull(retVal.get("configId").asString)
+        Assert.assertNotNull(retVal.get("config_id").asString)
     }
 }

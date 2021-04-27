@@ -73,8 +73,8 @@ internal class DeliveryStatusTests {
         )
         val jsonString = """
         {
-            "statusCode": "404",
-            "statusText": "invalid recipient",
+            "status_code": "404",
+            "status_text": "invalid recipient",
             "extra": "field"
         }    
         """.trimIndent()

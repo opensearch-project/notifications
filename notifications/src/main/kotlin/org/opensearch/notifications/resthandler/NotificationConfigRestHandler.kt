@@ -27,13 +27,13 @@
 package org.opensearch.notifications.resthandler
 
 import org.opensearch.client.node.NodeClient
+import org.opensearch.commons.notifications.NotificationConstants.DEFAULT_MAX_ITEMS
+import org.opensearch.commons.notifications.NotificationConstants.FROM_INDEX_TAG
+import org.opensearch.commons.notifications.NotificationConstants.MAX_ITEMS_TAG
 import org.opensearch.commons.notifications.NotificationsPluginInterface
 import org.opensearch.commons.notifications.action.CreateNotificationConfigRequest
 import org.opensearch.commons.notifications.action.DeleteNotificationConfigRequest
 import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
-import org.opensearch.commons.notifications.action.GetNotificationConfigRequest.Companion.DEFAULT_MAX_ITEMS
-import org.opensearch.commons.notifications.action.GetNotificationConfigRequest.Companion.FROM_INDEX_TAG
-import org.opensearch.commons.notifications.action.GetNotificationConfigRequest.Companion.MAX_ITEMS_TAG
 import org.opensearch.commons.notifications.action.UpdateNotificationConfigRequest
 import org.opensearch.commons.utils.contentParserNextToken
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
@@ -57,7 +57,7 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
          * Base URL for this handler
          */
         private const val REQUEST_URL = "$PLUGIN_BASE_URI/configs"
-        private const val CONFIG_ID_FIELD = "configId"
+        private const val CONFIG_ID_FIELD = "config_id"
     }
 
     /**

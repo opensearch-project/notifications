@@ -71,21 +71,21 @@ internal class UpdateNotificationConfigRequestTests {
 
     @Test
     fun `Update config serialize and deserialize transport object should be equal`() {
-        val configRequest = UpdateNotificationConfigRequest("configId", createAllContentConfigObject())
+        val configRequest = UpdateNotificationConfigRequest("config_id", createAllContentConfigObject())
         val recreatedObject =
             recreateObject(configRequest) { UpdateNotificationConfigRequest(it) }
         assertNull(recreatedObject.validate())
         assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
-        assertEquals("configId", recreatedObject.configId)
+        assertEquals("config_id", recreatedObject.configId)
     }
 
     @Test
     fun `Update config serialize and deserialize using json object should be equal`() {
-        val configRequest = UpdateNotificationConfigRequest("configId", createAllContentConfigObject())
+        val configRequest = UpdateNotificationConfigRequest("config_id", createAllContentConfigObject())
         val jsonString = getJsonString(configRequest)
         val recreatedObject = createObjectFromJsonString(jsonString) { UpdateNotificationConfigRequest.parse(it) }
         assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
-        assertEquals("configId", recreatedObject.configId)
+        assertEquals("config_id", recreatedObject.configId)
     }
 
     @Test
@@ -102,20 +102,20 @@ internal class UpdateNotificationConfigRequestTests {
 
         val jsonString = """
         {
-            "configId":"configId1",
-            "notificationConfig":{
+            "config_id":"config_id1",
+            "notification_config":{
                 "name":"name",
                 "description":"description",
-                "configType":"Slack",
+                "config_type":"Slack",
                 "features":["IndexManagement"],
-                "isEnabled":true,
+                "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
             }
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { UpdateNotificationConfigRequest.parse(it) }
         assertEquals(config, recreatedObject.notificationConfig)
-        assertEquals("configId1", recreatedObject.configId)
+        assertEquals("config_id1", recreatedObject.configId)
     }
 
     @Test
@@ -140,13 +140,13 @@ internal class UpdateNotificationConfigRequestTests {
 
         val jsonString = """
         {
-            "configId":"configId1",
-            "notificationConfig":{
+            "config_id":"config_id1",
+            "notification_config":{
                 "name":"name",
                 "description":"description",
-                "configType":"Slack",
+                "config_type":"Slack",
                 "features":["IndexManagement"],
-                "isEnabled":true,
+                "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"},
                 "extra_field_1":["extra", "value"],
                 "extra_field_2":{"extra":"value"},
@@ -156,6 +156,6 @@ internal class UpdateNotificationConfigRequestTests {
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { UpdateNotificationConfigRequest.parse(it) }
         assertEquals(config, recreatedObject.notificationConfig)
-        assertEquals("configId1", recreatedObject.configId)
+        assertEquals("config_id1", recreatedObject.configId)
     }
 }

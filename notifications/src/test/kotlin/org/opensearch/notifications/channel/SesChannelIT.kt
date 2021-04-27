@@ -42,10 +42,10 @@ class SesChannelIT : NotificationsRestTestCase() {
     private val attachment = jsonify(
         """
         {
-          "fileName": "odfe.data",
-          "fileEncoding": "base64",
-          "fileContentType": "application/octet-stream",
-          "fileData": "VGVzdCBtZXNzYWdlCgo="
+          "file_name": "odfe.data",
+          "file_encoding": "base64",
+          "file_content_type": "application/octet-stream",
+          "file_data": "VGVzdCBtZXNzYWdlCgo="
         }
         """.trimIndent()
     )

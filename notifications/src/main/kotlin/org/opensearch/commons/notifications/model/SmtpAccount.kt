@@ -35,6 +35,12 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.FROM_ADDRESS_FIELD
+import org.opensearch.commons.notifications.NotificationConstants.HOST_FIELD
+import org.opensearch.commons.notifications.NotificationConstants.METHOD_FIELD
+import org.opensearch.commons.notifications.NotificationConstants.PASSWORD_FIELD
+import org.opensearch.commons.notifications.NotificationConstants.PORT_FIELD
+import org.opensearch.commons.notifications.NotificationConstants.USERNAME_FIELD
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.isValidEmail
 import org.opensearch.commons.utils.logger
@@ -62,19 +68,12 @@ data class SmtpAccount(
     enum class MethodType { None, Ssl, StartTls; }
 
     companion object {
-        private val log by logger(NotificationConfig::class.java)
+        private val log by logger(SmtpAccount::class.java)
 
         /**
          * reader to create instance of class from writable.
          */
         val reader = Writeable.Reader { SmtpAccount(it) }
-
-        const val HOST_FIELD = "host"
-        const val PORT_FIELD = "port"
-        const val METHOD_FIELD = "method"
-        const val FROM_ADDRESS_FIELD = "fromAddress"
-        const val USERNAME_FIELD = "username"
-        const val PASSWORD_FIELD = "password"
 
         @JvmStatic
         @Throws(IOException::class)

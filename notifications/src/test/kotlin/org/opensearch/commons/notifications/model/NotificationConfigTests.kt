@@ -331,9 +331,9 @@ internal class NotificationConfigTests {
         {
             "name":"name",
             "description":"description",
-            "configType":"Webhook",
+            "config_type":"Webhook",
             "features":["IndexManagement"],
-            "isEnabled":true,
+            "is_enabled":true,
             "slack":{"url":"https://domain.com/sample_slack_url#1234567890"},
             "chime":{"url":"https://domain.com/sample_chime_url#1234567890"},
             "webhook":{"url":"https://domain.com/sample_webhook_url#1234567890"},
@@ -364,14 +364,14 @@ internal class NotificationConfigTests {
         {
             "name":"name",
             "description":"description",
-            "configType":"NewConfig",
+            "config_type":"NewConfig",
             "features":["IndexManagement"],
-            "isEnabled":true,
+            "is_enabled":true,
             "slack":{"url":"https://domain.com/sample_slack_url#1234567890"},
             "chime":{"url":"https://domain.com/sample_chime_url#1234567890"},
             "webhook":{"url":"https://domain.com/sample_webhook_url#1234567890"},
-            "newConfig1":{"newField1":"new value 1"},
-            "newConfig2":{"newField2":"new value 2"}
+            "new_config1":{"newField1":"new value 1"},
+            "new_config2":{"newField2":"new value 2"}
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { NotificationConfig.parse(it) }
@@ -397,9 +397,9 @@ internal class NotificationConfigTests {
         {
             "name":"name",
             "description":"description",
-            "configType":"Webhook",
+            "config_type":"Webhook",
             "features":["IndexManagement", "NewFeature1", "NewFeature2"],
-            "isEnabled":true,
+            "is_enabled":true,
             "slack":{"url":"https://domain.com/sample_slack_url#1234567890"},
             "chime":{"url":"https://domain.com/sample_chime_url#1234567890"},
             "webhook":{"url":"https://domain.com/sample_webhook_url#1234567890"}

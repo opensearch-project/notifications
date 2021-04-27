@@ -56,7 +56,7 @@ internal class SendMessageResponse : BaseResponse {
         /**
          * Parse the recipient response list from parser
          * @param parser data referenced at parser
-         * @return created list of ReportInstance
+         * @return created list of response
          */
         private fun parseRecipientResponseList(parser: XContentParser): List<ChannelMessageResponse> {
             val retList: MutableList<ChannelMessageResponse> = mutableListOf()

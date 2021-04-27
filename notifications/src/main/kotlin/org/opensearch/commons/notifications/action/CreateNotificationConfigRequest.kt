@@ -36,6 +36,7 @@ import org.opensearch.common.xcontent.ToXContentObject
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.NOTIFICATION_CONFIG_TAG
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.utils.logger
 import java.io.IOException
@@ -48,7 +49,6 @@ class CreateNotificationConfigRequest : ActionRequest, ToXContentObject {
 
     companion object {
         private val log by logger(CreateNotificationConfigResponse::class.java)
-        private const val NOTIFICATION_CONFIG_TAG = "notificationConfig"
 
         /**
          * reader to create instance of class from writable.

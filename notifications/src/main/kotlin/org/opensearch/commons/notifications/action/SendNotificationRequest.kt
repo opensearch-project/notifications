@@ -37,6 +37,10 @@ import org.opensearch.common.xcontent.ToXContentObject
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.CHANNEL_IDS_TAG
+import org.opensearch.commons.notifications.NotificationConstants.CHANNEL_MESSAGE_TAG
+import org.opensearch.commons.notifications.NotificationConstants.NOTIFICATION_INFO_TAG
+import org.opensearch.commons.notifications.NotificationConstants.THREAD_CONTEXT_TAG
 import org.opensearch.commons.notifications.model.ChannelMessage
 import org.opensearch.commons.notifications.model.NotificationInfo
 import org.opensearch.commons.utils.fieldIfNotNull
@@ -55,10 +59,6 @@ class SendNotificationRequest : ActionRequest, ToXContentObject {
 
     companion object {
         private val log by logger(SendNotificationRequest::class.java)
-        private const val NOTIFICATION_INFO_TAG = "notificationInfo"
-        private const val CHANNEL_MESSAGE_TAG = "channelMessage"
-        private const val CHANNEL_IDS_TAG = "channelIds"
-        private const val THREAD_CONTEXT_TAG = "context"
 
         /**
          * reader to create instance of class from writable.

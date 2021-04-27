@@ -87,7 +87,7 @@ internal class SmtpAccountTests {
             "host":"domain.com",
             "port":"1234",
             "method":"Ssl",
-            "fromAddress":"from@domain.com"
+            "from_address":"from@domain.com"
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { SmtpAccount.parse(it) }
@@ -108,7 +108,7 @@ internal class SmtpAccountTests {
             "host":"domain.com",
             "port":"1234",
             "method":"StartTls",
-            "fromAddress":"from@domain.com",
+            "from_address":"from@domain.com",
             "username":"given_username",
             "password":"given_password"
         }
@@ -132,7 +132,7 @@ internal class SmtpAccountTests {
             "host":"domain.com",
             "port":"1234",
             "method":"Ssl",
-            "fromAddress":".from@domain.com",
+            "from_address":".from@domain.com",
             "username":"given_username",
             "password":"given_password"
         }
@@ -156,7 +156,7 @@ internal class SmtpAccountTests {
             "host":"domain.com",
             "port":"1234",
             "method":"Ssl",
-            "fromAddress":"from@domain.com",
+            "from_address":"from@domain.com",
             "username":"given_username",
             "password":"given_password",
             "extra_field_1":"extra value 1",
