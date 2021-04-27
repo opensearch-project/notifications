@@ -38,6 +38,7 @@ import org.opensearch.commons.notifications.model.config.ConfigPropertiesUtils.g
 import org.opensearch.commons.notifications.model.config.ConfigPropertiesUtils.getReaderForConfigType
 import org.opensearch.commons.notifications.model.config.ConfigPropertiesUtils.getTagForConfigType
 import org.opensearch.commons.notifications.model.config.ConfigPropertiesUtils.isValidConfigTag
+import org.opensearch.commons.notifications.model.config.ConfigPropertiesUtils.validateConfigData
 import org.opensearch.commons.notifications.model.config.createConfigData
 import org.opensearch.commons.utils.enumSet
 import org.opensearch.commons.utils.logger
@@ -59,6 +60,9 @@ data class NotificationConfig(
 
     init {
         require(!Strings.isNullOrEmpty(name)) { "name is null or empty" }
+        if (!validateConfigData(configType, configData)) {
+            throw IllegalArgumentException("ConfigType: $configType and data doesn't match")
+        }
         if (configType === ConfigType.None) {
             log.info("Some config field not recognized")
         }
