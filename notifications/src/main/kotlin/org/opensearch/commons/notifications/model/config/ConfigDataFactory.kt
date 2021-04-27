@@ -38,4 +38,3 @@ import org.opensearch.commons.notifications.model.ConfigType
 internal fun createConfigData(configType: ConfigType, map: Map<String, Any>): BaseConfigData? {
     return CONFIG_TYPE_VS_PROPERTIES[configType]?.createConfigData(map)
 }
-

@@ -28,6 +28,12 @@
 package org.opensearch.commons.notifications.model.config
 
 import org.opensearch.common.io.stream.Writeable.Reader
+import org.opensearch.commons.notifications.model.NotificationConfig.Companion.CHIME_TAG
+import org.opensearch.commons.notifications.model.NotificationConfig.Companion.EMAIL_GROUP_TAG
+import org.opensearch.commons.notifications.model.NotificationConfig.Companion.EMAIL_TAG
+import org.opensearch.commons.notifications.model.NotificationConfig.Companion.SLACK_TAG
+import org.opensearch.commons.notifications.model.NotificationConfig.Companion.SMTP_ACCOUNT_TAG
+import org.opensearch.commons.notifications.model.NotificationConfig.Companion.WEBHOOK_TAG
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.Email
@@ -36,9 +42,16 @@ import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.commons.notifications.model.ConfigType
 import java.lang.UnsupportedOperationException
-
+import kotlin.reflect.KClass
 
 val SlackChannelProperties = object : ConfigDataProperties {
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun getChannelTag(): String {
+        return SLACK_TAG
+    }
 
     /**
      * {@inheritDoc}
@@ -60,10 +73,23 @@ val SlackChannelProperties = object : ConfigDataProperties {
     override fun getConfigType(): ConfigType {
         return ConfigType.Slack
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun getDataClass(): KClass<Slack> {
+        return Slack::class
+    }
 }
 
-
 val ChimeChannelProperties = object : ConfigDataProperties {
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun getChannelTag(): String {
+        return CHIME_TAG
+    }
 
     /**
      * {@inheritDoc}
@@ -86,10 +112,22 @@ val ChimeChannelProperties = object : ConfigDataProperties {
         return ConfigType.Chime
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    override fun getDataClass(): KClass<Chime> {
+        return Chime::class
+    }
 }
 
-
 val EmailChannelProperties = object : ConfigDataProperties {
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun getChannelTag(): String {
+        return EMAIL_TAG
+    }
 
     /**
      * {@inheritDoc}
@@ -111,10 +149,23 @@ val EmailChannelProperties = object : ConfigDataProperties {
     override fun getConfigType(): ConfigType {
         return ConfigType.Email
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun getDataClass(): KClass<Email> {
+        return Email::class
+    }
 }
 
-
 val EmailGroupChannelProperties = object : ConfigDataProperties {
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun getChannelTag(): String {
+        return EMAIL_GROUP_TAG
+    }
 
     /**
      * {@inheritDoc}
@@ -136,16 +187,29 @@ val EmailGroupChannelProperties = object : ConfigDataProperties {
     override fun getConfigType(): ConfigType {
         return ConfigType.EmailGroup
     }
-}
 
+    /**
+     * {@inheritDoc}
+     */
+    override fun getDataClass(): KClass<EmailGroup> {
+        return EmailGroup::class
+    }
+}
 
 val SmtpAccountChannelProperties = object : ConfigDataProperties {
 
     /**
      * {@inheritDoc}
      */
+    override fun getChannelTag(): String {
+        return SMTP_ACCOUNT_TAG
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     override fun getConfigDataReader(): Reader<SmtpAccount> {
-        return Reader { SmtpAccount(it) }
+        return SmtpAccount.reader
     }
 
     /**
@@ -161,10 +225,23 @@ val SmtpAccountChannelProperties = object : ConfigDataProperties {
     override fun getConfigType(): ConfigType {
         return ConfigType.SmtpAccount
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun getDataClass(): KClass<SmtpAccount> {
+        return SmtpAccount::class
+    }
 }
 
-
 val WebhookChannelProperties = object : ConfigDataProperties {
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun getChannelTag(): String {
+        return WEBHOOK_TAG
+    }
 
     /**
      * {@inheritDoc}
@@ -186,10 +263,23 @@ val WebhookChannelProperties = object : ConfigDataProperties {
     override fun getConfigType(): ConfigType {
         return ConfigType.Webhook
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun getDataClass(): KClass<Webhook> {
+        return Webhook::class
+    }
 }
 
-
 val NoOpProperties = object : ConfigDataProperties {
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun getChannelTag(): String {
+        throw UnsupportedOperationException()
+    }
 
     /**
      * {@inheritDoc}
@@ -211,29 +301,25 @@ val NoOpProperties = object : ConfigDataProperties {
     override fun getConfigType(): ConfigType {
         return ConfigType.None
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun getDataClass(): KClass<out BaseConfigData> {
+        throw UnsupportedOperationException()
+    }
 }
-
-val CONFIG_PROPERTIES: List<ConfigDataProperties> = listOf(
-        SlackChannelProperties,
-        ChimeChannelProperties,
-        WebhookChannelProperties,
-        EmailChannelProperties,
-        EmailGroupChannelProperties,
-        SmtpAccountChannelProperties,
-        NoOpProperties
-)
-
-val CONFIG_TYPE_VS_PROPERTIES: Map<ConfigType, ConfigDataProperties> = CONFIG_PROPERTIES
-        .filter { c -> c.getConfigType() != ConfigType.None }
-        .associate { c ->
-            c.getConfigType() to c
-        }
 
 /**
  * Properties for ConfigTypes.
  * This interface is used to provide contract accross configTypes without reading into config data classes.
  */
 interface ConfigDataProperties {
+
+    /**
+     * @return ChannelTag for concrete ConfigType
+     */
+    fun getChannelTag(): String
 
     /**
      * @return Reader for concrete ConfigType.
@@ -250,5 +336,9 @@ interface ConfigDataProperties {
      * @return ConfigType for concrete implementation
      */
     fun getConfigType(): ConfigType
-}
 
+    /**
+     * @return Klass for concrete implementation, to be used to map with config data class.
+     */
+    fun getDataClass(): KClass<out BaseConfigData>
+}
