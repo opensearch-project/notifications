@@ -33,6 +33,8 @@ import org.opensearch.common.io.stream.Writeable
 import org.opensearch.common.settings.SecureString
 import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
+import org.opensearch.common.xcontent.XContentParser
+import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.model.config.BaseConfigData
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.isValidEmail
@@ -75,6 +77,58 @@ data class SmtpAccount(
         const val USERNAME_FIELD = "username"
         const val PASSWORD_FIELD = "password"
 
+        /**
+         * @param parser XContentParser to deserialize data from.
+         */
+        @JvmStatic
+        @Throws(IOException::class)
+        fun parse(parser: XContentParser): SmtpAccount {
+            var host: String? = null
+            var port: Int? = null
+            var method: MethodType? = null
+            var fromAddress: String? = null
+            var username: SecureString? = null
+            var password: SecureString? = null
+
+            XContentParserUtils.ensureExpectedToken(
+                XContentParser.Token.START_OBJECT,
+                parser.currentToken(),
+                parser
+            )
+            while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
+                val fieldName = parser.currentName()
+                parser.nextToken()
+                when (fieldName) {
+                    HOST_FIELD -> host = parser.text()
+                    PORT_FIELD -> port = parser.intValue()
+                    METHOD_FIELD -> method = valueOf(parser.text(), MethodType.None, log)
+                    FROM_ADDRESS_FIELD -> fromAddress = parser.text()
+                    USERNAME_FIELD -> username = SecureString(parser.text().toCharArray())
+                    PASSWORD_FIELD -> password = SecureString(parser.text().toCharArray())
+                    else -> {
+                        parser.skipChildren()
+                        log.info("Unexpected field: $fieldName, while parsing SmtpAccount")
+                    }
+                }
+            }
+            host ?: throw IllegalArgumentException("$HOST_FIELD field absent")
+            port ?: throw IllegalArgumentException("$PORT_FIELD field absent")
+            method ?: throw IllegalArgumentException("$METHOD_FIELD field absent")
+            fromAddress ?: throw IllegalArgumentException("$FROM_ADDRESS_FIELD field absent")
+            return SmtpAccount(
+                host,
+                port,
+                method,
+                fromAddress,
+                username,
+                password
+            )
+        }
+
+        /**
+         * Creator used in REST communication.
+         * @param configDataMap Map to deserialize data from.
+         */
         @JvmStatic
         @Throws(IOException::class)
         fun parse(configDataMap: Map<String, Any>): SmtpAccount {

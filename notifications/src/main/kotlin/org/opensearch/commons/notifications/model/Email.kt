@@ -32,9 +32,12 @@ import org.opensearch.common.io.stream.StreamOutput
 import org.opensearch.common.io.stream.Writeable
 import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
+import org.opensearch.common.xcontent.XContentParser
+import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.model.config.BaseConfigData
 import org.opensearch.commons.utils.isValidEmail
 import org.opensearch.commons.utils.logger
+import org.opensearch.commons.utils.stringList
 import java.io.IOException
 
 /**
@@ -65,8 +68,40 @@ data class Email(
         val reader = Writeable.Reader { Email(it) }
 
         /**
-         * Creator used in REST communication.
          * @param parser XContentParser to deserialize data from.
+         */
+        @JvmStatic
+        @Throws(IOException::class)
+        fun parse(parser: XContentParser): Email {
+            var emailAccountID: String? = null
+            var recipients: List<String> = listOf()
+            var emailGroupIds: List<String> = listOf()
+
+            XContentParserUtils.ensureExpectedToken(
+                XContentParser.Token.START_OBJECT,
+                parser.currentToken(),
+                parser
+            )
+            while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
+                val fieldName = parser.currentName()
+                parser.nextToken()
+                when (fieldName) {
+                    EMAIL_ACCOUNT_ID_TAG -> emailAccountID = parser.text()
+                    DEFAULT_RECIPIENTS_TAG -> recipients = parser.stringList()
+                    DEFAULT_EMAIL_GROUPS_TAG -> emailGroupIds = parser.stringList()
+                    else -> {
+                        parser.skipChildren()
+                        log.info("Unexpected field: $fieldName, while parsing Email")
+                    }
+                }
+            }
+            emailAccountID ?: throw IllegalArgumentException("$EMAIL_ACCOUNT_ID_TAG field absent")
+            return Email(emailAccountID, recipients, emailGroupIds)
+        }
+
+        /**
+         * Creator used in REST communication.
+         * @param configDataMap Map to deserialize data from.
          */
         @JvmStatic
         @Throws(IOException::class)

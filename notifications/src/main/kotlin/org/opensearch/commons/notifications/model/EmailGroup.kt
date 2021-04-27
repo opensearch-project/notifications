@@ -31,9 +31,12 @@ import org.opensearch.common.io.stream.StreamOutput
 import org.opensearch.common.io.stream.Writeable
 import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
+import org.opensearch.common.xcontent.XContentParser
+import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.model.config.BaseConfigData
 import org.opensearch.commons.utils.isValidEmail
 import org.opensearch.commons.utils.logger
+import org.opensearch.commons.utils.stringList
 import java.io.IOException
 
 /**
@@ -59,8 +62,36 @@ data class EmailGroup(
         val reader = Writeable.Reader { EmailGroup(it) }
 
         /**
-         * Creator used in REST communication.
          * @param parser XContentParser to deserialize data from.
+         */
+        @JvmStatic
+        @Throws(IOException::class)
+        fun parse(parser: XContentParser): EmailGroup {
+            var recipients: List<String>? = null
+
+            XContentParserUtils.ensureExpectedToken(
+                XContentParser.Token.START_OBJECT,
+                parser.currentToken(),
+                parser
+            )
+            while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
+                val fieldName = parser.currentName()
+                parser.nextToken()
+                when (fieldName) {
+                    RECIPIENTS_TAG -> recipients = parser.stringList()
+                    else -> {
+                        parser.skipChildren()
+                        log.info("Unexpected field: $fieldName, while parsing EmailGroup")
+                    }
+                }
+            }
+            recipients ?: throw IllegalArgumentException("$RECIPIENTS_TAG field absent")
+            return EmailGroup(recipients)
+        }
+
+        /**
+         * Creator used in REST communication.
+         * @param configDataMap Map to deserialize data from.
          */
         @JvmStatic
         @Throws(IOException::class)

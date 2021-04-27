@@ -32,6 +32,8 @@ import org.opensearch.common.io.stream.StreamOutput
 import org.opensearch.common.io.stream.Writeable
 import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
+import org.opensearch.common.xcontent.XContentParser
+import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.model.config.BaseConfigData
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.validateUrl
@@ -59,8 +61,36 @@ data class Webhook(
         val reader = Writeable.Reader { Webhook(it) }
 
         /**
-         * Creator used in REST communication.
          * @param parser XContentParser to deserialize data from.
+         */
+        @JvmStatic
+        @Throws(IOException::class)
+        fun parse(parser: XContentParser): Webhook {
+            var url: String? = null
+
+            XContentParserUtils.ensureExpectedToken(
+                XContentParser.Token.START_OBJECT,
+                parser.currentToken(),
+                parser
+            )
+            while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
+                val fieldName = parser.currentName()
+                parser.nextToken()
+                when (fieldName) {
+                    URL_TAG -> url = parser.text()
+                    else -> {
+                        parser.skipChildren()
+                        log.info("Unexpected field: $fieldName, while parsing Webhook destination")
+                    }
+                }
+            }
+            url ?: throw IllegalArgumentException("$URL_TAG field absent")
+            return Webhook(url)
+        }
+
+        /**
+         * Creator used in REST communication.
+         * @param configDataMap Map to deserialize data from.
          */
         @JvmStatic
         @Throws(IOException::class)
