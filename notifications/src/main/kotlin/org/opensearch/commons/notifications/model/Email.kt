@@ -41,9 +41,9 @@ import java.io.IOException
  * Data class representing Email account and default recipients.
  */
 data class Email(
-        val emailAccountID: String,
-        val defaultRecipients: List<String>,
-        val defaultEmailGroupIds: List<String>
+    val emailAccountID: String,
+    val defaultRecipients: List<String>,
+    val defaultEmailGroupIds: List<String>
 ) : BaseConfigData {
 
     init {
@@ -80,8 +80,6 @@ data class Email(
             if (tempRecipients is List<*>) {
                 recipients = tempRecipients.filterIsInstance<String>()
             }
-
-
             var emailRecipients: List<String> = listOf()
             val tempEmailGroupIds = configDataMap.getOrDefault(DEFAULT_EMAIL_GROUPS_TAG, listOf<String>())
             if (tempEmailGroupIds is List<*>) {
@@ -98,9 +96,9 @@ data class Email(
      * @param input StreamInput stream to deserialize data from.
      */
     constructor(input: StreamInput) : this(
-            emailAccountID = input.readString(),
-            defaultRecipients = input.readStringList(),
-            defaultEmailGroupIds = input.readStringList()
+        emailAccountID = input.readString(),
+        defaultRecipients = input.readStringList(),
+        defaultEmailGroupIds = input.readStringList()
     )
 
     /**
@@ -118,9 +116,9 @@ data class Email(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-                .field(EMAIL_ACCOUNT_ID_TAG, emailAccountID)
-                .field(DEFAULT_RECIPIENTS_TAG, defaultRecipients)
-                .field(DEFAULT_EMAIL_GROUPS_TAG, defaultEmailGroupIds)
-                .endObject()
+            .field(EMAIL_ACCOUNT_ID_TAG, emailAccountID)
+            .field(DEFAULT_RECIPIENTS_TAG, defaultRecipients)
+            .field(DEFAULT_EMAIL_GROUPS_TAG, defaultEmailGroupIds)
+            .endObject()
     }
 }

@@ -41,7 +41,7 @@ import java.io.IOException
  * Data class representing Webhook channel.
  */
 data class Webhook(
-        val url: String
+    val url: String
 ) : BaseConfigData {
 
     init {
@@ -66,7 +66,7 @@ data class Webhook(
         @Throws(IOException::class)
         fun parse(configDataMap: Map<String, Any>): Webhook {
             if (!configDataMap.containsKey(URL_TAG)) {
-                throw IllegalArgumentException("${URL_TAG} field absent")
+                throw IllegalArgumentException("$URL_TAG field absent")
             }
             val url: String = configDataMap[URL_TAG] as String
             return Webhook(url)
@@ -78,7 +78,7 @@ data class Webhook(
      * @param input StreamInput stream to deserialize data from.
      */
     constructor(input: StreamInput) : this(
-            url = input.readString()
+        url = input.readString()
     )
 
     /**
@@ -94,7 +94,7 @@ data class Webhook(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-                .field(URL_TAG, url)
-                .endObject()
+            .field(URL_TAG, url)
+            .endObject()
     }
 }

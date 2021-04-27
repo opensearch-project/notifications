@@ -40,7 +40,7 @@ import java.io.IOException
  * Data class representing Email group.
  */
 data class EmailGroup(
-        val recipients: List<String>
+    val recipients: List<String>
 ) : BaseConfigData {
 
     init {
@@ -66,7 +66,7 @@ data class EmailGroup(
         @Throws(IOException::class)
         fun parse(configDataMap: Map<String, Any>): EmailGroup {
             if (!configDataMap.containsKey(RECIPIENTS_TAG)) {
-                throw IllegalArgumentException("${RECIPIENTS_TAG} field absent")
+                throw IllegalArgumentException("$RECIPIENTS_TAG field absent")
             }
 
             val tempRecipients = configDataMap.get(RECIPIENTS_TAG)
@@ -83,7 +83,7 @@ data class EmailGroup(
      * @param input StreamInput stream to deserialize data from.
      */
     constructor(input: StreamInput) : this(
-            recipients = input.readStringList()
+        recipients = input.readStringList()
     )
 
     /**
@@ -99,7 +99,7 @@ data class EmailGroup(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-                .field(RECIPIENTS_TAG, recipients)
-                .endObject()
+            .field(RECIPIENTS_TAG, recipients)
+            .endObject()
     }
 }

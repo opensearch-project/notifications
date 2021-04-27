@@ -41,7 +41,7 @@ import java.io.IOException
  * Data class representing Chime channel.
  */
 data class Chime(
-        val url: String
+    val url: String
 ) : BaseConfigData {
 
     init {
@@ -66,7 +66,7 @@ data class Chime(
         @Throws(IOException::class)
         fun parse(configDataMap: Map<String, Any>): Chime {
             if (!configDataMap.containsKey(URL_TAG)) {
-                throw IllegalArgumentException("${URL_TAG} field absent")
+                throw IllegalArgumentException("$URL_TAG field absent")
             }
             val url: String = configDataMap[URL_TAG] as String
             return Chime(url)
@@ -78,7 +78,7 @@ data class Chime(
      * @param input StreamInput stream to deserialize data from.
      */
     constructor(input: StreamInput) : this(
-            url = input.readString()
+        url = input.readString()
     )
 
     /**
@@ -94,7 +94,7 @@ data class Chime(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-                .field(URL_TAG, url)
-                .endObject()
+            .field(URL_TAG, url)
+            .endObject()
     }
 }

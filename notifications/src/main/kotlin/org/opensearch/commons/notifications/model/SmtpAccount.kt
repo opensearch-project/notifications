@@ -44,12 +44,12 @@ import java.io.IOException
  * Data class representing SMTP account channel.
  */
 data class SmtpAccount(
-        val host: String,
-        val port: Int,
-        val method: MethodType,
-        val fromAddress: String,
-        val username: SecureString? = null,
-        val password: SecureString? = null
+    val host: String,
+    val port: Int,
+    val method: MethodType,
+    val fromAddress: String,
+    val username: SecureString? = null,
+    val password: SecureString? = null
 ) : BaseConfigData {
 
     init {
@@ -94,12 +94,13 @@ data class SmtpAccount(
             }
 
             return SmtpAccount(
-                    configDataMap[HOST_FIELD] as String,
-                    configDataMap[PORT_FIELD] as Int,
-                    valueOf(configDataMap[METHOD_FIELD] as String, MethodType.None, log),
-                    configDataMap[FROM_ADDRESS_FIELD] as String,
-                    username,
-                    password
+                configDataMap[HOST_FIELD] as String,
+                // Covering both cases of port being String or Int
+                (configDataMap[PORT_FIELD].toString()).toInt(),
+                valueOf(configDataMap[METHOD_FIELD] as String, MethodType.None, log),
+                configDataMap[FROM_ADDRESS_FIELD] as String,
+                username,
+                password
             )
         }
     }
@@ -111,11 +112,11 @@ data class SmtpAccount(
         builder!!
         builder.startObject()
         builder.field(HOST_FIELD, host)
-                .field(PORT_FIELD, port)
-                .field(METHOD_FIELD, method)
-                .field(FROM_ADDRESS_FIELD, fromAddress)
-                .fieldIfNotNull(USERNAME_FIELD, username?.toString())
-                .fieldIfNotNull(PASSWORD_FIELD, password?.toString())
+            .field(PORT_FIELD, port)
+            .field(METHOD_FIELD, method)
+            .field(FROM_ADDRESS_FIELD, fromAddress)
+            .fieldIfNotNull(USERNAME_FIELD, username?.toString())
+            .fieldIfNotNull(PASSWORD_FIELD, password?.toString())
         return builder.endObject()
     }
 
@@ -124,12 +125,12 @@ data class SmtpAccount(
      * @param input StreamInput stream to deserialize data from.
      */
     constructor(input: StreamInput) : this(
-            host = input.readString(),
-            port = input.readInt(),
-            method = input.readEnum(MethodType::class.java),
-            fromAddress = input.readString(),
-            username = input.readOptionalSecureString(),
-            password = input.readOptionalSecureString()
+        host = input.readString(),
+        port = input.readInt(),
+        method = input.readEnum(MethodType::class.java),
+        fromAddress = input.readString(),
+        username = input.readOptionalSecureString(),
+        password = input.readOptionalSecureString()
     )
 
     /**

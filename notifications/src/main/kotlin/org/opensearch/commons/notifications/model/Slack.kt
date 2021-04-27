@@ -41,7 +41,7 @@ import java.io.IOException
  * Data class representing Slack channel.
  */
 data class Slack(
-        val url: String
+    val url: String
 ) : BaseConfigData {
 
     init {
@@ -78,7 +78,7 @@ data class Slack(
      * @param input StreamInput stream to deserialize data from.
      */
     constructor(input: StreamInput) : this(
-            url = input.readString()
+        url = input.readString()
     )
 
     /**
@@ -94,7 +94,7 @@ data class Slack(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-                .field(URL_TAG, url)
-                .endObject()
+            .field(URL_TAG, url)
+            .endObject()
     }
 }
