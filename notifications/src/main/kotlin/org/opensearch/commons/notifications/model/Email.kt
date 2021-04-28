@@ -37,6 +37,7 @@ import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.DEFAULT_EMAIL_GROUPS_TAG
 import org.opensearch.commons.notifications.NotificationConstants.DEFAULT_RECIPIENTS_TAG
 import org.opensearch.commons.notifications.NotificationConstants.EMAIL_ACCOUNT_ID_TAG
+import org.opensearch.commons.notifications.model.config.BaseConfigData
 import org.opensearch.commons.utils.isValidEmail
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.stringList
@@ -49,7 +50,7 @@ data class Email(
     val emailAccountID: String,
     val defaultRecipients: List<String>,
     val defaultEmailGroupIds: List<String>
-) : BaseModel {
+) : BaseConfigData {
 
     init {
         require(!Strings.isNullOrEmpty(emailAccountID)) { "emailAccountID is null or empty" }
