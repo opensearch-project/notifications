@@ -27,9 +27,9 @@
 
 package org.opensearch.notifications.resthandler
 
-import org.opensearch.notifications.ODFERestTestCase
+import org.opensearch.notifications.PluginRestTestCase
 
-internal class SendMessageRestHandlerIT : ODFERestTestCase() {
+internal class SendMessageRestHandlerIT : PluginRestTestCase() {
 
     fun sendRestHandler() {
     }

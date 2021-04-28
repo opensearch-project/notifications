@@ -90,8 +90,8 @@ internal object NotificationConfigIndex {
 
     /**
      * Initialize the class
-     * @param client The ES client
-     * @param clusterService The ES cluster service
+     * @param client The OpenSearch client
+     * @param clusterService The OpenSearch cluster service
      */
     fun initialize(client: Client, clusterService: ClusterService) {
         NotificationConfigIndex.client = SecureIndexClient(client)
@@ -204,7 +204,7 @@ internal object NotificationConfigIndex {
         createIndex()
         val sourceBuilder = SearchSourceBuilder()
             .timeout(TimeValue(PluginSettings.operationTimeoutMs, TimeUnit.MILLISECONDS))
-            .sort("metadata.lastUpdatedTimeMs")
+            .sort("metadata.last_updated_time_ms")
             .size(maxItems)
             .from(from)
         val tenantQuery = QueryBuilders.termsQuery("metadata.tenant", tenant)

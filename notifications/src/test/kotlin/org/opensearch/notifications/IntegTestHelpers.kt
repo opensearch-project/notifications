@@ -29,12 +29,17 @@ package org.opensearch.notifications
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import org.junit.Assert
 import org.opensearch.client.Response
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
+import java.time.Instant
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+
+private const val DEFAULT_TIME_ACCURACY_SEC = 5L
 
 @Throws(IOException::class)
 fun getResponseBody(response: Response, retainNewLines: Boolean): String {
@@ -59,9 +64,32 @@ fun jsonify(text: String): JsonObject {
     return JsonParser.parseString(text).asJsonObject
 }
 
+fun validateTimeNearRefTime(time: Instant, refTime: Instant, accuracySeconds: Long) {
+    assertTrue(time.plusSeconds(accuracySeconds).isAfter(refTime), "$time + $accuracySeconds > $refTime")
+    assertTrue(time.minusSeconds(accuracySeconds).isBefore(refTime), "$time - $accuracySeconds < $refTime")
+}
+
+fun validateTimeRecency(time: Instant, accuracySeconds: Long = DEFAULT_TIME_ACCURACY_SEC) {
+    validateTimeNearRefTime(time, Instant.now(), accuracySeconds)
+}
+
+fun validateErrorResponse(response: JsonObject, statusCode: Int, errorType: String = "status_exception") {
+    Assert.assertNotNull("Error response content should be generated", response)
+    val status = response.get("status").asInt
+    val error = response.get("error").asJsonObject
+    val rootCause = error.get("root_cause").asJsonArray
+    val type = error.get("type").asString
+    val reason = error.get("reason").asString
+    Assert.assertEquals(statusCode, status)
+    Assert.assertEquals(errorType, type)
+    Assert.assertNotNull(reason)
+    Assert.assertNotNull(rootCause)
+    Assert.assertTrue(rootCause.size() > 0)
+}
+
 fun verifyResponse(response: JsonObject, refTag: String, recipients: List<String>) {
     // verify ref tag is consistent
-    val actualRefTag = response.get("refTag").asString
+    val actualRefTag = response.get("ref_tag").asString
     assertEquals(refTag, actualRefTag)
 
     // verify status to each recipient
@@ -118,7 +146,7 @@ class NotificationsJsonEntity(
         jsonEntityString =
             """
                     {
-                      "refTag": "$refTag",
+                      "ref_tag": "$refTag",
                       "recipients": ${listToString(recipients)},
                       "title": "$title",
                       "text_description": "$textDescription",
