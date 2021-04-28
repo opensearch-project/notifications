@@ -31,14 +31,12 @@ import org.apache.lucene.search.TotalHits
 import org.opensearch.action.search.SearchResponse
 import org.opensearch.common.io.stream.StreamInput
 import org.opensearch.common.xcontent.XContentParser
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_CONFIG_LIST_TAG
 
 /**
  * FeatureChannel search results
  */
 class FeatureChannelList : SearchResults<FeatureChannel> {
-    companion object {
-        private const val FEATURE_CONFIG_LIST_TAG = "featureChannelList"
-    }
 
     /**
      * single item result constructor
@@ -69,7 +67,7 @@ class FeatureChannelList : SearchResults<FeatureChannel> {
     /**
      * Construct object from SearchResponse
      */
-    constructor(from: Long, response: SearchResponse, searchHitParser: SearchHitParser) : super(
+    constructor(from: Long, response: SearchResponse, searchHitParser: SearchHitParser<FeatureChannel>) : super(
         from,
         response,
         searchHitParser,

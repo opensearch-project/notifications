@@ -81,9 +81,9 @@ internal class EmailRecipientStatusTests {
         val jsonString = """
         {
             "recipient": "sample@email.com",
-            "deliveryStatus": {
-                "statusCode": "200",
-                "statusText": "Success"
+            "delivery_status": {
+                "status_code": "200",
+                "status_text": "Success"
             },
             "extra": "field"
         }

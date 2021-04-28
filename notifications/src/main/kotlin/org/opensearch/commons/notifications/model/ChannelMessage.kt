@@ -35,6 +35,9 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.ATTACHMENT_TAG
+import org.opensearch.commons.notifications.NotificationConstants.HTML_DESCRIPTION_TAG
+import org.opensearch.commons.notifications.NotificationConstants.TEXT_DESCRIPTION_TAG
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.logger
 import java.io.IOException
@@ -54,9 +57,6 @@ data class ChannelMessage(
 
     companion object {
         private val log by logger(ChannelMessage::class.java)
-        private const val TEXT_DESCRIPTION_TAG = "textDescription"
-        private const val HTML_DESCRIPTION_TAG = "htmlDescription"
-        private const val ATTACHMENT_TAG = "attachment"
 
         /**
          * reader to create instance of class from writable.
@@ -146,10 +146,10 @@ data class ChannelMessage(
     ) : BaseModel {
         internal companion object {
             private val log by logger(Attachment::class.java)
-            private const val FILE_NAME_TAG = "fileName"
-            private const val FILE_ENCODING_TAG = "fileEncoding"
-            private const val FILE_DATA_TAG = "fileData"
-            private const val FILE_CONTENT_TYPE_TAG = "fileContentType"
+            private const val FILE_NAME_TAG = "file_name"
+            private const val FILE_ENCODING_TAG = "file_encoding"
+            private const val FILE_DATA_TAG = "file_data"
+            private const val FILE_CONTENT_TYPE_TAG = "file_content_type"
 
             /**
              * reader to create instance of class from writable.

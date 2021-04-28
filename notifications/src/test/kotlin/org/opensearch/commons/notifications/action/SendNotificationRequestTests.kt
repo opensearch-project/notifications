@@ -57,13 +57,13 @@ internal class SendNotificationRequestTests {
     fun `Send request serialize and deserialize transport object should be equal`() {
         val notificationInfo = NotificationInfo(
             "title",
-            "referenceId",
+            "reference_id",
             Feature.Reports,
             SeverityType.High,
             listOf("tag1", "tag2")
         )
         val channelMessage = ChannelMessage(
-            "textDescription",
+            "text_description",
             "<b>htmlDescription</b>",
             null
         )
@@ -81,13 +81,13 @@ internal class SendNotificationRequestTests {
     fun `Send request serialize and deserialize using json object should be equal`() {
         val notificationInfo = NotificationInfo(
             "title",
-            "referenceId",
+            "reference_id",
             Feature.IndexManagement,
             SeverityType.Critical,
             listOf("tag1", "tag2")
         )
         val channelMessage = ChannelMessage(
-            "textDescription",
+            "text_description",
             "<b>htmlDescription</b>",
             null
         )
@@ -114,13 +114,13 @@ internal class SendNotificationRequestTests {
     fun `Send request should safely ignore extra field in json object`() {
         val notificationInfo = NotificationInfo(
             "title",
-            "referenceId",
+            "reference_id",
             Feature.Alerting,
             SeverityType.High,
             listOf("tag1", "tag2")
         )
         val channelMessage = ChannelMessage(
-            "textDescription",
+            "text_description",
             "<b>htmlDescription</b>",
             null
         )
@@ -132,18 +132,18 @@ internal class SendNotificationRequestTests {
         )
         val jsonString = """
         {
-            "notificationInfo":{
+            "notification_info":{
                 "title":"${notificationInfo.title}",
-                "referenceId":"${notificationInfo.referenceId}",
+                "reference_id":"${notificationInfo.referenceId}",
                 "feature":"${notificationInfo.feature}",
                 "severity":"${notificationInfo.severity}",
                 "tags":["tag1", "tag2"]
             },
-            "channelMessage":{
-                "textDescription":"${channelMessage.textDescription}",
-                "htmlDescription":"${channelMessage.htmlDescription}"
+            "channel_message":{
+                "text_description":"${channelMessage.textDescription}",
+                "html_description":"${channelMessage.htmlDescription}"
             },
-            "channelIds":["channelId1", "channelId2"],
+            "channel_ids":["channelId1", "channelId2"],
             "context":"${request.threadContext}",
             "extra_field_1":["extra", "value"],
             "extra_field_2":{"extra":"value"},
@@ -158,13 +158,13 @@ internal class SendNotificationRequestTests {
     fun `Send request should safely ignore thread context is absent in json object`() {
         val notificationInfo = NotificationInfo(
             "title",
-            "referenceId",
+            "reference_id",
             Feature.Reports,
             SeverityType.Info,
             listOf("tag1", "tag2")
         )
         val channelMessage = ChannelMessage(
-            "textDescription",
+            "text_description",
             "<b>htmlDescription</b>",
             null
         )
@@ -176,18 +176,18 @@ internal class SendNotificationRequestTests {
         )
         val jsonString = """
         {
-            "notificationInfo":{
+            "notification_info":{
                 "title":"${notificationInfo.title}",
-                "referenceId":"${notificationInfo.referenceId}",
+                "reference_id":"${notificationInfo.referenceId}",
                 "feature":"${notificationInfo.feature}",
                 "severity":"${notificationInfo.severity}",
                 "tags":["tag1", "tag2"]
             },
-            "channelMessage":{
-                "textDescription":"${channelMessage.textDescription}",
-                "htmlDescription":"${channelMessage.htmlDescription}"
+            "channel_message":{
+                "text_description":"${channelMessage.textDescription}",
+                "html_description":"${channelMessage.htmlDescription}"
             },
-            "channelIds":["channelId1", "channelId2"]
+            "channel_ids":["channelId1", "channelId2"]
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { SendNotificationRequest.parse(it) }
@@ -198,10 +198,10 @@ internal class SendNotificationRequestTests {
     fun `Send request should throw exception if notificationInfo field is absent in json object`() {
         val jsonString = """
         {
-            "channelMessage":{
-                "textDescription":"textDescription"
+            "channel_message":{
+                "text_description":"text_description"
             },
-            "channelIds":["channelId1", "channelId2"]
+            "channel_ids":["channelId1", "channelId2"]
         }
         """.trimIndent()
         assertThrows<IllegalArgumentException> {
@@ -213,14 +213,14 @@ internal class SendNotificationRequestTests {
     fun `Send request should throw exception if channelMessage field is absent in json object`() {
         val jsonString = """
         {
-            "notificationInfo":{
+            "notification_info":{
                 "title":"title",
-                "referenceId":"referenceId",
+                "reference_id":"reference_id",
                 "feature":"feature",
                 "severity":"High",
                 "tags":["tag1", "tag2"]
             },
-            "channelIds":["channelId1", "channelId2"]
+            "channel_ids":["channelId1", "channelId2"]
         }
         """.trimIndent()
         assertThrows<IllegalArgumentException> {
@@ -232,15 +232,15 @@ internal class SendNotificationRequestTests {
     fun `Send request should throw exception if channelIds field is absent in json object`() {
         val jsonString = """
         {
-            "notificationInfo":{
+            "notification_info":{
                 "title":"title",
-                "referenceId":"referenceId",
+                "reference_id":"reference_id",
                 "feature":"feature",
                 "severity":"High",
                 "tags":["tag1", "tag2"]
             },
-            "channelMessage":{
-                "textDescription":"textDescription"
+            "channel_message":{
+                "text_description":"text_description"
             }
         }
         """.trimIndent()
@@ -253,17 +253,17 @@ internal class SendNotificationRequestTests {
     fun `Send request validate return exception if channelIds field is empty`() {
         val jsonString = """
         {
-            "notificationInfo":{
+            "notification_info":{
                 "title":"title",
-                "referenceId":"referenceId",
+                "reference_id":"reference_id",
                 "feature":"feature",
                 "severity":"High",
                 "tags":["tag1", "tag2"]
             },
-            "channelMessage":{
-                "textDescription":"textDescription"
+            "channel_message":{
+                "text_description":"text_description"
             },
-            "channelIds":[]
+            "channel_ids":[]
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { SendNotificationRequest.parse(it) }

@@ -33,6 +33,7 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.NOTIFICATION_ID_TAG
 import org.opensearch.commons.utils.logger
 import java.io.IOException
 
@@ -44,7 +45,6 @@ class SendNotificationResponse : BaseResponse {
 
     companion object {
         private val log by logger(SendNotificationResponse::class.java)
-        private const val NOTIFICATION_ID_TAG = "notificationId"
 
         /**
          * reader to create instance of class from writable.

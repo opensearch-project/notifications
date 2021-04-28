@@ -77,6 +77,6 @@ internal class GetNotificationConfigAction @Inject constructor(
         request: GetNotificationConfigRequest,
         user: User?
     ): GetNotificationConfigResponse {
-        TODO()
+        return NotificationConfigActions.get(request, user)
     }
 }

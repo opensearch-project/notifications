@@ -41,7 +41,7 @@ import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 
 /**
- * Delete reportDefinition transport action
+ * Delete NotificationConfig transport action
  */
 internal class DeleteNotificationConfigAction @Inject constructor(
     transportService: TransportService,
@@ -77,6 +77,6 @@ internal class DeleteNotificationConfigAction @Inject constructor(
         request: DeleteNotificationConfigRequest,
         user: User?
     ): DeleteNotificationConfigResponse {
-        return DeleteNotificationConfigResponse("TODO-configId")
+        return NotificationConfigActions.delete(request, user)
     }
 }

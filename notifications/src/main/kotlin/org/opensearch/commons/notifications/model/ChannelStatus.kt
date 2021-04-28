@@ -35,6 +35,11 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_NAME_TAG
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TYPE_TAG
+import org.opensearch.commons.notifications.NotificationConstants.EMAIL_RECIPIENT_STATUS_TAG
+import org.opensearch.commons.notifications.NotificationConstants.STATUS_DETAIL_TAG
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.objectList
@@ -69,11 +74,6 @@ data class ChannelStatus(
 
     companion object {
         private val log by logger(NotificationConfig::class.java)
-        private const val CONFIG_ID_TAG = "configId"
-        private const val CONFIG_NAME_TAG = "configName"
-        private const val CONFIG_TYPE_TAG = "configType"
-        private const val EMAIL_RECIPIENT_STATUS_TAG = "emailRecipientStatus"
-        private const val STATUS_DETAIL_TAG = "deliveryStatus"
 
         /**
          * reader to create instance of class from writable.

@@ -41,7 +41,7 @@ import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 
 /**
- * Update reportDefinition transport action
+ * Update NotificationConfig transport action
  */
 internal class UpdateNotificationConfigAction @Inject constructor(
     transportService: TransportService,
@@ -77,6 +77,6 @@ internal class UpdateNotificationConfigAction @Inject constructor(
         request: UpdateNotificationConfigRequest,
         user: User?
     ): UpdateNotificationConfigResponse {
-        return UpdateNotificationConfigResponse("TODO-configId")
+        return NotificationConfigActions.update(request, user)
     }
 }

@@ -48,7 +48,7 @@ internal class NotificationConfigInfoTests {
             slack = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
-            "configId",
+            "config_id",
             Instant.now(),
             Instant.now(),
             "tenant",
@@ -71,7 +71,7 @@ internal class NotificationConfigInfoTests {
             slack = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
-            "configId",
+            "config_id",
             lastUpdatedTimeMs,
             createdTimeMs,
             "tenant",
@@ -104,15 +104,15 @@ internal class NotificationConfigInfoTests {
         )
         val jsonString = """
         {
-            "configId":"config-Id",
-            "lastUpdatedTimeMs":"${lastUpdatedTimeMs.toEpochMilli()}",
-            "createdTimeMs":"${createdTimeMs.toEpochMilli()}",
-            "notificationConfig":{
+            "config_id":"config-Id",
+            "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
+            "created_time_ms":"${createdTimeMs.toEpochMilli()}",
+            "notification_config":{
                 "name":"name",
                 "description":"description",
-                "configType":"Slack",
+                "config_type":"Slack",
                 "features":["IndexManagement"],
-                "isEnabled":true,
+                "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
             }
         }
@@ -143,16 +143,16 @@ internal class NotificationConfigInfoTests {
         )
         val jsonString = """
         {
-            "configId":"config-Id",
-            "lastUpdatedTimeMs":"${lastUpdatedTimeMs.toEpochMilli()}",
-            "createdTimeMs":"${createdTimeMs.toEpochMilli()}",
+            "config_id":"config-Id",
+            "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
+            "created_time_ms":"${createdTimeMs.toEpochMilli()}",
             "tenant":"selectedTenant",
-            "notificationConfig":{
+            "notification_config":{
                 "name":"name",
                 "description":"description",
-                "configType":"Slack",
+                "config_type":"Slack",
                 "features":["IndexManagement"],
-                "isEnabled":true,
+                "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
             },
             "extra_field_1":["extra", "value"],
@@ -191,15 +191,15 @@ internal class NotificationConfigInfoTests {
         val createdTimeMs = lastUpdatedTimeMs.minusSeconds(1000)
         val jsonString = """
         {
-            "lastUpdatedTimeMs":"${lastUpdatedTimeMs.toEpochMilli()}",
-            "createdTimeMs":"${createdTimeMs.toEpochMilli()}",
+            "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
+            "created_time_ms":"${createdTimeMs.toEpochMilli()}",
             "tenant":"selectedTenant",
-            "notificationConfig":{
+            "notification_config":{
                 "name":"name",
                 "description":"description",
-                "configType":"Slack",
+                "config_type":"Slack",
                 "features":["IndexManagement"],
-                "isEnabled":true,
+                "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
             }
         }
@@ -215,15 +215,15 @@ internal class NotificationConfigInfoTests {
         val createdTimeMs = lastUpdatedTimeMs.minusSeconds(1000)
         val jsonString = """
         {
-            "configId":"config-Id",
-            "createdTimeMs":"${createdTimeMs.toEpochMilli()}",
+            "config_id":"config-Id",
+            "created_time_ms":"${createdTimeMs.toEpochMilli()}",
             "tenant":"selectedTenant",
-            "notificationConfig":{
+            "notification_config":{
                 "name":"name",
                 "description":"description",
-                "configType":"Slack",
+                "config_type":"Slack",
                 "features":["IndexManagement"],
-                "isEnabled":true,
+                "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
             }
         }
@@ -238,15 +238,15 @@ internal class NotificationConfigInfoTests {
         val lastUpdatedTimeMs = Instant.ofEpochMilli(Instant.now().toEpochMilli())
         val jsonString = """
         {
-            "configId":"config-Id",
-            "lastUpdatedTimeMs":"${lastUpdatedTimeMs.toEpochMilli()}",
+            "config_id":"config-Id",
+            "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
             "tenant":"selectedTenant",
-            "notificationConfig":{
+            "notification_config":{
                 "name":"name",
                 "description":"description",
-                "configType":"Slack",
+                "config_type":"Slack",
                 "features":["IndexManagement"],
-                "isEnabled":true,
+                "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
             }
         }
@@ -262,9 +262,9 @@ internal class NotificationConfigInfoTests {
         val createdTimeMs = lastUpdatedTimeMs.minusSeconds(1000)
         val jsonString = """
         {
-            "configId":"config-Id",
-            "lastUpdatedTimeMs":"${lastUpdatedTimeMs.toEpochMilli()}",
-            "createdTimeMs":"${createdTimeMs.toEpochMilli()}",
+            "config_id":"config-Id",
+            "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
+            "created_time_ms":"${createdTimeMs.toEpochMilli()}",
             "tenant":"selectedTenant"
         }
         """.trimIndent()

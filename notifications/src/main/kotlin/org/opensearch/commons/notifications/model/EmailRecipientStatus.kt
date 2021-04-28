@@ -34,6 +34,8 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.RECIPIENT_TAG
+import org.opensearch.commons.notifications.NotificationConstants.STATUS_DETAIL_TAG
 import org.opensearch.commons.utils.isValidEmail
 import org.opensearch.commons.utils.logger
 import java.io.IOException
@@ -52,8 +54,6 @@ data class EmailRecipientStatus(
 
     companion object {
         private val log by logger(EmailRecipientStatus::class.java)
-        private const val RECIPIENT_TAG = "recipient"
-        private const val STATUS_DETAIL_TAG = "deliveryStatus"
 
         /**
          * reader to create instance of class from writable.

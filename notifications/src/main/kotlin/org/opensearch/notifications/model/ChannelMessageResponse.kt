@@ -33,6 +33,9 @@ import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.RECIPIENT_TAG
+import org.opensearch.commons.notifications.NotificationConstants.STATUS_CODE_TAG
+import org.opensearch.commons.notifications.NotificationConstants.STATUS_TEXT_TAG
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.rest.RestStatus
@@ -47,9 +50,6 @@ internal data class ChannelMessageResponse(
 ) : ToXContentObject {
     internal companion object {
         private val log by logger(ChannelMessageResponse::class.java)
-        private const val RECIPIENT_TAG = "recipient"
-        private const val STATUS_CODE_TAG = "statusCode"
-        private const val STATUS_TEXT_TAG = "statusText"
 
         /**
          * Parse the data from parser and create ChannelMessageResponse object

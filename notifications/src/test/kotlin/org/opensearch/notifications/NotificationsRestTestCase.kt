@@ -36,7 +36,7 @@ import org.opensearch.notifications.resthandler.SendMessageRestHandler.Companion
 import org.opensearch.notifications.settings.PluginSettings
 import org.springframework.integration.test.mail.TestMailServer
 
-abstract class NotificationsRestTestCase : ODFERestTestCase() {
+abstract class NotificationsRestTestCase : PluginRestTestCase() {
 
     private val smtpPort = PluginSettings.smtpPort
     private val smtpServer: TestMailServer.SmtpServer
@@ -57,11 +57,6 @@ abstract class NotificationsRestTestCase : ODFERestTestCase() {
     open fun tearDownServer() {
         smtpServer.stop()
         smtpServer.resetServer()
-    }
-
-    @After
-    open fun wipeAllSettings() {
-        wipeAllClusterSettings()
     }
 
     protected fun executeRequest(

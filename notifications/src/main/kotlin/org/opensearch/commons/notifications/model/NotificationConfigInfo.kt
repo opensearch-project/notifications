@@ -34,6 +34,11 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
+import org.opensearch.commons.notifications.NotificationConstants.CREATED_TIME_TAG
+import org.opensearch.commons.notifications.NotificationConstants.NOTIFICATION_CONFIG_TAG
+import org.opensearch.commons.notifications.NotificationConstants.TENANT_TAG
+import org.opensearch.commons.notifications.NotificationConstants.UPDATED_TIME_TAG
 import org.opensearch.commons.utils.logger
 import java.io.IOException
 import java.time.Instant
@@ -55,11 +60,6 @@ data class NotificationConfigInfo(
 
     companion object {
         private val log by logger(NotificationConfigInfo::class.java)
-        private const val CONFIG_ID_TAG = "configId"
-        private const val UPDATED_TIME_TAG = "lastUpdatedTimeMs"
-        private const val CREATED_TIME_TAG = "createdTimeMs"
-        private const val TENANT_TAG = "tenant"
-        private const val NOTIFICATION_CONFIG_TAG = "notificationConfig"
 
         /**
          * reader to create instance of class from writable.

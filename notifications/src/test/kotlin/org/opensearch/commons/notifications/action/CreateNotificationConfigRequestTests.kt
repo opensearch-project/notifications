@@ -108,12 +108,12 @@ internal class CreateNotificationConfigRequestTests {
 
         val jsonString = """
         {
-            "notificationConfig":{
+            "notification_config":{
                 "name":"name",
                 "description":"description",
-                "configType":"Slack",
+                "config_type":"Slack",
                 "features":["IndexManagement"],
-                "isEnabled":true,
+                "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
             }
         }
@@ -144,12 +144,12 @@ internal class CreateNotificationConfigRequestTests {
 
         val jsonString = """
         {
-            "notificationConfig":{
+            "notification_config":{
                 "name":"name",
                 "description":"description",
-                "configType":"Slack",
+                "config_type":"Slack",
                 "features":["IndexManagement"],
-                "isEnabled":true,
+                "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"},
                 "extra_field_1":["extra", "value"],
                 "extra_field_2":{"extra":"value"},

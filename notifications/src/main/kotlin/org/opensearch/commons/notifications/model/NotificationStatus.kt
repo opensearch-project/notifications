@@ -33,6 +33,8 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.NOTIFICATION_INFO_TAG
+import org.opensearch.commons.notifications.NotificationConstants.STATUS_LIST_TAG
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.objectList
 import java.io.IOException
@@ -47,8 +49,6 @@ data class NotificationStatus(
 
     companion object {
         private val log by logger(NotificationStatus::class.java)
-        private const val NOTIFICATION_INFO_TAG = "notificationInfo"
-        private const val STATUS_LIST_TAG = "statusList"
 
         /**
          * reader to create instance of class from writable.

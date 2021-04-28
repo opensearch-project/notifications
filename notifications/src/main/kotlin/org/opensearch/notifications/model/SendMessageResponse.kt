@@ -50,13 +50,13 @@ internal class SendMessageResponse : BaseResponse {
 
     companion object {
         private val log by logger(SendMessageResponse::class.java)
-        private const val REF_TAG_FIELD = "refTag"
+        private const val REF_TAG_FIELD = "ref_tag"
         private const val RECIPIENTS_TAG_FIELD = "recipients"
 
         /**
          * Parse the recipient response list from parser
          * @param parser data referenced at parser
-         * @return created list of ReportInstance
+         * @return created list of response
          */
         private fun parseRecipientResponseList(parser: XContentParser): List<ChannelMessageResponse> {
             val retList: MutableList<ChannelMessageResponse> = mutableListOf()
