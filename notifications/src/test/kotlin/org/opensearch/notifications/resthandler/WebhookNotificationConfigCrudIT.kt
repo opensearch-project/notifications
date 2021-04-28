@@ -50,7 +50,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement, Feature.Reports, Feature.Alerting),
             isEnabled = true,
-            webhook = sampleWebhook
+            configData = sampleWebhook
         )
 
         // Create webhook notification config
@@ -66,7 +66,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
                     "${referenceObject.features.elementAt(2)}"
                 ],
                 "is_enabled":${referenceObject.isEnabled},
-                "webhook":{"url":"${referenceObject.webhook!!.url}"}
+                "webhook":{"url":"${(referenceObject.configData!! as Webhook).url}"}
             }
         }
         """.trimIndent()
@@ -110,7 +110,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement, Feature.Reports),
             isEnabled = true,
-            webhook = updatedWebhook
+            configData = updatedWebhook
         )
 
         // Update webhook notification config
@@ -125,7 +125,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
                     "${updatedObject.features.elementAt(1)}"
                 ],
                 "is_enabled":${updatedObject.isEnabled},
-                "webhook":{"url":"${updatedObject.webhook!!.url}"}
+                "webhook":{"url":"${(updatedObject.configData!! as Webhook).url}"}
             }
         }
         """.trimIndent()

@@ -50,7 +50,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             ConfigType.Slack,
             EnumSet.of(Feature.IndexManagement, Feature.Reports),
             isEnabled = true,
-            slack = sampleSlack
+            configData = sampleSlack
         )
 
         // Create slack notification config
@@ -65,7 +65,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
                     "${referenceObject.features.elementAt(1)}"
                 ],
                 "is_enabled":${referenceObject.isEnabled},
-                "slack":{"url":"${referenceObject.slack!!.url}"}
+                "slack":{"url":"${(referenceObject.configData!! as Slack).url}"}
             }
         }
         """.trimIndent()
@@ -109,7 +109,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             ConfigType.Slack,
             EnumSet.of(Feature.IndexManagement, Feature.Reports),
             isEnabled = true,
-            slack = updatedSlack
+            configData = updatedSlack
         )
 
         // Update slack notification config
@@ -124,7 +124,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
                     "${updatedObject.features.elementAt(1)}"
                 ],
                 "is_enabled":${updatedObject.isEnabled},
-                "slack":{"url":"${updatedObject.slack!!.url}"}
+                "slack":{"url":"${(updatedObject.configData!! as Slack).url}"}
             }
         }
         """.trimIndent()

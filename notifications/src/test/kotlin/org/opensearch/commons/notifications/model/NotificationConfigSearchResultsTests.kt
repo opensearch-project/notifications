@@ -57,7 +57,7 @@ internal class NotificationConfigSearchResultsTests {
             "description",
             ConfigType.Slack,
             EnumSet.of(Feature.Reports),
-            slack = sampleSlack
+            configData = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
             "config_id",
@@ -78,7 +78,7 @@ internal class NotificationConfigSearchResultsTests {
             "description",
             ConfigType.Slack,
             EnumSet.of(Feature.Reports),
-            slack = Slack("https://domain.com/sample_url#1234567890")
+            configData = Slack("https://domain.com/sample_url#1234567890")
         )
         val configInfo1 = NotificationConfigInfo(
             "config_id1",
@@ -92,7 +92,7 @@ internal class NotificationConfigSearchResultsTests {
             "description",
             ConfigType.Chime,
             EnumSet.of(Feature.IndexManagement),
-            chime = Chime("https://domain.com/sample_url#1234567890")
+            configData = Chime("https://domain.com/sample_url#1234567890")
         )
         val configInfo2 = NotificationConfigInfo(
             "config_id2",
@@ -121,7 +121,7 @@ internal class NotificationConfigSearchResultsTests {
             "description",
             ConfigType.Slack,
             EnumSet.of(Feature.Reports),
-            slack = sampleSlack
+            configData = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
             "config_id",
@@ -145,7 +145,7 @@ internal class NotificationConfigSearchResultsTests {
             "description",
             ConfigType.Slack,
             EnumSet.of(Feature.Reports),
-            slack = Slack("https://domain.com/sample_url#1234567890")
+            configData = Slack("https://domain.com/sample_url#1234567890")
         )
         val configInfo1 = NotificationConfigInfo(
             "config_id1",
@@ -159,7 +159,7 @@ internal class NotificationConfigSearchResultsTests {
             "description",
             ConfigType.Chime,
             EnumSet.of(Feature.IndexManagement),
-            chime = Chime("https://domain.com/sample_url#1234567890")
+            configData = Chime("https://domain.com/sample_url#1234567890")
         )
         val configInfo2 = NotificationConfigInfo(
             "config_id2",
@@ -190,7 +190,7 @@ internal class NotificationConfigSearchResultsTests {
             ConfigType.Slack,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            slack = sampleSlack
+            configData = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
             "config-Id",
@@ -241,7 +241,7 @@ internal class NotificationConfigSearchResultsTests {
             ConfigType.Slack,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            slack = sampleSlack
+            configData = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
             "config-Id",

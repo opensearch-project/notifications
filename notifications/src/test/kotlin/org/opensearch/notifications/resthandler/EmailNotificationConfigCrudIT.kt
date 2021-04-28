@@ -61,7 +61,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             ConfigType.SmtpAccount,
             EnumSet.of(Feature.Reports),
             isEnabled = true,
-            smtpAccount = sampleSmtpAccount
+            configData = sampleSmtpAccount
         )
 
         // Create smtp account notification config
@@ -70,7 +70,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${smtpAccountConfig.name}",
                 "description":"${smtpAccountConfig.description}",
-                "config_type":"SmtpAccount",
+                "config_type":"Smtp_account",
                 "features":[
                     "${smtpAccountConfig.features.elementAt(0)}"
                 ],
@@ -104,7 +104,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             ConfigType.EmailGroup,
             EnumSet.of(Feature.Reports),
             isEnabled = true,
-            emailGroup = sampleEmailGroup
+            configData = sampleEmailGroup
         )
 
         // Create email group notification config
@@ -113,7 +113,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${emailGroupConfig.name}",
                 "description":"${emailGroupConfig.description}",
-                "config_type":"EmailGroup",
+                "config_type":"Email_group",
                 "features":[
                     "${emailGroupConfig.features.elementAt(0)}"
                 ],
@@ -149,7 +149,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             ConfigType.Email,
             EnumSet.of(Feature.Reports),
             isEnabled = true,
-            email = sampleEmail
+            configData = sampleEmail
         )
 
         // Create email notification config
@@ -247,7 +247,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             ConfigType.SmtpAccount,
             EnumSet.of(Feature.Reports),
             isEnabled = true,
-            smtpAccount = updatedSmtpAccount
+            configData = updatedSmtpAccount
         )
 
         // Update smtp account notification config
@@ -256,7 +256,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${updatedSmtpAccountConfig.name}",
                 "description":"${updatedSmtpAccountConfig.description}",
-                "config_type":"SmtpAccount",
+                "config_type":"Smtp_account",
                 "features":[
                     "${updatedSmtpAccountConfig.features.elementAt(0)}"
                 ],

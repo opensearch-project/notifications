@@ -50,7 +50,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             ConfigType.Chime,
             EnumSet.of(Feature.Alerting, Feature.Reports),
             isEnabled = true,
-            chime = sampleChime
+            configData = sampleChime
         )
 
         // Create chime notification config
@@ -65,7 +65,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                     "${referenceObject.features.elementAt(1)}"
                 ],
                 "is_enabled":${referenceObject.isEnabled},
-                "chime":{"url":"${referenceObject.chime!!.url}"}
+                "chime":{"url":"${(referenceObject.configData!! as Chime).url}"}
             }
         }
         """.trimIndent()
@@ -109,7 +109,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             ConfigType.Chime,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            chime = updatedChime
+            configData = updatedChime
         )
 
         // Update chime notification config
@@ -123,7 +123,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                     "${updatedObject.features.elementAt(0)}"
                 ],
                 "is_enabled":${updatedObject.isEnabled},
-                "chime":{"url":"${updatedObject.chime!!.url}"}
+                "chime":{"url":"${(updatedObject.configData!! as Chime).url}"}
             }
         }
         """.trimIndent()

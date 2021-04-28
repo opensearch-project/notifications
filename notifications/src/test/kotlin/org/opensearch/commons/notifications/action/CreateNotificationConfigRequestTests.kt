@@ -48,24 +48,14 @@ import java.util.EnumSet
 internal class CreateNotificationConfigRequestTests {
 
     private fun createAllContentConfigObject(): NotificationConfig {
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
-        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
         val sampleWebhook = Webhook("https://domain.com/sample_webhook_url#1234567890")
-        val sampleEmail = Email("id_1234567890", listOf("email@domain.com"), listOf("groupId"))
-        val sampleSmtpAccount = SmtpAccount("domain.com", 1234, SmtpAccount.MethodType.Ssl, "from@domain.com")
-        val sampleEmailGroup = EmailGroup(listOf("email@domain.com"))
         return NotificationConfig(
             "name",
             "description",
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            slack = sampleSlack,
-            chime = sampleChime,
-            webhook = sampleWebhook,
-            email = sampleEmail,
-            smtpAccount = sampleSmtpAccount,
-            emailGroup = sampleEmailGroup
+            configData = sampleWebhook,
         )
     }
 
@@ -103,7 +93,7 @@ internal class CreateNotificationConfigRequestTests {
             ConfigType.Slack,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            slack = sampleSlack
+            configData = sampleSlack
         )
 
         val jsonString = """
@@ -139,7 +129,7 @@ internal class CreateNotificationConfigRequestTests {
             ConfigType.Slack,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            slack = sampleSlack
+            configData = sampleSlack
         )
 
         val jsonString = """
