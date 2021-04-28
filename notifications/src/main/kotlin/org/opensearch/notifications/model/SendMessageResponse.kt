@@ -50,7 +50,7 @@ internal class SendMessageResponse : BaseResponse {
 
     companion object {
         private val log by logger(SendMessageResponse::class.java)
-        private const val REF_TAG_FIELD = "refTag"
+        private const val REF_TAG_FIELD = "ref_tag"
         private const val RECIPIENTS_TAG_FIELD = "recipients"
 
         /**
