@@ -41,6 +41,7 @@ import org.opensearch.commons.notifications.NotificationConstants.METHOD_FIELD
 import org.opensearch.commons.notifications.NotificationConstants.PASSWORD_FIELD
 import org.opensearch.commons.notifications.NotificationConstants.PORT_FIELD
 import org.opensearch.commons.notifications.NotificationConstants.USERNAME_FIELD
+import org.opensearch.commons.notifications.model.config.BaseConfigData
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.isValidEmail
 import org.opensearch.commons.utils.logger
@@ -57,7 +58,7 @@ data class SmtpAccount(
     val fromAddress: String,
     val username: SecureString? = null,
     val password: SecureString? = null
-) : BaseModel {
+) : BaseConfigData {
 
     init {
         require(!Strings.isNullOrEmpty(host)) { "host is null or empty" }

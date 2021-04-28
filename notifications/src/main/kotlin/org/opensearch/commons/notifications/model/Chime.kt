@@ -35,6 +35,7 @@ import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.URL_TAG
+import org.opensearch.commons.notifications.model.config.BaseConfigData
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.validateUrl
 import java.io.IOException
@@ -44,7 +45,7 @@ import java.io.IOException
  */
 data class Chime(
     val url: String
-) : BaseModel {
+) : BaseConfigData {
 
     init {
         require(!Strings.isNullOrEmpty(url)) { "URL is null or empty" }

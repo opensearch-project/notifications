@@ -50,7 +50,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement, Feature.Reports, Feature.Alerting),
             isEnabled = true,
-            webhook = sampleWebhook
+            configData = sampleWebhook
         )
 
         // Create webhook notification config
@@ -66,7 +66,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
                     "${referenceObject.features.elementAt(2)}"
                 ],
                 "is_enabled":${referenceObject.isEnabled},
-                "webhook":{"url":"${referenceObject.webhook!!.url}"}
+                "webhook":{"url":"${(referenceObject.configData as Webhook).url}"}
             }
         }
         """.trimIndent()
@@ -110,7 +110,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement, Feature.Reports),
             isEnabled = true,
-            webhook = updatedWebhook
+            configData = updatedWebhook
         )
 
         // Update webhook notification config
@@ -125,7 +125,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
                     "${updatedObject.features.elementAt(1)}"
                 ],
                 "is_enabled":${updatedObject.isEnabled},
-                "webhook":{"url":"${updatedObject.webhook!!.url}"}
+                "webhook":{"url":"${(updatedObject.configData as Webhook).url}"}
             }
         }
         """.trimIndent()
@@ -168,5 +168,43 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.NOT_FOUND.status
         )
         Thread.sleep(100)
+    }
+
+    fun `test Bad Request for multiple config for Webhook data using REST Client`() {
+        // Create sample config request reference
+        val sampleWebhook = Webhook("https://domain.com/sample_webhook_url#1234567890")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.Webhook,
+            EnumSet.of(Feature.IndexManagement, Feature.Reports, Feature.Alerting),
+            isEnabled = true,
+            configData = sampleWebhook
+        )
+
+        // Create webhook notification config
+        val createRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"Webhook",
+                "features":[
+                    "${referenceObject.features.elementAt(0)}",
+                    "${referenceObject.features.elementAt(1)}",
+                    "${referenceObject.features.elementAt(2)}"
+                ],
+                "is_enabled":${referenceObject.isEnabled},
+                "slack":{"url":"https://dummy.com"}
+                "webhook":{"url":"${(referenceObject.configData as Webhook).url}"}
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createRequestJsonString,
+            RestStatus.BAD_REQUEST.status
+        )
     }
 }

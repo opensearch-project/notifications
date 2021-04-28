@@ -55,7 +55,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             ConfigType.Slack,
             EnumSet.of(Feature.IndexManagement, Feature.Reports),
             isEnabled = true,
-            slack = sampleSlack
+            configData = sampleSlack
         )
 
         // Create slack notification config
@@ -70,7 +70,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
                     "${referenceObject.features.elementAt(1)}"
                 ],
                 "is_enabled":${referenceObject.isEnabled},
-                "slack":{"url":"${referenceObject.slack!!.url}"}
+                "slack":{"url":"${(referenceObject.configData as Slack).url}"}
             }
         }
         """.trimIndent()
@@ -105,7 +105,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             ConfigType.Chime,
             EnumSet.of(Feature.Alerting, Feature.Reports),
             isEnabled = true,
-            chime = sampleChime
+            configData = sampleChime
         )
 
         // Create chime notification config
@@ -121,7 +121,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
                     "${referenceObject.features.elementAt(1)}"
                 ],
                 "is_enabled":${referenceObject.isEnabled},
-                "chime":{"url":"${referenceObject.chime!!.url}"}
+                "chime":{"url":"${(referenceObject.configData as Chime).url}"}
             }
         }
         """.trimIndent()
@@ -154,7 +154,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement, Feature.Reports, Feature.Alerting),
             isEnabled = true,
-            webhook = sampleWebhook
+            configData = sampleWebhook
         )
 
         // Create webhook notification config
@@ -170,7 +170,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
                     "${referenceObject.features.elementAt(2)}"
                 ],
                 "is_enabled":${referenceObject.isEnabled},
-                "webhook":{"url":"${referenceObject.webhook!!.url}"}
+                "webhook":{"url":"${(referenceObject.configData as Webhook).url}"}
             }
         }
         """.trimIndent()
@@ -203,7 +203,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement, Feature.Reports),
             isEnabled = true,
-            webhook = anotherWebhook
+            configData = anotherWebhook
         )
 
         // create another webhook notification config with same id
@@ -219,7 +219,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
                     "${anotherObject.features.elementAt(1)}"
                 ],
                 "is_enabled":${anotherObject.isEnabled},
-                "webhook":{"url":"${anotherObject.webhook!!.url}"}
+                "webhook":{"url":"${(anotherObject.configData as Webhook).url}"}
             }
         }
         """.trimIndent()
@@ -249,7 +249,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             ConfigType.SmtpAccount,
             EnumSet.of(Feature.Reports),
             isEnabled = true,
-            smtpAccount = sampleSmtpAccount
+            configData = sampleSmtpAccount
         )
 
         // Create smtp account notification config

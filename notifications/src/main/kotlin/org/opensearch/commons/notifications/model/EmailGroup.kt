@@ -34,6 +34,7 @@ import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.RECIPIENTS_TAG
+import org.opensearch.commons.notifications.model.config.BaseConfigData
 import org.opensearch.commons.utils.isValidEmail
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.stringList
@@ -44,7 +45,7 @@ import java.io.IOException
  */
 data class EmailGroup(
     val recipients: List<String>
-) : BaseModel {
+) : BaseConfigData {
 
     init {
         recipients.forEach {
