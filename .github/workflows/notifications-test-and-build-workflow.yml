@@ -1,21 +1,27 @@
----
-##
-# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License").
-# You may not use this file except in compliance with the License.
-# A copy of the License is located at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# or in the "license" file accompanying this file. This file is distributed
-# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-# express or implied. See the License for the specific language governing
-# permissions and limitations under the License.
-#
-##
+ # SPDX-License-Identifier: Apache-2.0
+ #
+ # The OpenSearch Contributors require contributions made to
+ # this file be licensed under the Apache-2.0 license or a
+ # compatible open source license.
+ #
+ # Modifications Copyright OpenSearch Contributors. See
+ # GitHub history for details.
 
-name: Notifications Test and Build
+ # Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License").
+ # You may not use this file except in compliance with the License.
+ # A copy of the License is located at
+ #
+ # http://www.apache.org/licenses/LICENSE-2.0
+ #
+ # or in the "license" file accompanying this file. This file is distributed
+ # on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ # express or implied. See the License for the specific language governing
+ # permissions and limitations under the License.
+ #
+ 
+name: Test and Build Notifications
 
 on: [push, pull_request]
 
@@ -24,24 +30,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
-
       - name: Set up JDK 1.14
         uses: actions/setup-java@v1
         with:
           java-version: 1.14
 
+       # dependencies: OpenSearch
+      - name: Checkout OpenSearch
+        uses: actions/checkout@v2
+        with:
+          repository: 'opensearch-project/OpenSearch'
+          path: OpenSearch
+          ref: '1.0.0-beta1'
+      - name: Build OpenSearch
+        working-directory: ./OpenSearch
+        run: ./gradlew publishToMavenLocal -Dbuild.version_qualifier=beta1 -Dbuild.snapshot=false
+
+      # dependencies: common-utils
+      - name: Checkout common-utils
+        uses: actions/checkout@v2
+        with:
+          repository: 'opensearch-project/common-utils'
+          ref: '1.0.0-beta1'
+          path: common-utils
+      - name: Build common-utils
+        working-directory: ./common-utils
+        run: ./gradlew publishToMavenLocal -Dopensearch.version=1.0.0-beta1
+
+      # notifications
+      - name: Checkout Notifications
+        uses: actions/checkout@v2
+
       - name: Build with Gradle
         run: |
           cd notifications
-          ./gradlew build -x :integTest # exclude integTest task to avoid permission denied issue
+          ./gradlew build -x :integTest -Dopensearch.version=1.0.0-beta1 # exclude integTest task to avoid permission denied issue
 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v1
-        with:
-          flags: notifications-es
-          directory: notifications/
-          token: ${{ secrets.CODECOV_TOKEN }}
+      # - name: Upload coverage
+      #   uses: codecov/codecov-action@v1
+      #   with:
+      #     flags: notifications-es
+      #     directory: notifications/
+      #     token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Create Artifact Path
         run: |
