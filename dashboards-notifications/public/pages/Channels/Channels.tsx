@@ -89,7 +89,6 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
         name: 'Name',
         sortable: true,
         truncateText: true,
-        width: '150px',
         render: (name: string, item: ChannelItemType) => (
           <EuiLink href={`#${ROUTES.CHANNEL_DETAILS}/${item.id}`}>
             {name}
@@ -100,7 +99,6 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
         field: 'enabled',
         name: 'Notification status',
         sortable: true,
-        width: '150px',
         render: (enabled: boolean) => {
           const color = enabled ? 'success' : 'subdued';
           const label = enabled ? 'Active' : 'Muted';
@@ -112,7 +110,6 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
         name: 'Type',
         sortable: true,
         truncateText: false,
-        width: '150px',
         render: (type: string) => _.get(CHANNEL_TYPE, type, '-'),
       },
       {
@@ -120,7 +117,6 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
         name: 'Notification source',
         sortable: true,
         truncateText: true,
-        width: '150px',
         render: (features: string[]) =>
           features
             .map((feature) => _.get(NOTIFICATION_SOURCE, feature, '-'))
@@ -131,7 +127,6 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
         name: 'Description',
         sortable: true,
         truncateText: true,
-        width: '150px',
       },
     ];
   }
@@ -274,6 +269,7 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
             onChange={this.onTableChange}
             pagination={pagination}
             sorting={sorting}
+            tableLayout="auto"
           />
         </ContentPanel>
       </>

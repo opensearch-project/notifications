@@ -13,16 +13,17 @@ import { DataGenerator } from '@elastic/charts';
 
 export const MOCK_GET_HISTOGRAM = () => {
   const dg = new DataGenerator();
-  const data = dg.generateGroupedSeries(26, 2, 'Channel-');
-  data[18].y = 18;
-  for (let index = 0; index < data.length / 2; index++) {
-    const element = data[index];
-    element.y = Math.round(element.y);
-    element.x = 1618951331 + index * 1000 * 60 * 60;
-    element.g = 'Ops_channel';
-    data[index + data.length / 2].x = element.x;
-    data[index + data.length / 2].y = Math.round(element.y);
-    data[index + data.length / 2].g = 'Oncall_channel';
+  const n = 10;
+  const data = dg.generateGroupedSeries(26, n, 'Channel-');
+  data[18].y = 20;
+  data[18 + 26 * 2].y = 30;
+  for (let channel = 0; channel < n; channel++) {
+    for (let index = 0; index < data.length / n; index++) {
+      const i = index + (channel * data.length) / n;
+      const element = data[i];
+      element.y = Math.round(element.y);
+      element.x = 1618951331 + index * 1000 * 60 * 60;
+    }
   }
   return data;
 };
@@ -152,6 +153,10 @@ export const MOCK_CHANNELS = [
         },
         headers: {
           'Content-Type': 'application/JSON',
+          'WWW-Authenticate':
+            'Basic realm="Access to the staging site", charset="UTF-8"',
+          'Access-Control-Allow-Headers':
+            'X-Custom-Header, Upgrade-Insecure-Requests, Accept, Cross-Origin-Embedder-Policy: require-corp Cross-Origin-Opener-Policy: same-origin',
           Header1: 'value1',
           Header2: 'value2',
           Header3: 'value3',

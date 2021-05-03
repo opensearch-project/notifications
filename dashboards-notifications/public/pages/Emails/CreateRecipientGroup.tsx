@@ -110,7 +110,7 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
   return (
     <>
       <EuiTitle size="l">
-        <h1>Create recipient group</h1>
+        <h1>{`${props.edit ? 'Edit' : 'Create'} recipient group`}</h1>
       </EuiTitle>
 
       <EuiSpacer />
