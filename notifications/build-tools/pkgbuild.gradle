@@ -1,4 +1,15 @@
 /*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ *
+ * Modifications Copyright OpenSearch Contributors. See
+ * GitHub history for details.
+ */
+
+/*
  * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
@@ -23,9 +34,9 @@ afterEvaluate {
         release = isSnapshot ? "0.1" : '1'
         version = "${project.version}" - "-SNAPSHOT"
 
-        into '/usr/share/elasticsearch/plugins'
+        into '/usr/share/opensearch/plugins'
         from(zipTree(bundlePlugin.archivePath)) {
-            into esplugin.name
+            into opensearchplugin.name
         }
 
         user 'root'
@@ -33,18 +44,18 @@ afterEvaluate {
         fileMode 0644
         dirMode 0755
 
-        requires('elasticsearch-oss', versions.elasticsearch, EQUAL)
+        requires('opensearch-oss', versions.opensearch, EQUAL)
         packager = 'Amazon'
         vendor = 'Amazon'
         os = 'LINUX'
         prefix '/usr'
 
         license 'ASL-2.0'
-        maintainer 'OpenDistro for Elasticsearch Team <opendistro@amazon.com>'
-        url 'https://opendistro.github.io/elasticsearch/downloads'
+        maintainer 'OpenSearch Team <opensearch@amazon.com>'
+        url 'https://opensearch.org/'
         summary '''
-         Open Distro for Elasticsearch Notifications.
-         Reference documentation can be found at https://opendistro.github.io/elasticsearch/docs.
+         OpenSearch Notifications.
+         Reference documentation can be found at https://opendistro.github.io/for-elasticsearch-docs/. // TODO:MIGRATE
     '''.stripIndent().replace('\n', ' ').trim()
     }
 

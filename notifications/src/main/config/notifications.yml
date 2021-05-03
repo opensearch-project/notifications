@@ -1,4 +1,15 @@
 ---
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+# Modifications Copyright OpenSearch Contributors. See
+# GitHub history for details.
+#
+
 ##
 # Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -16,9 +27,10 @@
 ##
 
 # configuration file for the notifications plugin
-opendistro.notifications:
+opensearch.notifications:
   general:
     operationTimeoutMs: 60000 # 60 seconds, Minimum 100ms
+    defaultItemsQueryCount: 100 # default number of items to query
   email:
     channel: "smtp" # ses or smtp, provide corresponding sections
     fromAddress: "from@email.com"
@@ -30,3 +42,15 @@ opendistro.notifications:
       host: "localhost"
       port: 587
       transportMethod: "starttls" # starttls, ssl or plain
+  access:
+    adminAccess: "All"
+    # adminAccess values:
+    ## Standard -> Admin user access follows standard user
+    ## All -> Admin user with "all_access" role can see all data of all users.
+    filterBy: "NoFilter" # Applied when tenant != __user__
+    # filterBy values:
+    ## NoFilter -> everyone see each other's configurations
+    ## User -> configurations are visible to only themselves
+    ## Roles -> configurations are visible to users having any one of the role of creator
+    ## BackendRoles -> configurations are visible to users having any one of the backend role of creator
+    ignoreRoles: ["own_index", "kibana_user", "notifications_full_access", "notifications_read_access"]

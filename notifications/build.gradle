@@ -1,4 +1,15 @@
 /*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ *
+ * Modifications Copyright OpenSearch Contributors. See
+ * GitHub history for details.
+ */
+
+/*
  * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
@@ -14,25 +25,23 @@
  *
  */
 
-import org.elasticsearch.gradle.test.RestIntegTestTask
+import org.opensearch.gradle.test.RestIntegTestTask
 
 buildscript {
     ext {
-        es_group = "org.elasticsearch"
-        es_version = System.getProperty("es.version", "7.10.2")
+        opensearch_version = System.getProperty("opensearch.version", "1.0.0-beta1")
         kotlin_version = System.getProperty("kotlin.version", "1.4.0")
     }
 
     repositories {
-        mavenCentral()
-        maven { url "https://plugins.gradle.org/m2/" }
-        jcenter()
         // For local publish dependency
         mavenLocal()
+        mavenCentral()
+        jcenter()
     }
 
     dependencies {
-        classpath "org.elasticsearch.gradle:build-tools:${es_version}"
+        classpath "org.opensearch.gradle:build-tools:${opensearch_version}"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
         classpath "org.jetbrains.kotlin:kotlin-allopen:${kotlin_version}"
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.12.0"
@@ -48,8 +57,8 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'idea'
-apply plugin: 'elasticsearch.esplugin'
-apply plugin: 'elasticsearch.testclusters'
+apply plugin: 'opensearch.opensearchplugin'
+apply plugin: 'opensearch.testclusters'
 apply plugin: 'io.gitlab.arturbosch.detekt'
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
@@ -59,15 +68,19 @@ def usingMultiNode = project.properties.containsKey('numNodes')
 
 check.dependsOn jacocoTestReport
 
-esplugin {
-    name 'opendistro-notifications'
-    description 'Open Distro Notifications Plugin'
-    classname 'com.amazon.opendistroforelasticsearch.notifications.NotificationPlugin'
+opensearchplugin {
+    name 'opensearch-notifications'
+    description 'OpenSearch Notifications Plugin'
+    classname 'org.opensearch.notifications.NotificationPlugin'
     extendedPlugins = []
 }
 
+repositories {
+    mavenLocal()
+}
+
 allOpen {
-    annotation("com.amazon.opendistroforelasticsearch.notifications.util.OpenForTesting")
+    annotation("org.opensearch.notifications.util.OpenForTesting")
 }
 
 configurations {
@@ -98,16 +111,15 @@ configurations.all {
 }
 ext {
     projectSubstitutions = [:]
-    opendistroVersion = "${version}"
+    opensearchVersion = "${version}.0-beta1"
     isSnapshot = "true" == System.getProperty("build.snapshot", "true")
     licenseFile = rootProject.file('LICENSE')
     noticeFile = rootProject.file('NOTICE')
 }
 
 allprojects {
-    group = "com.amazon.opendistroforelasticsearch"
-    version = "${opendistroVersion}.0"
-
+    group = "com.amazon.opendistroforelasticsearch" //TODO：migrate
+    version = "${opensearchVersion}"
     plugins.withId('java') {
         sourceCompatibility = targetCompatibility = "1.8"
     }
@@ -131,11 +143,11 @@ plugins.withId('org.jetbrains.kotlin.jvm') {
 }
 
 dependencies {
-    compileOnly "org.elasticsearch:elasticsearch:${es_version}"
+    compileOnly "org.opensearch:opensearch:${opensearch_version}"
     compile "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
     compile "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9"
-    compile "${group}:common-utils:${opendistroVersion}.0"
+    compile "${group}:common-utils:${opensearchVersion}"
     compile ("software.amazon.awssdk:ses:2.14.16") {
         exclude module: 'annotations' // conflict with org.jetbrains:annotations, integTestRunner fails with error "codebase property already set"
     }
@@ -146,7 +158,7 @@ dependencies {
             'org.junit.jupiter:junit-jupiter-api:5.6.2'
     )
     testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.2')
-    testCompile "org.elasticsearch.test:framework:${es_version}"
+    testCompile "org.opensearch.test:framework:${opensearch_version}"
     testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
     testCompile "org.mockito:mockito-core:2.23.0"
@@ -165,10 +177,8 @@ validateNebulaPom.enabled = false
 dependencyLicenses.enabled = false
 thirdPartyAudit.enabled = false
 // Allow @Test to be used in test classes not inherited from LuceneTestCase.
-// see https://github.com/elastic/elasticsearch/blob/master/buildSrc/src/main/resources/forbidden/es-test-signatures.txt
 forbiddenApis.ignoreFailures = true
 // Allow test cases to be named Tests without having to be inherited from LuceneTestCase.
-// see https://github.com/elastic/elasticsearch/blob/323f312bbc829a63056a79ebe45adced5099f6e6/buildSrc/src/main/java/org/elasticsearch/gradle/precommit/TestingConventionsTasks.java
 testingConventions.enabled = false
 loggerUsageCheck.enabled = false
 
@@ -234,11 +244,12 @@ integTest.dependsOn(bundle)
 integTest.getClusters().forEach{c -> c.plugin(project.getObjects().fileProperty().value(bundle.getArchiveFile()))}
 
 testClusters.integTest {
-    testDistribution = 'OSS'
+    // need to remove temporarily if build on mac
+    testDistribution = 'ARCHIVE'
     // Cluster shrink exception thrown if we try to set numberOfNodes to 1, so only apply if > 1
     if (_numNodes > 1) numberOfNodes = _numNodes
     // When running integration tests it doesn't forward the --debug-jvm to the cluster anymore
-    // i.e. we have to use a custom property to flag when we want to debug elasticsearch JVM
+    // i.e. we have to use a custom property to flag when we want to debug OpenSearch JVM
     // since we also support multi node integration tests we increase debugPort per node
     if (System.getProperty("cluster.debug") != null) {
         def debugPort = 5005
@@ -284,7 +295,7 @@ compileKotlin { kotlinOptions.freeCompilerArgs = ['-Xjsr305=strict'] }
 
 // Only apply jacoco test coverage if we are running a local single node cluster
 if (!usingRemoteCluster && !usingMultiNode) {
-    apply from: 'build-tools/esplugin-coverage.gradle'
+    apply from: 'build-tools/plugin-coverage.gradle'
 }
 
 apply from: 'build-tools/pkgbuild.gradle'
