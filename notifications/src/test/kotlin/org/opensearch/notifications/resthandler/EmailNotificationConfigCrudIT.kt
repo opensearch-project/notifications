@@ -318,7 +318,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "",
             RestStatus.OK.status
         )
-        Assert.assertEquals(emailConfigId, deleteResponse.get("config_id").asString)
+        Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(emailConfigId).asString)
         Thread.sleep(1000)
 
         // Get email notification config after delete

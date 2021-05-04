@@ -154,7 +154,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "",
             RestStatus.OK.status
         )
-        Assert.assertEquals(configId, deleteResponse.get("config_id").asString)
+        Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
         Thread.sleep(1000)
 
         // Get chime notification config after delete

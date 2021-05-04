@@ -27,7 +27,7 @@
 
 package org.opensearch.notifications.resthandler
 
-import org.opensearch.notifications.model.BaseResponse
+import org.opensearch.commons.notifications.action.BaseResponse
 import org.opensearch.rest.RestChannel
 import org.opensearch.rest.RestStatus
 import org.opensearch.rest.action.RestToXContentListener
