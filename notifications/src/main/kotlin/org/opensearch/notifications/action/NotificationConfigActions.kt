@@ -72,7 +72,7 @@ internal object NotificationConfigActions {
             UserAccessManager.getAllAccessInfo(user)
         )
         val configDoc = NotificationConfigDoc(metadata, request.notificationConfig)
-        val docId = NotificationConfigIndex.createNotificationConfig(configDoc)
+        val docId = NotificationConfigIndex.createNotificationConfig(configDoc, request.configId)
         docId ?: throw OpenSearchStatusException(
             "NotificationConfig Creation failed",
             RestStatus.INTERNAL_SERVER_ERROR
@@ -176,18 +176,18 @@ internal object NotificationConfigActions {
 
     /**
      * Delete NotificationConfig
-     * @param request [DeleteNotificationConfigRequest] object
+     * @param configId NotificationConfig object id
      * @param user the user info object
      * @return [DeleteNotificationConfigResponse]
      */
-    fun delete(request: DeleteNotificationConfigRequest, user: User?): DeleteNotificationConfigResponse {
-        log.info("$LOG_PREFIX:NotificationConfig-delete ${request.configId}")
+    private fun delete(configId: String, user: User?): DeleteNotificationConfigResponse {
+        log.info("$LOG_PREFIX:NotificationConfig-delete $configId")
         UserAccessManager.validateUser(user)
-        val currentConfigDoc = NotificationConfigIndex.getNotificationConfig(request.configId)
+        val currentConfigDoc = NotificationConfigIndex.getNotificationConfig(configId)
         currentConfigDoc
             ?: run {
                 throw OpenSearchStatusException(
-                    "NotificationConfig ${request.configId} not found",
+                    "NotificationConfig $configId not found",
                     RestStatus.NOT_FOUND
                 )
             }
@@ -195,16 +195,62 @@ internal object NotificationConfigActions {
         val currentMetadata = currentConfigDoc.configDoc.metadata
         if (!UserAccessManager.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
             throw OpenSearchStatusException(
-                "Permission denied for NotificationConfig ${request.configId}",
+                "Permission denied for NotificationConfig $configId",
                 RestStatus.FORBIDDEN
             )
         }
-        if (!NotificationConfigIndex.deleteNotificationConfig(request.configId)) {
+        if (!NotificationConfigIndex.deleteNotificationConfig(configId)) {
             throw OpenSearchStatusException(
-                "NotificationConfig ${request.configId} delete failed",
+                "NotificationConfig $configId delete failed",
                 RestStatus.REQUEST_TIMEOUT
             )
         }
-        return DeleteNotificationConfigResponse(request.configId)
+        return DeleteNotificationConfigResponse(mapOf(Pair(configId, RestStatus.OK)))
+    }
+
+    /**
+     * Delete NotificationConfig
+     * @param configIds NotificationConfig object ids
+     * @param user the user info object
+     * @return [DeleteNotificationConfigResponse]
+     */
+    private fun delete(configIds: Set<String>, user: User?): DeleteNotificationConfigResponse {
+        log.info("$LOG_PREFIX:NotificationConfig-delete $configIds")
+        UserAccessManager.validateUser(user)
+        val configDocs = NotificationConfigIndex.getNotificationConfigs(configIds)
+        if (configDocs.size != configIds.size) {
+            val mutableSet = configIds.toMutableSet()
+            configDocs.forEach { mutableSet.remove(it.docInfo.id) }
+            throw OpenSearchStatusException(
+                "NotificationConfig $configDocs not found",
+                RestStatus.NOT_FOUND
+            )
+        }
+        configDocs.forEach {
+            val currentMetadata = it.configDoc.metadata
+            if (!UserAccessManager.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+                throw OpenSearchStatusException(
+                    "Permission denied for NotificationConfig ${it.docInfo.id}",
+                    RestStatus.FORBIDDEN
+                )
+            }
+        }
+        val deleteStatus = NotificationConfigIndex.deleteNotificationConfigs(configIds)
+        return DeleteNotificationConfigResponse(deleteStatus)
+    }
+
+    /**
+     * Delete NotificationConfig
+     * @param request [DeleteNotificationConfigRequest] object
+     * @param user the user info object
+     * @return [DeleteNotificationConfigResponse]
+     */
+    fun delete(request: DeleteNotificationConfigRequest, user: User?): DeleteNotificationConfigResponse {
+        log.info("$LOG_PREFIX:NotificationConfig-delete ${request.configIds}")
+        return if (request.configIds.size == 1) {
+            delete(request.configIds.first(), user)
+        } else {
+            delete(request.configIds, user)
+        }
     }
 }

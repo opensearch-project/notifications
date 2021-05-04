@@ -62,6 +62,7 @@ class UpdateNotificationConfigRequest : ActionRequest, ToXContentObject {
         /**
          * Creator used in REST communication.
          * @param parser XContentParser to deserialize data from.
+         * @param id optional id to use if missed in XContent
          */
         @JvmStatic
         @Throws(IOException::class)

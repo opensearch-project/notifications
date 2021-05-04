@@ -28,6 +28,8 @@
 package org.opensearch.commons.utils
 
 import org.apache.logging.log4j.Logger
+import org.opensearch.common.io.stream.StreamOutput
+import org.opensearch.common.io.stream.Writeable
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import java.util.EnumSet
@@ -48,4 +50,16 @@ inline fun <reified E : Enum<E>> XContentParser.enumSet(default: E, logHelper: L
         retSet.add(valueOf(text(), default, logHelper))
     }
     return retSet
+}
+
+inline fun <reified E : Enum<E>> enumReader(enumClass: Class<E>): Writeable.Reader<E> {
+    return Writeable.Reader<E> {
+        it.readEnum(enumClass)
+    }
+}
+
+inline fun <reified E : Enum<E>> enumWriter(ignore: Class<E>): Writeable.Writer<E> {
+    return Writeable.Writer<E> { streamOutput: StreamOutput, value: E ->
+        streamOutput.writeEnum(value)
+    }
 }

@@ -5,6 +5,7 @@ package org.opensearch.commons.notifications
  */
 internal object NotificationConstants {
     internal const val CONFIG_ID_TAG = "config_id"
+    internal const val CONFIG_ID_LIST_TAG = "config_id_list"
     internal const val NOTIFICATION_ID_TAG = "notification_id"
     internal const val EMAIL_ACCOUNT_ID_TAG = "email_account_id"
     internal const val REFERENCE_ID_TAG = "reference_id"
@@ -52,6 +53,7 @@ internal object NotificationConstants {
     internal const val TENANT_TAG = "tenant"
     internal const val NOTIFICATION_CONFIG_LIST_TAG = "notification_config_list"
     internal const val FEATURE_CONFIG_LIST_TAG = "feature_channel_list"
+    internal const val DELETE_RESPONSE_LIST_TAG = "delete_response_list"
     internal const val FROM_INDEX_TAG = "from_index"
     internal const val MAX_ITEMS_TAG = "max_items"
     internal const val STATUS_LIST_TAG = "status_list"

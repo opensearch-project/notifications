@@ -28,8 +28,6 @@ package org.opensearch.notifications.resthandler
 
 import org.opensearch.client.node.NodeClient
 import org.opensearch.commons.notifications.NotificationConstants.DEFAULT_MAX_ITEMS
-import org.opensearch.commons.notifications.NotificationConstants.FROM_INDEX_TAG
-import org.opensearch.commons.notifications.NotificationConstants.MAX_ITEMS_TAG
 import org.opensearch.commons.notifications.NotificationsPluginInterface
 import org.opensearch.commons.notifications.action.CreateNotificationConfigRequest
 import org.opensearch.commons.notifications.action.DeleteNotificationConfigRequest
@@ -58,6 +56,9 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
          */
         private const val REQUEST_URL = "$PLUGIN_BASE_URI/configs"
         private const val CONFIG_ID_FIELD = "config_id"
+        private const val CONFIG_ID_LIST_TAG = "config_id_list"
+        private const val FROM_INDEX_TAG = "from_index"
+        private const val MAX_ITEMS_TAG = "max_items"
     }
 
     /**
@@ -94,6 +95,13 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
              */
             Route(DELETE, "$REQUEST_URL/{$CONFIG_ID_FIELD}"),
             /**
+             * Delete a notification config
+             * Request URL: DELETE [REQUEST_URL?config_id=id] or [REQUEST_URL?config_id_list=comma_separated_ids]
+             * Request body: Ref [org.opensearch.commons.notifications.action.DeleteNotificationConfigRequest]
+             * Response body: [org.opensearch.commons.notifications.action.DeleteNotificationConfigResponse]
+             */
+            Route(DELETE, REQUEST_URL),
+            /**
              * Get a notification config
              * Request URL: GET [REQUEST_URL/{configId}]
              * Request body: Ref [org.opensearch.commons.notifications.action.GetNotificationConfigRequest]
@@ -102,7 +110,9 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
             Route(GET, "$REQUEST_URL/{$CONFIG_ID_FIELD}"),
             /**
              * Get list of notification configs
-             * Request URL: GET [REQUEST_URL]
+             * Request URL: GET [REQUEST_URL?config_id=id] or [REQUEST_URL?from_index=20&max_items=10]
+             * TODO:sort_order=ASC&sort_field=name
+             * TODO:&is_enabled=true&config_type=Slack,Chime&features=Alerting,Reports&name=test*
              * Request body: Ref [org.opensearch.commons.notifications.action.GetNotificationConfigRequest]
              * Response body: [org.opensearch.commons.notifications.action.GetNotificationConfigResponse]
              */
@@ -114,7 +124,7 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
      * {@inheritDoc}
      */
     override fun responseParams(): Set<String> {
-        return setOf(CONFIG_ID_FIELD, FROM_INDEX_TAG, MAX_ITEMS_TAG)
+        return setOf(CONFIG_ID_FIELD, CONFIG_ID_LIST_TAG, FROM_INDEX_TAG, MAX_ITEMS_TAG)
     }
 
     /**
@@ -140,11 +150,25 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
                 )
             }
             DELETE -> RestChannelConsumer {
-                NotificationsPluginInterface.deleteNotificationConfig(
-                    client,
-                    DeleteNotificationConfigRequest(request.param(CONFIG_ID_FIELD)),
-                    RestToXContentListener(it)
-                )
+                val configId: String? = request.param(CONFIG_ID_FIELD)
+                val configIdSet: Set<String> =
+                    request.paramAsStringArray(CONFIG_ID_LIST_TAG, arrayOf(configId))
+                        .filter { s -> !s.isNullOrBlank() }
+                        .toSet()
+                if (configIdSet.isEmpty()) {
+                    it.sendResponse(
+                        BytesRestResponse(
+                            RestStatus.BAD_REQUEST,
+                            "either $CONFIG_ID_FIELD or $CONFIG_ID_LIST_TAG is required"
+                        )
+                    )
+                } else {
+                    NotificationsPluginInterface.deleteNotificationConfig(
+                        client,
+                        DeleteNotificationConfigRequest(configIdSet),
+                        RestResponseToXContentListener(it)
+                    )
+                }
             }
             GET -> {
                 val configId: String? = request.param(CONFIG_ID_FIELD)

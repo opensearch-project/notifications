@@ -34,14 +34,20 @@ import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
+import org.opensearch.commons.notifications.NotificationConstants.DELETE_RESPONSE_LIST_TAG
+import org.opensearch.commons.utils.STRING_READER
+import org.opensearch.commons.utils.STRING_WRITER
+import org.opensearch.commons.utils.enumReader
+import org.opensearch.commons.utils.enumWriter
 import org.opensearch.commons.utils.logger
+import org.opensearch.rest.RestStatus
 import java.io.IOException
 
 /**
  * Action Response for creating new configuration.
  */
 class DeleteNotificationConfigResponse : BaseResponse {
-    val configId: String
+    val configIdToStatus: Map<String, RestStatus>
 
     companion object {
         private val log by logger(DeleteNotificationConfigResponse::class.java)
@@ -58,7 +64,7 @@ class DeleteNotificationConfigResponse : BaseResponse {
         @JvmStatic
         @Throws(IOException::class)
         fun parse(parser: XContentParser): DeleteNotificationConfigResponse {
-            var configId: String? = null
+            var configIdToStatus: Map<String, RestStatus>? = null
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -69,24 +75,28 @@ class DeleteNotificationConfigResponse : BaseResponse {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    CONFIG_ID_TAG -> configId = parser.text()
+                    DELETE_RESPONSE_LIST_TAG -> configIdToStatus = convertMapStrings(parser.mapStrings())
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing DeleteNotificationConfigResponse")
                     }
                 }
             }
-            configId ?: throw IllegalArgumentException("$CONFIG_ID_TAG field absent")
-            return DeleteNotificationConfigResponse(configId)
+            configIdToStatus ?: throw IllegalArgumentException("$CONFIG_ID_TAG field absent")
+            return DeleteNotificationConfigResponse(configIdToStatus)
+        }
+
+        private fun convertMapStrings(inputMap: Map<String, String>): Map<String, RestStatus> {
+            return inputMap.mapValues { RestStatus.valueOf(it.value) }
         }
     }
 
     /**
      * constructor for creating the class
-     * @param configId the id of the deleted notification configuration
+     * @param configIdToStatus the ids of the deleted notification configuration with status
      */
-    constructor(configId: String) {
-        this.configId = configId
+    constructor(configIdToStatus: Map<String, RestStatus>) {
+        this.configIdToStatus = configIdToStatus
     }
 
     /**
@@ -94,7 +104,7 @@ class DeleteNotificationConfigResponse : BaseResponse {
      */
     @Throws(IOException::class)
     constructor(input: StreamInput) : super(input) {
-        configId = input.readString()
+        configIdToStatus = input.readMap(STRING_READER, enumReader(RestStatus::class.java))
     }
 
     /**
@@ -102,7 +112,7 @@ class DeleteNotificationConfigResponse : BaseResponse {
      */
     @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
-        output.writeString(configId)
+        output.writeMap(configIdToStatus, STRING_WRITER, enumWriter(RestStatus::class.java))
     }
 
     /**
@@ -111,7 +121,16 @@ class DeleteNotificationConfigResponse : BaseResponse {
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(CONFIG_ID_TAG, configId)
+            .field(DELETE_RESPONSE_LIST_TAG, configIdToStatus)
             .endObject()
+    }
+
+    override fun getStatus(): RestStatus {
+        val distinctStatus = configIdToStatus.values.distinct()
+        return when {
+            distinctStatus.size > 1 -> RestStatus.MULTI_STATUS
+            distinctStatus.size == 1 -> distinctStatus[0]
+            else -> RestStatus.NOT_MODIFIED
+        }
     }
 }
