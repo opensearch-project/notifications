@@ -28,6 +28,7 @@ package org.opensearch.commons.notifications.action
 
 import org.opensearch.action.ActionRequest
 import org.opensearch.action.ActionRequestValidationException
+import org.opensearch.action.ValidateActions
 import org.opensearch.common.io.stream.StreamInput
 import org.opensearch.common.io.stream.StreamOutput
 import org.opensearch.common.io.stream.Writeable
@@ -36,15 +37,16 @@ import org.opensearch.common.xcontent.ToXContentObject
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
-import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_LIST_TAG
 import org.opensearch.commons.utils.logger
+import org.opensearch.commons.utils.stringList
 import java.io.IOException
 
 /**
  * Action Response for creating new configuration.
  */
 class DeleteNotificationConfigRequest : ActionRequest, ToXContentObject {
-    val configId: String
+    val configIds: Set<String>
 
     companion object {
         private val log by logger(DeleteNotificationConfigRequest::class.java)
@@ -61,7 +63,7 @@ class DeleteNotificationConfigRequest : ActionRequest, ToXContentObject {
         @JvmStatic
         @Throws(IOException::class)
         fun parse(parser: XContentParser): DeleteNotificationConfigRequest {
-            var configId: String? = null
+            var configIds: Set<String>? = null
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -72,24 +74,24 @@ class DeleteNotificationConfigRequest : ActionRequest, ToXContentObject {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    CONFIG_ID_TAG -> configId = parser.text()
+                    CONFIG_ID_LIST_TAG -> configIds = parser.stringList().toSet()
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing DeleteNotificationConfigRequest")
                     }
                 }
             }
-            configId ?: throw IllegalArgumentException("$CONFIG_ID_TAG field absent")
-            return DeleteNotificationConfigRequest(configId)
+            configIds ?: throw IllegalArgumentException("$CONFIG_ID_LIST_TAG field absent")
+            return DeleteNotificationConfigRequest(configIds)
         }
     }
 
     /**
      * constructor for creating the class
-     * @param configId the id of the notification configuration
+     * @param configIds the id of the notification configuration
      */
-    constructor(configId: String) {
-        this.configId = configId
+    constructor(configIds: Set<String>) {
+        this.configIds = configIds
     }
 
     /**
@@ -97,7 +99,7 @@ class DeleteNotificationConfigRequest : ActionRequest, ToXContentObject {
      */
     @Throws(IOException::class)
     constructor(input: StreamInput) : super(input) {
-        configId = input.readString()
+        configIds = input.readStringList().toSet()
     }
 
     /**
@@ -106,7 +108,7 @@ class DeleteNotificationConfigRequest : ActionRequest, ToXContentObject {
     @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
         super.writeTo(output)
-        output.writeString(configId)
+        output.writeStringCollection(configIds)
     }
 
     /**
@@ -115,7 +117,7 @@ class DeleteNotificationConfigRequest : ActionRequest, ToXContentObject {
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(CONFIG_ID_TAG, configId)
+            .field(CONFIG_ID_LIST_TAG, configIds)
             .endObject()
     }
 
@@ -123,6 +125,10 @@ class DeleteNotificationConfigRequest : ActionRequest, ToXContentObject {
      * {@inheritDoc}
      */
     override fun validate(): ActionRequestValidationException? {
-        return null
+        var validationException: ActionRequestValidationException? = null
+        if (configIds.isNullOrEmpty()) {
+            validationException = ValidateActions.addValidationError("configIds is null or empty", validationException)
+        }
+        return validationException
     }
 }

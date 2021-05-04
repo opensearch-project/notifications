@@ -36,8 +36,10 @@ import org.opensearch.common.xcontent.ToXContentObject
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.notifications.NotificationConstants.NOTIFICATION_CONFIG_TAG
 import org.opensearch.commons.notifications.model.NotificationConfig
+import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.logger
 import java.io.IOException
 
@@ -45,6 +47,7 @@ import java.io.IOException
  * Action request for creating new configuration.
  */
 class CreateNotificationConfigRequest : ActionRequest, ToXContentObject {
+    val configId: String?
     val notificationConfig: NotificationConfig
 
     companion object {
@@ -58,10 +61,12 @@ class CreateNotificationConfigRequest : ActionRequest, ToXContentObject {
         /**
          * Creator used in REST communication.
          * @param parser XContentParser to deserialize data from.
+         * @param id optional id to use if missed in XContent
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): CreateNotificationConfigRequest {
+        fun parse(parser: XContentParser, id: String? = null): CreateNotificationConfigRequest {
+            var configId: String? = id
             var notificationConfig: NotificationConfig? = null
 
             XContentParserUtils.ensureExpectedToken(
@@ -73,6 +78,7 @@ class CreateNotificationConfigRequest : ActionRequest, ToXContentObject {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
+                    CONFIG_ID_TAG -> configId = parser.text()
                     NOTIFICATION_CONFIG_TAG -> notificationConfig = NotificationConfig.parse(parser)
                     else -> {
                         parser.skipChildren()
@@ -81,7 +87,7 @@ class CreateNotificationConfigRequest : ActionRequest, ToXContentObject {
                 }
             }
             notificationConfig ?: throw IllegalArgumentException("$NOTIFICATION_CONFIG_TAG field absent")
-            return CreateNotificationConfigRequest(notificationConfig)
+            return CreateNotificationConfigRequest(notificationConfig, configId)
         }
     }
 
@@ -91,6 +97,7 @@ class CreateNotificationConfigRequest : ActionRequest, ToXContentObject {
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
+            .fieldIfNotNull(CONFIG_ID_TAG, configId)
             .field(NOTIFICATION_CONFIG_TAG, notificationConfig)
             .endObject()
     }
@@ -98,8 +105,10 @@ class CreateNotificationConfigRequest : ActionRequest, ToXContentObject {
     /**
      * constructor for creating the class
      * @param notificationConfig the notification config object
+     * @param configId optional id to use for notification config object
      */
-    constructor(notificationConfig: NotificationConfig) {
+    constructor(notificationConfig: NotificationConfig, configId: String? = null) {
+        this.configId = configId
         this.notificationConfig = notificationConfig
     }
 
@@ -108,6 +117,7 @@ class CreateNotificationConfigRequest : ActionRequest, ToXContentObject {
      */
     @Throws(IOException::class)
     constructor(input: StreamInput) : super(input) {
+        configId = input.readOptionalString()
         notificationConfig = NotificationConfig.reader.read(input)!!
     }
 
@@ -117,6 +127,7 @@ class CreateNotificationConfigRequest : ActionRequest, ToXContentObject {
     @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
         super.writeTo(output)
+        output.writeOptionalString(configId)
         notificationConfig.writeTo(output)
     }
 

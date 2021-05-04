@@ -38,25 +38,30 @@ internal class DeleteNotificationConfigRequestTests {
 
     @Test
     fun `Delete request serialize and deserialize transport object should be equal`() {
-        val deleteRequest = DeleteNotificationConfigRequest("sample_config_id")
+        val deleteRequest = DeleteNotificationConfigRequest(setOf("sample_config_id"))
         val recreatedObject = recreateObject(deleteRequest) { DeleteNotificationConfigRequest(it) }
-        assertEquals(deleteRequest.configId, recreatedObject.configId)
+        assertEquals(deleteRequest.configIds, recreatedObject.configIds)
     }
 
     @Test
     fun `Delete request serialize and deserialize using json object should be equal`() {
-        val deleteRequest = DeleteNotificationConfigRequest("sample_config_id")
+        val deleteRequest = DeleteNotificationConfigRequest(setOf("sample_config_id"))
         val jsonString = getJsonString(deleteRequest)
         val recreatedObject = createObjectFromJsonString(jsonString) { DeleteNotificationConfigRequest.parse(it) }
-        assertEquals(deleteRequest.configId, recreatedObject.configId)
+        assertEquals(deleteRequest.configIds, recreatedObject.configIds)
     }
 
     @Test
     fun `Delete request should deserialize json object using parser`() {
         val configId = "sample_config_id"
-        val jsonString = "{\"config_id\":\"$configId\"}"
+        val configIds = setOf(configId)
+        val jsonString = """
+        {
+            "config_id_list":["$configId"]
+        }
+        """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { DeleteNotificationConfigRequest.parse(it) }
-        assertEquals(configId, recreatedObject.configId)
+        assertEquals(configIds, recreatedObject.configIds)
     }
 
     @Test
@@ -68,8 +73,12 @@ internal class DeleteNotificationConfigRequestTests {
     }
 
     @Test
-    fun `Delete request should throw exception when configId is replace with configId2 in json object`() {
-        val jsonString = "{\"config_id2\":\"sample_config_id\"}"
+    fun `Delete request should throw exception when config_id_lists is replace with config_id_lists2 in json object`() {
+        val jsonString = """
+        {
+            "config_id_lists":["sample_config_id"]
+        }
+        """.trimIndent()
         assertThrows<IllegalArgumentException> {
             createObjectFromJsonString(jsonString) { DeleteNotificationConfigRequest.parse(it) }
         }
@@ -78,15 +87,16 @@ internal class DeleteNotificationConfigRequestTests {
     @Test
     fun `Delete request should safely ignore extra field in json object`() {
         val configId = "sample_config_id"
+        val configIds = setOf(configId)
         val jsonString = """
         {
-            "config_id":"$configId",
+            "config_id_list":["$configId"],
             "extra_field_1":["extra", "value"],
             "extra_field_2":{"extra":"value"},
             "extra_field_3":"extra value 3"
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { DeleteNotificationConfigRequest.parse(it) }
-        assertEquals(configId, recreatedObject.configId)
+        assertEquals(configIds, recreatedObject.configIds)
     }
 }
