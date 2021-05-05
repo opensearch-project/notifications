@@ -40,7 +40,7 @@ exports[`<NotificationsHistogram /> spec renders the component 1`] = `
                 >
                   <input
                     type="hidden"
-                    value="CHANNEL_TYPE"
+                    value=""
                   />
                   <div
                     class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
@@ -57,7 +57,8 @@ exports[`<NotificationsHistogram /> spec renders the component 1`] = `
                         class="euiScreenReaderOnly"
                         id="random_html_id"
                       >
-                        Select an option: Channel types, is selected
+                        Select an option: 
+                        , is selected
                       </span>
                       <button
                         aria-haspopup="true"
@@ -65,9 +66,7 @@ exports[`<NotificationsHistogram /> spec renders the component 1`] = `
                         class="euiSuperSelectControl euiSuperSelectControl--fullWidth euiSuperSelectControl--inGroup"
                         style="width: 300px;"
                         type="button"
-                      >
-                        Channel types
-                      </button>
+                      />
                       <div
                         class="euiFormControlLayoutIcons euiFormControlLayoutIcons--right"
                       >

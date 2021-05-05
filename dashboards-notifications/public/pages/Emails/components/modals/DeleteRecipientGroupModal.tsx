@@ -27,6 +27,7 @@
 import {
   EuiButton,
   EuiButtonEmpty,
+  EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
   EuiModal,
@@ -35,10 +36,12 @@ import {
   EuiModalHeader,
   EuiModalHeaderTitle,
   EuiOverlayMask,
+  EuiSpacer,
   EuiText,
 } from '@elastic/eui';
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { RecipientGroupItemType } from '../../../../../models/interfaces';
+import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 
 interface DeleteRecipientGroupModalProps extends ModalRootProps {
@@ -46,16 +49,21 @@ interface DeleteRecipientGroupModalProps extends ModalRootProps {
   onClose: () => void;
 }
 
-export const DeleteRecipientGroupModal = (props: DeleteRecipientGroupModalProps) => {
+export const DeleteRecipientGroupModal = (
+  props: DeleteRecipientGroupModalProps
+) => {
   if (!props.recipientGroups.length) return null;
 
-  const plural = props.recipientGroups.length >= 2;
-  const name = plural
-    ? `${props.recipientGroups.length} recipient groups`
-    : props.recipientGroups[0].name;
-  const message = `Delete ${name} permanently? Any channels using ${
-    plural ? 'these' : 'this'
-  } email recipient group${plural ? 's' : ''} will not be able to receive notifications.`;
+  const coreContext = useContext(CoreServicesContext)!;
+  const [input, setInput] = useState('');
+  const num = props.recipientGroups.length;
+  const name =
+    num >= 2 ? `${num} recipient groups` : props.recipientGroups[0].name;
+  const message = `Delete ${
+    num >= 2 ? 'the following recipient groups' : name
+  } permanently? Any channels using ${
+    num >= 2 ? 'these email recipient groups' : 'this email recipient group'
+  } will not be able to receive notifications.`;
 
   return (
     <EuiOverlayMask>
@@ -65,6 +73,28 @@ export const DeleteRecipientGroupModal = (props: DeleteRecipientGroupModalProps)
         </EuiModalHeader>
         <EuiModalBody>
           <EuiText>{message}</EuiText>
+          {num >= 2 && (
+            <>
+              <EuiSpacer />
+              {props.recipientGroups.map((recipientGroup, i) => (
+                <EuiText
+                  key={`recipient-groups-list-item-${i}`}
+                  style={{ marginLeft: 20 }}
+                >
+                  <li>{recipientGroup.name}</li>
+                </EuiText>
+              ))}
+            </>
+          )}
+          <EuiSpacer />
+          <EuiText>
+            To confirm delete, type <i>delete</i> in the field.
+          </EuiText>
+          <EuiFieldText
+            placeholder="delete"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
         </EuiModalBody>
         <EuiModalFooter>
           <EuiFlexGroup justifyContent="flexEnd">
@@ -72,7 +102,21 @@ export const DeleteRecipientGroupModal = (props: DeleteRecipientGroupModalProps)
               <EuiButtonEmpty onClick={props.onClose}>Cancel</EuiButtonEmpty>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiButton fill color="danger" onClick={props.onClose}>
+              <EuiButton
+                fill
+                color="danger"
+                onClick={() => {
+                  coreContext.notifications.toasts.addSuccess(
+                    `${
+                      props.recipientGroups.length > 1
+                        ? props.recipientGroups.length + ' recipient groups'
+                        : 'Recipient group ' + props.recipientGroups[0].name
+                    } successfully deleted.`
+                  );
+                  props.onClose();
+                }}
+                disabled={input !== 'delete'}
+              >
                 Delete
               </EuiButton>
             </EuiFlexItem>

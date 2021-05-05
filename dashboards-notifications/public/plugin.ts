@@ -49,8 +49,8 @@ export class notificationsDashboardsPlugin
       id: PLUGIN_NAME,
       title: 'Notifications',
       category: {
-        id: 'odfe',
-        label: 'Open Distro for Elasticsearch',
+        id: 'opensearch',
+        label: 'OpenSearch Plugins',
         order: 2000,
       },
       order: 6000,

@@ -1,11 +1,11 @@
 {
   "name": "notifications-dashboards",
-  "version": "1.15.0.0",
+  "version": "1.0.0",
   "description": "OpenSearch Dashboards Notifications Plugin",
   "license": "Apache-2.0",
   "main": "index.ts",
   "opensearchDashboards": {
-    "version": "7.10.2",
+    "version": "1.0.0",
     "templateVersion": "1.0.0"
   },
   "scripts": {
@@ -19,16 +19,11 @@
     "cypress:open": "cypress open",
     "plugin_helpers": "node ../../scripts/plugin_helpers"
   },
-  "dependencies": {
-    "react-mde": "^10.2.1",
-    "showdown": "^1.9.1"
-  },
   "devDependencies": {
     "@types/enzyme-adapter-react-16": "^1.0.6",
     "@types/showdown": "^1.9.3",
     "enzyme-adapter-react-16": "^1.15.2",
     "jest": "^26.4.2",
-    "jest-dom": "^4.0.0",
-    "@types/showdown": "^1.9.3"
+    "jest-dom": "^4.0.0"
   }
 }

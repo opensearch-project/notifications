@@ -35,9 +35,9 @@ import { SendersTable } from './components/tables/SendersTable';
 interface EmailGroupsProps extends RouteComponentProps {}
 
 export function EmailGroups(props: EmailGroupsProps) {
-  const context = useContext(CoreServicesContext)!;
+  const coreContext = useContext(CoreServicesContext)!;
   useEffect(() => {
-    context.chrome.setBreadcrumbs([
+    coreContext.chrome.setBreadcrumbs([
       BREADCRUMBS.NOTIFICATIONS,
       BREADCRUMBS.EMAIL_GROUPS,
     ]);
@@ -47,7 +47,7 @@ export function EmailGroups(props: EmailGroupsProps) {
   return (
     <>
       <EuiTitle size="l">
-        <h1>Email senders and groups</h1>
+        <h1>Email senders and recipient groups</h1>
       </EuiTitle>
 
       <EuiSpacer />

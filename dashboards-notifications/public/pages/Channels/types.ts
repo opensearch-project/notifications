@@ -24,12 +24,12 @@
  * permissions and limitations under the License.
  */
 
-import Showdown from 'showdown';
+export interface ListItemType {
+  title: NonNullable<React.ReactNode>;
+  description: NonNullable<React.ReactNode>;
+}
 
-export const converter = new Showdown.Converter({
-  tables: true,
-  simplifiedAutoLink: true,
-  strikethrough: true,
-  tasklists: true,
-  noHeaderId: true,
-});
+export interface HeaderItemType {
+  key: string;
+  value: string;
+}

@@ -25,22 +25,21 @@
  */
 
 import { EuiPage, EuiPageBody, EuiPageSideBar, EuiSideNav } from '@elastic/eui';
+import React, { Component } from 'react';
+import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
+import { CoreStart } from '../../../../../src/core/public';
 import { CoreServicesConsumer } from '../../components/coreServices';
 import { ModalProvider, ModalRoot } from '../../components/Modal';
 import { BrowserServices } from '../../models/interfaces';
 import { ServicesConsumer } from '../../services/services';
 import { ROUTES } from '../../utils/constants';
-import React from 'react';
-import { Component } from 'react';
-import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
-import { CoreStart } from '../../../../../src/core/public';
-import Notifications from '../Notifications';
 import { Channels } from '../Channels/Channels';
+import { ChannelDetails } from '../Channels/components/details/ChannelDetails';
 import { CreateChannel } from '../CreateChannel/CreateChannel';
-import { ChannelDetails } from '../Channels/ChannelDetails';
-import { EmailGroups } from '../Emails/EmailGroups';
-import { CreateSender } from '../Emails/CreateSender';
 import { CreateRecipientGroup } from '../Emails/CreateRecipientGroup';
+import { CreateSender } from '../Emails/CreateSender';
+import { EmailGroups } from '../Emails/EmailGroups';
+import Notifications from '../Notifications';
 
 enum Navigation {
   Notifications = 'Notifications',
@@ -124,9 +123,9 @@ export default class Main extends Component<MainProps, object> {
                           />
                           <Route
                             path={`${ROUTES.EDIT_CHANNEL}/:id`}
-                            render={(props: RouteComponentProps<{id: string}>) => (
-                              <CreateChannel {...props} edit={true} />
-                            )}
+                            render={(
+                              props: RouteComponentProps<{ id: string }>
+                            ) => <CreateChannel {...props} edit={true} />}
                           />
                           <Route
                             path={`${ROUTES.CHANNEL_DETAILS}/:id`}
@@ -137,7 +136,12 @@ export default class Main extends Component<MainProps, object> {
                           <Route
                             path={ROUTES.CHANNELS}
                             render={(props: RouteComponentProps) => (
-                              <Channels {...props} />
+                              <Channels
+                                {...props}
+                                notificationService={
+                                  services.notificationService
+                                }
+                              />
                             )}
                           />
                           <Route
@@ -176,7 +180,7 @@ export default class Main extends Component<MainProps, object> {
                             )}
                           />
                           <Route
-                            path={`${ROUTES.EDIT_RECIPIENT_GROUP}/:name`}
+                            path={`${ROUTES.EDIT_RECIPIENT_GROUP}/:id`}
                             render={(props: RouteComponentProps) => (
                               <CreateRecipientGroup {...props} edit={true} />
                             )}

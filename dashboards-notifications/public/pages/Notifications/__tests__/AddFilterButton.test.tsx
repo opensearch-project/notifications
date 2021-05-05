@@ -26,7 +26,7 @@
 
 import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
-import { AddFilterButton } from '../component/SearchBar/Filter/AddFilterButton';
+import { AddFilterButton } from '../components/SearchBar/Filter/AddFilterButton';
 
 describe('<AddFilterButton /> spec', () => {
   it('renders the component', () => {

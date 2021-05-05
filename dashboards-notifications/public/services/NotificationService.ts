@@ -24,9 +24,15 @@
  * permissions and limitations under the License.
  */
 
-import { NODE_API } from '../../common';
 import { HttpSetup } from '../../../../src/core/public';
 import { NotificationItem } from '../../models/interfaces';
+import {
+  MOCK_CHANNELS,
+  MOCK_GET_HISTOGRAM,
+  MOCK_NOTIFICATIONS,
+  MOCK_RECIPIENT_GROUPS,
+  MOCK_SENDERS,
+} from './mockData';
 
 export interface GetNotificationsResponse {
   totalNotifications: number;
@@ -47,155 +53,34 @@ export default class NotificationService {
     //   query: queryObject,
     // });
     // return response;
+    return MOCK_NOTIFICATIONS;
+  };
 
-    const fakeRes = {
-      notifications: [
-        {
-          title: 'title 1',
-          channel: {
-            id: 'c_id_1',
-            name: 'c_name_1',
-            type: 'slack',
-          },
-          source: 'reporting',
-          severity: '1',
-          status: {
-            overview: 'Sent',
-            detail: [
-              {
-                recipient: 'slack',
-                statusText: 'Success',
-                statusCode: '200',
-              },
-            ],
-          },
-          sentTime: 1614234267001,
-          lastUpdatedTime: 1614230526,
-        },
-        {
-          title: 'title 2',
-          channel: {
-            id: 'c_id_2',
-            name: 'c_name_2',
-            type: 'email',
-          },
-          source: 'alerting',
-          severity: '2',
-          status: {
-            overview: 'Error',
-            detail: [
-              {
-                recipient: 'sd@amazon.com',
-                statusText: 'failed',
-                statusCode: '500',
-              },
-              {
-                recipient: 'david@amazon.com',
-                statusText: 'no recipient',
-                statusCode: '404',
-              },
-            ],
-          },
-          sentTime: 1614120516,
-          lastUpdatedTime: 1614130526,
-        },
-        {
-          title: 'title 3',
-          channel: {
-            id: 'c_id_3',
-            name: 'c_name_3',
-            type: 'chime',
-          },
-          source: 'reporting',
-          severity: '1',
-          status: {
-            overview: 'Sent',
-            detail: [
-              {
-                recipient: 'chime',
-                statusText: 'Success',
-                statusCode: '200',
-              },
-            ],
-          },
-          sentTime: 1614220006,
-          lastUpdatedTime: 1614230116,
-        },
-        {
-          title: 'title 4',
-          channel: {
-            id: 'c_id_1',
-            name: 'c_name_1',
-            type: 'slack',
-          },
-          source: 'reporting',
-          severity: '1',
-          status: {
-            overview: 'Sent',
-            detail: [
-              {
-                recipient: 'slack',
-                statusText: 'Success',
-                statusCode: '200',
-              },
-            ],
-          },
-          sentTime: 1614220516,
-          lastUpdatedTime: 1614230526,
-        },
-        {
-          title: 'title 5',
-          channel: {
-            id: 'c_id_2',
-            name: 'c_name_2',
-            type: 'email',
-          },
-          source: 'alerting',
-          severity: '2',
-          status: {
-            overview: 'Error',
-            detail: [
-              {
-                recipient: 'sd@amazon.com',
-                statusText: 'failed',
-                statusCode: '500',
-              },
-              {
-                recipient: 'david@amazon.com',
-                statusText: 'no recipient',
-                statusCode: '404',
-              },
-            ],
-          },
-          sentTime: 1614120516,
-          lastUpdatedTime: 1614130526,
-        },
-        {
-          title: 'title 6',
-          channel: {
-            id: 'c_id_3',
-            name: 'c_name_3',
-            type: 'chime',
-          },
-          source: 'reporting',
-          severity: '1',
-          status: {
-            overview: 'Sent',
-            detail: [
-              {
-                recipient: 'chime',
-                statusText: 'Success',
-                statusCode: '200',
-              },
-            ],
-          },
-          sentTime: 1614220006,
-          lastUpdatedTime: 1614230116,
-        },
-      ],
-      totalNotifications: 6,
-    };
+  getHistogram = async (queryObject: object) => {
+    return MOCK_GET_HISTOGRAM();
+  };
 
-    return fakeRes;
+  getChannels = async (queryObject: object) => {
+    return MOCK_CHANNELS;
+  };
+
+  getChannel = async (id: string) => {
+    return MOCK_CHANNELS[parseInt(id)];
+  };
+
+  getSenders = async (queryObject: object) => {
+    return MOCK_SENDERS;
+  };
+
+  getSender = async (id: string) => {
+    return MOCK_SENDERS[parseInt(id)];
+  };
+
+  getRecipientGroups = async (queryObject: object) => {
+    return MOCK_RECIPIENT_GROUPS;
+  };
+
+  getRecipientGroup = async (id: string) => {
+    return MOCK_RECIPIENT_GROUPS[parseInt(id)];
   };
 }

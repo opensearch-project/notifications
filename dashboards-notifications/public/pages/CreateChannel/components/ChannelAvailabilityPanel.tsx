@@ -24,8 +24,6 @@
  * permissions and limitations under the License.
  */
 
-import { ContentPanel } from '../../../components/ContentPanel';
-import React from 'react';
 import {
   EuiCheckboxGroup,
   EuiCheckboxGroupOption,
@@ -33,6 +31,8 @@ import {
   EuiSpacer,
   EuiText,
 } from '@elastic/eui';
+import React from 'react';
+import { ContentPanel } from '../../../components/ContentPanel';
 import { NOTIFICATION_SOURCE } from '../../../utils/constants';
 
 interface ChannelAvailabilityPanelProps {
@@ -57,7 +57,7 @@ export function ChannelAvailabilityPanel(props: ChannelAvailabilityPanelProps) {
       <EuiFormRow label="Notification source">
         <>
           <EuiText size="xs" color="subdued">
-            Select sources where this channel will be available.
+            Select the features that can use this channel.
           </EuiText>
           <EuiSpacer size="s" />
           <EuiCheckboxGroup

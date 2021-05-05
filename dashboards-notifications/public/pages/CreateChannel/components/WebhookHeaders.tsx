@@ -31,6 +31,7 @@ import {
   EuiFlexItem,
   EuiFormRow,
   EuiSpacer,
+  EuiText,
   EuiTitle,
 } from '@elastic/eui';
 import React from 'react';
@@ -59,8 +60,17 @@ export function WebhookHeaders(props: WebhookHeadersProps) {
   return (
     <>
       <EuiTitle size="xs">
-        <h4>{`Webhook ${props.type}s`}</h4>
+        <h4>
+          {props.type === 'parameter' ? 'Query parameters' : 'Webhook headers'}
+        </h4>
       </EuiTitle>
+
+      {props.headers.length === 0 && (
+        <>
+          <EuiSpacer size="m" />
+          <EuiText size="s">{`No ${props.type}s defined.`}</EuiText>
+        </>
+      )}
 
       {props.headers.map((header, i) => {
         return (
@@ -89,7 +99,6 @@ export function WebhookHeaders(props: WebhookHeadersProps) {
               <EuiFlexItem>
                 <EuiFormRow hasEmptyLabelSpace>
                   <EuiButton
-                    size="s"
                     onClick={() => {
                       const newHeaders = [...props.headers];
                       newHeaders.splice(i, 1);
@@ -108,7 +117,6 @@ export function WebhookHeaders(props: WebhookHeadersProps) {
 
       <EuiSpacer size="m" />
       <EuiButton
-        size="s"
         onClick={() => {
           props.setHeaders([...props.headers, { key: '', value: '' }]);
         }}

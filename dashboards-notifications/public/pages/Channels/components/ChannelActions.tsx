@@ -24,11 +24,12 @@
  * permissions and limitations under the License.
  */
 
-import { ROUTES } from '../../../utils/constants';
 import { EuiButton, EuiContextMenuItem, EuiPopover } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ChannelItemType } from '../../../../models/interfaces';
+import { CoreServicesContext } from '../../../components/coreServices';
 import { ModalConsumer } from '../../../components/Modal';
+import { ROUTES } from '../../../utils/constants';
 import { DeleteChannelModal } from './modals/DeleteChannelModal';
 import { MuteChannelModal } from './modals/MuteChannelModal';
 
@@ -38,6 +39,7 @@ interface ChannelActionsParams {
   modal?: React.ReactNode;
   modalParams?: object;
   href?: string;
+  action?: () => void;
 }
 
 interface ChannelActionsProps {
@@ -45,6 +47,7 @@ interface ChannelActionsProps {
 }
 
 export function ChannelActions(props: ChannelActionsProps) {
+  const coreContext = useContext(CoreServicesContext)!;
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const actions: ChannelActionsParams[] = [
@@ -63,14 +66,16 @@ export function ChannelActions(props: ChannelActionsProps) {
       disabled:
         props.selectedItems.length !== 1 || !props.selectedItems[0].enabled,
       modal: MuteChannelModal,
-      modalParams: { mute: true },
     },
     {
       label: 'Unmute',
       disabled:
         props.selectedItems.length !== 1 || props.selectedItems[0].enabled,
-      modal: MuteChannelModal,
-      modalParams: { mute: false },
+      action: () => {
+        coreContext.notifications.toasts.addSuccess(
+          `Channel ${props.selectedItems[0].name} successfully unmuted.`
+        );
+      },
     },
   ];
 
@@ -83,7 +88,6 @@ export function ChannelActions(props: ChannelActionsProps) {
             <EuiButton
               iconType="arrowDown"
               iconSide="right"
-              size="s"
               disabled={props.selectedItems.length === 0}
               onClick={() => setIsPopoverOpen(!isPopoverOpen)}
             >
@@ -106,6 +110,7 @@ export function ChannelActions(props: ChannelActionsProps) {
                   });
                 }
                 if (params.href) location.assign(params.href);
+                if (params.action) params.action();
               }}
             >
               {params.label}

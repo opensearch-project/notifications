@@ -30,27 +30,27 @@ import {
   EuiCheckboxGroupOption,
   EuiComboBox,
   EuiComboBoxOptionOption,
+  EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
+  EuiMarkdownEditor,
   EuiSpacer,
   EuiSuperSelect,
   EuiSuperSelectOption,
 } from '@elastic/eui';
 import React, { useContext, useState } from 'react';
-import ReactMde from 'react-mde';
-import { CreateChannelContext } from '../CreateChannel';
-import { CreateRecipientGroupModal } from './modals/CreateRecipientGroupModal';
-import { CreateSenderModal } from './modals/CreateSenderModal';
 import { ModalConsumer } from '../../../components/Modal';
-import { converter } from '../utils';
+import { CreateChannelContext } from '../CreateChannel';
 import {
   validateEmailSender,
   validateRecipients,
 } from '../utils/validationHelper';
-import 'react-mde/lib/styles/css/react-mde-all.css';
+import { CreateRecipientGroupModal } from './modals/CreateRecipientGroupModal';
+import { CreateSenderModal } from './modals/CreateSenderModal';
 
 interface EmailSettingsProps {
+  isAmazonSES: boolean;
   headerFooterCheckboxIdToSelectedMap: { [x: string]: boolean };
   setHeaderFooterCheckboxIdToSelectedMap: (map: {
     [x: string]: boolean;
@@ -65,6 +65,8 @@ interface EmailSettingsProps {
   setSelectedRecipientGroupOptions: (
     options: Array<EuiComboBoxOptionOption<string>>
   ) => void;
+  sesSender: string;
+  setSesSender: (sesSender: string) => void;
 }
 
 export function EmailSettings(props: EmailSettingsProps) {
@@ -80,19 +82,17 @@ export function EmailSettings(props: EmailSettingsProps) {
     },
   ];
 
-  const [selectedTabFooter, setSelectedTabFooter] = React.useState<
-    'write' | 'preview'
-  >('write');
-  const [selectedTabHeader, setSelectedTabHeader] = React.useState<
-    'write' | 'preview'
-  >('write');
-  const senderOptions: Array<EuiSuperSelectOption<string>> = [
+  const [senderOptions, setSenderOptions] = useState<
+    Array<EuiSuperSelectOption<string>>
+  >([
     {
       value: 'Admin',
       inputDisplay: 'Admin',
     },
-  ];
-  const [recipientGroupOptions, setRecipientGroupOptions] = useState([
+  ]);
+  const [recipientGroupOptions, setRecipientGroupOptions] = useState<
+    Array<EuiComboBoxOptionOption<string>>
+  >([
     {
       label: 'no-reply@company.com',
     },
@@ -120,74 +120,107 @@ export function EmailSettings(props: EmailSettingsProps) {
   };
   return (
     <>
-      <EuiSpacer size="m" />
-      <EuiFlexGroup>
-        <EuiFlexItem style={{ maxWidth: 400 }}>
+      {props.isAmazonSES ? (
+        <>
           <EuiFormRow
             label="Sender"
-            helpText={`A destination only allows one sender. Use "Create sender" to create a sender with its email address, host, port, encryption method.`}
-            error="Sender is required."
-            isInvalid={context.inputErrors.sender}
+            helpText="Enter a sender email address that has been verified by Amazon SES."
+            error={context.inputErrors.sesSender.join(' ')}
+            isInvalid={context.inputErrors.sesSender.length > 0}
           >
-            <EuiSuperSelect
+            <EuiFieldText
               fullWidth
-              options={senderOptions}
-              valueOfSelected={props.sender}
-              onChange={props.setSender}
+              placeholder="Enter a sender email address"
+              value={props.sesSender}
+              onChange={(e) => props.setSesSender(e.target.value)}
+              isInvalid={context.inputErrors.slackWebhook.length > 0}
               onBlur={() => {
-                const error = validateEmailSender(props.sender);
-                if (error !== context.inputErrors.sender) {
-                  context.setInputErrors({
-                    ...context.inputErrors,
-                    sender: error,
-                  });
-                }
+                context.setInputErrors({
+                  ...context.inputErrors,
+                  sesSender: validateEmailSender(props.sesSender),
+                });
               }}
             />
           </EuiFormRow>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiFormRow hasEmptyLabelSpace>
-            <ModalConsumer>
-              {({ onShow }) => (
-                <EuiButton
-                  size="s"
-                  onClick={() => onShow(CreateSenderModal, { test: 123 })}
-                >
-                  Create sender
-                </EuiButton>
-              )}
-            </ModalConsumer>
-          </EuiFormRow>
-        </EuiFlexItem>
-      </EuiFlexGroup>
+          <EuiSpacer size="m" />
+        </>
+      ) : (
+        <>
+          <EuiSpacer size="m" />
+          <EuiFlexGroup>
+            <EuiFlexItem style={{ maxWidth: 400 }}>
+              <EuiFormRow
+                label="Sender"
+                helpText={`A destination only allows one sender. Use "Create sender" to create a sender with its email address, host, port, encryption method.`}
+                error={context.inputErrors.sender.join(' ')}
+                isInvalid={context.inputErrors.sender.length > 0}
+              >
+                <EuiSuperSelect
+                  fullWidth
+                  options={senderOptions}
+                  valueOfSelected={props.sender}
+                  onChange={props.setSender}
+                  isInvalid={context.inputErrors.sender.length > 0}
+                  onBlur={() => {
+                    context.setInputErrors({
+                      ...context.inputErrors,
+                      sender: validateEmailSender(props.sender),
+                    });
+                  }}
+                />
+              </EuiFormRow>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiFormRow hasEmptyLabelSpace>
+                <ModalConsumer>
+                  {({ onShow }) => (
+                    <EuiButton
+                      onClick={() =>
+                        onShow(CreateSenderModal, {
+                          addSenderOptionAndSelect: (
+                            newOption: EuiSuperSelectOption<string>
+                          ) => {
+                            setSenderOptions([...senderOptions, newOption]);
+                            props.setSender(newOption.value);
+                          },
+                        })
+                      }
+                    >
+                      Create sender
+                    </EuiButton>
+                  )}
+                </ModalConsumer>
+              </EuiFormRow>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </>
+      )}
 
       <EuiFlexGroup>
         <EuiFlexItem style={{ maxWidth: 400 }}>
           <EuiFormRow
             label="Default recipients"
             helpText={`Add recipient(s) using an email address or pre-created email group. Use "Create email group" to create an email group.`}
-            error="Recipient is required."
-            isInvalid={context.inputErrors.recipients}
+            error={context.inputErrors.recipients.join(' ')}
+            isInvalid={context.inputErrors.recipients.length > 0}
           >
             <EuiComboBox
-              placeholder=""
+              placeholder="Email address, recipient group name"
               fullWidth
               options={recipientGroupOptions}
               selectedOptions={props.selectedRecipientGroupOptions}
               onChange={props.setSelectedRecipientGroupOptions}
               onCreateOption={onCreateEmailOption}
+              customOptionText={'Add {searchValue} as a default recipient'}
               isClearable={true}
+              isInvalid={context.inputErrors.recipients.length > 0}
               onBlur={() => {
-                const error = validateRecipients(
-                  props.selectedRecipientGroupOptions
-                );
-                if (error !== context.inputErrors.recipients) {
-                  context.setInputErrors({
-                    ...context.inputErrors,
-                    recipients: error,
-                  });
-                }
+                context.setInputErrors({
+                  ...context.inputErrors,
+                  recipients: validateRecipients(
+                    props.selectedRecipientGroupOptions
+                  ),
+                });
               }}
             />
           </EuiFormRow>
@@ -197,12 +230,24 @@ export function EmailSettings(props: EmailSettingsProps) {
             <ModalConsumer>
               {({ onShow }) => (
                 <EuiButton
-                  size="s"
                   onClick={() =>
-                    onShow(CreateRecipientGroupModal, { test: 123 })
+                    onShow(CreateRecipientGroupModal, {
+                      addRecipientGroupOptionAndSelect: (
+                        newOption: EuiComboBoxOptionOption<string>
+                      ) => {
+                        setRecipientGroupOptions([
+                          ...recipientGroupOptions,
+                          newOption,
+                        ]);
+                        props.setSelectedRecipientGroupOptions([
+                          ...props.selectedRecipientGroupOptions,
+                          newOption,
+                        ]);
+                      },
+                    })
                   }
                 >
-                  Create email group
+                  Create recipient group
                 </EuiButton>
               )}
             </ModalConsumer>
@@ -231,36 +276,20 @@ export function EmailSettings(props: EmailSettingsProps) {
 
       {props.headerFooterCheckboxIdToSelectedMap.header && (
         <EuiFormRow label="Header" fullWidth={true}>
-          <ReactMde
+          <EuiMarkdownEditor
+            aria-labelledby="email-header-markdown-editor"
             value={props.emailHeader}
             onChange={props.setEmailHeader}
-            selectedTab={selectedTabHeader}
-            onTabChange={setSelectedTabHeader}
-            toolbarCommands={[
-              ['header', 'bold', 'italic', 'strikethrough'],
-              ['unordered-list', 'ordered-list', 'checked-list'],
-            ]}
-            generateMarkdownPreview={(markdown) =>
-              Promise.resolve(converter.makeHtml(markdown))
-            }
           />
         </EuiFormRow>
       )}
 
       {props.headerFooterCheckboxIdToSelectedMap.footer && (
         <EuiFormRow label="Footer" fullWidth={true}>
-          <ReactMde
+          <EuiMarkdownEditor
+            aria-labelledby="email-footer-markdown-editor"
             value={props.emailFooter}
             onChange={props.setEmailFooter}
-            selectedTab={selectedTabFooter}
-            onTabChange={setSelectedTabFooter}
-            toolbarCommands={[
-              ['header', 'bold', 'italic', 'strikethrough'],
-              ['unordered-list', 'ordered-list', 'checked-list'],
-            ]}
-            generateMarkdownPreview={(markdown) =>
-              Promise.resolve(converter.makeHtml(markdown))
-            }
           />
         </EuiFormRow>
       )}

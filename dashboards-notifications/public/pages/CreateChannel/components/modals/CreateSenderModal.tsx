@@ -33,26 +33,58 @@ import {
   EuiModalHeader,
   EuiModalHeaderTitle,
   EuiOverlayMask,
+  EuiSuperSelectOption,
 } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ENCRYPTION_METHOD } from '../../../../../models/interfaces';
+import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 import { CreateSenderForm } from '../../../Emails/components/forms/CreateSenderForm';
+import {
+  validateEmail,
+  validateHost,
+  validatePort,
+  validateSenderName,
+} from '../../../Emails/utils/validationHelper';
 
 interface CreateSenderModalProps extends ModalRootProps {
+  addSenderOptionAndSelect: (
+    senderOption: EuiSuperSelectOption<string>
+  ) => void;
   onClose: () => void;
 }
 
 export function CreateSenderModal(props: CreateSenderModalProps) {
+  const coreContext = useContext(CoreServicesContext)!;
   const [senderName, setSenderName] = useState('');
   const [email, setEmail] = useState('');
   const [host, setHost] = useState('');
-  const [port, setPort] = useState('465');
+  const [port, setPort] = useState('');
   const [encryption, setEncryption] = useState<ENCRYPTION_METHOD>('SSL');
+  const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>({
+    senderName: [],
+    email: [],
+    host: [],
+    port: [],
+  });
+
+  const isInputValid = (): boolean => {
+    const errors: { [key: string]: string[] } = {
+      senderName: validateSenderName(senderName),
+      email: validateEmail(email),
+      host: validateHost(host),
+      port: validatePort(port),
+    };
+    setInputErrors(errors);
+    return !Object.values(errors).reduce(
+      (errorFlag, error) => errorFlag || error.length > 0,
+      false
+    );
+  };
 
   return (
     <EuiOverlayMask>
-      <EuiModal onClose={props.onClose} style={{ width: 650 }}>
+      <EuiModal onClose={props.onClose} style={{ width: 750 }}>
         <EuiModalHeader>
           <EuiModalHeaderTitle>Create sender</EuiModalHeaderTitle>
         </EuiModalHeader>
@@ -69,14 +101,34 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
             setPort={setPort}
             encryption={encryption}
             setEncryption={setEncryption}
+            inputErrors={inputErrors}
+            setInputErrors={setInputErrors}
           />
         </EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButtonEmpty onClick={props.onClose} size="s">
+          <EuiButtonEmpty onClick={props.onClose}>
             Cancel
           </EuiButtonEmpty>
-          <EuiButton fill onClick={props.onClose} size="s">
+          <EuiButton
+            fill
+            onClick={() => {
+              if (!isInputValid()) {
+                coreContext.notifications.toasts.addDanger(
+                  'Some fields are invalid. Fix all highlighted error(s) before continuing.'
+                );
+                return;
+              }
+              coreContext.notifications.toasts.addSuccess(
+                `Sender ${senderName} successfully created. You can select ${senderName} from the list of senders.`
+              );
+              props.addSenderOptionAndSelect({
+                value: senderName,
+                inputDisplay: senderName,
+              });
+              props.onClose();
+            }}
+          >
             Create
           </EuiButton>
         </EuiModalFooter>

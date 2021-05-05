@@ -37,15 +37,23 @@ import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
+import { ServicesContext } from '../../services';
 import { BREADCRUMBS, ROUTES } from '../../utils/constants';
 import { CreateRecipientGroupForm } from './components/forms/CreateRecipientGroupForm';
+import {
+  validateRecipientGroupEmails,
+  validateRecipientGroupName,
+} from './utils/validationHelper';
 
-interface CreateRecipientGroupProps extends RouteComponentProps {
+interface CreateRecipientGroupProps
+  extends RouteComponentProps<{ id?: string }> {
   edit?: boolean;
 }
 
 export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
-  const context = useContext(CoreServicesContext)!;
+  const coreContext = useContext(CoreServicesContext)!;
+  const servicesContext = useContext(ServicesContext)!;
+
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedEmailOptions, setSelectedEmailOptions] = useState<
@@ -56,9 +64,25 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
       label: 'no-reply@company.com',
     },
   ]);
+  const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>({
+    name: [],
+    emailOptions: [],
+  });
+
+  const isInputValid = (): boolean => {
+    const errors: { [key: string]: string[] } = {
+      name: validateRecipientGroupName(name),
+      emailOptions: validateRecipientGroupEmails(emailOptions),
+    };
+    setInputErrors(errors);
+    return !Object.values(errors).reduce(
+      (errorFlag, error) => errorFlag || error.length > 0,
+      false
+    );
+  };
 
   useEffect(() => {
-    context.chrome.setBreadcrumbs([
+    coreContext.chrome.setBreadcrumbs([
       BREADCRUMBS.NOTIFICATIONS,
       BREADCRUMBS.EMAIL_GROUPS,
       props.edit
@@ -68,15 +92,25 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
     window.scrollTo(0, 0);
 
     if (props.edit) {
-      setName('test');
-      setDescription('test desc');
+      getRecipientGroup();
     }
   }, []);
+
+  const getRecipientGroup = async () => {
+    const id = props.match.params?.id;
+    if (typeof id !== 'string') return;
+    const response = await servicesContext.notificationService.getRecipientGroup(
+      id
+    );
+    setName(response.name);
+    setDescription(response.description);
+    setSelectedEmailOptions(response.email.map((email) => ({ label: email.email })));
+  };
 
   return (
     <>
       <EuiTitle size="l">
-        <h1>Create recipient group</h1>
+        <h1>{`${props.edit ? 'Edit' : 'Create'} recipient group`}</h1>
       </EuiTitle>
 
       <EuiSpacer />
@@ -95,17 +129,33 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
           setSelectedEmailOptions={setSelectedEmailOptions}
           emailOptions={emailOptions}
           setEmailOptions={setEmailOptions}
+          inputErrors={inputErrors}
+          setInputErrors={setInputErrors}
         />
       </ContentPanel>
       <EuiSpacer />
       <EuiFlexGroup justifyContent="flexEnd" style={{ maxWidth: 1024 }}>
         <EuiFlexItem grow={false}>
-          <EuiButtonEmpty size="s" href={`#${ROUTES.EMAIL_GROUPS}`}>
+          <EuiButtonEmpty href={`#${ROUTES.EMAIL_GROUPS}`}>
             Cancel
           </EuiButtonEmpty>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiButton fill size="s">
+          <EuiButton
+            fill
+            onClick={() => {
+              if (!isInputValid()) {
+                coreContext.notifications.toasts.addDanger(
+                  'Some fields are invalid. Fix all highlighted error(s) before continuing.'
+                );
+                return;
+              }
+              coreContext.notifications.toasts.addSuccess(
+                `Recipient group ${name} successfully ${props.edit ? 'updated' : 'created'}.`
+              );
+              location.assign(`#${ROUTES.EMAIL_GROUPS}`);
+            }}
+          >
             {props.edit ? 'Save' : 'Create'}
           </EuiButton>
         </EuiFlexItem>
