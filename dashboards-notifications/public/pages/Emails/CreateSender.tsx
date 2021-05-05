@@ -24,7 +24,6 @@
  * permissions and limitations under the License.
  */
 
-import { ENCRYPTION_METHOD } from '../../../models/interfaces';
 import {
   EuiButton,
   EuiButtonEmpty,
@@ -35,25 +34,41 @@ import {
 } from '@elastic/eui';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import { ENCRYPTION_METHOD } from '../../../models/interfaces';
 import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
+import { ServicesContext } from '../../services';
 import { BREADCRUMBS, ROUTES } from '../../utils/constants';
 import { CreateSenderForm } from './components/forms/CreateSenderForm';
+import {
+  validateEmail,
+  validateHost,
+  validatePort,
+  validateSenderName,
+} from './utils/validationHelper';
 
-interface CreateSenderProps extends RouteComponentProps {
+interface CreateSenderProps extends RouteComponentProps<{ id?: string }> {
   edit?: boolean;
 }
 
 export function CreateSender(props: CreateSenderProps) {
-  const context = useContext(CoreServicesContext)!;
+  const coreContext = useContext(CoreServicesContext)!;
+  const servicesContext = useContext(ServicesContext)!;
+
   const [senderName, setSenderName] = useState('');
   const [email, setEmail] = useState('');
   const [host, setHost] = useState('');
-  const [port, setPort] = useState('465');
+  const [port, setPort] = useState('');
   const [encryption, setEncryption] = useState<ENCRYPTION_METHOD>('SSL');
+  const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>({
+    senderName: [],
+    email: [],
+    host: [],
+    port: [],
+  });
 
   useEffect(() => {
-    context.chrome.setBreadcrumbs([
+    coreContext.chrome.setBreadcrumbs([
       BREADCRUMBS.NOTIFICATIONS,
       BREADCRUMBS.EMAIL_GROUPS,
       props.edit ? BREADCRUMBS.EDIT_SENDER : BREADCRUMBS.CREATE_SENDER,
@@ -61,10 +76,35 @@ export function CreateSender(props: CreateSenderProps) {
     window.scrollTo(0, 0);
 
     if (props.edit) {
-      setSenderName('test');
-      setEmail('test mail');
+      getSender();
     }
   }, []);
+
+  const getSender = async () => {
+    const id = props.match.params?.id;
+    if (typeof id !== 'string') return;
+
+    const response = await servicesContext.notificationService.getSender(id);
+    setSenderName(response.name);
+    setEmail(response.from);
+    setHost(response.host);
+    setPort(response.port);
+    setEncryption(response.method as ENCRYPTION_METHOD);
+  };
+
+  const isInputValid = (): boolean => {
+    const errors: { [key: string]: string[] } = {
+      senderName: validateSenderName(senderName),
+      email: validateEmail(email),
+      host: validateHost(host),
+      port: validatePort(port),
+    };
+    setInputErrors(errors);
+    return !Object.values(errors).reduce(
+      (errorFlag, error) => errorFlag || error.length > 0,
+      false
+    );
+  };
 
   return (
     <>
@@ -90,18 +130,36 @@ export function CreateSender(props: CreateSenderProps) {
           setPort={setPort}
           encryption={encryption}
           setEncryption={setEncryption}
+          inputErrors={inputErrors}
+          setInputErrors={setInputErrors}
         />
       </ContentPanel>
 
       <EuiSpacer />
       <EuiFlexGroup justifyContent="flexEnd" style={{ maxWidth: 1024 }}>
         <EuiFlexItem grow={false}>
-          <EuiButtonEmpty size="s" href={`#${ROUTES.EMAIL_GROUPS}`}>
+          <EuiButtonEmpty href={`#${ROUTES.EMAIL_GROUPS}`}>
             Cancel
           </EuiButtonEmpty>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiButton fill size="s">
+          <EuiButton
+            fill
+            onClick={() => {
+              if (!isInputValid()) {
+                coreContext.notifications.toasts.addDanger(
+                  'Some fields are invalid. Fix all highlighted error(s) before continuing.'
+                );
+                return;
+              }
+              coreContext.notifications.toasts.addSuccess(
+                `Sender ${senderName} successfully ${
+                  props.edit ? 'updated' : 'created'
+                }.`
+              );
+              location.assign(`#${ROUTES.EMAIL_GROUPS}`);
+            }}
+          >
             {props.edit ? 'Save' : 'Create'}
           </EuiButton>
         </EuiFlexItem>

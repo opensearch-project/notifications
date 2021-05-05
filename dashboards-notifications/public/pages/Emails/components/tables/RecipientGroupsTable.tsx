@@ -25,31 +25,33 @@
  */
 
 import {
-  RecipientGroupItemType,
-  TableState,
-} from '../../../../../models/interfaces';
-import { Component } from 'react';
-import { CoreServicesContext } from '../../../../components/coreServices';
-import {
   EuiBasicTable,
   EuiButton,
   EuiEmptyPrompt,
   EuiFieldSearch,
   EuiHorizontalRule,
+  EuiLink,
   EuiTableFieldDataColumnType,
   EuiTableSortingType,
 } from '@elastic/eui';
-import { SORT_DIRECTION } from '../../../../../common';
-import { ROUTES } from '../../../../utils/constants';
-import React from 'react';
 import { Criteria } from '@elastic/eui/src/components/basic_table/basic_table';
 import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_bar';
-import { DEFAULT_PAGE_SIZE_OPTIONS } from '../../../Notifications/utils/constants';
+import React, { Component } from 'react';
+import { SORT_DIRECTION } from '../../../../../common';
+import {
+  RecipientGroupItemType,
+  TableState,
+} from '../../../../../models/interfaces';
 import {
   ContentPanel,
   ContentPanelActions,
 } from '../../../../components/ContentPanel';
 import { ModalConsumer } from '../../../../components/Modal';
+import { ServicesContext } from '../../../../services';
+import { ROUTES } from '../../../../utils/constants';
+import { getErrorMessage } from '../../../../utils/helpers';
+import { DetailsListModal } from '../../../Channels/components/modals/DetailsListModal';
+import { DEFAULT_PAGE_SIZE_OPTIONS } from '../../../Notifications/utils/constants';
 import { DeleteRecipientGroupModal } from '../modals/DeleteRecipientGroupModal';
 
 interface RecipientGroupsTableProps {}
@@ -61,25 +63,20 @@ export class RecipientGroupsTable extends Component<
   RecipientGroupsTableProps,
   RecipientGroupsTableState
 > {
-  static contextType = CoreServicesContext;
+  static contextType = ServicesContext;
   columns: EuiTableFieldDataColumnType<RecipientGroupItemType>[];
 
   constructor(props: RecipientGroupsTableProps) {
     super(props);
 
     this.state = {
-      total: 1,
+      total: 0,
       from: 0,
       size: 5,
       search: '',
       sortField: 'name',
       sortDirection: SORT_DIRECTION.ASC,
-      items: Array.from({ length: 5 }, (v, i) => ({
-        id: i.toString(),
-        name: 'Group ' + (i + 1),
-        email: [{ email: 'no-reply@company.com' }],
-        description: 'Description ' + i,
-      })),
+      items: [],
       selectedItems: [],
       loading: true,
     };
@@ -97,22 +94,67 @@ export class RecipientGroupsTable extends Component<
         name: 'Email addresses',
         sortable: true,
         truncateText: true,
-        width: '150px',
-        render: (emails: string[]) => emails.length,
+        width: '450px',
+        render: (emailObjects: Array<{ email: string }>) => {
+          const emails = emailObjects.map((email) => email.email);
+          return (
+            <div>
+              {emails.slice(0, 5).join(', ')}
+              {emails.length > 5 && (
+                <span>
+                  {' '}
+                  <ModalConsumer>
+                    {({ onShow }) => (
+                      <EuiLink
+                        onClick={() =>
+                          onShow(DetailsListModal, {
+                            header: `Email addresses (${emails.length})`,
+                            title: 'Email addresses',
+                            items: emails,
+                          })
+                        }
+                      >
+                        {emails.length - 5} more
+                      </EuiLink>
+                    )}
+                  </ModalConsumer>
+                </span>
+              )}
+            </div>
+          );
+        },
       },
       {
         field: 'description',
         name: 'Description',
         sortable: true,
         truncateText: true,
-        width: '150px',
+        width: '300px',
       },
     ];
   }
 
-  // TODO send request on component mount
-  // async componentDidMount() {
-  // }
+  async componentDidMount() {
+    this.setState({ loading: true });
+    try {
+      const queryObject = {
+        from: this.state.from,
+        size: this.state.size,
+        search: this.state.search,
+        sortField: this.state.sortField,
+        sortDirection: this.state.sortDirection,
+      };
+      const recipientGroups = await this.context.notificationService.getRecipientGroups(
+        queryObject
+      );
+      this.setState({ items: recipientGroups, total: recipientGroups.length });
+    } catch (error) {
+      this.context.notifications.toasts.addDanger(
+        getErrorMessage(error, 'There was a problem loading senders.')
+      );
+    }
+    this.setState({ loading: false });
+  }
 
   onTableChange = ({
     page: tablePage,
@@ -182,7 +224,6 @@ export class RecipientGroupsTable extends Component<
                     <ModalConsumer>
                       {({ onShow }) => (
                         <EuiButton
-                          size="s"
                           disabled={this.state.selectedItems.length === 0}
                           onClick={() =>
                             onShow(DeleteRecipientGroupModal, {
@@ -199,7 +240,6 @@ export class RecipientGroupsTable extends Component<
                 {
                   component: (
                     <EuiButton
-                      size="s"
                       disabled={this.state.selectedItems.length !== 1}
                       onClick={() =>
                         location.assign(
@@ -213,11 +253,7 @@ export class RecipientGroupsTable extends Component<
                 },
                 {
                   component: (
-                    <EuiButton
-                      size="s"
-                      fill
-                      href={`#${ROUTES.CREATE_RECIPIENT_GROUP}`}
-                    >
+                    <EuiButton fill href={`#${ROUTES.CREATE_RECIPIENT_GROUP}`}>
                       Create recipient group
                     </EuiButton>
                   ),
@@ -226,8 +262,9 @@ export class RecipientGroupsTable extends Component<
             />
           }
           bodyStyles={{ padding: 'initial' }}
-          title={`Recipient groups (${this.state.total})`}
+          title="Recipient groups"
           titleSize="m"
+          total={this.state.total}
         >
           <EuiFieldSearch
             fullWidth={true}

@@ -36,6 +36,7 @@ import {
 } from '@elastic/eui';
 import { Criteria } from '@elastic/eui/src/components/basic_table/basic_table';
 import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_bar';
+import _ from 'lodash';
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { SORT_DIRECTION } from '../../../common';
@@ -45,12 +46,21 @@ import {
   ContentPanelActions,
 } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
-import { BREADCRUMBS, ROUTES } from '../../utils/constants';
+import { NotificationService } from '../../services';
+import {
+  BREADCRUMBS,
+  CHANNEL_TYPE,
+  NOTIFICATION_SOURCE,
+  ROUTES,
+} from '../../utils/constants';
+import { getErrorMessage } from '../../utils/helpers';
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '../Notifications/utils/constants';
-import { ChannelControls } from './components/ChannelControls';
 import { ChannelActions } from './components/ChannelActions';
+import { ChannelControls } from './components/ChannelControls';
 
-interface ChannelsProps extends RouteComponentProps {}
+interface ChannelsProps extends RouteComponentProps {
+  notificationService: NotificationService;
+}
 
 interface ChannelsState extends TableState<ChannelItemType> {}
 
@@ -62,27 +72,13 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
     super(props);
 
     this.state = {
-      total: 1,
+      total: 0,
       from: 0,
       size: 5,
       search: '',
       sortField: 'name',
       sortDirection: SORT_DIRECTION.ASC,
-      items: Array.from({ length: 5 }, (v, i) => ({
-        id: `${i}`,
-        name: 'Channel ' + (i + 1),
-        enabled: true,
-        type: 'email',
-        allowedFeatures: ['Alerting', 'Reporting'],
-        description: 'a sample description',
-        lastUpdatedTime: 0,
-        destination: {
-          slack: {
-            url:
-              'https://hooks.slack.com/services/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',
-          },
-        },
-      })),
+      items: [],
       selectedItems: [],
       loading: true,
     };
@@ -93,7 +89,6 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
         name: 'Name',
         sortable: true,
         truncateText: true,
-        width: '150px',
         render: (name: string, item: ChannelItemType) => (
           <EuiLink href={`#${ROUTES.CHANNEL_DETAILS}/${item.id}`}>
             {name}
@@ -104,7 +99,6 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
         field: 'enabled',
         name: 'Notification status',
         sortable: true,
-        width: '150px',
         render: (enabled: boolean) => {
           const color = enabled ? 'success' : 'subdued';
           const label = enabled ? 'Active' : 'Muted';
@@ -116,22 +110,23 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
         name: 'Type',
         sortable: true,
         truncateText: false,
-        width: '150px',
+        render: (type: string) => _.get(CHANNEL_TYPE, type, '-'),
       },
       {
         field: 'allowedFeatures',
         name: 'Notification source',
         sortable: true,
         truncateText: true,
-        width: '150px',
-        render: (features: string[]) => features.join(', '),
+        render: (features: string[]) =>
+          features
+            .map((feature) => _.get(NOTIFICATION_SOURCE, feature, '-'))
+            .join(', '),
       },
       {
         field: 'description',
         name: 'Description',
         sortable: true,
         truncateText: true,
-        width: '150px',
       },
     ];
   }
@@ -142,7 +137,29 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
       BREADCRUMBS.CHANNELS,
     ]);
     window.scrollTo(0, 0);
-    // await this.getNotifications();
+    await this.getChannels();
+  }
+
+  async getChannels() {
+    this.setState({ loading: true });
+    try {
+      const queryObject = {
+        from: this.state.from,
+        size: this.state.size,
+        search: this.state.search,
+        sortField: this.state.sortField,
+        sortDirection: this.state.sortDirection,
+      };
+      const channels = await this.props.notificationService.getChannels(
+        queryObject
+      );
+      this.setState({ items: channels, total: channels.length });
+    } catch (error) {
+      this.context.notifications.toasts.addDanger(
+        getErrorMessage(error, 'There was a problem loading channels.')
+      );
+    }
+    this.setState({ loading: false });
   }
 
   onTableChange = ({
@@ -213,7 +230,7 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
                 },
                 {
                   component: (
-                    <EuiButton size="s" fill href={`#${ROUTES.CREATE_CHANNEL}`}>
+                    <EuiButton fill href={`#${ROUTES.CREATE_CHANNEL}`}>
                       Create channel
                     </EuiButton>
                   ),
@@ -222,8 +239,9 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
             />
           }
           bodyStyles={{ padding: 'initial' }}
-          title={`Channels (${this.state.total})`}
+          title="Channels"
           titleSize="m"
+          total={this.state.total}
         >
           <ChannelControls
             search={search}
@@ -251,6 +269,7 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
             onChange={this.onTableChange}
             pagination={pagination}
             sorting={sorting}
+            tableLayout="auto"
           />
         </ContentPanel>
       </>

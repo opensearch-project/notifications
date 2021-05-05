@@ -35,17 +35,26 @@ import {
   EuiModalHeaderTitle,
   EuiOverlayMask,
 } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 import { CreateRecipientGroupForm } from '../../../Emails/components/forms/CreateRecipientGroupForm';
+import {
+  validateRecipientGroupEmails,
+  validateRecipientGroupName,
+} from '../../../Emails/utils/validationHelper';
 
 interface CreateRecipientGroupModalProps extends ModalRootProps {
+  addRecipientGroupOptionAndSelect: (
+    recipientGroupOption: EuiComboBoxOptionOption<string>
+  ) => void;
   onClose: () => void;
 }
 
 export function CreateRecipientGroupModal(
   props: CreateRecipientGroupModalProps
 ) {
+  const coreContext = useContext(CoreServicesContext)!;
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedEmailOptions, setSelectedEmailOptions] = useState<
@@ -56,6 +65,22 @@ export function CreateRecipientGroupModal(
       label: 'no-reply@company.com',
     },
   ]);
+  const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>({
+    name: [],
+    emailOptions: [],
+  });
+
+  const isInputValid = (): boolean => {
+    const errors: { [key: string]: string[] } = {
+      name: validateRecipientGroupName(name),
+      emailOptions: validateRecipientGroupEmails(emailOptions),
+    };
+    setInputErrors(errors);
+    return !Object.values(errors).reduce(
+      (errorFlag, error) => errorFlag || error.length > 0,
+      false
+    );
+  };
 
   return (
     <EuiOverlayMask>
@@ -74,14 +99,31 @@ export function CreateRecipientGroupModal(
             setSelectedEmailOptions={setSelectedEmailOptions}
             emailOptions={emailOptions}
             setEmailOptions={setEmailOptions}
+            inputErrors={inputErrors}
+            setInputErrors={setInputErrors}
           />
         </EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButtonEmpty onClick={props.onClose} size="s">
+          <EuiButtonEmpty onClick={props.onClose}>
             Cancel
           </EuiButtonEmpty>
-          <EuiButton fill onClick={props.onClose} size="s">
+          <EuiButton
+            fill
+            onClick={() => {
+              if (!isInputValid()) {
+                coreContext.notifications.toasts.addDanger(
+                  'Some fields are invalid. Fix all highlighted error(s) before continuing.'
+                );
+                return;
+              }
+              coreContext.notifications.toasts.addSuccess(
+                `Recipient group ${name} successfully created. You can select ${name} from the list of recipient groups.`
+              );
+              props.addRecipientGroupOptionAndSelect({ label: name });
+              props.onClose();
+            }}
+          >
             Create
           </EuiButton>
         </EuiModalFooter>

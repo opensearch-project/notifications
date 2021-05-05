@@ -74,7 +74,7 @@ export function NotificationsSearchBar(props: NotificationsSearchBarProps) {
           />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiButton size="s" onClick={props.refresh}>
+          <EuiButton iconType="refresh" onClick={props.refresh}>
             Refresh
           </EuiButton>
         </EuiFlexItem>

@@ -24,34 +24,32 @@
  * permissions and limitations under the License.
  */
 
+import { Datum } from '@elastic/charts';
 import {
-  //@ts-ignore
-  Criteria,
   EuiButton,
   EuiFlexGroup,
   EuiFlexItem,
   EuiSpacer,
   EuiTableSortingType,
   EuiTitle,
-
-  //@ts-ignore
-  Pagination,
   ShortDate,
 } from '@elastic/eui';
+import { Criteria } from '@elastic/eui/src/components/basic_table/basic_table';
+import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_bar';
 import _ from 'lodash';
 import queryString from 'querystring';
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import { PLUGIN_NAME } from '../../../../common';
 import { NotificationItem, TableState } from '../../../../models/interfaces';
 import { CoreServicesContext } from '../../../components/coreServices';
 import { NotificationService } from '../../../services';
-import { BREADCRUMBS } from '../../../utils/constants';
+import { BREADCRUMBS, HISTOGRAM_TYPE, ROUTES } from '../../../utils/constants';
 import { getErrorMessage } from '../../../utils/helpers';
-import { NotificationsHistogram } from '../component/NotificationsHistogram/NotificationsHistogram';
-import { FilterType } from '../component/SearchBar/Filter/Filters';
-import { NotificationsSearchBar } from '../component/SearchBar/NotificationsSearchBar';
-import { NotificationsTable } from '../table/NotificationsTable';
+import { EmptyState } from '../components/EmptyState/EmptyState';
+import { NotificationsHistogram } from '../components/NotificationsHistogram/NotificationsHistogram';
+import { NotificationsTable } from '../components/NotificationsTable/NotificationsTable';
+import { FilterType } from '../components/SearchBar/Filter/Filters';
+import { NotificationsSearchBar } from '../components/SearchBar/NotificationsSearchBar';
 import {
   DEFAULT_PAGE_SIZE_OPTIONS,
   DEFAULT_QUERY_PARAMS,
@@ -65,7 +63,9 @@ interface NotificationsProps extends RouteComponentProps {
 interface NotificationsState extends TableState<NotificationItem> {
   startTime: ShortDate;
   endTime: ShortDate;
-  filters: FilterType[];
+  filters: Array<FilterType>;
+  histogramType: keyof typeof HISTOGRAM_TYPE;
+  histogramData: Array<Datum>;
 }
 
 export default class Notifications extends Component<
@@ -77,6 +77,9 @@ export default class Notifications extends Component<
   constructor(props: NotificationsProps) {
     super(props);
 
+    const urlParams =
+      this.props.location.search ||
+      localStorage.getItem('NotificationsQueryParams');
     const {
       from,
       size,
@@ -86,7 +89,8 @@ export default class Notifications extends Component<
       startTime,
       endTime,
       filters,
-    } = getURLQueryParams(this.props.location);
+      histogramType,
+    } = getURLQueryParams(urlParams);
 
     this.state = {
       total: 0,
@@ -101,6 +105,8 @@ export default class Notifications extends Component<
       startTime,
       endTime,
       filters,
+      histogramType,
+      histogramData: [],
     };
 
     this.getNotifications = _.debounce(this.getNotifications, 500, {
@@ -138,6 +144,7 @@ export default class Notifications extends Component<
       startTime: state.startTime,
       endTime: state.endTime,
       filters: JSON.stringify(state.filters),
+      histogramType: state.histogramType,
     };
   }
 
@@ -148,11 +155,19 @@ export default class Notifications extends Component<
       const queryObject = Notifications.getQueryObjectFromState(this.state);
       const queryParamsString = queryString.stringify(queryObject);
       history.replace({ ...this.props.location, search: queryParamsString });
+      localStorage.setItem('NotificationsQueryParams', queryParamsString);
       const getNotificationsResponse = await notificationService.getNotifications(
         queryObject
       );
+      const getHistogramResponse = await notificationService.getHistogram(
+        queryObject
+      );
       const { notifications, totalNotifications } = getNotificationsResponse;
-      this.setState({ items: notifications, total: totalNotifications });
+      this.setState({
+        items: notifications,
+        total: totalNotifications,
+        histogramData: getHistogramResponse,
+      });
     } catch (err) {
       this.context.notifications.toasts.addDanger(
         getErrorMessage(err, 'There was a problem loading notifications.')
@@ -165,8 +180,8 @@ export default class Notifications extends Component<
     page: tablePage,
     sort,
   }: Criteria<NotificationItem>): void => {
-    const { index: page, size } = tablePage;
-    const { field: sortField, direction: sortDirection } = sort;
+    const { index: page, size } = tablePage!;
+    const { field: sortField, direction: sortDirection } = sort!;
     this.setState({ from: page * size, size, sortField, sortDirection });
   };
 
@@ -191,6 +206,9 @@ export default class Notifications extends Component<
   };
   setFilters = (filters: FilterType[]) => {
     this.setState({ from: 0, filters });
+  };
+  setHistogramType = (histogramType: keyof typeof HISTOGRAM_TYPE) => {
+    this.setState({ histogramType });
   };
 
   // onClickModalEdit = (item: NotificationItem, onClose: () => void): void => {
@@ -233,6 +251,11 @@ export default class Notifications extends Component<
       },
     };
 
+    // TODO check if no channels
+    if (this.state.items.length === 0) {
+      return <EmptyState channels={false} />;
+    }
+
     return (
       <div style={{ padding: '0px 25px' }}>
         <EuiFlexGroup alignItems="center">
@@ -243,12 +266,11 @@ export default class Notifications extends Component<
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButton
-              href={`${PLUGIN_NAME}#/create-channel`}
+              href={`#${ROUTES.CHANNELS}`}
               data-test-subj="createChannelButton"
               fill
-              size="s"
             >
-              Create Channel
+              Manage channels
             </EuiButton>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -266,16 +288,27 @@ export default class Notifications extends Component<
           refresh={this.getNotifications}
         />
 
-        <EuiSpacer />
-        <NotificationsHistogram />
+        {/* TODO: change back to items.length > 0 */}
+        {this.state.search.length === 0 ? (
+          <>
+            <EuiSpacer />
+            <NotificationsHistogram
+              histogramType={this.state.histogramType}
+              setHistogramType={this.setHistogramType}
+              histogramData={this.state.histogramData}
+            />
 
-        <EuiSpacer />
-        <NotificationsTable
-          items={items}
-          onTableChange={this.onTableChange}
-          pagination={pagination}
-          sorting={sorting}
-        />
+            <EuiSpacer />
+            <NotificationsTable
+              items={items}
+              onTableChange={this.onTableChange}
+              pagination={pagination}
+              sorting={sorting}
+            />
+          </>
+        ) : (
+          <EmptyState channels />
+        )}
       </div>
     );
   }

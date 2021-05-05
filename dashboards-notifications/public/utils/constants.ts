@@ -24,6 +24,8 @@
  * permissions and limitations under the License.
  */
 
+export const DOCUMENTATION_LINK = '';
+
 export const ROUTES = Object.freeze({
   // notification
   NOTIFICATIONS: '/notifications',
@@ -71,8 +73,8 @@ export const CHANNEL_TYPE = Object.freeze({
   EMAIL: 'Email',
   CHIME: 'Chime',
   CUSTOM_WEBHOOK: 'Custom webhook',
-  SES: 'SES',
-  SNS: 'SNS',
+  SES: 'Amazon SES',
+  SNS: 'Amazon SNS',
 });
 
 export const CUSTOM_WEBHOOK_ENDPOINT_TYPE = Object.freeze({
@@ -81,7 +83,7 @@ export const CUSTOM_WEBHOOK_ENDPOINT_TYPE = Object.freeze({
 });
 
 export const HISTOGRAM_TYPE = Object.freeze({
-  CHANNEL_TYPE: 'Channel types',
+  CHANNEL_TYPE: 'Channel type',
   SOURCE: 'Notification source',
   STATUS: 'Notification status',
   SEVERITY: 'Severity',

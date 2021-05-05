@@ -27,7 +27,7 @@
 import { EuiFieldText, EuiFormRow } from '@elastic/eui';
 import React, { useContext } from 'react';
 import { CreateChannelContext } from '../CreateChannel';
-import { validateSlackWebhook } from '../utils/validationHelper';
+import { validateWebhookURL } from '../utils/validationHelper';
 
 interface SlackSettingsProps {
   slackWebhook: string;
@@ -41,22 +41,20 @@ export function SlackSettings(props: SlackSettingsProps) {
     <EuiFormRow
       label="Slack webhook URL"
       style={{ maxWidth: '700px' }}
-      error="Slack webhook URL is required."
-      isInvalid={context.inputErrors.slackWebhook}
+      error={context.inputErrors.slackWebhook.join(' ')}
+      isInvalid={context.inputErrors.slackWebhook.length > 0}
     >
       <EuiFieldText
         fullWidth
-        placeholder="https://hook.slack.com/services/T0000000000/B0000000/XXXXXXXXXXXXXXX"
+        placeholder="https://hook.slack.com/services/XXXXX/XXXXX/XXXXX..."
         value={props.slackWebhook}
         onChange={(e) => props.setSlackWebhook(e.target.value)}
+        isInvalid={context.inputErrors.slackWebhook.length > 0}
         onBlur={() => {
-          const error = validateSlackWebhook(props.slackWebhook);
-          if (error !== context.inputErrors.slackWebhook) {
-            context.setInputErrors({
-              ...context.inputErrors,
-              slackWebhook: error,
-            });
-          }
+          context.setInputErrors({
+            ...context.inputErrors,
+            slackWebhook: validateWebhookURL(props.slackWebhook),
+          });
         }}
       />
     </EuiFormRow>

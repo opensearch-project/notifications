@@ -37,24 +37,20 @@ import {
   EuiOverlayMask,
   EuiText,
 } from '@elastic/eui';
-import React from 'react';
+import React, { useContext } from 'react';
 import { ChannelItemType } from '../../../../../models/interfaces';
+import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 
 interface MuteChannelModalProps extends ModalRootProps {
   channels: ChannelItemType[];
   onClose: () => void;
-  mute: boolean;
 }
 
 export const MuteChannelModal = (props: MuteChannelModalProps) => {
   if (props.channels.length !== 1) return null;
 
-  // do not show modal on unmute
-  if (!props.mute) {
-    return null;
-  }
-
+  const coreContext = useContext(CoreServicesContext)!;
   return (
     <EuiOverlayMask>
       <EuiModal onClose={props.onClose} maxWidth={500}>
@@ -64,7 +60,7 @@ export const MuteChannelModal = (props: MuteChannelModalProps) => {
         <EuiModalBody>
           <EuiText>
             This channel will stop sending notifications to its recipients.
-            However, this channel is still available from selection.
+            However, the channel will remain available for selection.
           </EuiText>
         </EuiModalBody>
         <EuiModalFooter>
@@ -73,7 +69,15 @@ export const MuteChannelModal = (props: MuteChannelModalProps) => {
               <EuiButtonEmpty onClick={props.onClose}>Cancel</EuiButtonEmpty>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiButton fill onClick={props.onClose}>
+              <EuiButton
+                fill
+                onClick={() => {
+                  coreContext.notifications.toasts.addSuccess(
+                    `Channel ${props.channels[0].name} successfully muted.`
+                  );
+                  props.onClose();
+                }}
+              >
                 Mute
               </EuiButton>
             </EuiFlexItem>

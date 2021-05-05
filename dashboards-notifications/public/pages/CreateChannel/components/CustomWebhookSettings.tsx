@@ -32,9 +32,14 @@ import {
   EuiRadioGroupOption,
   EuiSpacer,
 } from '@elastic/eui';
-import React from 'react';
+import React, { useContext } from 'react';
 import { CUSTOM_WEBHOOK_ENDPOINT_TYPE } from '../../../utils/constants';
-import { HeaderType } from '../CreateChannel';
+import { CreateChannelContext, HeaderType } from '../CreateChannel';
+import {
+  validateCustomURLHost,
+  validateCustomURLPort,
+  validateWebhookURL,
+} from '../utils/validationHelper';
 import { WebhookHeaders } from './WebhookHeaders';
 
 interface CustomWebhookSettingsProps {
@@ -57,6 +62,7 @@ interface CustomWebhookSettingsProps {
 }
 
 export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
+  const context = useContext(CreateChannelContext)!;
   const webhookTypeOptions: EuiRadioGroupOption[] = Object.entries(
     CUSTOM_WEBHOOK_ENDPOINT_TYPE
   ).map(([key, value]) => ({
@@ -66,11 +72,22 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
 
   const renderWebhook = () => {
     return (
-      <EuiFormRow label="Webhook URL">
+      <EuiFormRow
+        label="Webhook URL"
+        error={context.inputErrors.webhookURL.join(' ')}
+        isInvalid={context.inputErrors.webhookURL.length > 0}
+      >
         <EuiFieldText
-          placeholder=""
+          placeholder="https://name.example.com/XXXXX..."
           value={props.webhookURL}
           onChange={(e) => props.setWebhookURL(e.target.value)}
+          isInvalid={context.inputErrors.webhookURL.length > 0}
+          onBlur={() => {
+            context.setInputErrors({
+              ...context.inputErrors,
+              webhookURL: validateWebhookURL(props.webhookURL),
+            });
+          }}
         />
       </EuiFormRow>
     );
@@ -79,23 +96,55 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
   const renderCustomURL = () => {
     return (
       <>
-        <EuiFormRow label="Host">
+        <EuiFormRow
+          label="Host"
+          error={context.inputErrors.customURLHost.join(' ')}
+          isInvalid={context.inputErrors.customURLHost.length > 0}
+        >
           <EuiFieldText
-            placeholder=""
+            placeholder="name.example.com"
             value={props.customURLHost}
             onChange={(e) => props.setCustomURLHost(e.target.value)}
+            isInvalid={context.inputErrors.customURLHost.length > 0}
+            onBlur={() => {
+              context.setInputErrors({
+                ...context.inputErrors,
+                customURLHost: validateCustomURLHost(props.customURLHost),
+              });
+            }}
           />
         </EuiFormRow>
-        <EuiFormRow label="Port">
+        <EuiFormRow
+          label={
+            <span>
+              Port - <i style={{ fontWeight: 'normal' }}>optional</i>
+            </span>
+          }
+          error={context.inputErrors.customURLPort.join(' ')}
+          isInvalid={context.inputErrors.customURLPort.length > 0}
+        >
           <EuiFieldNumber
-            placeholder=""
+            placeholder="Enter port"
             value={props.customURLPort}
             onChange={(e) => props.setCustomURLPort(e.target.value)}
+            isInvalid={context.inputErrors.customURLPort.length > 0}
+            onBlur={() => {
+              context.setInputErrors({
+                ...context.inputErrors,
+                customURLPort: validateCustomURLPort(props.customURLPort),
+              });
+            }}
           />
         </EuiFormRow>
-        <EuiFormRow label="Path" helpText="Query parameters">
+        <EuiFormRow
+          label={
+            <span>
+              Path - <i style={{ fontWeight: 'normal' }}>optional</i>
+            </span>
+          }
+        >
           <EuiFieldText
-            placeholder=""
+            placeholder="Enter path"
             value={props.customURLPath}
             onChange={(e) => props.setCustomURLPath(e.target.value)}
           />
@@ -128,7 +177,7 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
         ? renderWebhook()
         : renderCustomURL()}
 
-      <EuiSpacer />
+      <EuiSpacer size="xxl" />
       <WebhookHeaders
         headers={props.webhookHeaders}
         setHeaders={props.setWebhookHeaders}

@@ -28,12 +28,15 @@ import {
   Axis,
   BarSeries,
   Chart,
-  DataGenerator,
   Datum,
+  niceTimeFormatByDay,
+  ScaleType,
   Settings,
+  timeFormatter,
 } from '@elastic/charts';
 import { euiPaletteColorBlind, EuiSpacer } from '@elastic/eui';
-import React, { useEffect, useState } from 'react';
+import _ from 'lodash';
+import React from 'react';
 import {
   ContentPanel,
   ContentPanelActions,
@@ -41,21 +44,15 @@ import {
 import { HISTOGRAM_TYPE } from '../../../../utils/constants';
 import { HistogramControls } from './HistogramControls';
 
-interface NotificationsHistogramProps {}
+interface NotificationsHistogramProps {
+  histogramType: keyof typeof HISTOGRAM_TYPE;
+  setHistogramType: (histogramType: keyof typeof HISTOGRAM_TYPE) => void;
+  histogramData: Array<Datum>;
+}
 
 export function NotificationsHistogram(props: NotificationsHistogramProps) {
-  const [histogramType, setHistogramType] = useState<
-    keyof typeof HISTOGRAM_TYPE
-  >('CHANNEL_TYPE');
-  const [data, setData] = useState<Datum[]>([]);
-
-  useEffect(() => {
-    const dg = new DataGenerator();
-    const data = dg.generateGroupedSeries(25, 2, 'Channel-')
-    data[18].y = 18;
-    setData(data);
-  }, []);
-
+  console.log('props', props);
+  const formatter = timeFormatter(niceTimeFormatByDay(1));
   return (
     <>
       <ContentPanel
@@ -65,8 +62,8 @@ export function NotificationsHistogram(props: NotificationsHistogramProps) {
               {
                 component: (
                   <HistogramControls
-                    histogramType={histogramType}
-                    setHistogramType={setHistogramType}
+                    histogramType={props.histogramType}
+                    setHistogramType={props.setHistogramType}
                   />
                 ),
               },
@@ -74,9 +71,11 @@ export function NotificationsHistogram(props: NotificationsHistogramProps) {
           />
         }
         bodyStyles={{ padding: 'initial' }}
-        title={`Notifications by ${HISTOGRAM_TYPE[
-          histogramType
-        ].toLowerCase()}`}
+        title={`Notifications by ${_.get(
+          HISTOGRAM_TYPE,
+          props.histogramType,
+          Object.values(HISTOGRAM_TYPE)[0]
+        ).toLowerCase()}`}
         titleSize="m"
       >
         <EuiSpacer />
@@ -92,13 +91,14 @@ export function NotificationsHistogram(props: NotificationsHistogramProps) {
           <BarSeries
             id="status"
             name="Status"
-            data={data}
+            data={props.histogramData}
             xAccessor={'x'}
             yAccessors={['y']}
             splitSeriesAccessors={['g']}
             stackAccessors={['g']}
+            xScaleType={ScaleType.Time}
           />
-          <Axis id="bottom-axis" position="bottom" />
+          <Axis id="bottom-axis" position="bottom" tickFormat={formatter} />
           <Axis id="left-axis" position="left" showGridLines />
         </Chart>
       </ContentPanel>

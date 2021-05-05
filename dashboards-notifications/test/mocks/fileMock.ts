@@ -24,4 +24,4 @@
  * permissions and limitations under the License.
  */
 
-module.exports = 'react-mde-all';
+module.exports = 'mock-file';

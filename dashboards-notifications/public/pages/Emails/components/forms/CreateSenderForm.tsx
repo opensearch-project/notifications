@@ -30,14 +30,22 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
+  EuiLink,
   EuiSpacer,
   EuiSuperSelect,
   EuiSuperSelectOption,
 } from '@elastic/eui';
 import React from 'react';
 import { ENCRYPTION_METHOD } from '../../../../../models/interfaces';
+import { DOCUMENTATION_LINK } from '../../../../utils/constants';
+import {
+  validateEmail,
+  validateHost,
+  validatePort,
+  validateSenderName,
+} from '../../utils/validationHelper';
 
-interface CreateSenderModalProps {
+interface CreateSenderFormProps {
   senderName: string;
   setSenderName: (name: string) => void;
   email: string;
@@ -48,9 +56,11 @@ interface CreateSenderModalProps {
   setPort: (port: string) => void;
   encryption: ENCRYPTION_METHOD;
   setEncryption: (encryption: ENCRYPTION_METHOD) => void;
+  inputErrors: { [key: string]: string[] };
+  setInputErrors: (errors: { [key: string]: string[] }) => void;
 }
 
-export function CreateSenderForm(props: CreateSenderModalProps) {
+export function CreateSenderForm(props: CreateSenderFormProps) {
   const encryptionOptions: Array<EuiSuperSelectOption<ENCRYPTION_METHOD>> = [
     {
       value: 'SSL',
@@ -67,42 +77,84 @@ export function CreateSenderForm(props: CreateSenderModalProps) {
       <EuiFormRow
         label="Sender name"
         style={{ maxWidth: '650px' }}
-        helpText="Use a unique and descriptive name that's easy to search. The sender name must contain from m to n characters. Valid characters are lowercase a-z, 0-9, and - (hyphen)."
+        helpText="Use a unique, descriptive name. The sender name must contain from 2 to 50 characters. Valid characters are lowercase a-z, 0-9, and - (hyphen)."
+        error={props.inputErrors.senderName.join(' ')}
+        isInvalid={props.inputErrors.senderName.length > 0}
       >
         <EuiFieldText
           fullWidth
-          placeholder=""
+          placeholder="Enter sender name"
           value={props.senderName}
           onChange={(e) => props.setSenderName(e.target.value)}
+          isInvalid={props.inputErrors.senderName.length > 0}
+          onBlur={() => {
+            props.setInputErrors({
+              ...props.inputErrors,
+              senderName: validateSenderName(props.senderName),
+            });
+          }}
         />
       </EuiFormRow>
 
       <EuiSpacer size="m" />
-      <EuiFlexGroup gutterSize="s" style={{maxWidth: '658px'}}>
+      <EuiFlexGroup gutterSize="s" style={{ maxWidth: '658px' }}>
         <EuiFlexItem grow={4}>
-          <EuiFormRow label="Email address">
+          <EuiFormRow
+            label="Email address"
+            error={props.inputErrors.email.join(' ')}
+            isInvalid={props.inputErrors.email.length > 0}
+          >
             <EuiFieldText
-              placeholder=""
+              placeholder="name@example.com"
               value={props.email}
               onChange={(e) => props.setEmail(e.target.value)}
+              isInvalid={props.inputErrors.email.length > 0}
+              onBlur={() => {
+                props.setInputErrors({
+                  ...props.inputErrors,
+                  email: validateEmail(props.email),
+                });
+              }}
             />
           </EuiFormRow>
         </EuiFlexItem>
         <EuiFlexItem grow={4}>
-          <EuiFormRow label="Host">
+          <EuiFormRow
+            label="Host"
+            error={props.inputErrors.host.join(' ')}
+            isInvalid={props.inputErrors.host.length > 0}
+          >
             <EuiFieldText
-              placeholder=""
+              placeholder="smtp.example.com"
               value={props.host}
               onChange={(e) => props.setHost(e.target.value)}
+              isInvalid={props.inputErrors.host.length > 0}
+              onBlur={() => {
+                props.setInputErrors({
+                  ...props.inputErrors,
+                  host: validateHost(props.host),
+                });
+              }}
             />
           </EuiFormRow>
         </EuiFlexItem>
         <EuiFlexItem grow={2}>
-          <EuiFormRow label="Port">
+          <EuiFormRow
+            label="Port"
+            error={props.inputErrors.port.join(' ')}
+            isInvalid={props.inputErrors.port.length > 0}
+          >
             <EuiFieldNumber
-              placeholder=""
+              placeholder="465"
               value={props.port}
               onChange={(e) => props.setPort(e.target.value)}
+              isInvalid={props.inputErrors.port.length > 0}
+              onBlur={() => {
+                props.setInputErrors({
+                  ...props.inputErrors,
+                  port: validatePort(props.port),
+                });
+              }}
             />
           </EuiFormRow>
         </EuiFlexItem>
@@ -114,9 +166,9 @@ export function CreateSenderForm(props: CreateSenderModalProps) {
         style={{ maxWidth: '650px' }}
         helpText={
           <div>
-            SSL or TSL is recommended for security. SSL and TSL requires
-            validation by adding the following two fields to OpenSearch
-            keystore:
+            SSL or TLS is recommended for security. To use either one, you must
+            add the following fields to the OpenSearch keystore on each node.{' '}
+            <EuiLink href={DOCUMENTATION_LINK} target="_blank" external>Learn more</EuiLink>
             <br />
             opendistro.alerting.destination.mail.adminTest.username: [username]
             <br />
