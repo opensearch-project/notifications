@@ -98,7 +98,7 @@ export function SNSSettings(props: SNSSettingsProps) {
           >
             <div>
               If your cluster is not running on AWS, you must add your access
-              key, secret key, and optional session token to the Elasticsearch
+              key, secret key, and optional session token to the OpenSearch
               keystore.{' '}
               <EuiLink href={DOCUMENTATION_LINK} target="_blank" external>
                 Learn more

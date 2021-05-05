@@ -167,7 +167,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
         helpText={
           <div>
             SSL or TLS is recommended for security. To use either one, you must
-            add the following fields to the Elasticsearch keystore on each node.{' '}
+            add the following fields to the OpenSearch keystore on each node.{' '}
             <EuiLink href={DOCUMENTATION_LINK} target="_blank" external>Learn more</EuiLink>
             <br />
             opendistro.alerting.destination.mail.adminTest.username: [username]
