@@ -42,7 +42,7 @@ internal class ChannelStatusTests {
         val sampleStatus = ChannelStatus(
             "config_id",
             "name",
-            ConfigType.Slack,
+            ConfigType.SLACK,
             deliveryStatus = DeliveryStatus("404", "invalid recipient")
         )
         val recreatedObject = recreateObject(sampleStatus) { ChannelStatus(it) }
@@ -54,7 +54,7 @@ internal class ChannelStatusTests {
         val sampleStatus = ChannelStatus(
             "config_id",
             "name",
-            ConfigType.Slack,
+            ConfigType.SLACK,
             deliveryStatus = DeliveryStatus("404", "invalid recipient")
         )
 
@@ -68,13 +68,13 @@ internal class ChannelStatusTests {
         val sampleStatus = ChannelStatus(
             "config_id",
             "name",
-            ConfigType.Slack,
+            ConfigType.SLACK,
             deliveryStatus = DeliveryStatus("404", "invalid recipient")
         )
         val jsonString = """
         {
            "config_id":"config_id",
-           "config_type":"Slack",
+           "config_type":"slack",
            "config_name":"name",
            "email_recipient_status":[],
            "delivery_status":
@@ -96,7 +96,7 @@ internal class ChannelStatusTests {
         val jsonString = """
         {
            "config_id":"config_id",
-           "config_type":"Email",
+           "config_type":"email",
            "config_name":"name",
            "delivery_status":
            {
@@ -125,7 +125,7 @@ internal class ChannelStatusTests {
             ChannelStatus(
                 "config_id",
                 "name",
-                ConfigType.Slack
+                ConfigType.SLACK
             )
         }
     }
@@ -136,7 +136,7 @@ internal class ChannelStatusTests {
             ChannelStatus(
                 "config_id",
                 "name",
-                ConfigType.Chime
+                ConfigType.CHIME
             )
         }
     }
@@ -147,7 +147,7 @@ internal class ChannelStatusTests {
             ChannelStatus(
                 "config_id",
                 "name",
-                ConfigType.Webhook
+                ConfigType.WEBHOOK
             )
         }
     }
@@ -158,7 +158,7 @@ internal class ChannelStatusTests {
             ChannelStatus(
                 "config_id",
                 "name",
-                ConfigType.Email
+                ConfigType.EMAIL
             )
         }
     }

@@ -36,10 +36,10 @@ import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Email
 import org.opensearch.commons.notifications.model.EmailGroup
 import org.opensearch.commons.notifications.model.Feature
+import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.SmtpAccount
-import org.opensearch.commons.notifications.model.SmtpAccount.MethodType
 import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.commons.utils.createObjectFromJsonString
 import org.opensearch.commons.utils.getJsonString
@@ -53,8 +53,8 @@ internal class UpdateNotificationConfigRequestTests {
         return NotificationConfig(
             "name",
             "description",
-            ConfigType.Webhook,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.WEBHOOK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleWebhook
         )
@@ -65,8 +65,8 @@ internal class UpdateNotificationConfigRequestTests {
         return NotificationConfig(
             "name",
             "description",
-            ConfigType.Slack,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.SLACK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleSlack
         )
@@ -77,8 +77,8 @@ internal class UpdateNotificationConfigRequestTests {
         return NotificationConfig(
             "name",
             "description",
-            ConfigType.Chime,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.CHIME,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleChime
         )
@@ -89,8 +89,8 @@ internal class UpdateNotificationConfigRequestTests {
         return NotificationConfig(
             "name",
             "description",
-            ConfigType.EmailGroup,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.EMAIL_GROUP,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleEmailGroup
         )
@@ -99,14 +99,14 @@ internal class UpdateNotificationConfigRequestTests {
     private fun createEmailContentConfigObject(): NotificationConfig {
         val sampleEmail = Email(
             emailAccountID = "sample_1@dummy.com",
-            defaultRecipients = listOf("sample_2@dummy.com"),
-            defaultEmailGroupIds = listOf("sample_3@dummy.com")
+            recipients = listOf("sample_2@dummy.com"),
+            emailGroupIds = listOf("sample_3@dummy.com")
         )
         return NotificationConfig(
             "name",
             "description",
-            ConfigType.Email,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.EMAIL,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleEmail
         )
@@ -116,14 +116,14 @@ internal class UpdateNotificationConfigRequestTests {
         val sampleSmtpAccount = SmtpAccount(
             host = "http://dummy.com",
             port = 11,
-            method = MethodType.Ssl,
+            method = MethodType.SSL,
             fromAddress = "sample@dummy.com"
         )
         return NotificationConfig(
             "name",
             "description",
-            ConfigType.SmtpAccount,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.SMTP_ACCOUNT,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleSmtpAccount
         )
@@ -249,8 +249,8 @@ internal class UpdateNotificationConfigRequestTests {
         val config = NotificationConfig(
             "name",
             "description",
-            ConfigType.Slack,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.SLACK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleSlack
         )
@@ -261,8 +261,8 @@ internal class UpdateNotificationConfigRequestTests {
             "notification_config":{
                 "name":"name",
                 "description":"description",
-                "config_type":"Slack",
-                "features":["IndexManagement"],
+                "config_type":"slack",
+                "feature_list":["index_management"],
                 "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
             }
@@ -279,8 +279,8 @@ internal class UpdateNotificationConfigRequestTests {
         val config = NotificationConfig(
             "name",
             "description",
-            ConfigType.Webhook,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.WEBHOOK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleWebhook
         )
@@ -291,8 +291,8 @@ internal class UpdateNotificationConfigRequestTests {
             "notification_config":{
                 "name":"name",
                 "description":"description",
-                "config_type":"Webhook",
-                "features":["IndexManagement"],
+                "config_type":"webhook",
+                "feature_list":["index_management"],
                 "is_enabled":true,
                 "webhook":{"url":"https://domain.com/sample_webhook_url#1234567890"}
             }
@@ -309,8 +309,8 @@ internal class UpdateNotificationConfigRequestTests {
         val config = NotificationConfig(
             "name",
             "description",
-            ConfigType.Chime,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.CHIME,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleChime
         )
@@ -321,8 +321,8 @@ internal class UpdateNotificationConfigRequestTests {
             "notification_config":{
                 "name":"name",
                 "description":"description",
-                "config_type":"Chime",
-                "features":["IndexManagement"],
+                "config_type":"chime",
+                "feature_list":["index_management"],
                 "is_enabled":true,
                 "chime":{"url":"https://domain.com/sample_chime_url#1234567890"}
             }
@@ -339,8 +339,8 @@ internal class UpdateNotificationConfigRequestTests {
         val config = NotificationConfig(
             "name",
             "description",
-            ConfigType.EmailGroup,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.EMAIL_GROUP,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleEmailGroup
         )
@@ -351,10 +351,10 @@ internal class UpdateNotificationConfigRequestTests {
             "notification_config":{
                 "name":"name",
                 "description":"description",
-                "config_type":"EmailGroup",
-                "features":["IndexManagement"],
+                "config_type":"email_group",
+                "feature_list":["index_management"],
                 "is_enabled":true,
-                "email_group":{"recipients":["dummy@company.com"]}
+                "email_group":{"recipient_list":["dummy@company.com"]}
             }
         }
         """.trimIndent()
@@ -367,14 +367,14 @@ internal class UpdateNotificationConfigRequestTests {
     fun `Update config should deserialize json object using parser Email`() {
         val sampleEmail = Email(
             emailAccountID = "sample_1@dummy.com",
-            defaultRecipients = listOf("sample_2@dummy.com"),
-            defaultEmailGroupIds = listOf("sample_3@dummy.com")
+            recipients = listOf("sample_2@dummy.com"),
+            emailGroupIds = listOf("sample_3@dummy.com")
         )
         val config = NotificationConfig(
             "name",
             "description",
-            ConfigType.Email,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.EMAIL,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleEmail
         )
@@ -385,11 +385,11 @@ internal class UpdateNotificationConfigRequestTests {
             "notification_config":{
                 "name":"name",
                 "description":"description",
-                "config_type":"Email",
-                "features":["IndexManagement"],
+                "config_type":"email",
+                "feature_list":["index_management"],
                 "is_enabled":true,
-                "email":{"email_account_id":"sample_1@dummy.com","default_recipients":["sample_2@dummy.com"],
-                "default_email_group_ids":["sample_3@dummy.com"] }
+                "email":{"email_account_id":"sample_1@dummy.com","recipient_list":["sample_2@dummy.com"],
+                "email_group_id_list":["sample_3@dummy.com"] }
             }
         }
         """.trimIndent()
@@ -403,14 +403,14 @@ internal class UpdateNotificationConfigRequestTests {
         val sampleSmtpAccount = SmtpAccount(
             host = "http://dummy.com",
             port = 11,
-            method = MethodType.Ssl,
+            method = MethodType.SSL,
             fromAddress = "sample@dummy.com"
         )
         val config = NotificationConfig(
             "name",
             "description",
-            ConfigType.SmtpAccount,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.SMTP_ACCOUNT,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleSmtpAccount
         )
@@ -421,10 +421,10 @@ internal class UpdateNotificationConfigRequestTests {
             "notification_config":{
                 "name":"name",
                 "description":"description",
-                "config_type":"SmtpAccount",
-                "features":["IndexManagement"],
+                "config_type":"smtp_account",
+                "feature_list":["index_management"],
                 "is_enabled":true,
-                "smtp_account":{"host":"http://dummy.com", "port":11,"method": "Ssl", "from_address": "sample@dummy.com" }
+                "smtp_account":{"host":"http://dummy.com", "port":11,"method": "ssl", "from_address": "sample@dummy.com" }
             }
         }
         """.trimIndent()
@@ -447,8 +447,8 @@ internal class UpdateNotificationConfigRequestTests {
         val config = NotificationConfig(
             "name",
             "description",
-            ConfigType.Slack,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.SLACK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleSlack
         )
@@ -459,8 +459,8 @@ internal class UpdateNotificationConfigRequestTests {
             "notification_config":{
                 "name":"name",
                 "description":"description",
-                "config_type":"Slack",
-                "features":["IndexManagement"],
+                "config_type":"slack",
+                "feature_list":["index_management"],
                 "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"},
                 "extra_field_1":["extra", "value"],

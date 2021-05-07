@@ -39,19 +39,29 @@ import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.notifications.NotificationConstants.DEFAULT_MAX_ITEMS
+import org.opensearch.commons.notifications.NotificationConstants.FILTER_PARAM_LIST_TAG
 import org.opensearch.commons.notifications.NotificationConstants.FROM_INDEX_TAG
 import org.opensearch.commons.notifications.NotificationConstants.MAX_ITEMS_TAG
+import org.opensearch.commons.notifications.NotificationConstants.SORT_FIELD_TAG
+import org.opensearch.commons.notifications.NotificationConstants.SORT_ORDER_TAG
+import org.opensearch.commons.utils.STRING_READER
+import org.opensearch.commons.utils.STRING_WRITER
+import org.opensearch.commons.utils.enumReader
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.logger
+import org.opensearch.search.sort.SortOrder
 import java.io.IOException
 
 /**
- * Action Response for creating new configuration.
+ * Action Response for getting notification configuration.
  */
 class GetNotificationConfigRequest : ActionRequest, ToXContentObject {
+    val configId: String?
     val fromIndex: Int
     val maxItems: Int
-    val configId: String?
+    val sortField: String?
+    val sortOrder: SortOrder?
+    val filterParams: Map<String, String>
 
     companion object {
         private val log by logger(GetNotificationConfigRequest::class.java)
@@ -68,9 +78,12 @@ class GetNotificationConfigRequest : ActionRequest, ToXContentObject {
         @JvmStatic
         @Throws(IOException::class)
         fun parse(parser: XContentParser): GetNotificationConfigRequest {
+            var configId: String? = null
             var fromIndex = 0
             var maxItems = DEFAULT_MAX_ITEMS
-            var configId: String? = null
+            var sortField: String? = null
+            var sortOrder: SortOrder? = null
+            var filterParams: Map<String, String> = mapOf()
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -81,50 +94,20 @@ class GetNotificationConfigRequest : ActionRequest, ToXContentObject {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
+                    CONFIG_ID_TAG -> configId = parser.text()
                     FROM_INDEX_TAG -> fromIndex = parser.intValue()
                     MAX_ITEMS_TAG -> maxItems = parser.intValue()
-                    CONFIG_ID_TAG -> configId = parser.text()
+                    SORT_FIELD_TAG -> sortField = parser.text()
+                    SORT_ORDER_TAG -> sortOrder = SortOrder.fromString(parser.text())
+                    FILTER_PARAM_LIST_TAG -> filterParams = parser.mapStrings()
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing GetNotificationConfigRequest")
                     }
                 }
             }
-            return GetNotificationConfigRequest(fromIndex, maxItems, configId)
+            return GetNotificationConfigRequest(configId, fromIndex, maxItems, sortField, sortOrder, filterParams)
         }
-    }
-
-    /**
-     * constructor for creating the class
-     * @param fromIndex the starting index for paginated response
-     * @param maxItems the maximum number of items to return for paginated response
-     * @param configId the id of the notification configuration
-     */
-    constructor(fromIndex: Int = 0, maxItems: Int = DEFAULT_MAX_ITEMS, configId: String? = null) {
-        this.fromIndex = fromIndex
-        this.maxItems = maxItems
-        this.configId = configId
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Throws(IOException::class)
-    constructor(input: StreamInput) : super(input) {
-        fromIndex = input.readInt()
-        maxItems = input.readInt()
-        configId = input.readOptionalString()
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Throws(IOException::class)
-    override fun writeTo(output: StreamOutput) {
-        super.writeTo(output)
-        output.writeInt(fromIndex)
-        output.writeInt(maxItems)
-        output.writeOptionalString(configId)
     }
 
     /**
@@ -133,10 +116,65 @@ class GetNotificationConfigRequest : ActionRequest, ToXContentObject {
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
+            .fieldIfNotNull(CONFIG_ID_TAG, configId)
             .field(FROM_INDEX_TAG, fromIndex)
             .field(MAX_ITEMS_TAG, maxItems)
-            .fieldIfNotNull(CONFIG_ID_TAG, configId)
+            .fieldIfNotNull(SORT_FIELD_TAG, sortField)
+            .fieldIfNotNull(SORT_ORDER_TAG, sortOrder)
+            .field(FILTER_PARAM_LIST_TAG, filterParams)
             .endObject()
+    }
+
+    /**
+     * constructor for creating the class
+     * @param configId the id of the notification configuration (other parameters are not relevant if id is present)
+     * @param fromIndex the starting index for paginated response
+     * @param maxItems the maximum number of items to return for paginated response
+     * @param sortField the sort field if response has many items
+     * @param sortOrder the sort order if response has many items
+     * @param filterParams the filter parameters
+     */
+    constructor(
+        configId: String? = null,
+        fromIndex: Int = 0,
+        maxItems: Int = DEFAULT_MAX_ITEMS,
+        sortField: String? = null,
+        sortOrder: SortOrder? = null,
+        filterParams: Map<String, String> = mapOf()
+    ) {
+        this.configId = configId
+        this.fromIndex = fromIndex
+        this.maxItems = maxItems
+        this.sortField = sortField
+        this.sortOrder = sortOrder
+        this.filterParams = filterParams
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Throws(IOException::class)
+    constructor(input: StreamInput) : super(input) {
+        configId = input.readOptionalString()
+        fromIndex = input.readInt()
+        maxItems = input.readInt()
+        sortField = input.readOptionalString()
+        sortOrder = input.readOptionalWriteable(enumReader(SortOrder::class.java))
+        filterParams = input.readMap(STRING_READER, STRING_READER)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Throws(IOException::class)
+    override fun writeTo(output: StreamOutput) {
+        super.writeTo(output)
+        output.writeOptionalString(configId)
+        output.writeInt(fromIndex)
+        output.writeInt(maxItems)
+        output.writeOptionalString(sortField)
+        output.writeOptionalWriteable(sortOrder)
+        output.writeMap(filterParams, STRING_WRITER, STRING_WRITER)
     }
 
     /**

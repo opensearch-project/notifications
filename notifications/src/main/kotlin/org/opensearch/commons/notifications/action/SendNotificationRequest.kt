@@ -37,7 +37,7 @@ import org.opensearch.common.xcontent.ToXContentObject
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
-import org.opensearch.commons.notifications.NotificationConstants.CHANNEL_IDS_TAG
+import org.opensearch.commons.notifications.NotificationConstants.CHANNEL_ID_LIST_TAG
 import org.opensearch.commons.notifications.NotificationConstants.CHANNEL_MESSAGE_TAG
 import org.opensearch.commons.notifications.NotificationConstants.NOTIFICATION_INFO_TAG
 import org.opensearch.commons.notifications.NotificationConstants.THREAD_CONTEXT_TAG
@@ -88,7 +88,7 @@ class SendNotificationRequest : ActionRequest, ToXContentObject {
                 when (fieldName) {
                     NOTIFICATION_INFO_TAG -> notificationInfo = NotificationInfo.parse(parser)
                     CHANNEL_MESSAGE_TAG -> channelMessage = ChannelMessage.parse(parser)
-                    CHANNEL_IDS_TAG -> channelIds = parser.stringList()
+                    CHANNEL_ID_LIST_TAG -> channelIds = parser.stringList()
                     THREAD_CONTEXT_TAG -> threadContext = parser.text()
                     else -> {
                         parser.skipChildren()
@@ -98,7 +98,7 @@ class SendNotificationRequest : ActionRequest, ToXContentObject {
             }
             notificationInfo ?: throw IllegalArgumentException("$NOTIFICATION_INFO_TAG field absent")
             channelMessage ?: throw IllegalArgumentException("$CHANNEL_MESSAGE_TAG field absent")
-            channelIds ?: throw IllegalArgumentException("$CHANNEL_IDS_TAG field absent")
+            channelIds ?: throw IllegalArgumentException("$CHANNEL_ID_LIST_TAG field absent")
             return SendNotificationRequest(notificationInfo, channelMessage, channelIds, threadContext)
         }
     }
@@ -153,7 +153,7 @@ class SendNotificationRequest : ActionRequest, ToXContentObject {
         return builder.startObject()
             .field(NOTIFICATION_INFO_TAG, notificationInfo)
             .field(CHANNEL_MESSAGE_TAG, channelMessage)
-            .field(CHANNEL_IDS_TAG, channelIds)
+            .field(CHANNEL_ID_LIST_TAG, channelIds)
             .fieldIfNotNull(THREAD_CONTEXT_TAG, threadContext)
             .endObject()
     }

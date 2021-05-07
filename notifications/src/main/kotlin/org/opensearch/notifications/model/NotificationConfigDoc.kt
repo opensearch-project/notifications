@@ -45,8 +45,8 @@ data class NotificationConfigDoc(
 
     companion object {
         private val log by logger(NotificationConfigDoc::class.java)
-        private const val METADATA_TAG = "metadata"
-        private const val CONFIG_TAG = "config"
+        const val METADATA_TAG = "metadata"
+        const val CONFIG_TAG = "config"
 
         /**
          * Parse the data from parser and create object

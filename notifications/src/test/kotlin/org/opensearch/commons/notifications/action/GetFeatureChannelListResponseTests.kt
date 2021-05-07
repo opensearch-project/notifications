@@ -56,7 +56,7 @@ internal class GetFeatureChannelListResponseTests {
             "config_id",
             "name",
             "description",
-            ConfigType.Slack
+            ConfigType.SLACK
         )
         val searchResult = FeatureChannelList(sampleConfig)
         val getResponse = GetFeatureChannelListResponse(searchResult)
@@ -70,19 +70,19 @@ internal class GetFeatureChannelListResponseTests {
             "config_id1",
             "name1",
             "description1",
-            ConfigType.Slack
+            ConfigType.SLACK
         )
         val sampleConfig2 = FeatureChannel(
             "config_id2",
             "name2",
             "description2",
-            ConfigType.Chime
+            ConfigType.CHIME
         )
         val sampleConfig3 = FeatureChannel(
             "config_id3",
             "name3",
             "description3",
-            ConfigType.Webhook
+            ConfigType.WEBHOOK
         )
         val searchResult = FeatureChannelList(
             100,
@@ -101,7 +101,7 @@ internal class GetFeatureChannelListResponseTests {
             "config_id",
             "name",
             "description",
-            ConfigType.EmailGroup
+            ConfigType.EMAIL_GROUP
         )
         val searchResult = FeatureChannelList(sampleConfig)
         val getResponse = GetFeatureChannelListResponse(searchResult)
@@ -116,19 +116,19 @@ internal class GetFeatureChannelListResponseTests {
             "config_id1",
             "name1",
             "description1",
-            ConfigType.Slack
+            ConfigType.SLACK
         )
         val sampleConfig2 = FeatureChannel(
             "config_id2",
             "name2",
             "description2",
-            ConfigType.Chime
+            ConfigType.CHIME
         )
         val sampleConfig3 = FeatureChannel(
             "config_id3",
             "name3",
             "description3",
-            ConfigType.Webhook
+            ConfigType.WEBHOOK
         )
         val searchResult = FeatureChannelList(
             100,
@@ -148,7 +148,7 @@ internal class GetFeatureChannelListResponseTests {
             "config_id",
             "name",
             "description",
-            ConfigType.Email,
+            ConfigType.EMAIL,
             true
         )
         val searchResult = FeatureChannelList(sampleConfig)
@@ -162,7 +162,7 @@ internal class GetFeatureChannelListResponseTests {
                     "config_id":"config_id",
                     "name":"name",
                     "description":"description",
-                    "config_type":"Email"
+                    "config_type":"email"
                 }
             ]
         }
@@ -177,7 +177,7 @@ internal class GetFeatureChannelListResponseTests {
             "config_id",
             "name",
             "description",
-            ConfigType.Email
+            ConfigType.EMAIL
         )
         val searchResult = FeatureChannelList(sampleConfig)
         val jsonString = """
@@ -190,7 +190,7 @@ internal class GetFeatureChannelListResponseTests {
                     "config_id":"config_id",
                     "name":"name",
                     "description":"description",
-                    "config_type":"Email",
+                    "config_type":"email",
                     "is_enabled":true
                 }
             ],
@@ -209,7 +209,7 @@ internal class GetFeatureChannelListResponseTests {
             "config_id",
             "name",
             "description",
-            ConfigType.Email
+            ConfigType.EMAIL
         )
         val searchResult = FeatureChannelList(sampleConfig)
         val jsonString = """
@@ -219,7 +219,7 @@ internal class GetFeatureChannelListResponseTests {
                     "config_id":"config_id",
                     "name":"name",
                     "description":"description",
-                    "config_type":"Email",
+                    "config_type":"email",
                     "is_enabled":true
                 }
             ]

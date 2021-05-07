@@ -47,7 +47,7 @@ internal class GetFeatureChannelListRequestTests {
 
     @Test
     fun `Get request serialize and deserialize transport object should be equal`() {
-        val configRequest = GetFeatureChannelListRequest(Feature.Reports, "sample-thread-context")
+        val configRequest = GetFeatureChannelListRequest(Feature.REPORTS, "sample-thread-context")
         val recreatedObject = recreateObject(configRequest) { GetFeatureChannelListRequest(it) }
         assertGetRequestEquals(configRequest, recreatedObject)
     }
@@ -55,7 +55,7 @@ internal class GetFeatureChannelListRequestTests {
     @Test
     fun `Get request serialize and deserialize using json object should be equal`() {
         val configRequest =
-            GetFeatureChannelListRequest(Feature.IndexManagement, "sample-thread-context")
+            GetFeatureChannelListRequest(Feature.INDEX_MANAGEMENT, "sample-thread-context")
         val jsonString = getJsonString(configRequest)
         val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureChannelListRequest.parse(it) }
         assertGetRequestEquals(configRequest, recreatedObject)
@@ -71,7 +71,7 @@ internal class GetFeatureChannelListRequestTests {
 
     @Test
     fun `Get request should safely ignore extra field in json object`() {
-        val configRequest = GetFeatureChannelListRequest(Feature.Alerting, "sample-thread-context")
+        val configRequest = GetFeatureChannelListRequest(Feature.ALERTING, "sample-thread-context")
         val jsonString = """
         {
             "feature":"${configRequest.feature}",
@@ -87,7 +87,7 @@ internal class GetFeatureChannelListRequestTests {
 
     @Test
     fun `Get request should safely ignore thread context is absent in json object`() {
-        val configRequest = GetFeatureChannelListRequest(Feature.Reports, null)
+        val configRequest = GetFeatureChannelListRequest(Feature.REPORTS, null)
         val jsonString = """
         {
             "feature":"${configRequest.feature}"

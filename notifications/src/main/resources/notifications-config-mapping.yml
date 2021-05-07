@@ -32,7 +32,6 @@ dynamic: false
 properties:
   metadata:
     type: object
-    dynamic: false
     properties:
       last_updated_time_ms:
         type: date
@@ -46,62 +45,81 @@ properties:
         type: keyword
   config: # dynamic structure to store notifications configuration
     type: object
-    dynamic: false
     properties:
       name:
         type: text
+        fields:
+          keyword:
+            type: keyword
       description:
         type: text
-        index: false
+        fields:
+          keyword:
+            type: keyword
       config_type:
         type: keyword
-      features:
+      feature_list:
         type: keyword
       is_enabled:
         type: boolean
       slack: # slack configuration
         type: object
-        dynamic: false
         properties:
           url:
             type: text
+            fields:
+              keyword:
+                type: keyword
       chime: # chime configuration
         type: object
-        dynamic: false
         properties:
           url:
             type: text
+            fields:
+              keyword:
+                type: keyword
       webhook: # webhook configuration
         type: object
-        dynamic: false
         properties:
           url:
             type: text
+            fields:
+              keyword:
+                type: keyword
       email: # email configuration
         type: object
-        dynamic: false
         properties:
           email_account_id:
             type: keyword
-          default_recipients:
+          recipient_list:
             type: text
-          default_email_group_ids:
+            fields:
+              keyword:
+                type: keyword
+          email_group_id_list:
             type: keyword
       smtp_account: # smtp account configuration
         type: object
-        dynamic: false
         properties:
           host:
             type: text
+            fields:
+              keyword:
+                type: keyword
           port:
             type: integer
           method:
             type: keyword
           from_address:
             type: text
+            fields:
+              keyword:
+                type: keyword
       email_group: # email group configuration
         type: object
-        dynamic: false
         properties:
-          recipients:
+          recipient_list:
             type: text
+            fields:
+              keyword:
+                type: keyword

@@ -34,13 +34,12 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
-import org.opensearch.commons.notifications.NotificationConstants.DEFAULT_EMAIL_GROUPS_TAG
-import org.opensearch.commons.notifications.NotificationConstants.DEFAULT_RECIPIENTS_TAG
 import org.opensearch.commons.notifications.NotificationConstants.EMAIL_ACCOUNT_ID_TAG
-import org.opensearch.commons.notifications.model.config.BaseConfigData
-import org.opensearch.commons.utils.isValidEmail
+import org.opensearch.commons.notifications.NotificationConstants.EMAIL_GROUP_ID_LIST_TAG
+import org.opensearch.commons.notifications.NotificationConstants.RECIPIENT_LIST_TAG
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.stringList
+import org.opensearch.commons.utils.validateEmail
 import java.io.IOException
 
 /**
@@ -48,14 +47,14 @@ import java.io.IOException
  */
 data class Email(
     val emailAccountID: String,
-    val defaultRecipients: List<String>,
-    val defaultEmailGroupIds: List<String>
+    val recipients: List<String>,
+    val emailGroupIds: List<String>
 ) : BaseConfigData {
 
     init {
         require(!Strings.isNullOrEmpty(emailAccountID)) { "emailAccountID is null or empty" }
-        defaultRecipients.forEach {
-            require(isValidEmail(it)) { "Invalid email address" }
+        recipients.forEach {
+            validateEmail(it)
         }
     }
 
@@ -66,6 +65,11 @@ data class Email(
          * reader to create instance of class from writable.
          */
         val reader = Writeable.Reader { Email(it) }
+
+        /**
+         * Parser to parse xContent
+         */
+        val xParser = XParser { parse(it) }
 
         /**
          * Creator used in REST communication.
@@ -88,8 +92,8 @@ data class Email(
                 parser.nextToken()
                 when (fieldName) {
                     EMAIL_ACCOUNT_ID_TAG -> emailAccountID = parser.text()
-                    DEFAULT_RECIPIENTS_TAG -> recipients = parser.stringList()
-                    DEFAULT_EMAIL_GROUPS_TAG -> emailGroupIds = parser.stringList()
+                    RECIPIENT_LIST_TAG -> recipients = parser.stringList()
+                    EMAIL_GROUP_ID_LIST_TAG -> emailGroupIds = parser.stringList()
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing Email")
@@ -107,8 +111,8 @@ data class Email(
      */
     constructor(input: StreamInput) : this(
         emailAccountID = input.readString(),
-        defaultRecipients = input.readStringList(),
-        defaultEmailGroupIds = input.readStringList()
+        recipients = input.readStringList(),
+        emailGroupIds = input.readStringList()
     )
 
     /**
@@ -116,8 +120,8 @@ data class Email(
      */
     override fun writeTo(output: StreamOutput) {
         output.writeString(emailAccountID)
-        output.writeStringCollection(defaultRecipients)
-        output.writeStringCollection(defaultEmailGroupIds)
+        output.writeStringCollection(recipients)
+        output.writeStringCollection(emailGroupIds)
     }
 
     /**
@@ -127,8 +131,8 @@ data class Email(
         builder!!
         return builder.startObject()
             .field(EMAIL_ACCOUNT_ID_TAG, emailAccountID)
-            .field(DEFAULT_RECIPIENTS_TAG, defaultRecipients)
-            .field(DEFAULT_EMAIL_GROUPS_TAG, defaultEmailGroupIds)
+            .field(RECIPIENT_LIST_TAG, recipients)
+            .field(EMAIL_GROUP_ID_LIST_TAG, emailGroupIds)
             .endObject()
     }
 }

@@ -44,14 +44,20 @@ import org.opensearch.common.unit.TimeValue
 import org.opensearch.common.xcontent.LoggingDeprecationHandler
 import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.common.xcontent.XContentType
+import org.opensearch.commons.notifications.NotificationConstants.TENANT_TAG
+import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
 import org.opensearch.commons.notifications.model.NotificationConfigInfo
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
 import org.opensearch.commons.notifications.model.SearchResults
 import org.opensearch.commons.utils.logger
 import org.opensearch.index.query.QueryBuilders
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
+import org.opensearch.notifications.index.QueryHelper.getSortField
 import org.opensearch.notifications.model.DocInfo
+import org.opensearch.notifications.model.DocMetadata.Companion.ACCESS_LIST_TAG
 import org.opensearch.notifications.model.NotificationConfigDoc
+import org.opensearch.notifications.model.NotificationConfigDoc.Companion.CONFIG_TAG
+import org.opensearch.notifications.model.NotificationConfigDoc.Companion.METADATA_TAG
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.notifications.util.SecureIndexClient
@@ -219,41 +225,39 @@ internal object NotificationConfigIndex {
      * Query index for NotificationConfigDocs for given access details
      * @param tenant the tenant of the user
      * @param access the list of access details to search NotificationConfigDocs for.
-     * @param from the paginated start index
-     * @param maxItems the max items to query
+     * @param request [GetNotificationConfigRequest] object
      * @return search result of NotificationConfigDocs
      */
     fun getAllNotificationConfigs(
         tenant: String,
         access: List<String>,
-        from: Int,
-        maxItems: Int
+        request: GetNotificationConfigRequest
     ): NotificationConfigSearchResult {
         createIndex()
         val sourceBuilder = SearchSourceBuilder()
             .timeout(TimeValue(PluginSettings.operationTimeoutMs, TimeUnit.MILLISECONDS))
-            .sort("metadata.last_updated_time_ms", SortOrder.DESC)
-            .size(maxItems)
-            .from(from)
-        val tenantQuery = QueryBuilders.termsQuery("metadata.tenant", tenant)
+            .sort(getSortField(request.sortField), request.sortOrder ?: SortOrder.ASC)
+            .size(request.maxItems)
+            .from(request.fromIndex)
+        val query = QueryBuilders.boolQuery()
+        query.filter(QueryBuilders.termsQuery("$METADATA_TAG.$TENANT_TAG", tenant))
         if (access.isNotEmpty()) {
-            val accessQuery = QueryBuilders.termsQuery("metadata.access", access)
-            val query = QueryBuilders.boolQuery()
-            query.filter(tenantQuery)
-            query.filter(accessQuery)
-            sourceBuilder.query(query)
-        } else {
-            sourceBuilder.query(tenantQuery)
+            query.filter(QueryBuilders.termsQuery("$METADATA_TAG.$ACCESS_LIST_TAG", access))
         }
+        request.filterParams.forEach {
+            query.filter(QueryHelper.getQueryBuilder(CONFIG_TAG, it.key, it.value))
+        }
+        sourceBuilder.query(query)
         val searchRequest = SearchRequest()
             .indices(INDEX_NAME)
             .source(sourceBuilder)
         val actionFuture = client.search(searchRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        val result = NotificationConfigSearchResult(from.toLong(), response, searchHitParser)
+        val result = NotificationConfigSearchResult(request.fromIndex.toLong(), response, searchHitParser)
         log.info(
-            "$LOG_PREFIX:getAllNotificationConfigs from:$from, maxItems:$maxItems," +
-                    " retCount:${result.objectList.size}, totalCount:${result.totalHits}"
+            "$LOG_PREFIX:getAllNotificationConfigs from:${request.fromIndex}, maxItems:${request.maxItems}," +
+                " sortField:${request.sortField}, sortOrder=${request.sortOrder}, filters=${request.filterParams}" +
+                " retCount:${result.objectList.size}, totalCount:${result.totalHits}"
         )
         return result
     }

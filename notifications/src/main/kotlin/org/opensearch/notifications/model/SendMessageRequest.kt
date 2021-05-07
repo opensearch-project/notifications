@@ -57,7 +57,7 @@ internal class SendMessageRequest : ActionRequest, ToXContentObject {
     companion object {
         private val log by logger(SendMessageRequest::class.java)
         private const val REF_TAG_FIELD = "ref_tag"
-        private const val RECIPIENTS_FIELD = "recipients"
+        private const val RECIPIENTS_FIELD = "recipient_list"
         private const val TITLE_FIELD = "title"
         private const val TEXT_DESCRIPTION_FIELD = "text_description"
         private const val HTML_DESCRIPTION_FIELD = "html_description"

@@ -24,42 +24,17 @@
  * permissions and limitations under the License.
  *
  */
+package org.opensearch.commons.notifications.model
 
-package org.opensearch.commons.notifications.model.config
-
-import org.opensearch.common.io.stream.Writeable
 import org.opensearch.common.xcontent.XContentParser
-import org.opensearch.commons.notifications.NotificationConstants
-import org.opensearch.commons.notifications.model.ConfigType
-import org.opensearch.commons.notifications.model.SmtpAccount
 
-object SmtpAccountConfigProperties : ConfigDataProperties {
-
+/**
+ * Functional interface to create config data object using XContentParser
+ */
+fun interface XParser<V> {
     /**
-     * {@inheritDoc}
+     * Creator used in REST communication.
+     * @param parser XContentParser to deserialize data from.
      */
-    override fun getChannelTag(): String {
-        return NotificationConstants.SMTP_ACCOUNT_TAG
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun getConfigDataReader(): Writeable.Reader<SmtpAccount> {
-        return SmtpAccount.reader
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun createConfigData(parser: XContentParser): SmtpAccount {
-        return SmtpAccount.parse(parser)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun getConfigType(): ConfigType {
-        return ConfigType.SmtpAccount
-    }
+    fun parse(parser: XContentParser): V
 }

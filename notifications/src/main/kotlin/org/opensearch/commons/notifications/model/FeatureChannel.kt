@@ -40,7 +40,6 @@ import org.opensearch.commons.notifications.NotificationConstants.DESCRIPTION_TA
 import org.opensearch.commons.notifications.NotificationConstants.IS_ENABLED_TAG
 import org.opensearch.commons.notifications.NotificationConstants.NAME_TAG
 import org.opensearch.commons.utils.logger
-import org.opensearch.commons.utils.valueOf
 import java.io.IOException
 
 /**
@@ -93,7 +92,7 @@ data class FeatureChannel(
                     CONFIG_ID_TAG -> configId = parser.text()
                     NAME_TAG -> name = parser.text()
                     DESCRIPTION_TAG -> description = parser.text()
-                    CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), ConfigType.None, log)
+                    CONFIG_TYPE_TAG -> configType = ConfigType.fromTagOrDefault(parser.text())
                     IS_ENABLED_TAG -> isEnabled = parser.booleanValue()
                     else -> {
                         parser.skipChildren()
@@ -146,7 +145,7 @@ data class FeatureChannel(
             .field(CONFIG_ID_TAG, configId)
             .field(NAME_TAG, name)
             .field(DESCRIPTION_TAG, description)
-            .field(CONFIG_TYPE_TAG, configType)
+            .field(CONFIG_TYPE_TAG, configType.tag)
             .field(IS_ENABLED_TAG, isEnabled)
             .endObject()
     }

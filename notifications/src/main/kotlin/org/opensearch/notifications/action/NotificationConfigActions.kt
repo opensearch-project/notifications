@@ -123,7 +123,7 @@ internal object NotificationConfigActions {
         log.info("$LOG_PREFIX:NotificationConfig-get $request")
         UserAccessManager.validateUser(user)
         return if (request.configId == null || Strings.isEmpty(request.configId)) {
-            getAll(request.fromIndex, request.maxItems, user)
+            getAll(request, user)
         } else {
             info(request.configId, user)
         }
@@ -158,18 +158,16 @@ internal object NotificationConfigActions {
 
     /**
      * Get all NotificationConfig matching the criteria
-     * @param fromIndex the paginated start index
-     * @param maxItems the max items to query
+     * @param request [GetNotificationConfigRequest] object
      * @param user the user info object
      * @return [GetNotificationConfigResponse]
      */
-    private fun getAll(fromIndex: Int, maxItems: Int, user: User?): GetNotificationConfigResponse {
-        log.info("$LOG_PREFIX:NotificationConfig-getAll fromIndex:$fromIndex maxItems:$maxItems")
+    private fun getAll(request: GetNotificationConfigRequest, user: User?): GetNotificationConfigResponse {
+        log.info("$LOG_PREFIX:NotificationConfig-getAll")
         val searchResult = NotificationConfigIndex.getAllNotificationConfigs(
             UserAccessManager.getUserTenant(user),
             UserAccessManager.getSearchAccessInfo(user),
-            fromIndex,
-            maxItems
+            request
         )
         return GetNotificationConfigResponse(searchResult)
     }

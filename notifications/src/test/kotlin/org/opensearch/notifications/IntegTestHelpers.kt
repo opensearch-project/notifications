@@ -93,7 +93,7 @@ fun verifyResponse(response: JsonObject, refTag: String, recipients: List<String
     assertEquals(refTag, actualRefTag)
 
     // verify status to each recipient
-    val actualRecipients = response.getAsJsonArray("recipients")
+    val actualRecipients = response.getAsJsonArray("recipient_list")
     actualRecipients.forEach { item ->
         val recipient = item.asJsonObject.get("recipient").asString
         assert(recipients.contains(recipient))
@@ -108,14 +108,14 @@ fun verifyResponse(response: JsonObject, refTag: String, recipients: List<String
 
 fun getStatusCode(response: JsonObject): Int {
     return response
-        .getAsJsonArray("recipients")
+        .getAsJsonArray("recipient_list")
         .get(0).asJsonObject
         .get("status_code").asInt
 }
 
 fun getStatusText(response: JsonObject): String {
     return response
-        .getAsJsonArray("recipients")
+        .getAsJsonArray("recipient_list")
         .get(0).asJsonObject
         .get("status_text").asString
 }
@@ -145,15 +145,15 @@ class NotificationsJsonEntity(
     private fun updateJsonEntity() {
         jsonEntityString =
             """
-                    {
-                      "ref_tag": "$refTag",
-                      "recipients": ${listToString(recipients)},
-                      "title": "$title",
-                      "text_description": "$textDescription",
-                      "html_description": "$htmlDescription",
-                      "attachment": $attachment
-                    }
-                """.trimIndent()
+            {
+              "ref_tag": "$refTag",
+              "recipient_list": ${listToString(recipients)},
+              "title": "$title",
+              "text_description": "$textDescription",
+              "html_description": "$htmlDescription",
+              "attachment": $attachment
+            }
+            """.trimIndent()
     }
 
     private fun listToString(list: List<String>): String {

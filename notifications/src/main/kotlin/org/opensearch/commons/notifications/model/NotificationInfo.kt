@@ -41,7 +41,6 @@ import org.opensearch.commons.notifications.NotificationConstants.TAGS_TAG
 import org.opensearch.commons.notifications.NotificationConstants.TITLE_TAG
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.stringList
-import org.opensearch.commons.utils.valueOf
 import java.io.IOException
 
 /**
@@ -51,7 +50,7 @@ data class NotificationInfo(
     val title: String,
     val referenceId: String,
     val feature: Feature,
-    val severity: SeverityType = SeverityType.Info,
+    val severity: SeverityType = SeverityType.INFO,
     val tags: List<String> = listOf()
 ) : BaseModel {
 
@@ -77,7 +76,7 @@ data class NotificationInfo(
             var title: String? = null
             var referenceId: String? = null
             var feature: Feature? = null
-            var severity: SeverityType = SeverityType.Info
+            var severity: SeverityType = SeverityType.INFO
             var tags: List<String> = emptyList()
 
             XContentParserUtils.ensureExpectedToken(
@@ -91,8 +90,8 @@ data class NotificationInfo(
                 when (fieldName) {
                     TITLE_TAG -> title = parser.text()
                     REFERENCE_ID_TAG -> referenceId = parser.text()
-                    FEATURE_TAG -> feature = valueOf(parser.text(), Feature.None, log)
-                    SEVERITY_TAG -> severity = valueOf(parser.text(), SeverityType.None, log)
+                    FEATURE_TAG -> feature = Feature.fromTagOrDefault(parser.text())
+                    SEVERITY_TAG -> severity = SeverityType.fromTagOrDefault(parser.text())
                     TAGS_TAG -> tags = parser.stringList()
                     else -> {
                         parser.skipChildren()
@@ -112,6 +111,20 @@ data class NotificationInfo(
                 tags
             )
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
+        builder!!
+        return builder.startObject()
+            .field(TITLE_TAG, title)
+            .field(REFERENCE_ID_TAG, referenceId)
+            .field(FEATURE_TAG, feature.tag)
+            .field(SEVERITY_TAG, severity.tag)
+            .field(TAGS_TAG, tags)
+            .endObject()
     }
 
     /**
@@ -135,19 +148,5 @@ data class NotificationInfo(
         output.writeEnum(feature)
         output.writeEnum(severity)
         output.writeStringCollection(tags)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
-        builder!!
-        return builder.startObject()
-            .field(TITLE_TAG, title)
-            .field(REFERENCE_ID_TAG, referenceId)
-            .field(FEATURE_TAG, feature)
-            .field(SEVERITY_TAG, severity)
-            .field(TAGS_TAG, tags)
-            .endObject()
     }
 }

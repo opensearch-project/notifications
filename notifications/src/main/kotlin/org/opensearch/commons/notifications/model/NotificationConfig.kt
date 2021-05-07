@@ -36,18 +36,15 @@ import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TYPE_TAG
 import org.opensearch.commons.notifications.NotificationConstants.DESCRIPTION_TAG
-import org.opensearch.commons.notifications.NotificationConstants.FEATURES_TAG
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_LIST_TAG
 import org.opensearch.commons.notifications.NotificationConstants.IS_ENABLED_TAG
 import org.opensearch.commons.notifications.NotificationConstants.NAME_TAG
-import org.opensearch.commons.notifications.model.config.BaseConfigData
-import org.opensearch.commons.notifications.model.config.ConfigPropertiesUtils.createConfigData
-import org.opensearch.commons.notifications.model.config.ConfigPropertiesUtils.getConfigTypeForTag
-import org.opensearch.commons.notifications.model.config.ConfigPropertiesUtils.getReaderForConfigType
-import org.opensearch.commons.notifications.model.config.ConfigPropertiesUtils.getTagForConfigType
-import org.opensearch.commons.notifications.model.config.ConfigPropertiesUtils.validateConfigData
+import org.opensearch.commons.notifications.model.config.ConfigDataProperties.createConfigData
+import org.opensearch.commons.notifications.model.config.ConfigDataProperties.getReaderForConfigType
+import org.opensearch.commons.notifications.model.config.ConfigDataProperties.validateConfigData
 import org.opensearch.commons.utils.enumSet
+import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.logger
-import org.opensearch.commons.utils.valueOf
 import java.io.IOException
 import java.util.EnumSet
 
@@ -59,7 +56,7 @@ data class NotificationConfig(
     val description: String,
     val configType: ConfigType,
     val features: EnumSet<Feature>,
-    val configData: BaseConfigData,
+    val configData: BaseConfigData?,
     val isEnabled: Boolean = true
 ) : BaseModel {
 
@@ -68,10 +65,9 @@ data class NotificationConfig(
         if (!validateConfigData(configType, configData)) {
             throw IllegalArgumentException("ConfigType: $configType and data doesn't match")
         }
-        if (configType === ConfigType.None) {
+        if (configType === ConfigType.NONE) {
             log.info("Some config field not recognized")
         }
-        requireNotNull(configData)
     }
 
     companion object {
@@ -107,12 +103,12 @@ data class NotificationConfig(
                 when (fieldName) {
                     NAME_TAG -> name = parser.text()
                     DESCRIPTION_TAG -> description = parser.text()
-                    CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), ConfigType.None, log)
-                    FEATURES_TAG -> features = parser.enumSet(Feature.None, log)
+                    CONFIG_TYPE_TAG -> configType = ConfigType.fromTagOrDefault(parser.text())
+                    FEATURE_LIST_TAG -> features = parser.enumSet(Feature.enumParser)
                     IS_ENABLED_TAG -> isEnabled = parser.booleanValue()
                     else -> {
-                        val configTypeForTag = getConfigTypeForTag(fieldName)
-                        if (configTypeForTag != null && configData == null) {
+                        val configTypeForTag = ConfigType.fromTagOrDefault(fieldName)
+                        if (configTypeForTag != ConfigType.NONE && configData == null) {
                             configData = createConfigData(configTypeForTag, parser)
                         } else {
                             parser.skipChildren()
@@ -123,16 +119,31 @@ data class NotificationConfig(
             }
             name ?: throw IllegalArgumentException("$NAME_TAG field absent")
             configType ?: throw IllegalArgumentException("$CONFIG_TYPE_TAG field absent")
-            features ?: throw IllegalArgumentException("$FEATURES_TAG field absent")
+            features ?: throw IllegalArgumentException("$FEATURE_LIST_TAG field absent")
             return NotificationConfig(
                 name,
                 description,
                 configType,
                 features,
-                configData!!,
+                configData,
                 isEnabled
             )
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
+        builder!!
+        return builder.startObject()
+            .field(NAME_TAG, name)
+            .field(DESCRIPTION_TAG, description)
+            .field(CONFIG_TYPE_TAG, configType.tag)
+            .field(FEATURE_LIST_TAG, features)
+            .field(IS_ENABLED_TAG, isEnabled)
+            .fieldIfNotNull(configType.tag, configData)
+            .endObject()
     }
 
     /**
@@ -145,7 +156,7 @@ data class NotificationConfig(
         configType = input.readEnum(ConfigType::class.java),
         features = input.readEnumSet(Feature::class.java),
         isEnabled = input.readBoolean(),
-        configData = input.readOptionalWriteable(getReaderForConfigType(input.readEnum(ConfigType::class.java)))!!
+        configData = input.readOptionalWriteable(getReaderForConfigType(input.readEnum(ConfigType::class.java)))
     )
 
     /**
@@ -160,20 +171,5 @@ data class NotificationConfig(
         // Reading config types multiple times in constructor
         output.writeEnum(configType)
         output.writeOptionalWriteable(configData)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
-        builder!!
-        return builder.startObject()
-            .field(NAME_TAG, name)
-            .field(DESCRIPTION_TAG, description)
-            .field(CONFIG_TYPE_TAG, configType)
-            .field(FEATURES_TAG, features)
-            .field(IS_ENABLED_TAG, isEnabled)
-            .field(getTagForConfigType(configType), configData)
-            .endObject()
     }
 }

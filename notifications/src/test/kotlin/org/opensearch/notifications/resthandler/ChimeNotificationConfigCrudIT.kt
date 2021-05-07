@@ -24,14 +24,13 @@
  * permissions and limitations under the License.
  *
  */
-
 package org.opensearch.notifications.resthandler
 
 import org.junit.Assert
+import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.NotificationConfig
-import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.PluginRestTestCase
 import org.opensearch.notifications.verifySingleConfigEquals
@@ -47,8 +46,8 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
-            ConfigType.Chime,
-            EnumSet.of(Feature.Alerting, Feature.Reports),
+            ConfigType.CHIME,
+            EnumSet.of(Feature.ALERTING, Feature.REPORTS),
             isEnabled = true,
             configData = sampleChime
         )
@@ -59,8 +58,8 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
-                "config_type":"Chime",
-                "features":[
+                "config_type":"chime",
+                "feature_list":[
                     "${referenceObject.features.elementAt(0)}",
                     "${referenceObject.features.elementAt(1)}"
                 ],
@@ -106,8 +105,8 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
         val updatedObject = NotificationConfig(
             "this is a updated config name",
             "this is a updated config description",
-            ConfigType.Chime,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.CHIME,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = updatedChime
         )
@@ -118,8 +117,8 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${updatedObject.name}",
                 "description":"${updatedObject.description}",
-                "config_type":"Chime",
-                "features":[
+                "config_type":"chime",
+                "feature_list":[
                     "${updatedObject.features.elementAt(0)}"
                 ],
                 "is_enabled":${updatedObject.isEnabled},
@@ -174,8 +173,8 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
-            ConfigType.Chime,
-            EnumSet.of(Feature.Alerting, Feature.Reports),
+            ConfigType.CHIME,
+            EnumSet.of(Feature.ALERTING, Feature.REPORTS),
             isEnabled = true,
             configData = sampleChime
         )
@@ -186,7 +185,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
-                "config_type":"Chime",
+                "config_type":"chime",
                 "features":[
                     "${referenceObject.features.elementAt(0)}",
                     "${referenceObject.features.elementAt(1)}"

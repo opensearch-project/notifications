@@ -40,8 +40,8 @@ internal class NotificationInfoTests {
         val sampleNotification = NotificationInfo(
             "title",
             "reference_id",
-            Feature.Alerting,
-            severity = SeverityType.Info
+            Feature.ALERTING,
+            severity = SeverityType.INFO
         )
         val recreatedObject = recreateObject(sampleNotification) { NotificationInfo(it) }
         assertEquals(sampleNotification, recreatedObject)
@@ -52,8 +52,8 @@ internal class NotificationInfoTests {
         val sampleNotification = NotificationInfo(
             "title",
             "reference_id",
-            Feature.Alerting,
-            severity = SeverityType.Info
+            Feature.ALERTING,
+            severity = SeverityType.INFO
         )
 
         val jsonString = getJsonString(sampleNotification)
@@ -66,16 +66,16 @@ internal class NotificationInfoTests {
         val sampleNotification = NotificationInfo(
             "title",
             "reference_id",
-            Feature.Alerting,
+            Feature.ALERTING,
             tags = listOf("tag1", "tag2"),
-            severity = SeverityType.Info
+            severity = SeverityType.INFO
         )
         val jsonString = """
         { 
             "title":"title",
             "reference_id":"reference_id",
-            "feature":"Alerting",
-            "severity":"Info",
+            "feature":"alerting",
+            "severity":"info",
             "tags":["tag1", "tag2"],
             "extra_field_1":["extra", "value"],
             "extra_field_2":{"extra":"value"},
@@ -91,16 +91,16 @@ internal class NotificationInfoTests {
         val sampleNotification = NotificationInfo(
             "title",
             "reference_id",
-            Feature.None,
+            Feature.NONE,
             tags = listOf("tag1", "tag2"),
-            severity = SeverityType.Info
+            severity = SeverityType.INFO
         )
         val jsonString = """
         {
             "title":"title",
             "reference_id":"reference_id",
             "feature": "NewFeature",
-            "severity":"Info",
+            "severity":"info",
             "tags":["tag1", "tag2"]
         }
         """.trimIndent()
@@ -114,9 +114,9 @@ internal class NotificationInfoTests {
             NotificationInfo(
                 "",
                 "reference_id",
-                Feature.Alerting,
+                Feature.ALERTING,
                 tags = listOf("tag1", "tag2"),
-                severity = SeverityType.Info
+                severity = SeverityType.INFO
             )
         }
     }

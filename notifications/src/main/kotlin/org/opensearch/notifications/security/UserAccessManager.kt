@@ -57,8 +57,10 @@ internal object UserAccessManager {
      */
     fun validateUser(user: User?) {
         if (isUserPrivateTenant(user) && user?.name == null) {
-            throw OpenSearchStatusException("User name not provided for private tenant access",
-                RestStatus.FORBIDDEN)
+            throw OpenSearchStatusException(
+                "User name not provided for private tenant access",
+                RestStatus.FORBIDDEN
+            )
         }
         when (PluginSettings.filterBy) {
             PluginSettings.FilterBy.NoFilter -> { // No validation
@@ -66,23 +68,31 @@ internal object UserAccessManager {
             PluginSettings.FilterBy.User -> { // User name must be present
                 user?.name
                     ?: run {
-                        throw OpenSearchStatusException("Filter-by enabled with security disabled",
-                            RestStatus.FORBIDDEN)
+                        throw OpenSearchStatusException(
+                            "Filter-by enabled with security disabled",
+                            RestStatus.FORBIDDEN
+                        )
                     }
             }
             PluginSettings.FilterBy.Roles -> { // backend roles must be present
                 if (user == null || user.roles.isNullOrEmpty()) {
-                    throw OpenSearchStatusException("User doesn't have roles configured. Contact administrator.",
-                        RestStatus.FORBIDDEN)
+                    throw OpenSearchStatusException(
+                        "User doesn't have roles configured. Contact administrator.",
+                        RestStatus.FORBIDDEN
+                    )
                 } else if (user.roles.stream().filter { !PluginSettings.ignoredRoles.contains(it) }.count() == 0L) {
-                    throw OpenSearchStatusException("No distinguishing roles configured. Contact administrator.",
-                        RestStatus.FORBIDDEN)
+                    throw OpenSearchStatusException(
+                        "No distinguishing roles configured. Contact administrator.",
+                        RestStatus.FORBIDDEN
+                    )
                 }
             }
             PluginSettings.FilterBy.BackendRoles -> { // backend roles must be present
                 if (user?.backendRoles.isNullOrEmpty()) {
-                    throw OpenSearchStatusException("User doesn't have backend roles configured. Contact administrator.",
-                        RestStatus.FORBIDDEN)
+                    throw OpenSearchStatusException(
+                        "User doesn't have backend roles configured. Contact administrator.",
+                        RestStatus.FORBIDDEN
+                    )
                 }
             }
         }

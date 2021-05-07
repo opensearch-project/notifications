@@ -30,7 +30,6 @@ import com.fasterxml.jackson.core.JsonParseException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.opensearch.common.settings.SecureString
 import org.opensearch.commons.utils.createObjectFromJsonString
 import org.opensearch.commons.utils.getJsonString
 import org.opensearch.commons.utils.recreateObject
@@ -39,41 +38,14 @@ internal class SmtpAccountTests {
 
     @Test
     fun `SmtpAccount serialize and deserialize transport object should be equal`() {
-        val sampleSmtpAccount = SmtpAccount("domain.com", 1234, SmtpAccount.MethodType.Ssl, "from@domain.com")
-        val recreatedObject = recreateObject(sampleSmtpAccount) { SmtpAccount(it) }
-        assertEquals(sampleSmtpAccount, recreatedObject)
-    }
-
-    @Test
-    fun `SmtpAccount serialize and deserialize transport object should be equal with credentials`() {
-        val sampleSmtpAccount = SmtpAccount(
-            "domain.com",
-            1234, SmtpAccount.MethodType.StartTls,
-            "from@domain.com",
-            SecureString("username".toCharArray()),
-            SecureString("password".toCharArray())
-        )
+        val sampleSmtpAccount = SmtpAccount("domain.com", 1234, MethodType.SSL, "from@domain.com")
         val recreatedObject = recreateObject(sampleSmtpAccount) { SmtpAccount(it) }
         assertEquals(sampleSmtpAccount, recreatedObject)
     }
 
     @Test
     fun `SmtpAccount serialize and deserialize using json object should be equal`() {
-        val sampleSmtpAccount = SmtpAccount("domain.com", 1234, SmtpAccount.MethodType.Ssl, "from@domain.com")
-        val jsonString = getJsonString(sampleSmtpAccount)
-        val recreatedObject = createObjectFromJsonString(jsonString) { SmtpAccount.parse(it) }
-        assertEquals(sampleSmtpAccount, recreatedObject)
-    }
-
-    @Test
-    fun `SmtpAccount serialize and deserialize using json object should be equal with credentials`() {
-        val sampleSmtpAccount = SmtpAccount(
-            "domain.com",
-            1234, SmtpAccount.MethodType.StartTls,
-            "from@domain.com",
-            SecureString("username".toCharArray()),
-            SecureString("password".toCharArray())
-        )
+        val sampleSmtpAccount = SmtpAccount("domain.com", 1234, MethodType.SSL, "from@domain.com")
         val jsonString = getJsonString(sampleSmtpAccount)
         val recreatedObject = createObjectFromJsonString(jsonString) { SmtpAccount.parse(it) }
         assertEquals(sampleSmtpAccount, recreatedObject)
@@ -81,36 +53,13 @@ internal class SmtpAccountTests {
 
     @Test
     fun `SmtpAccount should deserialize json object using parser`() {
-        val sampleSmtpAccount = SmtpAccount("domain.com", 1234, SmtpAccount.MethodType.Ssl, "from@domain.com")
+        val sampleSmtpAccount = SmtpAccount("domain.com", 1234, MethodType.SSL, "from@domain.com")
         val jsonString = """
         {
             "host":"domain.com",
             "port":"1234",
-            "method":"Ssl",
+            "method":"ssl",
             "from_address":"from@domain.com"
-        }
-        """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { SmtpAccount.parse(it) }
-        assertEquals(sampleSmtpAccount, recreatedObject)
-    }
-
-    @Test
-    fun `SmtpAccount should deserialize json object using parser with credentials`() {
-        val sampleSmtpAccount = SmtpAccount(
-            "domain.com",
-            1234, SmtpAccount.MethodType.StartTls,
-            "from@domain.com",
-            SecureString("given_username".toCharArray()),
-            SecureString("given_password".toCharArray())
-        )
-        val jsonString = """
-        {
-            "host":"domain.com",
-            "port":"1234",
-            "method":"StartTls",
-            "from_address":"from@domain.com",
-            "username":"given_username",
-            "password":"given_password"
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { SmtpAccount.parse(it) }
@@ -131,10 +80,8 @@ internal class SmtpAccountTests {
         {
             "host":"domain.com",
             "port":"1234",
-            "method":"Ssl",
-            "from_address":".from@domain.com",
-            "username":"given_username",
-            "password":"given_password"
+            "method":"ssl",
+            "from_address":".from@domain.com"
         }
         """.trimIndent()
         assertThrows<IllegalArgumentException> {
@@ -146,19 +93,15 @@ internal class SmtpAccountTests {
     fun `SmtpAccount should safely ignore extra field in json object`() {
         val sampleSmtpAccount = SmtpAccount(
             "domain.com",
-            1234, SmtpAccount.MethodType.Ssl,
-            "from@domain.com",
-            SecureString("given_username".toCharArray()),
-            SecureString("given_password".toCharArray())
+            1234, MethodType.START_TLS,
+            "from@domain.com"
         )
         val jsonString = """
         {
             "host":"domain.com",
             "port":"1234",
-            "method":"Ssl",
+            "method":"start_tls",
             "from_address":"from@domain.com",
-            "username":"given_username",
-            "password":"given_password",
             "extra_field_1":"extra value 1",
             "extra_field_2":"extra value 2"
         }

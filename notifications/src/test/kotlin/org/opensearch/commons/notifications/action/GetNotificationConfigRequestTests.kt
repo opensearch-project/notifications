@@ -33,6 +33,7 @@ import org.junit.jupiter.api.assertThrows
 import org.opensearch.commons.utils.createObjectFromJsonString
 import org.opensearch.commons.utils.getJsonString
 import org.opensearch.commons.utils.recreateObject
+import org.opensearch.search.sort.SortOrder
 
 internal class GetNotificationConfigRequestTests {
 
@@ -40,21 +41,38 @@ internal class GetNotificationConfigRequestTests {
         expected: GetNotificationConfigRequest,
         actual: GetNotificationConfigRequest
     ) {
+        assertEquals(expected.configId, actual.configId)
         assertEquals(expected.fromIndex, actual.fromIndex)
         assertEquals(expected.maxItems, actual.maxItems)
-        assertEquals(expected.configId, actual.configId)
+        assertEquals(expected.sortField, actual.sortField)
+        assertEquals(expected.sortOrder, actual.sortOrder)
+        assertEquals(expected.filterParams, actual.filterParams)
     }
 
     @Test
     fun `Get request serialize and deserialize transport object should be equal`() {
-        val configRequest = GetNotificationConfigRequest(0, 10, "sample_config_id")
+        val configRequest = GetNotificationConfigRequest(
+            "sample_config_id",
+            0,
+            10,
+            "sortField",
+            SortOrder.DESC,
+            mapOf(Pair("filterKey", "filterValue"))
+        )
         val recreatedObject = recreateObject(configRequest) { GetNotificationConfigRequest(it) }
         assertGetRequestEquals(configRequest, recreatedObject)
     }
 
     @Test
     fun `Get request serialize and deserialize using json object should be equal`() {
-        val configRequest = GetNotificationConfigRequest(0, 10, "sample_config_id")
+        val configRequest = GetNotificationConfigRequest(
+            "sample_config_id",
+            0,
+            10,
+            "sortField",
+            SortOrder.ASC,
+            mapOf(Pair("filterKey", "filterValue"))
+        )
         val jsonString = getJsonString(configRequest)
         val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }
         assertGetRequestEquals(configRequest, recreatedObject)
@@ -62,11 +80,43 @@ internal class GetNotificationConfigRequestTests {
 
     @Test
     fun `Get request with all field should deserialize json object using parser`() {
-        val configRequest = GetNotificationConfigRequest(10, 100, "sample_config_id")
+        val configRequest = GetNotificationConfigRequest(
+            "sample_config_id",
+            10,
+            100,
+            "sortField",
+            SortOrder.DESC,
+            mapOf(
+                Pair("filterKey1", "filterValue1"),
+                Pair("filterKey2", "true"),
+                Pair("filterKey3", "filter,Value,3"),
+                Pair("filterKey4", "4")
+            )
+        )
         val jsonString = """
         {
+            "config_id":"${configRequest.configId}",
             "from_index":"10",
             "max_items":"100",
+            "sort_field":"sortField",
+            "sort_order":"desc",
+            "filter_param_list": {
+                "filterKey1":"filterValue1",
+                "filterKey2":"true",
+                "filterKey3":"filter,Value,3",
+                "filterKey4":"4"
+            }
+        }
+        """.trimIndent()
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }
+        assertGetRequestEquals(configRequest, recreatedObject)
+    }
+
+    @Test
+    fun `Get request with only config_id field should deserialize json object using parser`() {
+        val configRequest = GetNotificationConfigRequest(configId = "sample_config_id")
+        val jsonString = """
+        {
             "config_id":"${configRequest.configId}"
         }
         """.trimIndent()
@@ -75,12 +125,11 @@ internal class GetNotificationConfigRequestTests {
     }
 
     @Test
-    fun `Get request without configId field should deserialize json object using parser`() {
-        val configRequest = GetNotificationConfigRequest(20, 200)
+    fun `Get request with only from_index field should deserialize json object using parser`() {
+        val configRequest = GetNotificationConfigRequest(fromIndex = 20)
         val jsonString = """
         {
-            "from_index":"20",
-            "max_items":"200"
+            "from_index":"20"
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }
@@ -88,12 +137,11 @@ internal class GetNotificationConfigRequestTests {
     }
 
     @Test
-    fun `Get request without fromIndex field should deserialize json object using parser`() {
-        val configRequest = GetNotificationConfigRequest(maxItems = 100, configId = "sample_config_id")
+    fun `Get request with only max_items field should deserialize json object using parser`() {
+        val configRequest = GetNotificationConfigRequest(maxItems = 100)
         val jsonString = """
         {
-            "max_items":"100",
-            "config_id":"${configRequest.configId}"
+            "max_items":"100"
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }
@@ -101,12 +149,95 @@ internal class GetNotificationConfigRequestTests {
     }
 
     @Test
-    fun `Get request without maxItems field should deserialize json object using parser`() {
-        val configRequest = GetNotificationConfigRequest(fromIndex = 10, configId = "sample_config_id")
+    fun `Get request with only sort_field field should deserialize json object using parser`() {
+        val configRequest = GetNotificationConfigRequest(sortField = "sample_sort_field")
         val jsonString = """
         {
-            "from_index":"10",
-            "config_id":"${configRequest.configId}"
+            "sort_field":"sample_sort_field"
+        }
+        """.trimIndent()
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }
+        assertGetRequestEquals(configRequest, recreatedObject)
+    }
+
+    @Test
+    fun `Get request with only sort_order=asc field should deserialize json object using parser`() {
+        val configRequest = GetNotificationConfigRequest(sortOrder = SortOrder.ASC)
+        val jsonString = """
+        {
+            "sort_order":"asc"
+        }
+        """.trimIndent()
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }
+        assertGetRequestEquals(configRequest, recreatedObject)
+    }
+
+    @Test
+    fun `Get request with only sort_order=ASC field should deserialize json object using parser`() {
+        val configRequest = GetNotificationConfigRequest(sortOrder = SortOrder.ASC)
+        val jsonString = """
+        {
+            "sort_order":"ASC"
+        }
+        """.trimIndent()
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }
+        assertGetRequestEquals(configRequest, recreatedObject)
+    }
+
+    @Test
+    fun `Get request with only sort_order=desc field should deserialize json object using parser`() {
+        val configRequest = GetNotificationConfigRequest(sortOrder = SortOrder.DESC)
+        val jsonString = """
+        {
+            "sort_order":"desc"
+        }
+        """.trimIndent()
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }
+        assertGetRequestEquals(configRequest, recreatedObject)
+    }
+
+    @Test
+    fun `Get request with only sort_order=DESC field should deserialize json object using parser`() {
+        val configRequest = GetNotificationConfigRequest(sortOrder = SortOrder.DESC)
+        val jsonString = """
+        {
+            "sort_order":"DESC"
+        }
+        """.trimIndent()
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }
+        assertGetRequestEquals(configRequest, recreatedObject)
+    }
+
+    @Test
+    fun `Get request with invalid sort_order should throw exception`() {
+        val jsonString = """
+        {
+            "sort_order":"descending"
+        }
+        """.trimIndent()
+        assertThrows<IllegalArgumentException> {
+            createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }
+        }
+    }
+
+    @Test
+    fun `Get request with only filter_param_list field should deserialize json object using parser`() {
+        val configRequest = GetNotificationConfigRequest(
+            filterParams = mapOf(
+                Pair("filterKey1", "filterValue1"),
+                Pair("filterKey2", "true"),
+                Pair("filterKey3", "filter,Value,3"),
+                Pair("filterKey4", "4")
+            )
+        )
+        val jsonString = """
+        {
+            "filter_param_list": {
+                "filterKey1":"filterValue1",
+                "filterKey2":"true",
+                "filterKey3":"filter,Value,3",
+                "filterKey4":"4"
+            }
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }

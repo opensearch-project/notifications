@@ -24,37 +24,72 @@
  * permissions and limitations under the License.
  *
  */
-
 package org.opensearch.commons.notifications.model.config
 
 import org.opensearch.common.io.stream.Writeable.Reader
 import org.opensearch.common.xcontent.XContentParser
+import org.opensearch.commons.notifications.model.BaseConfigData
+import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
+import org.opensearch.commons.notifications.model.Email
+import org.opensearch.commons.notifications.model.EmailGroup
+import org.opensearch.commons.notifications.model.Slack
+import org.opensearch.commons.notifications.model.SmtpAccount
+import org.opensearch.commons.notifications.model.Webhook
+import org.opensearch.commons.notifications.model.XParser
 
-/**
- * Properties for ConfigTypes.
- * This interface is used to provide contract accross configTypes without reading into config data classes.
- */
-interface ConfigDataProperties {
+internal object ConfigDataProperties {
+    /**
+     * Properties for ConfigTypes.
+     * This data class is used to provide contract across configTypes without reading into config data classes.
+     */
+    private data class ConfigProperty(
+        val configDataReader: Reader<out BaseConfigData>,
+        val configDataParser: XParser<out BaseConfigData>
+    )
+
+    private val CONFIG_PROPERTIES_MAP = mapOf(
+        Pair(ConfigType.SLACK, ConfigProperty(Slack.reader, Slack.xParser)),
+        Pair(ConfigType.CHIME, ConfigProperty(Chime.reader, Chime.xParser)),
+        Pair(ConfigType.WEBHOOK, ConfigProperty(Webhook.reader, Webhook.xParser)),
+        Pair(ConfigType.EMAIL, ConfigProperty(Email.reader, Email.xParser)),
+        Pair(ConfigType.EMAIL_GROUP, ConfigProperty(EmailGroup.reader, EmailGroup.xParser)),
+        Pair(ConfigType.SMTP_ACCOUNT, ConfigProperty(SmtpAccount.reader, SmtpAccount.xParser))
+    )
 
     /**
-     * @return ChannelTag for concrete ConfigType
+     * Get Reader for provided config type
+     * @param @ConfigType
+     * @return Reader
      */
-    fun getChannelTag(): String
+    fun getReaderForConfigType(configType: ConfigType): Reader<out BaseConfigData> {
+        return CONFIG_PROPERTIES_MAP[configType]?.configDataReader
+            ?: throw IllegalArgumentException("Transport action used with unknown ConfigType:$configType")
+    }
 
     /**
-     * @return Reader for concrete ConfigType.
+     * Validate config data is of ConfigType
      */
-    fun getConfigDataReader(): Reader<out BaseConfigData>
+    fun validateConfigData(configType: ConfigType, configData: BaseConfigData?): Boolean {
+        return when (configType) {
+            ConfigType.SLACK -> configData is Slack
+            ConfigType.WEBHOOK -> configData is Webhook
+            ConfigType.EMAIL -> configData is Email
+            ConfigType.EMAIL_GROUP -> configData is EmailGroup
+            ConfigType.SMTP_ACCOUNT -> configData is SmtpAccount
+            ConfigType.CHIME -> configData is Chime
+            ConfigType.NONE -> true
+        }
+    }
 
     /**
-     * Create ConfigData for provided parser, by calling data class' parse.
-     * @return Created ConfigData
+     * Creates config data from parser for given configType
+     * @param configType the ConfigType
+     * @param parser parser for ConfigType
+     * @return created BaseConfigData on success. null if configType is not recognized
+     *
      */
-    fun createConfigData(parser: XContentParser): BaseConfigData
-
-    /**
-     * @return ConfigType for concrete implementation
-     */
-    fun getConfigType(): ConfigType
+    fun createConfigData(configType: ConfigType, parser: XContentParser): BaseConfigData? {
+        return CONFIG_PROPERTIES_MAP[configType]?.configDataParser?.parse(parser)
+    }
 }
