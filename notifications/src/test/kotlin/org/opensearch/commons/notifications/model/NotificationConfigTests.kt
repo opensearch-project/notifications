@@ -41,8 +41,8 @@ internal class NotificationConfigTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.Slack,
-            EnumSet.of(Feature.Reports),
+            ConfigType.SLACK,
+            EnumSet.of(Feature.REPORTS),
             configData = sampleSlack
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
@@ -55,8 +55,8 @@ internal class NotificationConfigTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.Slack,
-            EnumSet.of(Feature.Reports),
+            ConfigType.SLACK,
+            EnumSet.of(Feature.REPORTS),
             configData = sampleSlack
         )
         val jsonString = getJsonString(sampleConfig)
@@ -70,8 +70,8 @@ internal class NotificationConfigTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.Chime,
-            EnumSet.of(Feature.Alerting),
+            ConfigType.CHIME,
+            EnumSet.of(Feature.ALERTING),
             configData = sampleChime
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
@@ -84,8 +84,8 @@ internal class NotificationConfigTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.Chime,
-            EnumSet.of(Feature.Alerting),
+            ConfigType.CHIME,
+            EnumSet.of(Feature.ALERTING),
             configData = sampleChime
         )
         val jsonString = getJsonString(sampleConfig)
@@ -99,8 +99,8 @@ internal class NotificationConfigTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.Webhook,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.WEBHOOK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             configData = sampleWebhook
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
@@ -113,8 +113,8 @@ internal class NotificationConfigTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.Webhook,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.WEBHOOK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             configData = sampleWebhook
         )
         val jsonString = getJsonString(sampleConfig)
@@ -128,8 +128,8 @@ internal class NotificationConfigTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.Email,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.EMAIL,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             configData = sampleEmail
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
@@ -142,8 +142,8 @@ internal class NotificationConfigTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.Email,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.EMAIL,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             configData = sampleEmail
         )
         val jsonString = getJsonString(sampleConfig)
@@ -153,12 +153,12 @@ internal class NotificationConfigTests {
 
     @Test
     fun `Config serialize and deserialize with json smtpAccount object should be equal`() {
-        val smtpAccount = SmtpAccount("domain.com", 1234, SmtpAccount.MethodType.Ssl, "from@domain.com")
+        val smtpAccount = SmtpAccount("domain.com", 1234, MethodType.SSL, "from@domain.com")
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.SmtpAccount,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.SMTP_ACCOUNT,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             configData = smtpAccount
         )
         val jsonString = getJsonString(sampleConfig)
@@ -168,12 +168,12 @@ internal class NotificationConfigTests {
 
     @Test
     fun `Config serialize and deserialize with smtpAccount object should be equal`() {
-        val sampleSmtpAccount = SmtpAccount("domain.com", 1234, SmtpAccount.MethodType.Ssl, "from@domain.com")
+        val sampleSmtpAccount = SmtpAccount("domain.com", 1234, MethodType.SSL, "from@domain.com")
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.SmtpAccount,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.SMTP_ACCOUNT,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             configData = sampleSmtpAccount
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
@@ -186,8 +186,8 @@ internal class NotificationConfigTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.EmailGroup,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.EMAIL_GROUP,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             configData = sampleEmailGroup
         )
         val jsonString = getJsonString(sampleConfig)
@@ -201,8 +201,8 @@ internal class NotificationConfigTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.EmailGroup,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.EMAIL_GROUP,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             configData = sampleEmailGroup
         )
         val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
@@ -210,13 +210,14 @@ internal class NotificationConfigTests {
     }
 
     @Test
+
     fun `Config should safely ignore unknown config type in json object`() {
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.None,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.NONE,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleSlack
         )
@@ -225,7 +226,7 @@ internal class NotificationConfigTests {
             "name":"name",
             "description":"description",
             "config_type":"NewConfig",
-            "features":["IndexManagement"],
+            "feature_list":["index_management"],
             "is_enabled":true,
             "slack":{"url":"https://domain.com/sample_slack_url#1234567890"},
             "chime":{"url":"https://domain.com/sample_chime_url#1234567890"},
@@ -244,8 +245,8 @@ internal class NotificationConfigTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.Webhook,
-            EnumSet.of(Feature.IndexManagement, Feature.None),
+            ConfigType.WEBHOOK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.NONE),
             isEnabled = true,
             configData = sampleWebhook
         )
@@ -253,8 +254,8 @@ internal class NotificationConfigTests {
         {
             "name":"name",
             "description":"description",
-            "config_type":"Webhook",
-            "features":["IndexManagement", "NewFeature1", "NewFeature2"],
+            "config_type":"webhook",
+            "feature_list":["index_management", "NewFeature1", "NewFeature2"],
             "is_enabled":true,
             "webhook":{"url":"https://domain.com/sample_webhook_url#1234567890"}
         }

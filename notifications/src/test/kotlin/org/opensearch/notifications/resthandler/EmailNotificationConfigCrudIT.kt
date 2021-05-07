@@ -28,11 +28,11 @@
 package org.opensearch.notifications.resthandler
 
 import org.junit.Assert
-import org.opensearch.common.settings.SecureString
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Email
 import org.opensearch.commons.notifications.model.EmailGroup
 import org.opensearch.commons.notifications.model.Feature
+import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
@@ -50,16 +50,14 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         val sampleSmtpAccount = SmtpAccount(
             "smtp.domain.com",
             1234,
-            SmtpAccount.MethodType.StartTls,
-            "from@domain.com",
-            SecureString("username".toCharArray()),
-            SecureString("password".toCharArray())
+            MethodType.START_TLS,
+            "from@domain.com"
         )
         val smtpAccountConfig = NotificationConfig(
             "this is a sample smtp account config name",
             "this is a sample smtp account config description",
-            ConfigType.SmtpAccount,
-            EnumSet.of(Feature.Reports),
+            ConfigType.SMTP_ACCOUNT,
+            EnumSet.of(Feature.REPORTS),
             isEnabled = true,
             configData = sampleSmtpAccount
         )
@@ -70,8 +68,8 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${smtpAccountConfig.name}",
                 "description":"${smtpAccountConfig.description}",
-                "config_type":"Smtp_account",
-                "features":[
+                "config_type":"smtp_account",
+                "feature_list":[
                     "${smtpAccountConfig.features.elementAt(0)}"
                 ],
                 "is_enabled":${smtpAccountConfig.isEnabled},
@@ -79,9 +77,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                     "host":"${sampleSmtpAccount.host}",
                     "port":"${sampleSmtpAccount.port}",
                     "method":"${sampleSmtpAccount.method}",
-                    "from_address":"${sampleSmtpAccount.fromAddress}",
-                    "username":"${sampleSmtpAccount.username!!.chars}",
-                    "password":"${sampleSmtpAccount.password!!.chars}"
+                    "from_address":"${sampleSmtpAccount.fromAddress}"
                 }
             }
         }
@@ -101,8 +97,8 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         val emailGroupConfig = NotificationConfig(
             "this is a sample email group config name",
             "this is a sample email group config description",
-            ConfigType.EmailGroup,
-            EnumSet.of(Feature.Reports),
+            ConfigType.EMAIL_GROUP,
+            EnumSet.of(Feature.REPORTS),
             isEnabled = true,
             configData = sampleEmailGroup
         )
@@ -113,13 +109,13 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${emailGroupConfig.name}",
                 "description":"${emailGroupConfig.description}",
-                "config_type":"Email_group",
-                "features":[
+                "config_type":"email_group",
+                "feature_list":[
                     "${emailGroupConfig.features.elementAt(0)}"
                 ],
                 "is_enabled":${emailGroupConfig.isEnabled},
                 "email_group":{
-                    "recipients":[
+                    "recipient_list":[
                         "${sampleEmailGroup.recipients[0]}",
                         "${sampleEmailGroup.recipients[1]}"
                     ]
@@ -146,8 +142,8 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         val emailConfig = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
-            ConfigType.Email,
-            EnumSet.of(Feature.Reports),
+            ConfigType.EMAIL,
+            EnumSet.of(Feature.REPORTS),
             isEnabled = true,
             configData = sampleEmail
         )
@@ -158,19 +154,19 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${emailConfig.name}",
                 "description":"${emailConfig.description}",
-                "config_type":"Email",
-                "features":[
+                "config_type":"email",
+                "feature_list":[
                     "${emailConfig.features.elementAt(0)}"
                 ],
                 "is_enabled":${emailConfig.isEnabled},
                 "email":{
                     "email_account_id":"${sampleEmail.emailAccountID}",
-                    "default_recipients":[
-                        "${sampleEmail.defaultRecipients[0]}",
-                        "${sampleEmail.defaultRecipients[1]}"
+                    "recipient_list":[
+                        "${sampleEmail.recipients[0]}",
+                        "${sampleEmail.recipients[1]}"
                     ],
-                    "default_email_group_ids":[
-                        "${sampleEmail.defaultEmailGroupIds[0]}"
+                    "email_group_id_list":[
+                        "${sampleEmail.emailGroupIds[0]}"
                     ]
                 }
             }
@@ -236,16 +232,14 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         val updatedSmtpAccount = SmtpAccount(
             "updated.domain.com",
             4321,
-            SmtpAccount.MethodType.Ssl,
-            "updated-from@domain.com",
-            SecureString("updated_username".toCharArray()),
-            SecureString("updated_password".toCharArray())
+            MethodType.SSL,
+            "updated-from@domain.com"
         )
         val updatedSmtpAccountConfig = NotificationConfig(
             "this is a updated smtp account config name",
             "this is a updated smtp account config description",
-            ConfigType.SmtpAccount,
-            EnumSet.of(Feature.Reports),
+            ConfigType.SMTP_ACCOUNT,
+            EnumSet.of(Feature.REPORTS),
             isEnabled = true,
             configData = updatedSmtpAccount
         )
@@ -256,8 +250,8 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${updatedSmtpAccountConfig.name}",
                 "description":"${updatedSmtpAccountConfig.description}",
-                "config_type":"Smtp_account",
-                "features":[
+                "config_type":"smtp_account",
+                "feature_list":[
                     "${updatedSmtpAccountConfig.features.elementAt(0)}"
                 ],
                 "is_enabled":${updatedSmtpAccountConfig.isEnabled},
@@ -265,9 +259,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                     "host":"${updatedSmtpAccount.host}",
                     "port":"${updatedSmtpAccount.port}",
                     "method":"${updatedSmtpAccount.method}",
-                    "from_address":"${updatedSmtpAccount.fromAddress}",
-                    "username":"${updatedSmtpAccount.username!!.chars}",
-                    "password":"${updatedSmtpAccount.password!!.chars}"
+                    "from_address":"${updatedSmtpAccount.fromAddress}"
                 }
             }
         }
@@ -337,16 +329,14 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         val sampleSmtpAccount = SmtpAccount(
             "smtp.domain.com",
             1234,
-            SmtpAccount.MethodType.StartTls,
-            "from@domain.com",
-            SecureString("username".toCharArray()),
-            SecureString("password".toCharArray())
+            MethodType.START_TLS,
+            "from@domain.com"
         )
         val smtpAccountConfig = NotificationConfig(
             "this is a sample smtp account config name",
             "this is a sample smtp account config description",
-            ConfigType.SmtpAccount,
-            EnumSet.of(Feature.Reports),
+            ConfigType.SMTP_ACCOUNT,
+            EnumSet.of(Feature.REPORTS),
             isEnabled = true,
             configData = sampleSmtpAccount
         )
@@ -357,7 +347,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${smtpAccountConfig.name}",
                 "description":"${smtpAccountConfig.description}",
-                "config_type":"Smtp_account",
+                "config_type":"smtp_account",
                 "features":[
                     "${smtpAccountConfig.features.elementAt(0)}"
                 ],
@@ -367,9 +357,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                     "host":"${sampleSmtpAccount.host}",
                     "port":"${sampleSmtpAccount.port}",
                     "method":"${sampleSmtpAccount.method}",
-                    "from_address":"${sampleSmtpAccount.fromAddress}",
-                    "username":"${sampleSmtpAccount.username!!.chars}",
-                    "password":"${sampleSmtpAccount.password!!.chars}"
+                    "from_address":"${sampleSmtpAccount.fromAddress}"
                 }
             }
         }
@@ -392,8 +380,8 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         val emailConfig = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
-            ConfigType.Email,
-            EnumSet.of(Feature.Reports),
+            ConfigType.EMAIL,
+            EnumSet.of(Feature.REPORTS),
             isEnabled = true,
             configData = sampleEmail
         )
@@ -404,7 +392,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${emailConfig.name}",
                 "description":"${emailConfig.description}",
-                "config_type":"Email",
+                "config_type":"email",
                 "features":[
                     "${emailConfig.features.elementAt(0)}"
                 ],
@@ -413,11 +401,11 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "email":{
                     "email_account_id":"${sampleEmail.emailAccountID}",
                     "default_recipients":[
-                        "${sampleEmail.defaultRecipients[0]}",
-                        "${sampleEmail.defaultRecipients[1]}"
+                        "${sampleEmail.recipients[0]}",
+                        "${sampleEmail.recipients[1]}"
                     ],
                     "default_email_group_ids":[
-                        "${sampleEmail.defaultEmailGroupIds[0]}"
+                        "${sampleEmail.emailGroupIds[0]}"
                     ]
                 }
             }

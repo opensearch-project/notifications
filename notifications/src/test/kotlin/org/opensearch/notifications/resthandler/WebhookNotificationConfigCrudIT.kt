@@ -47,8 +47,8 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
-            ConfigType.Webhook,
-            EnumSet.of(Feature.IndexManagement, Feature.Reports, Feature.Alerting),
+            ConfigType.WEBHOOK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS, Feature.ALERTING),
             isEnabled = true,
             configData = sampleWebhook
         )
@@ -59,8 +59,8 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
-                "config_type":"Webhook",
-                "features":[
+                "config_type":"webhook",
+                "feature_list":[
                     "${referenceObject.features.elementAt(0)}",
                     "${referenceObject.features.elementAt(1)}",
                     "${referenceObject.features.elementAt(2)}"
@@ -107,8 +107,8 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
         val updatedObject = NotificationConfig(
             "this is a updated config name",
             "this is a updated config description",
-            ConfigType.Webhook,
-            EnumSet.of(Feature.IndexManagement, Feature.Reports),
+            ConfigType.WEBHOOK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS),
             isEnabled = true,
             configData = updatedWebhook
         )
@@ -119,8 +119,8 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${updatedObject.name}",
                 "description":"${updatedObject.description}",
-                "config_type":"Webhook",
-                "features":[
+                "config_type":"webhook",
+                "feature_list":[
                     "${updatedObject.features.elementAt(0)}",
                     "${updatedObject.features.elementAt(1)}"
                 ],
@@ -176,8 +176,8 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
-            ConfigType.Webhook,
-            EnumSet.of(Feature.IndexManagement, Feature.Reports, Feature.Alerting),
+            ConfigType.WEBHOOK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS, Feature.ALERTING),
             isEnabled = true,
             configData = sampleWebhook
         )
@@ -188,7 +188,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
-                "config_type":"Webhook",
+                "config_type":"webhook",
                 "features":[
                     "${referenceObject.features.elementAt(0)}",
                     "${referenceObject.features.elementAt(1)}",

@@ -110,13 +110,13 @@ internal class EmailTests {
         val jsonString = """
             {
                 "email_account_id":"${sampleEmail.emailAccountID}",
-                "default_recipients":[
-                    "${sampleEmail.defaultRecipients[0]}",
-                    "${sampleEmail.defaultRecipients[1]}"
+                "recipient_list":[
+                    "${sampleEmail.recipients[0]}",
+                    "${sampleEmail.recipients[1]}"
                 ],
-                "default_email_group_ids":[
-                    "${sampleEmail.defaultEmailGroupIds[0]}",
-                    "${sampleEmail.defaultEmailGroupIds[1]}"
+                "email_group_id_list":[
+                    "${sampleEmail.emailGroupIds[0]}",
+                    "${sampleEmail.emailGroupIds[1]}"
                 ]
              }"
         """.trimIndent()
@@ -142,13 +142,13 @@ internal class EmailTests {
         val jsonString = """
             {
                 "email_account_id2":"${sampleEmail.emailAccountID}",
-                "default_recipients":[
-                    "${sampleEmail.defaultRecipients[0]}",
-                    "${sampleEmail.defaultRecipients[1]}"
+                "recipient_list":[
+                    "${sampleEmail.recipients[0]}",
+                    "${sampleEmail.recipients[1]}"
                 ],
-                "default_email_group_ids":[
-                    "${sampleEmail.defaultEmailGroupIds[0]}",
-                    "${sampleEmail.defaultEmailGroupIds[1]}"
+                "email_group_id_list":[
+                    "${sampleEmail.emailGroupIds[0]}",
+                    "${sampleEmail.emailGroupIds[1]}"
                 ]
              }"
         """.trimIndent()
@@ -175,11 +175,11 @@ internal class EmailTests {
         val jsonString = """
             {
                 "email_account_id":"${sampleEmail.emailAccountID}",
-                "default_recipients2":[
+                "recipient_list2":[
                     "email1@email.com",
                     "email2@email.com"
                 ],
-                "default_email_group_ids2":[
+                "email_group_id_list2":[
                     "sample_group_id_1"
                 ],
                 "another":"field"

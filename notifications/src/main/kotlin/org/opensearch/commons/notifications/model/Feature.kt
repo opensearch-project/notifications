@@ -27,7 +27,45 @@
 
 package org.opensearch.commons.notifications.model
 
+import org.opensearch.commons.utils.EnumParser
+
 /**
  * Features using notification plugin
  */
-enum class Feature { None, Alerting, IndexManagement, Reports }
+enum class Feature(val tag: String) {
+    NONE("none") {
+        override fun toString(): String {
+            return tag
+        }
+    },
+    ALERTING("alerting") {
+        override fun toString(): String {
+            return tag
+        }
+    },
+    INDEX_MANAGEMENT("index_management") {
+        override fun toString(): String {
+            return tag
+        }
+    },
+    REPORTS("reports") {
+        override fun toString(): String {
+            return tag
+        }
+    };
+
+    companion object {
+        private val tagMap = values().associateBy { it.tag }
+
+        val enumParser = EnumParser { fromTagOrDefault(it) }
+
+        /**
+         * Get Feature from tag or NONE if not found
+         * @param tag the tag
+         * @return Feature corresponding to tag. NONE if invalid tag.
+         */
+        fun fromTagOrDefault(tag: String): Feature {
+            return tagMap[tag] ?: NONE
+        }
+    }
+}

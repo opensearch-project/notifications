@@ -34,6 +34,7 @@ import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Email
 import org.opensearch.commons.notifications.model.EmailGroup
 import org.opensearch.commons.notifications.model.Feature
+import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.SmtpAccount
@@ -53,16 +54,16 @@ fun verifyEquals(webhook: Webhook, jsonObject: JsonObject) {
 
 fun verifyEquals(email: Email, jsonObject: JsonObject) {
     Assert.assertEquals(email.emailAccountID, jsonObject.get("email_account_id").asString)
-    val defaultRecipients = jsonObject.get("default_recipients").asJsonArray
-    Assert.assertEquals(email.defaultRecipients.size, defaultRecipients.size())
-    defaultRecipients.forEach { email.defaultRecipients.contains(it.asString) }
-    val defaultEmailGroupIds = jsonObject.get("default_email_group_ids").asJsonArray
-    Assert.assertEquals(email.defaultEmailGroupIds.size, defaultEmailGroupIds.size())
-    defaultEmailGroupIds.forEach { email.defaultEmailGroupIds.contains(it.asString) }
+    val defaultRecipients = jsonObject.get("recipient_list").asJsonArray
+    Assert.assertEquals(email.recipients.size, defaultRecipients.size())
+    defaultRecipients.forEach { email.recipients.contains(it.asString) }
+    val defaultEmailGroupIds = jsonObject.get("email_group_id_list").asJsonArray
+    Assert.assertEquals(email.emailGroupIds.size, defaultEmailGroupIds.size())
+    defaultEmailGroupIds.forEach { email.emailGroupIds.contains(it.asString) }
 }
 
 fun verifyEquals(emailGroup: EmailGroup, jsonObject: JsonObject) {
-    val recipients = jsonObject.get("recipients").asJsonArray
+    val recipients = jsonObject.get("recipient_list").asJsonArray
     Assert.assertEquals(emailGroup.recipients.size, recipients.size())
     recipients.forEach { emailGroup.recipients.contains(it.asString) }
 }
@@ -70,43 +71,72 @@ fun verifyEquals(emailGroup: EmailGroup, jsonObject: JsonObject) {
 fun verifyEquals(smtpAccount: SmtpAccount, jsonObject: JsonObject) {
     Assert.assertEquals(smtpAccount.host, jsonObject.get("host").asString)
     Assert.assertEquals(smtpAccount.port, jsonObject.get("port").asInt)
-    Assert.assertEquals(smtpAccount.method, SmtpAccount.MethodType.valueOf(jsonObject.get("method").asString))
+    Assert.assertEquals(smtpAccount.method, MethodType.fromTagOrDefault(jsonObject.get("method").asString))
     Assert.assertEquals(smtpAccount.fromAddress, jsonObject.get("from_address").asString)
-    // TODO: Validate username,password?
 }
 
 fun verifyEquals(config: NotificationConfig, jsonObject: JsonObject) {
     Assert.assertEquals(config.name, jsonObject.get("name").asString)
     Assert.assertEquals(config.description, jsonObject.get("description").asString)
-    Assert.assertEquals(config.configType.name, jsonObject.get("config_type").asString)
+    Assert.assertEquals(config.configType.tag, jsonObject.get("config_type").asString)
     Assert.assertEquals(config.isEnabled, jsonObject.get("is_enabled").asBoolean)
-    val features = jsonObject.get("features").asJsonArray
+    val features = jsonObject.get("feature_list").asJsonArray
     Assert.assertEquals(config.features.size, features.size())
-    features.forEach { config.features.contains(Feature.valueOf(it.asString)) }
+    features.forEach { config.features.contains(Feature.fromTagOrDefault(it.asString)) }
     when (config.configType) {
-        ConfigType.Slack -> verifyEquals((config.configData as Slack), jsonObject.get("slack").asJsonObject)
-        ConfigType.Chime -> verifyEquals((config.configData as Chime), jsonObject.get("chime").asJsonObject)
-        ConfigType.Webhook -> verifyEquals((config.configData as Webhook), jsonObject.get("webhook").asJsonObject)
-        ConfigType.Email -> verifyEquals((config.configData as Email), jsonObject.get("email").asJsonObject)
-        ConfigType.SmtpAccount -> verifyEquals((config.configData as SmtpAccount), jsonObject.get("smtp_account")
-            .asJsonObject)
-        ConfigType.EmailGroup -> verifyEquals((config.configData as EmailGroup), jsonObject.get("email_group")
-            .asJsonObject)
+        ConfigType.SLACK -> verifyEquals((config.configData as Slack), jsonObject.get("slack").asJsonObject)
+        ConfigType.CHIME -> verifyEquals((config.configData as Chime), jsonObject.get("chime").asJsonObject)
+        ConfigType.WEBHOOK -> verifyEquals((config.configData as Webhook), jsonObject.get("webhook").asJsonObject)
+        ConfigType.EMAIL -> verifyEquals((config.configData as Email), jsonObject.get("email").asJsonObject)
+        ConfigType.SMTP_ACCOUNT -> verifyEquals(
+            (config.configData as SmtpAccount),
+            jsonObject.get("smtp_account").asJsonObject
+        )
+        ConfigType.EMAIL_GROUP -> verifyEquals(
+            (config.configData as EmailGroup),
+            jsonObject.get("email_group").asJsonObject
+        )
         else -> Assert.fail("configType:${config.configType} not handled in test")
     }
 }
 
-fun verifySingleConfigEquals(configId: String, config: NotificationConfig, jsonObject: JsonObject) {
-    Assert.assertEquals(1, jsonObject.get("total_hits").asInt)
-    val getResponseItem = jsonObject.get("notification_config_list").asJsonArray[0].asJsonObject
+fun verifySingleConfigEquals(
+    configId: String,
+    config: NotificationConfig,
+    jsonObject: JsonObject,
+    totalHits: Int = -1
+) {
+    if (totalHits >= 0) {
+        Assert.assertEquals(totalHits, jsonObject.get("total_hits").asInt)
+    }
+    val items = jsonObject.get("notification_config_list").asJsonArray
+    Assert.assertEquals(1, items.size())
+    val getResponseItem = items[0].asJsonObject
     Assert.assertEquals(configId, getResponseItem.get("config_id").asString)
     Assert.assertEquals("", getResponseItem.get("tenant").asString)
     verifyEquals(config, getResponseItem.get("notification_config").asJsonObject)
 }
 
-fun verifyMultiConfigEquals(objectMap: Map<String, NotificationConfig>, jsonObject: JsonObject) {
-    Assert.assertEquals(objectMap.size, jsonObject.get("total_hits").asInt)
+fun verifySingleConfigIdEquals(configId: String, jsonObject: JsonObject, totalHits: Int = -1) {
+    if (totalHits >= 0) {
+        Assert.assertEquals(totalHits, jsonObject.get("total_hits").asInt)
+    }
     val items = jsonObject.get("notification_config_list").asJsonArray
+    Assert.assertEquals(1, items.size())
+    val getResponseItem = items[0].asJsonObject
+    Assert.assertEquals(configId, getResponseItem.get("config_id").asString)
+}
+
+fun verifyMultiConfigEquals(
+    objectMap: Map<String, NotificationConfig>,
+    jsonObject: JsonObject,
+    totalHits: Int = -1
+) {
+    if (totalHits >= 0) {
+        Assert.assertEquals(totalHits, jsonObject.get("total_hits").asInt)
+    }
+    val items = jsonObject.get("notification_config_list").asJsonArray
+    Assert.assertEquals(objectMap.size, items.size())
     items.forEach {
         val item = it.asJsonObject
         val configId = item.get("config_id").asString
@@ -115,5 +145,30 @@ fun verifyMultiConfigEquals(objectMap: Map<String, NotificationConfig>, jsonObje
         Assert.assertNotNull(config)
         Assert.assertEquals("", item.get("tenant").asString)
         verifyEquals(config!!, item.get("notification_config").asJsonObject)
+    }
+}
+
+fun verifyMultiConfigIdEquals(idSet: Set<String>, jsonObject: JsonObject, totalHits: Int = -1) {
+    if (totalHits >= 0) {
+        Assert.assertEquals(totalHits, jsonObject.get("total_hits").asInt)
+    }
+    val items = jsonObject.get("notification_config_list").asJsonArray
+    Assert.assertEquals(idSet.size, items.size())
+    items.forEach {
+        val item = it.asJsonObject
+        val configId = item.get("config_id").asString
+        Assert.assertNotNull(configId)
+        Assert.assertTrue(idSet.contains(configId))
+    }
+}
+
+fun verifyOrderedConfigList(idList: List<String>, jsonObject: JsonObject, totalHits: Int = -1) {
+    if (totalHits >= 0) {
+        Assert.assertEquals(totalHits, jsonObject.get("total_hits").asInt)
+    }
+    val items = jsonObject.get("notification_config_list").asJsonArray
+    Assert.assertEquals(idList.size, items.size())
+    (1..idList.size).forEach {
+        Assert.assertEquals(idList[it - 1], items[it - 1].asJsonObject.get("config_id").asString)
     }
 }

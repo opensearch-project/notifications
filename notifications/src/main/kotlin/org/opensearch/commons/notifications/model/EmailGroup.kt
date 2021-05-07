@@ -33,11 +33,10 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
-import org.opensearch.commons.notifications.NotificationConstants.RECIPIENTS_TAG
-import org.opensearch.commons.notifications.model.config.BaseConfigData
-import org.opensearch.commons.utils.isValidEmail
+import org.opensearch.commons.notifications.NotificationConstants.RECIPIENT_LIST_TAG
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.stringList
+import org.opensearch.commons.utils.validateEmail
 import java.io.IOException
 
 /**
@@ -49,7 +48,7 @@ data class EmailGroup(
 
     init {
         recipients.forEach {
-            require(isValidEmail(it)) { "Invalid email address" }
+            validateEmail(it)
         }
     }
 
@@ -60,6 +59,11 @@ data class EmailGroup(
          * reader to create instance of class from writable.
          */
         val reader = Writeable.Reader { EmailGroup(it) }
+
+        /**
+         * Parser to parse xContent
+         */
+        val xParser = XParser { parse(it) }
 
         /**
          * Creator used in REST communication.
@@ -79,14 +83,14 @@ data class EmailGroup(
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    RECIPIENTS_TAG -> recipients = parser.stringList()
+                    RECIPIENT_LIST_TAG -> recipients = parser.stringList()
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing EmailGroup")
                     }
                 }
             }
-            recipients ?: throw IllegalArgumentException("$RECIPIENTS_TAG field absent")
+            recipients ?: throw IllegalArgumentException("$RECIPIENT_LIST_TAG field absent")
             return EmailGroup(recipients)
         }
     }
@@ -112,7 +116,7 @@ data class EmailGroup(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(RECIPIENTS_TAG, recipients)
+            .field(RECIPIENT_LIST_TAG, recipients)
             .endObject()
     }
 }

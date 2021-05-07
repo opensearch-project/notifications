@@ -24,30 +24,19 @@
  * permissions and limitations under the License.
  *
  */
-
 package org.opensearch.commons.utils
 
-import org.apache.logging.log4j.Logger
 import org.opensearch.common.io.stream.StreamOutput
 import org.opensearch.common.io.stream.Writeable
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import java.util.EnumSet
 
-inline fun <reified E : Enum<E>> valueOf(type: String, default: E, logHelper: Logger): E {
-    return try {
-        java.lang.Enum.valueOf(E::class.java, type)
-    } catch (e: IllegalArgumentException) {
-        logHelper.info("${e.message}:Enum value $type is not recognized, defaulting to $default")
-        default
-    }
-}
-
-inline fun <reified E : Enum<E>> XContentParser.enumSet(default: E, logHelper: Logger): EnumSet<E> {
+inline fun <reified E : Enum<E>> XContentParser.enumSet(enumParser: EnumParser<E>): EnumSet<E> {
     val retSet: EnumSet<E> = EnumSet.noneOf(E::class.java)
     XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_ARRAY, currentToken(), this)
     while (nextToken() != XContentParser.Token.END_ARRAY) {
-        retSet.add(valueOf(text(), default, logHelper))
+        retSet.add(enumParser.fromTagOrDefault(text()))
     }
     return retSet
 }

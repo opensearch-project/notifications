@@ -36,8 +36,8 @@ import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.RECIPIENT_TAG
 import org.opensearch.commons.notifications.NotificationConstants.STATUS_DETAIL_TAG
-import org.opensearch.commons.utils.isValidEmail
 import org.opensearch.commons.utils.logger
+import org.opensearch.commons.utils.validateEmail
 import java.io.IOException
 
 /**
@@ -49,7 +49,7 @@ data class EmailRecipientStatus(
 ) : BaseModel {
 
     init {
-        require(isValidEmail(recipient)) { "Invalid email address" }
+        validateEmail(recipient)
     }
 
     companion object {

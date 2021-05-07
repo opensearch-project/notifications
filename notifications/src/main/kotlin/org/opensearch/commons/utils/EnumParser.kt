@@ -24,12 +24,16 @@
  * permissions and limitations under the License.
  *
  */
-
-package org.opensearch.commons.notifications.model.config
-
-import org.opensearch.commons.notifications.model.BaseModel
+package org.opensearch.commons.utils
 
 /**
- * Marker interface for Channel Data
+ * Functional interface to create config data object using XContentParser
  */
-interface BaseConfigData : BaseModel
+fun interface EnumParser<E> {
+    /**
+     * Get Enum from tag or default value if not found
+     * @param tag the tag
+     * @return Enum corresponding to tag. default value if invalid tag.
+     */
+    fun fromTagOrDefault(tag: String): E
+}

@@ -58,8 +58,8 @@ internal class SendNotificationRequestTests {
         val notificationInfo = NotificationInfo(
             "title",
             "reference_id",
-            Feature.Reports,
-            SeverityType.High,
+            Feature.REPORTS,
+            SeverityType.HIGH,
             listOf("tag1", "tag2")
         )
         val channelMessage = ChannelMessage(
@@ -82,8 +82,8 @@ internal class SendNotificationRequestTests {
         val notificationInfo = NotificationInfo(
             "title",
             "reference_id",
-            Feature.IndexManagement,
-            SeverityType.Critical,
+            Feature.INDEX_MANAGEMENT,
+            SeverityType.CRITICAL,
             listOf("tag1", "tag2")
         )
         val channelMessage = ChannelMessage(
@@ -115,8 +115,8 @@ internal class SendNotificationRequestTests {
         val notificationInfo = NotificationInfo(
             "title",
             "reference_id",
-            Feature.Alerting,
-            SeverityType.High,
+            Feature.ALERTING,
+            SeverityType.HIGH,
             listOf("tag1", "tag2")
         )
         val channelMessage = ChannelMessage(
@@ -143,7 +143,7 @@ internal class SendNotificationRequestTests {
                 "text_description":"${channelMessage.textDescription}",
                 "html_description":"${channelMessage.htmlDescription}"
             },
-            "channel_ids":["channelId1", "channelId2"],
+            "channel_id_list":["channelId1", "channelId2"],
             "context":"${request.threadContext}",
             "extra_field_1":["extra", "value"],
             "extra_field_2":{"extra":"value"},
@@ -159,8 +159,8 @@ internal class SendNotificationRequestTests {
         val notificationInfo = NotificationInfo(
             "title",
             "reference_id",
-            Feature.Reports,
-            SeverityType.Info,
+            Feature.REPORTS,
+            SeverityType.INFO,
             listOf("tag1", "tag2")
         )
         val channelMessage = ChannelMessage(
@@ -187,7 +187,7 @@ internal class SendNotificationRequestTests {
                 "text_description":"${channelMessage.textDescription}",
                 "html_description":"${channelMessage.htmlDescription}"
             },
-            "channel_ids":["channelId1", "channelId2"]
+            "channel_id_list":["channelId1", "channelId2"]
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { SendNotificationRequest.parse(it) }
@@ -201,7 +201,7 @@ internal class SendNotificationRequestTests {
             "channel_message":{
                 "text_description":"text_description"
             },
-            "channel_ids":["channelId1", "channelId2"]
+            "channel_id_list":["channelId1", "channelId2"]
         }
         """.trimIndent()
         assertThrows<IllegalArgumentException> {
@@ -220,7 +220,7 @@ internal class SendNotificationRequestTests {
                 "severity":"High",
                 "tags":["tag1", "tag2"]
             },
-            "channel_ids":["channelId1", "channelId2"]
+            "channel_id_list":["channelId1", "channelId2"]
         }
         """.trimIndent()
         assertThrows<IllegalArgumentException> {
@@ -263,7 +263,7 @@ internal class SendNotificationRequestTests {
             "channel_message":{
                 "text_description":"text_description"
             },
-            "channel_ids":[]
+            "channel_id_list":[]
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { SendNotificationRequest.parse(it) }

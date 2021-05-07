@@ -47,8 +47,8 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
-            ConfigType.Slack,
-            EnumSet.of(Feature.IndexManagement, Feature.Reports),
+            ConfigType.SLACK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS),
             isEnabled = true,
             configData = sampleSlack
         )
@@ -59,8 +59,8 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
-                "config_type":"Slack",
-                "features":[
+                "config_type":"slack",
+                "feature_list":[
                     "${referenceObject.features.elementAt(0)}",
                     "${referenceObject.features.elementAt(1)}"
                 ],
@@ -106,8 +106,8 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         val updatedObject = NotificationConfig(
             "this is a updated config name",
             "this is a updated config description",
-            ConfigType.Slack,
-            EnumSet.of(Feature.IndexManagement, Feature.Reports),
+            ConfigType.SLACK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS),
             isEnabled = true,
             configData = updatedSlack
         )
@@ -118,8 +118,8 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${updatedObject.name}",
                 "description":"${updatedObject.description}",
-                "config_type":"Slack",
-                "features":[
+                "config_type":"slack",
+                "feature_list":[
                     "${updatedObject.features.elementAt(0)}",
                     "${updatedObject.features.elementAt(1)}"
                 ],
@@ -175,8 +175,8 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
-            ConfigType.Slack,
-            EnumSet.of(Feature.IndexManagement, Feature.Reports),
+            ConfigType.SLACK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS),
             isEnabled = true,
             configData = sampleSlack
         )
@@ -187,7 +187,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
-                "config_type":"Slack",
+                "config_type":"slack",
                 "features":[
                     "${referenceObject.features.elementAt(0)}",
                     "${referenceObject.features.elementAt(1)}"

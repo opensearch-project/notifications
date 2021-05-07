@@ -128,16 +128,16 @@ internal abstract class BaseEmailChannel : NotificationChannel {
     private fun isMessageSizeOverLimit(title: String, channelMessage: ChannelMessage): Boolean {
         val approxAttachmentLength = if (channelMessage.attachment != null) {
             MINIMUM_EMAIL_HEADER_LENGTH +
-                    channelMessage.attachment.fileData.length +
-                    channelMessage.attachment.fileName.length
+                channelMessage.attachment.fileData.length +
+                channelMessage.attachment.fileName.length
         } else {
             0
         }
         val approxEmailLength = MINIMUM_EMAIL_HEADER_LENGTH +
-                title.length +
-                channelMessage.textDescription.length +
-                (channelMessage.htmlDescription?.length ?: 0) +
-                approxAttachmentLength
+            title.length +
+            channelMessage.textDescription.length +
+            (channelMessage.htmlDescription?.length ?: 0) +
+            approxAttachmentLength
         return approxEmailLength > PluginSettings.emailSizeLimit
     }
 

@@ -41,6 +41,7 @@ import org.opensearch.commons.notifications.NotificationConstants.NOTIFICATION_C
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.logger
+import org.opensearch.commons.utils.validateId
 import java.io.IOException
 
 /**
@@ -87,6 +88,9 @@ class CreateNotificationConfigRequest : ActionRequest, ToXContentObject {
                 }
             }
             notificationConfig ?: throw IllegalArgumentException("$NOTIFICATION_CONFIG_TAG field absent")
+            if (configId != null) {
+                validateId(configId)
+            }
             return CreateNotificationConfigRequest(notificationConfig, configId)
         }
     }

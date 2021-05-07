@@ -41,7 +41,6 @@ import org.opensearch.commons.notifications.NotificationConstants.THREAD_CONTEXT
 import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.logger
-import org.opensearch.commons.utils.valueOf
 import java.io.IOException
 
 /**
@@ -81,7 +80,7 @@ class GetFeatureChannelListRequest : ActionRequest, ToXContentObject {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    FEATURE_TAG -> feature = valueOf(parser.text(), Feature.None, log)
+                    FEATURE_TAG -> feature = Feature.fromTagOrDefault(parser.text())
                     THREAD_CONTEXT_TAG -> threadContext = parser.text()
                     else -> {
                         parser.skipChildren()

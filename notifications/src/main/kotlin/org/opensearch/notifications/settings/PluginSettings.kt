@@ -210,10 +210,12 @@ internal object PluginSettings {
     /**
      * Default filter-by method.
      */
-    private val DEFAULT_IGNORED_ROLES = listOf("own_index",
+    private val DEFAULT_IGNORED_ROLES = listOf(
+        "own_index",
         "kibana_user",
         "notifications_full_access",
-        "notifications_read_access")
+        "notifications_read_access"
+    )
 
     /**
      * Operation timeout setting in ms for I/O operations

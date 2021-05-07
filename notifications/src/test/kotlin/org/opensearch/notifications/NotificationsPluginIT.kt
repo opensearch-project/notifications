@@ -43,6 +43,7 @@ class NotificationsPluginIT : OpenSearchIntegTestCase() {
         val pluginInfos = nodesInfoResponse.nodes[0].getInfo(PluginsAndModules::class.java).pluginInfos
         assertTrue(
             pluginInfos.stream()
-                .anyMatch { pluginInfo: PluginInfo -> pluginInfo.name == "opensearch-notifications" })
+                .anyMatch { pluginInfo: PluginInfo -> pluginInfo.name == "opensearch-notifications" }
+        )
     }
 }

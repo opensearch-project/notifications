@@ -28,10 +28,10 @@
 package org.opensearch.notifications.resthandler
 
 import org.junit.Assert
-import org.opensearch.common.settings.SecureString
 import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Feature
+import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.SmtpAccount
@@ -41,7 +41,6 @@ import org.opensearch.notifications.PluginRestTestCase
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
-import java.net.URLEncoder
 import java.util.EnumSet
 
 class CreateNotificationConfigIT : PluginRestTestCase() {
@@ -52,8 +51,8 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
-            ConfigType.Slack,
-            EnumSet.of(Feature.IndexManagement, Feature.Reports),
+            ConfigType.SLACK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS),
             isEnabled = true,
             configData = sampleSlack
         )
@@ -64,8 +63,8 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
-                "config_type":"Slack",
-                "features":[
+                "config_type":"slack",
+                "feature_list":[
                     "${referenceObject.features.elementAt(0)}",
                     "${referenceObject.features.elementAt(1)}"
                 ],
@@ -102,8 +101,8 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
-            ConfigType.Chime,
-            EnumSet.of(Feature.Alerting, Feature.Reports),
+            ConfigType.CHIME,
+            EnumSet.of(Feature.ALERTING, Feature.REPORTS),
             isEnabled = true,
             configData = sampleChime
         )
@@ -115,8 +114,8 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
-                "config_type":"Chime",
-                "features":[
+                "config_type":"chime",
+                "feature_list":[
                     "${referenceObject.features.elementAt(0)}",
                     "${referenceObject.features.elementAt(1)}"
                 ],
@@ -151,8 +150,8 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
-            ConfigType.Webhook,
-            EnumSet.of(Feature.IndexManagement, Feature.Reports, Feature.Alerting),
+            ConfigType.WEBHOOK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS, Feature.ALERTING),
             isEnabled = true,
             configData = sampleWebhook
         )
@@ -163,8 +162,8 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
-                "config_type":"Webhook",
-                "features":[
+                "config_type":"webhook",
+                "feature_list":[
                     "${referenceObject.features.elementAt(0)}",
                     "${referenceObject.features.elementAt(1)}",
                     "${referenceObject.features.elementAt(2)}"
@@ -200,8 +199,8 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         val anotherObject = NotificationConfig(
             "this is another config name",
             "this is another config description",
-            ConfigType.Webhook,
-            EnumSet.of(Feature.IndexManagement, Feature.Reports),
+            ConfigType.WEBHOOK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS),
             isEnabled = true,
             configData = anotherWebhook
         )
@@ -213,8 +212,8 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${anotherObject.name}",
                 "description":"${anotherObject.description}",
-                "config_type":"Webhook",
-                "features":[
+                "config_type":"webhook",
+                "feature_list":[
                     "${anotherObject.features.elementAt(0)}",
                     "${anotherObject.features.elementAt(1)}"
                 ],
@@ -232,22 +231,20 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         )
     }
 
-    fun `test Create smtpAccount notification config with ID containing special chars`() {
+    fun `test Create smtpAccount notification config with ID containing special chars fails`() {
         // Create sample smtp account config request reference
         val configId = "~!@#$%^&*()_+`-=;',./<>?"
         val sampleSmtpAccount = SmtpAccount(
             "smtp.domain.com",
             1234,
-            SmtpAccount.MethodType.StartTls,
-            "from@domain.com",
-            SecureString("username".toCharArray()),
-            SecureString("password".toCharArray())
+            MethodType.START_TLS,
+            "from@domain.com"
         )
         val smtpAccountConfig = NotificationConfig(
             "this is a sample smtp account config name",
             "this is a sample smtp account config description",
-            ConfigType.SmtpAccount,
-            EnumSet.of(Feature.Reports),
+            ConfigType.SMTP_ACCOUNT,
+            EnumSet.of(Feature.REPORTS),
             isEnabled = true,
             configData = sampleSmtpAccount
         )
@@ -259,8 +256,8 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             "notification_config":{
                 "name":"${smtpAccountConfig.name}",
                 "description":"${smtpAccountConfig.description}",
-                "config_type":"SmtpAccount",
-                "features":[
+                "config_type":"smtp_account",
+                "feature_list":[
                     "${smtpAccountConfig.features.elementAt(0)}"
                 ],
                 "is_enabled":${smtpAccountConfig.isEnabled},
@@ -268,29 +265,16 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
                     "host":"${sampleSmtpAccount.host}",
                     "port":"${sampleSmtpAccount.port}",
                     "method":"${sampleSmtpAccount.method}",
-                    "from_address":"${sampleSmtpAccount.fromAddress}",
-                    "username":"${sampleSmtpAccount.username!!.chars}",
-                    "password":"${sampleSmtpAccount.password!!.chars}"
+                    "from_address":"${sampleSmtpAccount.fromAddress}"
                 }
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
+        executeRequest(
             RestRequest.Method.POST.name,
             "$PLUGIN_BASE_URI/configs",
             createSmtpAccountRequestJsonString,
-            RestStatus.OK.status
+            RestStatus.BAD_REQUEST.status
         )
-        Assert.assertEquals(configId, createResponse.get("config_id").asString)
-        Thread.sleep(100)
-
-        // Get email notification config
-        val getSmtpAccountResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs/${URLEncoder.encode(configId, "utf-8")}",
-            "",
-            RestStatus.OK.status
-        )
-        verifySingleConfigEquals(configId, smtpAccountConfig, getSmtpAccountResponse)
     }
 }

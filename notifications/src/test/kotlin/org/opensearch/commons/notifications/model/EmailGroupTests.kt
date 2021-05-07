@@ -97,7 +97,7 @@ internal class EmailGroupTests {
         val sampleEmailGroup = EmailGroup(listOf("email1@email.com", "email2@email.com"))
         val jsonString = """
             {
-                "recipients":[
+                "recipient_list":[
                     "${sampleEmailGroup.recipients[0]}",
                     "${sampleEmailGroup.recipients[1]}"
                 ]
@@ -120,7 +120,7 @@ internal class EmailGroupTests {
         val sampleEmailGroup = EmailGroup(listOf("email1@email.com", "email2@email.com"))
         val jsonString = """
             {
-                "recipients2":[
+                "recipient_list2":[
                     "${sampleEmailGroup.recipients[0]}",
                     "${sampleEmailGroup.recipients[1]}"
                 ]
@@ -134,7 +134,7 @@ internal class EmailGroupTests {
     @Test
     fun `EmailGroup should safely ignore extra field in json object`() {
         val sampleEmailGroup = EmailGroup(listOf("email@email.com"))
-        val jsonString = "{\"recipients\":[\"${sampleEmailGroup.recipients[0]}\"], \"another\":\"field\"}"
+        val jsonString = "{\"recipient_list\":[\"${sampleEmailGroup.recipients[0]}\"], \"another\":\"field\"}"
         val recreatedObject = createObjectFromJsonString(jsonString) { EmailGroup.parse(it) }
         assertEquals(sampleEmailGroup, recreatedObject)
     }

@@ -43,7 +43,6 @@ import org.opensearch.commons.notifications.NotificationConstants.STATUS_DETAIL_
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.objectList
-import org.opensearch.commons.utils.valueOf
 import java.io.IOException
 
 /**
@@ -61,11 +60,11 @@ data class ChannelStatus(
         require(!Strings.isNullOrEmpty(configId)) { "config id is null or empty" }
         require(!Strings.isNullOrEmpty(configName)) { "config name is null or empty" }
         when (configType) {
-            ConfigType.Chime -> requireNotNull(deliveryStatus)
-            ConfigType.Webhook -> requireNotNull(deliveryStatus)
-            ConfigType.Slack -> requireNotNull(deliveryStatus)
-            ConfigType.Email -> require(emailRecipientStatus.isNotEmpty())
-            ConfigType.None -> log.info("Some config field not recognized")
+            ConfigType.CHIME -> requireNotNull(deliveryStatus)
+            ConfigType.WEBHOOK -> requireNotNull(deliveryStatus)
+            ConfigType.SLACK -> requireNotNull(deliveryStatus)
+            ConfigType.EMAIL -> require(emailRecipientStatus.isNotEmpty())
+            ConfigType.NONE -> log.info("Some config field not recognized")
             else -> {
                 log.info("non-allowed config type for Status")
             }
@@ -104,7 +103,7 @@ data class ChannelStatus(
                 when (fieldName) {
                     CONFIG_NAME_TAG -> configName = parser.text()
                     CONFIG_ID_TAG -> configId = parser.text()
-                    CONFIG_TYPE_TAG -> configType = valueOf(parser.text(), ConfigType.None, log)
+                    CONFIG_TYPE_TAG -> configType = ConfigType.fromTagOrDefault(parser.text())
                     EMAIL_RECIPIENT_STATUS_TAG -> emailRecipientStatus = parser.objectList { EmailRecipientStatus.parse(it) }
                     STATUS_DETAIL_TAG -> deliveryStatus = DeliveryStatus.parse(parser)
                     else -> {
@@ -157,7 +156,7 @@ data class ChannelStatus(
         builder!!
         return builder.startObject()
             .field(CONFIG_ID_TAG, configId)
-            .field(CONFIG_TYPE_TAG, configType)
+            .field(CONFIG_TYPE_TAG, configType.tag)
             .field(CONFIG_NAME_TAG, configName)
             .field(EMAIL_RECIPIENT_STATUS_TAG, emailRecipientStatus)
             .fieldIfNotNull(STATUS_DETAIL_TAG, deliveryStatus)

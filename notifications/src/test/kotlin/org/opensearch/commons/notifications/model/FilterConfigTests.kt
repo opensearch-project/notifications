@@ -41,7 +41,7 @@ internal class FilterConfigTests {
             "config_id",
             "name",
             "description",
-            ConfigType.Slack
+            ConfigType.SLACK
         )
         val recreatedObject = recreateObject(sampleConfig) { FeatureChannel(it) }
         assertEquals(sampleConfig, recreatedObject)
@@ -53,7 +53,7 @@ internal class FilterConfigTests {
             "config_id",
             "name",
             "description",
-            ConfigType.Chime,
+            ConfigType.CHIME,
             false
         )
         val recreatedObject = recreateObject(sampleConfig) { FeatureChannel(it) }
@@ -66,7 +66,7 @@ internal class FilterConfigTests {
             "config_id",
             "name",
             "description",
-            ConfigType.Webhook
+            ConfigType.WEBHOOK
         )
         val jsonString = getJsonString(sampleConfig)
         val recreatedObject = createObjectFromJsonString(jsonString) { FeatureChannel.parse(it) }
@@ -79,7 +79,7 @@ internal class FilterConfigTests {
             "config_id",
             "name",
             "description",
-            ConfigType.EmailGroup,
+            ConfigType.EMAIL_GROUP,
             false
         )
         val jsonString = getJsonString(sampleConfig)
@@ -93,14 +93,14 @@ internal class FilterConfigTests {
             "config_id",
             "name",
             "description",
-            ConfigType.Email
+            ConfigType.EMAIL
         )
         val jsonString = """
         {
             "config_id":"config_id",
             "name":"name",
             "description":"description",
-            "config_type":"Email",
+            "config_type":"email",
             "is_enabled":true,
             "extra_field_1":["extra", "value"],
             "extra_field_2":{"extra":"value"},
@@ -117,7 +117,7 @@ internal class FilterConfigTests {
             "config_id",
             "name",
             "description",
-            ConfigType.None
+            ConfigType.NONE
         )
         val jsonString = """
         {
@@ -138,7 +138,7 @@ internal class FilterConfigTests {
                 "",
                 "name",
                 "description",
-                ConfigType.EmailGroup
+                ConfigType.EMAIL_GROUP
             )
         }
     }
@@ -150,7 +150,7 @@ internal class FilterConfigTests {
                 "config_id",
                 "",
                 "description",
-                ConfigType.EmailGroup
+                ConfigType.EMAIL_GROUP
             )
         }
     }

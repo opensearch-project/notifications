@@ -31,6 +31,8 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.TENANT_TAG
+import org.opensearch.commons.notifications.NotificationConstants.UPDATED_TIME_TAG
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.stringList
 import org.opensearch.notifications.security.UserAccessManager.DEFAULT_TENANT
@@ -47,10 +49,8 @@ data class DocMetadata(
 ) : ToXContent {
     companion object {
         private val log by logger(DocMetadata::class.java)
-        private const val UPDATED_TIME_TAG = "last_updated_time_ms"
-        private const val CREATED_TIME_TAG = "created_time_ms"
-        private const val TENANT_TAG = "tenant"
-        private const val ACCESS_LIST_TAG = "access"
+        const val CREATED_TIME_TAG = "created_time_ms"
+        const val ACCESS_LIST_TAG = "access"
 
         /**
          * Parse the data from parser and create object

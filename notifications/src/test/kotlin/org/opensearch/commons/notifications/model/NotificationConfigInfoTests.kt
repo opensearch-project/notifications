@@ -43,8 +43,8 @@ internal class NotificationConfigInfoTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.Slack,
-            EnumSet.of(Feature.Reports),
+            ConfigType.SLACK,
+            EnumSet.of(Feature.REPORTS),
             configData = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
@@ -66,8 +66,8 @@ internal class NotificationConfigInfoTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.Slack,
-            EnumSet.of(Feature.Reports),
+            ConfigType.SLACK,
+            EnumSet.of(Feature.REPORTS),
             configData = sampleSlack
         )
         val configInfo = NotificationConfigInfo(
@@ -90,8 +90,8 @@ internal class NotificationConfigInfoTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.Slack,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.SLACK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleSlack
         )
@@ -110,8 +110,8 @@ internal class NotificationConfigInfoTests {
             "notification_config":{
                 "name":"name",
                 "description":"description",
-                "config_type":"Slack",
-                "features":["IndexManagement"],
+                "config_type":"slack",
+                "feature_list":["index_management"],
                 "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
             }
@@ -129,8 +129,8 @@ internal class NotificationConfigInfoTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.Slack,
-            EnumSet.of(Feature.IndexManagement),
+            ConfigType.SLACK,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleSlack
         )
@@ -150,8 +150,8 @@ internal class NotificationConfigInfoTests {
             "notification_config":{
                 "name":"name",
                 "description":"description",
-                "config_type":"Slack",
-                "features":["IndexManagement"],
+                "config_type":"slack",
+                "feature_list":["index_management"],
                 "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
             },
@@ -170,8 +170,8 @@ internal class NotificationConfigInfoTests {
         val sampleConfig = NotificationConfig(
             "name",
             "description",
-            ConfigType.Slack,
-            EnumSet.of(Feature.Reports),
+            ConfigType.SLACK,
+            EnumSet.of(Feature.REPORTS),
             configData = sampleSlack
         )
         Assertions.assertThrows(IllegalArgumentException::class.java) {
@@ -197,8 +197,8 @@ internal class NotificationConfigInfoTests {
             "notification_config":{
                 "name":"name",
                 "description":"description",
-                "config_type":"Slack",
-                "features":["IndexManagement"],
+                "config_type":"slack",
+                "feature_list":["index_management"],
                 "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
             }
@@ -221,8 +221,8 @@ internal class NotificationConfigInfoTests {
             "notification_config":{
                 "name":"name",
                 "description":"description",
-                "config_type":"Slack",
-                "features":["IndexManagement"],
+                "config_type":"slack",
+                "feature_list":["index_management"],
                 "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
             }
@@ -244,8 +244,8 @@ internal class NotificationConfigInfoTests {
             "notification_config":{
                 "name":"name",
                 "description":"description",
-                "config_type":"Slack",
-                "features":["IndexManagement"],
+                "config_type":"slack",
+                "feature_list":["index_management"],
                 "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
             }
