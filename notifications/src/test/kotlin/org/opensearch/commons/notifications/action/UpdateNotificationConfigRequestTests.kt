@@ -87,7 +87,7 @@ internal class UpdateNotificationConfigRequestTests {
             ConfigType.Slack,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            slack = sampleSlack
+            configData = sampleSlack
         )
 
         val jsonString = """
@@ -125,7 +125,7 @@ internal class UpdateNotificationConfigRequestTests {
             ConfigType.Slack,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            slack = sampleSlack
+            configData = sampleSlack
         )
 
         val jsonString = """

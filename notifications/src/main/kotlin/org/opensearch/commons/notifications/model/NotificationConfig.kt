@@ -27,6 +27,7 @@
 package org.opensearch.commons.notifications.model
 
 import org.opensearch.common.Strings
+import org.opensearch.common.io.stream.StreamInput
 import org.opensearch.common.io.stream.StreamOutput
 import org.opensearch.common.io.stream.Writeable
 import org.opensearch.common.xcontent.ToXContent
@@ -79,16 +80,7 @@ data class NotificationConfig(
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader<NotificationConfig> { input ->
-          val name = input!!.readString()
-          val description = input.readString()
-          val configType = input.readEnum(ConfigType::class.java)
-          val features = input.readEnumSet(Feature::class.java)
-          val isEnabled = input.readBoolean()
-          val configData = input.readOptionalWriteable(getReaderForConfigType(configType))
-
-          NotificationConfig(name, description, configType, features, configData!!, isEnabled)
-        }
+        val reader = Writeable.Reader { NotificationConfig(it) }
 
         /**
          * Creator used in REST communication.
@@ -143,7 +135,20 @@ data class NotificationConfig(
         }
     }
 
-    /**
+  /**
+   * Constructor used in transport action communication.
+   * @param input StreamInput stream to deserialize data from.
+   */
+  constructor(input: StreamInput) : this(
+      name = input.readString(),
+      description = input.readString(),
+      configType = input.readEnum(ConfigType::class.java),
+      features = input.readEnumSet(Feature::class.java),
+      isEnabled = input.readBoolean(),
+      configData = input.readOptionalWriteable(getReaderForConfigType(input.readEnum(ConfigType::class.java))))
+
+
+      /**
      * {@inheritDoc}
      */
     override fun writeTo(output: StreamOutput) {
@@ -152,6 +157,8 @@ data class NotificationConfig(
         output.writeEnum(configType)
         output.writeEnumSet(features)
         output.writeBoolean(isEnabled)
+       // Reading config types multiple times in constructor
+        output.writeEnum(configType)
         output.writeOptionalWriteable(configData)
     }
 

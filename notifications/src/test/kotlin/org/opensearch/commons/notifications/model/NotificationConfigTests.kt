@@ -46,7 +46,7 @@ internal class NotificationConfigTests {
             EnumSet.of(Feature.Reports),
             configData = sampleSlack
         )
-        val recreatedObject = recreateObject(sampleConfig) { NotificationConfig.reader.read(it) }
+        val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
         assertEquals(sampleConfig, recreatedObject)
     }
 
@@ -75,7 +75,7 @@ internal class NotificationConfigTests {
             EnumSet.of(Feature.Alerting),
             configData = sampleChime
         )
-        val recreatedObject = recreateObject(sampleConfig) { NotificationConfig.reader.read(it) }
+        val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
         assertEquals(sampleConfig, recreatedObject)
     }
 
@@ -104,7 +104,7 @@ internal class NotificationConfigTests {
             EnumSet.of(Feature.IndexManagement),
             configData = sampleWebhook
         )
-        val recreatedObject = recreateObject(sampleConfig) { NotificationConfig.reader.read(it) }
+        val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
         assertEquals(sampleConfig, recreatedObject)
     }
 
@@ -133,7 +133,7 @@ internal class NotificationConfigTests {
             EnumSet.of(Feature.IndexManagement),
             configData = sampleEmail
         )
-        val recreatedObject = recreateObject(sampleConfig) { NotificationConfig.reader.read(it) }
+        val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
         assertEquals(sampleConfig, recreatedObject)
     }
 
@@ -177,7 +177,7 @@ internal class NotificationConfigTests {
             EnumSet.of(Feature.IndexManagement),
             configData = sampleSmtpAccount
         )
-        val recreatedObject = recreateObject(sampleConfig) { NotificationConfig.reader.read(it) }
+        val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
         assertEquals(sampleConfig, recreatedObject)
     }
 
@@ -206,7 +206,7 @@ internal class NotificationConfigTests {
             EnumSet.of(Feature.IndexManagement),
             configData = sampleEmailGroup
         )
-        val recreatedObject = recreateObject(sampleConfig) { NotificationConfig.reader.read(it) }
+        val recreatedObject = recreateObject(sampleConfig) { NotificationConfig(it) }
         assertEquals(sampleConfig, recreatedObject)
     }
 
