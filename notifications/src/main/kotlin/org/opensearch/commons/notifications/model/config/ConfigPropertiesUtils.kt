@@ -1,6 +1,5 @@
 package org.opensearch.commons.notifications.model.config
 
-import com.fasterxml.jackson.databind.ser.Serializers
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.common.io.stream.Writeable.Reader
 import org.opensearch.common.xcontent.XContentParser
@@ -11,32 +10,33 @@ import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.notifications.model.Webhook
 
-val CONFIG_PROPERTIES: List<ConfigDataProperties> = listOf(
-    SlackChannelProperties,
-    ChimeChannelProperties,
-    WebhookChannelProperties,
-    EmailChannelProperties,
-    EmailGroupChannelProperties,
-    SmtpAccountChannelProperties,
-    NoOpProperties
-)
-
-val CONFIG_TYPE_VS_PROPERTIES: Map<ConfigType, ConfigDataProperties> = CONFIG_PROPERTIES
-    .filter { c -> c.getConfigType() != ConfigType.None }
-    .associate { c ->
-      c.getConfigType() to c
-    }
-
-/**
- * Internal field for Tags to ChannelProperty mapping
- */
-val TAG_VS_PROPERTY = CONFIG_PROPERTIES
-    .filter { prop -> prop.getConfigType() != ConfigType.None }
-    .associate { prop ->
-      prop.getChannelTag() to prop
-    }
 
 object ConfigPropertiesUtils {
+
+  private val CONFIG_PROPERTIES: List<ConfigDataProperties> = listOf(
+      SlackConfigProperties,
+      ChimeConfigProperties,
+      WebhookConfigProperties,
+      EmailConfigProperties,
+      EmailGroupConfigProperties,
+      SmtpAccountConfigProperties,
+      NoOpConfigProperties
+  )
+
+  private val CONFIG_TYPE_VS_PROPERTIES: Map<ConfigType, ConfigDataProperties> = CONFIG_PROPERTIES
+      .filter { c -> c.getConfigType() != ConfigType.None }
+      .associate { c ->
+        c.getConfigType() to c
+      }
+
+  /**
+   * Internal field for Tags to ChannelProperty mapping
+   */
+  private val TAG_VS_PROPERTY = CONFIG_PROPERTIES
+      .filter { prop -> prop.getConfigType() != ConfigType.None }
+      .associate { prop ->
+        prop.getChannelTag() to prop
+      }
 
   /**
    * validates provided tag

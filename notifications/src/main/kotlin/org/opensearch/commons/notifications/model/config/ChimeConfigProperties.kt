@@ -27,34 +27,39 @@
 
 package org.opensearch.commons.notifications.model.config
 
-import org.opensearch.common.io.stream.Writeable.Reader
+import org.opensearch.common.io.stream.Writeable
 import org.opensearch.common.xcontent.XContentParser
+import org.opensearch.commons.notifications.NotificationConstants
+import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 
-/**
- * Properties for ConfigTypes.
- * This interface is used to provide contract accross configTypes without reading into config data classes.
- */
-interface ConfigDataProperties {
+object ChimeConfigProperties : ConfigDataProperties {
 
   /**
-   * @return ChannelTag for concrete ConfigType
+   * {@inheritDoc}
    */
-  fun getChannelTag(): String
+  override fun getChannelTag(): String {
+    return NotificationConstants.CHIME_TAG
+  }
 
   /**
-   * @return Reader for concrete ConfigType.
+   * {@inheritDoc}
    */
-  fun getConfigDataReader(): Reader<out BaseConfigData>
+  override fun getConfigDataReader(): Writeable.Reader<Chime> {
+    return Chime.reader
+  }
 
   /**
-   * Create ConfigData for provided parser, by calling data class' parse.
-   * @return Created ConfigData
+   * {@inheritDoc}
    */
-  fun createConfigData(parser: XContentParser): BaseConfigData
+  override fun createConfigData(parser: XContentParser): Chime {
+    return Chime.parse(parser)
+  }
 
   /**
-   * @return ConfigType for concrete implementation
+   * {@inheritDoc}
    */
-  fun getConfigType(): ConfigType
+  override fun getConfigType(): ConfigType {
+    return ConfigType.Chime
+  }
 }
