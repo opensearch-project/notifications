@@ -39,6 +39,7 @@ import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.SmtpAccount
+import org.opensearch.commons.notifications.model.SmtpAccount.MethodType
 import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.commons.utils.createObjectFromJsonString
 import org.opensearch.commons.utils.getJsonString
@@ -47,7 +48,7 @@ import java.util.EnumSet
 
 internal class CreateNotificationConfigRequestTests {
 
-    private fun createAllContentConfigObject(): NotificationConfig {
+    private fun createWebhookContentConfigObject(): NotificationConfig {
         val sampleWebhook = Webhook("https://domain.com/sample_webhook_url#1234567890")
         return NotificationConfig(
             "name",
@@ -59,10 +60,81 @@ internal class CreateNotificationConfigRequestTests {
         )
     }
 
-    @Test
-    fun `Create config serialize and deserialize transport object should be equal`() {
+  private fun createSlackContentConfigObject(): NotificationConfig {
+    val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+    return NotificationConfig(
+        "name",
+        "description",
+        ConfigType.Slack,
+        EnumSet.of(Feature.IndexManagement),
+        isEnabled = true,
+        configData = sampleSlack,
+    )
+  }
+
+
+  private fun createChimeContentConfigObject(): NotificationConfig {
+    val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
+    return NotificationConfig(
+        "name",
+        "description",
+        ConfigType.Chime,
+        EnumSet.of(Feature.IndexManagement),
+        isEnabled = true,
+        configData = sampleChime,
+    )
+  }
+
+
+  private fun createEmailGroupContentConfigObject(): NotificationConfig {
+    val sampleEmailGroup = EmailGroup(listOf("dummy@company.com"))
+    return NotificationConfig(
+        "name",
+        "description",
+        ConfigType.EmailGroup,
+        EnumSet.of(Feature.IndexManagement),
+        isEnabled = true,
+        configData = sampleEmailGroup,
+    )
+  }
+
+
+  private fun createEmailContentConfigObject(): NotificationConfig {
+    val sampleEmail = Email(
+                    emailAccountID = "sample_1@dummy.com",
+                    defaultRecipients = listOf("sample_2@dummy.com"),
+                    defaultEmailGroupIds = listOf("sample_3@dummy.com"),
+    )
+    return NotificationConfig(
+        "name",
+        "description",
+        ConfigType.Email,
+        EnumSet.of(Feature.IndexManagement),
+        isEnabled = true,
+        configData = sampleEmail,
+    )
+  }
+  private fun createSmtpAccountContentConfigObject(): NotificationConfig {
+    val sampleSmtpAccount = SmtpAccount(
+                            host = "http://dummy.com",
+                            port = 11,
+                            method =  MethodType.Ssl,
+                            fromAddress = "sample@dummy.com",
+    )
+    return NotificationConfig(
+        "name",
+        "description",
+        ConfigType.SmtpAccount,
+        EnumSet.of(Feature.IndexManagement),
+        isEnabled = true,
+        configData = sampleSmtpAccount,
+    )
+  }
+
+  @Test
+  fun `Create config serialize and deserialize transport object should be equal webhook`() {
         val configRequest = CreateNotificationConfigRequest(
-            createAllContentConfigObject()
+            createWebhookContentConfigObject()
         )
         val recreatedObject =
             recreateObject(configRequest) {
@@ -74,18 +146,145 @@ internal class CreateNotificationConfigRequestTests {
         assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
     }
 
-    @Test
-    fun `Create config serialize and deserialize using json object should be equal`() {
+  @Test
+  fun `Create config serialize and deserialize transport object should be equal slack`() {
+    val configRequest = CreateNotificationConfigRequest(
+        createSlackContentConfigObject()
+    )
+    val recreatedObject =
+        recreateObject(configRequest) {
+          CreateNotificationConfigRequest(
+              it
+          )
+        }
+    assertNull(recreatedObject.validate())
+    assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
+  }
+
+  @Test
+  fun `Create config serialize and deserialize transport object should be equal chime`() {
+    val configRequest = CreateNotificationConfigRequest(
+        createChimeContentConfigObject()
+    )
+    val recreatedObject =
+        recreateObject(configRequest) {
+          CreateNotificationConfigRequest(
+              it
+          )
+        }
+    assertNull(recreatedObject.validate())
+    assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
+  }
+
+  @Test
+  fun `Create config serialize and deserialize transport object should be equal email`() {
+    val configRequest = CreateNotificationConfigRequest(
+        createEmailContentConfigObject()
+    )
+    val recreatedObject =
+        recreateObject(configRequest) {
+          CreateNotificationConfigRequest(
+              it
+          )
+        }
+    assertNull(recreatedObject.validate())
+    assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
+  }
+
+  @Test
+  fun `Create config serialize and deserialize transport object should be equal emailGroup`() {
+    val configRequest = CreateNotificationConfigRequest(
+        createEmailGroupContentConfigObject()
+    )
+    val recreatedObject =
+        recreateObject(configRequest) {
+          CreateNotificationConfigRequest(
+              it
+          )
+        }
+    assertNull(recreatedObject.validate())
+    assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
+  }
+
+
+  @Test
+  fun `Create config serialize and deserialize transport object should be equal SmtpAccount`() {
+    val configRequest = CreateNotificationConfigRequest(
+        createSmtpAccountContentConfigObject()
+    )
+    val recreatedObject =
+        recreateObject(configRequest) {
+          CreateNotificationConfigRequest(
+              it
+          )
+        }
+    assertNull(recreatedObject.validate())
+    assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
+  }
+
+  @Test
+  fun `Create config serialize and deserialize using json object should be equal`() {
         val configRequest = CreateNotificationConfigRequest(
-            createAllContentConfigObject()
+            createWebhookContentConfigObject()
         )
         val jsonString = getJsonString(configRequest)
         val recreatedObject = createObjectFromJsonString(jsonString) { CreateNotificationConfigRequest.parse(it) }
         assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
     }
 
-    @Test
-    fun `Create config should deserialize json object using parser`() {
+  @Test
+  fun `Create config serialize and deserialize using json object should be equal slack`() {
+    val configRequest = CreateNotificationConfigRequest(
+        createSlackContentConfigObject()
+    )
+    val jsonString = getJsonString(configRequest)
+    val recreatedObject = createObjectFromJsonString(jsonString) { CreateNotificationConfigRequest.parse(it) }
+    assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
+  }
+
+
+  @Test
+  fun `Create config serialize and deserialize using json object should be equal chime`() {
+    val configRequest = CreateNotificationConfigRequest(
+        createChimeContentConfigObject()
+    )
+    val jsonString = getJsonString(configRequest)
+    val recreatedObject = createObjectFromJsonString(jsonString) { CreateNotificationConfigRequest.parse(it) }
+    assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
+  }
+
+  @Test
+  fun `Create config serialize and deserialize using json object should be equal email`() {
+    val configRequest = CreateNotificationConfigRequest(
+        createEmailContentConfigObject()
+    )
+    val jsonString = getJsonString(configRequest)
+    val recreatedObject = createObjectFromJsonString(jsonString) { CreateNotificationConfigRequest.parse(it) }
+    assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
+  }
+
+  @Test
+  fun `Create config serialize and deserialize using json object should be equal EmailGroup`() {
+    val configRequest = CreateNotificationConfigRequest(
+        createEmailGroupContentConfigObject()
+    )
+    val jsonString = getJsonString(configRequest)
+    val recreatedObject = createObjectFromJsonString(jsonString) { CreateNotificationConfigRequest.parse(it) }
+    assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
+  }
+
+  @Test
+  fun `Create config serialize and deserialize using json object should be equal SmtpAccount`() {
+    val configRequest = CreateNotificationConfigRequest(
+        createSmtpAccountContentConfigObject()
+    )
+    val jsonString = getJsonString(configRequest)
+    val recreatedObject = createObjectFromJsonString(jsonString) { CreateNotificationConfigRequest.parse(it) }
+    assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
+  }
+
+  @Test
+  fun `Create config should deserialize json object using parser`() {
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
         val config = NotificationConfig(
             "name",
