@@ -49,7 +49,7 @@ import org.opensearch.commons.utils.enumSet
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.valueOf
 import java.io.IOException
-import java.util.*
+import java.util.EnumSet
 
 /**
  * Data class representing Notification config.
