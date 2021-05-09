@@ -35,31 +35,31 @@ import org.opensearch.commons.notifications.model.Webhook
 
 object WebhookConfigProperties : ConfigDataProperties {
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getChannelTag(): String {
-    return NotificationConstants.WEBHOOK_TAG
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getChannelTag(): String {
+        return NotificationConstants.WEBHOOK_TAG
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getConfigDataReader(): Writeable.Reader<Webhook> {
-    return Webhook.reader
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigDataReader(): Writeable.Reader<Webhook> {
+        return Webhook.reader
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun createConfigData(parser: XContentParser): Webhook {
-    return Webhook.parse(parser)
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun createConfigData(parser: XContentParser): Webhook {
+        return Webhook.parse(parser)
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getConfigType(): ConfigType {
-    return ConfigType.Webhook
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigType(): ConfigType {
+        return ConfigType.Webhook
+    }
 }

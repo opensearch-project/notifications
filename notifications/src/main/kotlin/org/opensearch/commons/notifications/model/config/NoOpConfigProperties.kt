@@ -34,31 +34,31 @@ import org.opensearch.commons.notifications.model.Webhook
 
 object NoOpConfigProperties : ConfigDataProperties {
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getChannelTag(): String {
-    throw UnsupportedOperationException()
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getChannelTag(): String {
+        throw UnsupportedOperationException()
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getConfigDataReader(): Writeable.Reader<Webhook> {
-    throw UnsupportedOperationException()
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigDataReader(): Writeable.Reader<Webhook> {
+        throw UnsupportedOperationException()
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun createConfigData(parser: XContentParser): Webhook {
-    throw UnsupportedOperationException()
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun createConfigData(parser: XContentParser): Webhook {
+        throw UnsupportedOperationException()
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getConfigType(): ConfigType {
-    return ConfigType.None
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigType(): ConfigType {
+        return ConfigType.None
+    }
 }

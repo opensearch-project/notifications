@@ -35,31 +35,31 @@ import org.opensearch.commons.notifications.model.Slack
 
 object SlackConfigProperties : ConfigDataProperties {
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getChannelTag(): String {
-    return NotificationConstants.SLACK_TAG
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getChannelTag(): String {
+        return NotificationConstants.SLACK_TAG
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getConfigDataReader(): Writeable.Reader<Slack> {
-    return Slack.reader
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigDataReader(): Writeable.Reader<Slack> {
+        return Slack.reader
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun createConfigData(parser: XContentParser): Slack {
-    return Slack.parse(parser)
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun createConfigData(parser: XContentParser): Slack {
+        return Slack.parse(parser)
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getConfigType(): ConfigType {
-    return ConfigType.Slack
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigType(): ConfigType {
+        return ConfigType.Slack
+    }
 }

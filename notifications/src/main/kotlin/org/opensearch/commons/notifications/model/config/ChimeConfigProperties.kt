@@ -35,31 +35,31 @@ import org.opensearch.commons.notifications.model.ConfigType
 
 object ChimeConfigProperties : ConfigDataProperties {
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getChannelTag(): String {
-    return NotificationConstants.CHIME_TAG
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getChannelTag(): String {
+        return NotificationConstants.CHIME_TAG
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getConfigDataReader(): Writeable.Reader<Chime> {
-    return Chime.reader
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigDataReader(): Writeable.Reader<Chime> {
+        return Chime.reader
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun createConfigData(parser: XContentParser): Chime {
-    return Chime.parse(parser)
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun createConfigData(parser: XContentParser): Chime {
+        return Chime.parse(parser)
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getConfigType(): ConfigType {
-    return ConfigType.Chime
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigType(): ConfigType {
+        return ConfigType.Chime
+    }
 }

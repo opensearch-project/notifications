@@ -35,31 +35,31 @@ import org.opensearch.commons.notifications.model.SmtpAccount
 
 object SmtpAccountConfigProperties : ConfigDataProperties {
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getChannelTag(): String {
-    return NotificationConstants.SMTP_ACCOUNT_TAG
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getChannelTag(): String {
+        return NotificationConstants.SMTP_ACCOUNT_TAG
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getConfigDataReader(): Writeable.Reader<SmtpAccount> {
-    return SmtpAccount.reader
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigDataReader(): Writeable.Reader<SmtpAccount> {
+        return SmtpAccount.reader
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun createConfigData(parser: XContentParser): SmtpAccount {
-    return SmtpAccount.parse(parser)
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun createConfigData(parser: XContentParser): SmtpAccount {
+        return SmtpAccount.parse(parser)
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getConfigType(): ConfigType {
-    return ConfigType.SmtpAccount
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigType(): ConfigType {
+        return ConfigType.SmtpAccount
+    }
 }

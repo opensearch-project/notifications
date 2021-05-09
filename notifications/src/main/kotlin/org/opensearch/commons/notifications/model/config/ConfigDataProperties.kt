@@ -37,24 +37,24 @@ import org.opensearch.commons.notifications.model.ConfigType
  */
 interface ConfigDataProperties {
 
-  /**
-   * @return ChannelTag for concrete ConfigType
-   */
-  fun getChannelTag(): String
+    /**
+     * @return ChannelTag for concrete ConfigType
+     */
+    fun getChannelTag(): String
 
-  /**
-   * @return Reader for concrete ConfigType.
-   */
-  fun getConfigDataReader(): Reader<out BaseConfigData>
+    /**
+     * @return Reader for concrete ConfigType.
+     */
+    fun getConfigDataReader(): Reader<out BaseConfigData>
 
-  /**
-   * Create ConfigData for provided parser, by calling data class' parse.
-   * @return Created ConfigData
-   */
-  fun createConfigData(parser: XContentParser): BaseConfigData
+    /**
+     * Create ConfigData for provided parser, by calling data class' parse.
+     * @return Created ConfigData
+     */
+    fun createConfigData(parser: XContentParser): BaseConfigData
 
-  /**
-   * @return ConfigType for concrete implementation
-   */
-  fun getConfigType(): ConfigType
+    /**
+     * @return ConfigType for concrete implementation
+     */
+    fun getConfigType(): ConfigType
 }
