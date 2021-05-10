@@ -26,7 +26,6 @@
  */
 package org.opensearch.commons.notifications.model
 
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.opensearch.commons.utils.createObjectFromJsonString
@@ -219,7 +218,7 @@ internal class NotificationConfigTests {
             ConfigType.None,
             EnumSet.of(Feature.IndexManagement),
             isEnabled = true,
-            configData = sampleSlack,
+            configData = sampleSlack
         )
         val jsonString = """
         {
@@ -248,7 +247,7 @@ internal class NotificationConfigTests {
             ConfigType.Webhook,
             EnumSet.of(Feature.IndexManagement, Feature.None),
             isEnabled = true,
-            configData = sampleWebhook,
+            configData = sampleWebhook
         )
         val jsonString = """
         {

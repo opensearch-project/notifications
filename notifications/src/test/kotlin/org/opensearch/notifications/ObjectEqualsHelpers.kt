@@ -86,7 +86,7 @@ fun verifyEquals(config: NotificationConfig, jsonObject: JsonObject) {
     when (config.configType) {
         ConfigType.Slack -> verifyEquals((config.configData as Slack), jsonObject.get("slack").asJsonObject)
         ConfigType.Chime -> verifyEquals((config.configData as Chime), jsonObject.get("chime").asJsonObject)
-        ConfigType.Webhook -> verifyEquals((config.configData as Webhook ), jsonObject.get("webhook").asJsonObject)
+        ConfigType.Webhook -> verifyEquals((config.configData as Webhook), jsonObject.get("webhook").asJsonObject)
         ConfigType.Email -> verifyEquals((config.configData as Email), jsonObject.get("email").asJsonObject)
         ConfigType.SmtpAccount -> verifyEquals((config.configData as SmtpAccount), jsonObject.get("smtp_account")
             .asJsonObject)

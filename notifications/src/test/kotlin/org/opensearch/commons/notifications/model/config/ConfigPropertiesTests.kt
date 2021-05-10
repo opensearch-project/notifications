@@ -37,8 +37,8 @@ internal class ConfigPropertiesTests {
     @Test
     fun `Validate config property reader chime`() {
         assertEquals(
-              ConfigPropertiesUtils.getReaderForConfigType(ConfigType.Chime)!!, Chime
-              .reader
+            ConfigPropertiesUtils.getReaderForConfigType(ConfigType.Chime)!!, Chime
+            .reader
         )
     }
 
@@ -60,8 +60,8 @@ internal class ConfigPropertiesTests {
     @Test
     fun `Validate config property reader webhook`() {
         assertEquals(
-              ConfigPropertiesUtils.getReaderForConfigType(ConfigType.Webhook),
-              Webhook.reader
+            ConfigPropertiesUtils.getReaderForConfigType(ConfigType.Webhook),
+            Webhook.reader
         )
     }
 
@@ -83,8 +83,8 @@ internal class ConfigPropertiesTests {
     @Test
     fun `Validate config property reader email`() {
         assertEquals(
-              ConfigPropertiesUtils.getReaderForConfigType(ConfigType.Email), Email
-              .reader
+            ConfigPropertiesUtils.getReaderForConfigType(ConfigType.Email), Email
+            .reader
         )
     }
 
@@ -106,8 +106,8 @@ internal class ConfigPropertiesTests {
     @Test
     fun `Validate config property reader EmailGroup`() {
         assertEquals(
-              ConfigPropertiesUtils.getReaderForConfigType(ConfigType.EmailGroup),
-              EmailGroup.reader
+            ConfigPropertiesUtils.getReaderForConfigType(ConfigType.EmailGroup),
+            EmailGroup.reader
         )
     }
 
@@ -129,8 +129,8 @@ internal class ConfigPropertiesTests {
     @Test
     fun `Validate config property reader SmtpAccount`() {
         assertEquals(
-              ConfigPropertiesUtils.getReaderForConfigType(ConfigType.SmtpAccount),
-              SmtpAccount.reader
+            ConfigPropertiesUtils.getReaderForConfigType(ConfigType.SmtpAccount),
+            SmtpAccount.reader
         )
     }
 
@@ -155,7 +155,7 @@ internal class ConfigPropertiesTests {
         val jsonString = getJsonString(sampleSlack)
         val recreatedObject = createObjectFromJsonString(jsonString) {
             ConfigPropertiesUtils.createConfigData(ConfigType
-                  .Slack, it)
+                .Slack, it)
         }
         assertEquals(sampleSlack, recreatedObject)
     }
@@ -166,7 +166,7 @@ internal class ConfigPropertiesTests {
         val jsonString = getJsonString(sampleChime)
         val recreatedObject = createObjectFromJsonString(jsonString) {
             ConfigPropertiesUtils.createConfigData(ConfigType
-                  .Chime, it)
+                .Chime, it)
         }
         assertEquals(sampleChime, recreatedObject)
     }
@@ -177,7 +177,7 @@ internal class ConfigPropertiesTests {
         val jsonString = getJsonString(sampleWebhook)
         val recreatedObject = createObjectFromJsonString(jsonString) {
             ConfigPropertiesUtils.createConfigData(ConfigType
-                  .Webhook, it)
+                .Webhook, it)
         }
         assertEquals(sampleWebhook, recreatedObject)
     }
@@ -187,7 +187,7 @@ internal class ConfigPropertiesTests {
         val sampleEmailGroup = EmailGroup(listOf("email1@email.com", "email2@email.com"))
         val jsonString = getJsonString(sampleEmailGroup)
         val recreatedObject =
-              createObjectFromJsonString(jsonString) { ConfigPropertiesUtils.createConfigData(ConfigType.EmailGroup, it) }
+            createObjectFromJsonString(jsonString) { ConfigPropertiesUtils.createConfigData(ConfigType.EmailGroup, it) }
         assertEquals(sampleEmailGroup, recreatedObject)
     }
 
@@ -201,5 +201,4 @@ internal class ConfigPropertiesTests {
         }
         assertEquals(sampleSmtpAccount, recreatedObject)
     }
-
 }

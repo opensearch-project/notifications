@@ -35,31 +35,31 @@ import org.opensearch.commons.notifications.model.EmailGroup
 
 object EmailGroupConfigProperties : ConfigDataProperties {
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getChannelTag(): String {
-    return NotificationConstants.EMAIL_GROUP_TAG
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getChannelTag(): String {
+        return NotificationConstants.EMAIL_GROUP_TAG
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getConfigDataReader(): Writeable.Reader<EmailGroup> {
-    return EmailGroup.reader
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigDataReader(): Writeable.Reader<EmailGroup> {
+        return EmailGroup.reader
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun createConfigData(parser: XContentParser): EmailGroup {
-    return EmailGroup.parse(parser)
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun createConfigData(parser: XContentParser): EmailGroup {
+        return EmailGroup.parse(parser)
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun getConfigType(): ConfigType {
-    return ConfigType.EmailGroup
-  }
+    /**
+     * {@inheritDoc}
+     */
+    override fun getConfigType(): ConfigType {
+        return ConfigType.EmailGroup
+    }
 }

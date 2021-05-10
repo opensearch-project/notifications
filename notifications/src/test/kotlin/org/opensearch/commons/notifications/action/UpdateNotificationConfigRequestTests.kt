@@ -51,84 +51,81 @@ internal class UpdateNotificationConfigRequestTests {
     private fun createWebhookContentConfigObject(): NotificationConfig {
         val sampleWebhook = Webhook("https://domain.com/sample_webhook_url#1234567890")
         return NotificationConfig(
-              "name",
-              "description",
-              ConfigType.Webhook,
-              EnumSet.of(Feature.IndexManagement),
-              isEnabled = true,
-              configData = sampleWebhook,
+            "name",
+            "description",
+            ConfigType.Webhook,
+            EnumSet.of(Feature.IndexManagement),
+            isEnabled = true,
+            configData = sampleWebhook
         )
     }
 
     private fun createSlackContentConfigObject(): NotificationConfig {
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
         return NotificationConfig(
-              "name",
-              "description",
-              ConfigType.Slack,
-              EnumSet.of(Feature.IndexManagement),
-              isEnabled = true,
-              configData = sampleSlack,
+            "name",
+            "description",
+            ConfigType.Slack,
+            EnumSet.of(Feature.IndexManagement),
+            isEnabled = true,
+            configData = sampleSlack
         )
     }
-
 
     private fun createChimeContentConfigObject(): NotificationConfig {
         val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
         return NotificationConfig(
-              "name",
-              "description",
-              ConfigType.Chime,
-              EnumSet.of(Feature.IndexManagement),
-              isEnabled = true,
-              configData = sampleChime,
+            "name",
+            "description",
+            ConfigType.Chime,
+            EnumSet.of(Feature.IndexManagement),
+            isEnabled = true,
+            configData = sampleChime
         )
     }
-
 
     private fun createEmailGroupContentConfigObject(): NotificationConfig {
         val sampleEmailGroup = EmailGroup(listOf("dummy@company.com"))
         return NotificationConfig(
-              "name",
-              "description",
-              ConfigType.EmailGroup,
-              EnumSet.of(Feature.IndexManagement),
-              isEnabled = true,
-              configData = sampleEmailGroup,
+            "name",
+            "description",
+            ConfigType.EmailGroup,
+            EnumSet.of(Feature.IndexManagement),
+            isEnabled = true,
+            configData = sampleEmailGroup
         )
     }
 
-
     private fun createEmailContentConfigObject(): NotificationConfig {
         val sampleEmail = Email(
-              emailAccountID = "sample_1@dummy.com",
-              defaultRecipients = listOf("sample_2@dummy.com"),
-              defaultEmailGroupIds = listOf("sample_3@dummy.com"),
+            emailAccountID = "sample_1@dummy.com",
+            defaultRecipients = listOf("sample_2@dummy.com"),
+            defaultEmailGroupIds = listOf("sample_3@dummy.com")
         )
         return NotificationConfig(
-              "name",
-              "description",
-              ConfigType.Email,
-              EnumSet.of(Feature.IndexManagement),
-              isEnabled = true,
-              configData = sampleEmail,
+            "name",
+            "description",
+            ConfigType.Email,
+            EnumSet.of(Feature.IndexManagement),
+            isEnabled = true,
+            configData = sampleEmail
         )
     }
 
     private fun createSmtpAccountContentConfigObject(): NotificationConfig {
         val sampleSmtpAccount = SmtpAccount(
-              host = "http://dummy.com",
-              port = 11,
-              method = MethodType.Ssl,
-              fromAddress = "sample@dummy.com",
+            host = "http://dummy.com",
+            port = 11,
+            method = MethodType.Ssl,
+            fromAddress = "sample@dummy.com"
         )
         return NotificationConfig(
-              "name",
-              "description",
-              ConfigType.SmtpAccount,
-              EnumSet.of(Feature.IndexManagement),
-              isEnabled = true,
-              configData = sampleSmtpAccount,
+            "name",
+            "description",
+            ConfigType.SmtpAccount,
+            EnumSet.of(Feature.IndexManagement),
+            isEnabled = true,
+            configData = sampleSmtpAccount
         )
     }
 
@@ -136,7 +133,7 @@ internal class UpdateNotificationConfigRequestTests {
     fun `Update config serialize and deserialize transport object should be equal Webhook`() {
         val configRequest = UpdateNotificationConfigRequest("config_id", createWebhookContentConfigObject())
         val recreatedObject =
-              recreateObject(configRequest) { UpdateNotificationConfigRequest(it) }
+            recreateObject(configRequest) { UpdateNotificationConfigRequest(it) }
         assertNull(recreatedObject.validate())
         assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
         assertEquals("config_id", recreatedObject.configId)
@@ -146,7 +143,7 @@ internal class UpdateNotificationConfigRequestTests {
     fun `Update config serialize and deserialize transport object should be equal Slack`() {
         val configRequest = UpdateNotificationConfigRequest("config_id", createSlackContentConfigObject())
         val recreatedObject =
-              recreateObject(configRequest) { UpdateNotificationConfigRequest(it) }
+            recreateObject(configRequest) { UpdateNotificationConfigRequest(it) }
         assertNull(recreatedObject.validate())
         assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
         assertEquals("config_id", recreatedObject.configId)
@@ -156,7 +153,7 @@ internal class UpdateNotificationConfigRequestTests {
     fun `Update config serialize and deserialize transport object should be equal Chime`() {
         val configRequest = UpdateNotificationConfigRequest("config_id", createChimeContentConfigObject())
         val recreatedObject =
-              recreateObject(configRequest) { UpdateNotificationConfigRequest(it) }
+            recreateObject(configRequest) { UpdateNotificationConfigRequest(it) }
         assertNull(recreatedObject.validate())
         assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
         assertEquals("config_id", recreatedObject.configId)
@@ -166,7 +163,7 @@ internal class UpdateNotificationConfigRequestTests {
     fun `Update config serialize and deserialize transport object should be equal Email`() {
         val configRequest = UpdateNotificationConfigRequest("config_id", createEmailContentConfigObject())
         val recreatedObject =
-              recreateObject(configRequest) { UpdateNotificationConfigRequest(it) }
+            recreateObject(configRequest) { UpdateNotificationConfigRequest(it) }
         assertNull(recreatedObject.validate())
         assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
         assertEquals("config_id", recreatedObject.configId)
@@ -176,7 +173,7 @@ internal class UpdateNotificationConfigRequestTests {
     fun `Update config serialize and deserialize transport object should be equal EmailGroup`() {
         val configRequest = UpdateNotificationConfigRequest("config_id", createEmailGroupContentConfigObject())
         val recreatedObject =
-              recreateObject(configRequest) { UpdateNotificationConfigRequest(it) }
+            recreateObject(configRequest) { UpdateNotificationConfigRequest(it) }
         assertNull(recreatedObject.validate())
         assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
         assertEquals("config_id", recreatedObject.configId)
@@ -186,7 +183,7 @@ internal class UpdateNotificationConfigRequestTests {
     fun `Update config serialize and deserialize transport object should be equal SmtpAccount`() {
         val configRequest = UpdateNotificationConfigRequest("config_id", createSmtpAccountContentConfigObject())
         val recreatedObject =
-              recreateObject(configRequest) { UpdateNotificationConfigRequest(it) }
+            recreateObject(configRequest) { UpdateNotificationConfigRequest(it) }
         assertNull(recreatedObject.validate())
         assertEquals(configRequest.notificationConfig, recreatedObject.notificationConfig)
         assertEquals("config_id", recreatedObject.configId)
@@ -250,12 +247,12 @@ internal class UpdateNotificationConfigRequestTests {
     fun `Update config should deserialize json object using parser slack`() {
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
         val config = NotificationConfig(
-              "name",
-              "description",
-              ConfigType.Slack,
-              EnumSet.of(Feature.IndexManagement),
-              isEnabled = true,
-              configData = sampleSlack
+            "name",
+            "description",
+            ConfigType.Slack,
+            EnumSet.of(Feature.IndexManagement),
+            isEnabled = true,
+            configData = sampleSlack
         )
 
         val jsonString = """
@@ -276,17 +273,16 @@ internal class UpdateNotificationConfigRequestTests {
         assertEquals("config_id1", recreatedObject.configId)
     }
 
-
     @Test
     fun `Update config should deserialize json object using parser webhook`() {
         val sampleWebhook = Webhook("https://domain.com/sample_webhook_url#1234567890")
         val config = NotificationConfig(
-              "name",
-              "description",
-              ConfigType.Webhook,
-              EnumSet.of(Feature.IndexManagement),
-              isEnabled = true,
-              configData = sampleWebhook
+            "name",
+            "description",
+            ConfigType.Webhook,
+            EnumSet.of(Feature.IndexManagement),
+            isEnabled = true,
+            configData = sampleWebhook
         )
 
         val jsonString = """
@@ -311,12 +307,12 @@ internal class UpdateNotificationConfigRequestTests {
     fun `Update config should deserialize json object using parser Chime`() {
         val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
         val config = NotificationConfig(
-              "name",
-              "description",
-              ConfigType.Chime,
-              EnumSet.of(Feature.IndexManagement),
-              isEnabled = true,
-              configData = sampleChime
+            "name",
+            "description",
+            ConfigType.Chime,
+            EnumSet.of(Feature.IndexManagement),
+            isEnabled = true,
+            configData = sampleChime
         )
 
         val jsonString = """
@@ -341,12 +337,12 @@ internal class UpdateNotificationConfigRequestTests {
     fun `Update config should deserialize json object using parser Email Group`() {
         val sampleEmailGroup = EmailGroup(listOf("dummy@company.com"))
         val config = NotificationConfig(
-              "name",
-              "description",
-              ConfigType.EmailGroup,
-              EnumSet.of(Feature.IndexManagement),
-              isEnabled = true,
-              configData = sampleEmailGroup
+            "name",
+            "description",
+            ConfigType.EmailGroup,
+            EnumSet.of(Feature.IndexManagement),
+            isEnabled = true,
+            configData = sampleEmailGroup
         )
 
         val jsonString = """
@@ -370,17 +366,17 @@ internal class UpdateNotificationConfigRequestTests {
     @Test
     fun `Update config should deserialize json object using parser Email`() {
         val sampleEmail = Email(
-              emailAccountID = "sample_1@dummy.com",
-              defaultRecipients = listOf("sample_2@dummy.com"),
-              defaultEmailGroupIds = listOf("sample_3@dummy.com"),
+            emailAccountID = "sample_1@dummy.com",
+            defaultRecipients = listOf("sample_2@dummy.com"),
+            defaultEmailGroupIds = listOf("sample_3@dummy.com")
         )
         val config = NotificationConfig(
-              "name",
-              "description",
-              ConfigType.Email,
-              EnumSet.of(Feature.IndexManagement),
-              isEnabled = true,
-              configData = sampleEmail
+            "name",
+            "description",
+            ConfigType.Email,
+            EnumSet.of(Feature.IndexManagement),
+            isEnabled = true,
+            configData = sampleEmail
         )
 
         val jsonString = """
@@ -405,18 +401,18 @@ internal class UpdateNotificationConfigRequestTests {
     @Test
     fun `Update config should deserialize json object using parser SmtpAccount`() {
         val sampleSmtpAccount = SmtpAccount(
-              host = "http://dummy.com",
-              port = 11,
-              method = MethodType.Ssl,
-              fromAddress = "sample@dummy.com",
+            host = "http://dummy.com",
+            port = 11,
+            method = MethodType.Ssl,
+            fromAddress = "sample@dummy.com"
         )
         val config = NotificationConfig(
-              "name",
-              "description",
-              ConfigType.SmtpAccount,
-              EnumSet.of(Feature.IndexManagement),
-              isEnabled = true,
-              configData = sampleSmtpAccount
+            "name",
+            "description",
+            ConfigType.SmtpAccount,
+            EnumSet.of(Feature.IndexManagement),
+            isEnabled = true,
+            configData = sampleSmtpAccount
         )
 
         val jsonString = """
@@ -449,12 +445,12 @@ internal class UpdateNotificationConfigRequestTests {
     fun `Update config should safely ignore extra field in json object`() {
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
         val config = NotificationConfig(
-              "name",
-              "description",
-              ConfigType.Slack,
-              EnumSet.of(Feature.IndexManagement),
-              isEnabled = true,
-              configData = sampleSlack
+            "name",
+            "description",
+            ConfigType.Slack,
+            EnumSet.of(Feature.IndexManagement),
+            isEnabled = true,
+            configData = sampleSlack
         )
 
         val jsonString = """

@@ -10,33 +10,32 @@ import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.notifications.model.Webhook
 
-
 object ConfigPropertiesUtils {
 
     private val CONFIG_PROPERTIES: List<ConfigDataProperties> = listOf(
-          SlackConfigProperties,
-          ChimeConfigProperties,
-          WebhookConfigProperties,
-          EmailConfigProperties,
-          EmailGroupConfigProperties,
-          SmtpAccountConfigProperties,
-          NoOpConfigProperties
+        SlackConfigProperties,
+        ChimeConfigProperties,
+        WebhookConfigProperties,
+        EmailConfigProperties,
+        EmailGroupConfigProperties,
+        SmtpAccountConfigProperties,
+        NoOpConfigProperties
     )
 
     private val CONFIG_TYPE_VS_PROPERTIES: Map<ConfigType, ConfigDataProperties> = CONFIG_PROPERTIES
-          .filter { c -> c.getConfigType() != ConfigType.None }
-          .associate { c ->
-              c.getConfigType() to c
-          }
+        .filter { c -> c.getConfigType() != ConfigType.None }
+        .associate { c ->
+            c.getConfigType() to c
+        }
 
     /**
      * Internal field for Tags to ChannelProperty mapping
      */
     private val TAG_VS_PROPERTY = CONFIG_PROPERTIES
-          .filter { prop -> prop.getConfigType() != ConfigType.None }
-          .associate { prop ->
-              prop.getChannelTag() to prop
-          }
+        .filter { prop -> prop.getConfigType() != ConfigType.None }
+        .associate { prop ->
+            prop.getChannelTag() to prop
+        }
 
     /**
      * validates provided tag

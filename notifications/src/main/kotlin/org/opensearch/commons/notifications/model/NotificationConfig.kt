@@ -60,19 +60,19 @@ data class NotificationConfig(
     val configType: ConfigType,
     val features: EnumSet<Feature>,
     val configData: BaseConfigData,
-    val isEnabled: Boolean = true,
+    val isEnabled: Boolean = true
 ) : BaseModel {
 
-  init {
-    require(!Strings.isNullOrEmpty(name)) { "name is null or empty" }
-    if (!validateConfigData(configType, configData)) {
-      throw IllegalArgumentException("ConfigType: $configType and data doesn't match")
+    init {
+        require(!Strings.isNullOrEmpty(name)) { "name is null or empty" }
+        if (!validateConfigData(configType, configData)) {
+            throw IllegalArgumentException("ConfigType: $configType and data doesn't match")
+        }
+        if (configType === ConfigType.None) {
+            log.info("Some config field not recognized")
+        }
+        requireNotNull(configData)
     }
-    if (configType === ConfigType.None) {
-      log.info("Some config field not recognized")
-    }
-    requireNotNull(configData)
-  }
 
     companion object {
         private val log by logger(NotificationConfig::class.java)
@@ -111,45 +111,44 @@ data class NotificationConfig(
                     FEATURES_TAG -> features = parser.enumSet(Feature.None, log)
                     IS_ENABLED_TAG -> isEnabled = parser.booleanValue()
                     else -> {
-                      val configTypeForTag = getConfigTypeForTag(fieldName)
-                      if (configTypeForTag != null && configData == null) {
-                        configData = createConfigData(configTypeForTag, parser)
-                      } else {
-                        parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing configuration")
+                        val configTypeForTag = getConfigTypeForTag(fieldName)
+                        if (configTypeForTag != null && configData == null) {
+                            configData = createConfigData(configTypeForTag, parser)
+                        } else {
+                            parser.skipChildren()
+                            log.info("Unexpected field: $fieldName, while parsing configuration")
+                        }
                     }
                 }
             }
-          }
-          name ?: throw IllegalArgumentException("$NAME_TAG field absent")
-          configType ?: throw IllegalArgumentException("$CONFIG_TYPE_TAG field absent")
-          features ?: throw IllegalArgumentException("$FEATURES_TAG field absent")
-          return NotificationConfig(
-              name,
-              description,
-              configType,
-              features,
-              configData!!,
-              isEnabled,
-          )
+            name ?: throw IllegalArgumentException("$NAME_TAG field absent")
+            configType ?: throw IllegalArgumentException("$CONFIG_TYPE_TAG field absent")
+            features ?: throw IllegalArgumentException("$FEATURES_TAG field absent")
+            return NotificationConfig(
+                name,
+                description,
+                configType,
+                features,
+                configData!!,
+                isEnabled
+            )
         }
     }
 
-  /**
-   * Constructor used in transport action communication.
-   * @param input StreamInput stream to deserialize data from.
-   */
-  constructor(input: StreamInput) : this(
-      name = input.readString(),
-      description = input.readString(),
-      configType = input.readEnum(ConfigType::class.java),
-      features = input.readEnumSet(Feature::class.java),
-      isEnabled = input.readBoolean(),
-      configData = input.readOptionalWriteable(getReaderForConfigType(input.readEnum(ConfigType::class.java)))!!
-  )
+    /**
+     * Constructor used in transport action communication.
+     * @param input StreamInput stream to deserialize data from.
+     */
+    constructor(input: StreamInput) : this(
+        name = input.readString(),
+        description = input.readString(),
+        configType = input.readEnum(ConfigType::class.java),
+        features = input.readEnumSet(Feature::class.java),
+        isEnabled = input.readBoolean(),
+        configData = input.readOptionalWriteable(getReaderForConfigType(input.readEnum(ConfigType::class.java)))!!
+    )
 
-
-      /**
+    /**
      * {@inheritDoc}
      */
     override fun writeTo(output: StreamOutput) {
@@ -158,7 +157,7 @@ data class NotificationConfig(
         output.writeEnum(configType)
         output.writeEnumSet(features)
         output.writeBoolean(isEnabled)
-       // Reading config types multiple times in constructor
+        // Reading config types multiple times in constructor
         output.writeEnum(configType)
         output.writeOptionalWriteable(configData)
     }
