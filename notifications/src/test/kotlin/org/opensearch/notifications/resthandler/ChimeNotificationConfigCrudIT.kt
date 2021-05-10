@@ -167,4 +167,41 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
         )
         Thread.sleep(100)
     }
+
+    fun `test BAD Request for multiple config data for Chime using REST Client`() {
+        // Create sample config request reference
+        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.Chime,
+            EnumSet.of(Feature.Alerting, Feature.Reports),
+            isEnabled = true,
+            configData = sampleChime
+        )
+
+        // Create chime notification config
+        val createRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"Chime",
+                "features":[
+                    "${referenceObject.features.elementAt(0)}",
+                    "${referenceObject.features.elementAt(1)}"
+                ],
+                "is_enabled":${referenceObject.isEnabled},
+                "slack":{"url":"https://dummy.com"}
+                "chime":{"url":"${(referenceObject.configData as Chime).url}"}
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createRequestJsonString,
+            RestStatus.BAD_REQUEST.status
+        )
+    }
 }

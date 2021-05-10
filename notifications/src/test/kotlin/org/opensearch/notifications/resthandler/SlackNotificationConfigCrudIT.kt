@@ -168,4 +168,41 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         )
         Thread.sleep(100)
     }
+
+    fun `test Bad Request for multiple config data for Slack using REST Client`() {
+        // Create sample config request reference
+        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.Slack,
+            EnumSet.of(Feature.IndexManagement, Feature.Reports),
+            isEnabled = true,
+            configData = sampleSlack
+        )
+
+        // Create slack notification config
+        val createRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"Slack",
+                "features":[
+                    "${referenceObject.features.elementAt(0)}",
+                    "${referenceObject.features.elementAt(1)}"
+                ],
+                "is_enabled":${referenceObject.isEnabled},
+                "chime":{"url":"https://dummy.com"}
+                "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createRequestJsonString,
+            RestStatus.BAD_REQUEST.status
+        )
+    }
 }

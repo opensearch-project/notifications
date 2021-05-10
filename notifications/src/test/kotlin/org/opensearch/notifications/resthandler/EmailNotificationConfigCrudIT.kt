@@ -331,4 +331,103 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         )
         Thread.sleep(100)
     }
+
+    fun `test Bad Request for multiple config for SmtpAccont using REST Client`() {
+        // Create sample smtp account config request reference
+        val sampleSmtpAccount = SmtpAccount(
+            "smtp.domain.com",
+            1234,
+            SmtpAccount.MethodType.StartTls,
+            "from@domain.com",
+            SecureString("username".toCharArray()),
+            SecureString("password".toCharArray())
+        )
+        val smtpAccountConfig = NotificationConfig(
+            "this is a sample smtp account config name",
+            "this is a sample smtp account config description",
+            ConfigType.SmtpAccount,
+            EnumSet.of(Feature.Reports),
+            isEnabled = true,
+            configData = sampleSmtpAccount
+        )
+
+        // Create smtp account notification config
+        val createSmtpAccountRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"${smtpAccountConfig.name}",
+                "description":"${smtpAccountConfig.description}",
+                "config_type":"Smtp_account",
+                "features":[
+                    "${smtpAccountConfig.features.elementAt(0)}"
+                ],
+                "is_enabled":${smtpAccountConfig.isEnabled},
+                "slack": {"url": "https://dummy.com"},
+                "smtp_account":{
+                    "host":"${sampleSmtpAccount.host}",
+                    "port":"${sampleSmtpAccount.port}",
+                    "method":"${sampleSmtpAccount.method}",
+                    "from_address":"${sampleSmtpAccount.fromAddress}",
+                    "username":"${sampleSmtpAccount.username!!.chars}",
+                    "password":"${sampleSmtpAccount.password!!.chars}"
+                }
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createSmtpAccountRequestJsonString,
+            RestStatus.BAD_REQUEST.status
+        )
+    }
+
+    fun `test Bad Request for multiple config for Email using REST Client Email`() {
+        // Create sample email config request reference
+        val sampleEmail = Email(
+            "dummy",
+            listOf("default-email1@email.com", "default-email2@email.com"),
+            listOf("dummy")
+        )
+        val emailConfig = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.Email,
+            EnumSet.of(Feature.Reports),
+            isEnabled = true,
+            configData = sampleEmail
+        )
+
+        // Create email notification config
+        val createEmailRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"${emailConfig.name}",
+                "description":"${emailConfig.description}",
+                "config_type":"Email",
+                "features":[
+                    "${emailConfig.features.elementAt(0)}"
+                ],
+                "is_enabled":${emailConfig.isEnabled},
+                "slack":{"url": "https://dummy.com"},
+                "email":{
+                    "email_account_id":"${sampleEmail.emailAccountID}",
+                    "default_recipients":[
+                        "${sampleEmail.defaultRecipients[0]}",
+                        "${sampleEmail.defaultRecipients[1]}"
+                    ],
+                    "default_email_group_ids":[
+                        "${sampleEmail.defaultEmailGroupIds[0]}"
+                    ]
+                }
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createEmailRequestJsonString,
+            RestStatus.BAD_REQUEST.status
+        )
+    }
 }
