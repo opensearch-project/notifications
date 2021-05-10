@@ -59,7 +59,7 @@ data class NotificationConfig(
     val description: String,
     val configType: ConfigType,
     val features: EnumSet<Feature>,
-    val configData: BaseConfigData?,
+    val configData: BaseConfigData,
     val isEnabled: Boolean = true,
 ) : BaseModel {
 
@@ -129,7 +129,7 @@ data class NotificationConfig(
               description,
               configType,
               features,
-              configData,
+              configData!!,
               isEnabled,
           )
         }
@@ -145,7 +145,8 @@ data class NotificationConfig(
       configType = input.readEnum(ConfigType::class.java),
       features = input.readEnumSet(Feature::class.java),
       isEnabled = input.readBoolean(),
-      configData = input.readOptionalWriteable(getReaderForConfigType(input.readEnum(ConfigType::class.java))))
+      configData = input.readOptionalWriteable(getReaderForConfigType(input.readEnum(ConfigType::class.java)))!!
+  )
 
 
       /**

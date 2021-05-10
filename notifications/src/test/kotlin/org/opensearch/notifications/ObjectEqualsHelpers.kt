@@ -84,13 +84,13 @@ fun verifyEquals(config: NotificationConfig, jsonObject: JsonObject) {
     Assert.assertEquals(config.features.size, features.size())
     features.forEach { config.features.contains(Feature.valueOf(it.asString)) }
     when (config.configType) {
-        ConfigType.Slack -> verifyEquals((config.configData!! as Slack), jsonObject.get("slack").asJsonObject)
-        ConfigType.Chime -> verifyEquals((config.configData!! as Chime), jsonObject.get("chime").asJsonObject)
-        ConfigType.Webhook -> verifyEquals((config.configData!! as Webhook ), jsonObject.get("webhook").asJsonObject)
-        ConfigType.Email -> verifyEquals((config.configData!! as Email), jsonObject.get("email").asJsonObject)
-        ConfigType.SmtpAccount -> verifyEquals((config.configData!! as SmtpAccount), jsonObject.get("smtp_account")
+        ConfigType.Slack -> verifyEquals((config.configData as Slack), jsonObject.get("slack").asJsonObject)
+        ConfigType.Chime -> verifyEquals((config.configData as Chime), jsonObject.get("chime").asJsonObject)
+        ConfigType.Webhook -> verifyEquals((config.configData as Webhook ), jsonObject.get("webhook").asJsonObject)
+        ConfigType.Email -> verifyEquals((config.configData as Email), jsonObject.get("email").asJsonObject)
+        ConfigType.SmtpAccount -> verifyEquals((config.configData as SmtpAccount), jsonObject.get("smtp_account")
             .asJsonObject)
-        ConfigType.EmailGroup -> verifyEquals((config.configData!! as EmailGroup), jsonObject.get("email_group")
+        ConfigType.EmailGroup -> verifyEquals((config.configData as EmailGroup), jsonObject.get("email_group")
             .asJsonObject)
         else -> Assert.fail("configType:${config.configType} not handled in test")
     }

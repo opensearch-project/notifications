@@ -65,7 +65,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                     "${referenceObject.features.elementAt(1)}"
                 ],
                 "is_enabled":${referenceObject.isEnabled},
-                "chime":{"url":"${(referenceObject.configData!! as Chime).url}"}
+                "chime":{"url":"${(referenceObject.configData as Chime).url}"}
             }
         }
         """.trimIndent()
@@ -123,7 +123,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                     "${updatedObject.features.elementAt(0)}"
                 ],
                 "is_enabled":${updatedObject.isEnabled},
-                "chime":{"url":"${(updatedObject.configData!! as Chime).url}"}
+                "chime":{"url":"${(updatedObject.configData as Chime).url}"}
             }
         }
         """.trimIndent()

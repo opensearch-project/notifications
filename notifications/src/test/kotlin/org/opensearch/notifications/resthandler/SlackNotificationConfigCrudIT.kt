@@ -65,7 +65,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
                     "${referenceObject.features.elementAt(1)}"
                 ],
                 "is_enabled":${referenceObject.isEnabled},
-                "slack":{"url":"${(referenceObject.configData!! as Slack).url}"}
+                "slack":{"url":"${(referenceObject.configData as Slack).url}"}
             }
         }
         """.trimIndent()
@@ -124,7 +124,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
                     "${updatedObject.features.elementAt(1)}"
                 ],
                 "is_enabled":${updatedObject.isEnabled},
-                "slack":{"url":"${(updatedObject.configData!! as Slack).url}"}
+                "slack":{"url":"${(updatedObject.configData as Slack).url}"}
             }
         }
         """.trimIndent()

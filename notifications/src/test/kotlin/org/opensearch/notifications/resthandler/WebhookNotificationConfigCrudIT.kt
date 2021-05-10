@@ -66,7 +66,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
                     "${referenceObject.features.elementAt(2)}"
                 ],
                 "is_enabled":${referenceObject.isEnabled},
-                "webhook":{"url":"${(referenceObject.configData!! as Webhook).url}"}
+                "webhook":{"url":"${(referenceObject.configData as Webhook).url}"}
             }
         }
         """.trimIndent()
@@ -125,7 +125,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
                     "${updatedObject.features.elementAt(1)}"
                 ],
                 "is_enabled":${updatedObject.isEnabled},
-                "webhook":{"url":"${(updatedObject.configData!! as Webhook).url}"}
+                "webhook":{"url":"${(updatedObject.configData as Webhook).url}"}
             }
         }
         """.trimIndent()
