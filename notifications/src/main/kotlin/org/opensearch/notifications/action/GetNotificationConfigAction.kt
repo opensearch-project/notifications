@@ -37,6 +37,7 @@ import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
 import org.opensearch.commons.notifications.action.GetNotificationConfigResponse
 import org.opensearch.commons.notifications.action.NotificationsActions
 import org.opensearch.commons.utils.recreateObject
+import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 
@@ -77,6 +78,6 @@ internal class GetNotificationConfigAction @Inject constructor(
         request: GetNotificationConfigRequest,
         user: User?
     ): GetNotificationConfigResponse {
-        return NotificationConfigActions.get(request, user)
+        return ConfigIndexingActions.get(request, user)
     }
 }

@@ -36,7 +36,7 @@ import java.util.stream.Collectors
 /**
  * Class for checking/filtering user access.
  */
-internal object UserAccessManager {
+internal object UserAccessManager : UserAccess {
     private const val USER_TAG = "User:"
     private const val ROLE_TAG = "Role:"
     private const val BACKEND_ROLE_TAG = "BERole:"
@@ -45,17 +45,9 @@ internal object UserAccessManager {
     const val DEFAULT_TENANT = ""
 
     /**
-     * Validate User if eligible to do operation
-     * If filterBy == NoFilter
-     *  -> No validation
-     * If filterBy == User
-     *  -> User name should be present
-     * If filterBy == Roles
-     *  -> roles should be present
-     * If filterBy == BackendRoles
-     *  -> backend roles should be present
+     * {@inheritDoc}
      */
-    fun validateUser(user: User?) {
+    override fun validateUser(user: User?) {
         if (isUserPrivateTenant(user) && user?.name == null) {
             throw OpenSearchStatusException(
                 "User name not provided for private tenant access",
@@ -99,9 +91,9 @@ internal object UserAccessManager {
     }
 
     /**
-     * Get tenant info from user object.
+     * {@inheritDoc}
      */
-    fun getUserTenant(user: User?): String {
+    override fun getUserTenant(user: User?): String {
         return when (val requestedTenant = user?.requestedTenant) {
             null -> DEFAULT_TENANT
             else -> requestedTenant
@@ -109,9 +101,9 @@ internal object UserAccessManager {
     }
 
     /**
-     * Get all user access info from user object.
+     * {@inheritDoc}
      */
-    fun getAllAccessInfo(user: User?): List<String> {
+    override fun getAllAccessInfo(user: User?): List<String> {
         if (user == null) { // Security is disabled
             return listOf()
         }
@@ -125,9 +117,9 @@ internal object UserAccessManager {
     }
 
     /**
-     * Get access info for search filtering
+     * {@inheritDoc}
      */
-    fun getSearchAccessInfo(user: User?): List<String> {
+    override fun getSearchAccessInfo(user: User?): List<String> {
         if (user == null) { // Security is disabled
             return listOf()
         }
@@ -149,9 +141,9 @@ internal object UserAccessManager {
     }
 
     /**
-     * validate if user has access based on given access list
+     * {@inheritDoc}
      */
-    fun doesUserHasAccess(user: User?, tenant: String, access: List<String>): Boolean {
+    override fun doesUserHasAccess(user: User?, tenant: String, access: List<String>): Boolean {
         if (user == null) { // Security is disabled
             return true
         }
@@ -173,9 +165,9 @@ internal object UserAccessManager {
     }
 
     /**
-     * Check if user has all info access.
+     * {@inheritDoc}
      */
-    fun hasAllInfoAccess(user: User?): Boolean {
+    override fun hasAllInfoAccess(user: User?): Boolean {
         if (user == null) { // Security is disabled
             return true
         }

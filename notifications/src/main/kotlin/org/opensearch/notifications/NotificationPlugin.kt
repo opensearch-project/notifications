@@ -51,9 +51,11 @@ import org.opensearch.notifications.action.GetNotificationConfigAction
 import org.opensearch.notifications.action.SendMessageAction
 import org.opensearch.notifications.action.SendNotificationAction
 import org.opensearch.notifications.action.UpdateNotificationConfigAction
+import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.notifications.index.NotificationConfigIndex
 import org.opensearch.notifications.resthandler.NotificationConfigRestHandler
 import org.opensearch.notifications.resthandler.SendMessageRestHandler
+import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.notifications.throttle.Accountant
 import org.opensearch.plugins.ActionPlugin
@@ -110,6 +112,7 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
         this.clusterService = clusterService
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         NotificationConfigIndex.initialize(client, clusterService)
+        ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
         Accountant.initialize(client, clusterService)
         return listOf()
     }
