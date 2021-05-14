@@ -38,7 +38,9 @@ import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.PluginRestTestCase
 import org.opensearch.notifications.verifyMultiConfigEquals
+import org.opensearch.notifications.verifyMultiConfigIdEquals
 import org.opensearch.notifications.verifySingleConfigEquals
+import org.opensearch.notifications.verifySingleConfigIdEquals
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
 import java.util.EnumSet
@@ -324,7 +326,550 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
     }
 
-    fun `test Bad Request for multiple config for SmtpAccont using REST Client`() {
+    fun `test Create email notification config without email_group IDs`() {
+        // Create smtp account notification config
+        val createSmtpAccountRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"sample smtp account config name",
+                "description":"sample smtp account config description",
+                "config_type":"smtp_account",
+                "feature_list":[
+                    "reports"
+                ],
+                "is_enabled":true,
+                "smtp_account":{
+                    "host":"smtp.domain.com",
+                    "port":"1234",
+                    "method":"start_tls",
+                    "from_address":"from@domain.com"
+                }
+            }
+        }
+        """.trimIndent()
+        val createSmtpAccountResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createSmtpAccountRequestJsonString,
+            RestStatus.OK.status
+        )
+        val smtpAccountConfigId = createSmtpAccountResponse.get("config_id").asString
+        Assert.assertNotNull(smtpAccountConfigId)
+        Thread.sleep(100)
+
+        // Create sample email config request reference
+        val sampleEmail = Email(
+            smtpAccountConfigId,
+            listOf("default-email1@email.com", "default-email2@email.com"),
+            listOf()
+        )
+        val emailConfig = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.EMAIL,
+            EnumSet.of(Feature.REPORTS),
+            isEnabled = true,
+            configData = sampleEmail
+        )
+
+        // Create email notification config
+        val createEmailRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"${emailConfig.name}",
+                "description":"${emailConfig.description}",
+                "config_type":"email",
+                "feature_list":[
+                    "${emailConfig.features.elementAt(0)}"
+                ],
+                "is_enabled":${emailConfig.isEnabled},
+                "email":{
+                    "email_account_id":"${sampleEmail.emailAccountID}",
+                    "recipient_list":[
+                        "${sampleEmail.recipients[0]}",
+                        "${sampleEmail.recipients[1]}"
+                    ],
+                    "email_group_id_list":[]
+                }
+            }
+        }
+        """.trimIndent()
+        val createEmailResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createEmailRequestJsonString,
+            RestStatus.OK.status
+        )
+        val emailConfigId = createEmailResponse.get("config_id").asString
+        Assert.assertNotNull(emailConfigId)
+        Thread.sleep(1000)
+
+        val getEmailResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs/$emailConfigId",
+            "",
+            RestStatus.OK.status
+        )
+        verifySingleConfigEquals(emailConfigId, emailConfig, getEmailResponse)
+        Thread.sleep(100)
+    }
+
+    fun `test Create email notification config using invalid email account id should fail`() {
+        // Create sample email config request reference
+        val sampleEmail = Email(
+            "InvalidSmtpAccountConfigId",
+            listOf("default-email1@email.com", "default-email2@email.com"),
+            listOf()
+        )
+        val emailConfig = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.EMAIL,
+            EnumSet.of(Feature.REPORTS),
+            isEnabled = true,
+            configData = sampleEmail
+        )
+
+        // Create email notification config
+        val createEmailRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"${emailConfig.name}",
+                "description":"${emailConfig.description}",
+                "config_type":"email",
+                "feature_list":[
+                    "${emailConfig.features.elementAt(0)}"
+                ],
+                "is_enabled":${emailConfig.isEnabled},
+                "email":{
+                    "email_account_id":"${sampleEmail.emailAccountID}",
+                    "recipient_list":[
+                        "${sampleEmail.recipients[0]}",
+                        "${sampleEmail.recipients[1]}"
+                    ],
+                    "email_group_id_list":[]
+                }
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createEmailRequestJsonString,
+            RestStatus.NOT_FOUND.status
+        )
+        Thread.sleep(1000)
+
+        // Get all notification config should give empty result
+        val getAllConfigResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigEquals(mapOf(), getAllConfigResponse)
+        Thread.sleep(100)
+    }
+
+    fun `test Create email notification config using invalid group ID should fail`() {
+        // Create sample smtp account config request reference
+        val sampleSmtpAccount = SmtpAccount(
+            "smtp.domain.com",
+            1234,
+            MethodType.START_TLS,
+            "from@domain.com"
+        )
+        val smtpAccountConfig = NotificationConfig(
+            "this is a sample smtp account config name",
+            "this is a sample smtp account config description",
+            ConfigType.SMTP_ACCOUNT,
+            EnumSet.of(Feature.REPORTS),
+            isEnabled = true,
+            configData = sampleSmtpAccount
+        )
+
+        // Create smtp account notification config
+        val createSmtpAccountRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"${smtpAccountConfig.name}",
+                "description":"${smtpAccountConfig.description}",
+                "config_type":"smtp_account",
+                "feature_list":[
+                    "${smtpAccountConfig.features.elementAt(0)}"
+                ],
+                "is_enabled":${smtpAccountConfig.isEnabled},
+                "smtp_account":{
+                    "host":"${sampleSmtpAccount.host}",
+                    "port":"${sampleSmtpAccount.port}",
+                    "method":"${sampleSmtpAccount.method}",
+                    "from_address":"${sampleSmtpAccount.fromAddress}"
+                }
+            }
+        }
+        """.trimIndent()
+        val createSmtpAccountResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createSmtpAccountRequestJsonString,
+            RestStatus.OK.status
+        )
+        val smtpAccountConfigId = createSmtpAccountResponse.get("config_id").asString
+        Assert.assertNotNull(smtpAccountConfigId)
+        Thread.sleep(100)
+
+        // Create sample email config request reference
+        val sampleEmail = Email(
+            smtpAccountConfigId,
+            listOf("default-email1@email.com", "default-email2@email.com"),
+            listOf("InvalidEmailGroupConfigId")
+        )
+        val emailConfig = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.EMAIL,
+            EnumSet.of(Feature.REPORTS),
+            isEnabled = true,
+            configData = sampleEmail
+        )
+
+        // Create email notification config
+        val createEmailRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"${emailConfig.name}",
+                "description":"${emailConfig.description}",
+                "config_type":"email",
+                "feature_list":[
+                    "${emailConfig.features.elementAt(0)}"
+                ],
+                "is_enabled":${emailConfig.isEnabled},
+                "email":{
+                    "email_account_id":"${sampleEmail.emailAccountID}",
+                    "recipient_list":[
+                        "${sampleEmail.recipients[0]}",
+                        "${sampleEmail.recipients[1]}"
+                    ],
+                    "email_group_id_list":[
+                        "${sampleEmail.emailGroupIds[0]}"
+                    ]
+                }
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createEmailRequestJsonString,
+            RestStatus.NOT_FOUND.status
+        )
+        Thread.sleep(1000)
+
+        // Get all notification config should give only smtp account
+        val getAllConfigResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigEquals(mapOf(Pair(smtpAccountConfigId, smtpAccountConfig)), getAllConfigResponse)
+        Thread.sleep(100)
+    }
+
+    fun `test Create email notification config using email account id with unavailable feature should fail`() {
+        // Create smtp account notification config with reporting and alerting feature
+        val createSmtpAccountRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"sample smtp account config name",
+                "description":"sample smtp account config description",
+                "config_type":"smtp_account",
+                "feature_list":[
+                    "reports",
+                    "alerting"
+                ],
+                "is_enabled":true,
+                "smtp_account":{
+                    "host":"smtp.domain.com",
+                    "port":"1234",
+                    "method":"start_tls",
+                    "from_address":"from@domain.com"
+                }
+            }
+        }
+        """.trimIndent()
+        val createSmtpAccountResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createSmtpAccountRequestJsonString,
+            RestStatus.OK.status
+        )
+        val smtpAccountConfigId = createSmtpAccountResponse.get("config_id").asString
+        Assert.assertNotNull(smtpAccountConfigId)
+        Thread.sleep(100)
+
+        // Create sample email config request reference with reports and index_management
+        val sampleEmail = Email(
+            smtpAccountConfigId,
+            listOf("default-email1@email.com", "default-email2@email.com"),
+            listOf()
+        )
+        val emailConfig = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.EMAIL,
+            EnumSet.of(Feature.REPORTS, Feature.INDEX_MANAGEMENT),
+            isEnabled = true,
+            configData = sampleEmail
+        )
+
+        // Create email notification config
+        val createEmailRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"${emailConfig.name}",
+                "description":"${emailConfig.description}",
+                "config_type":"email",
+                "feature_list":[
+                    "${emailConfig.features.elementAt(0)}",
+                    "${emailConfig.features.elementAt(1)}"
+                ],
+                "is_enabled":${emailConfig.isEnabled},
+                "email":{
+                    "email_account_id":"${sampleEmail.emailAccountID}",
+                    "recipient_list":[
+                        "${sampleEmail.recipients[0]}",
+                        "${sampleEmail.recipients[1]}"
+                    ],
+                    "email_group_id_list":[]
+                }
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createEmailRequestJsonString,
+            RestStatus.FORBIDDEN.status
+        )
+        Thread.sleep(1000)
+
+        // Get all notification config should give only email group
+        val getAllConfigResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs",
+            "",
+            RestStatus.OK.status
+        )
+        verifySingleConfigIdEquals(smtpAccountConfigId, getAllConfigResponse)
+        Thread.sleep(100)
+    }
+
+    fun `test Create email notification config wit email_group IDs put as email account id should fail`() {
+
+        // Create email group notification config
+        val createEmailGroupRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"sample email group name",
+                "description":"sample email group description",
+                "config_type":"email_group",
+                "feature_list":["reports"],
+                "is_enabled":true,
+                "email_group":{
+                    "recipient_list":[ "email1@email.com", "email2@email.com"]
+                }
+            }
+        }
+        """.trimIndent()
+        val createEmailGroupResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createEmailGroupRequestJsonString,
+            RestStatus.OK.status
+        )
+        val emailGroupConfigId = createEmailGroupResponse.get("config_id").asString
+        Assert.assertNotNull(emailGroupConfigId)
+        Thread.sleep(100)
+
+        // Create email notification config
+        val createEmailRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"this is a sample config name",
+                "description":"this is a sample config description",
+                "config_type":"email",
+                "feature_list":["reports"],
+                "is_enabled":true,
+                "email":{
+                    "email_account_id":"$emailGroupConfigId",
+                    "recipient_list":[],
+                    "email_group_id_list":[]
+                }
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createEmailRequestJsonString,
+            RestStatus.NOT_ACCEPTABLE.status
+        )
+        Thread.sleep(1000)
+
+        // Get all notification config should give only email group
+        val getAllConfigResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs",
+            "",
+            RestStatus.OK.status
+        )
+        verifySingleConfigIdEquals(emailGroupConfigId, getAllConfigResponse)
+        Thread.sleep(100)
+    }
+
+    fun `test Create email notification config with email account ID put as well email group id should fail`() {
+        // Create smtp account notification config
+        val createSmtpAccountRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"sample smtp account config name",
+                "description":"sample smtp account config description",
+                "config_type":"smtp_account",
+                "feature_list":[
+                    "reports"
+                ],
+                "is_enabled":true,
+                "smtp_account":{
+                    "host":"smtp.domain.com",
+                    "port":"1234",
+                    "method":"start_tls",
+                    "from_address":"from@domain.com"
+                }
+            }
+        }
+        """.trimIndent()
+        val createSmtpAccountResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createSmtpAccountRequestJsonString,
+            RestStatus.OK.status
+        )
+        val smtpAccountConfigId = createSmtpAccountResponse.get("config_id").asString
+        Assert.assertNotNull(smtpAccountConfigId)
+        Thread.sleep(100)
+        val createEmailRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"this is a sample config name",
+                "description":"this is a sample config description",
+                "config_type":"email",
+                "feature_list":["reports"],
+                "is_enabled":true,
+                "email":{
+                    "email_account_id":"$smtpAccountConfigId",
+                    "recipient_list":[],
+                    "email_group_id_list":["$smtpAccountConfigId"]
+                }
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createEmailRequestJsonString,
+            RestStatus.BAD_REQUEST.status
+        )
+        Thread.sleep(1000)
+
+        // Get all notification config should give only email group
+        val getAllConfigResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs",
+            "",
+            RestStatus.OK.status
+        )
+        verifySingleConfigIdEquals(smtpAccountConfigId, getAllConfigResponse)
+        Thread.sleep(100)
+    }
+
+    fun `test Create email notification config with email account IDs put in email group id should fail`() {
+        // Create smtp account notification config
+        val createSmtpAccountRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"sample smtp account config name",
+                "description":"sample smtp account config description",
+                "config_type":"smtp_account",
+                "feature_list":[
+                    "reports"
+                ],
+                "is_enabled":true,
+                "smtp_account":{
+                    "host":"smtp.domain.com",
+                    "port":"1234",
+                    "method":"start_tls",
+                    "from_address":"from@domain.com"
+                }
+            }
+        }
+        """.trimIndent()
+        val createSmtpAccountResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createSmtpAccountRequestJsonString,
+            RestStatus.OK.status
+        )
+        val smtpAccountConfigId = createSmtpAccountResponse.get("config_id").asString
+        Assert.assertNotNull(smtpAccountConfigId)
+        Thread.sleep(100)
+
+        // Create another smtp account
+        val anotherAccountResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createSmtpAccountRequestJsonString,
+            RestStatus.OK.status
+        )
+        val anotherAccountConfigId = anotherAccountResponse.get("config_id").asString
+        Assert.assertNotNull(anotherAccountConfigId)
+        Thread.sleep(100)
+        val createEmailRequestJsonString = """
+        {
+            "notification_config":{
+                "name":"this is a sample config name",
+                "description":"this is a sample config description",
+                "config_type":"email",
+                "feature_list":["reports"],
+                "is_enabled":true,
+                "email":{
+                    "email_account_id":"$smtpAccountConfigId",
+                    "recipient_list":[],
+                    "email_group_id_list":["$anotherAccountConfigId"]
+                }
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createEmailRequestJsonString,
+            RestStatus.NOT_ACCEPTABLE.status
+        )
+        Thread.sleep(1000)
+
+        // Get all notification config should give only email group
+        val getAllConfigResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(setOf(smtpAccountConfigId, anotherAccountConfigId), getAllConfigResponse)
+        Thread.sleep(100)
+    }
+
+    fun `test Bad Request for multiple config for SmtpAccount using REST Client`() {
         // Create sample smtp account config request reference
         val sampleSmtpAccount = SmtpAccount(
             "smtp.domain.com",

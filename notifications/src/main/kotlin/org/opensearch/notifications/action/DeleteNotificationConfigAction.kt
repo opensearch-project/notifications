@@ -37,6 +37,7 @@ import org.opensearch.commons.notifications.action.DeleteNotificationConfigReque
 import org.opensearch.commons.notifications.action.DeleteNotificationConfigResponse
 import org.opensearch.commons.notifications.action.NotificationsActions
 import org.opensearch.commons.utils.recreateObject
+import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 
@@ -77,6 +78,6 @@ internal class DeleteNotificationConfigAction @Inject constructor(
         request: DeleteNotificationConfigRequest,
         user: User?
     ): DeleteNotificationConfigResponse {
-        return NotificationConfigActions.delete(request, user)
+        return ConfigIndexingActions.delete(request, user)
     }
 }

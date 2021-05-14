@@ -71,7 +71,7 @@ import java.util.concurrent.TimeUnit
  * Class for doing index operations to maintain configurations in cluster.
  */
 @Suppress("TooManyFunctions")
-internal object NotificationConfigIndex {
+internal object NotificationConfigIndex : ConfigOperations {
     private val log by logger(NotificationConfigIndex::class.java)
     private const val INDEX_NAME = ".opensearch-notifications-config"
     private const val MAPPING_FILE_NAME = "notifications-config-mapping.yml"
@@ -101,9 +101,7 @@ internal object NotificationConfigIndex {
     }
 
     /**
-     * Initialize the class
-     * @param client The OpenSearch client
-     * @param clusterService The OpenSearch cluster service
+     * {@inheritDoc}
      */
     fun initialize(client: Client, clusterService: ClusterService) {
         NotificationConfigIndex.client = SecureIndexClient(client)
@@ -148,13 +146,9 @@ internal object NotificationConfigIndex {
     }
 
     /**
-     * create a new doc for NotificationConfigDoc
-     * @param configDoc the Notification Config Doc
-     * @param id optional id to use as id for the document
-     * @return Notification Config id if successful, null otherwise
-     * @throws java.util.concurrent.ExecutionException with a cause
+     * {@inheritDoc}
      */
-    fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String? = null): String? {
+    override fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String?): String? {
         createIndex()
         val indexRequest = IndexRequest(INDEX_NAME)
             .source(configDoc.toXContent())
@@ -173,11 +167,9 @@ internal object NotificationConfigIndex {
     }
 
     /**
-     * Query index for Notification Config with ID
-     * @param ids set of the document ids to get info
-     * @return list of NotificationConfigDocInfo on success, null otherwise
+     * {@inheritDoc}
      */
-    fun getNotificationConfigs(ids: Set<String>): List<NotificationConfigDocInfo> {
+    override fun getNotificationConfigs(ids: Set<String>): List<NotificationConfigDocInfo> {
         createIndex()
         val getRequest = MultiGetRequest()
         ids.forEach { getRequest.add(INDEX_NAME, it) }
@@ -187,11 +179,9 @@ internal object NotificationConfigIndex {
     }
 
     /**
-     * Query index for Notification Config with ID
-     * @param id the id for the document
-     * @return NotificationConfigDocInfo on success, null otherwise
+     * {@inheritDoc}
      */
-    fun getNotificationConfig(id: String): NotificationConfigDocInfo? {
+    override fun getNotificationConfig(id: String): NotificationConfigDocInfo? {
         createIndex()
         val getRequest = GetRequest(INDEX_NAME).id(id)
         val actionFuture = client.get(getRequest)
@@ -222,13 +212,9 @@ internal object NotificationConfigIndex {
     }
 
     /**
-     * Query index for NotificationConfigDocs for given access details
-     * @param tenant the tenant of the user
-     * @param access the list of access details to search NotificationConfigDocs for.
-     * @param request [GetNotificationConfigRequest] object
-     * @return search result of NotificationConfigDocs
+     * {@inheritDoc}
      */
-    fun getAllNotificationConfigs(
+    override fun getAllNotificationConfigs(
         tenant: String,
         access: List<String>,
         request: GetNotificationConfigRequest
@@ -263,12 +249,9 @@ internal object NotificationConfigIndex {
     }
 
     /**
-     * update NotificationConfigDoc for given id
-     * @param id the id for the document
-     * @param notificationConfigDoc the NotificationConfigDoc data
-     * @return true if successful, false otherwise
+     * {@inheritDoc}
      */
-    fun updateNotificationConfig(id: String, notificationConfigDoc: NotificationConfigDoc): Boolean {
+    override fun updateNotificationConfig(id: String, notificationConfigDoc: NotificationConfigDoc): Boolean {
         createIndex()
         val updateRequest = UpdateRequest()
             .index(INDEX_NAME)
@@ -284,11 +267,9 @@ internal object NotificationConfigIndex {
     }
 
     /**
-     * delete NotificationConfigDoc for given id
-     * @param id the id for the document
-     * @return true if successful, false otherwise
+     * {@inheritDoc}
      */
-    fun deleteNotificationConfig(id: String): Boolean {
+    override fun deleteNotificationConfig(id: String): Boolean {
         createIndex()
         val deleteRequest = DeleteRequest()
             .index(INDEX_NAME)
@@ -302,11 +283,9 @@ internal object NotificationConfigIndex {
     }
 
     /**
-     * delete NotificationConfigDoc for given ids
-     * @param ids set of the document ids to delete
-     * @return map of id to status
+     * {@inheritDoc}
      */
-    fun deleteNotificationConfigs(ids: Set<String>): Map<String, RestStatus> {
+    override fun deleteNotificationConfigs(ids: Set<String>): Map<String, RestStatus> {
         createIndex()
         val bulkRequest = BulkRequest()
         ids.forEach {
