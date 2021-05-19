@@ -34,9 +34,9 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
-import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
-import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TAG
 import org.opensearch.commons.notifications.NotificationConstants.CREATED_TIME_TAG
+import org.opensearch.commons.notifications.NotificationConstants.EVENT_ID_TAG
+import org.opensearch.commons.notifications.NotificationConstants.EVENT_TAG
 import org.opensearch.commons.notifications.NotificationConstants.TENANT_TAG
 import org.opensearch.commons.notifications.NotificationConstants.UPDATED_TIME_TAG
 import org.opensearch.commons.utils.logger
@@ -44,27 +44,27 @@ import java.io.IOException
 import java.time.Instant
 
 /**
- * Data class representing Notification config.
+ * Data class representing Notification event with information.
  */
-data class NotificationConfigInfo(
-    val configId: String,
+data class NotificationEventInfo(
+    val eventId: String,
     val lastUpdatedTime: Instant,
     val createdTime: Instant,
     val tenant: String,
-    val notificationConfig: NotificationConfig
+    val notificationEvent: NotificationEvent
 ) : BaseModel {
 
     init {
-        require(!Strings.isNullOrEmpty(configId)) { "config id is null or empty" }
+        require(!Strings.isNullOrEmpty(eventId)) { "event id is null or empty" }
     }
 
     companion object {
-        private val log by logger(NotificationConfigInfo::class.java)
+        private val log by logger(NotificationEventInfo::class.java)
 
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader { NotificationConfigInfo(it) }
+        val reader = Writeable.Reader { NotificationEventInfo(it) }
 
         /**
          * Creator used in REST communication.
@@ -72,12 +72,12 @@ data class NotificationConfigInfo(
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): NotificationConfigInfo {
-            var configId: String? = null
+        fun parse(parser: XContentParser): NotificationEventInfo {
+            var eventId: String? = null
             var lastUpdatedTime: Instant? = null
             var createdTime: Instant? = null
             var tenant: String? = null
-            var notificationConfig: NotificationConfig? = null
+            var notificationEvent: NotificationEvent? = null
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -88,53 +88,30 @@ data class NotificationConfigInfo(
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    CONFIG_ID_TAG -> configId = parser.text()
+                    EVENT_ID_TAG -> eventId = parser.text()
                     UPDATED_TIME_TAG -> lastUpdatedTime = Instant.ofEpochMilli(parser.longValue())
                     CREATED_TIME_TAG -> createdTime = Instant.ofEpochMilli(parser.longValue())
                     TENANT_TAG -> tenant = parser.text()
-                    CONFIG_TAG -> notificationConfig = NotificationConfig.parse(parser)
+                    EVENT_TAG -> notificationEvent = NotificationEvent.parse(parser)
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing configuration")
+                        log.info("Unexpected field: $fieldName, while parsing event info")
                     }
                 }
             }
-            configId ?: throw IllegalArgumentException("$CONFIG_ID_TAG field absent")
+            eventId ?: throw IllegalArgumentException("$EVENT_ID_TAG field absent")
             lastUpdatedTime ?: throw IllegalArgumentException("$UPDATED_TIME_TAG field absent")
             createdTime ?: throw IllegalArgumentException("$CREATED_TIME_TAG field absent")
             tenant = tenant ?: ""
-            notificationConfig ?: throw IllegalArgumentException("$CONFIG_TAG field absent")
-            return NotificationConfigInfo(
-                configId,
+            notificationEvent ?: throw IllegalArgumentException("$EVENT_TAG field absent")
+            return NotificationEventInfo(
+                eventId,
                 lastUpdatedTime,
                 createdTime,
                 tenant,
-                notificationConfig
+                notificationEvent
             )
         }
-    }
-
-    /**
-     * Constructor used in transport action communication.
-     * @param input StreamInput stream to deserialize data from.
-     */
-    constructor(input: StreamInput) : this(
-        configId = input.readString(),
-        lastUpdatedTime = input.readInstant(),
-        createdTime = input.readInstant(),
-        tenant = input.readString(),
-        notificationConfig = NotificationConfig.reader.read(input)
-    )
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun writeTo(output: StreamOutput) {
-        output.writeString(configId)
-        output.writeInstant(lastUpdatedTime)
-        output.writeInstant(createdTime)
-        output.writeString(tenant)
-        notificationConfig.writeTo(output)
     }
 
     /**
@@ -143,11 +120,34 @@ data class NotificationConfigInfo(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(CONFIG_ID_TAG, configId)
+            .field(EVENT_ID_TAG, eventId)
             .field(UPDATED_TIME_TAG, lastUpdatedTime.toEpochMilli())
             .field(CREATED_TIME_TAG, createdTime.toEpochMilli())
             .field(TENANT_TAG, tenant)
-            .field(CONFIG_TAG, notificationConfig)
+            .field(EVENT_TAG, notificationEvent)
             .endObject()
+    }
+
+    /**
+     * Constructor used in transport action communication.
+     * @param input StreamInput stream to deserialize data from.
+     */
+    constructor(input: StreamInput) : this(
+        eventId = input.readString(),
+        lastUpdatedTime = input.readInstant(),
+        createdTime = input.readInstant(),
+        tenant = input.readString(),
+        notificationEvent = NotificationEvent.reader.read(input)
+    )
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun writeTo(output: StreamOutput) {
+        output.writeString(eventId)
+        output.writeInstant(lastUpdatedTime)
+        output.writeInstant(createdTime)
+        output.writeString(tenant)
+        notificationEvent.writeTo(output)
     }
 }

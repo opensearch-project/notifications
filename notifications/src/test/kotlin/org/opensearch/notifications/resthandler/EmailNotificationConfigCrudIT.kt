@@ -67,7 +67,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create smtp account notification config
         val createSmtpAccountRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${smtpAccountConfig.name}",
                 "description":"${smtpAccountConfig.description}",
                 "config_type":"smtp_account",
@@ -108,7 +108,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create email group notification config
         val createEmailGroupRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${emailGroupConfig.name}",
                 "description":"${emailGroupConfig.description}",
                 "config_type":"email_group",
@@ -153,7 +153,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create email notification config
         val createEmailRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${emailConfig.name}",
                 "description":"${emailConfig.description}",
                 "config_type":"email",
@@ -249,7 +249,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Update smtp account notification config
         val updateSmtpAccountRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${updatedSmtpAccountConfig.name}",
                 "description":"${updatedSmtpAccountConfig.description}",
                 "config_type":"smtp_account",
@@ -330,7 +330,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create smtp account notification config
         val createSmtpAccountRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"sample smtp account config name",
                 "description":"sample smtp account config description",
                 "config_type":"smtp_account",
@@ -375,7 +375,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create email notification config
         val createEmailRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${emailConfig.name}",
                 "description":"${emailConfig.description}",
                 "config_type":"email",
@@ -433,7 +433,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create email notification config
         val createEmailRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${emailConfig.name}",
                 "description":"${emailConfig.description}",
                 "config_type":"email",
@@ -491,7 +491,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create smtp account notification config
         val createSmtpAccountRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${smtpAccountConfig.name}",
                 "description":"${smtpAccountConfig.description}",
                 "config_type":"smtp_account",
@@ -536,7 +536,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create email notification config
         val createEmailRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${emailConfig.name}",
                 "description":"${emailConfig.description}",
                 "config_type":"email",
@@ -580,7 +580,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create smtp account notification config with reporting and alerting feature
         val createSmtpAccountRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"sample smtp account config name",
                 "description":"sample smtp account config description",
                 "config_type":"smtp_account",
@@ -626,7 +626,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create email notification config
         val createEmailRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${emailConfig.name}",
                 "description":"${emailConfig.description}",
                 "config_type":"email",
@@ -670,7 +670,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create email group notification config
         val createEmailGroupRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"sample email group name",
                 "description":"sample email group description",
                 "config_type":"email_group",
@@ -695,7 +695,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create email notification config
         val createEmailRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"this is a sample config name",
                 "description":"this is a sample config description",
                 "config_type":"email",
@@ -732,7 +732,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create smtp account notification config
         val createSmtpAccountRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"sample smtp account config name",
                 "description":"sample smtp account config description",
                 "config_type":"smtp_account",
@@ -760,7 +760,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
         val createEmailRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"this is a sample config name",
                 "description":"this is a sample config description",
                 "config_type":"email",
@@ -797,7 +797,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create smtp account notification config
         val createSmtpAccountRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"sample smtp account config name",
                 "description":"sample smtp account config description",
                 "config_type":"smtp_account",
@@ -836,7 +836,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
         val createEmailRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"this is a sample config name",
                 "description":"this is a sample config description",
                 "config_type":"email",
@@ -889,7 +889,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create smtp account notification config
         val createSmtpAccountRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${smtpAccountConfig.name}",
                 "description":"${smtpAccountConfig.description}",
                 "config_type":"smtp_account",
@@ -934,7 +934,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create email notification config
         val createEmailRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${emailConfig.name}",
                 "description":"${emailConfig.description}",
                 "config_type":"email",

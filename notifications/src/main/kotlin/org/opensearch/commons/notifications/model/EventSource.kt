@@ -44,9 +44,9 @@ import org.opensearch.commons.utils.stringList
 import java.io.IOException
 
 /**
- * Data class representing Notification.
+ * Data class representing Notification event source.
  */
-data class NotificationInfo(
+data class EventSource(
     val title: String,
     val referenceId: String,
     val feature: Feature,
@@ -59,12 +59,12 @@ data class NotificationInfo(
     }
 
     companion object {
-        private val log by logger(NotificationInfo::class.java)
+        private val log by logger(EventSource::class.java)
 
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader { NotificationInfo(it) }
+        val reader = Writeable.Reader { EventSource(it) }
 
         /**
          * Creator used in REST communication.
@@ -72,7 +72,7 @@ data class NotificationInfo(
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): NotificationInfo {
+        fun parse(parser: XContentParser): EventSource {
             var title: String? = null
             var referenceId: String? = null
             var feature: Feature? = null
@@ -95,7 +95,7 @@ data class NotificationInfo(
                     TAGS_TAG -> tags = parser.stringList()
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing NotificationInfo")
+                        log.info("Unexpected field: $fieldName, while parsing EventSource")
                     }
                 }
             }
@@ -103,7 +103,7 @@ data class NotificationInfo(
             referenceId ?: throw IllegalArgumentException("$REFERENCE_ID_TAG field absent")
             feature ?: throw IllegalArgumentException("$FEATURE_TAG field absent")
 
-            return NotificationInfo(
+            return EventSource(
                 title,
                 referenceId,
                 feature,

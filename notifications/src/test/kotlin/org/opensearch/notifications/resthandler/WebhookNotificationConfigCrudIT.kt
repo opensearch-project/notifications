@@ -56,7 +56,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
         // Create webhook notification config
         val createRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"webhook",
@@ -116,7 +116,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
         // Update webhook notification config
         val updateRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${updatedObject.name}",
                 "description":"${updatedObject.description}",
                 "config_type":"webhook",
@@ -185,7 +185,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
         // Create webhook notification config
         val createRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"webhook",

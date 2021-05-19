@@ -33,37 +33,37 @@ import org.opensearch.commons.utils.createObjectFromJsonString
 import org.opensearch.commons.utils.getJsonString
 import org.opensearch.commons.utils.recreateObject
 
-internal class NotificationInfoTests {
+internal class EventSourceTests {
 
     @Test
-    fun `Notification serialize and deserialize should be equal`() {
-        val sampleNotification = NotificationInfo(
+    fun `Event source serialize and deserialize should be equal`() {
+        val sampleEventSource = EventSource(
             "title",
             "reference_id",
             Feature.ALERTING,
             severity = SeverityType.INFO
         )
-        val recreatedObject = recreateObject(sampleNotification) { NotificationInfo(it) }
-        assertEquals(sampleNotification, recreatedObject)
+        val recreatedObject = recreateObject(sampleEventSource) { EventSource(it) }
+        assertEquals(sampleEventSource, recreatedObject)
     }
 
     @Test
-    fun `Notification serialize and deserialize using json should be equal`() {
-        val sampleNotification = NotificationInfo(
+    fun `Event source serialize and deserialize using json should be equal`() {
+        val sampleEventSource = EventSource(
             "title",
             "reference_id",
             Feature.ALERTING,
             severity = SeverityType.INFO
         )
 
-        val jsonString = getJsonString(sampleNotification)
-        val recreatedObject = createObjectFromJsonString(jsonString) { NotificationInfo.parse(it) }
-        assertEquals(sampleNotification, recreatedObject)
+        val jsonString = getJsonString(sampleEventSource)
+        val recreatedObject = createObjectFromJsonString(jsonString) { EventSource.parse(it) }
+        assertEquals(sampleEventSource, recreatedObject)
     }
 
     @Test
-    fun `Notification should safely ignore extra field in json object`() {
-        val sampleNotification = NotificationInfo(
+    fun `Event source should safely ignore extra field in json object`() {
+        val sampleEventSource = EventSource(
             "title",
             "reference_id",
             Feature.ALERTING,
@@ -82,13 +82,13 @@ internal class NotificationInfoTests {
             "extra_field_3":"extra value 3"
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { NotificationInfo.parse(it) }
-        assertEquals(sampleNotification, recreatedObject)
+        val recreatedObject = createObjectFromJsonString(jsonString) { EventSource.parse(it) }
+        assertEquals(sampleEventSource, recreatedObject)
     }
 
     @Test
-    fun `Notification should safely ignore unknown feature type in json object`() {
-        val sampleNotification = NotificationInfo(
+    fun `Event source should safely ignore unknown feature type in json object`() {
+        val sampleEventSource = EventSource(
             "title",
             "reference_id",
             Feature.NONE,
@@ -104,14 +104,14 @@ internal class NotificationInfoTests {
             "tags":["tag1", "tag2"]
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { NotificationInfo.parse(it) }
-        assertEquals(sampleNotification, recreatedObject)
+        val recreatedObject = createObjectFromJsonString(jsonString) { EventSource.parse(it) }
+        assertEquals(sampleEventSource, recreatedObject)
     }
 
     @Test
-    fun `Notification throw exception if name is empty`() {
+    fun `Event source throw exception if name is empty`() {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
-            NotificationInfo(
+            EventSource(
                 "",
                 "reference_id",
                 Feature.ALERTING,

@@ -33,27 +33,31 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
-import org.opensearch.commons.notifications.NotificationConstants.NOTIFICATION_INFO_TAG
+import org.opensearch.commons.notifications.NotificationConstants.EVENT_SOURCE_TAG
 import org.opensearch.commons.notifications.NotificationConstants.STATUS_LIST_TAG
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.objectList
 import java.io.IOException
 
 /**
- * Data class representing Notification.
+ * Data class representing Notification event.
  */
-data class NotificationStatus(
-    val notificationInfo: NotificationInfo,
-    val statusList: List<ChannelStatus> = listOf()
+data class NotificationEvent(
+    val eventSource: EventSource,
+    val statusList: List<EventStatus> = listOf()
 ) : BaseModel {
 
+    init {
+        require(statusList.isNotEmpty()) { "statusList is null or empty" }
+    }
+
     companion object {
-        private val log by logger(NotificationStatus::class.java)
+        private val log by logger(NotificationEvent::class.java)
 
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader { NotificationStatus(it) }
+        val reader = Writeable.Reader { NotificationEvent(it) }
 
         /**
          * Creator used in REST communication.
@@ -61,9 +65,9 @@ data class NotificationStatus(
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): NotificationStatus {
-            var notificationInfo: NotificationInfo? = null
-            var statusList: List<ChannelStatus> = listOf()
+        fun parse(parser: XContentParser): NotificationEvent {
+            var eventSource: EventSource? = null
+            var statusList: List<EventStatus> = listOf()
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -74,18 +78,20 @@ data class NotificationStatus(
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    NOTIFICATION_INFO_TAG -> notificationInfo = NotificationInfo.parse(parser)
-                    STATUS_LIST_TAG -> statusList = parser.objectList { ChannelStatus.parse(it) }
+                    EVENT_SOURCE_TAG -> eventSource = EventSource.parse(parser)
+                    STATUS_LIST_TAG -> statusList = parser.objectList { EventStatus.parse(it) }
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing notification")
+                        log.info("Unexpected field: $fieldName, while parsing notification event")
                     }
                 }
             }
-            notificationInfo ?: throw IllegalArgumentException("$NOTIFICATION_INFO_TAG field absent")
-
-            return NotificationStatus(
-                notificationInfo,
+            eventSource ?: throw IllegalArgumentException("$EVENT_SOURCE_TAG field absent")
+            if (statusList.isEmpty()) {
+                throw IllegalArgumentException("$STATUS_LIST_TAG field absent or empty")
+            }
+            return NotificationEvent(
+                eventSource,
                 statusList
             )
         }
@@ -96,15 +102,15 @@ data class NotificationStatus(
      * @param input StreamInput stream to deserialize data from.
      */
     constructor(input: StreamInput) : this(
-        notificationInfo = NotificationInfo.reader.read(input),
-        statusList = input.readList(ChannelStatus.reader)
+        eventSource = EventSource.reader.read(input),
+        statusList = input.readList(EventStatus.reader)
     )
 
     /**
      * {@inheritDoc}
      */
     override fun writeTo(output: StreamOutput) {
-        notificationInfo.writeTo(output)
+        eventSource.writeTo(output)
         output.writeList(statusList)
     }
 
@@ -114,7 +120,7 @@ data class NotificationStatus(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(NOTIFICATION_INFO_TAG, notificationInfo)
+            .field(EVENT_SOURCE_TAG, eventSource)
             .field(STATUS_LIST_TAG, statusList)
             .endObject()
     }

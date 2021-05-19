@@ -33,8 +33,8 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.opensearch.commons.notifications.model.ChannelMessage
+import org.opensearch.commons.notifications.model.EventSource
 import org.opensearch.commons.notifications.model.Feature
-import org.opensearch.commons.notifications.model.NotificationInfo
 import org.opensearch.commons.notifications.model.SeverityType
 import org.opensearch.commons.utils.createObjectFromJsonString
 import org.opensearch.commons.utils.getJsonString
@@ -46,7 +46,7 @@ internal class SendNotificationRequestTests {
         expected: SendNotificationRequest,
         actual: SendNotificationRequest
     ) {
-        assertEquals(expected.notificationInfo, actual.notificationInfo)
+        assertEquals(expected.eventSource, actual.eventSource)
         assertEquals(expected.channelMessage, actual.channelMessage)
         assertEquals(expected.channelIds, actual.channelIds)
         assertEquals(expected.threadContext, actual.threadContext)
@@ -55,7 +55,7 @@ internal class SendNotificationRequestTests {
 
     @Test
     fun `Send request serialize and deserialize transport object should be equal`() {
-        val notificationInfo = NotificationInfo(
+        val notificationInfo = EventSource(
             "title",
             "reference_id",
             Feature.REPORTS,
@@ -79,7 +79,7 @@ internal class SendNotificationRequestTests {
 
     @Test
     fun `Send request serialize and deserialize using json object should be equal`() {
-        val notificationInfo = NotificationInfo(
+        val notificationInfo = EventSource(
             "title",
             "reference_id",
             Feature.INDEX_MANAGEMENT,
@@ -112,7 +112,7 @@ internal class SendNotificationRequestTests {
 
     @Test
     fun `Send request should safely ignore extra field in json object`() {
-        val notificationInfo = NotificationInfo(
+        val notificationInfo = EventSource(
             "title",
             "reference_id",
             Feature.ALERTING,
@@ -132,7 +132,7 @@ internal class SendNotificationRequestTests {
         )
         val jsonString = """
         {
-            "notification_info":{
+            "event_source":{
                 "title":"${notificationInfo.title}",
                 "reference_id":"${notificationInfo.referenceId}",
                 "feature":"${notificationInfo.feature}",
@@ -156,7 +156,7 @@ internal class SendNotificationRequestTests {
 
     @Test
     fun `Send request should safely ignore thread context is absent in json object`() {
-        val notificationInfo = NotificationInfo(
+        val notificationInfo = EventSource(
             "title",
             "reference_id",
             Feature.REPORTS,
@@ -176,7 +176,7 @@ internal class SendNotificationRequestTests {
         )
         val jsonString = """
         {
-            "notification_info":{
+            "event_source":{
                 "title":"${notificationInfo.title}",
                 "reference_id":"${notificationInfo.referenceId}",
                 "feature":"${notificationInfo.feature}",
@@ -213,7 +213,7 @@ internal class SendNotificationRequestTests {
     fun `Send request should throw exception if channelMessage field is absent in json object`() {
         val jsonString = """
         {
-            "notification_info":{
+            "event_source":{
                 "title":"title",
                 "reference_id":"reference_id",
                 "feature":"feature",
@@ -232,7 +232,7 @@ internal class SendNotificationRequestTests {
     fun `Send request should throw exception if channelIds field is absent in json object`() {
         val jsonString = """
         {
-            "notification_info":{
+            "event_source":{
                 "title":"title",
                 "reference_id":"reference_id",
                 "feature":"feature",
@@ -253,7 +253,7 @@ internal class SendNotificationRequestTests {
     fun `Send request validate return exception if channelIds field is empty`() {
         val jsonString = """
         {
-            "notification_info":{
+            "event_source":{
                 "title":"title",
                 "reference_id":"reference_id",
                 "feature":"feature",

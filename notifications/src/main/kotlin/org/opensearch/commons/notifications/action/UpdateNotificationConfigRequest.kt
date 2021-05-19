@@ -39,13 +39,13 @@ import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
-import org.opensearch.commons.notifications.NotificationConstants.NOTIFICATION_CONFIG_TAG
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TAG
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.utils.logger
 import java.io.IOException
 
 /**
- * Action request for creating new configuration.
+ * Action request for updating notification configuration.
  */
 class UpdateNotificationConfigRequest : ActionRequest, ToXContentObject {
     val configId: String
@@ -80,7 +80,7 @@ class UpdateNotificationConfigRequest : ActionRequest, ToXContentObject {
                 parser.nextToken()
                 when (fieldName) {
                     CONFIG_ID_TAG -> configId = parser.text()
-                    NOTIFICATION_CONFIG_TAG -> notificationConfig = NotificationConfig.parse(parser)
+                    CONFIG_TAG -> notificationConfig = NotificationConfig.parse(parser)
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing UpdateNotificationConfigRequest")
@@ -88,7 +88,7 @@ class UpdateNotificationConfigRequest : ActionRequest, ToXContentObject {
                 }
             }
             configId ?: throw IllegalArgumentException("$CONFIG_ID_TAG field absent")
-            notificationConfig ?: throw IllegalArgumentException("$NOTIFICATION_CONFIG_TAG field absent")
+            notificationConfig ?: throw IllegalArgumentException("$CONFIG_TAG field absent")
             return UpdateNotificationConfigRequest(configId, notificationConfig)
         }
     }
@@ -100,7 +100,7 @@ class UpdateNotificationConfigRequest : ActionRequest, ToXContentObject {
         builder!!
         return builder.startObject()
             .field(CONFIG_ID_TAG, configId)
-            .field(NOTIFICATION_CONFIG_TAG, notificationConfig)
+            .field(CONFIG_TAG, notificationConfig)
             .endObject()
     }
 

@@ -87,7 +87,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         return """
         {
             "config_id":"$randomString",
-            "notification_config":{
+            "config":{
                 "name":"$nameSubstring:this is a sample config name $randomString",
                 "description":"this is a sample config description $randomString",
                 "config_type":"$configType",

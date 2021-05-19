@@ -47,7 +47,7 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
         return """
         {
             "config_id":"$randomString",
-            "notification_config":{
+            "config":{
                 "name":"this is a sample config name $randomString",
                 "description":"this is a sample config description $randomString",
                 "config_type":"slack",

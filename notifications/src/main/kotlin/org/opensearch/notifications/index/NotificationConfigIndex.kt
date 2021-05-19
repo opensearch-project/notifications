@@ -44,6 +44,7 @@ import org.opensearch.common.unit.TimeValue
 import org.opensearch.common.xcontent.LoggingDeprecationHandler
 import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.common.xcontent.XContentType
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TAG
 import org.opensearch.commons.notifications.NotificationConstants.TENANT_TAG
 import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
 import org.opensearch.commons.notifications.model.NotificationConfigInfo
@@ -55,9 +56,8 @@ import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.index.QueryHelper.getSortField
 import org.opensearch.notifications.model.DocInfo
 import org.opensearch.notifications.model.DocMetadata.Companion.ACCESS_LIST_TAG
+import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
 import org.opensearch.notifications.model.NotificationConfigDoc
-import org.opensearch.notifications.model.NotificationConfigDoc.Companion.CONFIG_TAG
-import org.opensearch.notifications.model.NotificationConfigDoc.Companion.METADATA_TAG
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.notifications.util.SecureIndexClient

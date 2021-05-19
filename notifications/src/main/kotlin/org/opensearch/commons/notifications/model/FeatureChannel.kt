@@ -96,7 +96,7 @@ data class FeatureChannel(
                     IS_ENABLED_TAG -> isEnabled = parser.booleanValue()
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing configuration")
+                        log.info("Unexpected field: $fieldName, while parsing FeatureChannel")
                     }
                 }
             }

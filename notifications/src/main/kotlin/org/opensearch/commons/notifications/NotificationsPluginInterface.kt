@@ -37,10 +37,13 @@ import org.opensearch.commons.notifications.action.GetFeatureChannelListRequest
 import org.opensearch.commons.notifications.action.GetFeatureChannelListResponse
 import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
 import org.opensearch.commons.notifications.action.GetNotificationConfigResponse
+import org.opensearch.commons.notifications.action.GetNotificationEventRequest
+import org.opensearch.commons.notifications.action.GetNotificationEventResponse
 import org.opensearch.commons.notifications.action.NotificationsActions.CREATE_NOTIFICATION_CONFIG_ACTION_TYPE
 import org.opensearch.commons.notifications.action.NotificationsActions.DELETE_NOTIFICATION_CONFIG_ACTION_TYPE
 import org.opensearch.commons.notifications.action.NotificationsActions.GET_FEATURE_CHANNEL_LIST_ACTION_TYPE
 import org.opensearch.commons.notifications.action.NotificationsActions.GET_NOTIFICATION_CONFIG_ACTION_TYPE
+import org.opensearch.commons.notifications.action.NotificationsActions.GET_NOTIFICATION_EVENT_ACTION_TYPE
 import org.opensearch.commons.notifications.action.NotificationsActions.SEND_NOTIFICATION_ACTION_TYPE
 import org.opensearch.commons.notifications.action.NotificationsActions.UPDATE_NOTIFICATION_CONFIG_ACTION_TYPE
 import org.opensearch.commons.notifications.action.SendNotificationRequest
@@ -48,8 +51,8 @@ import org.opensearch.commons.notifications.action.SendNotificationResponse
 import org.opensearch.commons.notifications.action.UpdateNotificationConfigRequest
 import org.opensearch.commons.notifications.action.UpdateNotificationConfigResponse
 import org.opensearch.commons.notifications.model.ChannelMessage
+import org.opensearch.commons.notifications.model.EventSource
 import org.opensearch.commons.notifications.model.Feature
-import org.opensearch.commons.notifications.model.NotificationInfo
 import org.opensearch.commons.utils.SecureClientWrapper
 
 /**
@@ -130,6 +133,24 @@ object NotificationsPluginInterface {
     }
 
     /**
+     * Get notification events.
+     * @param client Node client for making transport action
+     * @param request The request object
+     * @param listener The listener for getting response
+     */
+    fun getNotificationEvent(
+        client: NodeClient,
+        request: GetNotificationEventRequest,
+        listener: ActionListener<GetNotificationEventResponse>
+    ) {
+        client.execute(
+            GET_NOTIFICATION_EVENT_ACTION_TYPE,
+            request,
+            listener
+        )
+    }
+
+    /**
      * Get notification channel configuration enabled for a feature.
      * @param client Node client for making transport action
      * @param feature The feature name requested
@@ -153,14 +174,14 @@ object NotificationsPluginInterface {
     /**
      * Send notification API enabled for a feature.
      * @param client Node client for making transport action
-     * @param notificationInfo The notification information
+     * @param eventSource The notification event information
      * @param channelMessage The notification message
      * @param channelIds The list of channel ids to send message to.
      * @param listener The listener for getting response
      */
     fun sendNotification(
         client: NodeClient,
-        notificationInfo: NotificationInfo,
+        eventSource: EventSource,
         channelMessage: ChannelMessage,
         channelIds: List<String>,
         listener: ActionListener<SendNotificationResponse>
@@ -170,7 +191,7 @@ object NotificationsPluginInterface {
         val wrapper = SecureClientWrapper(client) // Executing request in privileged mode
         wrapper.execute(
             SEND_NOTIFICATION_ACTION_TYPE,
-            SendNotificationRequest(notificationInfo, channelMessage, channelIds, threadContext),
+            SendNotificationRequest(eventSource, channelMessage, channelIds, threadContext),
             listener
         )
     }

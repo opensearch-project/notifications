@@ -107,7 +107,7 @@ internal class NotificationConfigInfoTests {
             "config_id":"config-Id",
             "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
             "created_time_ms":"${createdTimeMs.toEpochMilli()}",
-            "notification_config":{
+            "config":{
                 "name":"name",
                 "description":"description",
                 "config_type":"slack",
@@ -147,7 +147,7 @@ internal class NotificationConfigInfoTests {
             "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
             "created_time_ms":"${createdTimeMs.toEpochMilli()}",
             "tenant":"selectedTenant",
-            "notification_config":{
+            "config":{
                 "name":"name",
                 "description":"description",
                 "config_type":"slack",
@@ -194,7 +194,7 @@ internal class NotificationConfigInfoTests {
             "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
             "created_time_ms":"${createdTimeMs.toEpochMilli()}",
             "tenant":"selectedTenant",
-            "notification_config":{
+            "config":{
                 "name":"name",
                 "description":"description",
                 "config_type":"slack",
@@ -218,7 +218,7 @@ internal class NotificationConfigInfoTests {
             "config_id":"config-Id",
             "created_time_ms":"${createdTimeMs.toEpochMilli()}",
             "tenant":"selectedTenant",
-            "notification_config":{
+            "config":{
                 "name":"name",
                 "description":"description",
                 "config_type":"slack",
@@ -241,7 +241,7 @@ internal class NotificationConfigInfoTests {
             "config_id":"config-Id",
             "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
             "tenant":"selectedTenant",
-            "notification_config":{
+            "config":{
                 "name":"name",
                 "description":"description",
                 "config_type":"slack",

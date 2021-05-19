@@ -60,7 +60,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         // Create slack notification config
         val createRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"slack",
@@ -111,7 +111,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         val createRequestJsonString = """
         {
             "config_id":"$configId",
-            "notification_config":{
+            "config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"chime",
@@ -159,7 +159,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         // Create webhook notification config
         val createRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"webhook",
@@ -209,7 +209,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         val anotherRequestJsonString = """
         {
             "config_id":"$configId",
-            "notification_config":{
+            "config":{
                 "name":"${anotherObject.name}",
                 "description":"${anotherObject.description}",
                 "config_type":"webhook",
@@ -253,7 +253,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         val createSmtpAccountRequestJsonString = """
         {
             "config_id":"$configId",
-            "notification_config":{
+            "config":{
                 "name":"${smtpAccountConfig.name}",
                 "description":"${smtpAccountConfig.description}",
                 "config_type":"smtp_account",

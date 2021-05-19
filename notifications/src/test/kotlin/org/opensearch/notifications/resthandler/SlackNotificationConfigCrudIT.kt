@@ -56,7 +56,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         // Create slack notification config
         val createRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"slack",
@@ -115,7 +115,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         // Update slack notification config
         val updateRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${updatedObject.name}",
                 "description":"${updatedObject.description}",
                 "config_type":"slack",
@@ -184,7 +184,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         // Create slack notification config
         val createRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"slack",

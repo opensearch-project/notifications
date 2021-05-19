@@ -27,6 +27,7 @@
 package org.opensearch.notifications.index
 
 import org.opensearch.OpenSearchStatusException
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TAG
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TYPE_TAG
 import org.opensearch.commons.notifications.NotificationConstants.CREATED_TIME_TAG
 import org.opensearch.commons.notifications.NotificationConstants.DESCRIPTION_TAG
@@ -49,8 +50,7 @@ import org.opensearch.commons.notifications.model.ConfigType.SMTP_ACCOUNT
 import org.opensearch.commons.notifications.model.ConfigType.WEBHOOK
 import org.opensearch.index.query.QueryBuilder
 import org.opensearch.index.query.QueryBuilders
-import org.opensearch.notifications.model.NotificationConfigDoc.Companion.CONFIG_TAG
-import org.opensearch.notifications.model.NotificationConfigDoc.Companion.METADATA_TAG
+import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
 import org.opensearch.rest.RestStatus
 
 /**
