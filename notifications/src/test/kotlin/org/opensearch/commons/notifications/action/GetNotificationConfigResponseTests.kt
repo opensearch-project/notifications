@@ -216,13 +216,13 @@ internal class GetNotificationConfigResponseTests {
             "start_index":"0",
             "total_hits":"1",
             "total_hit_relation":"eq",
-            "notification_config_list":[
+            "config_list":[
                 {
                     "config_id":"config-Id",
                     "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
                     "created_time_ms":"${createdTimeMs.toEpochMilli()}",
                     "tenant":"selectedTenant",
-                    "notification_config":{
+                    "config":{
                         "name":"name",
                         "description":"description",
                         "config_type":"slack",
@@ -264,13 +264,13 @@ internal class GetNotificationConfigResponseTests {
         val searchResult = NotificationConfigSearchResult(configInfo)
         val jsonString = """
         {
-            "notification_config_list":[
+            "config_list":[
                 {
                     "config_id":"config-Id",
                     "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
                     "created_time_ms":"${createdTimeMs.toEpochMilli()}",
                     "tenant":"selectedTenant",
-                    "notification_config":{
+                    "config":{
                         "name":"name",
                         "description":"description",
                         "config_type":"slack",
@@ -295,7 +295,7 @@ internal class GetNotificationConfigResponseTests {
             "start_index":"0",
             "total_hits":"1",
             "total_hit_relation":"eq",
-            "notification_config_list":[
+            "config_list":[
                 {
                     "config_id":"config-Id",
                     "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",

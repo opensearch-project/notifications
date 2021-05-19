@@ -35,37 +35,36 @@ import org.opensearch.commons.utils.createObjectFromJsonString
 import org.opensearch.commons.utils.getJsonString
 import org.opensearch.commons.utils.recreateObject
 
-internal class ChannelStatusTests {
+internal class EventStatusTests {
 
     @Test
-    fun `Notification Status serialize and deserialize should be equal`() {
-        val sampleStatus = ChannelStatus(
+    fun `Event Status serialize and deserialize should be equal`() {
+        val sampleStatus = EventStatus(
             "config_id",
             "name",
             ConfigType.SLACK,
             deliveryStatus = DeliveryStatus("404", "invalid recipient")
         )
-        val recreatedObject = recreateObject(sampleStatus) { ChannelStatus(it) }
+        val recreatedObject = recreateObject(sampleStatus) { EventStatus(it) }
         assertEquals(sampleStatus, recreatedObject)
     }
 
     @Test
-    fun `Notification Status serialize and deserialize using json should be equal`() {
-        val sampleStatus = ChannelStatus(
+    fun `Event Status serialize and deserialize using json should be equal`() {
+        val sampleStatus = EventStatus(
             "config_id",
             "name",
             ConfigType.SLACK,
             deliveryStatus = DeliveryStatus("404", "invalid recipient")
         )
-
         val jsonString = getJsonString(sampleStatus)
-        val recreatedObject = createObjectFromJsonString(jsonString) { ChannelStatus.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { EventStatus.parse(it) }
         assertEquals(sampleStatus, recreatedObject)
     }
 
     @Test
-    fun `Notification Status should safely ignore extra field in json object`() {
-        val sampleStatus = ChannelStatus(
+    fun `Event Status should safely ignore extra field in json object`() {
+        val sampleStatus = EventStatus(
             "config_id",
             "name",
             ConfigType.SLACK,
@@ -87,12 +86,12 @@ internal class ChannelStatusTests {
            "extra_field_3":"extra value 3"
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { ChannelStatus.parse(it) }
+        val recreatedObject = createObjectFromJsonString(jsonString) { EventStatus.parse(it) }
         assertEquals(sampleStatus, recreatedObject)
     }
 
     @Test
-    fun `Notification Status should throw exception when config type is email with empty emailRecipientList`() {
+    fun `Event Status should throw exception when config type is email with empty emailRecipientList`() {
         val jsonString = """
         {
            "config_id":"config_id",
@@ -107,22 +106,22 @@ internal class ChannelStatusTests {
         }
         """.trimIndent()
         assertThrows<IllegalArgumentException> {
-            createObjectFromJsonString(jsonString) { ChannelStatus.parse(it) }
+            createObjectFromJsonString(jsonString) { EventStatus.parse(it) }
         }
     }
 
     @Test
-    fun `Notification should throw exception when invalid json object is passed`() {
+    fun `Event should throw exception when invalid json object is passed`() {
         val jsonString = "sample message"
         assertThrows<JsonParseException> {
-            createObjectFromJsonString(jsonString) { NotificationInfo.parse(it) }
+            createObjectFromJsonString(jsonString) { EventSource.parse(it) }
         }
     }
 
     @Test
-    fun `Notification throw exception if deliveryStatus is empty for config type Slack`() {
+    fun `Event throw exception if deliveryStatus is empty for config type Slack`() {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
-            ChannelStatus(
+            EventStatus(
                 "config_id",
                 "name",
                 ConfigType.SLACK
@@ -131,9 +130,9 @@ internal class ChannelStatusTests {
     }
 
     @Test
-    fun `Notification throw exception if deliveryStatus is empty for config type Chime`() {
+    fun `Event throw exception if deliveryStatus is empty for config type Chime`() {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
-            ChannelStatus(
+            EventStatus(
                 "config_id",
                 "name",
                 ConfigType.CHIME
@@ -142,9 +141,9 @@ internal class ChannelStatusTests {
     }
 
     @Test
-    fun `Notification throw exception if deliveryStatus is empty for config type Webhook`() {
+    fun `Event throw exception if deliveryStatus is empty for config type Webhook`() {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
-            ChannelStatus(
+            EventStatus(
                 "config_id",
                 "name",
                 ConfigType.WEBHOOK
@@ -153,9 +152,9 @@ internal class ChannelStatusTests {
     }
 
     @Test
-    fun `Notification throw exception if emailRecipientStatus is empty for config type Email`() {
+    fun `Event throw exception if emailRecipientStatus is empty for config type Email`() {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
-            ChannelStatus(
+            EventStatus(
                 "config_id",
                 "name",
                 ConfigType.EMAIL

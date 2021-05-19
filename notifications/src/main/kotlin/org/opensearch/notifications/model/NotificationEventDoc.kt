@@ -24,41 +24,40 @@
  * permissions and limitations under the License.
  *
  */
-package org.opensearch.commons.notifications.action
+package org.opensearch.notifications.model
 
-import org.opensearch.common.io.stream.StreamInput
-import org.opensearch.common.io.stream.StreamOutput
-import org.opensearch.common.io.stream.Writeable
 import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
+import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
-import org.opensearch.commons.notifications.NotificationConstants.EVENT_ID_TAG
+import org.opensearch.commons.notifications.NotificationConstants.EVENT_TAG
+import org.opensearch.commons.notifications.model.NotificationEvent
 import org.opensearch.commons.utils.logger
+import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
 import java.io.IOException
 
 /**
- * Action Response for send notification.
+ * Data class representing Notification event with metadata.
  */
-class SendNotificationResponse : BaseResponse {
-    val notificationId: String
+data class NotificationEventDoc(
+    val metadata: DocMetadata,
+    val event: NotificationEvent
+) : ToXContent {
 
     companion object {
-        private val log by logger(SendNotificationResponse::class.java)
+        private val log by logger(NotificationEventDoc::class.java)
 
         /**
-         * reader to create instance of class from writable.
-         */
-        val reader = Writeable.Reader { SendNotificationResponse(it) }
-
-        /**
-         * Creator used in REST communication.
-         * @param parser XContentParser to deserialize data from.
+         * Parse the data from parser and create object
+         * @param parser data referenced at parser
+         * @return created object
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): SendNotificationResponse {
-            var notificationId: String? = null
+        fun parse(parser: XContentParser): NotificationEventDoc {
+            var metadata: DocMetadata? = null
+            var config: NotificationEvent? = null
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -69,40 +68,30 @@ class SendNotificationResponse : BaseResponse {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    EVENT_ID_TAG -> notificationId = parser.text()
+                    METADATA_TAG -> metadata = DocMetadata.parse(parser)
+                    EVENT_TAG -> config = NotificationEvent.parse(parser)
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing SendNotificationResponse")
+                        log.info("Unexpected field: $fieldName, while parsing event doc")
                     }
                 }
             }
-            notificationId ?: throw IllegalArgumentException("$EVENT_ID_TAG field absent")
-            return SendNotificationResponse(notificationId)
+            metadata ?: throw IllegalArgumentException("$METADATA_TAG field absent")
+            config ?: throw IllegalArgumentException("$EVENT_TAG field absent")
+            return NotificationEventDoc(
+                metadata,
+                config
+            )
         }
     }
 
     /**
-     * constructor for creating the class
-     * @param configId the id of the created notification configuration
+     * create XContentBuilder from this object using [XContentFactory.jsonBuilder()]
+     * @param params XContent parameters
+     * @return created XContentBuilder object
      */
-    constructor(configId: String) {
-        this.notificationId = configId
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Throws(IOException::class)
-    constructor(input: StreamInput) : super(input) {
-        notificationId = input.readString()
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Throws(IOException::class)
-    override fun writeTo(output: StreamOutput) {
-        output.writeString(notificationId)
+    fun toXContent(params: ToXContent.Params = ToXContent.EMPTY_PARAMS): XContentBuilder {
+        return toXContent(XContentFactory.jsonBuilder(), params)
     }
 
     /**
@@ -111,7 +100,8 @@ class SendNotificationResponse : BaseResponse {
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(EVENT_ID_TAG, notificationId)
+            .field(METADATA_TAG, metadata)
+            .field(EVENT_TAG, event)
             .endObject()
     }
 }

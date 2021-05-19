@@ -258,7 +258,7 @@ internal class UpdateNotificationConfigRequestTests {
         val jsonString = """
         {
             "config_id":"config_id1",
-            "notification_config":{
+            "config":{
                 "name":"name",
                 "description":"description",
                 "config_type":"slack",
@@ -288,7 +288,7 @@ internal class UpdateNotificationConfigRequestTests {
         val jsonString = """
         {
             "config_id":"config_id1",
-            "notification_config":{
+            "config":{
                 "name":"name",
                 "description":"description",
                 "config_type":"webhook",
@@ -318,7 +318,7 @@ internal class UpdateNotificationConfigRequestTests {
         val jsonString = """
         {
             "config_id":"config_id1",
-            "notification_config":{
+            "config":{
                 "name":"name",
                 "description":"description",
                 "config_type":"chime",
@@ -348,7 +348,7 @@ internal class UpdateNotificationConfigRequestTests {
         val jsonString = """
         {
             "config_id":"config_id1",
-            "notification_config":{
+            "config":{
                 "name":"name",
                 "description":"description",
                 "config_type":"email_group",
@@ -382,7 +382,7 @@ internal class UpdateNotificationConfigRequestTests {
         val jsonString = """
         {
             "config_id":"config_id1",
-            "notification_config":{
+            "config":{
                 "name":"name",
                 "description":"description",
                 "config_type":"email",
@@ -418,7 +418,7 @@ internal class UpdateNotificationConfigRequestTests {
         val jsonString = """
         {
             "config_id":"config_id1",
-            "notification_config":{
+            "config":{
                 "name":"name",
                 "description":"description",
                 "config_type":"smtp_account",
@@ -456,7 +456,7 @@ internal class UpdateNotificationConfigRequestTests {
         val jsonString = """
         {
             "config_id":"config_id1",
-            "notification_config":{
+            "config":{
                 "name":"name",
                 "description":"description",
                 "config_type":"slack",

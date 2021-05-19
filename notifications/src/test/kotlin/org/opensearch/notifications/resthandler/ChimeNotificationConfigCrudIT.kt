@@ -55,7 +55,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
         // Create chime notification config
         val createRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"chime",
@@ -114,7 +114,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
         // Update chime notification config
         val updateRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${updatedObject.name}",
                 "description":"${updatedObject.description}",
                 "config_type":"chime",
@@ -182,7 +182,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
         // Create chime notification config
         val createRequestJsonString = """
         {
-            "notification_config":{
+            "config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"chime",

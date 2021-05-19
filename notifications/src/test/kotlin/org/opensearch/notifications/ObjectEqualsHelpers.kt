@@ -109,19 +109,19 @@ fun verifySingleConfigEquals(
     if (totalHits >= 0) {
         Assert.assertEquals(totalHits, jsonObject.get("total_hits").asInt)
     }
-    val items = jsonObject.get("notification_config_list").asJsonArray
+    val items = jsonObject.get("config_list").asJsonArray
     Assert.assertEquals(1, items.size())
     val getResponseItem = items[0].asJsonObject
     Assert.assertEquals(configId, getResponseItem.get("config_id").asString)
     Assert.assertEquals("", getResponseItem.get("tenant").asString)
-    verifyEquals(config, getResponseItem.get("notification_config").asJsonObject)
+    verifyEquals(config, getResponseItem.get("config").asJsonObject)
 }
 
 fun verifySingleConfigIdEquals(configId: String, jsonObject: JsonObject, totalHits: Int = -1) {
     if (totalHits >= 0) {
         Assert.assertEquals(totalHits, jsonObject.get("total_hits").asInt)
     }
-    val items = jsonObject.get("notification_config_list").asJsonArray
+    val items = jsonObject.get("config_list").asJsonArray
     Assert.assertEquals(1, items.size())
     val getResponseItem = items[0].asJsonObject
     Assert.assertEquals(configId, getResponseItem.get("config_id").asString)
@@ -135,7 +135,7 @@ fun verifyMultiConfigEquals(
     if (totalHits >= 0) {
         Assert.assertEquals(totalHits, jsonObject.get("total_hits").asInt)
     }
-    val items = jsonObject.get("notification_config_list").asJsonArray
+    val items = jsonObject.get("config_list").asJsonArray
     Assert.assertEquals(objectMap.size, items.size())
     items.forEach {
         val item = it.asJsonObject
@@ -144,7 +144,7 @@ fun verifyMultiConfigEquals(
         val config = objectMap[configId]
         Assert.assertNotNull(config)
         Assert.assertEquals("", item.get("tenant").asString)
-        verifyEquals(config!!, item.get("notification_config").asJsonObject)
+        verifyEquals(config!!, item.get("config").asJsonObject)
     }
 }
 
@@ -152,7 +152,7 @@ fun verifyMultiConfigIdEquals(idSet: Set<String>, jsonObject: JsonObject, totalH
     if (totalHits >= 0) {
         Assert.assertEquals(totalHits, jsonObject.get("total_hits").asInt)
     }
-    val items = jsonObject.get("notification_config_list").asJsonArray
+    val items = jsonObject.get("config_list").asJsonArray
     Assert.assertEquals(idSet.size, items.size())
     items.forEach {
         val item = it.asJsonObject
@@ -166,7 +166,7 @@ fun verifyOrderedConfigList(idList: List<String>, jsonObject: JsonObject, totalH
     if (totalHits >= 0) {
         Assert.assertEquals(totalHits, jsonObject.get("total_hits").asInt)
     }
-    val items = jsonObject.get("notification_config_list").asJsonArray
+    val items = jsonObject.get("config_list").asJsonArray
     Assert.assertEquals(idList.size, items.size())
     (1..idList.size).forEach {
         Assert.assertEquals(idList[it - 1], items[it - 1].asJsonObject.get("config_id").asString)

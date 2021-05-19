@@ -31,8 +31,10 @@ import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TAG
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.utils.logger
+import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
 import java.io.IOException
 
 /**
@@ -45,8 +47,6 @@ data class NotificationConfigDoc(
 
     companion object {
         private val log by logger(NotificationConfigDoc::class.java)
-        const val METADATA_TAG = "metadata"
-        const val CONFIG_TAG = "config"
 
         /**
          * Parse the data from parser and create object

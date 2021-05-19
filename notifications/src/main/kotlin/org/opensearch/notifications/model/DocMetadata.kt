@@ -49,6 +49,7 @@ data class DocMetadata(
 ) : ToXContent {
     companion object {
         private val log by logger(DocMetadata::class.java)
+        const val METADATA_TAG = "metadata"
         const val CREATED_TIME_TAG = "created_time_ms"
         const val ACCESS_LIST_TAG = "access"
 

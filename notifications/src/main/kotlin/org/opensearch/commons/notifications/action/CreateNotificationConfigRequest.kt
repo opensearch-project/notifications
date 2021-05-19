@@ -37,7 +37,7 @@ import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
-import org.opensearch.commons.notifications.NotificationConstants.NOTIFICATION_CONFIG_TAG
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TAG
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.logger
@@ -80,14 +80,14 @@ class CreateNotificationConfigRequest : ActionRequest, ToXContentObject {
                 parser.nextToken()
                 when (fieldName) {
                     CONFIG_ID_TAG -> configId = parser.text()
-                    NOTIFICATION_CONFIG_TAG -> notificationConfig = NotificationConfig.parse(parser)
+                    CONFIG_TAG -> notificationConfig = NotificationConfig.parse(parser)
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing CreateNotificationConfigRequest")
                     }
                 }
             }
-            notificationConfig ?: throw IllegalArgumentException("$NOTIFICATION_CONFIG_TAG field absent")
+            notificationConfig ?: throw IllegalArgumentException("$CONFIG_TAG field absent")
             if (configId != null) {
                 validateId(configId)
             }
@@ -102,7 +102,7 @@ class CreateNotificationConfigRequest : ActionRequest, ToXContentObject {
         builder!!
         return builder.startObject()
             .fieldIfNotNull(CONFIG_ID_TAG, configId)
-            .field(NOTIFICATION_CONFIG_TAG, notificationConfig)
+            .field(CONFIG_TAG, notificationConfig)
             .endObject()
     }
 

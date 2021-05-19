@@ -36,7 +36,7 @@ import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
 import java.io.IOException
 
 /**
- * Action Response for creating new configuration.
+ * Action Response for getting notification configuration.
  */
 class GetNotificationConfigResponse : BaseResponse {
     val searchResult: NotificationConfigSearchResult

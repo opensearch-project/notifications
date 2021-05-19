@@ -46,9 +46,9 @@ import org.opensearch.commons.utils.objectList
 import java.io.IOException
 
 /**
- * Data class representing Notification Status.
+ * Data class representing Notification Event Status.
  */
-data class ChannelStatus(
+data class EventStatus(
     val configId: String,
     val configName: String,
     val configType: ConfigType,
@@ -77,7 +77,7 @@ data class ChannelStatus(
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader { ChannelStatus(it) }
+        val reader = Writeable.Reader { EventStatus(it) }
 
         /**
          * Creator used in REST communication.
@@ -85,7 +85,7 @@ data class ChannelStatus(
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): ChannelStatus {
+        fun parse(parser: XContentParser): EventStatus {
             var configName: String? = null
             var configId: String? = null
             var configType: ConfigType? = null
@@ -108,7 +108,7 @@ data class ChannelStatus(
                     STATUS_DETAIL_TAG -> deliveryStatus = DeliveryStatus.parse(parser)
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing Notification Status")
+                        log.info("Unexpected field: $fieldName, while parsing EventStatus")
                     }
                 }
             }
@@ -116,7 +116,7 @@ data class ChannelStatus(
             configId ?: throw IllegalArgumentException("$CONFIG_ID_TAG field absent")
             configType ?: throw IllegalArgumentException("$CONFIG_TYPE_TAG field absent")
 
-            return ChannelStatus(
+            return EventStatus(
                 configId,
                 configName,
                 configType,
