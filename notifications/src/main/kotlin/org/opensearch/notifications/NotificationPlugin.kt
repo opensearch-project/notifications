@@ -48,12 +48,16 @@ import org.opensearch.notifications.action.CreateNotificationConfigAction
 import org.opensearch.notifications.action.DeleteNotificationConfigAction
 import org.opensearch.notifications.action.GetFeatureChannelListAction
 import org.opensearch.notifications.action.GetNotificationConfigAction
+import org.opensearch.notifications.action.GetNotificationEventAction
 import org.opensearch.notifications.action.SendMessageAction
 import org.opensearch.notifications.action.SendNotificationAction
 import org.opensearch.notifications.action.UpdateNotificationConfigAction
 import org.opensearch.notifications.index.ConfigIndexingActions
+import org.opensearch.notifications.index.EventIndexingActions
 import org.opensearch.notifications.index.NotificationConfigIndex
+import org.opensearch.notifications.index.NotificationEventIndex
 import org.opensearch.notifications.resthandler.NotificationConfigRestHandler
+import org.opensearch.notifications.resthandler.NotificationEventRestHandler
 import org.opensearch.notifications.resthandler.SendMessageRestHandler
 import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.settings.PluginSettings
@@ -112,7 +116,9 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
         this.clusterService = clusterService
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         NotificationConfigIndex.initialize(client, clusterService)
+        NotificationEventIndex.initialize(client, clusterService)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
+        EventIndexingActions.initialize(NotificationEventIndex, UserAccessManager)
         Accountant.initialize(client, clusterService)
         return listOf()
     }
@@ -141,6 +147,10 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
                 GetNotificationConfigAction::class.java
             ),
             ActionPlugin.ActionHandler(
+                NotificationsActions.GET_NOTIFICATION_EVENT_ACTION_TYPE,
+                GetNotificationEventAction::class.java
+            ),
+            ActionPlugin.ActionHandler(
                 NotificationsActions.GET_FEATURE_CHANNEL_LIST_ACTION_TYPE,
                 GetFeatureChannelListAction::class.java
             ),
@@ -166,7 +176,8 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
         log.debug("$LOG_PREFIX:getRestHandlers")
         return listOf(
             SendMessageRestHandler(),
-            NotificationConfigRestHandler()
+            NotificationConfigRestHandler(),
+            NotificationEventRestHandler()
         )
     }
 }

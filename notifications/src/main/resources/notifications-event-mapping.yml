@@ -1,0 +1,101 @@
+---
+##
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+# Modifications Copyright OpenSearch Contributors. See
+# GitHub history for details.
+##
+
+##
+# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the License.
+# A copy of the License is located at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# or in the "license" file accompanying this file. This file is distributed
+# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+# express or implied. See the License for the specific language governing
+# permissions and limitations under the License.
+#
+##
+
+# Schema file for the notifications-event index
+# "dynamic" is set to "false" so that only specified fields are indexed instead of all fields.
+dynamic: false
+properties:
+  metadata:
+    type: object
+    properties:
+      last_updated_time_ms:
+        type: date
+        format: epoch_millis
+      created_time_ms:
+        type: date
+        format: epoch_millis
+      tenant:
+        type: keyword
+      access: # Array of access details like user,role,backend_role etc
+        type: keyword
+  event: # dynamic structure to store notifications event
+    type: object
+    properties:
+      event_source:
+        type: object
+        properties:
+          title:
+            type: text
+            fields:
+              keyword:
+                type: keyword
+          reference_id:
+            type: keyword
+          feature:
+            type: keyword
+          severity:
+            type: keyword
+          tags:
+            type: keyword
+      status_list:
+        type: nested
+        properties:
+          config_id:
+            type: keyword
+          config_name:
+            type: text
+            fields:
+              keyword:
+                type: keyword
+          config_type:
+            type: keyword
+          email_recipient_status: # applicable only for config_type=email
+            type: object # flattened instead of nested to reduce complexity
+            properties:
+              recipient:
+                type: keyword
+              delivery_status: # Individual status for each email recipient
+                type: object
+                properties:
+                  status_code:
+                    type: keyword
+                  status_text:
+                    type: text
+                    fields:
+                      keyword:
+                        type: keyword
+          delivery_status: # Overall status for config_id/channel (including email)
+            type: object
+            properties:
+              status_code:
+                type: keyword
+              status_text:
+                type: text
+                fields:
+                  keyword:
+                    type: keyword

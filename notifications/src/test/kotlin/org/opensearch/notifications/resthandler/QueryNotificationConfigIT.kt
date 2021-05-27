@@ -40,6 +40,7 @@ import org.opensearch.notifications.verifyOrderedConfigList
 import org.opensearch.notifications.verifySingleConfigIdEquals
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
+import java.time.Instant
 import kotlin.random.Random
 
 class QueryNotificationConfigIT : PluginRestTestCase() {
@@ -609,6 +610,193 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(partialConfigIds, getPartialResponse, partialConfigIds.size)
+        Thread.sleep(100)
+    }
+
+    fun `test Get filtered notification config using keyword filter_param_list(last_updated_time_ms)`() {
+        val initialTime = Instant.now()
+        val initialConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
+        Thread.sleep(1000)
+        val middleTime = Instant.now()
+        val middleConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
+        Thread.sleep(1000)
+        val finalTime = Instant.now()
+        val finalConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
+        Thread.sleep(1000)
+        val endTime = Instant.now()
+
+        // Get notification configs between initialTime..middleTime
+        val getFirstResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?last_updated_time_ms=${initialTime.toEpochMilli()}..${middleTime.toEpochMilli()}",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(initialConfigIds, getFirstResponse, initialConfigIds.size)
+        Thread.sleep(100)
+
+        // Get notification configs between middleTime..finalTime
+        val getSecondResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?last_updated_time_ms=${middleTime.toEpochMilli()}..${finalTime.toEpochMilli()}",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(middleConfigIds, getSecondResponse, middleConfigIds.size)
+        Thread.sleep(100)
+
+        // Get notification configs between finalTime..endTime
+        val getThirdResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?last_updated_time_ms=${finalTime.toEpochMilli()}..${endTime.toEpochMilli()}",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(finalConfigIds, getThirdResponse, finalConfigIds.size)
+        Thread.sleep(100)
+    }
+
+    fun `test Get filtered notification config using keyword filter_param_list(created_time_ms)`() {
+        val initialTime = Instant.now()
+        val initialConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
+        Thread.sleep(1000)
+        val middleTime = Instant.now()
+        val middleConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
+        Thread.sleep(1000)
+        val finalTime = Instant.now()
+        val finalConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
+        Thread.sleep(1000)
+        val endTime = Instant.now()
+
+        // Get notification configs between initialTime..middleTime
+        val getFirstResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?created_time_ms=${initialTime.toEpochMilli()}..${middleTime.toEpochMilli()}",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(initialConfigIds, getFirstResponse, initialConfigIds.size)
+        Thread.sleep(100)
+
+        // Get notification configs between middleTime..finalTime
+        val getSecondResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?created_time_ms=${middleTime.toEpochMilli()}..${finalTime.toEpochMilli()}",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(middleConfigIds, getSecondResponse, middleConfigIds.size)
+        Thread.sleep(100)
+
+        // Get notification configs between finalTime..endTime
+        val getThirdResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?created_time_ms=${finalTime.toEpochMilli()}..${endTime.toEpochMilli()}",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(finalConfigIds, getThirdResponse, finalConfigIds.size)
+        Thread.sleep(100)
+    }
+
+    fun `test Get filtered notification config using keyword filter_param_list(internal config fields)`() {
+        val slackId = createConfig(configType = ConfigType.SLACK)
+        val chimeId = createConfig(configType = ConfigType.CHIME)
+        val webhookId = createConfig(configType = ConfigType.WEBHOOK)
+        val emailGroupId = createConfig(configType = ConfigType.EMAIL_GROUP)
+        val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
+        Thread.sleep(1000)
+
+        // Get notification configs using slack.url
+        val getSlackResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?slack.url=$slackId",
+            "",
+            RestStatus.OK.status
+        )
+        verifySingleConfigIdEquals(slackId, getSlackResponse, 1)
+        Thread.sleep(100)
+
+        // Get notification configs using chime.url
+        val getChimeResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?chime.url=$chimeId",
+            "",
+            RestStatus.OK.status
+        )
+        verifySingleConfigIdEquals(chimeId, getChimeResponse, 1)
+        Thread.sleep(100)
+
+        // Get notification configs using webhook.url
+        val getWebhookResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?webhook.url=$webhookId",
+            "",
+            RestStatus.OK.status
+        )
+        verifySingleConfigIdEquals(webhookId, getWebhookResponse, 1)
+        Thread.sleep(100)
+
+        // Get notification configs using email_group.recipient_list
+        val getEmailGroupResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?email_group.recipient_list=$emailGroupId",
+            "",
+            RestStatus.OK.status
+        )
+        verifySingleConfigIdEquals(emailGroupId, getEmailGroupResponse, 1)
+        Thread.sleep(100)
+
+        // Get notification configs using email_group.recipient_list
+        val getSmtpAccountResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?smtp_account.from_address=$smtpAccountId",
+            "",
+            RestStatus.OK.status
+        )
+        verifySingleConfigIdEquals(smtpAccountId, getSmtpAccountResponse, 1)
+        Thread.sleep(100)
+    }
+
+    fun `test Get filtered notification config using query`() {
+        val slackId = createConfig(configType = ConfigType.SLACK)
+        val chimeId = createConfig(configType = ConfigType.CHIME)
+        val webhookId = createConfig(configType = ConfigType.WEBHOOK)
+        val emailGroupId = createConfig(configType = ConfigType.EMAIL_GROUP)
+        val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
+        val allIds = setOf(slackId, chimeId, webhookId, emailGroupId, smtpAccountId)
+        val urlIds = setOf(slackId, chimeId, webhookId)
+        val domainIds = setOf(slackId, chimeId, webhookId, smtpAccountId)
+        Thread.sleep(1000)
+
+        // Get notification configs using query=sample
+        val getAllResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?query=sample",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(allIds, getAllResponse, allIds.size)
+        Thread.sleep(100)
+
+        // Get notification configs using query=sample_*
+        val getUrlResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?query=sample_*",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(urlIds, getUrlResponse, urlIds.size)
+        Thread.sleep(100)
+
+        // Get notification configs using query=*.domain.*
+        val getDomainResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?query=*.domain.*",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(domainIds, getDomainResponse, domainIds.size)
         Thread.sleep(100)
     }
 }

@@ -45,19 +45,18 @@ import org.opensearch.common.xcontent.LoggingDeprecationHandler
 import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.common.xcontent.XContentType
 import org.opensearch.commons.notifications.NotificationConstants.TENANT_TAG
-import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
-import org.opensearch.commons.notifications.model.NotificationConfigInfo
-import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
+import org.opensearch.commons.notifications.action.GetNotificationEventRequest
+import org.opensearch.commons.notifications.model.NotificationEventInfo
+import org.opensearch.commons.notifications.model.NotificationEventSearchResult
 import org.opensearch.commons.notifications.model.SearchResults
 import org.opensearch.commons.utils.logger
 import org.opensearch.index.query.QueryBuilders
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
-import org.opensearch.notifications.index.ConfigQueryHelper.getSortField
 import org.opensearch.notifications.model.DocInfo
 import org.opensearch.notifications.model.DocMetadata.Companion.ACCESS_LIST_TAG
 import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
-import org.opensearch.notifications.model.NotificationConfigDoc
-import org.opensearch.notifications.model.NotificationConfigDocInfo
+import org.opensearch.notifications.model.NotificationEventDoc
+import org.opensearch.notifications.model.NotificationEventDocInfo
 import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.rest.RestStatus
@@ -67,34 +66,34 @@ import org.opensearch.search.sort.SortOrder
 import java.util.concurrent.TimeUnit
 
 /**
- * Class for doing index operations to maintain configurations in cluster.
+ * Class for doing index operations to maintain notification events in cluster.
  */
 @Suppress("TooManyFunctions")
-internal object NotificationConfigIndex : ConfigOperations {
-    private val log by logger(NotificationConfigIndex::class.java)
-    private const val INDEX_NAME = ".opensearch-notifications-config"
-    private const val MAPPING_FILE_NAME = "notifications-config-mapping.yml"
-    private const val SETTINGS_FILE_NAME = "notifications-config-settings.yml"
+internal object NotificationEventIndex : EventOperations {
+    private val log by logger(NotificationEventIndex::class.java)
+    private const val INDEX_NAME = ".opensearch-notifications-event"
+    private const val MAPPING_FILE_NAME = "notifications-event-mapping.yml"
+    private const val SETTINGS_FILE_NAME = "notifications-event-settings.yml"
     private const val MAPPING_TYPE = "_doc"
 
     private lateinit var client: Client
     private lateinit var clusterService: ClusterService
 
-    private val searchHitParser = object : SearchResults.SearchHitParser<NotificationConfigInfo> {
-        override fun parse(searchHit: SearchHit): NotificationConfigInfo {
+    private val searchHitParser = object : SearchResults.SearchHitParser<NotificationEventInfo> {
+        override fun parse(searchHit: SearchHit): NotificationEventInfo {
             val parser = XContentType.JSON.xContent().createParser(
                 NamedXContentRegistry.EMPTY,
                 LoggingDeprecationHandler.INSTANCE,
                 searchHit.sourceAsString
             )
             parser.nextToken()
-            val doc = NotificationConfigDoc.parse(parser)
-            return NotificationConfigInfo(
+            val doc = NotificationEventDoc.parse(parser)
+            return NotificationEventInfo(
                 searchHit.id,
                 doc.metadata.lastUpdateTime,
                 doc.metadata.createdTime,
                 doc.metadata.tenant,
-                doc.config
+                doc.event
             )
         }
     }
@@ -103,8 +102,8 @@ internal object NotificationConfigIndex : ConfigOperations {
      * {@inheritDoc}
      */
     fun initialize(client: Client, clusterService: ClusterService) {
-        NotificationConfigIndex.client = SecureIndexClient(client)
-        NotificationConfigIndex.clusterService = clusterService
+        NotificationEventIndex.client = SecureIndexClient(client)
+        NotificationEventIndex.clusterService = clusterService
     }
 
     /**
@@ -113,7 +112,7 @@ internal object NotificationConfigIndex : ConfigOperations {
     @Suppress("TooGenericExceptionCaught")
     private fun createIndex() {
         if (!isIndexExists()) {
-            val classLoader = NotificationConfigIndex::class.java.classLoader
+            val classLoader = NotificationEventIndex::class.java.classLoader
             val indexMappingSource = classLoader.getResource(MAPPING_FILE_NAME)?.readText()!!
             val indexSettingsSource = classLoader.getResource(SETTINGS_FILE_NAME)?.readText()!!
             val request = CreateIndexRequest(INDEX_NAME)
@@ -147,10 +146,10 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    override fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String?): String? {
+    override fun createNotificationEvent(eventDoc: NotificationEventDoc, id: String?): String? {
         createIndex()
         val indexRequest = IndexRequest(INDEX_NAME)
-            .source(configDoc.toXContent())
+            .source(eventDoc.toXContent())
             .create(true)
         if (id != null) {
             indexRequest.id(id)
@@ -158,7 +157,7 @@ internal object NotificationConfigIndex : ConfigOperations {
         val actionFuture = client.index(indexRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
         return if (response.result != DocWriteResponse.Result.CREATED) {
-            log.warn("$LOG_PREFIX:createNotificationConfig - response:$response")
+            log.warn("$LOG_PREFIX:createNotificationEvent - response:$response")
             null
         } else {
             response.id
@@ -168,29 +167,29 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    override fun getNotificationConfigs(ids: Set<String>): List<NotificationConfigDocInfo> {
+    override fun getNotificationEvents(ids: Set<String>): List<NotificationEventDocInfo> {
         createIndex()
         val getRequest = MultiGetRequest()
         ids.forEach { getRequest.add(INDEX_NAME, it) }
         val actionFuture = client.multiGet(getRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        return response.responses.mapNotNull { parseNotificationConfigDoc(it.id, it.response) }
+        return response.responses.mapNotNull { parseNotificationEventDoc(it.id, it.response) }
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun getNotificationConfig(id: String): NotificationConfigDocInfo? {
+    override fun getNotificationEvent(id: String): NotificationEventDocInfo? {
         createIndex()
         val getRequest = GetRequest(INDEX_NAME).id(id)
         val actionFuture = client.get(getRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        return parseNotificationConfigDoc(id, response)
+        return parseNotificationEventDoc(id, response)
     }
 
-    private fun parseNotificationConfigDoc(id: String, response: GetResponse): NotificationConfigDocInfo? {
+    private fun parseNotificationEventDoc(id: String, response: GetResponse): NotificationEventDocInfo? {
         return if (response.sourceAsString == null) {
-            log.warn("$LOG_PREFIX:getNotificationConfig - $id not found; response:$response")
+            log.warn("$LOG_PREFIX:getNotificationEvent - $id not found; response:$response")
             null
         } else {
             val parser = XContentType.JSON.xContent().createParser(
@@ -199,29 +198,29 @@ internal object NotificationConfigIndex : ConfigOperations {
                 response.sourceAsString
             )
             parser.nextToken()
-            val doc = NotificationConfigDoc.parse(parser)
+            val doc = NotificationEventDoc.parse(parser)
             val info = DocInfo(
                 id = id,
                 version = response.version,
                 seqNo = response.seqNo,
                 primaryTerm = response.primaryTerm
             )
-            NotificationConfigDocInfo(info, doc)
+            NotificationEventDocInfo(info, doc)
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun getAllNotificationConfigs(
+    override fun getAllNotificationEvents(
         tenant: String,
         access: List<String>,
-        request: GetNotificationConfigRequest
-    ): NotificationConfigSearchResult {
+        request: GetNotificationEventRequest
+    ): NotificationEventSearchResult {
         createIndex()
         val sourceBuilder = SearchSourceBuilder()
             .timeout(TimeValue(PluginSettings.operationTimeoutMs, TimeUnit.MILLISECONDS))
-            .sort(getSortField(request.sortField), request.sortOrder ?: SortOrder.ASC)
+            .sort(EventQueryHelper.getSortField(request.sortField), request.sortOrder ?: SortOrder.ASC)
             .size(request.maxItems)
             .from(request.fromIndex)
         val query = QueryBuilders.boolQuery()
@@ -229,16 +228,16 @@ internal object NotificationConfigIndex : ConfigOperations {
         if (access.isNotEmpty()) {
             query.filter(QueryBuilders.termsQuery("$METADATA_TAG.$ACCESS_LIST_TAG", access))
         }
-        ConfigQueryHelper.addQueryFilters(query, request.filterParams)
+        EventQueryHelper.addQueryFilters(query, request.filterParams)
         sourceBuilder.query(query)
         val searchRequest = SearchRequest()
             .indices(INDEX_NAME)
             .source(sourceBuilder)
         val actionFuture = client.search(searchRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        val result = NotificationConfigSearchResult(request.fromIndex.toLong(), response, searchHitParser)
+        val result = NotificationEventSearchResult(request.fromIndex.toLong(), response, searchHitParser)
         log.info(
-            "$LOG_PREFIX:getAllNotificationConfigs from:${request.fromIndex}, maxItems:${request.maxItems}," +
+            "$LOG_PREFIX:getAllNotificationEvents from:${request.fromIndex}, maxItems:${request.maxItems}," +
                 " sortField:${request.sortField}, sortOrder=${request.sortOrder}, filters=${request.filterParams}" +
                 " retCount:${result.objectList.size}, totalCount:${result.totalHits}"
         )
@@ -248,17 +247,17 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    override fun updateNotificationConfig(id: String, notificationConfigDoc: NotificationConfigDoc): Boolean {
+    override fun updateNotificationEvent(id: String, notificationEventDoc: NotificationEventDoc): Boolean {
         createIndex()
         val updateRequest = UpdateRequest()
             .index(INDEX_NAME)
             .id(id)
-            .doc(notificationConfigDoc.toXContent())
+            .doc(notificationEventDoc.toXContent())
             .fetchSource(true)
         val actionFuture = client.update(updateRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
         if (response.result != DocWriteResponse.Result.UPDATED) {
-            log.warn("$LOG_PREFIX:updateNotificationConfig failed for $id; response:$response")
+            log.warn("$LOG_PREFIX:updateNotificationEvent failed for $id; response:$response")
         }
         return response.result == DocWriteResponse.Result.UPDATED
     }
@@ -266,7 +265,7 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    override fun deleteNotificationConfig(id: String): Boolean {
+    override fun deleteNotificationEvent(id: String): Boolean {
         createIndex()
         val deleteRequest = DeleteRequest()
             .index(INDEX_NAME)
@@ -274,7 +273,7 @@ internal object NotificationConfigIndex : ConfigOperations {
         val actionFuture = client.delete(deleteRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
         if (response.result != DocWriteResponse.Result.DELETED) {
-            log.warn("$LOG_PREFIX:deleteNotificationConfig failed for $id; response:$response")
+            log.warn("$LOG_PREFIX:deleteNotificationEvent failed for $id; response:$response")
         }
         return response.result == DocWriteResponse.Result.DELETED
     }
@@ -282,7 +281,7 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    override fun deleteNotificationConfigs(ids: Set<String>): Map<String, RestStatus> {
+    override fun deleteNotificationEvents(ids: Set<String>): Map<String, RestStatus> {
         createIndex()
         val bulkRequest = BulkRequest()
         ids.forEach {
@@ -297,7 +296,7 @@ internal object NotificationConfigIndex : ConfigOperations {
         response.forEach {
             mutableMap[it.id] = it.status()
             if (it.isFailed) {
-                log.warn("$LOG_PREFIX:deleteNotificationConfig failed for ${it.id}; response:${it.failureMessage}")
+                log.warn("$LOG_PREFIX:deleteNotificationEvent failed for ${it.id}; response:${it.failureMessage}")
             }
         }
         return mutableMap

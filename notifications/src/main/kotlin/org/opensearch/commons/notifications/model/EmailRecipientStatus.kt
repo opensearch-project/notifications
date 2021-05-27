@@ -34,8 +34,8 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.DELIVERY_STATUS_TAG
 import org.opensearch.commons.notifications.NotificationConstants.RECIPIENT_TAG
-import org.opensearch.commons.notifications.NotificationConstants.STATUS_DETAIL_TAG
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.validateEmail
 import java.io.IOException
@@ -80,7 +80,7 @@ data class EmailRecipientStatus(
                 parser.nextToken()
                 when (fieldName) {
                     RECIPIENT_TAG -> recipient = parser.text()
-                    STATUS_DETAIL_TAG -> deliveryStatus = DeliveryStatus.parse(parser)
+                    DELIVERY_STATUS_TAG -> deliveryStatus = DeliveryStatus.parse(parser)
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing Email Recipient Status")
@@ -88,7 +88,7 @@ data class EmailRecipientStatus(
                 }
             }
             recipient ?: throw IllegalArgumentException("$RECIPIENT_TAG field absent")
-            deliveryStatus ?: throw IllegalArgumentException("$STATUS_DETAIL_TAG field absent")
+            deliveryStatus ?: throw IllegalArgumentException("$DELIVERY_STATUS_TAG field absent")
             return EmailRecipientStatus(recipient, deliveryStatus)
         }
     }
@@ -117,7 +117,7 @@ data class EmailRecipientStatus(
         builder!!
         return builder.startObject()
             .field(RECIPIENT_TAG, recipient)
-            .field(STATUS_DETAIL_TAG, deliveryStatus)
+            .field(DELIVERY_STATUS_TAG, deliveryStatus)
             .endObject()
     }
 }
