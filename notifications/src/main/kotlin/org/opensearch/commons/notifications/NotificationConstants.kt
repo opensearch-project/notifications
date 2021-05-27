@@ -7,6 +7,7 @@ internal object NotificationConstants {
     internal const val CONFIG_ID_TAG = "config_id"
     internal const val CONFIG_ID_LIST_TAG = "config_id_list"
     internal const val EVENT_ID_TAG = "event_id"
+    internal const val EVENT_ID_LIST_TAG = "event_id_list"
     internal const val EMAIL_ACCOUNT_ID_TAG = "email_account_id"
     internal const val REFERENCE_ID_TAG = "reference_id"
     internal const val CHANNEL_ID_LIST_TAG = "channel_id_list"
@@ -27,7 +28,7 @@ internal object NotificationConstants {
     internal const val EMAIL_GROUP_ID_LIST_TAG = "email_group_id_list"
     internal const val STATUS_CODE_TAG = "status_code"
     internal const val STATUS_TEXT_TAG = "status_text"
-    internal const val STATUS_DETAIL_TAG = "delivery_status"
+    internal const val DELIVERY_STATUS_TAG = "delivery_status"
     internal const val NAME_TAG = "name"
     internal const val DESCRIPTION_TAG = "description"
     internal const val IS_ENABLED_TAG = "is_enabled"
@@ -56,6 +57,7 @@ internal object NotificationConstants {
     internal const val START_INDEX_TAG = "start_index"
     internal const val TOTAL_HITS_TAG = "total_hits"
     internal const val TOTAL_HIT_RELATION_TAG = "total_hit_relation"
+    internal const val QUERY_TAG = "query"
 
     internal const val DEFAULT_MAX_ITEMS = 1000
 }

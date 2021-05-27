@@ -37,6 +37,7 @@ import org.opensearch.commons.notifications.action.GetNotificationEventRequest
 import org.opensearch.commons.notifications.action.GetNotificationEventResponse
 import org.opensearch.commons.notifications.action.NotificationsActions
 import org.opensearch.commons.utils.recreateObject
+import org.opensearch.notifications.index.EventIndexingActions
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 
@@ -77,6 +78,6 @@ internal class GetNotificationEventAction @Inject constructor(
         request: GetNotificationEventRequest,
         user: User?
     ): GetNotificationEventResponse {
-        TODO()
+        return EventIndexingActions.get(request, user)
     }
 }

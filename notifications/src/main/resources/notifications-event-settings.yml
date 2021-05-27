@@ -1,5 +1,5 @@
 ---
-#
+##
 # SPDX-License-Identifier: Apache-2.0
 #
 # The OpenSearch Contributors require contributions made to
@@ -8,10 +8,10 @@
 #
 # Modifications Copyright OpenSearch Contributors. See
 # GitHub history for details.
-#
+##
 
 ##
-# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #
 ##
 
-# Settings file for the notifications counter index
+# Settings file for the notifications-event index
 index:
   number_of_shards: "1" # The data size is not expected to be big so keeping it 1 shard
   auto_expand_replicas: "0-2"

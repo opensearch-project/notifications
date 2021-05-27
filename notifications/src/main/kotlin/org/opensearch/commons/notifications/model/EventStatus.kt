@@ -38,8 +38,8 @@ import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_NAME_TAG
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TYPE_TAG
+import org.opensearch.commons.notifications.NotificationConstants.DELIVERY_STATUS_TAG
 import org.opensearch.commons.notifications.NotificationConstants.EMAIL_RECIPIENT_STATUS_TAG
-import org.opensearch.commons.notifications.NotificationConstants.STATUS_DETAIL_TAG
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.objectList
@@ -105,7 +105,7 @@ data class EventStatus(
                     CONFIG_ID_TAG -> configId = parser.text()
                     CONFIG_TYPE_TAG -> configType = ConfigType.fromTagOrDefault(parser.text())
                     EMAIL_RECIPIENT_STATUS_TAG -> emailRecipientStatus = parser.objectList { EmailRecipientStatus.parse(it) }
-                    STATUS_DETAIL_TAG -> deliveryStatus = DeliveryStatus.parse(parser)
+                    DELIVERY_STATUS_TAG -> deliveryStatus = DeliveryStatus.parse(parser)
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing EventStatus")
@@ -159,7 +159,7 @@ data class EventStatus(
             .field(CONFIG_TYPE_TAG, configType.tag)
             .field(CONFIG_NAME_TAG, configName)
             .field(EMAIL_RECIPIENT_STATUS_TAG, emailRecipientStatus)
-            .fieldIfNotNull(STATUS_DETAIL_TAG, deliveryStatus)
+            .fieldIfNotNull(DELIVERY_STATUS_TAG, deliveryStatus)
             .endObject()
     }
 }
