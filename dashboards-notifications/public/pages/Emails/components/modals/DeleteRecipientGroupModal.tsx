@@ -24,6 +24,7 @@
  * permissions and limitations under the License.
  */
 
+import { SERVER_DELAY } from '../../../../../common';
 import {
   EuiButton,
   EuiButtonEmpty,
@@ -46,6 +47,7 @@ import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 
 interface DeleteRecipientGroupModalProps extends ModalRootProps {
   recipientGroups: RecipientGroupItemType[];
+  refresh: () => void;
   onClose: () => void;
 }
 
@@ -105,15 +107,27 @@ export const DeleteRecipientGroupModal = (
               <EuiButton
                 fill
                 color="danger"
-                onClick={() => {
-                  coreContext.notifications.toasts.addSuccess(
-                    `${
-                      props.recipientGroups.length > 1
-                        ? props.recipientGroups.length + ' recipient groups'
-                        : 'Recipient group ' + props.recipientGroups[0].name
-                    } successfully deleted.`
-                  );
-                  props.onClose();
+                onClick={async() => {
+                  props.services.notificationService
+                    .deleteConfigs(
+                      props.recipientGroups.map((recipientGroup) => recipientGroup.config_id)
+                    )
+                    .then((resp) => {
+                      coreContext.notifications.toasts.addSuccess(
+                        `${props.recipientGroups.length > 1
+                          ? props.recipientGroups.length + ' recipient groups'
+                          : 'Recipient group ' + props.recipientGroups[0].name
+                        } successfully deleted.`
+                      );
+                      props.onClose();
+                      setTimeout(() => props.refresh(), SERVER_DELAY);
+                    })
+                    .catch((error) => {
+                      coreContext.notifications.toasts.addError(error, {
+                        title: 'Failed to delete one or more recipient groups.',
+                      });
+                      props.onClose();
+                    });
                 }}
                 disabled={input !== 'delete'}
               >

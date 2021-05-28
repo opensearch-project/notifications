@@ -27,19 +27,20 @@
 import {
   EuiButton,
   EuiButtonEmpty,
+  EuiComboBoxOptionOption,
   EuiModal,
   EuiModalBody,
   EuiModalFooter,
   EuiModalHeader,
   EuiModalHeaderTitle,
   EuiOverlayMask,
-  EuiSuperSelectOption,
 } from '@elastic/eui';
 import React, { useContext, useState } from 'react';
-import { ENCRYPTION_METHOD } from '../../../../../models/interfaces';
 import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
+import { ENCRYPTION_TYPE } from '../../../../utils/constants';
 import { CreateSenderForm } from '../../../Emails/components/forms/CreateSenderForm';
+import { createSenderConfigObject } from '../../../Emails/utils/helper';
 import {
   validateEmail,
   validateHost,
@@ -49,7 +50,7 @@ import {
 
 interface CreateSenderModalProps extends ModalRootProps {
   addSenderOptionAndSelect: (
-    senderOption: EuiSuperSelectOption<string>
+    senderOption: EuiComboBoxOptionOption<string>
   ) => void;
   onClose: () => void;
 }
@@ -60,7 +61,9 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
   const [email, setEmail] = useState('');
   const [host, setHost] = useState('');
   const [port, setPort] = useState('');
-  const [encryption, setEncryption] = useState<ENCRYPTION_METHOD>('SSL');
+  const [encryption, setEncryption] = useState<keyof typeof ENCRYPTION_TYPE>(
+    Object.keys(ENCRYPTION_TYPE)[0] as keyof typeof ENCRYPTION_TYPE
+  );
   const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>({
     senderName: [],
     email: [],
@@ -107,26 +110,37 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
         </EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButtonEmpty onClick={props.onClose}>
-            Cancel
-          </EuiButtonEmpty>
+          <EuiButtonEmpty onClick={props.onClose}>Cancel</EuiButtonEmpty>
           <EuiButton
             fill
-            onClick={() => {
+            onClick={async () => {
               if (!isInputValid()) {
                 coreContext.notifications.toasts.addDanger(
                   'Some fields are invalid. Fix all highlighted error(s) before continuing.'
                 );
                 return;
               }
-              coreContext.notifications.toasts.addSuccess(
-                `Sender ${senderName} successfully created. You can select ${senderName} from the list of senders.`
+              const config = createSenderConfigObject(
+                senderName,
+                host,
+                port,
+                encryption,
+                email
               );
-              props.addSenderOptionAndSelect({
-                value: senderName,
-                inputDisplay: senderName,
-              });
-              props.onClose();
+              await props.services.notificationService
+                .createConfig(config)
+                .then((response) => {
+                  coreContext.notifications.toasts.addSuccess(
+                    `Sender ${senderName} successfully created. You can select ${senderName} from the list of senders.`
+                  );
+                  props.addSenderOptionAndSelect({ label: senderName });
+                  props.onClose();
+                })
+                .catch((error) => {
+                  coreContext.notifications.toasts.addError(error, {
+                    title: 'Failed to create sender.',
+                  });
+                });
             }}
           >
             Create

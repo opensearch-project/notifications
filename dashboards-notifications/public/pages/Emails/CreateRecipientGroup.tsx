@@ -35,11 +35,13 @@ import {
 } from '@elastic/eui';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import { SERVER_DELAY } from '../../../common';
 import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
 import { ServicesContext } from '../../services';
 import { BREADCRUMBS, ROUTES } from '../../utils/constants';
 import { CreateRecipientGroupForm } from './components/forms/CreateRecipientGroupForm';
+import { createRecipientGroupConfigObject } from './utils/helper';
 import {
   validateRecipientGroupEmails,
   validateRecipientGroupName,
@@ -72,7 +74,7 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
   const isInputValid = (): boolean => {
     const errors: { [key: string]: string[] } = {
       name: validateRecipientGroupName(name),
-      emailOptions: validateRecipientGroupEmails(emailOptions),
+      emailOptions: validateRecipientGroupEmails(selectedEmailOptions),
     };
     setInputErrors(errors);
     return !Object.values(errors).reduce(
@@ -99,12 +101,15 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
   const getRecipientGroup = async () => {
     const id = props.match.params?.id;
     if (typeof id !== 'string') return;
+
     const response = await servicesContext.notificationService.getRecipientGroup(
       id
     );
     setName(response.name);
-    setDescription(response.description);
-    setSelectedEmailOptions(response.email.map((email) => ({ label: email.email })));
+    setDescription(response.description || '');
+    setSelectedEmailOptions(
+      response.email_group.recipient_list.map((email) => ({ label: email }))
+    );
   };
 
   return (
@@ -143,17 +148,43 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
         <EuiFlexItem grow={false}>
           <EuiButton
             fill
-            onClick={() => {
+            onClick={async () => {
               if (!isInputValid()) {
                 coreContext.notifications.toasts.addDanger(
                   'Some fields are invalid. Fix all highlighted error(s) before continuing.'
                 );
                 return;
               }
-              coreContext.notifications.toasts.addSuccess(
-                `Recipient group ${name} successfully ${props.edit ? 'updated' : 'created'}.`
+              const config = createRecipientGroupConfigObject(
+                name,
+                description,
+                selectedEmailOptions
               );
-              location.assign(`#${ROUTES.EMAIL_GROUPS}`);
+              const request = props.edit
+                ? servicesContext.notificationService.updateConfig(
+                    props.match.params.id!,
+                    config
+                  )
+                : servicesContext.notificationService.createConfig(config);
+              await request
+                .then((response) => {
+                  coreContext.notifications.toasts.addSuccess(
+                    `Recipient group ${name} successfully ${
+                      props.edit ? 'updated' : 'created'
+                    }.`
+                  );
+                  setTimeout(
+                    () => location.assign(`#${ROUTES.EMAIL_GROUPS}`),
+                    SERVER_DELAY
+                  );
+                })
+                .catch((error) => {
+                  coreContext.notifications.toasts.addError(error, {
+                    title: `Failed to ${
+                      props.edit ? 'update' : 'create'
+                    } sender.`,
+                  });
+                });
             }}
           >
             {props.edit ? 'Save' : 'Create'}

@@ -34,12 +34,13 @@ import {
 } from '@elastic/eui';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import { ENCRYPTION_METHOD } from '../../../models/interfaces';
+import { SERVER_DELAY } from '../../../common';
 import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
 import { ServicesContext } from '../../services';
-import { BREADCRUMBS, ROUTES } from '../../utils/constants';
+import { BREADCRUMBS, ENCRYPTION_TYPE, ROUTES } from '../../utils/constants';
 import { CreateSenderForm } from './components/forms/CreateSenderForm';
+import { createSenderConfigObject } from './utils/helper';
 import {
   validateEmail,
   validateHost,
@@ -59,7 +60,9 @@ export function CreateSender(props: CreateSenderProps) {
   const [email, setEmail] = useState('');
   const [host, setHost] = useState('');
   const [port, setPort] = useState('');
-  const [encryption, setEncryption] = useState<ENCRYPTION_METHOD>('SSL');
+  const [encryption, setEncryption] = useState<keyof typeof ENCRYPTION_TYPE>(
+    Object.keys(ENCRYPTION_TYPE)[0] as keyof typeof ENCRYPTION_TYPE
+  );
   const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>({
     senderName: [],
     email: [],
@@ -86,10 +89,10 @@ export function CreateSender(props: CreateSenderProps) {
 
     const response = await servicesContext.notificationService.getSender(id);
     setSenderName(response.name);
-    setEmail(response.from);
-    setHost(response.host);
-    setPort(response.port);
-    setEncryption(response.method as ENCRYPTION_METHOD);
+    setEmail(response.smtp_account.from_address);
+    setHost(response.smtp_account.host);
+    setPort(response.smtp_account.port);
+    setEncryption(response.smtp_account.method);
   };
 
   const isInputValid = (): boolean => {
@@ -145,19 +148,45 @@ export function CreateSender(props: CreateSenderProps) {
         <EuiFlexItem grow={false}>
           <EuiButton
             fill
-            onClick={() => {
+            onClick={async () => {
               if (!isInputValid()) {
                 coreContext.notifications.toasts.addDanger(
                   'Some fields are invalid. Fix all highlighted error(s) before continuing.'
                 );
                 return;
               }
-              coreContext.notifications.toasts.addSuccess(
-                `Sender ${senderName} successfully ${
-                  props.edit ? 'updated' : 'created'
-                }.`
+              const config = createSenderConfigObject(
+                senderName,
+                host,
+                port,
+                encryption,
+                email
               );
-              location.assign(`#${ROUTES.EMAIL_GROUPS}`);
+              const request = props.edit
+                ? servicesContext.notificationService.updateConfig(
+                    props.match.params.id!,
+                    config
+                  )
+                : servicesContext.notificationService.createConfig(config);
+              await request
+                .then((response) => {
+                  coreContext.notifications.toasts.addSuccess(
+                    `Sender ${senderName} successfully ${
+                      props.edit ? 'updated' : 'created'
+                    }.`
+                  );
+                  setTimeout(
+                    () => location.assign(`#${ROUTES.EMAIL_GROUPS}`),
+                    SERVER_DELAY
+                  );
+                })
+                .catch((error) => {
+                  coreContext.notifications.toasts.addError(error, {
+                    title: `Failed to ${
+                      props.edit ? 'update' : 'create'
+                    } sender.`,
+                  });
+                });
             }}
           >
             {props.edit ? 'Save' : 'Create'}

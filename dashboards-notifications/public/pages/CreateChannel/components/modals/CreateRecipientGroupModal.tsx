@@ -39,6 +39,7 @@ import React, { useContext, useState } from 'react';
 import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 import { CreateRecipientGroupForm } from '../../../Emails/components/forms/CreateRecipientGroupForm';
+import { createRecipientGroupConfigObject } from '../../../Emails/utils/helper';
 import {
   validateRecipientGroupEmails,
   validateRecipientGroupName,
@@ -105,23 +106,35 @@ export function CreateRecipientGroupModal(
         </EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButtonEmpty onClick={props.onClose}>
-            Cancel
-          </EuiButtonEmpty>
+          <EuiButtonEmpty onClick={props.onClose}>Cancel</EuiButtonEmpty>
           <EuiButton
             fill
-            onClick={() => {
+            onClick={async () => {
               if (!isInputValid()) {
                 coreContext.notifications.toasts.addDanger(
                   'Some fields are invalid. Fix all highlighted error(s) before continuing.'
                 );
                 return;
               }
-              coreContext.notifications.toasts.addSuccess(
-                `Recipient group ${name} successfully created. You can select ${name} from the list of recipient groups.`
+              const config = createRecipientGroupConfigObject(
+                name,
+                description,
+                selectedEmailOptions
               );
-              props.addRecipientGroupOptionAndSelect({ label: name });
-              props.onClose();
+              await props.services.notificationService
+                .createConfig(config)
+                .then((response) => {
+                  coreContext.notifications.toasts.addSuccess(
+                    `Recipient group ${name} successfully created. You can select ${name} from the list of recipient groups.`
+                  );
+                  props.addRecipientGroupOptionAndSelect({ label: name });
+                  props.onClose();
+                })
+                .catch((error) => {
+                  coreContext.notifications.toasts.addError(error, {
+                    title: 'Failed to create sender.',
+                  });
+                });
             }}
           >
             Create
