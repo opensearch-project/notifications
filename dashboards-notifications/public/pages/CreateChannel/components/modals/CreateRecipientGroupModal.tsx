@@ -127,7 +127,10 @@ export function CreateRecipientGroupModal(
                   coreContext.notifications.toasts.addSuccess(
                     `Recipient group ${name} successfully created. You can select ${name} from the list of recipient groups.`
                   );
-                  props.addRecipientGroupOptionAndSelect({ label: name });
+                  props.addRecipientGroupOptionAndSelect({
+                    label: name,
+                    value: response.config_id,
+                  });
                   props.onClose();
                 })
                 .catch((error) => {

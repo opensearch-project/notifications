@@ -133,7 +133,10 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
                   coreContext.notifications.toasts.addSuccess(
                     `Sender ${senderName} successfully created. You can select ${senderName} from the list of senders.`
                   );
-                  props.addSenderOptionAndSelect({ label: senderName });
+                  props.addSenderOptionAndSelect({
+                    label: senderName,
+                    value: response.config_id,
+                  });
                   props.onClose();
                 })
                 .catch((error) => {
