@@ -37,6 +37,7 @@ internal object NotificationConstants {
     internal const val SEVERITY_TAG = "severity"
     internal const val TAGS_TAG = "tags"
     internal const val URL_TAG = "url"
+    internal const val HEADER_PARAMS_TAG = "header_params"
     internal const val HOST_TAG = "host"
     internal const val PORT_TAG = "port"
     internal const val METHOD_TAG = "method"

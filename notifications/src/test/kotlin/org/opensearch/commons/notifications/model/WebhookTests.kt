@@ -39,14 +39,14 @@ internal class WebhookTests {
 
     @Test
     fun `Webhook serialize and deserialize transport object should be equal`() {
-        val sampleWebhook = Webhook("https://domain.com/sample_url#1234567890")
+        val sampleWebhook = Webhook("https://domain.com/sample_url#1234567890", mapOf(Pair("key", "value")))
         val recreatedObject = recreateObject(sampleWebhook) { Webhook(it) }
         assertEquals(sampleWebhook, recreatedObject)
     }
 
     @Test
     fun `Webhook serialize and deserialize using json object should be equal`() {
-        val sampleWebhook = Webhook("https://domain.com/sample_url#1234567890")
+        val sampleWebhook = Webhook("https://domain.com/sample_url#1234567890", mapOf(Pair("key", "value")))
         val jsonString = getJsonString(sampleWebhook)
         val recreatedObject = createObjectFromJsonString(jsonString) { Webhook.parse(it) }
         assertEquals(sampleWebhook, recreatedObject)
@@ -54,8 +54,15 @@ internal class WebhookTests {
 
     @Test
     fun `Webhook should deserialize json object using parser`() {
-        val sampleWebhook = Webhook("https://domain.com/sample_url#1234567890")
-        val jsonString = "{\"url\":\"${sampleWebhook.url}\"}"
+        val sampleWebhook = Webhook("https://domain.com/sample_url#1234567890", mapOf(Pair("key", "value")))
+        val jsonString = """
+            {
+                "url":"${sampleWebhook.url}",
+                "header_params":{
+                    "key":"value"
+                }
+            }
+        """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { Webhook.parse(it) }
         assertEquals(sampleWebhook, recreatedObject)
     }

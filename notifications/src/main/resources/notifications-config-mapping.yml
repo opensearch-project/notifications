@@ -86,6 +86,8 @@ properties:
             fields:
               keyword:
                 type: keyword
+          header_params:
+            type: object
       email: # email configuration
         type: object
         properties:
