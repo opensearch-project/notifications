@@ -34,7 +34,10 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.HEADER_PARAMS_TAG
 import org.opensearch.commons.notifications.NotificationConstants.URL_TAG
+import org.opensearch.commons.utils.STRING_READER
+import org.opensearch.commons.utils.STRING_WRITER
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.validateUrl
 import java.io.IOException
@@ -43,7 +46,8 @@ import java.io.IOException
  * Data class representing Webhook channel.
  */
 data class Webhook(
-    val url: String
+    val url: String,
+    val headerParams: Map<String, String> = mapOf()
 ) : BaseConfigData {
 
     init {
@@ -72,6 +76,7 @@ data class Webhook(
         @Throws(IOException::class)
         fun parse(parser: XContentParser): Webhook {
             var url: String? = null
+            var headerParams: Map<String, String> = mapOf()
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -83,6 +88,7 @@ data class Webhook(
                 parser.nextToken()
                 when (fieldName) {
                     URL_TAG -> url = parser.text()
+                    HEADER_PARAMS_TAG -> headerParams = parser.mapStrings()
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing Webhook destination")
@@ -90,23 +96,8 @@ data class Webhook(
                 }
             }
             url ?: throw IllegalArgumentException("$URL_TAG field absent")
-            return Webhook(url)
+            return Webhook(url, headerParams)
         }
-    }
-
-    /**
-     * Constructor used in transport action communication.
-     * @param input StreamInput stream to deserialize data from.
-     */
-    constructor(input: StreamInput) : this(
-        url = input.readString()
-    )
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun writeTo(output: StreamOutput) {
-        output.writeString(url)
     }
 
     /**
@@ -116,6 +107,24 @@ data class Webhook(
         builder!!
         return builder.startObject()
             .field(URL_TAG, url)
+            .field(HEADER_PARAMS_TAG, headerParams)
             .endObject()
+    }
+
+    /**
+     * Constructor used in transport action communication.
+     * @param input StreamInput stream to deserialize data from.
+     */
+    constructor(input: StreamInput) : this(
+        url = input.readString(),
+        headerParams = input.readMap(STRING_READER, STRING_READER)
+    )
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun writeTo(output: StreamOutput) {
+        output.writeString(url)
+        output.writeMap(headerParams, STRING_WRITER, STRING_WRITER)
     }
 }
