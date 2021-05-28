@@ -25,6 +25,7 @@
  */
 
 import { Direction } from '@elastic/eui';
+import { ENCRYPTION_TYPE } from '../public/utils/constants';
 
 export interface NotificationItem {
   id: string;
@@ -54,33 +55,34 @@ export interface DeliveryStatus {
   statusText: string;
 }
 
-export interface ChannelItemType {
-  id: string;
+export interface ChannelItemType extends ConfigType {
+  config_type: string;
+  feature_list: string[];
+  is_enabled: boolean; // active or muted
+  [config_type: string]: any;
+}
+
+interface ConfigType {
+  config_id: string;
   name: string;
-  enabled: boolean; // active or muted
-  type: string;
-  allowedFeatures: string[];
-  lastUpdatedTime: number;
-  destination: {
-    [type: string]: any;
+  description?: string;
+  created_time_ms: number;
+  last_updated_time_ms: number;
+}
+
+export interface SenderItemType extends ConfigType {
+  smtp_account: {
+    from_address: string; // outbound email address
+    host: string;
+    port: string;
+    method: keyof typeof ENCRYPTION_TYPE;
   };
-  description?: string;
 }
 
-export interface SenderItemType {
-  id: string;
-  name: string;
-  from: string; // outbound email address
-  host: string;
-  port: string;
-  method: ENCRYPTION_METHOD;
-}
-
-export interface RecipientGroupItemType {
-  id: string;
-  name: string;
-  email: Array<{ email: string }>;
-  description?: string;
+export interface RecipientGroupItemType extends ConfigType {
+  email_group: {
+    recipient_list: string[];
+  };
 }
 
 export interface TableState<T> {
@@ -94,5 +96,3 @@ export interface TableState<T> {
   items: T[];
   loading: boolean;
 }
-
-export type ENCRYPTION_METHOD = 'SSL' | 'TSL';
