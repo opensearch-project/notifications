@@ -30,66 +30,53 @@ import com.fasterxml.jackson.core.JsonParseException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.utils.createObjectFromJsonString
 import org.opensearch.commons.utils.getJsonString
 import org.opensearch.commons.utils.recreateObject
 
-internal class GetFeatureChannelListRequestTests {
+internal class GetPluginFeaturesRequestTests {
 
     private fun assertGetRequestEquals(
-        expected: GetFeatureChannelListRequest,
-        actual: GetFeatureChannelListRequest
+        expected: GetPluginFeaturesRequest,
+        actual: GetPluginFeaturesRequest
     ) {
-        assertEquals(expected.feature, actual.feature)
+        assertEquals(expected.compact, actual.compact)
     }
 
     @Test
     fun `Get request serialize and deserialize transport object should be equal`() {
-        val configRequest = GetFeatureChannelListRequest(Feature.REPORTS)
-        val recreatedObject = recreateObject(configRequest) { GetFeatureChannelListRequest(it) }
-        assertGetRequestEquals(configRequest, recreatedObject)
+        val request = GetPluginFeaturesRequest()
+        val recreatedObject = recreateObject(request) { GetPluginFeaturesRequest(it) }
+        assertGetRequestEquals(request, recreatedObject)
     }
 
     @Test
     fun `Get request serialize and deserialize using json object should be equal`() {
-        val configRequest = GetFeatureChannelListRequest(Feature.INDEX_MANAGEMENT)
-        val jsonString = getJsonString(configRequest)
-        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureChannelListRequest.parse(it) }
-        assertGetRequestEquals(configRequest, recreatedObject)
+        val request = GetPluginFeaturesRequest()
+        val jsonString = getJsonString(request)
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetPluginFeaturesRequest.parse(it) }
+        assertGetRequestEquals(request, recreatedObject)
     }
 
     @Test
     fun `Get request should throw exception when invalid json object is passed`() {
         val jsonString = "sample message"
         assertThrows<JsonParseException> {
-            createObjectFromJsonString(jsonString) { GetFeatureChannelListRequest.parse(it) }
+            createObjectFromJsonString(jsonString) { GetPluginFeaturesRequest.parse(it) }
         }
     }
 
     @Test
     fun `Get request should safely ignore extra field in json object`() {
-        val configRequest = GetFeatureChannelListRequest(Feature.ALERTING)
+        val request = GetPluginFeaturesRequest()
         val jsonString = """
         {
-            "feature":"${configRequest.feature}",
             "extra_field_1":["extra", "value"],
             "extra_field_2":{"extra":"value"},
             "extra_field_3":"extra value 3"
         }
         """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureChannelListRequest.parse(it) }
-        assertGetRequestEquals(configRequest, recreatedObject)
-    }
-
-    @Test
-    fun `Get request should throw exception if feature field is absent in json object`() {
-        val jsonString = """
-        {
-        }
-        """.trimIndent()
-        assertThrows<IllegalArgumentException> {
-            createObjectFromJsonString(jsonString) { GetFeatureChannelListRequest.parse(it) }
-        }
+        val recreatedObject = createObjectFromJsonString(jsonString) { GetPluginFeaturesRequest.parse(it) }
+        assertGetRequestEquals(request, recreatedObject)
     }
 }
