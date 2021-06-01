@@ -13,6 +13,6 @@ export const joinRequestParams = (
   queryParams: string | string[] | undefined
 ) => {
   if (Array.isArray(queryParams)) return queryParams.join(',');
-  if (queryParams?.length !== 0) return queryParams;
-  return undefined;
+  if (typeof queryParams === 'string') return queryParams;
+  return '';
 };
