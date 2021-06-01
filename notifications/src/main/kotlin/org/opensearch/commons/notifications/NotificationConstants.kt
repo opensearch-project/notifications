@@ -59,6 +59,9 @@ internal object NotificationConstants {
     internal const val TOTAL_HITS_TAG = "total_hits"
     internal const val TOTAL_HIT_RELATION_TAG = "total_hit_relation"
     internal const val QUERY_TAG = "query"
+    internal const val COMPACT_TAG = "compact"
+    internal const val CONFIG_TYPE_LIST_TAG = "config_type_list"
+    internal const val PLUGIN_FEATURES_TAG = "plugin_features"
 
     internal const val DEFAULT_MAX_ITEMS = 1000
 }

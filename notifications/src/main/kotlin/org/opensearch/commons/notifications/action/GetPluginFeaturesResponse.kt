@@ -33,28 +33,28 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
-import org.opensearch.commons.notifications.NotificationConstants.DELETE_RESPONSE_LIST_TAG
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TYPE_LIST_TAG
+import org.opensearch.commons.notifications.NotificationConstants.PLUGIN_FEATURES_TAG
 import org.opensearch.commons.utils.STRING_READER
 import org.opensearch.commons.utils.STRING_WRITER
-import org.opensearch.commons.utils.enumReader
-import org.opensearch.commons.utils.enumWriter
 import org.opensearch.commons.utils.logger
-import org.opensearch.rest.RestStatus
+import org.opensearch.commons.utils.stringList
 import java.io.IOException
 
 /**
- * Action Response for creating new configuration.
+ * Action Response for getting notification plugin features.
  */
-class DeleteNotificationConfigResponse : BaseResponse {
-    val configIdToStatus: Map<String, RestStatus>
+class GetPluginFeaturesResponse : BaseResponse {
+    val configTypeList: List<String>
+    val pluginFeatures: Map<String, String>
 
     companion object {
-        private val log by logger(DeleteNotificationConfigResponse::class.java)
+        private val log by logger(GetPluginFeaturesResponse::class.java)
 
         /**
          * reader to create instance of class from writable.
          */
-        val reader = Writeable.Reader { DeleteNotificationConfigResponse(it) }
+        val reader = Writeable.Reader { GetPluginFeaturesResponse(it) }
 
         /**
          * Creator used in REST communication.
@@ -62,8 +62,9 @@ class DeleteNotificationConfigResponse : BaseResponse {
          */
         @JvmStatic
         @Throws(IOException::class)
-        fun parse(parser: XContentParser): DeleteNotificationConfigResponse {
-            var configIdToStatus: Map<String, RestStatus>? = null
+        fun parse(parser: XContentParser): GetPluginFeaturesResponse {
+            var configTypeList: List<String>? = null
+            var pluginFeatures: Map<String, String>? = null
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -74,28 +75,38 @@ class DeleteNotificationConfigResponse : BaseResponse {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    DELETE_RESPONSE_LIST_TAG -> configIdToStatus = convertMapStrings(parser.mapStrings())
+                    CONFIG_TYPE_LIST_TAG -> configTypeList = parser.stringList()
+                    PLUGIN_FEATURES_TAG -> pluginFeatures = parser.mapStrings()
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing DeleteNotificationConfigResponse")
                     }
                 }
             }
-            configIdToStatus ?: throw IllegalArgumentException("$DELETE_RESPONSE_LIST_TAG field absent")
-            return DeleteNotificationConfigResponse(configIdToStatus)
-        }
-
-        private fun convertMapStrings(inputMap: Map<String, String>): Map<String, RestStatus> {
-            return inputMap.mapValues { RestStatus.valueOf(it.value) }
+            configTypeList ?: throw IllegalArgumentException("$CONFIG_TYPE_LIST_TAG field absent")
+            pluginFeatures ?: throw IllegalArgumentException("$PLUGIN_FEATURES_TAG field absent")
+            return GetPluginFeaturesResponse(configTypeList, pluginFeatures)
         }
     }
 
     /**
-     * constructor for creating the class
-     * @param configIdToStatus the ids of the deleted notification configuration with status
+     * {@inheritDoc}
      */
-    constructor(configIdToStatus: Map<String, RestStatus>) {
-        this.configIdToStatus = configIdToStatus
+    override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
+        return builder!!.startObject()
+            .field(CONFIG_TYPE_LIST_TAG, configTypeList)
+            .field(PLUGIN_FEATURES_TAG, pluginFeatures)
+            .endObject()
+    }
+
+    /**
+     * constructor for creating the class
+     * @param configTypeList the list of config types supported by plugin
+     * @param pluginFeatures the map of plugin features supported to its value
+     */
+    constructor(configTypeList: List<String>, pluginFeatures: Map<String, String>) {
+        this.configTypeList = configTypeList
+        this.pluginFeatures = pluginFeatures
     }
 
     /**
@@ -103,7 +114,8 @@ class DeleteNotificationConfigResponse : BaseResponse {
      */
     @Throws(IOException::class)
     constructor(input: StreamInput) : super(input) {
-        configIdToStatus = input.readMap(STRING_READER, enumReader(RestStatus::class.java))
+        configTypeList = input.readStringList()
+        pluginFeatures = input.readMap(STRING_READER, STRING_READER)
     }
 
     /**
@@ -111,25 +123,7 @@ class DeleteNotificationConfigResponse : BaseResponse {
      */
     @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
-        output.writeMap(configIdToStatus, STRING_WRITER, enumWriter(RestStatus::class.java))
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
-        builder!!
-        return builder.startObject()
-            .field(DELETE_RESPONSE_LIST_TAG, configIdToStatus)
-            .endObject()
-    }
-
-    override fun getStatus(): RestStatus {
-        val distinctStatus = configIdToStatus.values.distinct()
-        return when {
-            distinctStatus.size > 1 -> RestStatus.MULTI_STATUS
-            distinctStatus.size == 1 -> distinctStatus[0]
-            else -> RestStatus.NOT_MODIFIED
-        }
+        output.writeStringCollection(configTypeList)
+        output.writeMap(pluginFeatures, STRING_WRITER, STRING_WRITER)
     }
 }

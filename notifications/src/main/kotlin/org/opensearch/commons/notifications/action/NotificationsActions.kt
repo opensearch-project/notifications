@@ -58,6 +58,11 @@ object NotificationsActions {
     const val GET_NOTIFICATION_EVENT_NAME = "cluster:admin/opensearch/notifications/events/get"
 
     /**
+     * Get notification plugin features transport action name.
+     */
+    const val GET_PLUGIN_FEATURES_NAME = "cluster:admin/opensearch/notifications/features"
+
+    /**
      * Get Config List for feature. Internal only - Inter plugin communication.
      */
     const val GET_FEATURE_CHANNEL_LIST_NAME = "cluster:admin/opensearch/notifications/feature/channels/get"
@@ -98,7 +103,13 @@ object NotificationsActions {
         ActionType(GET_NOTIFICATION_EVENT_NAME, ::GetNotificationEventResponse)
 
     /**
-     * Get Config List for feature transport action type. Internal only - Inter plugin communication.
+     * Get notification plugin features transport action type.
+     */
+    val GET_PLUGIN_FEATURES_ACTION_TYPE =
+        ActionType(GET_PLUGIN_FEATURES_NAME, ::GetPluginFeaturesResponse)
+
+    /**
+     * Get Config List for feature transport action type.
      */
     val GET_FEATURE_CHANNEL_LIST_ACTION_TYPE =
         ActionType(GET_FEATURE_CHANNEL_LIST_NAME, ::GetFeatureChannelListResponse)
