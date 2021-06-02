@@ -25,7 +25,11 @@
  */
 
 import { Direction } from '@elastic/eui';
-import { ENCRYPTION_TYPE } from '../public/utils/constants';
+import {
+  CHANNEL_TYPE,
+  ENCRYPTION_TYPE,
+  NOTIFICATION_SOURCE,
+} from '../public/utils/constants';
 
 export interface NotificationItem {
   id: string;
@@ -56,10 +60,29 @@ export interface DeliveryStatus {
 }
 
 export interface ChannelItemType extends ConfigType {
-  config_type: string;
-  feature_list: string[];
+  config_type: keyof typeof CHANNEL_TYPE;
+  feature_list: Array<keyof typeof NOTIFICATION_SOURCE>;
   is_enabled: boolean; // active or muted
-  [config_type: string]: any;
+  slack?: {
+    url: string;
+  };
+  chime?: {
+    url: string;
+  };
+  webhook?: {
+    url: string;
+    header_params: object;
+  };
+  email?: {
+    email_account_id: string;
+    recipient_list: string[]; // custom email addresses
+    email_group_id_list: string[];
+    // optional fields for displaying or editing email channel, needs more requests
+    email_account_name?: string;
+    email_group_id_map?: {
+      [id: string]: string;
+    };
+  };
 }
 
 interface ConfigType {

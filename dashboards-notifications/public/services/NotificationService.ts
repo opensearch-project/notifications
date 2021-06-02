@@ -89,12 +89,20 @@ export default class NotificationService {
     return response;
   };
 
+  getConfigs = async (
+    queryObject: object = { config_type: Object.keys(CHANNEL_TYPE) }
+  ) => {
+    return this.httpClient.get(NODE_API.GET_CONFIGS, { query: queryObject });
+  };
+
+  getConfig = async (id: string) => {
+    return this.httpClient.get(`${NODE_API.GET_CONFIG}/${id}`);
+  };
+
   getChannels = async (
     queryObject: object = { config_type: Object.keys(CHANNEL_TYPE) }
   ): Promise<{ items: ChannelItemType[]; total: number }> => {
-    const response = await this.httpClient.get(NODE_API.GET_CONFIGS, {
-      query: queryObject,
-    });
+    const response = await this.getConfigs(queryObject);
     return {
       items: configListToChannels(response.config_list),
       total: response.total_hits || 0,
@@ -102,16 +110,42 @@ export default class NotificationService {
   };
 
   getChannel = async (id: string): Promise<ChannelItemType> => {
-    const response = await this.httpClient.get(`${NODE_API.GET_CONFIG}/${id}`);
+    const response = await this.getConfig(id);
     return configToChannel(response.config_list[0]);
+  };
+
+  getEmailConfigDetails = async (
+    channel: ChannelItemType
+  ): Promise<ChannelItemType> => {
+    if (!channel.email) return channel;
+    channel.email.email_account_name = await this.getChannel(
+      channel.email.email_account_id
+    ).then((channel) => channel.name);
+
+    channel.email.email_group_id_map = {};
+    await channel.email.email_group_id_list
+      .map((id) => () =>
+        this.getChannel(id).then((channel) => ({ id, name: channel.name }))
+      )
+      .reduce(
+        (prev, curr) =>
+          prev.then(() =>
+            curr().then(
+              (response) =>
+                (channel.email!.email_group_id_map![response.id] =
+                  response.name)
+            )
+          ),
+        Promise.resolve() as any
+      );
+
+    return channel;
   };
 
   getSenders = async (
     queryObject: object = { config_type: 'smtp_account' }
   ): Promise<{ items: SenderItemType[]; total: number }> => {
-    const response = await this.httpClient.get(NODE_API.GET_CONFIGS, {
-      query: queryObject,
-    });
+    const response = await this.getConfigs(queryObject);
     return {
       items: configListToSenders(response.config_list),
       total: response.total_hits || 0,
@@ -119,16 +153,14 @@ export default class NotificationService {
   };
 
   getSender = async (id: string): Promise<SenderItemType> => {
-    const response = await this.httpClient.get(`${NODE_API.GET_CONFIG}/${id}`);
+    const response = await this.getConfig(id);
     return configToSender(response.config_list[0]);
   };
 
   getRecipientGroups = async (
     queryObject: object = { config_type: 'email_group' }
   ): Promise<{ items: RecipientGroupItemType[]; total: number }> => {
-    const response = await this.httpClient.get(NODE_API.GET_CONFIGS, {
-      query: queryObject,
-    });
+    const response = await this.getConfigs(queryObject);
     return {
       items: configListToRecipientGroups(response.config_list),
       total: response.total_hits || 0,
@@ -136,7 +168,7 @@ export default class NotificationService {
   };
 
   getRecipientGroup = async (id: string): Promise<RecipientGroupItemType> => {
-    const response = await this.httpClient.get(`${NODE_API.GET_CONFIG}/${id}`);
+    const response = await this.getConfig(id);
     return configToRecipientGroup(response.config_list[0]);
   };
 }
