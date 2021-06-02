@@ -25,9 +25,9 @@
  *
  */
 
-package org.opensearch.notifications.resthandler
+package org.opensearch.integtest.send
 
-import org.opensearch.notifications.PluginRestTestCase
+import org.opensearch.integtest.PluginRestTestCase
 
 internal class SendMessageRestHandlerIT : PluginRestTestCase() {
 

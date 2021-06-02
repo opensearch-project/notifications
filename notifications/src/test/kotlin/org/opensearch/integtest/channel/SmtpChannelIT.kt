@@ -25,14 +25,14 @@
  *
  */
 
-package org.opensearch.notifications.channel
+package org.opensearch.integtest.channel
 
-import org.opensearch.notifications.NotificationsRestTestCase
-import org.opensearch.notifications.getStatusCode
-import org.opensearch.notifications.getStatusText
-import org.opensearch.notifications.jsonify
+import org.opensearch.integtest.NotificationsRestTestCase
+import org.opensearch.integtest.getStatusCode
+import org.opensearch.integtest.getStatusText
+import org.opensearch.integtest.jsonify
+import org.opensearch.integtest.verifyResponse
 import org.opensearch.notifications.settings.PluginSettings
-import org.opensearch.notifications.verifyResponse
 import org.opensearch.rest.RestStatus
 
 internal class SmtpChannelIT : NotificationsRestTestCase() {

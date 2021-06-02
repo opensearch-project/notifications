@@ -120,6 +120,7 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
              * Get list of notification configs
              * Request URL: GET [REQUEST_URL?config_id=id] or [REQUEST_URL?<query_params>]
              * <query_params> ->
+             *     config_id_list=id1,id2,id3
              *     from_index=20
              *     max_items=10
              *     sort_order=asc
@@ -210,6 +211,7 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
         client: NodeClient
     ): RestChannelConsumer {
         val configId: String? = request.param(CONFIG_ID_TAG)
+        val configIdList: String? = request.param(CONFIG_ID_LIST_TAG)
         val sortField: String? = request.param(SORT_FIELD_TAG)
         val sortOrderString: String? = request.param(SORT_ORDER_TAG)
         val sortOrder: SortOrder? = if (sortOrderString == null) {
@@ -227,13 +229,32 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
             "$LOG_PREFIX:executeGetRequest from:$fromIndex, maxItems:$maxItems," +
                 " sortField:$sortField, sortOrder=$sortOrder, filters=$filterParams"
         )
+        val configRequest = GetNotificationConfigRequest(
+            getConfigIdSet(configId, configIdList),
+            fromIndex,
+            maxItems,
+            sortField,
+            sortOrder,
+            filterParams
+        )
         return RestChannelConsumer {
             NotificationsPluginInterface.getNotificationConfig(
                 client,
-                GetNotificationConfigRequest(configId, fromIndex, maxItems, sortField, sortOrder, filterParams),
+                configRequest,
                 RestToXContentListener(it)
             )
         }
+    }
+
+    private fun getConfigIdSet(configId: String?, configIdList: String?): Set<String> {
+        var retIds: Set<String> = setOf()
+        if (configId != null) {
+            retIds = setOf(configId)
+        }
+        if (configIdList != null) {
+            retIds = configIdList.split(",").union(retIds)
+        }
+        return retIds
     }
 
     private fun executeDeleteRequest(

@@ -41,7 +41,7 @@ internal class GetNotificationEventRequestTests {
         expected: GetNotificationEventRequest,
         actual: GetNotificationEventRequest
     ) {
-        assertEquals(expected.eventId, actual.eventId)
+        assertEquals(expected.eventIds, actual.eventIds)
         assertEquals(expected.fromIndex, actual.fromIndex)
         assertEquals(expected.maxItems, actual.maxItems)
         assertEquals(expected.sortField, actual.sortField)
@@ -52,7 +52,7 @@ internal class GetNotificationEventRequestTests {
     @Test
     fun `Get request serialize and deserialize transport object should be equal`() {
         val configRequest = GetNotificationEventRequest(
-            "sample_event_id",
+            setOf("sample_event_id"),
             0,
             10,
             "sortField",
@@ -66,7 +66,7 @@ internal class GetNotificationEventRequestTests {
     @Test
     fun `Get request serialize and deserialize using json object should be equal`() {
         val configRequest = GetNotificationEventRequest(
-            "sample_event_id",
+            setOf("sample_event_id"),
             0,
             10,
             "sortField",
@@ -81,7 +81,7 @@ internal class GetNotificationEventRequestTests {
     @Test
     fun `Get request with all field should deserialize json object using parser`() {
         val configRequest = GetNotificationEventRequest(
-            "sample_event_id",
+            setOf("sample_event_id"),
             10,
             100,
             "sortField",
@@ -95,7 +95,7 @@ internal class GetNotificationEventRequestTests {
         )
         val jsonString = """
         {
-            "event_id":"${configRequest.eventId}",
+            "event_id_list":["${configRequest.eventIds.first()}"],
             "from_index":"10",
             "max_items":"100",
             "sort_field":"sortField",
@@ -114,10 +114,10 @@ internal class GetNotificationEventRequestTests {
 
     @Test
     fun `Get request with only event_id field should deserialize json object using parser`() {
-        val configRequest = GetNotificationEventRequest(eventId = "sample_event_id")
+        val configRequest = GetNotificationEventRequest(eventIds = setOf("sample_event_id"))
         val jsonString = """
         {
-            "event_id":"${configRequest.eventId}"
+            "event_id_list":["${configRequest.eventIds.first()}"]
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationEventRequest.parse(it) }
@@ -265,10 +265,10 @@ internal class GetNotificationEventRequestTests {
 
     @Test
     fun `Get request should safely ignore extra field in json object`() {
-        val configRequest = GetNotificationEventRequest(eventId = "sample_event_id")
+        val configRequest = GetNotificationEventRequest(eventIds = setOf("sample_event_id"))
         val jsonString = """
         {
-            "event_id":"${configRequest.eventId}",
+            "event_id_list":["${configRequest.eventIds.first()}"],
             "extra_field_1":["extra", "value"],
             "extra_field_2":{"extra":"value"},
             "extra_field_3":"extra value 3"

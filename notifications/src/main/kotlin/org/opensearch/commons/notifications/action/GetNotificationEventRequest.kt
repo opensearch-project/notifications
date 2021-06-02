@@ -38,7 +38,7 @@ import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.DEFAULT_MAX_ITEMS
-import org.opensearch.commons.notifications.NotificationConstants.EVENT_ID_TAG
+import org.opensearch.commons.notifications.NotificationConstants.EVENT_ID_LIST_TAG
 import org.opensearch.commons.notifications.NotificationConstants.FILTER_PARAM_LIST_TAG
 import org.opensearch.commons.notifications.NotificationConstants.FROM_INDEX_TAG
 import org.opensearch.commons.notifications.NotificationConstants.MAX_ITEMS_TAG
@@ -49,6 +49,7 @@ import org.opensearch.commons.utils.STRING_WRITER
 import org.opensearch.commons.utils.enumReader
 import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.logger
+import org.opensearch.commons.utils.stringList
 import org.opensearch.search.sort.SortOrder
 import java.io.IOException
 
@@ -56,7 +57,7 @@ import java.io.IOException
  * Action Request for getting notification event.
  */
 class GetNotificationEventRequest : ActionRequest, ToXContentObject {
-    val eventId: String?
+    val eventIds: Set<String>
     val fromIndex: Int
     val maxItems: Int
     val sortField: String?
@@ -78,7 +79,7 @@ class GetNotificationEventRequest : ActionRequest, ToXContentObject {
         @JvmStatic
         @Throws(IOException::class)
         fun parse(parser: XContentParser): GetNotificationEventRequest {
-            var eventId: String? = null
+            var eventIds: Set<String> = setOf()
             var fromIndex = 0
             var maxItems = DEFAULT_MAX_ITEMS
             var sortField: String? = null
@@ -94,7 +95,7 @@ class GetNotificationEventRequest : ActionRequest, ToXContentObject {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    EVENT_ID_TAG -> eventId = parser.text()
+                    EVENT_ID_LIST_TAG -> eventIds = parser.stringList().toSet()
                     FROM_INDEX_TAG -> fromIndex = parser.intValue()
                     MAX_ITEMS_TAG -> maxItems = parser.intValue()
                     SORT_FIELD_TAG -> sortField = parser.text()
@@ -106,7 +107,7 @@ class GetNotificationEventRequest : ActionRequest, ToXContentObject {
                     }
                 }
             }
-            return GetNotificationEventRequest(eventId, fromIndex, maxItems, sortField, sortOrder, filterParams)
+            return GetNotificationEventRequest(eventIds, fromIndex, maxItems, sortField, sortOrder, filterParams)
         }
     }
 
@@ -114,9 +115,8 @@ class GetNotificationEventRequest : ActionRequest, ToXContentObject {
      * {@inheritDoc}
      */
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
-        builder!!
-        return builder.startObject()
-            .fieldIfNotNull(EVENT_ID_TAG, eventId)
+        return builder!!.startObject()
+            .field(EVENT_ID_LIST_TAG, eventIds)
             .field(FROM_INDEX_TAG, fromIndex)
             .field(MAX_ITEMS_TAG, maxItems)
             .fieldIfNotNull(SORT_FIELD_TAG, sortField)
@@ -127,7 +127,7 @@ class GetNotificationEventRequest : ActionRequest, ToXContentObject {
 
     /**
      * constructor for creating the class
-     * @param eventId the id of the notification configuration (other parameters are not relevant if id is present)
+     * @param eventIds the ids of the notification events (other parameters are not relevant if ids are present)
      * @param fromIndex the starting index for paginated response
      * @param maxItems the maximum number of items to return for paginated response
      * @param sortField the sort field if response has many items
@@ -135,14 +135,14 @@ class GetNotificationEventRequest : ActionRequest, ToXContentObject {
      * @param filterParams the filter parameters
      */
     constructor(
-        eventId: String? = null,
+        eventIds: Set<String> = setOf(),
         fromIndex: Int = 0,
         maxItems: Int = DEFAULT_MAX_ITEMS,
         sortField: String? = null,
         sortOrder: SortOrder? = null,
         filterParams: Map<String, String> = mapOf()
     ) {
-        this.eventId = eventId
+        this.eventIds = eventIds
         this.fromIndex = fromIndex
         this.maxItems = maxItems
         this.sortField = sortField
@@ -155,7 +155,7 @@ class GetNotificationEventRequest : ActionRequest, ToXContentObject {
      */
     @Throws(IOException::class)
     constructor(input: StreamInput) : super(input) {
-        eventId = input.readOptionalString()
+        eventIds = input.readStringList().toSet()
         fromIndex = input.readInt()
         maxItems = input.readInt()
         sortField = input.readOptionalString()
@@ -169,7 +169,7 @@ class GetNotificationEventRequest : ActionRequest, ToXContentObject {
     @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
         super.writeTo(output)
-        output.writeOptionalString(eventId)
+        output.writeStringCollection(eventIds)
         output.writeInt(fromIndex)
         output.writeInt(maxItems)
         output.writeOptionalString(sortField)

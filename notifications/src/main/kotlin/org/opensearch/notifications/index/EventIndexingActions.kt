@@ -29,7 +29,6 @@ package org.opensearch.notifications.index
 
 import com.amazon.opendistroforelasticsearch.commons.authuser.User
 import org.opensearch.OpenSearchStatusException
-import org.opensearch.common.Strings
 import org.opensearch.commons.notifications.action.GetNotificationEventRequest
 import org.opensearch.commons.notifications.action.GetNotificationEventResponse
 import org.opensearch.commons.notifications.model.NotificationEventInfo
@@ -63,10 +62,10 @@ object EventIndexingActions {
     fun get(request: GetNotificationEventRequest, user: User?): GetNotificationEventResponse {
         log.info("$LOG_PREFIX:NotificationEvent-get $request")
         UserAccessManager.validateUser(user)
-        return if (request.eventId == null || Strings.isEmpty(request.eventId)) {
-            getAll(request, user)
-        } else {
-            info(request.eventId, user)
+        return when (request.eventIds.size) {
+            0 -> getAll(request, user)
+            1 -> info(request.eventIds.first(), user)
+            else -> info(request.eventIds, user)
         }
     }
 
@@ -95,6 +94,44 @@ object EventIndexingActions {
             eventDoc.eventDoc.event
         )
         return GetNotificationEventResponse(NotificationEventSearchResult(eventInfo))
+    }
+
+    /**
+     * Get NotificationEvent info
+     * @param eventIds event id set
+     * @param user the user info object
+     * @return [GetNotificationEventResponse]
+     */
+    private fun info(eventIds: Set<String>, user: User?): GetNotificationEventResponse {
+        log.info("$LOG_PREFIX:NotificationEvent-info $eventIds")
+        val eventDocs = operations.getNotificationEvents(eventIds)
+        if (eventDocs.size != eventIds.size) {
+            val mutableSet = eventIds.toMutableSet()
+            eventDocs.forEach { mutableSet.remove(it.docInfo.id) }
+            throw OpenSearchStatusException(
+                "NotificationEvent $mutableSet not found",
+                RestStatus.NOT_FOUND
+            )
+        }
+        eventDocs.forEach {
+            val currentMetadata = it.eventDoc.metadata
+            if (!UserAccessManager.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+                throw OpenSearchStatusException(
+                    "Permission denied for NotificationEvent ${it.docInfo.id}",
+                    RestStatus.FORBIDDEN
+                )
+            }
+        }
+        val eventSearchResult = eventDocs.map {
+            NotificationEventInfo(
+                it.docInfo.id!!,
+                it.eventDoc.metadata.lastUpdateTime,
+                it.eventDoc.metadata.createdTime,
+                it.eventDoc.metadata.tenant,
+                it.eventDoc.event
+            )
+        }
+        return GetNotificationEventResponse(NotificationEventSearchResult(eventSearchResult))
     }
 
     /**

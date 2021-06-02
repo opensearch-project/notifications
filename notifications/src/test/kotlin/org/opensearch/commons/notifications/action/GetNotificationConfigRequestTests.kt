@@ -41,7 +41,7 @@ internal class GetNotificationConfigRequestTests {
         expected: GetNotificationConfigRequest,
         actual: GetNotificationConfigRequest
     ) {
-        assertEquals(expected.configId, actual.configId)
+        assertEquals(expected.configIds, actual.configIds)
         assertEquals(expected.fromIndex, actual.fromIndex)
         assertEquals(expected.maxItems, actual.maxItems)
         assertEquals(expected.sortField, actual.sortField)
@@ -52,7 +52,7 @@ internal class GetNotificationConfigRequestTests {
     @Test
     fun `Get request serialize and deserialize transport object should be equal`() {
         val configRequest = GetNotificationConfigRequest(
-            "sample_config_id",
+            setOf("sample_config_id"),
             0,
             10,
             "sortField",
@@ -66,7 +66,7 @@ internal class GetNotificationConfigRequestTests {
     @Test
     fun `Get request serialize and deserialize using json object should be equal`() {
         val configRequest = GetNotificationConfigRequest(
-            "sample_config_id",
+            setOf("sample_config_id"),
             0,
             10,
             "sortField",
@@ -81,7 +81,7 @@ internal class GetNotificationConfigRequestTests {
     @Test
     fun `Get request with all field should deserialize json object using parser`() {
         val configRequest = GetNotificationConfigRequest(
-            "sample_config_id",
+            setOf("sample_config_id"),
             10,
             100,
             "sortField",
@@ -95,7 +95,7 @@ internal class GetNotificationConfigRequestTests {
         )
         val jsonString = """
         {
-            "config_id":"${configRequest.configId}",
+            "config_id_list":["${configRequest.configIds.first()}"],
             "from_index":"10",
             "max_items":"100",
             "sort_field":"sortField",
@@ -114,10 +114,10 @@ internal class GetNotificationConfigRequestTests {
 
     @Test
     fun `Get request with only config_id field should deserialize json object using parser`() {
-        val configRequest = GetNotificationConfigRequest(configId = "sample_config_id")
+        val configRequest = GetNotificationConfigRequest(configIds = setOf("sample_config_id"))
         val jsonString = """
         {
-            "config_id":"${configRequest.configId}"
+            "config_id_list":["${configRequest.configIds.first()}"]
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { GetNotificationConfigRequest.parse(it) }
@@ -265,10 +265,10 @@ internal class GetNotificationConfigRequestTests {
 
     @Test
     fun `Get request should safely ignore extra field in json object`() {
-        val configRequest = GetNotificationConfigRequest(configId = "sample_config_id")
+        val configRequest = GetNotificationConfigRequest(configIds = setOf("sample_config_id"))
         val jsonString = """
         {
-            "config_id":"${configRequest.configId}",
+            "config_id_list":["${configRequest.configIds.first()}"],
             "extra_field_1":["extra", "value"],
             "extra_field_2":{"extra":"value"},
             "extra_field_3":"extra value 3"
