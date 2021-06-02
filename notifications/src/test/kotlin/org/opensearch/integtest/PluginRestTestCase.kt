@@ -25,7 +25,7 @@
  *
  */
 
-package org.opensearch.notifications
+package org.opensearch.integtest
 
 import com.google.gson.JsonObject
 import org.apache.http.Header

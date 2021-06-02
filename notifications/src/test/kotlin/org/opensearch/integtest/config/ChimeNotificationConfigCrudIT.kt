@@ -24,57 +24,47 @@
  * permissions and limitations under the License.
  *
  */
-
-package org.opensearch.notifications.resthandler
+package org.opensearch.integtest.config
 
 import org.junit.Assert
+import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.NotificationConfig
-import org.opensearch.commons.notifications.model.Webhook
+import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
-import org.opensearch.notifications.PluginRestTestCase
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
 import java.util.EnumSet
 
-class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
+class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
 
-    fun `test Create, Get, Update, Delete webhook notification config using REST client`() {
+    fun `test Create, Get, Update, Delete chime notification config using REST client`() {
         // Create sample config request reference
-        val sampleWebhook = Webhook(
-            "https://domain.com/sample_webhook_url#1234567890",
-            mapOf(Pair("User-Agent", "Mozilla/5.0"))
-        )
+        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
-            ConfigType.WEBHOOK,
-            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS, Feature.ALERTING),
+            ConfigType.CHIME,
+            EnumSet.of(Feature.ALERTING, Feature.REPORTS),
             isEnabled = true,
-            configData = sampleWebhook
+            configData = sampleChime
         )
 
-        // Create webhook notification config
+        // Create chime notification config
         val createRequestJsonString = """
         {
             "config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
-                "config_type":"webhook",
+                "config_type":"chime",
                 "feature_list":[
                     "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}",
-                    "${referenceObject.features.elementAt(2)}"
+                    "${referenceObject.features.elementAt(1)}"
                 ],
                 "is_enabled":${referenceObject.isEnabled},
-                "webhook":{
-                    "url":"${(referenceObject.configData as Webhook).url}",
-                    "header_params":{
-                        "User-Agent":"Mozilla/5.0"
-                    }
-                }
+                "chime":{"url":"${(referenceObject.configData as Chime).url}"}
             }
         }
         """.trimIndent()
@@ -88,7 +78,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
-        // Get webhook notification config
+        // Get chime notification config
 
         val getConfigResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -111,29 +101,28 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Updated notification config object
-        val updatedWebhook = Webhook("https://updated.domain.com/updated_webhook_url#0987654321")
+        val updatedChime = Chime("https://updated.domain.com/updated_chime_url#0987654321")
         val updatedObject = NotificationConfig(
             "this is a updated config name",
             "this is a updated config description",
-            ConfigType.WEBHOOK,
-            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS),
+            ConfigType.CHIME,
+            EnumSet.of(Feature.INDEX_MANAGEMENT),
             isEnabled = true,
-            configData = updatedWebhook
+            configData = updatedChime
         )
 
-        // Update webhook notification config
+        // Update chime notification config
         val updateRequestJsonString = """
         {
             "config":{
                 "name":"${updatedObject.name}",
                 "description":"${updatedObject.description}",
-                "config_type":"webhook",
+                "config_type":"chime",
                 "feature_list":[
-                    "${updatedObject.features.elementAt(0)}",
-                    "${updatedObject.features.elementAt(1)}"
+                    "${updatedObject.features.elementAt(0)}"
                 ],
                 "is_enabled":${updatedObject.isEnabled},
-                "webhook":{"url":"${(updatedObject.configData as Webhook).url}"}
+                "chime":{"url":"${(updatedObject.configData as Chime).url}"}
             }
         }
         """.trimIndent()
@@ -146,7 +135,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
         Assert.assertEquals(configId, updateResponse.get("config_id").asString)
         Thread.sleep(1000)
 
-        // Get updated webhook notification config
+        // Get updated chime notification config
 
         val getUpdatedConfigResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -157,7 +146,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
         verifySingleConfigEquals(configId, updatedObject, getUpdatedConfigResponse)
         Thread.sleep(100)
 
-        // Delete webhook notification config
+        // Delete chime notification config
         val deleteResponse = executeRequest(
             RestRequest.Method.DELETE.name,
             "$PLUGIN_BASE_URI/configs/$configId",
@@ -167,7 +156,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
         Thread.sleep(1000)
 
-        // Get webhook notification config after delete
+        // Get chime notification config after delete
 
         executeRequest(
             RestRequest.Method.GET.name,
@@ -178,33 +167,32 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
     }
 
-    fun `test Bad Request for multiple config for Webhook data using REST Client`() {
+    fun `test BAD Request for multiple config data for Chime using REST Client`() {
         // Create sample config request reference
-        val sampleWebhook = Webhook("https://domain.com/sample_webhook_url#1234567890")
+        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
-            ConfigType.WEBHOOK,
-            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS, Feature.ALERTING),
+            ConfigType.CHIME,
+            EnumSet.of(Feature.ALERTING, Feature.REPORTS),
             isEnabled = true,
-            configData = sampleWebhook
+            configData = sampleChime
         )
 
-        // Create webhook notification config
+        // Create chime notification config
         val createRequestJsonString = """
         {
             "config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
-                "config_type":"webhook",
+                "config_type":"chime",
                 "features":[
                     "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}",
-                    "${referenceObject.features.elementAt(2)}"
+                    "${referenceObject.features.elementAt(1)}"
                 ],
                 "is_enabled":${referenceObject.isEnabled},
                 "slack":{"url":"https://dummy.com"}
-                "webhook":{"url":"${(referenceObject.configData as Webhook).url}"}
+                "chime":{"url":"${(referenceObject.configData as Chime).url}"}
             }
         }
         """.trimIndent()

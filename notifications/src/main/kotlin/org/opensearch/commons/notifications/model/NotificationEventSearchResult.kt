@@ -44,6 +44,16 @@ class NotificationEventSearchResult : SearchResults<NotificationEventInfo> {
     constructor(objectItem: NotificationEventInfo) : super(EVENT_LIST_TAG, objectItem)
 
     /**
+     * multiple items result constructor
+     */
+    constructor(objectList: List<NotificationEventInfo>) : this(
+        0,
+        objectList.size.toLong(),
+        TotalHits.Relation.EQUAL_TO,
+        objectList
+    )
+
+    /**
      * all param constructor
      */
     constructor(

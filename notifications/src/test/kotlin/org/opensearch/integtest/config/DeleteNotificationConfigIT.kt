@@ -25,11 +25,11 @@
  *
  */
 
-package org.opensearch.notifications.resthandler
+package org.opensearch.integtest.config
 
 import org.junit.Assert
+import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
-import org.opensearch.notifications.PluginRestTestCase
 import org.opensearch.notifications.verifyMultiConfigIdEquals
 import org.opensearch.notifications.verifySingleConfigIdEquals
 import org.opensearch.rest.RestRequest

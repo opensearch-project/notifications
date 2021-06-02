@@ -85,6 +85,7 @@ internal class NotificationEventRestHandler : PluginBaseHandler() {
              * Get list of notification events
              * Request URL: GET [REQUEST_URL?event_id=id] or [REQUEST_URL?<query_params>]
              * <query_params> ->
+             *     event_id_list=id1,id2,id3
              *     from_index=20
              *     max_items=10
              *     sort_order=asc
@@ -144,6 +145,7 @@ internal class NotificationEventRestHandler : PluginBaseHandler() {
         client: NodeClient
     ): RestChannelConsumer {
         val eventId: String? = request.param(EVENT_ID_TAG)
+        val eventIdList: String? = request.param(EVENT_ID_LIST_TAG)
         val sortField: String? = request.param(SORT_FIELD_TAG)
         val sortOrderString: String? = request.param(SORT_ORDER_TAG)
         val sortOrder: SortOrder? = if (sortOrderString == null) {
@@ -161,12 +163,31 @@ internal class NotificationEventRestHandler : PluginBaseHandler() {
             "$LOG_PREFIX:executeGetRequest from:$fromIndex, maxItems:$maxItems," +
                 " sortField:$sortField, sortOrder=$sortOrder, filters=$filterParams"
         )
+        val eventRequest = GetNotificationEventRequest(
+            getEventIdSet(eventId, eventIdList),
+            fromIndex,
+            maxItems,
+            sortField,
+            sortOrder,
+            filterParams
+        )
         return RestChannelConsumer {
             NotificationsPluginInterface.getNotificationEvent(
                 client,
-                GetNotificationEventRequest(eventId, fromIndex, maxItems, sortField, sortOrder, filterParams),
+                eventRequest,
                 RestToXContentListener(it)
             )
         }
+    }
+
+    private fun getEventIdSet(eventId: String?, eventIdList: String?): Set<String> {
+        var retIds: Set<String> = setOf()
+        if (eventId != null) {
+            retIds = setOf(eventId)
+        }
+        if (eventIdList != null) {
+            retIds = eventIdList.split(",").union(retIds)
+        }
+        return retIds
     }
 }

@@ -25,7 +25,7 @@
  *
  */
 
-package org.opensearch.notifications.resthandler
+package org.opensearch.integtest.config
 
 import org.junit.Assert
 import org.opensearch.commons.notifications.model.ConfigType
@@ -33,8 +33,8 @@ import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.Feature.ALERTING
 import org.opensearch.commons.notifications.model.Feature.INDEX_MANAGEMENT
 import org.opensearch.commons.notifications.model.Feature.REPORTS
+import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
-import org.opensearch.notifications.PluginRestTestCase
 import org.opensearch.notifications.verifyMultiConfigIdEquals
 import org.opensearch.notifications.verifyOrderedConfigList
 import org.opensearch.notifications.verifySingleConfigIdEquals
@@ -169,6 +169,24 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             "",
             RestStatus.NOT_FOUND.status
         )
+    }
+
+    fun `test Get multiple notification config as part of query`() {
+        (1..5).map { createConfig() }.toSet()
+        Thread.sleep(100)
+        (1..5).map { createConfig() }.toSet()
+        val configIds: Set<String> = (1..5).map { createConfig() }.toSet()
+        (1..5).map { createConfig() }.toSet()
+        Thread.sleep(1000)
+        // Get notification config with query parameter
+        val getConfigResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?config_id_list=${configIds.joinToString(",")}",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(configIds, getConfigResponse, configIds.size)
+        Thread.sleep(100)
     }
 
     fun `test Get all notification config`() {
