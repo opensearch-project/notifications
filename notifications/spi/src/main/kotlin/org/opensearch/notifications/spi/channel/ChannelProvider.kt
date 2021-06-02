@@ -25,6 +25,20 @@
  *
  */
 
-rootProject.name = 'opensearch-notifications'
-include "spi"
-project(":spi").name = rootProject.name + "-spi"
+package org.opensearch.notifications.spi.channel
+
+import org.opensearch.notifications.spi.message.BaseMessage
+import org.opensearch.notifications.spi.model.ChannelType
+
+/**
+ * Interface for channel provider for specific recipient depending on its type.
+ */
+internal interface ChannelProvider {
+    /**
+     * gets notification channel for specific recipient depending on its type (prefix).
+     * @param recipient recipient address to send notification to. prefix with channel type
+     *                  e.g. "mailto:email@address.com"
+     * @return Notification channel for sending notification for given recipient (depending on its type)
+     */
+    fun getNotificationChannel(channelType: ChannelType): NotificationChannel<BaseMessage, *>
+}

@@ -25,6 +25,24 @@
  *
  */
 
-rootProject.name = 'opensearch-notifications'
-include "spi"
-project(":spi").name = rootProject.name + "-spi"
+package org.opensearch.notifications.spi.channel
+
+import org.opensearch.notifications.spi.message.BaseMessage
+import org.opensearch.notifications.spi.model.ChannelMessageResponse
+
+/**
+ * Interface for sending notification message over a implemented channel.
+ */
+internal interface NotificationChannel<T : BaseMessage, Y> {
+    /**
+     * Sending notification message over this channel.
+     *
+     * @param message The message to send notification
+     * @return Channel message response
+     */
+    fun sendMessage(
+        message: T
+    ): ChannelMessageResponse
+
+    fun getClient(message: T): Y?
+}

@@ -1,0 +1,146 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ *
+ * Modifications Copyright OpenSearch Contributors. See
+ * GitHub history for details.
+ */
+
+/*
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ *
+ */
+
+import org.opensearch.gradle.test.RestIntegTestTask
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
+
+plugins {
+    id 'com.github.johnrengelman.shadow'
+    id 'jacoco'
+    id 'maven'
+    id 'maven-publish'
+    id 'signing'
+}
+
+apply plugin: 'opensearch.java'
+apply plugin: 'opensearch.testclusters'
+apply plugin: 'opensearch.java-rest-test'
+apply plugin: 'io.gitlab.arturbosch.detekt'
+apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
+
+ext {
+    projectSubstitutions = [:]
+    licenseFile = rootProject.file('LICENSE.txt')
+    noticeFile = rootProject.file('NOTICE')
+}
+
+
+jacoco {
+    toolVersion = '0.8.5'
+    reportsDir = file("$buildDir/JacocoReport")
+}
+plugins.withId('java') {
+    sourceCompatibility = targetCompatibility = "1.8"
+}
+plugins.withId('org.jetbrains.kotlin.jvm') {
+    compileKotlin.kotlinOptions.jvmTarget = compileTestKotlin.kotlinOptions.jvmTarget = "1.8"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/jacoco/")
+    }
+}
+check.dependsOn jacocoTestReport
+
+task integTest(type: RestIntegTestTask) {
+    description = "Run tests against a cluster that has security enabled"
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+}
+task sourcesJar(type: Jar) {
+    archiveClassifier.set 'sources'
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar) {
+    archiveClassifier.set 'javadoc'
+    from javadoc.destinationDir
+    dependsOn javadoc
+}
+
+test {
+    doFirst {
+        // reverse operation of https://github.com/elastic/elasticsearch/blob/7.6/buildSrc/src/main/groovy/org/elasticsearch/gradle/BuildPlugin.groovy#L736-L743
+        // to fix the classpath for unit tests
+        test.classpath -= project.files(project.tasks.named('shadowJar'))
+        test.classpath -= project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
+        test.classpath += project.extensions.getByType(SourceSetContainer).getByName(SourceSet.MAIN_SOURCE_SET_NAME).runtimeClasspath
+    }
+    // add "-Dtests.security.manager=false" to VM options if you want to run integ tests in IntelliJ
+    systemProperty 'tests.security.manager', 'false'
+}
+
+//TODO: see if this can be only set at top level and apply to subprojects, or we remove from top project if possible
+configurations.all {
+    if (it.state != Configuration.State.UNRESOLVED) return
+    resolutionStrategy {
+        force "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+        force "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
+        force "commons-logging:commons-logging:1.2" // resolve for awssdk:ses
+        force "commons-codec:commons-codec:1.13" // resolve for awssdk:ses
+        force "io.netty:netty-codec-http:4.1.63.Final" // resolve for awssdk:ses
+        force "io.netty:netty-handler:4.1.63.Final" // resolve for awssdk:ses
+        force "org.apache.httpcomponents:httpclient:4.5.10" // resolve for awssdk:ses
+        force "org.apache.httpcomponents:httpcore:4.4.13" // resolve for awssdk:ses
+    }
+}
+
+dependencies {
+    compileOnly "org.opensearch:opensearch:${opensearch_version}"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
+    compile "org.apache.httpcomponents:httpcore:4.4.5"
+    compile "org.apache.httpcomponents:httpclient:4.5.10"
+    //TODO: Add it back and remove from main project(to avoid jarhell) when implementing Email functionality
+//    compile ("software.amazon.awssdk:ses:2.14.16") {
+//        exclude module: 'annotations' // conflict with org.jetbrains:annotations, integTestRunner fails with error "codebase property already set"
+//    }
+//    compile "com.sun.mail:javax.mail:1.6.2"
+
+    testImplementation(
+            'org.assertj:assertj-core:3.16.1',
+            'org.junit.jupiter:junit-jupiter-api:5.6.2',
+            "org.easymock:easymock:4.0.1",
+            "org.apache.logging.log4j:log4j-core:${versions.log4j}",
+            "org.opensearch.test:framework:${opensearch_version}"
+    )
+    testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.2')
+    testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
+}
+
+shadowJar {
+    // fix jarhell by relocating packages
+    relocate 'com.fasterxml.jackson.core', 'org.opensearch.notifications.repackage.com.fasterxml.jackson.core'
+    relocate 'org.apache.http', 'org.opensearch.notifications.repackage.org.apache.http'
+    relocate 'org.apache.commons.logging', 'org.opensearch.notifications.repackage.org.apache.commons.logging'
+    relocate 'org.apache.commons.codec', 'org.opensearch.notifications.repackage.org.apache.commons.codec'
+    classifier = null
+}

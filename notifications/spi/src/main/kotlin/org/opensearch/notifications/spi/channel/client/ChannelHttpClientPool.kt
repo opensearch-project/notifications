@@ -10,7 +10,7 @@
  */
 
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -25,6 +25,11 @@
  *
  */
 
-rootProject.name = 'opensearch-notifications'
-include "spi"
-project(":spi").name = rootProject.name + "-spi"
+package org.opensearch.notifications.spi.channel.client
+
+/**
+ * This class provides Client to the relevant destinations
+ */
+internal object ChannelHttpClientPool {
+    val httpClient: ChannelHttpClient = ChannelHttpClient()
+}

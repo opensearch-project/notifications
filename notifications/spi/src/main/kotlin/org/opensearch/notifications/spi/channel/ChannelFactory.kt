@@ -25,6 +25,29 @@
  *
  */
 
-rootProject.name = 'opensearch-notifications'
-include "spi"
-project(":spi").name = rootProject.name + "-spi"
+package org.opensearch.notifications.spi.channel
+
+import org.opensearch.notifications.spi.channel.webhook.WebhookChannel
+import org.opensearch.notifications.spi.message.BaseMessage
+import org.opensearch.notifications.spi.model.ChannelType
+
+/**
+ * Factory object for creating and providing channel provider.
+ */
+internal object ChannelFactory : ChannelProvider {
+
+    private val channelMap = mapOf(
+        // TODO Add other channel
+        ChannelType.Slack to WebhookChannel(),
+        ChannelType.Chime to WebhookChannel(),
+        ChannelType.Webhook to WebhookChannel()
+    )
+
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+    override fun getNotificationChannel(channelType: ChannelType): NotificationChannel<BaseMessage, *> {
+        return channelMap[channelType] as NotificationChannel<BaseMessage, *>
+    }
+}

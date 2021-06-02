@@ -10,7 +10,7 @@
  */
 
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -25,6 +25,30 @@
  *
  */
 
-rootProject.name = 'opensearch-notifications'
-include "spi"
-project(":spi").name = rootProject.name + "-spi"
+package org.opensearch.notifications.spi.model
+
+import org.opensearch.common.Strings
+
+/**
+ * Data class for storing channel message.
+ */
+data class MessageContent(
+    val textDescription: String,
+    val htmlDescription: String?,
+    val attachment: Attachment?
+) {
+
+    init {
+        require(!Strings.isNullOrEmpty(textDescription)) { "text message part is null or empty" }
+    }
+
+    /**
+     * Data class for storing attachment of channel message.
+     */
+    data class Attachment(
+        val fileName: String,
+        val fileEncoding: String,
+        val fileData: String,
+        val fileContentType: String?
+    )
+}

@@ -25,6 +25,15 @@
  *
  */
 
-rootProject.name = 'opensearch-notifications'
-include "spi"
-project(":spi").name = rootProject.name + "-spi"
+package org.opensearch.notifications.spi.model
+
+import org.opensearch.rest.RestStatus
+
+/**
+ * Data class for storing channel message response per recipient.
+ */
+data class ChannelMessageResponse(
+    val recipient: String? = null,
+    val statusCode: RestStatus,
+    val statusText: String
+)

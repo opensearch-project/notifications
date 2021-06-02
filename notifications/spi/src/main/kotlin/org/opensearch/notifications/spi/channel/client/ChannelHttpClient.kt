@@ -1,0 +1,170 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ *
+ * Modifications Copyright OpenSearch Contributors. See
+ * GitHub history for details.
+ */
+
+/*
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ *
+ */
+
+package org.opensearch.notifications.spi.channel.client
+
+import org.apache.http.HttpEntity
+import org.apache.http.client.config.RequestConfig
+import org.apache.http.client.methods.CloseableHttpResponse
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
+import org.apache.http.client.methods.HttpPatch
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.client.methods.HttpPut
+import org.apache.http.client.methods.HttpRequestBase
+import org.apache.http.entity.StringEntity
+import org.apache.http.impl.client.CloseableHttpClient
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler
+import org.apache.http.impl.client.HttpClientBuilder
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
+import org.apache.http.util.EntityUtils
+import org.apache.logging.log4j.LogManager
+import org.opensearch.common.unit.TimeValue
+import org.opensearch.notifications.spi.message.WebhookMessage
+import org.opensearch.rest.RestStatus
+import java.io.IOException
+import java.nio.charset.StandardCharsets
+import java.util.Collections
+import kotlin.collections.HashSet
+
+/**
+ * This class handles the connections to the given Destination.
+ */
+class ChannelHttpClient {
+
+    companion object {
+        private val logger = LogManager.getLogger(ChannelHttpClient::class.java)
+        private const val MAX_CONNECTIONS = 60
+        private const val MAX_CONNECTIONS_PER_ROUTE = 20
+        private val TIMEOUT_MILLISECONDS = TimeValue.timeValueSeconds(5).millis().toInt()
+        private val SOCKET_TIMEOUT_MILLISECONDS = TimeValue.timeValueSeconds(50).millis().toInt()
+
+        /**
+         * all valid response status
+         */
+        private val VALID_RESPONSE_STATUS = Collections.unmodifiableSet(
+            HashSet(
+                listOf(
+                    RestStatus.OK.status, RestStatus.CREATED.status, RestStatus.ACCEPTED.status,
+                    RestStatus.NON_AUTHORITATIVE_INFORMATION.status, RestStatus.NO_CONTENT.status,
+                    RestStatus.RESET_CONTENT.status, RestStatus.PARTIAL_CONTENT.status,
+                    RestStatus.MULTI_STATUS.status
+                )
+            )
+        )
+
+        private var HTTP_CLIENT: CloseableHttpClient = createHttpClient()
+
+        private fun createHttpClient(): CloseableHttpClient {
+            val config: RequestConfig = RequestConfig.custom()
+                .setConnectTimeout(TIMEOUT_MILLISECONDS)
+                .setConnectionRequestTimeout(TIMEOUT_MILLISECONDS)
+                .setSocketTimeout(SOCKET_TIMEOUT_MILLISECONDS)
+                .build()
+            val connectionManager = PoolingHttpClientConnectionManager()
+            connectionManager.maxTotal = MAX_CONNECTIONS
+            connectionManager.defaultMaxPerRoute = MAX_CONNECTIONS_PER_ROUTE
+
+            return HttpClientBuilder.create()
+                .setDefaultRequestConfig(config)
+                .setConnectionManager(connectionManager)
+                .setRetryHandler(DefaultHttpRequestRetryHandler())
+                .useSystemProperties()
+                .build()
+        }
+    }
+
+    @Throws(Exception::class)
+    fun execute(message: WebhookMessage): String {
+        var response: CloseableHttpResponse? = null
+        return try {
+            response = getHttpResponse(message)
+            validateResponseStatus(response)
+            getResponseString(response)
+        } finally {
+            if (response != null) {
+                EntityUtils.consumeQuietly(response.entity)
+            }
+        }
+    }
+
+    @Throws(Exception::class)
+    private fun getHttpResponse(message: WebhookMessage): CloseableHttpResponse {
+        val httpRequest = HttpPost()
+        val uri = message.buildUri()
+
+        if (message.headerParams != null) {
+            if (message.headerParams.isEmpty()) {
+                // set default header
+                httpRequest.setHeader("Content-Type", "application/json")
+            } else {
+                for ((key, value) in message.headerParams.entries) httpRequest.setHeader(key, value)
+            }
+        }
+
+        httpRequest.uri = uri
+        val entity = StringEntity(extractBody(message), StandardCharsets.UTF_8)
+        (httpRequest as HttpEntityEnclosingRequestBase).entity = entity
+
+        return HTTP_CLIENT.execute(httpRequest)
+    }
+    @SuppressWarnings("UnusedPrivateMember")
+    private fun constructHttpRequest(method: String): HttpRequestBase {
+        return when (method) {
+            "POST" -> HttpPost()
+            "PUT" -> HttpPut()
+            "PATCH" -> HttpPatch()
+            else -> throw IllegalArgumentException("Invalid method supplied")
+        }
+    }
+
+    @Throws(IOException::class)
+    fun getResponseString(response: CloseableHttpResponse): String {
+        val entity: HttpEntity = response.entity ?: return "{}"
+        val responseString: String = EntityUtils.toString(entity)
+        logger.debug("Http response: $responseString")
+        return responseString
+    }
+
+    @Throws(IOException::class)
+    private fun validateResponseStatus(response: org.apache.http.HttpResponse) {
+        val statusCode: Int = response.statusLine.statusCode
+        if (!VALID_RESPONSE_STATUS.contains(statusCode)) {
+            throw IOException("Failed: $response")
+        }
+    }
+
+    private fun extractBody(message: WebhookMessage): String {
+        return message.channelMessage.textDescription
+    }
+
+    /**
+     * This method is useful for Mocking the client
+     */
+    fun setHttpClient(httpClient: CloseableHttpClient) {
+        HTTP_CLIENT = httpClient
+    }
+}
