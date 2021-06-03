@@ -27,8 +27,8 @@
 
 package org.opensearch.notifications.index
 
-import com.amazon.opendistroforelasticsearch.commons.authuser.User
 import org.opensearch.OpenSearchStatusException
+import org.opensearch.commons.authuser.User
 import org.opensearch.commons.notifications.action.CreateNotificationConfigRequest
 import org.opensearch.commons.notifications.action.CreateNotificationConfigResponse
 import org.opensearch.commons.notifications.action.DeleteNotificationConfigRequest

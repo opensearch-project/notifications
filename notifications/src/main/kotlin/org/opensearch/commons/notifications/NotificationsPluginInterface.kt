@@ -26,9 +26,9 @@
  */
 package org.opensearch.commons.notifications
 
-import com.amazon.opendistroforelasticsearch.commons.ConfigConstants.OPENDISTRO_SECURITY_USER_INFO_THREAD_CONTEXT
 import org.opensearch.action.ActionListener
 import org.opensearch.client.node.NodeClient
+import org.opensearch.commons.ConfigConstants.OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT
 import org.opensearch.commons.notifications.action.CreateNotificationConfigRequest
 import org.opensearch.commons.notifications.action.CreateNotificationConfigResponse
 import org.opensearch.commons.notifications.action.DeleteNotificationConfigRequest
@@ -204,7 +204,7 @@ object NotificationsPluginInterface {
         listener: ActionListener<SendNotificationResponse>
     ) {
         val threadContext: String? =
-            client.threadPool().threadContext.getTransient<String>(OPENDISTRO_SECURITY_USER_INFO_THREAD_CONTEXT)
+            client.threadPool().threadContext.getTransient<String>(OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT)
         val wrapper = SecureClientWrapper(client) // Executing request in privileged mode
         wrapper.execute(
             SEND_NOTIFICATION_ACTION_TYPE,

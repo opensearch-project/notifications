@@ -27,8 +27,8 @@
 
 package org.opensearch.notifications.security
 
-import com.amazon.opendistroforelasticsearch.commons.authuser.User
 import org.opensearch.OpenSearchStatusException
+import org.opensearch.commons.authuser.User
 import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.rest.RestStatus
 import java.util.stream.Collectors

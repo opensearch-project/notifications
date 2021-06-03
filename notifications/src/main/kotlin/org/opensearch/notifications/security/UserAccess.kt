@@ -26,7 +26,7 @@
  */
 package org.opensearch.notifications.security
 
-import com.amazon.opendistroforelasticsearch.commons.authuser.User
+import org.opensearch.commons.authuser.User
 
 interface UserAccess {
     /**
