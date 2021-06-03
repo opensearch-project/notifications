@@ -73,14 +73,17 @@ object ConfigIndexingActions {
         this.userAccess = userAccess
     }
 
+    @Suppress("UnusedPrivateMember")
     private fun validateSlackConfig(slack: Slack, user: User?) {
         // TODO: URL validation with rules
     }
 
+    @Suppress("UnusedPrivateMember")
     private fun validateChimeConfig(chime: Chime, user: User?) {
         // TODO: URL validation with rules
     }
 
+    @Suppress("UnusedPrivateMember")
     private fun validateWebhookConfig(webhook: Webhook, user: User?) {
         // TODO: URL validation with rules
     }
@@ -148,10 +151,12 @@ object ConfigIndexingActions {
         }
     }
 
+    @Suppress("UnusedPrivateMember")
     private fun validateSmtpAccountConfig(smtpAccount: SmtpAccount, user: User?) {
         // TODO: host validation with rules
     }
 
+    @Suppress("UnusedPrivateMember")
     private fun validateEmailGroupConfig(emailGroup: EmailGroup, user: User?) {
         // No extra validation required. All email IDs are validated as part of model validation.
     }
@@ -330,7 +335,6 @@ object ConfigIndexingActions {
 
     /**
      * Delete NotificationConfig
-     * @param operations [ConfigOperations] object
      * @param configId NotificationConfig object id
      * @param user the user info object
      * @return [DeleteNotificationConfigResponse]

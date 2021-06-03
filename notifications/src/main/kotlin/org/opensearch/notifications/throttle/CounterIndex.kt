@@ -130,8 +130,6 @@ internal class CounterIndex(client: Client, private val clusterService: ClusterS
             } catch (ignored: DocumentMissingException) {
                 log.info("$LOG_PREFIX:DocumentMissingException retrying")
                 false
-            } catch (exception: Exception) {
-                throw exception
             }
         }
     }

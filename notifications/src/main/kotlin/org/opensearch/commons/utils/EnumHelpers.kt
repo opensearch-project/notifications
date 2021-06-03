@@ -47,6 +47,7 @@ inline fun <reified E : Enum<E>> enumReader(enumClass: Class<E>): Writeable.Read
     }
 }
 
+@Suppress("UnusedPrivateMember")
 inline fun <reified E : Enum<E>> enumWriter(ignore: Class<E>): Writeable.Writer<E> {
     return Writeable.Writer<E> { streamOutput: StreamOutput, value: E ->
         streamOutput.writeEnum(value)
