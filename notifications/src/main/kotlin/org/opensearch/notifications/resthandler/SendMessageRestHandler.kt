@@ -29,7 +29,6 @@ package org.opensearch.notifications.resthandler
 
 import org.opensearch.client.node.NodeClient
 import org.opensearch.commons.utils.contentParserNextToken
-import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.action.SendMessageAction
 import org.opensearch.notifications.model.SendMessageRequest
@@ -48,7 +47,6 @@ import org.opensearch.rest.RestStatus
 internal class SendMessageRestHandler : BaseRestHandler() {
 
     internal companion object {
-        private val log by logger(SendMessageRestHandler::class.java)
         const val SEND_BASE_URI = "$PLUGIN_BASE_URI/send"
     }
 

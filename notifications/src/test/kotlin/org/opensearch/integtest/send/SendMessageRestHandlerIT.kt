@@ -31,6 +31,7 @@ import org.opensearch.integtest.PluginRestTestCase
 
 internal class SendMessageRestHandlerIT : PluginRestTestCase() {
 
+    @Suppress("EmptyFunctionBlock")
     fun sendRestHandler() {
     }
 }

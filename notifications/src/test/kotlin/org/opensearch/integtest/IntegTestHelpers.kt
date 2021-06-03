@@ -42,7 +42,8 @@ import kotlin.test.assertTrue
 private const val DEFAULT_TIME_ACCURACY_SEC = 5L
 
 @Throws(IOException::class)
-fun getResponseBody(response: Response, retainNewLines: Boolean): String {
+@Suppress("NestedBlockDepth")
+fun getResponseBody(response: Response, retainNewLines: Boolean = true): String {
     val sb = StringBuilder()
     response.entity.content.use { `is` ->
         BufferedReader(

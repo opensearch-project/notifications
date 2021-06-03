@@ -37,3 +37,11 @@ style:
   ReturnCount:
     active: true
     max: 10
+
+complexity:
+  LargeClass:
+    excludes: ['**/test/**']
+  LongMethod:
+    excludes: ['**/test/**']
+  LongParameterList:
+    excludes: ['**/test/**']

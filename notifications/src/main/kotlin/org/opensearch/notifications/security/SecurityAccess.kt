@@ -40,6 +40,7 @@ internal object SecurityAccess {
      * Execute the operation in privileged mode.
      */
     @Throws(Exception::class)
+    @Suppress("SwallowedException")
     fun <T> doPrivileged(operation: PrivilegedExceptionAction<T>?): T {
         SpecialPermission.check()
         return try {
