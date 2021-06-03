@@ -27,12 +27,12 @@
 
 package org.opensearch.notifications.action
 
-import com.amazon.opendistroforelasticsearch.commons.authuser.User
 import org.opensearch.action.ActionListener
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.client.Client
 import org.opensearch.common.inject.Inject
 import org.opensearch.common.xcontent.NamedXContentRegistry
+import org.opensearch.commons.authuser.User
 import org.opensearch.commons.notifications.action.DeleteNotificationConfigRequest
 import org.opensearch.commons.notifications.action.DeleteNotificationConfigResponse
 import org.opensearch.commons.notifications.action.NotificationsActions

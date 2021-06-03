@@ -118,15 +118,13 @@ configurations.all {
 }
 ext {
     projectSubstitutions = [:]
-    opensearchVersion = "${version}.0-beta1"
     isSnapshot = "true" == System.getProperty("build.snapshot", "true")
     licenseFile = rootProject.file('LICENSE')
     noticeFile = rootProject.file('NOTICE')
 }
 
 allprojects {
-    group = "com.amazon.opendistroforelasticsearch" //TODO：migrate
-    version = "${opensearchVersion}"
+    group = "org.opensearch"
     plugins.withId('java') {
         sourceCompatibility = targetCompatibility = "1.8"
     }
@@ -135,10 +133,6 @@ allprojects {
 repositories {
     // TODO: remove mavenLocal once notifications is published to maven
     mavenLocal()
-}
-
-if (isSnapshot) {
-    version += "-SNAPSHOT"
 }
 
 plugins.withId('java') {
@@ -150,11 +144,11 @@ plugins.withId('org.jetbrains.kotlin.jvm') {
 }
 
 dependencies {
-    compileOnly "org.opensearch:opensearch:${opensearch_version}"
+    compileOnly "${group}:opensearch:${opensearch_version}"
     compile "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
     compile "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3" // ${kotlin_version} does not work for coroutines
-    compile "${group}:common-utils:${opensearchVersion}"
+    compile "${group}:common-utils:1.0.0.0-rc1" // TODO: change to ${opensearch_version}
     compile ("software.amazon.awssdk:ses:2.16.75") {
         exclude module: 'annotations' // conflict with org.jetbrains:annotations, integTestRunner fails with error "codebase property already set"
     }

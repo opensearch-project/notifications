@@ -25,6 +25,11 @@ name: Test and Build Notifications
 
 on: [push, pull_request]
 
+env:
+  OPENSEARCH_VERSION: '1.0'
+  COMMON_UTILS_VERSION: main
+  OPENSEARCH_PLUGIN_VERSION: 1.0.0-rc1
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -41,21 +46,21 @@ jobs:
         with:
           repository: 'opensearch-project/OpenSearch'
           path: OpenSearch
-          ref: '1.0.0-beta1'
+          ref: ${{ env.OPENSEARCH_VERSION }}
       - name: Build OpenSearch
         working-directory: ./OpenSearch
-        run: ./gradlew publishToMavenLocal -Dbuild.version_qualifier=beta1 -Dbuild.snapshot=false
+        run: ./gradlew publishToMavenLocal -Dbuild.version_qualifier=rc1 -Dbuild.snapshot=false
 
       # dependencies: common-utils
       - name: Checkout common-utils
         uses: actions/checkout@v2
         with:
           repository: 'opensearch-project/common-utils'
-          ref: '1.0.0-beta1'
+          ref: ${{ env.COMMON_UTILS_VERSION }}
           path: common-utils
       - name: Build common-utils
         working-directory: ./common-utils
-        run: ./gradlew publishToMavenLocal -Dopensearch.version=1.0.0-beta1
+        run: ./gradlew publishToMavenLocal -Dopensearch.version=${{ env.OPENSEARCH_PLUGIN_VERSION }}
 
       # notifications
       - name: Checkout Notifications
@@ -64,7 +69,7 @@ jobs:
       - name: Build with Gradle
         run: |
           cd notifications
-          ./gradlew build -x :integTest -Dopensearch.version=1.0.0-beta1 # exclude integTest task to avoid permission denied issue
+          ./gradlew build -x :integTest -Dopensearch.version=${{ env.OPENSEARCH_PLUGIN_VERSION }} # exclude integTest task to avoid permission denied issue
 
       # - name: Upload coverage
       #   uses: codecov/codecov-action@v1
