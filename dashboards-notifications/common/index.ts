@@ -32,21 +32,23 @@ export enum SORT_DIRECTION {
   DESC = 'desc',
 }
 
-export const BASE_API_PATH = '/api/notifications';
+// after delete operation returns, a delay is needed before the change reflects in another request
+export const SERVER_DELAY = 1000;
+
+const NODE_API_BASE_PATH = '/api/notifications';
 export const NODE_API = Object.freeze({
-  NOTIFICATIONS: `${BASE_API_PATH}/notifications`,
-  _SEARCH: `${BASE_API_PATH}/_search`,
-  _INDICES: `${BASE_API_PATH}/_indices`,
-  _MAPPINGS: `${BASE_API_PATH}/_mappings`,
-  APPLY_POLICY: `${BASE_API_PATH}/applyPolicy`,
-  EDIT_ROLLOVER_ALIAS: `${BASE_API_PATH}/editRolloverAlias`,
-  POLICIES: `${BASE_API_PATH}/policies`,
-  ROLLUPS: `${BASE_API_PATH}/rollups`,
-  MANAGED_INDICES: `${BASE_API_PATH}/managedIndices`,
-  RETRY: `${BASE_API_PATH}/retry`,
-  CHANGE_POLICY: `${BASE_API_PATH}/changePolicy`,
-  REMOVE_POLICY: `${BASE_API_PATH}/removePolicy`,
+  GET_CONFIGS: `${NODE_API_BASE_PATH}/get_configs`,
+  GET_CONFIG: `${NODE_API_BASE_PATH}/get_config`,
+  CREATE_CONFIG: `${NODE_API_BASE_PATH}/create_config`,
+  DELETE_CONFIGS: `${NODE_API_BASE_PATH}/delete_configs`,
+  UPDATE_CONFIG: `${NODE_API_BASE_PATH}/update_config`,
 });
+
+// TODO change to _plugins when backend updates
+const OPENSEARCH_API_BASE_PATH = '/_opensearch/_notifications'
+export const OPENSEARCH_API = Object.freeze({
+  CONFIGS: `${OPENSEARCH_API_BASE_PATH}/configs`
+})
 
 export const REQUEST = Object.freeze({
   PUT: 'PUT',

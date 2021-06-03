@@ -9,9 +9,10 @@
  * GitHub history for details.
  */
 
-import { IRouter } from '../../../../src/core/server';
-import { configRoutes } from './configRoutes';
-
-export function defineRoutes(router: IRouter) {
-  configRoutes(router);
-}
+export const joinRequestParams = (
+  queryParams: string | string[] | undefined
+) => {
+  if (Array.isArray(queryParams)) return queryParams.join(',');
+  if (typeof queryParams === 'string') return queryParams;
+  return '';
+};

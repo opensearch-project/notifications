@@ -25,6 +25,8 @@
  */
 
 export const DOCUMENTATION_LINK = '';
+export const ALERTING_DOCUMENTATION_LINK =
+  'https://docs-beta.opensearch.org/docs/alerting/monitors/#authenticate-sender-account';
 
 export const ROUTES = Object.freeze({
   // notification
@@ -63,18 +65,24 @@ export const NOTIFICATION_STATUS = Object.freeze({
 });
 
 export const NOTIFICATION_SOURCE = Object.freeze({
-  ALERTING: 'Alerting',
-  ISM: 'ISM',
-  REPORTING: 'Reporting',
+  alerting: 'Alerting',
+  index_management: 'ISM',
+  reports: 'Reporting',
 });
 
 export const CHANNEL_TYPE = Object.freeze({
-  SLACK: 'Slack',
-  EMAIL: 'Email',
-  CHIME: 'Chime',
-  CUSTOM_WEBHOOK: 'Custom webhook',
+  slack: 'Slack',
+  email: 'Email',
+  chime: 'Chime',
+  webhook: 'Custom webhook',
   SES: 'Amazon SES',
   SNS: 'Amazon SNS',
+});
+
+export const ENCRYPTION_TYPE = Object.freeze({
+  ssl: 'SSL',
+  start_tls: 'TLS',
+  none: 'None',
 });
 
 export const CUSTOM_WEBHOOK_ENDPOINT_TYPE = Object.freeze({
