@@ -26,9 +26,9 @@
  */
 package org.opensearch.commons.notifications
 
-import com.amazon.opendistroforelasticsearch.commons.ConfigConstants.OPENDISTRO_SECURITY_USER_INFO_THREAD_CONTEXT
 import org.opensearch.action.ActionListener
 import org.opensearch.client.node.NodeClient
+import org.opensearch.commons.ConfigConstants.OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT
 import org.opensearch.commons.notifications.action.CreateNotificationConfigRequest
 import org.opensearch.commons.notifications.action.CreateNotificationConfigResponse
 import org.opensearch.commons.notifications.action.DeleteNotificationConfigRequest
@@ -39,11 +39,14 @@ import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
 import org.opensearch.commons.notifications.action.GetNotificationConfigResponse
 import org.opensearch.commons.notifications.action.GetNotificationEventRequest
 import org.opensearch.commons.notifications.action.GetNotificationEventResponse
+import org.opensearch.commons.notifications.action.GetPluginFeaturesRequest
+import org.opensearch.commons.notifications.action.GetPluginFeaturesResponse
 import org.opensearch.commons.notifications.action.NotificationsActions.CREATE_NOTIFICATION_CONFIG_ACTION_TYPE
 import org.opensearch.commons.notifications.action.NotificationsActions.DELETE_NOTIFICATION_CONFIG_ACTION_TYPE
 import org.opensearch.commons.notifications.action.NotificationsActions.GET_FEATURE_CHANNEL_LIST_ACTION_TYPE
 import org.opensearch.commons.notifications.action.NotificationsActions.GET_NOTIFICATION_CONFIG_ACTION_TYPE
 import org.opensearch.commons.notifications.action.NotificationsActions.GET_NOTIFICATION_EVENT_ACTION_TYPE
+import org.opensearch.commons.notifications.action.NotificationsActions.GET_PLUGIN_FEATURES_ACTION_TYPE
 import org.opensearch.commons.notifications.action.NotificationsActions.SEND_NOTIFICATION_ACTION_TYPE
 import org.opensearch.commons.notifications.action.NotificationsActions.UPDATE_NOTIFICATION_CONFIG_ACTION_TYPE
 import org.opensearch.commons.notifications.action.SendNotificationRequest
@@ -52,7 +55,6 @@ import org.opensearch.commons.notifications.action.UpdateNotificationConfigReque
 import org.opensearch.commons.notifications.action.UpdateNotificationConfigResponse
 import org.opensearch.commons.notifications.model.ChannelMessage
 import org.opensearch.commons.notifications.model.EventSource
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.utils.SecureClientWrapper
 
 /**
@@ -151,28 +153,43 @@ object NotificationsPluginInterface {
     }
 
     /**
-     * Get notification channel configuration enabled for a feature.
+     * Get notification plugin features.
      * @param client Node client for making transport action
-     * @param feature The feature name requested
+     * @param request The request object
      * @param listener The listener for getting response
      */
-    fun getFeatureChannelList(
+    fun getPluginFeatures(
         client: NodeClient,
-        feature: Feature,
-        listener: ActionListener<GetFeatureChannelListResponse>
+        request: GetPluginFeaturesRequest,
+        listener: ActionListener<GetPluginFeaturesResponse>
     ) {
-        val threadContext: String? =
-            client.threadPool().threadContext.getTransient<String>(OPENDISTRO_SECURITY_USER_INFO_THREAD_CONTEXT)
-        val wrapper = SecureClientWrapper(client) // Executing request in privileged mode
-        wrapper.execute(
-            GET_FEATURE_CHANNEL_LIST_ACTION_TYPE,
-            GetFeatureChannelListRequest(feature, threadContext),
+        client.execute(
+            GET_PLUGIN_FEATURES_ACTION_TYPE,
+            request,
             listener
         )
     }
 
     /**
-     * Send notification API enabled for a feature.
+     * Get notification channel configuration enabled for a feature.
+     * @param client Node client for making transport action
+     * @param request The request object
+     * @param listener The listener for getting response
+     */
+    fun getFeatureChannelList(
+        client: NodeClient,
+        request: GetFeatureChannelListRequest,
+        listener: ActionListener<GetFeatureChannelListResponse>
+    ) {
+        client.execute(
+            GET_FEATURE_CHANNEL_LIST_ACTION_TYPE,
+            request,
+            listener
+        )
+    }
+
+    /**
+     * Send notification API enabled for a feature. No REST API. Internal API only for Inter plugin communication.
      * @param client Node client for making transport action
      * @param eventSource The notification event information
      * @param channelMessage The notification message
@@ -187,7 +204,7 @@ object NotificationsPluginInterface {
         listener: ActionListener<SendNotificationResponse>
     ) {
         val threadContext: String? =
-            client.threadPool().threadContext.getTransient<String>(OPENDISTRO_SECURITY_USER_INFO_THREAD_CONTEXT)
+            client.threadPool().threadContext.getTransient<String>(OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT)
         val wrapper = SecureClientWrapper(client) // Executing request in privileged mode
         wrapper.execute(
             SEND_NOTIFICATION_ACTION_TYPE,

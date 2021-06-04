@@ -44,7 +44,6 @@ import org.opensearch.common.unit.TimeValue
 import org.opensearch.common.xcontent.LoggingDeprecationHandler
 import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.common.xcontent.XContentType
-import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TAG
 import org.opensearch.commons.notifications.NotificationConstants.TENANT_TAG
 import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
 import org.opensearch.commons.notifications.model.NotificationConfigInfo
@@ -53,7 +52,7 @@ import org.opensearch.commons.notifications.model.SearchResults
 import org.opensearch.commons.utils.logger
 import org.opensearch.index.query.QueryBuilders
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
-import org.opensearch.notifications.index.QueryHelper.getSortField
+import org.opensearch.notifications.index.ConfigQueryHelper.getSortField
 import org.opensearch.notifications.model.DocInfo
 import org.opensearch.notifications.model.DocMetadata.Companion.ACCESS_LIST_TAG
 import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
@@ -230,9 +229,7 @@ internal object NotificationConfigIndex : ConfigOperations {
         if (access.isNotEmpty()) {
             query.filter(QueryBuilders.termsQuery("$METADATA_TAG.$ACCESS_LIST_TAG", access))
         }
-        request.filterParams.forEach {
-            query.filter(QueryHelper.getQueryBuilder(CONFIG_TAG, it.key, it.value))
-        }
+        ConfigQueryHelper.addQueryFilters(query, request.filterParams)
         sourceBuilder.query(query)
         val searchRequest = SearchRequest()
             .indices(INDEX_NAME)

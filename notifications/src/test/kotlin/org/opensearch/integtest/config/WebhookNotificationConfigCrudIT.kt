@@ -25,15 +25,15 @@
  *
  */
 
-package org.opensearch.notifications.resthandler
+package org.opensearch.integtest.config
 
 import org.junit.Assert
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Webhook
+import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
-import org.opensearch.notifications.PluginRestTestCase
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
@@ -43,7 +43,10 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
 
     fun `test Create, Get, Update, Delete webhook notification config using REST client`() {
         // Create sample config request reference
-        val sampleWebhook = Webhook("https://domain.com/sample_webhook_url#1234567890")
+        val sampleWebhook = Webhook(
+            "https://domain.com/sample_webhook_url#1234567890",
+            mapOf(Pair("User-Agent", "Mozilla/5.0"))
+        )
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -66,7 +69,12 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
                     "${referenceObject.features.elementAt(2)}"
                 ],
                 "is_enabled":${referenceObject.isEnabled},
-                "webhook":{"url":"${(referenceObject.configData as Webhook).url}"}
+                "webhook":{
+                    "url":"${(referenceObject.configData as Webhook).url}",
+                    "header_params":{
+                        "User-Agent":"Mozilla/5.0"
+                    }
+                }
             }
         }
         """.trimIndent()

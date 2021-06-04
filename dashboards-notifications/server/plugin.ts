@@ -4,6 +4,7 @@ import {
   CoreStart,
   Plugin,
   Logger,
+  ILegacyClusterClient,
 } from "../../../src/core/server";
 
 import {
@@ -11,6 +12,7 @@ import {
   notificationsDashboardsPluginStart,
 } from "./types";
 import { defineRoutes } from "./routes";
+import { NotificationsPlugin } from "./clusters/notificationsPlugin";
 
 export class notificationsDashboardsPlugin
   implements
@@ -27,6 +29,20 @@ export class notificationsDashboardsPlugin
   public setup(core: CoreSetup) {
     this.logger.debug("notificationsDashboards: Setup");
     const router = core.http.createRouter();
+
+    const notificationsClient: ILegacyClusterClient = core.opensearch.legacy.createClient(
+      'opensearch_notifications',
+      {
+        plugins: [NotificationsPlugin],
+      }
+    );
+
+    core.http.registerRouteHandlerContext('notificationsContext', (context, request) => {
+      return {
+        logger: this.logger,
+        notificationsClient,
+      };
+    });
 
     // Register server side APIs
     defineRoutes(router);

@@ -27,16 +27,17 @@
 
 package org.opensearch.notifications.action
 
-import com.amazon.opendistroforelasticsearch.commons.authuser.User
 import org.opensearch.action.ActionListener
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.client.Client
 import org.opensearch.common.inject.Inject
 import org.opensearch.common.xcontent.NamedXContentRegistry
+import org.opensearch.commons.authuser.User
 import org.opensearch.commons.notifications.action.GetNotificationEventRequest
 import org.opensearch.commons.notifications.action.GetNotificationEventResponse
 import org.opensearch.commons.notifications.action.NotificationsActions
 import org.opensearch.commons.utils.recreateObject
+import org.opensearch.notifications.index.EventIndexingActions
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 
@@ -77,6 +78,6 @@ internal class GetNotificationEventAction @Inject constructor(
         request: GetNotificationEventRequest,
         user: User?
     ): GetNotificationEventResponse {
-        TODO()
+        return EventIndexingActions.get(request, user)
     }
 }

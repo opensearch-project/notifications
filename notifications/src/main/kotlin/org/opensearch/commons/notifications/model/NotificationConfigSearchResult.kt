@@ -44,6 +44,16 @@ class NotificationConfigSearchResult : SearchResults<NotificationConfigInfo> {
     constructor(objectItem: NotificationConfigInfo) : super(CONFIG_LIST_TAG, objectItem)
 
     /**
+     * multiple items result constructor
+     */
+    constructor(objectList: List<NotificationConfigInfo>) : this(
+        0,
+        objectList.size.toLong(),
+        TotalHits.Relation.EQUAL_TO,
+        objectList
+    )
+
+    /**
      * all param constructor
      */
     constructor(

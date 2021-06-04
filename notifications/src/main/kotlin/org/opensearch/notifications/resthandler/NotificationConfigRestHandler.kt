@@ -29,14 +29,9 @@ package org.opensearch.notifications.resthandler
 import org.opensearch.client.node.NodeClient
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_LIST_TAG
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
-import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TYPE_TAG
 import org.opensearch.commons.notifications.NotificationConstants.DEFAULT_MAX_ITEMS
-import org.opensearch.commons.notifications.NotificationConstants.DESCRIPTION_TAG
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_LIST_TAG
 import org.opensearch.commons.notifications.NotificationConstants.FROM_INDEX_TAG
-import org.opensearch.commons.notifications.NotificationConstants.IS_ENABLED_TAG
 import org.opensearch.commons.notifications.NotificationConstants.MAX_ITEMS_TAG
-import org.opensearch.commons.notifications.NotificationConstants.NAME_TAG
 import org.opensearch.commons.notifications.NotificationConstants.SORT_FIELD_TAG
 import org.opensearch.commons.notifications.NotificationConstants.SORT_ORDER_TAG
 import org.opensearch.commons.notifications.NotificationsPluginInterface
@@ -48,6 +43,7 @@ import org.opensearch.commons.utils.contentParserNextToken
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
+import org.opensearch.notifications.index.ConfigQueryHelper
 import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
 import org.opensearch.rest.BytesRestResponse
 import org.opensearch.rest.RestHandler.Route
@@ -71,13 +67,6 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
          * Base URL for this handler
          */
         private const val REQUEST_URL = "$PLUGIN_BASE_URI/configs"
-        private val FILTER_PARAMS = setOf(
-            IS_ENABLED_TAG,
-            CONFIG_TYPE_TAG,
-            FEATURE_LIST_TAG,
-            NAME_TAG,
-            DESCRIPTION_TAG
-        )
     }
 
     /**
@@ -131,15 +120,30 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
              * Get list of notification configs
              * Request URL: GET [REQUEST_URL?config_id=id] or [REQUEST_URL?<query_params>]
              * <query_params> ->
+             *     config_id_list=id1,id2,id3
              *     from_index=20
              *     max_items=10
              *     sort_order=asc
              *     sort_field=config_type
+             *     last_updated_time_ms=from_time..to_time
+             *     created_time_ms=from_time..to_time
              *     is_enabled=true
              *     config_type=slack,chime
              *     feature_list=alerting,reports
              *     name=test
              *     description=sample
+             *     email.email_account_id=abc,xyz
+             *     email.email_group_id_list=abc,xyz
+             *     smtp_account.method=ssl
+             *     slack.url=domain
+             *     chime.url=domain
+             *     webhook.url=domain
+             *     email.recipient_list=abc,xyz
+             *     email_group.recipient_list=abc,xyz
+             *     smtp_account.host=domain
+             *     smtp_account.from_address=abc,xyz
+             *     smtp_account.recipient_list=abc,xyz
+             *     query=search all above fields
              * Request body: Ref [org.opensearch.commons.notifications.action.GetNotificationConfigRequest]
              * Response body: [org.opensearch.commons.notifications.action.GetNotificationConfigResponse]
              */
@@ -207,6 +211,7 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
         client: NodeClient
     ): RestChannelConsumer {
         val configId: String? = request.param(CONFIG_ID_TAG)
+        val configIdList: String? = request.param(CONFIG_ID_LIST_TAG)
         val sortField: String? = request.param(SORT_FIELD_TAG)
         val sortOrderString: String? = request.param(SORT_ORDER_TAG)
         val sortOrder: SortOrder? = if (sortOrderString == null) {
@@ -217,20 +222,39 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
         val fromIndex = request.param(FROM_INDEX_TAG)?.toIntOrNull() ?: 0
         val maxItems = request.param(MAX_ITEMS_TAG)?.toIntOrNull() ?: DEFAULT_MAX_ITEMS
         val filterParams = request.params()
-            .filter { FILTER_PARAMS.contains(it.key) }
+            .filter { ConfigQueryHelper.FILTER_PARAMS.contains(it.key) }
             .map { Pair(it.key, request.param(it.key)) }
             .toMap()
         log.info(
             "$LOG_PREFIX:executeGetRequest from:$fromIndex, maxItems:$maxItems," +
                 " sortField:$sortField, sortOrder=$sortOrder, filters=$filterParams"
         )
+        val configRequest = GetNotificationConfigRequest(
+            getConfigIdSet(configId, configIdList),
+            fromIndex,
+            maxItems,
+            sortField,
+            sortOrder,
+            filterParams
+        )
         return RestChannelConsumer {
             NotificationsPluginInterface.getNotificationConfig(
                 client,
-                GetNotificationConfigRequest(configId, fromIndex, maxItems, sortField, sortOrder, filterParams),
+                configRequest,
                 RestToXContentListener(it)
             )
         }
+    }
+
+    private fun getConfigIdSet(configId: String?, configIdList: String?): Set<String> {
+        var retIds: Set<String> = setOf()
+        if (configId != null) {
+            retIds = setOf(configId)
+        }
+        if (configIdList != null) {
+            retIds = configIdList.split(",").union(retIds)
+        }
+        return retIds
     }
 
     private fun executeDeleteRequest(

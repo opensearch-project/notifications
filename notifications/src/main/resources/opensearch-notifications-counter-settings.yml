@@ -28,6 +28,5 @@
 
 # Settings file for the notifications counter index
 index:
-  number_of_shards: "1"
-  auto_expand_replicas: "0-1"
-  number_of_replicas: "0"
+  number_of_shards: "1" # The data size is not expected to be big so keeping it 1 shard
+  auto_expand_replicas: "0-2"

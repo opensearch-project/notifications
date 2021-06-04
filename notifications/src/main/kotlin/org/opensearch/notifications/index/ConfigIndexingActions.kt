@@ -27,9 +27,8 @@
 
 package org.opensearch.notifications.index
 
-import com.amazon.opendistroforelasticsearch.commons.authuser.User
 import org.opensearch.OpenSearchStatusException
-import org.opensearch.common.Strings
+import org.opensearch.commons.authuser.User
 import org.opensearch.commons.notifications.action.CreateNotificationConfigRequest
 import org.opensearch.commons.notifications.action.CreateNotificationConfigResponse
 import org.opensearch.commons.notifications.action.DeleteNotificationConfigRequest
@@ -74,14 +73,17 @@ object ConfigIndexingActions {
         this.userAccess = userAccess
     }
 
+    @Suppress("UnusedPrivateMember")
     private fun validateSlackConfig(slack: Slack, user: User?) {
         // TODO: URL validation with rules
     }
 
+    @Suppress("UnusedPrivateMember")
     private fun validateChimeConfig(chime: Chime, user: User?) {
         // TODO: URL validation with rules
     }
 
+    @Suppress("UnusedPrivateMember")
     private fun validateWebhookConfig(webhook: Webhook, user: User?) {
         // TODO: URL validation with rules
     }
@@ -149,10 +151,12 @@ object ConfigIndexingActions {
         }
     }
 
+    @Suppress("UnusedPrivateMember")
     private fun validateSmtpAccountConfig(smtpAccount: SmtpAccount, user: User?) {
         // TODO: host validation with rules
     }
 
+    @Suppress("UnusedPrivateMember")
     private fun validateEmailGroupConfig(emailGroup: EmailGroup, user: User?) {
         // No extra validation required. All email IDs are validated as part of model validation.
     }
@@ -241,10 +245,10 @@ object ConfigIndexingActions {
     fun get(request: GetNotificationConfigRequest, user: User?): GetNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-get $request")
         UserAccessManager.validateUser(user)
-        return if (request.configId == null || Strings.isEmpty(request.configId)) {
-            getAll(request, user)
-        } else {
-            info(request.configId, user)
+        return when (request.configIds.size) {
+            0 -> getAll(request, user)
+            1 -> info(request.configIds.first(), user)
+            else -> info(request.configIds, user)
         }
     }
 
@@ -276,6 +280,44 @@ object ConfigIndexingActions {
     }
 
     /**
+     * Get NotificationConfig info
+     * @param configIds config id set
+     * @param user the user info object
+     * @return [GetNotificationConfigResponse]
+     */
+    private fun info(configIds: Set<String>, user: User?): GetNotificationConfigResponse {
+        log.info("$LOG_PREFIX:NotificationConfig-info $configIds")
+        val configDocs = operations.getNotificationConfigs(configIds)
+        if (configDocs.size != configIds.size) {
+            val mutableSet = configIds.toMutableSet()
+            configDocs.forEach { mutableSet.remove(it.docInfo.id) }
+            throw OpenSearchStatusException(
+                "NotificationConfig $mutableSet not found",
+                RestStatus.NOT_FOUND
+            )
+        }
+        configDocs.forEach {
+            val currentMetadata = it.configDoc.metadata
+            if (!UserAccessManager.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+                throw OpenSearchStatusException(
+                    "Permission denied for NotificationConfig ${it.docInfo.id}",
+                    RestStatus.FORBIDDEN
+                )
+            }
+        }
+        val configSearchResult = configDocs.map {
+            NotificationConfigInfo(
+                it.docInfo.id!!,
+                it.configDoc.metadata.lastUpdateTime,
+                it.configDoc.metadata.createdTime,
+                it.configDoc.metadata.tenant,
+                it.configDoc.config
+            )
+        }
+        return GetNotificationConfigResponse(NotificationConfigSearchResult(configSearchResult))
+    }
+
+    /**
      * Get all NotificationConfig matching the criteria
      * @param request [GetNotificationConfigRequest] object
      * @param user the user info object
@@ -293,7 +335,6 @@ object ConfigIndexingActions {
 
     /**
      * Delete NotificationConfig
-     * @param operations [ConfigOperations] object
      * @param configId NotificationConfig object id
      * @param user the user info object
      * @return [DeleteNotificationConfigResponse]
@@ -340,7 +381,7 @@ object ConfigIndexingActions {
             val mutableSet = configIds.toMutableSet()
             configDocs.forEach { mutableSet.remove(it.docInfo.id) }
             throw OpenSearchStatusException(
-                "NotificationConfig $configDocs not found",
+                "NotificationConfig $mutableSet not found",
                 RestStatus.NOT_FOUND
             )
         }

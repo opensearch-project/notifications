@@ -27,8 +27,6 @@
 
 package org.opensearch.notifications.action
 
-import com.amazon.opendistroforelasticsearch.commons.ConfigConstants
-import com.amazon.opendistroforelasticsearch.commons.authuser.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,6 +39,8 @@ import org.opensearch.action.support.ActionFilters
 import org.opensearch.action.support.HandledTransportAction
 import org.opensearch.client.Client
 import org.opensearch.common.io.stream.Writeable
+import org.opensearch.commons.ConfigConstants.OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT
+import org.opensearch.commons.authuser.User
 import org.opensearch.commons.utils.logger
 import org.opensearch.index.IndexNotFoundException
 import org.opensearch.index.engine.VersionConflictEngineException
@@ -73,7 +73,7 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
         listener: ActionListener<Response>
     ) {
         val userStr: String? =
-            client.threadPool().threadContext.getTransient<String>(ConfigConstants.OPENDISTRO_SECURITY_USER_INFO_THREAD_CONTEXT)
+            client.threadPool().threadContext.getTransient<String>(OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT)
         val user: User? = User.parse(userStr)
         scope.launch {
             try {

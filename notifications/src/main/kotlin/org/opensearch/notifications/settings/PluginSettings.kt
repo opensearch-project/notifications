@@ -323,8 +323,8 @@ internal object PluginSettings {
             val defaultSettingYmlFile = Path.of(configDirName, PLUGIN_NAME, "notifications.yml")
             try {
                 settings = Settings.builder().loadFromPath(defaultSettingYmlFile).build()
-            } catch (exception: IOException) {
-                log.warn("$LOG_PREFIX:Failed to load ${defaultSettingYmlFile.toAbsolutePath()}")
+            } catch (e: IOException) {
+                log.warn("$LOG_PREFIX:Failed to load ${defaultSettingYmlFile.toAbsolutePath()}:${e.message}")
             }
         }
         // Initialize the settings values to default values

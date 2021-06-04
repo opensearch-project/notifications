@@ -42,20 +42,18 @@ internal class GetFeatureChannelListRequestTests {
         actual: GetFeatureChannelListRequest
     ) {
         assertEquals(expected.feature, actual.feature)
-        assertEquals(expected.threadContext, actual.threadContext)
     }
 
     @Test
     fun `Get request serialize and deserialize transport object should be equal`() {
-        val configRequest = GetFeatureChannelListRequest(Feature.REPORTS, "sample-thread-context")
+        val configRequest = GetFeatureChannelListRequest(Feature.REPORTS)
         val recreatedObject = recreateObject(configRequest) { GetFeatureChannelListRequest(it) }
         assertGetRequestEquals(configRequest, recreatedObject)
     }
 
     @Test
     fun `Get request serialize and deserialize using json object should be equal`() {
-        val configRequest =
-            GetFeatureChannelListRequest(Feature.INDEX_MANAGEMENT, "sample-thread-context")
+        val configRequest = GetFeatureChannelListRequest(Feature.INDEX_MANAGEMENT)
         val jsonString = getJsonString(configRequest)
         val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureChannelListRequest.parse(it) }
         assertGetRequestEquals(configRequest, recreatedObject)
@@ -71,11 +69,10 @@ internal class GetFeatureChannelListRequestTests {
 
     @Test
     fun `Get request should safely ignore extra field in json object`() {
-        val configRequest = GetFeatureChannelListRequest(Feature.ALERTING, "sample-thread-context")
+        val configRequest = GetFeatureChannelListRequest(Feature.ALERTING)
         val jsonString = """
         {
             "feature":"${configRequest.feature}",
-            "context":"${configRequest.threadContext}",
             "extra_field_1":["extra", "value"],
             "extra_field_2":{"extra":"value"},
             "extra_field_3":"extra value 3"
@@ -86,22 +83,9 @@ internal class GetFeatureChannelListRequestTests {
     }
 
     @Test
-    fun `Get request should safely ignore thread context is absent in json object`() {
-        val configRequest = GetFeatureChannelListRequest(Feature.REPORTS, null)
-        val jsonString = """
-        {
-            "feature":"${configRequest.feature}"
-        }
-        """.trimIndent()
-        val recreatedObject = createObjectFromJsonString(jsonString) { GetFeatureChannelListRequest.parse(it) }
-        assertGetRequestEquals(configRequest, recreatedObject)
-    }
-
-    @Test
     fun `Get request should throw exception if feature field is absent in json object`() {
         val jsonString = """
         {
-            "context":"sample-thread-context"
         }
         """.trimIndent()
         assertThrows<IllegalArgumentException> {

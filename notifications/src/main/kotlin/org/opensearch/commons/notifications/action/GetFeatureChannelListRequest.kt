@@ -37,9 +37,7 @@ import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.FEATURE_TAG
-import org.opensearch.commons.notifications.NotificationConstants.THREAD_CONTEXT_TAG
 import org.opensearch.commons.notifications.model.Feature
-import org.opensearch.commons.utils.fieldIfNotNull
 import org.opensearch.commons.utils.logger
 import java.io.IOException
 
@@ -51,7 +49,6 @@ import java.io.IOException
  */
 class GetFeatureChannelListRequest : ActionRequest, ToXContentObject {
     val feature: Feature
-    val threadContext: String?
 
     companion object {
         private val log by logger(GetFeatureChannelListRequest::class.java)
@@ -69,7 +66,6 @@ class GetFeatureChannelListRequest : ActionRequest, ToXContentObject {
         @Throws(IOException::class)
         fun parse(parser: XContentParser): GetFeatureChannelListRequest {
             var feature: Feature? = null
-            var threadContext: String? = null
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -81,7 +77,6 @@ class GetFeatureChannelListRequest : ActionRequest, ToXContentObject {
                 parser.nextToken()
                 when (fieldName) {
                     FEATURE_TAG -> feature = Feature.fromTagOrDefault(parser.text())
-                    THREAD_CONTEXT_TAG -> threadContext = parser.text()
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing GetFeatureChannelListRequest")
@@ -89,21 +84,16 @@ class GetFeatureChannelListRequest : ActionRequest, ToXContentObject {
                 }
             }
             feature ?: throw IllegalArgumentException("$FEATURE_TAG field absent")
-            return GetFeatureChannelListRequest(
-                feature,
-                threadContext
-            )
+            return GetFeatureChannelListRequest(feature)
         }
     }
 
     /**
      * constructor for creating the class
      * @param feature the caller plugin feature
-     * @param threadContext the user info thread context
      */
-    constructor(feature: Feature, threadContext: String?) {
+    constructor(feature: Feature) {
         this.feature = feature
-        this.threadContext = threadContext
     }
 
     /**
@@ -112,7 +102,6 @@ class GetFeatureChannelListRequest : ActionRequest, ToXContentObject {
     @Throws(IOException::class)
     constructor(input: StreamInput) : super(input) {
         feature = input.readEnum(Feature::class.java)
-        threadContext = input.readOptionalString()
     }
 
     /**
@@ -122,7 +111,6 @@ class GetFeatureChannelListRequest : ActionRequest, ToXContentObject {
     override fun writeTo(output: StreamOutput) {
         super.writeTo(output)
         output.writeEnum(feature)
-        output.writeOptionalString(threadContext)
     }
 
     /**
@@ -132,7 +120,6 @@ class GetFeatureChannelListRequest : ActionRequest, ToXContentObject {
         builder!!
         return builder.startObject()
             .field(FEATURE_TAG, feature)
-            .fieldIfNotNull(THREAD_CONTEXT_TAG, threadContext)
             .endObject()
     }
 

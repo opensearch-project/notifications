@@ -23,7 +23,7 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.opensearch.notifications
+package org.opensearch.integtest
 
 import org.opensearch.action.admin.cluster.health.ClusterHealthRequest
 import org.opensearch.action.admin.cluster.node.info.NodesInfoRequest

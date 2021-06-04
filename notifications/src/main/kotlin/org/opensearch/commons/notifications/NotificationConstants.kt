@@ -7,6 +7,7 @@ internal object NotificationConstants {
     internal const val CONFIG_ID_TAG = "config_id"
     internal const val CONFIG_ID_LIST_TAG = "config_id_list"
     internal const val EVENT_ID_TAG = "event_id"
+    internal const val EVENT_ID_LIST_TAG = "event_id_list"
     internal const val EMAIL_ACCOUNT_ID_TAG = "email_account_id"
     internal const val REFERENCE_ID_TAG = "reference_id"
     internal const val CHANNEL_ID_LIST_TAG = "channel_id_list"
@@ -27,7 +28,7 @@ internal object NotificationConstants {
     internal const val EMAIL_GROUP_ID_LIST_TAG = "email_group_id_list"
     internal const val STATUS_CODE_TAG = "status_code"
     internal const val STATUS_TEXT_TAG = "status_text"
-    internal const val STATUS_DETAIL_TAG = "delivery_status"
+    internal const val DELIVERY_STATUS_TAG = "delivery_status"
     internal const val NAME_TAG = "name"
     internal const val DESCRIPTION_TAG = "description"
     internal const val IS_ENABLED_TAG = "is_enabled"
@@ -36,6 +37,7 @@ internal object NotificationConstants {
     internal const val SEVERITY_TAG = "severity"
     internal const val TAGS_TAG = "tags"
     internal const val URL_TAG = "url"
+    internal const val HEADER_PARAMS_TAG = "header_params"
     internal const val HOST_TAG = "host"
     internal const val PORT_TAG = "port"
     internal const val METHOD_TAG = "method"
@@ -56,6 +58,10 @@ internal object NotificationConstants {
     internal const val START_INDEX_TAG = "start_index"
     internal const val TOTAL_HITS_TAG = "total_hits"
     internal const val TOTAL_HIT_RELATION_TAG = "total_hit_relation"
+    internal const val QUERY_TAG = "query"
+    internal const val COMPACT_TAG = "compact"
+    internal const val CONFIG_TYPE_LIST_TAG = "config_type_list"
+    internal const val PLUGIN_FEATURES_TAG = "plugin_features"
 
     internal const val DEFAULT_MAX_ITEMS = 1000
 }

@@ -25,7 +25,7 @@
  *
  */
 
-package org.opensearch.notifications
+package org.opensearch.integtest
 
 import com.google.gson.JsonObject
 import org.apache.http.Header
@@ -44,7 +44,6 @@ import org.junit.AfterClass
 import org.junit.Before
 import org.opensearch.client.Request
 import org.opensearch.client.RequestOptions
-import org.opensearch.client.Response
 import org.opensearch.client.ResponseException
 import org.opensearch.client.RestClient
 import org.opensearch.client.RestClientBuilder
@@ -55,10 +54,7 @@ import org.opensearch.common.xcontent.DeprecationHandler
 import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.common.xcontent.XContentType
 import org.opensearch.test.rest.OpenSearchRestTestCase
-import java.io.BufferedReader
 import java.io.IOException
-import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.security.cert.X509Certificate
@@ -126,6 +122,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
     }
 
     @Throws(IOException::class)
+    @Suppress("TooGenericExceptionThrown")
     protected open fun configureHttpsClient(builder: RestClientBuilder, settings: Settings) {
         val headers = ThreadContext.buildDefaultHeaders(settings)
         val defaultHeaders = arrayOfNulls<Header>(headers.size)
@@ -191,25 +188,6 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         }
         val responseBody = getResponseBody(response)
         return jsonify(responseBody)
-    }
-
-    @Throws(IOException::class)
-    private fun getResponseBody(response: Response, retainNewLines: Boolean = true): String {
-        val sb = StringBuilder()
-        response.entity.content.use { `is` ->
-            BufferedReader(
-                InputStreamReader(`is`, StandardCharsets.UTF_8)
-            ).use { br ->
-                var line: String?
-                while (br.readLine().also { line = it } != null) {
-                    sb.append(line)
-                    if (retainNewLines) {
-                        sb.appendLine()
-                    }
-                }
-            }
-        }
-        return sb.toString()
     }
 
     @After

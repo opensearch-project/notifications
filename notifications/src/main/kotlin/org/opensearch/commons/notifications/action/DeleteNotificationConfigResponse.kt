@@ -33,7 +33,6 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
-import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.notifications.NotificationConstants.DELETE_RESPONSE_LIST_TAG
 import org.opensearch.commons.utils.STRING_READER
 import org.opensearch.commons.utils.STRING_WRITER
@@ -82,7 +81,7 @@ class DeleteNotificationConfigResponse : BaseResponse {
                     }
                 }
             }
-            configIdToStatus ?: throw IllegalArgumentException("$CONFIG_ID_TAG field absent")
+            configIdToStatus ?: throw IllegalArgumentException("$DELETE_RESPONSE_LIST_TAG field absent")
             return DeleteNotificationConfigResponse(configIdToStatus)
         }
 

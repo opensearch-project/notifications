@@ -25,6 +25,11 @@
  */
 
 import { Direction } from '@elastic/eui';
+import {
+  CHANNEL_TYPE,
+  ENCRYPTION_TYPE,
+  NOTIFICATION_SOURCE,
+} from '../public/utils/constants';
 
 export interface NotificationItem {
   id: string;
@@ -54,33 +59,53 @@ export interface DeliveryStatus {
   statusText: string;
 }
 
-export interface ChannelItemType {
-  id: string;
-  name: string;
-  enabled: boolean; // active or muted
-  type: string;
-  allowedFeatures: string[];
-  lastUpdatedTime: number;
-  destination: {
-    [type: string]: any;
+export interface ChannelItemType extends ConfigType {
+  config_type: keyof typeof CHANNEL_TYPE;
+  feature_list: Array<keyof typeof NOTIFICATION_SOURCE>;
+  is_enabled: boolean; // active or muted
+  slack?: {
+    url: string;
   };
-  description?: string;
+  chime?: {
+    url: string;
+  };
+  webhook?: {
+    url: string;
+    header_params: object;
+  };
+  email?: {
+    email_account_id: string;
+    recipient_list: string[]; // custom email addresses
+    email_group_id_list: string[];
+    // optional fields for displaying or editing email channel, needs more requests
+    email_account_name?: string;
+    email_group_id_map?: {
+      [id: string]: string;
+    };
+  };
 }
 
-export interface SenderItemType {
-  id: string;
+interface ConfigType {
+  config_id: string;
   name: string;
-  from: string; // outbound email address
-  host: string;
-  port: string;
-  method: ENCRYPTION_METHOD;
+  description?: string;
+  created_time_ms: number;
+  last_updated_time_ms: number;
 }
 
-export interface RecipientGroupItemType {
-  id: string;
-  name: string;
-  email: Array<{ email: string }>;
-  description?: string;
+export interface SenderItemType extends ConfigType {
+  smtp_account: {
+    from_address: string; // outbound email address
+    host: string;
+    port: string;
+    method: keyof typeof ENCRYPTION_TYPE;
+  };
+}
+
+export interface RecipientGroupItemType extends ConfigType {
+  email_group: {
+    recipient_list: string[];
+  };
 }
 
 export interface TableState<T> {
@@ -94,5 +119,3 @@ export interface TableState<T> {
   items: T[];
   loading: boolean;
 }
-
-export type ENCRYPTION_METHOD = 'SSL' | 'TSL';
