@@ -271,7 +271,7 @@ export class SendersTable extends Component<
                 title={<h2>No senders to display</h2>}
                 body="Set up an outbound email server by creating a sender. You will select a sender when configuring email channels."
                 actions={
-                  <EuiButton href={`#${ROUTES.CREATE_CHANNEL}`}>
+                  <EuiButton href={`#${ROUTES.CREATE_SENDER}`}>
                     Create sender
                   </EuiButton>
                 }
