@@ -53,7 +53,7 @@ export function DetailsTableModal(props: DetailsTableModalProps) {
   return (
     <>
       <EuiOverlayMask>
-        <EuiModal onClose={props.onClose} maxWidth={500}>
+        <EuiModal onClose={props.onClose} maxWidth={800}>
           <EuiModalHeader>
             <EuiModalHeaderTitle>{props.header}</EuiModalHeaderTitle>
           </EuiModalHeader>

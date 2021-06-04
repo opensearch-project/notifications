@@ -58,12 +58,12 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
   const actions: ChannelDetailsActionsParams[] = [
     {
       label: 'Edit',
-      href: `#${ROUTES.EDIT_CHANNEL}/${props.channel.id}?from=details`,
+      href: `#${ROUTES.EDIT_CHANNEL}/${props.channel.config_id}?from=details`,
     },
     {
       label: 'Send test message',
       action: () => {
-        if (Math.random() < 0.5) {
+        if (true) {
           coreContext.notifications.toasts.addSuccess(
             'Successfully sent a test message.'
           );
@@ -115,7 +115,7 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
                 setIsPopoverOpen(false);
                 if (params.modal) {
                   onShow(params.modal, {
-                    channels: [props.channel],
+                    selected: [props.channel],
                     ...(params.modalParams || {}),
                   });
                 }

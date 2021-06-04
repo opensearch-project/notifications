@@ -63,7 +63,7 @@ export function ChannelDetailItems(props: ChannelDetailItemsProps) {
               <EuiFlexItem key={`channel-description-item-${itemIndex}`}>
                 {item && (
                   <EuiDescriptionList
-                    style={{ wordBreak: 'break-word' }}
+                    style={{ wordBreak: 'break-word', whiteSpace: 'pre-line' }}
                     listItems={[item]}
                   />
                 )}
