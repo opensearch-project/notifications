@@ -40,6 +40,7 @@ import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
 import { ServicesContext } from '../../services';
 import { BREADCRUMBS, ROUTES } from '../../utils/constants';
+import { getErrorMessage } from '../../utils/helpers';
 import { CreateRecipientGroupForm } from './components/forms/CreateRecipientGroupForm';
 import { createRecipientGroupConfigObject } from './utils/helper';
 import {
@@ -102,14 +103,20 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
     const id = props.match.params?.id;
     if (typeof id !== 'string') return;
 
-    const response = await servicesContext.notificationService.getRecipientGroup(
-      id
-    );
-    setName(response.name);
-    setDescription(response.description || '');
-    setSelectedEmailOptions(
-      response.email_group.recipient_list.map((email) => ({ label: email }))
-    );
+    try {
+      const response = await servicesContext.notificationService.getRecipientGroup(
+        id
+      );
+      setName(response.name);
+      setDescription(response.description || '');
+      setSelectedEmailOptions(
+        response.email_group.recipient_list.map((email) => ({ label: email }))
+      );
+    } catch (error) {
+      coreContext.notifications.toasts.addDanger(
+        getErrorMessage(error, 'There was a problem loading recipient group.')
+      );
+    }
   };
 
   return (

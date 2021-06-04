@@ -82,6 +82,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
         <EuiFieldText
           fullWidth
           placeholder="Enter sender name"
+          data-test-subj="create-sender-form-name-input"
           value={props.senderName}
           onChange={(e) => props.setSenderName(e.target.value)}
           isInvalid={props.inputErrors.senderName.length > 0}
@@ -104,6 +105,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
           >
             <EuiFieldText
               placeholder="name@example.com"
+              data-test-subj="create-sender-form-email-input"
               value={props.email}
               onChange={(e) => props.setEmail(e.target.value)}
               isInvalid={props.inputErrors.email.length > 0}
@@ -124,6 +126,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
           >
             <EuiFieldText
               placeholder="smtp.example.com"
+              data-test-subj="create-sender-form-host-input"
               value={props.host}
               onChange={(e) => props.setHost(e.target.value)}
               isInvalid={props.inputErrors.host.length > 0}
@@ -144,6 +147,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
           >
             <EuiFieldNumber
               placeholder="465"
+              data-test-subj="create-sender-form-port-input"
               value={props.port}
               onChange={(e) => props.setPort(e.target.value)}
               isInvalid={props.inputErrors.port.length > 0}
@@ -179,6 +183,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
       >
         <EuiSuperSelect
           fullWidth
+          data-test-subj="create-sender-form-encryption-input"
           options={encryptionOptions}
           valueOfSelected={props.encryption}
           onChange={props.setEncryption}

@@ -39,6 +39,7 @@ import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
 import { ServicesContext } from '../../services';
 import { BREADCRUMBS, ENCRYPTION_TYPE, ROUTES } from '../../utils/constants';
+import { getErrorMessage } from '../../utils/helpers';
 import { CreateSenderForm } from './components/forms/CreateSenderForm';
 import { createSenderConfigObject } from './utils/helper';
 import {
@@ -87,12 +88,18 @@ export function CreateSender(props: CreateSenderProps) {
     const id = props.match.params?.id;
     if (typeof id !== 'string') return;
 
-    const response = await servicesContext.notificationService.getSender(id);
-    setSenderName(response.name);
-    setEmail(response.smtp_account.from_address);
-    setHost(response.smtp_account.host);
-    setPort(response.smtp_account.port);
-    setEncryption(response.smtp_account.method);
+    try {
+      const response = await servicesContext.notificationService.getSender(id);
+      setSenderName(response.name);
+      setEmail(response.smtp_account.from_address);
+      setHost(response.smtp_account.host);
+      setPort(response.smtp_account.port);
+      setEncryption(response.smtp_account.method);
+    } catch (error) {
+      coreContext.notifications.toasts.addDanger(
+        getErrorMessage(error, 'There was a problem loading sender.')
+      );
+    }
   };
 
   const isInputValid = (): boolean => {

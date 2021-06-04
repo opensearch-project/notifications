@@ -200,11 +200,6 @@ export class RecipientGroupsTable extends Component<
     this.setState({ from: 0, search });
   };
 
-  onPageChange = (page: number): void => {
-    const { size } = this.state;
-    this.setState({ from: page * size });
-  };
-
   render() {
     const {
       total,

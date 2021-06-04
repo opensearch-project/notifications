@@ -39,6 +39,7 @@ const coreServicesMock = ({
     toasts: {
       addDanger: jest.fn().mockName('addDanger'),
       addSuccess: jest.fn().mockName('addSuccess'),
+      addError: jest.fn().mockName('addError'),
     },
   },
 } as unknown) as CoreStart;

@@ -24,11 +24,14 @@
  * permissions and limitations under the License.
  */
 
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import React from 'react';
+import { RouteComponentProps } from 'react-router-dom';
+import { MOCK_CONFIG } from '../../../../test/mocks/mockData';
 import { routerComponentPropsMock } from '../../../../test/mocks/routerPropsMock';
 import { coreServicesMock } from '../../../../test/mocks/serviceMock';
 import { CoreServicesContext } from '../../../components/coreServices';
+import { ServicesContext } from '../../../services';
 import { CreateSender } from '../CreateSender';
 
 describe('<CreateSender/> spec', () => {
@@ -41,13 +44,32 @@ describe('<CreateSender/> spec', () => {
     expect(utils.container.firstChild).toMatchSnapshot();
   });
 
-  it('renders the component for editing', () => {
+  it('renders the component for editing', async () => {
+    const notificationServiceMock = jest.fn() as any;
+    const updateConfig = jest.fn(async () => Promise.resolve());
+    notificationServiceMock.notificationService = {
+      getSender: async (id: string) => MOCK_CONFIG.sender,
+      updateConfig,
+    };
+    const props = { match: { params: { id: 'test' } } };
     const utils = render(
-      <CoreServicesContext.Provider value={coreServicesMock}>
-        <CreateSender {...routerComponentPropsMock} edit={true} />
-      </CoreServicesContext.Provider>
+      <ServicesContext.Provider value={notificationServiceMock}>
+        <CoreServicesContext.Provider value={coreServicesMock}>
+          <CreateSender
+            {...(props as RouteComponentProps<{ id: string }>)}
+            edit={true}
+          />
+        </CoreServicesContext.Provider>
+      </ServicesContext.Provider>
     );
-    expect(utils.container.firstChild).toMatchSnapshot();
-  });
-});
+    await waitFor(() => {
+      expect(utils.container.firstChild).toMatchSnapshot();
+    });
 
+    utils.getByText('Save').click();
+    await waitFor(() => {
+      expect(updateConfig).toBeCalled();
+    });
+  });
+
+});
