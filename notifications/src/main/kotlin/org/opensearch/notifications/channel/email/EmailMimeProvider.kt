@@ -27,6 +27,7 @@
 
 package org.opensearch.notifications.channel.email
 
+import org.opensearch.commons.notifications.model.Attachment
 import org.opensearch.commons.notifications.model.ChannelMessage
 import java.util.Base64
 import javax.activation.DataHandler
@@ -100,12 +101,13 @@ internal object EmailMimeProvider {
         // Add the multipart/alternative part to the message
         msg.addBodyPart(bodyWrapper)
 
-        if (channelMessage.attachment != null) {
+        val attachment: Attachment? = channelMessage.attachment
+        if (attachment != null) {
             // Add the attachment to the message
             var attachmentMime: MimeBodyPart? = null
-            when (channelMessage.attachment.fileEncoding) {
-                "text" -> attachmentMime = createTextAttachmentPart(channelMessage.attachment)
-                "base64" -> attachmentMime = createBinaryAttachmentPart(channelMessage.attachment)
+            when (attachment.fileEncoding) {
+                "text" -> attachmentMime = createTextAttachmentPart(attachment)
+                "base64" -> attachmentMime = createBinaryAttachmentPart(attachment)
             }
             if (attachmentMime != null) {
                 msg.addBodyPart(attachmentMime)
@@ -131,7 +133,7 @@ internal object EmailMimeProvider {
      * @param attachment channel attachment message
      * @return created mime body part for binary attachment
      */
-    private fun createBinaryAttachmentPart(attachment: ChannelMessage.Attachment): MimeBodyPart {
+    private fun createBinaryAttachmentPart(attachment: Attachment): MimeBodyPart {
         val attachmentMime = MimeBodyPart()
         val fds = ByteArrayDataSource(
             Base64.getMimeDecoder().decode(attachment.fileData),
@@ -147,7 +149,7 @@ internal object EmailMimeProvider {
      * @param attachment channel attachment message
      * @return created mime body part for text attachment
      */
-    private fun createTextAttachmentPart(attachment: ChannelMessage.Attachment): MimeBodyPart {
+    private fun createTextAttachmentPart(attachment: Attachment): MimeBodyPart {
         val attachmentMime = MimeBodyPart()
         val subContentType = attachment.fileContentType?.substringAfterLast('/') ?: "plain"
         attachmentMime.setText(attachment.fileData, "UTF-8", subContentType)

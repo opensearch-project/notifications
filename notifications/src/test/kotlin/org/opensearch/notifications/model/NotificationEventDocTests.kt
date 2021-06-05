@@ -36,8 +36,8 @@ import org.opensearch.commons.notifications.model.EventStatus
 import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.NotificationEvent
 import org.opensearch.commons.notifications.model.SeverityType
-import org.opensearch.commons.utils.createObjectFromJsonString
-import org.opensearch.commons.utils.getJsonString
+import org.opensearch.notifications.createObjectFromJsonString
+import org.opensearch.notifications.getJsonString
 import java.time.Instant
 
 internal class NotificationEventDocTests {

@@ -37,6 +37,7 @@ import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.model.Attachment
 import org.opensearch.commons.notifications.model.ChannelMessage
 import org.opensearch.commons.utils.createJsonParser
 import org.opensearch.commons.utils.fieldIfNotNull
@@ -88,7 +89,7 @@ internal class SendMessageRequest : ActionRequest, ToXContentObject {
         var title: String? = null
         var textDescription: String? = null
         var htmlDescription: String? = null
-        var attachment: ChannelMessage.Attachment? = null
+        var attachment: Attachment? = null
         var recipients: List<String> = listOf()
         XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser)
         while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
@@ -100,7 +101,7 @@ internal class SendMessageRequest : ActionRequest, ToXContentObject {
                 TITLE_FIELD -> title = parser.text()
                 TEXT_DESCRIPTION_FIELD -> textDescription = parser.text()
                 HTML_DESCRIPTION_FIELD -> htmlDescription = parser.text()
-                ATTACHMENT_FIELD -> attachment = ChannelMessage.Attachment.parse(parser)
+                ATTACHMENT_FIELD -> attachment = Attachment.parse(parser)
                 else -> {
                     parser.skipChildren()
                     log.info("$LOG_PREFIX:Skipping Unknown field $fieldName")

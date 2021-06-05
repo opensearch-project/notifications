@@ -30,8 +30,8 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.opensearch.commons.notifications.model.NotificationConfigInfo
-import org.opensearch.commons.utils.createObjectFromJsonString
-import org.opensearch.commons.utils.getJsonString
+import org.opensearch.notifications.createObjectFromJsonString
+import org.opensearch.notifications.getJsonString
 import java.time.Instant
 
 internal class DocMetadataTests {
