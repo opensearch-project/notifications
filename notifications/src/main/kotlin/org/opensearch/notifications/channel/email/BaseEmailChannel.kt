@@ -27,6 +27,7 @@
 
 package org.opensearch.notifications.channel.email
 
+import org.opensearch.commons.notifications.model.Attachment
 import org.opensearch.commons.notifications.model.ChannelMessage
 import org.opensearch.notifications.channel.NotificationChannel
 import org.opensearch.notifications.model.ChannelMessageResponse
@@ -126,10 +127,11 @@ internal abstract class BaseEmailChannel : NotificationChannel {
     }
 
     private fun isMessageSizeOverLimit(title: String, channelMessage: ChannelMessage): Boolean {
-        val approxAttachmentLength = if (channelMessage.attachment != null) {
+        val attachment: Attachment? = channelMessage.attachment
+        val approxAttachmentLength = if (attachment != null) {
             MINIMUM_EMAIL_HEADER_LENGTH +
-                channelMessage.attachment.fileData.length +
-                channelMessage.attachment.fileName.length
+                attachment.fileData.length +
+                attachment.fileName.length
         } else {
             0
         }
