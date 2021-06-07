@@ -100,8 +100,8 @@ object EventQueryHelper {
         } else {
             when {
                 METADATA_RANGE_FIELDS.contains(sortField) -> "$METADATA_TAG.$sortField"
-                KEYWORD_FIELDS.contains(sortField) -> "$CONFIG_TAG.$sortField"
-                TEXT_FIELDS.contains(sortField) -> "$CONFIG_TAG.$sortField.keyword"
+                KEYWORD_FIELDS.contains(sortField) -> "$KEY_PREFIX.$sortField"
+                TEXT_FIELDS.contains(sortField) -> "$KEY_PREFIX.$sortField.keyword"
                 else -> throw OpenSearchStatusException("Sort on $sortField not acceptable", RestStatus.NOT_ACCEPTABLE)
             }
         }
