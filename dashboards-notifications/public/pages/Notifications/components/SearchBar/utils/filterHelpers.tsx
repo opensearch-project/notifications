@@ -24,20 +24,22 @@
  * permissions and limitations under the License.
  */
 
+import { EuiComboBox, EuiFieldText, EuiFormRow, EuiSpacer } from '@elastic/eui';
+import React from 'react';
 import {
   CHANNEL_TYPE,
   NOTIFICATION_SOURCE,
-  NOTIFICATION_STATUS,
+  SEVERITY_TYPE
 } from '../../../../../utils/constants';
-import {
-  EuiComboBox,
-  EuiComboBoxOptionOption,
-  EuiFieldText,
-  EuiFormRow,
-  EuiSpacer,
-} from '@elastic/eui';
-import React from 'react';
 import { FilterType } from '../Filter/Filters';
+
+export interface FilterParamsType {
+  'status_list.config_name'?: string[];
+  'status_list.config_type'?: Array<keyof typeof CHANNEL_TYPE>;
+  'event_source.feature'?: Array<keyof typeof NOTIFICATION_SOURCE>;
+  'event_source.severity'?: Array<keyof typeof SEVERITY_TYPE>;
+  'status_list.delivery_status.status_code'?: string[];
+}
 
 export type FilterFieldType =
   | 'Channel'
@@ -110,12 +112,22 @@ export const getValueComponent = (
 
   let options;
 
-  if (field === 'Channel type') options = Object.values(CHANNEL_TYPE);
-  else if (field === 'Severity') options = ['1', '2', '3', '4', '5'];
-  else if (field === 'Source') options = Object.values(NOTIFICATION_SOURCE);
-  else options = Object.values(NOTIFICATION_STATUS);
-
-  options = options.map((option) => ({ label: option }));
+  if (field === 'Channel type')
+    options = Object.entries(CHANNEL_TYPE).map(([key, value]) => ({
+      label: value,
+      value: key,
+    }));
+  else if (field === 'Severity')
+    options = Object.entries(SEVERITY_TYPE).map(([key, value]) => ({
+      label: value,
+      value: key,
+    }));
+  else if (field === 'Source')
+    options = Object.entries(NOTIFICATION_SOURCE).map(([key, value]) => ({
+      label: value,
+      value: key,
+    }));
+  else if (field === 'Status') options = [{ label: 'Sent' }, { label: 'Error' }];
 
   const singleSelection = isSingleSelection(operator);
   const placeholder = singleSelection ? 'Select a value' : 'Select values';
@@ -149,21 +161,48 @@ export const isSingleSelection = (filterOrOperator: FilterType | string) => {
   );
 };
 
-export const filterToQueryString = (filters: FilterType[]) => {
-  // TODO: need to map display names to field names (Channel type => CHANNEL_TYPE ?)
-  return filters
-    .filter((filter) => !filter.disabled)
-    .map((filter) => {
-      if (filter.value === null) return '';
+const toBackendField = (field: FilterFieldType) => {
+  switch (field) {
+    case 'Channel':
+      return 'status_list.config_name';
+    case 'Channel type':
+      return 'status_list.config_type';
+    case 'Severity':
+      return 'event_source.severity';
+    case 'Source':
+      return 'event_source.feature';
+    case 'Status':
+      return 'status_list.delivery_status.status_code';
+    default:
+      return '';
+  }
+};
 
-      const sign = filter.inverted ? '-' : '+';
-      const field = filter.field;
-      const value =
+export const filtersToQueryParams = (filters: FilterType[]) => {
+  const filterParams: FilterParamsType = {};
+  filters
+    .filter((filter) => !filter.disabled && filter.value != null)
+    .forEach((filter) => {
+      const field = toBackendField(filter.field);
+      if (!field) return;
+      if (!filterParams[field]) filterParams[field] = [];
+
+      if (field === 'status_list.delivery_status.status_code') {
+        const queryForSuccess =
+          (filter.value === 'Sent' && !filter.inverted) ||
+          (filter.value === 'Error' && filter.inverted);
+        filterParams[field]!.push(queryForSuccess ? '200' : '!200');
+        return;
+      }
+
+      const inverted = filter.inverted ? '!' : '';
+      const values =
         typeof filter.value === 'string'
-          ? filter.value
-          : filter.value.map((option) => option.label).join(' OR ');
-
-      return `${sign}(${field}:${value})`;
-    })
-    .join(' ');
+          ? [filter.value]
+          : filter.value!.map((option) => option.value || option.label);
+      for (const value of values) {
+        filterParams[field]!.push(`${inverted}${value}`);
+      }
+    });
+  return filterParams;
 };

@@ -25,7 +25,7 @@
  */
 
 import { CoreStart } from 'opensearch-dashboards/public';
-import { NotificationService } from '../../public/services';
+import { EventService, NotificationService } from '../../public/services';
 import httpClientMock from './httpClientMock';
 
 const coreServicesMock = ({
@@ -45,8 +45,10 @@ const coreServicesMock = ({
 } as unknown) as CoreStart;
 
 const browserServicesMock = new NotificationService(httpClientMock);
+const eventServiceMock = new EventService(httpClientMock);
 const notificationServiceMock = {
   notificationService: browserServicesMock,
+  eventService: eventServiceMock,
 };
 
 export { notificationServiceMock, coreServicesMock };

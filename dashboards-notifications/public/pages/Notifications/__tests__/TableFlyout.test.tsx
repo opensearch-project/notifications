@@ -26,50 +26,17 @@
 
 import { render } from '@testing-library/react';
 import React from 'react';
+import { MOCK_DATA } from '../../../../test/mocks/mockData';
 import { notificationServiceMock } from '../../../../test/mocks/serviceMock';
 import { ChannelCard } from '../components/NotificationsTable/Flyout/ChannelCard';
 import { TableFlyout } from '../components/NotificationsTable/Flyout/TableFlyout';
 
 describe('<TableFlyout /> spec', () => {
-  const item = {
-    id: '1',
-    title: 'Alert notification on high error rate',
-    referenceId: 'alert_id_1',
-    source: 'Alerting',
-    severity: 'High',
-    lastUpdatedTime: 1612229000,
-    tags: ['optional string list'],
-    status: 'Error',
-    statusList: [
-      {
-        configId: '1',
-        configName: 'dev_email_channel',
-        configType: 'Email',
-        emailRecipientStatus: [
-          {
-            recipient: 'dd@amazon.com',
-            deliveryStatus: { statusCode: '500', statusText: 'Some error' },
-          },
-          {
-            recipient: 'cc@amazon.com',
-            deliveryStatus: { statusCode: '404', statusText: 'invalid' },
-          },
-        ],
-        deliveryStatus: { statusCode: '500', statusText: 'Error' },
-      },
-      {
-        configId: '2',
-        configName: 'manage_slack_channel',
-        configType: 'Slack',
-        deliveryStatus: { statusCode: '200', statusText: 'Success' },
-      },
-    ],
-  };
 
   it('renders the component', () => {
     const utils = render(
       <TableFlyout
-        notificationItem={item}
+        notificationItem={MOCK_DATA.notifications.items[0]}
         onClose={() => {}}
         services={notificationServiceMock}
       />
@@ -78,12 +45,12 @@ describe('<TableFlyout /> spec', () => {
   });
 
   it('clicks card link', () => {
-    const channel = item.statusList[0];
+    const channel = MOCK_DATA.notifications.items[0].status_list[0]
     const onClose = jest.fn();
     const utils = render(
       <ChannelCard channel={channel} onClose={onClose} />
     );
-    utils.getByText(channel.configName).click();
+    utils.getByText(channel.config_name).click();
     expect(onClose).toBeCalled();
   });
 });

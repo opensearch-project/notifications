@@ -43,6 +43,7 @@ import { NotificationItem } from '../../../../../../models/interfaces';
 import { ModalRootProps } from '../../../../../components/Modal/ModalRoot';
 import { NOTIFICATION_SOURCE } from '../../../../../utils/constants';
 import { renderTime } from '../../../../../utils/helpers';
+import { getReferenceText, getReferenceURL } from '../../../utils/helpers';
 import { ChannelCard } from './ChannelCard';
 
 interface TableFlyoutProps extends ModalRootProps {
@@ -64,7 +65,7 @@ export function TableFlyout(props: TableFlyoutProps) {
             listItems={[
               {
                 title: 'Notification',
-                description: props.notificationItem.title,
+                description: props.notificationItem.event_source.title,
               },
             ]}
           />
@@ -75,10 +76,13 @@ export function TableFlyout(props: TableFlyoutProps) {
                 listItems={[
                   {
                     title: 'Source',
-                    // TODO source plugin link
                     description: (
-                      <EuiLink href="#" target="_blank" external>
-                        new monitor
+                      <EuiLink
+                        href={getReferenceURL(props.notificationItem)}
+                        target="_blank"
+                        external
+                      >
+                        {getReferenceText(props.notificationItem)}
                       </EuiLink>
                     ),
                   },
@@ -92,7 +96,7 @@ export function TableFlyout(props: TableFlyoutProps) {
                     title: 'Source type',
                     description: _.get(
                       NOTIFICATION_SOURCE,
-                      props.notificationItem.source,
+                      props.notificationItem.event_source.feature,
                       '-'
                     ),
                   },
@@ -105,7 +109,9 @@ export function TableFlyout(props: TableFlyoutProps) {
             listItems={[
               {
                 title: 'Time sent',
-                description: renderTime(props.notificationItem.lastUpdatedTime),
+                description: renderTime(
+                  props.notificationItem.last_updated_time_ms
+                ),
               },
             ]}
           />
@@ -113,8 +119,8 @@ export function TableFlyout(props: TableFlyoutProps) {
           <EuiTitle size="xs">
             <h4>Channels sent</h4>
           </EuiTitle>
-          {props.notificationItem.statusList.map((channelStatus) => (
-            <div key={`channel-card-${channelStatus.configId}`}>
+          {props.notificationItem.status_list.map((channelStatus) => (
+            <div key={`channel-card-${channelStatus.config_id}`}>
               <EuiSpacer size="s" />
               <ChannelCard channel={channelStatus} onClose={props.onClose} />
             </div>

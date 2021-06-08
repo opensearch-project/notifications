@@ -51,7 +51,6 @@ interface NotificationsHistogramProps {
 }
 
 export function NotificationsHistogram(props: NotificationsHistogramProps) {
-  console.log('props', props);
   const formatter = timeFormatter(niceTimeFormatByDay(1));
   return (
     <>

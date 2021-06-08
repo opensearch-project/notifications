@@ -41,9 +41,9 @@ export function configRoutes(router: IRouter) {
     },
     async (context, request, response) => {
       const config_type = joinRequestParams(request.query.config_type);
-      const featureStr = joinRequestParams(request.query.feature_list);
-      const feature_list = featureStr ? { feature_list: featureStr } : {};
-      const query = request.query.query ? { query: request.query.query } : {};
+      const feature_list = joinRequestParams(request.query.feature_list);
+      const query = request.query.query;
+      // @ts-ignore
       const client: ILegacyScopedClusterClient = context.notificationsContext.notificationsClient.asScoped(
         request
       );
@@ -57,8 +57,8 @@ export function configRoutes(router: IRouter) {
             sort_field: request.query.sort_field,
             sort_order: request.query.sort_order,
             config_type,
-            ...feature_list,
-            ...query,
+            ...(feature_list && { feature_list }),
+            ...(query && { query }),
           }
         );
         return response.ok({ body: resp });
@@ -81,6 +81,7 @@ export function configRoutes(router: IRouter) {
       },
     },
     async (context, request, response) => {
+      // @ts-ignore
       const client: ILegacyScopedClusterClient = context.notificationsContext.notificationsClient.asScoped(
         request
       );
@@ -107,6 +108,7 @@ export function configRoutes(router: IRouter) {
       },
     },
     async (context, request, response) => {
+      // @ts-ignore
       const client: ILegacyScopedClusterClient = context.notificationsContext.notificationsClient.asScoped(
         request
       );
@@ -136,6 +138,7 @@ export function configRoutes(router: IRouter) {
       },
     },
     async (context, request, response) => {
+      // @ts-ignore
       const client: ILegacyScopedClusterClient = context.notificationsContext.notificationsClient.asScoped(
         request
       );
@@ -170,6 +173,7 @@ export function configRoutes(router: IRouter) {
       },
     },
     async (context, request, response) => {
+      // @ts-ignore
       const client: ILegacyScopedClusterClient = context.notificationsContext.notificationsClient.asScoped(
         request
       );
