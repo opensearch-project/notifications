@@ -24,47 +24,123 @@
  * permissions and limitations under the License.
  */
 
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
+import { configure } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
 import React from 'react';
+import ReactDOM from 'react-dom';
+import { act } from 'react-dom/test-utils';
 import { RouteComponentProps } from 'react-router-dom';
-import { coreServicesMock } from '../../../../test/mocks/serviceMock';
+import { MOCK_CONFIG } from '../../../../test/mocks/mockData';
+import {
+  coreServicesMock,
+  notificationServiceMock,
+} from '../../../../test/mocks/serviceMock';
 import { CoreServicesContext } from '../../../components/coreServices';
+import { ServicesContext } from '../../../services';
 import { ChannelDetails } from '../components/details/ChannelDetails';
 
 describe('<ChannelDetails/> spec', () => {
+  configure({ adapter: new Adapter() });
+
   it('renders the component', () => {
     const props = { match: { params: { id: 'test' } } };
     const utils = render(
-      <CoreServicesContext.Provider value={coreServicesMock}>
-        <ChannelDetails {...(props as RouteComponentProps<{ id: string }>)} />
-      </CoreServicesContext.Provider>
+      <ServicesContext.Provider value={notificationServiceMock}>
+        <CoreServicesContext.Provider value={coreServicesMock}>
+          <ChannelDetails {...(props as RouteComponentProps<{ id: string }>)} />
+        </CoreServicesContext.Provider>
+      </ServicesContext.Provider>
     );
-    expect(utils.container.firstChild).toMatchSnapshot();
-  });
-
-  it('clicks delete button', () => {
-    const props = { match: { params: { id: 'test' } } };
-    const utils = render(
-      <CoreServicesContext.Provider value={coreServicesMock}>
-        <ChannelDetails {...(props as RouteComponentProps<{ id: string }>)} />
-      </CoreServicesContext.Provider>
-    );
-
-    const button = utils.getByText('Delete');
-    fireEvent.click(button);
     expect(utils.container.firstChild).toMatchSnapshot();
   });
 
   it('clicks mute or unmute button', () => {
     const props = { match: { params: { id: 'test' } } };
     const utils = render(
-      <CoreServicesContext.Provider value={coreServicesMock}>
-        <ChannelDetails {...(props as RouteComponentProps<{ id: string }>)} />
-      </CoreServicesContext.Provider>
+      <ServicesContext.Provider value={notificationServiceMock}>
+        <CoreServicesContext.Provider value={coreServicesMock}>
+          <ChannelDetails {...(props as RouteComponentProps<{ id: string }>)} />
+        </CoreServicesContext.Provider>
+      </ServicesContext.Provider>
     );
 
     const button = utils.getByText('ute channel', { exact: false });
     fireEvent.click(button);
     expect(utils.container.firstChild).toMatchSnapshot();
+  });
+
+  it('renders a specific channel', async () => {
+    const props = { match: { params: { id: 'test' } } };
+    const notificationServiceMock = jest.fn() as any;
+    notificationServiceMock.notificationService = {
+      getChannel: async (id: string) => {
+        return MOCK_CONFIG.chime;
+      },
+    };
+    let container = document.createElement('div');
+
+    act(() => {
+      ReactDOM.render(
+        <ServicesContext.Provider value={notificationServiceMock}>
+          <CoreServicesContext.Provider value={coreServicesMock}>
+            <ChannelDetails
+              {...(props as RouteComponentProps<{ id: string }>)}
+            />
+          </CoreServicesContext.Provider>
+        </ServicesContext.Provider>,
+        container
+      );
+    });
+    await waitFor(() => {
+      expect(container).toMatchSnapshot();
+    });
+  });
+
+  it('clicks mute button with channel', async () => {
+    const props = { match: { params: { id: 'test' } } };
+    const notificationServiceMock = jest.fn() as any;
+    notificationServiceMock.notificationService = {
+      getChannel: async (id: string) => {
+        return MOCK_CONFIG.chime;
+      },
+      updateConfig: jest.fn(),
+    };
+
+    const utils = render(
+      <ServicesContext.Provider value={notificationServiceMock}>
+        <CoreServicesContext.Provider value={coreServicesMock}>
+          <ChannelDetails {...(props as RouteComponentProps<{ id: string }>)} />
+        </CoreServicesContext.Provider>
+      </ServicesContext.Provider>
+    );
+
+    await waitFor(() => {
+      utils.getByTestId('channel-details-mute-button').click();
+    });
+  });
+
+  it('clicks unmute button with channel', async () => {
+    const props = { match: { params: { id: 'test' } } };
+    const notificationServiceMock = jest.fn() as any;
+    const updateConfig = jest.fn(async () => Promise.resolve());
+    notificationServiceMock.notificationService = {
+      getChannel: async (id: string) => {
+        return MOCK_CONFIG.slack;
+      },
+      updateConfig,
+    };
+
+    const utils = render(
+      <ServicesContext.Provider value={notificationServiceMock}>
+        <CoreServicesContext.Provider value={coreServicesMock}>
+          <ChannelDetails {...(props as RouteComponentProps<{ id: string }>)} />
+        </CoreServicesContext.Provider>
+      </ServicesContext.Provider>
+    );
+
+    await waitFor(() => {
+      utils.getByTestId('channel-details-mute-button').click();
+    });
   });
 });

@@ -38,24 +38,27 @@ import {
   EuiText,
 } from '@elastic/eui';
 import React, { useContext } from 'react';
+import { SERVER_DELAY } from '../../../../../common';
 import { ChannelItemType } from '../../../../../models/interfaces';
 import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 
 interface MuteChannelModalProps extends ModalRootProps {
-  channels: ChannelItemType[];
+  selected: ChannelItemType[];
+  setSelected: (items: ChannelItemType[]) => void;
+  refresh?: () => void;
   onClose: () => void;
 }
 
 export const MuteChannelModal = (props: MuteChannelModalProps) => {
-  if (props.channels.length !== 1) return null;
+  if (props.selected.length !== 1) return null;
 
   const coreContext = useContext(CoreServicesContext)!;
   return (
     <EuiOverlayMask>
       <EuiModal onClose={props.onClose} maxWidth={500}>
         <EuiModalHeader>
-          <EuiModalHeaderTitle>{`Mute ${props.channels[0].name}?`}</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>{`Mute ${props.selected[0].name}?`}</EuiModalHeaderTitle>
         </EuiModalHeader>
         <EuiModalBody>
           <EuiText>
@@ -71,10 +74,23 @@ export const MuteChannelModal = (props: MuteChannelModalProps) => {
             <EuiFlexItem grow={false}>
               <EuiButton
                 fill
-                onClick={() => {
-                  coreContext.notifications.toasts.addSuccess(
-                    `Channel ${props.channels[0].name} successfully muted.`
-                  );
+                onClick={async () => {
+                  const channel = { ...props.selected[0], is_enabled: false };
+                  await props.services.notificationService
+                    .updateConfig(channel.config_id, channel)
+                    .then((resp) => {
+                      coreContext.notifications.toasts.addSuccess(
+                        `Channel ${channel.name} successfully muted.`
+                      );
+                      props.setSelected([channel]);
+                      if (props.refresh)
+                        setTimeout(() => props.refresh!(), SERVER_DELAY);
+                    })
+                    .catch((error) => {
+                      coreContext.notifications.toasts.addError(error, {
+                        title: 'Failed to mute channel',
+                      });
+                    });
                   props.onClose();
                 }}
               >

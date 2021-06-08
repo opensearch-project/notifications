@@ -49,7 +49,7 @@ export function DetailsListModal(props: DetailsListModalProps) {
   return (
     <>
       <EuiOverlayMask>
-        <EuiModal onClose={props.onClose} maxWidth={1000}>
+        <EuiModal onClose={props.onClose} maxWidth={800}>
           <EuiModalHeader>
             <EuiModalHeaderTitle>{props.header}</EuiModalHeaderTitle>
           </EuiModalHeader>

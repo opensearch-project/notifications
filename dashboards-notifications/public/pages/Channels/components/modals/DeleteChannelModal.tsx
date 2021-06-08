@@ -40,23 +40,25 @@ import {
   EuiText,
 } from '@elastic/eui';
 import React, { useContext, useState } from 'react';
+import { SERVER_DELAY } from '../../../../../common';
 import { ChannelItemType } from '../../../../../models/interfaces';
 import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 
 interface DeleteChannelModalProps extends ModalRootProps {
-  channels: ChannelItemType[];
+  selected: ChannelItemType[];
+  refresh?: () => void;
   href?: string;
   onClose: () => void;
 }
 
 export const DeleteChannelModal = (props: DeleteChannelModalProps) => {
-  if (!props.channels.length) return null;
+  if (!props.selected.length) return null;
 
   const coreContext = useContext(CoreServicesContext)!;
   const [input, setInput] = useState('');
-  const num = props.channels.length;
-  const name = num >= 2 ? `${num} channels` : props.channels[0].name;
+  const num = props.selected.length;
+  const name = num >= 2 ? `${num} channels` : props.selected[0].name;
   const message = `Delete ${
     num >= 2 ? 'the following channels' : name
   } permanently? Any notify actions will no longer be able to send notifications using ${
@@ -74,7 +76,7 @@ export const DeleteChannelModal = (props: DeleteChannelModalProps) => {
           {num >= 2 && (
             <>
               <EuiSpacer />
-              {props.channels.map((channel, i) => (
+              {props.selected.map((channel, i) => (
                 <EuiText
                   key={`channel-list-item-${i}`}
                   style={{ marginLeft: 20 }}
@@ -103,16 +105,34 @@ export const DeleteChannelModal = (props: DeleteChannelModalProps) => {
               <EuiButton
                 fill
                 color="danger"
-                onClick={() => {
-                  coreContext.notifications.toasts.addSuccess(
-                    `${
-                      props.channels.length > 1
-                        ? props.channels.length + ' channels'
-                        : 'Channel ' + props.channels[0].name
-                    } successfully deleted.`
-                  );
-                  props.onClose();
-                  if (props.href) location.assign(props.href);
+                onClick={async () => {
+                  props.services.notificationService
+                    .deleteConfigs(
+                      props.selected.map((channel) => channel.config_id)
+                    )
+                    .then((resp) => {
+                      coreContext.notifications.toasts.addSuccess(
+                        `${
+                          props.selected.length > 1
+                            ? props.selected.length + ' channels'
+                            : 'Channel ' + props.selected[0].name
+                        } successfully deleted.`
+                      );
+                      props.onClose();
+                      if (props.href)
+                        setTimeout(
+                          () => location.assign(props.href!),
+                          SERVER_DELAY
+                        );
+                      else if (props.refresh)
+                        setTimeout(() => props.refresh!(), SERVER_DELAY);
+                    })
+                    .catch((error) => {
+                      coreContext.notifications.toasts.addError(error, {
+                        title: 'Failed to delete one or more channels.',
+                      });
+                      props.onClose();
+                    });
                 }}
                 disabled={input !== 'delete'}
               >
