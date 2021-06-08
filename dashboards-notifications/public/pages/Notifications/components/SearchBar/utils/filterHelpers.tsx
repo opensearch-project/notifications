@@ -29,7 +29,7 @@ import React from 'react';
 import {
   CHANNEL_TYPE,
   NOTIFICATION_SOURCE,
-  SEVERITY_TYPE
+  SEVERITY_TYPE,
 } from '../../../../../utils/constants';
 import { FilterType } from '../Filter/Filters';
 
@@ -127,7 +127,8 @@ export const getValueComponent = (
       label: value,
       value: key,
     }));
-  else if (field === 'Status') options = [{ label: 'Sent' }, { label: 'Error' }];
+  else if (field === 'Status')
+    options = [{ label: 'Sent' }, { label: 'Error' }];
 
   const singleSelection = isSingleSelection(operator);
   const placeholder = singleSelection ? 'Select a value' : 'Select values';
