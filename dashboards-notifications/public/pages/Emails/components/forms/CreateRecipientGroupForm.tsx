@@ -84,6 +84,7 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
       >
         <EuiFieldText
           fullWidth
+          data-test-subj="create-recipient-group-form-name-input"
           placeholder="Enter recipient group name"
           value={props.name}
           onChange={(e) => props.setName(e.target.value)}
@@ -112,6 +113,7 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
           </EuiText>
           <EuiTextArea
             fullWidth
+            data-test-subj="create-recipient-group-form-description-input"
             placeholder="What is the purpose of this recipient group?"
             style={{ height: '4.1rem' }}
             value={props.description}
@@ -133,6 +135,7 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
           </EuiText>
           <EuiComboBox
             placeholder="Email addresses"
+            data-test-subj="create-recipient-group-form-emails-input"
             fullWidth
             options={props.emailOptions}
             selectedOptions={props.selectedEmailOptions}

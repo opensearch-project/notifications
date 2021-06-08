@@ -36,8 +36,10 @@ import {
   EuiSuperSelectOption,
 } from '@elastic/eui';
 import React from 'react';
-import { ENCRYPTION_METHOD } from '../../../../../models/interfaces';
-import { DOCUMENTATION_LINK } from '../../../../utils/constants';
+import {
+  ALERTING_DOCUMENTATION_LINK,
+  ENCRYPTION_TYPE,
+} from '../../../../utils/constants';
 import {
   validateEmail,
   validateHost,
@@ -54,23 +56,19 @@ interface CreateSenderFormProps {
   setHost: (host: string) => void;
   port: string;
   setPort: (port: string) => void;
-  encryption: ENCRYPTION_METHOD;
-  setEncryption: (encryption: ENCRYPTION_METHOD) => void;
+  encryption: keyof typeof ENCRYPTION_TYPE;
+  setEncryption: (encryption: keyof typeof ENCRYPTION_TYPE) => void;
   inputErrors: { [key: string]: string[] };
   setInputErrors: (errors: { [key: string]: string[] }) => void;
 }
 
 export function CreateSenderForm(props: CreateSenderFormProps) {
-  const encryptionOptions: Array<EuiSuperSelectOption<ENCRYPTION_METHOD>> = [
-    {
-      value: 'SSL',
-      inputDisplay: 'SSL',
-    },
-    {
-      value: 'TSL',
-      inputDisplay: 'TSL',
-    },
-  ];
+  const encryptionOptions: Array<EuiSuperSelectOption<
+    keyof typeof ENCRYPTION_TYPE
+  >> = Object.entries(ENCRYPTION_TYPE).map(([key, value]) => ({
+    value: key as keyof typeof ENCRYPTION_TYPE,
+    inputDisplay: value,
+  }));
 
   return (
     <>
@@ -84,6 +82,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
         <EuiFieldText
           fullWidth
           placeholder="Enter sender name"
+          data-test-subj="create-sender-form-name-input"
           value={props.senderName}
           onChange={(e) => props.setSenderName(e.target.value)}
           isInvalid={props.inputErrors.senderName.length > 0}
@@ -106,6 +105,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
           >
             <EuiFieldText
               placeholder="name@example.com"
+              data-test-subj="create-sender-form-email-input"
               value={props.email}
               onChange={(e) => props.setEmail(e.target.value)}
               isInvalid={props.inputErrors.email.length > 0}
@@ -126,6 +126,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
           >
             <EuiFieldText
               placeholder="smtp.example.com"
+              data-test-subj="create-sender-form-host-input"
               value={props.host}
               onChange={(e) => props.setHost(e.target.value)}
               isInvalid={props.inputErrors.host.length > 0}
@@ -146,6 +147,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
           >
             <EuiFieldNumber
               placeholder="465"
+              data-test-subj="create-sender-form-port-input"
               value={props.port}
               onChange={(e) => props.setPort(e.target.value)}
               isInvalid={props.inputErrors.port.length > 0}
@@ -167,17 +169,21 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
         helpText={
           <div>
             SSL or TLS is recommended for security. To use either one, you must
-            add the following fields to the OpenSearch keystore on each node.{' '}
-            <EuiLink href={DOCUMENTATION_LINK} target="_blank" external>Learn more</EuiLink>
-            <br />
-            opendistro.alerting.destination.mail.adminTest.username: [username]
-            <br />
-            opendistro.alerting.destination.mail.adminTest.password: [password]
+            enter each sender account's credentials to the Elasticsearch
+            keystore using the CLI.{' '}
+            <EuiLink
+              href={ALERTING_DOCUMENTATION_LINK}
+              target="_blank"
+              external
+            >
+              Learn more
+            </EuiLink>
           </div>
         }
       >
         <EuiSuperSelect
           fullWidth
+          data-test-subj="create-sender-form-encryption-input"
           options={encryptionOptions}
           valueOfSelected={props.encryption}
           onChange={props.setEncryption}

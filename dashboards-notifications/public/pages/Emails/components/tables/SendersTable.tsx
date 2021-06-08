@@ -35,6 +35,7 @@ import {
 } from '@elastic/eui';
 import { Criteria } from '@elastic/eui/src/components/basic_table/basic_table';
 import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_bar';
+import _ from 'lodash';
 import React, { Component } from 'react';
 import { SORT_DIRECTION } from '../../../../../common';
 import { SenderItemType, TableState } from '../../../../../models/interfaces';
@@ -44,7 +45,7 @@ import {
 } from '../../../../components/ContentPanel';
 import { ModalConsumer } from '../../../../components/Modal';
 import { ServicesContext } from '../../../../services';
-import { ROUTES } from '../../../../utils/constants';
+import { ENCRYPTION_TYPE, ROUTES } from '../../../../utils/constants';
 import { getErrorMessage } from '../../../../utils/helpers';
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '../../../Notifications/utils/constants';
 import { DeleteSenderModal } from '../modals/DeleteSenderModal';
@@ -84,50 +85,72 @@ export class SendersTable extends Component<
         width: '200px',
       },
       {
-        field: 'from',
+        field: 'smtp_account.from_address',
         name: 'Outbound email address',
         sortable: true,
         truncateText: true,
         width: '200px',
       },
       {
-        field: 'host',
+        field: 'smtp_account.host',
         name: 'Host',
         sortable: true,
         truncateText: true,
         width: '200px',
       },
       {
-        field: 'port',
+        field: 'smtp_account.port',
         name: 'Port',
-        sortable: true,
+        sortable: false,
         truncateText: true,
         width: '200px',
       },
       {
-        field: 'method',
+        field: 'smtp_account.method',
         name: 'Encryption method',
         sortable: true,
         truncateText: true,
         width: '200px',
+        render: (method: string) => _.get(ENCRYPTION_TYPE, method, '-'),
       },
     ];
+    this.refresh = this.refresh.bind(this);
   }
 
   async componentDidMount() {
+    await this.refresh();
+  }
+
+  async componentDidUpdate(
+    prevProps: SendersTableProps,
+    prevState: SendersTableState
+  ) {
+    const prevQuery = SendersTable.getQueryObjectFromState(prevState);
+    const currQuery = SendersTable.getQueryObjectFromState(this.state);
+    if (!_.isEqual(prevQuery, currQuery)) {
+      await this.refresh();
+    }
+  }
+
+  static getQueryObjectFromState(state: SendersTableState) {
+    return {
+      from_index: state.from,
+      max_items: state.size,
+      query: state.search,
+      config_type: 'smtp_account',
+      sort_field: state.sortField,
+      sort_order: state.sortDirection,
+    };
+  }
+
+  async refresh() {
     this.setState({ loading: true });
     try {
-      const queryObject = {
-        from: this.state.from,
-        size: this.state.size,
-        search: this.state.search,
-        sortField: this.state.sortField,
-        sortDirection: this.state.sortDirection,
-      };
+      const queryObject = SendersTable.getQueryObjectFromState(this.state);
       const senders = await this.context.notificationService.getSenders(
         queryObject
       );
-      this.setState({ items: senders, total: senders.length });
+      this.setState({ items: senders.items, total: senders.total });
     } catch (error) {
       this.context.notifications.toasts.addDanger(
         getErrorMessage(error, 'There was a problem loading senders.')
@@ -149,42 +172,25 @@ export class SendersTable extends Component<
     this.setState({ selectedItems });
   };
 
-  onSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    this.setState({ from: 0, search: e.target.value });
-  };
-
-  onPageChange = (page: number): void => {
-    const { size } = this.state;
-    this.setState({ from: page * size });
+  onSearchChange = (search: string): void => {
+    this.setState({ from: 0, search });
   };
 
   render() {
-    const {
-      total,
-      from,
-      size,
-      search,
-      sortField,
-      sortDirection,
-      selectedItems,
-      items,
-      loading,
-    } = this.state;
-
-    const filterIsApplied = !!search;
-    const page = Math.floor(from / size);
+    const filterIsApplied = !!this.state.search;
+    const page = Math.floor(this.state.from / this.state.size);
 
     const pagination: Pagination = {
       pageIndex: page,
-      pageSize: size,
+      pageSize: this.state.size,
       pageSizeOptions: DEFAULT_PAGE_SIZE_OPTIONS,
-      totalItemCount: total,
+      totalItemCount: this.state.total,
     };
 
     const sorting: EuiTableSortingType<SenderItemType> = {
       sort: {
-        direction: sortDirection,
-        field: sortField,
+        direction: this.state.sortDirection,
+        field: this.state.sortField,
       },
     };
 
@@ -208,6 +214,7 @@ export class SendersTable extends Component<
                           onClick={() =>
                             onShow(DeleteSenderModal, {
                               senders: this.state.selectedItems,
+                              refresh: this.refresh,
                             })
                           }
                         >
@@ -223,7 +230,7 @@ export class SendersTable extends Component<
                       disabled={this.state.selectedItems.length !== 1}
                       onClick={() =>
                         location.assign(
-                          `#${ROUTES.EDIT_SENDER}/${this.state.selectedItems[0]?.id}`
+                          `#${ROUTES.EDIT_SENDER}/${this.state.selectedItems[0]?.config_id}`
                         )
                       }
                     >
@@ -249,15 +256,14 @@ export class SendersTable extends Component<
           <EuiFieldSearch
             fullWidth={true}
             placeholder="Search"
-            onChange={this.onSearchChange}
-            value={search}
+            onSearch={this.onSearchChange}
           />
           <EuiHorizontalRule margin="s" />
 
           <EuiBasicTable
             columns={this.columns}
-            items={items}
-            itemId="name"
+            items={this.state.items}
+            itemId="config_id"
             isSelectable={true}
             selection={selection}
             noItemsMessage={
@@ -265,7 +271,7 @@ export class SendersTable extends Component<
                 title={<h2>No senders to display</h2>}
                 body="Set up an outbound email server by creating a sender. You will select a sender when configuring email channels."
                 actions={
-                  <EuiButton href={`#${ROUTES.CREATE_CHANNEL}`}>
+                  <EuiButton href={`#${ROUTES.CREATE_SENDER}`}>
                     Create sender
                   </EuiButton>
                 }
@@ -274,6 +280,7 @@ export class SendersTable extends Component<
             onChange={this.onTableChange}
             pagination={pagination}
             sorting={sorting}
+            loading={this.state.loading}
           />
         </ContentPanel>
       </>

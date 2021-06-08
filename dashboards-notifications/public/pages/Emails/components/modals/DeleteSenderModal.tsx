@@ -40,12 +40,14 @@ import {
   EuiText,
 } from '@elastic/eui';
 import React, { useContext, useState } from 'react';
+import { SERVER_DELAY } from '../../../../../common';
 import { SenderItemType } from '../../../../../models/interfaces';
 import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 
 interface DeleteSenderModalProps extends ModalRootProps {
   senders: SenderItemType[];
+  refresh: () => void;
   onClose: () => void;
 }
 
@@ -102,15 +104,28 @@ export const DeleteSenderModal = (props: DeleteSenderModalProps) => {
               <EuiButton
                 fill
                 color="danger"
-                onClick={() => {
-                  coreContext.notifications.toasts.addSuccess(
-                    `${
-                      props.senders.length > 1
-                        ? props.senders.length + ' senders'
-                        : 'Sender ' + props.senders[0].name
-                    } successfully deleted.`
-                  );
-                  props.onClose();
+                onClick={async () => {
+                  props.services.notificationService
+                    .deleteConfigs(
+                      props.senders.map((sender) => sender.config_id)
+                    )
+                    .then((resp) => {
+                      coreContext.notifications.toasts.addSuccess(
+                        `${
+                          props.senders.length > 1
+                            ? props.senders.length + ' senders'
+                            : 'Sender ' + props.senders[0].name
+                        } successfully deleted.`
+                      );
+                      props.onClose();
+                      setTimeout(() => props.refresh(), SERVER_DELAY);
+                    })
+                    .catch((error) => {
+                      coreContext.notifications.toasts.addError(error, {
+                        title: 'Failed to delete one or more senders.',
+                      });
+                      props.onClose();
+                    });
                 }}
                 disabled={input !== 'delete'}
               >
