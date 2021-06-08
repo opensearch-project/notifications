@@ -36,6 +36,7 @@ import org.opensearch.commons.authuser.User
 import org.opensearch.commons.notifications.action.GetPluginFeaturesRequest
 import org.opensearch.commons.notifications.action.GetPluginFeaturesResponse
 import org.opensearch.commons.notifications.action.NotificationsActions
+import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.utils.recreateObject
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
@@ -77,6 +78,20 @@ internal class GetPluginFeaturesAction @Inject constructor(
         request: GetPluginFeaturesRequest,
         user: User?
     ): GetPluginFeaturesResponse {
-        TODO()
+        // TODO: #130 Integrate with SPI to return features from config
+        return GetPluginFeaturesResponse(
+            listOf(
+                ConfigType.SLACK.tag,
+                ConfigType.CHIME.tag,
+                ConfigType.WEBHOOK.tag,
+                ConfigType.EMAIL.tag,
+                ConfigType.SMTP_ACCOUNT.tag,
+                ConfigType.EMAIL_GROUP.tag
+            ),
+            mapOf(
+                Pair("tooltip_support", "true"),
+                Pair("email_size_limit", "10000000")
+            )
+        )
     }
 }
