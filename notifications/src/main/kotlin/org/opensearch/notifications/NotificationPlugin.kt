@@ -49,6 +49,7 @@ import org.opensearch.notifications.action.DeleteNotificationConfigAction
 import org.opensearch.notifications.action.GetFeatureChannelListAction
 import org.opensearch.notifications.action.GetNotificationConfigAction
 import org.opensearch.notifications.action.GetNotificationEventAction
+import org.opensearch.notifications.action.GetPluginFeaturesAction
 import org.opensearch.notifications.action.SendMessageAction
 import org.opensearch.notifications.action.SendNotificationAction
 import org.opensearch.notifications.action.UpdateNotificationConfigAction
@@ -58,6 +59,8 @@ import org.opensearch.notifications.index.NotificationConfigIndex
 import org.opensearch.notifications.index.NotificationEventIndex
 import org.opensearch.notifications.resthandler.NotificationConfigRestHandler
 import org.opensearch.notifications.resthandler.NotificationEventRestHandler
+import org.opensearch.notifications.resthandler.NotificationFeatureChannelListRestHandler
+import org.opensearch.notifications.resthandler.NotificationFeaturesRestHandler
 import org.opensearch.notifications.resthandler.SendMessageRestHandler
 import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.settings.PluginSettings
@@ -155,6 +158,10 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
                 GetFeatureChannelListAction::class.java
             ),
             ActionPlugin.ActionHandler(
+                NotificationsActions.GET_PLUGIN_FEATURES_ACTION_TYPE,
+                GetPluginFeaturesAction::class.java
+            ),
+            ActionPlugin.ActionHandler(
                 NotificationsActions.SEND_NOTIFICATION_ACTION_TYPE,
                 SendNotificationAction::class.java
             )
@@ -177,7 +184,9 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
         return listOf(
             SendMessageRestHandler(),
             NotificationConfigRestHandler(),
-            NotificationEventRestHandler()
+            NotificationEventRestHandler(),
+            NotificationFeaturesRestHandler(),
+            NotificationFeatureChannelListRestHandler()
         )
     }
 }
