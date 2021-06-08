@@ -24,70 +24,201 @@
  * permissions and limitations under the License.
  */
 
-import { EuiSearchBar } from '@elastic/eui';
-import { FieldValueSelectionFilterConfigType } from '@elastic/eui/src/components/search_bar/filters/field_value_selection_filter';
-import React from 'react';
-import { CHANNEL_TYPE } from '../../../../public/utils/constants';
+import {
+  EuiFieldSearch,
+  EuiFilterButton,
+  EuiFilterGroup,
+  EuiFilterSelectItem,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiPopover,
+} from '@elastic/eui';
+import _ from 'lodash';
+import React, { useState } from 'react';
+import {
+  CHANNEL_TYPE,
+  NOTIFICATION_SOURCE,
+} from '../../../../public/utils/constants';
+import { ChannelFiltersType } from '../types';
 
 interface ChannelControlsProps {
   search: string;
   onSearchChange: (search: string) => void;
+  filters: ChannelFiltersType;
+  onFiltersChange: (filters: ChannelFiltersType) => void;
 }
 
 export const ChannelControls = (props: ChannelControlsProps) => {
-  const filters: FieldValueSelectionFilterConfigType[] = [
-    {
-      type: 'field_value_selection',
-      name: 'State',
-      field: 'enabled',
-      multiSelect: false,
-      options: [
-        { name: 'Active', value: true },
-        { name: 'Muted', value: false },
-      ],
-    },
-    {
-      type: 'field_value_selection',
-      name: 'Type',
-      field: 'type',
-      multiSelect: 'or',
-      options: [
-        { name: CHANNEL_TYPE.SLACK, value: 'slack' },
-        { name: CHANNEL_TYPE.EMAIL, value: 'email' },
-        { name: CHANNEL_TYPE.CHIME, value: 'chime' },
-        { name: CHANNEL_TYPE.CUSTOM_WEBHOOK, value: 'custom_webhook' },
-        { name: CHANNEL_TYPE.SES, value: 'ses' },
-        { name: CHANNEL_TYPE.SNS, value: 'sns' },
-      ],
-    },
-    {
-      type: 'field_value_selection',
-      name: 'Source',
-      field: 'source',
-      multiSelect: 'or',
-      options: [
-        { name: 'Alerting', value: 'alerting' },
-        { name: 'Reporting', value: 'reporting' },
-        { name: 'ISM', value: 'ISM' },
-      ],
-    },
-  ];
+  const [isStatePopoverOpen, setIsStatePopoverOpen] = useState(false);
+  const [stateItems, setStateItems] = useState([
+    { field: 'true', display: 'Active', checked: 'off' },
+    { field: 'false', display: 'Muted', checked: 'off' },
+  ]);
+  const [isTypePopoverOpen, setIsTypePopoverOpen] = useState(false);
+  const [typeItems, setTypeItems] = useState(
+    Object.entries(CHANNEL_TYPE).map(([key, value]) => ({
+      field: key,
+      display: value,
+      checked: 'off',
+    }))
+  );
+  const [isSourcePopoverOpen, setIsSourcePopoverOpen] = useState(false);
+  const [sourceItems, setSourceItems] = useState(
+    Object.entries(NOTIFICATION_SOURCE).map(([key, value]) => ({
+      field: key,
+      display: value,
+      checked: 'off',
+    }))
+  );
+
+  function updateItem(
+    items: Array<{ field: string; display: string; checked: string }>,
+    index: number,
+    type: 'state' | 'type' | 'source',
+    singleSelect?: boolean
+  ) {
+    if (!items[index]) return;
+    const newItems = [...items];
+    if (singleSelect) {
+      const checked = newItems[index].checked === 'off' ? 'on' : 'off';
+      newItems.forEach((item, i) => (item.checked = 'off'));
+      newItems[index].checked = checked;
+    } else {
+      newItems[index].checked =
+        newItems[index].checked === 'off' ? 'on' : 'off';
+    }
+
+    const newFilters = _.clone(props.filters);
+    const checkedItems = newItems
+      .filter((item) => item.checked === 'on')
+      .map((item) => item.field);
+
+    switch (type) {
+      case 'state':
+        setStateItems(newItems);
+        newFilters.state = checkedItems[0];
+        break;
+      case 'source':
+        setSourceItems(newItems);
+        newFilters.source = checkedItems;
+        break;
+      case 'type':
+        setTypeItems(newItems);
+        newFilters.type = checkedItems;
+        break
+      default:
+        break;
+    }
+    props.onFiltersChange(newFilters);
+  }
+
+  function isItemSelected(
+    items: Array<{ field: string; display: string; checked: string }>
+  ) {
+    return items
+      .map((item) => item.checked === 'on')
+      .reduce((flag, curr) => flag || curr, false);
+  }
 
   return (
-    <EuiSearchBar
-      defaultQuery={EuiSearchBar.Query.MATCH_ALL}
-      box={{
-        placeholder: 'Search',
-        incremental: false,
-      }}
-      filters={filters}
-      onChange={(args) => {
-        if (args.query) {
-          console.log(EuiSearchBar.Query.toESQuery(args.query));
-          console.log(EuiSearchBar.Query.toESQueryString(args.query));
-          props.onSearchChange(EuiSearchBar.Query.toESQueryString(args.query));
-        }
-      }}
-    />
+    <EuiFlexGroup>
+      <EuiFlexItem>
+        <EuiFieldSearch
+          fullWidth={true}
+          placeholder="Search"
+          onSearch={(search) => props.onSearchChange(search)}
+        />
+      </EuiFlexItem>
+
+      <EuiFlexItem grow={false}>
+        <EuiFilterGroup>
+          <EuiPopover
+            button={
+              <EuiFilterButton
+                iconType="arrowDown"
+                grow={false}
+                onClick={() => setIsStatePopoverOpen(!isStatePopoverOpen)}
+              >
+                {isItemSelected(stateItems) ? <b>Status</b> : 'Status'}
+              </EuiFilterButton>
+            }
+            isOpen={isStatePopoverOpen}
+            closePopover={() => setIsStatePopoverOpen(false)}
+            panelPaddingSize="none"
+          >
+            {stateItems.map((item, index) => {
+              return (
+                <EuiFilterSelectItem
+                  key={`channel-state-filter-${index}`}
+                  checked={item.checked === 'on' ? 'on' : undefined}
+                  onClick={() => {
+                    updateItem(stateItems, index, 'state', true);
+                    setIsStatePopoverOpen(false);
+                  }}
+                >
+                  {item.display}
+                </EuiFilterSelectItem>
+              );
+            })}
+          </EuiPopover>
+          <EuiPopover
+            button={
+              <EuiFilterButton
+                iconType="arrowDown"
+                grow={false}
+                onClick={() => setIsTypePopoverOpen(!isTypePopoverOpen)}
+              >
+                {isItemSelected(typeItems) ? <b>Type</b> : 'Type'}
+              </EuiFilterButton>
+            }
+            isOpen={isTypePopoverOpen}
+            closePopover={() => setIsTypePopoverOpen(false)}
+            panelPaddingSize="none"
+          >
+            {typeItems.map((item, index) => {
+              return (
+                <EuiFilterSelectItem
+                  key={`channel-type-filter-${index}`}
+                  checked={item.checked === 'on' ? 'on' : undefined}
+                  onClick={() =>
+                    updateItem(typeItems, index, 'type')
+                  }
+                >
+                  {item.display}
+                </EuiFilterSelectItem>
+              );
+            })}
+          </EuiPopover>
+          <EuiPopover
+            button={
+              <EuiFilterButton
+                iconType="arrowDown"
+                grow={false}
+                onClick={() => setIsSourcePopoverOpen(!isSourcePopoverOpen)}
+              >
+                {isItemSelected(sourceItems) ? <b>Source</b> : 'Source'}
+              </EuiFilterButton>
+            }
+            isOpen={isSourcePopoverOpen}
+            closePopover={() => setIsSourcePopoverOpen(false)}
+            panelPaddingSize="none"
+          >
+            {sourceItems.map((item, index) => {
+              return (
+                <EuiFilterSelectItem
+                  key={`channel-source-filter-${index}`}
+                  checked={item.checked === 'on' ? 'on' : undefined}
+                  onClick={() =>
+                    updateItem(sourceItems, index, 'source')
+                  }
+                >
+                  {item.display}
+                </EuiFilterSelectItem>
+              );
+            })}
+          </EuiPopover>
+        </EuiFilterGroup>
+      </EuiFlexItem>
+    </EuiFlexGroup>
   );
 };

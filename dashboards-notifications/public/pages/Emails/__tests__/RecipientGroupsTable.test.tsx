@@ -13,7 +13,7 @@ import { fireEvent, render, waitFor } from '@testing-library/react';
 import { configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import React from 'react';
-import { MOCK_CONFIG } from '../../../../test/mocks/mockData';
+import { MOCK_DATA } from '../../../../test/mocks/mockData';
 import {
   coreServicesMock,
   notificationServiceMock,
@@ -39,7 +39,7 @@ describe('<RecipientGroupsTable /> spec', () => {
   it('renders table', async () => {
     const notificationServiceMock = jest.fn() as any;
     const getRecipientGroups = jest.fn(
-      async (queryObject: object) => MOCK_CONFIG.recipientGroups
+      async (queryObject: object) => MOCK_DATA.recipientGroups
     );
     notificationServiceMock.notificationService = { getRecipientGroups };
 

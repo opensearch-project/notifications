@@ -51,10 +51,10 @@ export function EmailGroups(props: EmailGroupsProps) {
       </EuiTitle>
 
       <EuiSpacer />
-      <SendersTable />
+      <SendersTable coreContext={coreContext} />
 
       <EuiSpacer />
-      <RecipientGroupsTable />
+      <RecipientGroupsTable coreContext={coreContext} />
     </>
   );
 }

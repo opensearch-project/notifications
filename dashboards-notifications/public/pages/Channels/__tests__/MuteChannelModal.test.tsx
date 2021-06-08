@@ -24,7 +24,7 @@
  * permissions and limitations under the License.
  */
 
-import { MOCK_CONFIG } from '../../../../test/mocks/mockData';
+import { MOCK_DATA } from '../../../../test/mocks/mockData';
 import { act, render, waitFor } from '@testing-library/react';
 import React from 'react';
 import {
@@ -76,7 +76,7 @@ describe('<MuteChannelModal /> spec', () => {
     const utils = render(
       <CoreServicesContext.Provider value={coreServicesMock}>
         <MuteChannelModal
-          selected={[MOCK_CONFIG.chime]}
+          selected={[MOCK_DATA.chime]}
           setSelected={setSelected}
           onClose={() => {}}
           refresh={jest.fn()}
@@ -99,7 +99,7 @@ describe('<MuteChannelModal /> spec', () => {
     const utils = render(
       <CoreServicesContext.Provider value={coreServicesMock}>
         <MuteChannelModal
-          selected={[MOCK_CONFIG.chime]}
+          selected={[MOCK_DATA.chime]}
           setSelected={setSelected}
           onClose={() => {}}
           services={notificationServiceMock}
