@@ -30,7 +30,6 @@ import org.apache.lucene.search.join.ScoreMode
 import org.opensearch.OpenSearchStatusException
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_NAME_TAG
-import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TAG
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TYPE_TAG
 import org.opensearch.commons.notifications.NotificationConstants.CREATED_TIME_TAG
 import org.opensearch.commons.notifications.NotificationConstants.DELIVERY_STATUS_TAG
@@ -100,8 +99,8 @@ object EventQueryHelper {
         } else {
             when {
                 METADATA_RANGE_FIELDS.contains(sortField) -> "$METADATA_TAG.$sortField"
-                KEYWORD_FIELDS.contains(sortField) -> "$CONFIG_TAG.$sortField"
-                TEXT_FIELDS.contains(sortField) -> "$CONFIG_TAG.$sortField.keyword"
+                KEYWORD_FIELDS.contains(sortField) -> "$KEY_PREFIX.$sortField"
+                TEXT_FIELDS.contains(sortField) -> "$KEY_PREFIX.$sortField.keyword"
                 else -> throw OpenSearchStatusException("Sort on $sortField not acceptable", RestStatus.NOT_ACCEPTABLE)
             }
         }
