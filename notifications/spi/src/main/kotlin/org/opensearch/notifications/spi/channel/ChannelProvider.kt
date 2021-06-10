@@ -28,7 +28,7 @@
 package org.opensearch.notifications.spi.channel
 
 import org.opensearch.notifications.spi.message.BaseMessage
-import org.opensearch.notifications.spi.model.ChannelType
+import org.opensearch.notifications.spi.model.DestinationType
 
 /**
  * Interface for channel provider for specific recipient depending on its type.
@@ -40,5 +40,5 @@ internal interface ChannelProvider {
      *                  e.g. "mailto:email@address.com"
      * @return Notification channel for sending notification for given recipient (depending on its type)
      */
-    fun getNotificationChannel(channelType: ChannelType): NotificationChannel<BaseMessage, *>
+    fun getNotificationChannel(destinationType: DestinationType): NotificationChannel<BaseMessage>
 }

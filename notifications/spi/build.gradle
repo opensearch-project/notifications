@@ -49,6 +49,9 @@ ext {
     noticeFile = rootProject.file('NOTICE')
 }
 
+configurations {
+    ktlint
+}
 
 jacoco {
     toolVersion = '0.8.5'
@@ -119,6 +122,7 @@ dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
     compile "org.apache.httpcomponents:httpcore:4.4.5"
     compile "org.apache.httpcomponents:httpclient:4.5.10"
+    ktlint "com.pinterest:ktlint:0.41.0"
     //TODO: Add it back and remove from main project(to avoid jarhell) when implementing Email functionality
 //    compile ("software.amazon.awssdk:ses:2.14.16") {
 //        exclude module: 'annotations' // conflict with org.jetbrains:annotations, integTestRunner fails with error "codebase property already set"
@@ -143,4 +147,23 @@ shadowJar {
     relocate 'org.apache.commons.logging', 'org.opensearch.notifications.repackage.org.apache.commons.logging'
     relocate 'org.apache.commons.codec', 'org.opensearch.notifications.repackage.org.apache.commons.codec'
     classifier = null
+}
+
+task ktlint(type: JavaExec, group: "verification") {
+    description = "Check Kotlin code style."
+    main = "com.pinterest.ktlint.Main"
+    classpath = configurations.ktlint
+    args "src/**/*.kt"
+    // to generate report in checkstyle format prepend following args:
+    // "--reporter=plain", "--reporter=checkstyle,output=${buildDir}/ktlint.xml"
+    // see https://github.com/pinterest/ktlint#usage for more
+}
+
+check.dependsOn ktlint
+
+task ktlintFormat(type: JavaExec, group: "formatting") {
+    description = "Fix Kotlin code style deviations."
+    main = "com.pinterest.ktlint.Main"
+    classpath = configurations.ktlint
+    args "-F", "src/**/*.kt"
 }

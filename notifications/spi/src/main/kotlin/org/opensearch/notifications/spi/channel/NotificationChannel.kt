@@ -33,7 +33,7 @@ import org.opensearch.notifications.spi.model.ChannelMessageResponse
 /**
  * Interface for sending notification message over a implemented channel.
  */
-internal interface NotificationChannel<T : BaseMessage, Y> {
+internal interface NotificationChannel<T : BaseMessage> {
     /**
      * Sending notification message over this channel.
      *
@@ -43,6 +43,4 @@ internal interface NotificationChannel<T : BaseMessage, Y> {
     fun sendMessage(
         message: T
     ): ChannelMessageResponse
-
-    fun getClient(message: T): Y?
 }

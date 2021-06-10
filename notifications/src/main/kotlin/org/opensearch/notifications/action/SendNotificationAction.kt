@@ -50,9 +50,10 @@ import org.opensearch.commons.utils.recreateObject
 import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.notifications.spi.Notification
 import org.opensearch.notifications.spi.message.BaseMessage
+import org.opensearch.notifications.spi.message.CustomWebhookMessage
 import org.opensearch.notifications.spi.message.WebhookMessage
 import org.opensearch.notifications.spi.model.ChannelMessageResponse
-import org.opensearch.notifications.spi.model.ChannelType
+import org.opensearch.notifications.spi.model.DestinationType
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
@@ -132,31 +133,35 @@ internal class SendNotificationAction @Inject constructor(
         val configType = config.configType
         val configData = config.configData
         // convert to the the messageContent class that SPI accepts
+        val attachment = channelMessage.attachment
         val messageContent = MessageContent(
             channelMessage.textDescription,
             channelMessage.htmlDescription,
-            channelMessage.attachment?.let {
-                MessageContent.Attachment(
-                    it.fileName,
-                    it.fileEncoding,
-                    it.fileData,
-                    it.fileContentType
-                )
-            }
+            attachment?.fileName,
+            attachment?.fileEncoding,
+            attachment?.fileData,
+            attachment?.fileContentType
         )
 
         when (configType) {
             ConfigType.CHIME -> {
                 configData as Chime
-                return WebhookMessage(configData.url, null, title, ChannelType.Chime, messageContent, channelId)
+                return WebhookMessage(configData.url, title, DestinationType.Chime, messageContent, channelId)
             }
             ConfigType.SLACK -> {
                 configData as Slack
-                return WebhookMessage(configData.url, null, title, ChannelType.Slack, messageContent, channelId)
+                return WebhookMessage(configData.url, title, DestinationType.Slack, messageContent, channelId)
             }
             ConfigType.WEBHOOK -> {
                 configData as Webhook
-                return WebhookMessage(configData.url, configData.headerParams, title, ChannelType.Webhook, messageContent, channelId)
+                return CustomWebhookMessage(
+                    configData.url,
+                    title,
+                    DestinationType.Webhook,
+                    messageContent,
+                    channelId,
+                    configData.headerParams
+                )
             } else -> {
                 throw IllegalArgumentException("invalid config type")
             }

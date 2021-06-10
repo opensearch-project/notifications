@@ -27,4 +27,4 @@
 
 package org.opensearch.notifications.spi.model
 
-enum class ChannelType { None, Slack, Chime, Webhook, Email }
+enum class DestinationType { Slack, Chime, Webhook, Email }

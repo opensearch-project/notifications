@@ -33,13 +33,24 @@ import org.opensearch.notifications.spi.model.ChannelMessageResponse
 import java.security.AccessController
 import java.security.PrivilegedAction
 
+/**
+ * This is a client facing Notification class to send the messages
+ * to the Notification channels like chime, slack, webhooks, email etc
+ */
 class Notification private constructor() {
 
     companion object {
+        /**
+         * Send the notification message to the corresponding notification
+         * channel
+         *
+         * @param message
+         * @return ChannelMessageResponse
+         */
         fun sendMessage(message: BaseMessage): ChannelMessageResponse {
+            val channel = ChannelFactory.getNotificationChannel(message.configType)
             return AccessController.doPrivileged(
                 PrivilegedAction {
-                    val channel = ChannelFactory.getNotificationChannel(message.configType)
                     channel.sendMessage(message)
                 } as PrivilegedAction<ChannelMessageResponse>?
             )

@@ -29,16 +29,15 @@ package org.opensearch.notifications.spi.message
 
 import org.apache.http.client.utils.URIBuilder
 import org.opensearch.common.Strings
-import org.opensearch.notifications.spi.model.ChannelType
+import org.opensearch.notifications.spi.model.DestinationType
 import org.opensearch.notifications.spi.model.MessageContent
 import java.net.URI
 import java.net.URISyntaxException
 
-class WebhookMessage(
+open class WebhookMessage(
     val url: String,
-    val headerParams: Map<String, String>? = null,
     title: String,
-    configType: ChannelType,
+    configType: DestinationType,
     messageContent: MessageContent,
     channelId: String,
 ) : BaseMessage(title, configType, messageContent, channelId) {
@@ -58,6 +57,6 @@ class WebhookMessage(
 
     // TODO build complete message with title?
     override fun toString(): String {
-        return "DestinationType: $configType , Url: $url , Message: ${channelMessage.textDescription}"
+        return "DestinationType: $configType , Url: $url , Message: ${channelMessage.textDescription} , Title: $title"
     }
 }

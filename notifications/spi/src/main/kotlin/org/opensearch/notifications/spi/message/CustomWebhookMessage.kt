@@ -1,12 +1,12 @@
 /*
- * SPDX-License-Identifier: Apache-2.0
+ *  SPDX-License-Identifier: Apache-2.0
  *
- * The OpenSearch Contributors require contributions made to
- * this file be licensed under the Apache-2.0 license or a
- * compatible open source license.
+ *  The OpenSearch Contributors require contributions made to
+ *  this file be licensed under the Apache-2.0 license or a
+ *  compatible open source license.
  *
- * Modifications Copyright OpenSearch Contributors. See
- * GitHub history for details.
+ *  Modifications Copyright OpenSearch Contributors. See
+ *  GitHub history for details.
  */
 
 /*
@@ -27,23 +27,14 @@
 
 package org.opensearch.notifications.spi.message
 
-import org.opensearch.common.Strings
 import org.opensearch.notifications.spi.model.DestinationType
 import org.opensearch.notifications.spi.model.MessageContent
 
-/**
- * This class holds the generic parameters required for a message.
- */
-@Suppress("UnnecessaryAbstractClass")
-abstract class BaseMessage(
-    val title: String,
-    val configType: DestinationType,
-    val channelMessage: MessageContent,
-    val channelId: String,
-) {
-
-    init {
-        require(Strings.hasLength(title)) { "title name must be defined" }
-        require(Strings.hasLength(channelId)) { "channelId must be defined" }
-    }
-}
+class CustomWebhookMessage(
+    url: String,
+    title: String,
+    configType: DestinationType,
+    messageContent: MessageContent,
+    channelId: String,
+    val headerParams: Map<String, String>,
+) : WebhookMessage(url, title, configType, messageContent, channelId)

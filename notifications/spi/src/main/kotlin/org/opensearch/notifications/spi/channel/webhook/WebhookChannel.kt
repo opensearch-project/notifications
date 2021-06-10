@@ -27,43 +27,38 @@
 
 package org.opensearch.notifications.spi.channel.webhook
 
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.Logger
 import org.opensearch.notifications.spi.channel.NotificationChannel
 import org.opensearch.notifications.spi.channel.client.ChannelHttpClient
 import org.opensearch.notifications.spi.channel.client.ChannelHttpClientPool
 import org.opensearch.notifications.spi.message.WebhookMessage
 import org.opensearch.notifications.spi.model.ChannelMessageResponse
+import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.rest.RestStatus
 import java.io.IOException
 
 /**
  * Notification channel for sending mail to Email server.
  */
-internal class WebhookChannel : NotificationChannel<WebhookMessage, ChannelHttpClient> {
+internal class WebhookChannel : NotificationChannel<WebhookMessage> {
 
-    private val logger: Logger = LogManager.getLogger(NotificationChannel::class.java)
-    var channelHttpClient: ChannelHttpClient = ChannelHttpClientPool.httpClient
+    private val log by logger(NotificationChannel::class.java)
+    private val channelHttpClient: ChannelHttpClient = ChannelHttpClientPool.httpClient
 
     override fun sendMessage(message: WebhookMessage): ChannelMessageResponse {
         return try {
-            val response = getClient(message).execute(message)
+            val response = channelHttpClient.execute(message)
             ChannelMessageResponse(
                 recipient = message.configType.name,
                 statusCode = RestStatus.OK,
                 statusText = response
             )
         } catch (exception: IOException) {
-            logger.error("Exception publishing Message: $message", exception)
+            log.error("Exception sending message: $message", exception)
             ChannelMessageResponse(
                 recipient = message.configType.name,
                 statusCode = RestStatus.INTERNAL_SERVER_ERROR,
                 statusText = "Failed to send message"
             )
         }
-    }
-
-    override fun getClient(message: WebhookMessage): ChannelHttpClient {
-        return channelHttpClient
     }
 }

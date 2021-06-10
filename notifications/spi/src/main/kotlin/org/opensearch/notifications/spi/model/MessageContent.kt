@@ -30,25 +30,18 @@ package org.opensearch.notifications.spi.model
 import org.opensearch.common.Strings
 
 /**
- * Data class for storing channel message.
+ * Data class for storing message.
  */
 data class MessageContent(
     val textDescription: String,
-    val htmlDescription: String?,
-    val attachment: Attachment?
+    val htmlDescription: String? = null,
+    val fileName: String? = null,
+    val fileEncoding: String? = null,
+    val fileData: String? = null,
+    val fileContentType: String? = null
 ) {
 
     init {
         require(!Strings.isNullOrEmpty(textDescription)) { "text message part is null or empty" }
     }
-
-    /**
-     * Data class for storing attachment of channel message.
-     */
-    data class Attachment(
-        val fileName: String,
-        val fileEncoding: String,
-        val fileData: String,
-        val fileContentType: String?
-    )
 }

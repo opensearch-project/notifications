@@ -41,9 +41,10 @@ import org.apache.http.impl.client.DefaultHttpRequestRetryHandler
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
 import org.apache.http.util.EntityUtils
-import org.apache.logging.log4j.LogManager
 import org.opensearch.common.unit.TimeValue
+import org.opensearch.notifications.spi.message.CustomWebhookMessage
 import org.opensearch.notifications.spi.message.WebhookMessage
+import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.rest.RestStatus
 import java.io.IOException
 import java.nio.charset.StandardCharsets
@@ -56,7 +57,8 @@ import kotlin.collections.HashSet
 class ChannelHttpClient {
 
     companion object {
-        private val logger = LogManager.getLogger(ChannelHttpClient::class.java)
+        private val log by logger(ChannelHttpClient::class.java)
+        // TODO get the following constants
         private const val MAX_CONNECTIONS = 60
         private const val MAX_CONNECTIONS_PER_ROUTE = 20
         private val TIMEOUT_MILLISECONDS = TimeValue.timeValueSeconds(5).millis().toInt()
@@ -116,7 +118,7 @@ class ChannelHttpClient {
         val httpRequest = HttpPost()
         val uri = message.buildUri()
 
-        if (message.headerParams != null) {
+        if (message is CustomWebhookMessage) {
             if (message.headerParams.isEmpty()) {
                 // set default header
                 httpRequest.setHeader("Content-Type", "application/json")
@@ -131,6 +133,7 @@ class ChannelHttpClient {
 
         return HTTP_CLIENT.execute(httpRequest)
     }
+
     @SuppressWarnings("UnusedPrivateMember")
     private fun constructHttpRequest(method: String): HttpRequestBase {
         return when (method) {
@@ -145,7 +148,7 @@ class ChannelHttpClient {
     fun getResponseString(response: CloseableHttpResponse): String {
         val entity: HttpEntity = response.entity ?: return "{}"
         val responseString: String = EntityUtils.toString(entity)
-        logger.debug("Http response: $responseString")
+        log.debug("Http response: $responseString")
         return responseString
     }
 
