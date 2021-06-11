@@ -28,7 +28,7 @@ import { EuiLink } from '@elastic/eui';
 import React from 'react';
 import { ChannelItemType } from '../../../../../models/interfaces';
 import { ModalConsumer } from '../../../../components/Modal';
-import { CHANNEL_TYPE } from '../../../../utils/constants';
+import { BACKEND_CHANNEL_TYPE, CHANNEL_TYPE } from '../../../../utils/constants';
 import {
   deconstructEmailObject,
   deconstructWebhookObject,
@@ -96,7 +96,7 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
   };
 
   const type = props.channel.config_type as keyof typeof CHANNEL_TYPE;
-  if (type === 'slack') {
+  if (type === BACKEND_CHANNEL_TYPE.SLACK) {
     settingsList.push(
       ...[
         {
@@ -109,7 +109,7 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
         },
       ]
     );
-  } else if (type === 'chime') {
+  } else if (type === BACKEND_CHANNEL_TYPE.CHIME) {
     settingsList.push(
       ...[
         {
@@ -122,7 +122,7 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
         },
       ]
     );
-  } else if (type === 'email') {
+  } else if (type === BACKEND_CHANNEL_TYPE.EMAIL) {
     const emailObject = deconstructEmailObject(props.channel.email!);
     const recipientsDescription = getModalComponent(
       emailObject.selectedRecipientGroupOptions.map((group) => group.label),
@@ -158,7 +158,7 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
         // },
       ]
     );
-  } else if (type === 'webhook') {
+  } else if (type === BACKEND_CHANNEL_TYPE.CUSTOM_WEBHOOK) {
     const webhookObject = deconstructWebhookObject(props.channel.webhook!);
     const parametersDescription = getModalComponent(
       webhookObject.webhookParams,
@@ -202,7 +202,7 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
         },
       ]
     );
-  } else if (type === 'SNS') {
+  } else if (type === BACKEND_CHANNEL_TYPE.SNS) {
     // settingsList.push(
     //   ...[
     //     {
@@ -219,7 +219,7 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
     //     },
     //   ]
     // );
-  } else if (type === 'SES') {
+  } else if (type === BACKEND_CHANNEL_TYPE.SES) {
     // TODO
   }
 
