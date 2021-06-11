@@ -318,20 +318,6 @@ object ConfigIndexingActions {
     }
 
     /**
-     * Get NotificationConfig info
-     * @param configId config id
-     * @return [NotificationConfig]
-     */
-    fun get(configId: String): NotificationConfig {
-        log.info("$LOG_PREFIX:NotificationConfig-info $configId")
-        val configDoc = operations.getNotificationConfig(configId)
-        configDoc ?: run {
-            throw OpenSearchStatusException("NotificationConfig $configId not found", RestStatus.NOT_FOUND)
-        }
-        return configDoc.configDoc.config
-    }
-
-    /**
      * Get all NotificationConfig matching the criteria
      * @param request [GetNotificationConfigRequest] object
      * @param user the user info object
