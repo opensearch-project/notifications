@@ -24,15 +24,21 @@
  * permissions and limitations under the License.
  */
 
-import { EuiPage, EuiPageBody, EuiPageSideBar, EuiSideNav } from '@elastic/eui';
-import React, { Component } from 'react';
+import {
+  EuiPage,
+  EuiPageBody,
+  EuiPageSideBar,
+  EuiSideNav,
+  SortDirection,
+} from '@elastic/eui';
+import React, { Component, createContext } from 'react';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
 import { CoreStart } from '../../../../../src/core/public';
 import { CoreServicesConsumer } from '../../components/coreServices';
 import { ModalProvider, ModalRoot } from '../../components/Modal';
 import { BrowserServices } from '../../models/interfaces';
-import { ServicesConsumer } from '../../services/services';
-import { ROUTES } from '../../utils/constants';
+import { ServicesConsumer, ServicesContext } from '../../services/services';
+import { CHANNEL_TYPE, ROUTES } from '../../utils/constants';
 import { Channels } from '../Channels/Channels';
 import { ChannelDetails } from '../Channels/components/details/ChannelDetails';
 import { CreateChannel } from '../CreateChannel/CreateChannel';
@@ -55,7 +61,35 @@ enum Pathname {
 
 interface MainProps extends RouteComponentProps {}
 
-export default class Main extends Component<MainProps, object> {
+export interface MainState {
+  isChannelConfigured: boolean;
+}
+
+export const MainContext = createContext<MainState | null>(null);
+
+export default class Main extends Component<MainProps, MainState> {
+  static contextType = ServicesContext;
+
+  constructor(props: MainProps) {
+    super(props);
+    this.state = {
+      isChannelConfigured: true,
+    };
+  }
+
+  async componentDidMount() {
+    const isChannelConfigured = await this.context.notificationService.getChannels({
+      config_type: Object.keys(CHANNEL_TYPE),
+      from_index: 0,
+      max_items: 1,
+      sort_field: 'name',
+      sort_order: SortDirection.ASC,
+    });
+    if (!isChannelConfigured) {
+      this.setState({ isChannelConfigured });
+    }
+  }
+
   render() {
     const {
       location: { pathname },
@@ -95,101 +129,102 @@ export default class Main extends Component<MainProps, object> {
             <ServicesConsumer>
               {(services: BrowserServices | null) =>
                 services && (
-                  <ModalProvider>
-                    <ModalRoot services={services} />
-                    <EuiPage>
-                      {/*Hide side navigation bar when creating or editing rollup job*/}
-                      {pathname !== ROUTES.CREATE_CHANNEL &&
-                        !pathname.startsWith(ROUTES.EDIT_CHANNEL) &&
-                        !pathname.startsWith(ROUTES.CHANNEL_DETAILS) &&
-                        pathname !== ROUTES.CREATE_SENDER &&
-                        !pathname.startsWith(ROUTES.EDIT_SENDER) &&
-                        pathname !== ROUTES.CREATE_RECIPIENT_GROUP &&
-                        !pathname.startsWith(ROUTES.EDIT_RECIPIENT_GROUP) && (
-                          <EuiPageSideBar style={{ minWidth: 150 }}>
-                            <EuiSideNav
-                              style={{ width: 150 }}
-                              items={sideNav}
+                  <MainContext.Provider value={this.state}>
+                    <ModalProvider>
+                      <ModalRoot services={services} />
+                      <EuiPage>
+                        {/*Hide side navigation bar when creating or editing rollup job*/}
+                        {pathname !== ROUTES.CREATE_CHANNEL &&
+                          !pathname.startsWith(ROUTES.EDIT_CHANNEL) &&
+                          !pathname.startsWith(ROUTES.CHANNEL_DETAILS) &&
+                          pathname !== ROUTES.CREATE_SENDER &&
+                          !pathname.startsWith(ROUTES.EDIT_SENDER) &&
+                          pathname !== ROUTES.CREATE_RECIPIENT_GROUP &&
+                          !pathname.startsWith(ROUTES.EDIT_RECIPIENT_GROUP) && (
+                            <EuiPageSideBar style={{ minWidth: 150 }}>
+                              <EuiSideNav
+                                style={{ width: 150 }}
+                                items={sideNav}
+                              />
+                            </EuiPageSideBar>
+                          )}
+                        <EuiPageBody>
+                          <Switch>
+                            <Route
+                              path={ROUTES.CREATE_CHANNEL}
+                              render={(props: RouteComponentProps) => (
+                                <CreateChannel {...props} />
+                              )}
                             />
-                          </EuiPageSideBar>
-                        )}
-                      <EuiPageBody>
-                        <Switch>
-                          <Route
-                            path={ROUTES.CREATE_CHANNEL}
-                            render={(props: RouteComponentProps) => (
-                              <CreateChannel {...props} />
-                            )}
-                          />
-                          <Route
-                            path={`${ROUTES.EDIT_CHANNEL}/:id`}
-                            render={(
-                              props: RouteComponentProps<{ id: string }>
-                            ) => <CreateChannel {...props} edit={true} />}
-                          />
-                          <Route
-                            path={`${ROUTES.CHANNEL_DETAILS}/:id`}
-                            render={(
-                              props: RouteComponentProps<{ id: string }>
-                            ) => <ChannelDetails {...props} />}
-                          />
-                          <Route
-                            path={ROUTES.CHANNELS}
-                            render={(props: RouteComponentProps) => (
-                              <Channels
-                                {...props}
-                                notificationService={
-                                  services.notificationService
-                                }
-                              />
-                            )}
-                          />
-                          <Route
-                            path={ROUTES.NOTIFICATIONS}
-                            render={(props: RouteComponentProps) => (
-                              <Notifications
-                                {...props}
-                                notificationService={
-                                  services.notificationService
-                                }
-                              />
-                            )}
-                          />
-                          <Route
-                            path={ROUTES.EMAIL_GROUPS}
-                            render={(props: RouteComponentProps) => (
-                              <EmailGroups {...props} />
-                            )}
-                          />
-                          <Route
-                            path={ROUTES.CREATE_SENDER}
-                            render={(props: RouteComponentProps) => (
-                              <CreateSender {...props} />
-                            )}
-                          />
-                          <Route
-                            path={`${ROUTES.EDIT_SENDER}/:id`}
-                            render={(props: RouteComponentProps) => (
-                              <CreateSender {...props} edit={true} />
-                            )}
-                          />
-                          <Route
-                            path={ROUTES.CREATE_RECIPIENT_GROUP}
-                            render={(props: RouteComponentProps) => (
-                              <CreateRecipientGroup {...props} />
-                            )}
-                          />
-                          <Route
-                            path={`${ROUTES.EDIT_RECIPIENT_GROUP}/:id`}
-                            render={(props: RouteComponentProps) => (
-                              <CreateRecipientGroup {...props} edit={true} />
-                            )}
-                          />
-                          <Redirect from="/" to={ROUTES.NOTIFICATIONS} />
-                        </Switch>
-                      </EuiPageBody>
-                    </EuiPage>
-                  </ModalProvider>
+                            <Route
+                              path={`${ROUTES.EDIT_CHANNEL}/:id`}
+                              render={(
+                                props: RouteComponentProps<{ id: string }>
+                              ) => <CreateChannel {...props} edit={true} />}
+                            />
+                            <Route
+                              path={`${ROUTES.CHANNEL_DETAILS}/:id`}
+                              render={(
+                                props: RouteComponentProps<{ id: string }>
+                              ) => <ChannelDetails {...props} />}
+                            />
+                            <Route
+                              path={ROUTES.CHANNELS}
+                              render={(props: RouteComponentProps) => (
+                                <Channels
+                                  {...props}
+                                  notificationService={
+                                    services.notificationService
+                                  }
+                                />
+                              )}
+                            />
+                            <Route
+                              path={ROUTES.NOTIFICATIONS}
+                              render={(props: RouteComponentProps) => (
+                                <Notifications
+                                  {...props}
+                                  services={services}
+                                  mainProps={this.state}
+                                />
+                              )}
+                            />
+                            <Route
+                              path={ROUTES.EMAIL_GROUPS}
+                              render={(props: RouteComponentProps) => (
+                                <EmailGroups {...props} />
+                              )}
+                            />
+                            <Route
+                              path={ROUTES.CREATE_SENDER}
+                              render={(props: RouteComponentProps) => (
+                                <CreateSender {...props} />
+                              )}
+                            />
+                            <Route
+                              path={`${ROUTES.EDIT_SENDER}/:id`}
+                              render={(props: RouteComponentProps) => (
+                                <CreateSender {...props} edit={true} />
+                              )}
+                            />
+                            <Route
+                              path={ROUTES.CREATE_RECIPIENT_GROUP}
+                              render={(props: RouteComponentProps) => (
+                                <CreateRecipientGroup {...props} />
+                              )}
+                            />
+                            <Route
+                              path={`${ROUTES.EDIT_RECIPIENT_GROUP}/:id`}
+                              render={(props: RouteComponentProps) => (
+                                <CreateRecipientGroup {...props} edit={true} />
+                              )}
+                            />
+                            <Redirect from="/" to={ROUTES.NOTIFICATIONS} />
+                          </Switch>
+                        </EuiPageBody>
+                      </EuiPage>
+                    </ModalProvider>
+                  </MainContext.Provider>
                 )
               }
             </ServicesConsumer>

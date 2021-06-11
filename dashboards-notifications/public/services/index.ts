@@ -24,7 +24,8 @@
  * permissions and limitations under the License.
  */
 
-import { ServicesConsumer, ServicesContext } from './services';
+import EventService from './EventService';
 import NotificationService from './NotificationService';
+import { ServicesConsumer, ServicesContext } from './services';
 
-export { ServicesConsumer, ServicesContext, NotificationService };
+export { ServicesConsumer, ServicesContext, NotificationService, EventService };

@@ -59,11 +59,6 @@ export const BREADCRUMBS = Object.freeze({
   EDIT_RECIPIENT_GROUP: { text: 'Edit recipient group' },
 });
 
-export const NOTIFICATION_STATUS = Object.freeze({
-  SENT: 'Sent',
-  ERROR: 'Error',
-});
-
 export const NOTIFICATION_SOURCE = Object.freeze({
   alerting: 'Alerting',
   index_management: 'ISM',
@@ -83,6 +78,13 @@ export const ENCRYPTION_TYPE = Object.freeze({
   ssl: 'SSL',
   start_tls: 'TLS',
   none: 'None',
+});
+
+export const SEVERITY_TYPE = Object.freeze({
+  none: 'None',
+  info: 'Info',
+  high: 'High',
+  critical: 'Critical',
 });
 
 export const CUSTOM_WEBHOOK_ENDPOINT_TYPE = Object.freeze({
