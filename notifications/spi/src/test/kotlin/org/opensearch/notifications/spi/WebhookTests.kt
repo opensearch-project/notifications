@@ -35,11 +35,12 @@ import org.apache.http.message.BasicStatusLine
 import org.easymock.EasyMock
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.opensearch.notifications.spi.channel.client.ChannelHttpClient
-import org.opensearch.notifications.spi.message.WebhookMessage
+import org.opensearch.notifications.spi.client.DestinationHttpClient
+import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
+import org.opensearch.notifications.spi.factory.WebhookDestinationFactory
 import org.opensearch.notifications.spi.model.ChannelMessageResponse
-import org.opensearch.notifications.spi.model.DestinationType
 import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.rest.RestStatus
 
 internal class WebhookTests {
@@ -62,22 +63,21 @@ internal class WebhookTests {
         EasyMock.replay(httpResponse)
         EasyMock.replay(mockStatusLine)
 
-        val httpClient = ChannelHttpClient()
-        httpClient.setHttpClient(mockHttpClient)
+        val httpClient = DestinationHttpClient(mockHttpClient)
+        val webhookDestinationFactory = WebhookDestinationFactory()
+        webhookDestinationFactory.destinationHttpClient = httpClient
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("Chime" to webhookDestinationFactory)
 
-        val message = "Message gughjhjlkh Body emoji test: :) :+1: " +
+        val title = "test Chime"
+        val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
             "link test: http://sample.com email test: marymajor@example.com All member callout: " +
             "@All All Present member callout: @Present"
         val url = "https://abc/com"
 
-        val webhookMessage = WebhookMessage(
-            url = url,
-            title = "TODO",
-            configType = DestinationType.Chime,
-            messageContent = MessageContent(textDescription = message),
-            channelId = "channelId"
-        )
-        val actualChimeResponse: ChannelMessageResponse = Notification.sendMessage(webhookMessage)
+        val destination = ChimeDestination(url)
+        val message = MessageContent(title, messageText)
+
+        val actualChimeResponse: ChannelMessageResponse = Notification.sendMessage(destination, message)
 
         assertEquals(expectedWebhookResponse.statusText, actualChimeResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualChimeResponse.statusCode)
@@ -99,22 +99,21 @@ internal class WebhookTests {
         EasyMock.replay(httpResponse)
         EasyMock.replay(mockStatusLine)
 
-        val httpClient = ChannelHttpClient()
-        httpClient.setHttpClient(mockHttpClient)
+        val httpClient = DestinationHttpClient(mockHttpClient)
+        val webhookDestinationFactory = WebhookDestinationFactory()
+        webhookDestinationFactory.destinationHttpClient = httpClient
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("Chime" to webhookDestinationFactory)
 
-        val message = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
+        val title = "test Chime"
+        val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
             "link test: http://sample.com email test: marymajor@example.com All member callout: " +
             "@All All Present member callout: @Present\"}"
         val url = "https://abc/com"
-        val webhookMessage = WebhookMessage(
-            url = url,
-            title = "TODO",
-            configType = DestinationType.Chime,
-            messageContent = MessageContent(textDescription = message),
-            channelId = "channelId"
-        )
 
-        val actualChimeResponse: ChannelMessageResponse = Notification.sendMessage(webhookMessage)
+        val destination = ChimeDestination(url)
+        val message = MessageContent(title, messageText)
+
+        val actualChimeResponse: ChannelMessageResponse = Notification.sendMessage(destination, message)
 
         assertEquals(expectedWebhookResponse.statusText, actualChimeResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualChimeResponse.statusCode)
@@ -123,13 +122,7 @@ internal class WebhookTests {
     @Test(expected = IllegalArgumentException::class)
     fun testUrlMissingMessage() {
         try {
-            WebhookMessage(
-                url = "",
-                title = "title",
-                configType = DestinationType.Chime,
-                messageContent = MessageContent(textDescription = "message"),
-                channelId = "channelId"
-            )
+            ChimeDestination("")
         } catch (ex: Exception) {
             assertEquals("url is invalid or empty", ex.message)
             throw ex
@@ -139,13 +132,7 @@ internal class WebhookTests {
     @Test(expected = IllegalArgumentException::class)
     fun testContentMissingMessage() {
         try {
-            WebhookMessage(
-                url = "test.com",
-                title = "title",
-                configType = DestinationType.Chime,
-                messageContent = MessageContent(textDescription = ""),
-                channelId = "channelId"
-            )
+            MessageContent("title", "")
         } catch (ex: Exception) {
             assertEquals("text message part is null or empty", ex.message)
             throw ex

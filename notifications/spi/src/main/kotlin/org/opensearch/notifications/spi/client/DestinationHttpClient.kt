@@ -1,12 +1,12 @@
 /*
- * SPDX-License-Identifier: Apache-2.0
+ *  SPDX-License-Identifier: Apache-2.0
  *
- * The OpenSearch Contributors require contributions made to
- * this file be licensed under the Apache-2.0 license or a
- * compatible open source license.
+ *  The OpenSearch Contributors require contributions made to
+ *  this file be licensed under the Apache-2.0 license or a
+ *  compatible open source license.
  *
- * Modifications Copyright OpenSearch Contributors. See
- * GitHub history for details.
+ *  Modifications Copyright OpenSearch Contributors. See
+ *  GitHub history for details.
  */
 
 /*
@@ -25,7 +25,7 @@
  *
  */
 
-package org.opensearch.notifications.spi.channel.client
+package org.opensearch.notifications.spi.client
 
 import org.apache.http.HttpEntity
 import org.apache.http.client.config.RequestConfig
@@ -42,8 +42,9 @@ import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
 import org.apache.http.util.EntityUtils
 import org.opensearch.common.unit.TimeValue
-import org.opensearch.notifications.spi.message.CustomWebhookMessage
-import org.opensearch.notifications.spi.message.WebhookMessage
+import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
+import org.opensearch.notifications.spi.model.destination.WebhookDestination
 import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.rest.RestStatus
 import java.io.IOException
@@ -54,10 +55,20 @@ import kotlin.collections.HashSet
 /**
  * This class handles the connections to the given Destination.
  */
-class ChannelHttpClient {
+class DestinationHttpClient {
+
+    private val httpClient: CloseableHttpClient
+
+    constructor() {
+        this.httpClient = createHttpClient()
+    }
+
+    constructor(httpClient: CloseableHttpClient) {
+        this.httpClient = httpClient
+    }
 
     companion object {
-        private val log by logger(ChannelHttpClient::class.java)
+        private val log by logger(DestinationHttpClient::class.java)
         // TODO get the following constants
         private const val MAX_CONNECTIONS = 60
         private const val MAX_CONNECTIONS_PER_ROUTE = 20
@@ -77,8 +88,6 @@ class ChannelHttpClient {
                 )
             )
         )
-
-        private var HTTP_CLIENT: CloseableHttpClient = createHttpClient()
 
         private fun createHttpClient(): CloseableHttpClient {
             val config: RequestConfig = RequestConfig.custom()
@@ -100,10 +109,10 @@ class ChannelHttpClient {
     }
 
     @Throws(Exception::class)
-    fun execute(message: WebhookMessage): String {
+    fun execute(destination: WebhookDestination, message: MessageContent): String {
         var response: CloseableHttpResponse? = null
         return try {
-            response = getHttpResponse(message)
+            response = getHttpResponse(destination, message)
             validateResponseStatus(response)
             getResponseString(response)
         } finally {
@@ -114,16 +123,16 @@ class ChannelHttpClient {
     }
 
     @Throws(Exception::class)
-    private fun getHttpResponse(message: WebhookMessage): CloseableHttpResponse {
+    private fun getHttpResponse(destination: WebhookDestination, message: MessageContent): CloseableHttpResponse {
         val httpRequest = HttpPost()
-        val uri = message.buildUri()
+        val uri = destination.buildUri()
 
-        if (message is CustomWebhookMessage) {
-            if (message.headerParams.isEmpty()) {
+        if (destination is CustomWebhookDestination) {
+            if (destination.headerParams.isEmpty()) {
                 // set default header
                 httpRequest.setHeader("Content-Type", "application/json")
             } else {
-                for ((key, value) in message.headerParams.entries) httpRequest.setHeader(key, value)
+                for ((key, value) in destination.headerParams.entries) httpRequest.setHeader(key, value)
             }
         }
 
@@ -131,7 +140,7 @@ class ChannelHttpClient {
         val entity = StringEntity(extractBody(message), StandardCharsets.UTF_8)
         (httpRequest as HttpEntityEnclosingRequestBase).entity = entity
 
-        return HTTP_CLIENT.execute(httpRequest)
+        return httpClient.execute(httpRequest)
     }
 
     @SuppressWarnings("UnusedPrivateMember")
@@ -160,14 +169,14 @@ class ChannelHttpClient {
         }
     }
 
-    private fun extractBody(message: WebhookMessage): String {
-        return message.channelMessage.textDescription
+    private fun extractBody(message: MessageContent): String {
+        return message.textDescription
     }
 
-    /**
-     * This method is useful for Mocking the client
-     */
-    fun setHttpClient(httpClient: CloseableHttpClient) {
-        HTTP_CLIENT = httpClient
-    }
+//    /**
+//     * This method is useful for Mocking the client
+//     */
+//    fun setHttpClient(httpClient: CloseableHttpClient) {
+//        httpClient = httpClient
+//    }
 }

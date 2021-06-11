@@ -30,9 +30,11 @@ package org.opensearch.notifications.spi.model
 import org.opensearch.common.Strings
 
 /**
- * Data class for storing message.
+ *  class for storing message.
  */
-data class MessageContent(
+@SuppressWarnings("LongParameterList")
+class MessageContent(
+    val title: String,
     val textDescription: String,
     val htmlDescription: String? = null,
     val fileName: String? = null,
@@ -42,6 +44,7 @@ data class MessageContent(
 ) {
 
     init {
+        require(!Strings.isNullOrEmpty(title)) { "title is null or empty" }
         require(!Strings.isNullOrEmpty(textDescription)) { "text message part is null or empty" }
     }
 }
