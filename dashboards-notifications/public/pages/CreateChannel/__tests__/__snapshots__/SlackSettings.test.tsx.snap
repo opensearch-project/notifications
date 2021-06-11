@@ -1,0 +1,87 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<SlackSettings /> spec renders the component 1`] = `
+<div
+  class="euiFormRow"
+  id="random_html_id-row"
+  style="max-width: 700px;"
+>
+  <div
+    class="euiFormRow__labelWrapper"
+  >
+    <label
+      aria-invalid="false"
+      class="euiFormLabel euiFormRow__label"
+      for="random_html_id"
+    >
+      Slack webhook URL
+    </label>
+  </div>
+  <div
+    class="euiFormRow__fieldWrapper"
+  >
+    <div
+      class="euiFormControlLayout euiFormControlLayout--fullWidth"
+    >
+      <div
+        class="euiFormControlLayout__childrenWrapper"
+      >
+        <input
+          class="euiFieldText euiFieldText--fullWidth"
+          id="random_html_id"
+          placeholder="https://hook.slack.com/services/XXXXX/XXXXX/XXXXX..."
+          type="text"
+          value="test webhook"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<SlackSettings /> spec renders the component with error 1`] = `
+<div
+  class="euiFormRow"
+  id="random_html_id-row"
+  style="max-width: 700px;"
+>
+  <div
+    class="euiFormRow__labelWrapper"
+  >
+    <label
+      aria-invalid="true"
+      class="euiFormLabel euiFormRow__label euiFormLabel-isInvalid"
+      for="random_html_id"
+    >
+      Slack webhook URL
+    </label>
+  </div>
+  <div
+    class="euiFormRow__fieldWrapper"
+  >
+    <div
+      class="euiFormControlLayout euiFormControlLayout--fullWidth"
+    >
+      <div
+        class="euiFormControlLayout__childrenWrapper"
+      >
+        <input
+          aria-describedby="random_html_id-error-0"
+          class="euiFieldText euiFieldText--fullWidth"
+          id="random_html_id"
+          placeholder="https://hook.slack.com/services/XXXXX/XXXXX/XXXXX..."
+          type="text"
+          value="test webhook"
+        />
+      </div>
+    </div>
+    <div
+      aria-live="polite"
+      class="euiFormErrorText euiFormRow__text"
+      id="random_html_id-error-0"
+    >
+      test error
+    </div>
+  </div>
+</div>
+`;

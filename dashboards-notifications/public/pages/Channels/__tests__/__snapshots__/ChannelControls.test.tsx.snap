@@ -2,10 +2,10 @@
 
 exports[`<ChannelControls /> spec renders the component 1`] = `
 <div
-  class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
 >
   <div
-    class="euiFlexItem euiSearchBar__searchHolder"
+    class="euiFlexItem"
   >
     <div
       class="euiFormControlLayout euiFormControlLayout--fullWidth"
@@ -14,11 +14,9 @@ exports[`<ChannelControls /> spec renders the component 1`] = `
         class="euiFormControlLayout__childrenWrapper"
       >
         <input
-          aria-label="This is a search bar. After typing your query, hit enter to filter the results lower in the page."
           class="euiFieldSearch euiFieldSearch--fullWidth euiFieldSearch-isClearable"
           placeholder="Search"
           type="search"
-          value=""
         />
         <div
           class="euiFormControlLayoutIcons"
@@ -42,20 +40,19 @@ exports[`<ChannelControls /> spec renders the component 1`] = `
     </div>
   </div>
   <div
-    class="euiFlexItem euiFlexItem--flexGrowZero euiSearchBar__filtersHolder"
+    class="euiFlexItem euiFlexItem--flexGrowZero"
   >
     <div
       class="euiFilterGroup"
     >
       <div
         class="euiPopover euiPopover--anchorDownCenter"
-        id="field_value_selection_0"
       >
         <div
           class="euiPopover__anchor"
         >
           <button
-            class="euiButtonEmpty euiButtonEmpty--text euiFilterButton euiFilterButton--hasIcon"
+            class="euiButtonEmpty euiButtonEmpty--text euiFilterButton euiFilterButton--hasIcon euiFilterButton--noGrow"
             type="button"
           >
             <span
@@ -76,10 +73,10 @@ exports[`<ChannelControls /> spec renders the component 1`] = `
               >
                 <span
                   class="euiFilterButton__textShift"
-                  data-text="State"
-                  title="State"
+                  data-text="Status"
+                  title="Status"
                 >
-                  State
+                  Status
                 </span>
               </span>
             </span>
@@ -88,13 +85,12 @@ exports[`<ChannelControls /> spec renders the component 1`] = `
       </div>
       <div
         class="euiPopover euiPopover--anchorDownCenter"
-        id="field_value_selection_1"
       >
         <div
           class="euiPopover__anchor"
         >
           <button
-            class="euiButtonEmpty euiButtonEmpty--text euiFilterButton euiFilterButton--hasIcon"
+            class="euiButtonEmpty euiButtonEmpty--text euiFilterButton euiFilterButton--hasIcon euiFilterButton--noGrow"
             type="button"
           >
             <span
@@ -127,13 +123,12 @@ exports[`<ChannelControls /> spec renders the component 1`] = `
       </div>
       <div
         class="euiPopover euiPopover--anchorDownCenter"
-        id="field_value_selection_2"
       >
         <div
           class="euiPopover__anchor"
         >
           <button
-            class="euiButtonEmpty euiButtonEmpty--text euiFilterButton euiFilterButton--hasIcon"
+            class="euiButtonEmpty euiButtonEmpty--text euiFilterButton euiFilterButton--hasIcon euiFilterButton--noGrow"
             type="button"
           >
             <span

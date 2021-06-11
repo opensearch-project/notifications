@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<Channels/> spec renders the empty component 1`] = `
+exports[`<RecipientGroupsTable /> spec renders empty state 1`] = `
 <div
   class="euiPanel euiPanel--paddingMedium"
 >
@@ -14,7 +14,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
       <h3
         class="euiTitle euiTitle--medium"
       >
-        Channels
+        Recipient groups
         <span
           style="color: rgb(159, 159, 159); font-weight: 300;"
         >
@@ -37,46 +37,47 @@ exports[`<Channels/> spec renders the empty component 1`] = `
             <div
               class="euiFlexItem euiFlexItem--flexGrowZero"
             >
-              <div
-                class="euiPopover euiPopover--anchorDownCenter"
+              <button
+                class="euiButton euiButton--primary euiButton-isDisabled"
+                disabled=""
+                type="button"
               >
-                <div
-                  class="euiPopover__anchor"
+                <span
+                  class="euiButtonContent euiButton__content"
                 >
-                  <button
-                    class="euiButton euiButton--primary euiButton-isDisabled"
-                    disabled=""
-                    type="button"
+                  <span
+                    class="euiButton__text"
                   >
-                    <span
-                      class="euiButtonContent euiButtonContent--iconRight euiButton__content"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
-                        focusable="false"
-                        height="16"
-                        role="img"
-                        viewBox="0 0 16 16"
-                        width="16"
-                        xmlns="http://www.w3.org/2000/svg"
-                      />
-                      <span
-                        class="euiButton__text"
-                      >
-                        Actions
-                      </span>
-                    </span>
-                  </button>
-                </div>
-              </div>
+                    Delete
+                  </span>
+                </span>
+              </button>
+            </div>
+            <div
+              class="euiFlexItem euiFlexItem--flexGrowZero"
+            >
+              <button
+                class="euiButton euiButton--primary euiButton-isDisabled"
+                disabled=""
+                type="button"
+              >
+                <span
+                  class="euiButtonContent euiButton__content"
+                >
+                  <span
+                    class="euiButton__text"
+                  >
+                    Edit
+                  </span>
+                </span>
+              </button>
             </div>
             <div
               class="euiFlexItem euiFlexItem--flexGrowZero"
             >
               <a
                 class="euiButton euiButton--primary euiButton--fill"
-                href="#/create-channel"
+                href="#/create-recipient-group"
                 rel="noreferrer"
               >
                 <span
@@ -85,7 +86,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                   <span
                     class="euiButton__text"
                   >
-                    Create channel
+                    Create recipient group
                   </span>
                 </span>
               </a>
@@ -102,163 +103,33 @@ exports[`<Channels/> spec renders the empty component 1`] = `
     style="padding: initial;"
   >
     <div
-      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+      class="euiFormControlLayout euiFormControlLayout--fullWidth"
     >
       <div
-        class="euiFlexItem"
+        class="euiFormControlLayout__childrenWrapper"
       >
+        <input
+          class="euiFieldSearch euiFieldSearch--fullWidth euiFieldSearch-isClearable"
+          placeholder="Search"
+          type="search"
+        />
         <div
-          class="euiFormControlLayout euiFormControlLayout--fullWidth"
+          class="euiFormControlLayoutIcons"
         >
-          <div
-            class="euiFormControlLayout__childrenWrapper"
+          <span
+            class="euiFormControlLayoutCustomIcon"
           >
-            <input
-              class="euiFieldSearch euiFieldSearch--fullWidth euiFieldSearch-isClearable"
-              placeholder="Search"
-              type="search"
+            <svg
+              aria-hidden="true"
+              class="euiIcon euiIcon--medium euiIcon-isLoading euiFormControlLayoutCustomIcon__icon"
+              focusable="false"
+              height="16"
+              role="img"
+              viewBox="0 0 16 16"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
             />
-            <div
-              class="euiFormControlLayoutIcons"
-            >
-              <span
-                class="euiFormControlLayoutCustomIcon"
-              >
-                <svg
-                  aria-hidden="true"
-                  class="euiIcon euiIcon--medium euiIcon-isLoading euiFormControlLayoutCustomIcon__icon"
-                  focusable="false"
-                  height="16"
-                  role="img"
-                  viewBox="0 0 16 16"
-                  width="16"
-                  xmlns="http://www.w3.org/2000/svg"
-                />
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        class="euiFlexItem euiFlexItem--flexGrowZero"
-      >
-        <div
-          class="euiFilterGroup"
-        >
-          <div
-            class="euiPopover euiPopover--anchorDownCenter"
-          >
-            <div
-              class="euiPopover__anchor"
-            >
-              <button
-                class="euiButtonEmpty euiButtonEmpty--text euiFilterButton euiFilterButton--hasIcon euiFilterButton--noGrow"
-                type="button"
-              >
-                <span
-                  class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
-                >
-                  <svg
-                    aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
-                    focusable="false"
-                    height="16"
-                    role="img"
-                    viewBox="0 0 16 16"
-                    width="16"
-                    xmlns="http://www.w3.org/2000/svg"
-                  />
-                  <span
-                    class="euiButtonEmpty__text"
-                  >
-                    <span
-                      class="euiFilterButton__textShift"
-                      data-text="Status"
-                      title="Status"
-                    >
-                      Status
-                    </span>
-                  </span>
-                </span>
-              </button>
-            </div>
-          </div>
-          <div
-            class="euiPopover euiPopover--anchorDownCenter"
-          >
-            <div
-              class="euiPopover__anchor"
-            >
-              <button
-                class="euiButtonEmpty euiButtonEmpty--text euiFilterButton euiFilterButton--hasIcon euiFilterButton--noGrow"
-                type="button"
-              >
-                <span
-                  class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
-                >
-                  <svg
-                    aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
-                    focusable="false"
-                    height="16"
-                    role="img"
-                    viewBox="0 0 16 16"
-                    width="16"
-                    xmlns="http://www.w3.org/2000/svg"
-                  />
-                  <span
-                    class="euiButtonEmpty__text"
-                  >
-                    <span
-                      class="euiFilterButton__textShift"
-                      data-text="Type"
-                      title="Type"
-                    >
-                      Type
-                    </span>
-                  </span>
-                </span>
-              </button>
-            </div>
-          </div>
-          <div
-            class="euiPopover euiPopover--anchorDownCenter"
-          >
-            <div
-              class="euiPopover__anchor"
-            >
-              <button
-                class="euiButtonEmpty euiButtonEmpty--text euiFilterButton euiFilterButton--hasIcon euiFilterButton--noGrow"
-                type="button"
-              >
-                <span
-                  class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
-                >
-                  <svg
-                    aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
-                    focusable="false"
-                    height="16"
-                    role="img"
-                    viewBox="0 0 16 16"
-                    width="16"
-                    xmlns="http://www.w3.org/2000/svg"
-                  />
-                  <span
-                    class="euiButtonEmpty__text"
-                  >
-                    <span
-                      class="euiFilterButton__textShift"
-                      data-text="Source"
-                      title="Source"
-                    >
-                      Source
-                    </span>
-                  </span>
-                </span>
-              </button>
-            </div>
-          </div>
+          </span>
         </div>
       </div>
     </div>
@@ -342,7 +213,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
           </div>
         </div>
         <table
-          class="euiTable euiTable--responsive euiTable--auto"
+          class="euiTable euiTable--responsive"
           id="random_html_id"
           tabindex="-1"
         >
@@ -382,6 +253,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                 data-test-subj="tableHeaderCell_name_0"
                 role="columnheader"
                 scope="col"
+                style="width: 150px;"
               >
                 <button
                   class="euiTableHeaderButton euiTableHeaderButton-isSorted"
@@ -420,9 +292,10 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                 aria-live="polite"
                 aria-sort="none"
                 class="euiTableHeaderCell"
-                data-test-subj="tableHeaderCell_is_enabled_1"
+                data-test-subj="tableHeaderCell_email_group.recipient_list_1"
                 role="columnheader"
                 scope="col"
+                style="width: 450px;"
               >
                 <button
                   class="euiTableHeaderButton"
@@ -434,9 +307,9 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                   >
                     <span
                       class="euiTableCellContent__text"
-                      title="Notification status"
+                      title="Email addresses"
                     >
-                      Notification status
+                      Email addresses
                     </span>
                     <span
                       class="euiScreenReaderOnly"
@@ -450,69 +323,10 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                 aria-live="polite"
                 aria-sort="none"
                 class="euiTableHeaderCell"
-                data-test-subj="tableHeaderCell_config_type_2"
+                data-test-subj="tableHeaderCell_description_2"
                 role="columnheader"
                 scope="col"
-              >
-                <button
-                  class="euiTableHeaderButton"
-                  data-test-subj="tableHeaderSortButton"
-                  type="button"
-                >
-                  <span
-                    class="euiTableCellContent"
-                  >
-                    <span
-                      class="euiTableCellContent__text"
-                      title="Type"
-                    >
-                      Type
-                    </span>
-                    <span
-                      class="euiScreenReaderOnly"
-                    >
-                      Click to sort in ascending order
-                    </span>
-                  </span>
-                </button>
-              </th>
-              <th
-                aria-live="polite"
-                aria-sort="none"
-                class="euiTableHeaderCell"
-                data-test-subj="tableHeaderCell_feature_list_3"
-                role="columnheader"
-                scope="col"
-              >
-                <button
-                  class="euiTableHeaderButton"
-                  data-test-subj="tableHeaderSortButton"
-                  type="button"
-                >
-                  <span
-                    class="euiTableCellContent"
-                  >
-                    <span
-                      class="euiTableCellContent__text"
-                      title="Notification source"
-                    >
-                      Notification source
-                    </span>
-                    <span
-                      class="euiScreenReaderOnly"
-                    >
-                      Click to sort in ascending order
-                    </span>
-                  </span>
-                </button>
-              </th>
-              <th
-                aria-live="polite"
-                aria-sort="none"
-                class="euiTableHeaderCell"
-                data-test-subj="tableHeaderCell_description_4"
-                role="columnheader"
-                scope="col"
+                style="width: 300px;"
               >
                 <button
                   class="euiTableHeaderButton"
@@ -544,7 +358,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
             >
               <td
                 class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                colspan="6"
+                colspan="4"
               >
                 <div
                   class="euiTableCellContent euiTableCellContent--alignCenter"
@@ -561,7 +375,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                         <h2
                           class="euiTitle euiTitle--medium"
                         >
-                          No channels to display
+                          No recipient groups to display
                         </h2>
                         <div
                           class="euiSpacer euiSpacer--m"
@@ -569,7 +383,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                         <div
                           class="euiText euiText--medium"
                         >
-                          To send or receive notifications, you will need to create a notification channel.
+                          Use an email group to manage a list of email addresses you frequently send at a time. You can select recipient groups when configuring email channels.
                         </div>
                       </span>
                       <div
@@ -580,7 +394,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                       />
                       <a
                         class="euiButton euiButton--primary"
-                        href="#/create-channel"
+                        href="#/create-recipient-group"
                         rel="noreferrer"
                       >
                         <span
@@ -589,7 +403,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                           <span
                             class="euiButton__text"
                           >
-                            Create channel
+                            Create recipient group
                           </span>
                         </span>
                       </a>

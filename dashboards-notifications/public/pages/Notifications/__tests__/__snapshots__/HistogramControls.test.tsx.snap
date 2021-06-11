@@ -26,7 +26,7 @@ exports[`<HistogramControls /> spec renders the component 1`] = `
           class="euiScreenReaderOnly"
           id="random_html_id"
         >
-          Select an option: Channel types, is selected
+          Select an option: Channel type, is selected
         </span>
         <button
           aria-haspopup="true"
@@ -35,7 +35,7 @@ exports[`<HistogramControls /> spec renders the component 1`] = `
           style="width: 300px;"
           type="button"
         >
-          Channel types
+          Channel type
         </button>
         <div
           class="euiFormControlLayoutIcons euiFormControlLayoutIcons--right"

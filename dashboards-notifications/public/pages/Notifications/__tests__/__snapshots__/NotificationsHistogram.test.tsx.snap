@@ -14,7 +14,7 @@ exports[`<NotificationsHistogram /> spec renders the component 1`] = `
       <h3
         class="euiTitle euiTitle--medium"
       >
-        Notifications by channel types
+        Notifications by channel type
       </h3>
     </div>
     <div

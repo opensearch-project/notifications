@@ -12,6 +12,14 @@ exports[`<CreateRecipientGroup/> spec renders the component for editing 1`] = `
 <h1
   class="euiTitle euiTitle--large"
 >
-  Create recipient group
+  Edit recipient group
+</h1>
+`;
+
+exports[`<CreateRecipientGroup/> spec renders the component for editing 2`] = `
+<h1
+  class="euiTitle euiTitle--large"
+>
+  Edit recipient group
 </h1>
 `;

@@ -26,7 +26,7 @@ describe('creates sender and recipient groups as config object', () => {
     expect(config).toEqual({
       name: 'sender',
       config_type: 'smtp_account',
-      feature_list: [],
+      feature_list: ['alerting', 'index_management', 'reports'],
       is_enabled: true,
       smtp_account: {
         host: 'test.com',
@@ -57,7 +57,7 @@ describe('creates sender and recipient groups as config object', () => {
       name: 'recipient group',
       config_type: 'email_group',
       description: 'test description',
-      feature_list: [],
+      feature_list: ['alerting', 'index_management', 'reports'],
       is_enabled: true,
       email_group: {
         recipient_list: [

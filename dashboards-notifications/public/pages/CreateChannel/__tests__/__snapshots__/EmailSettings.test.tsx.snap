@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<EmailSettings /> spec renders the component 1`] = `
+<div
+  class="euiSpacer euiSpacer--m"
+/>
+`;

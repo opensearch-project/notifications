@@ -1,112 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<ChannelDetails/> spec clicks delete button 1`] = `
-<div
-  class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
-  style="max-width: 1316px;"
->
-  <div
-    class="euiFlexItem euiFlexItem--flexGrowZero"
-  >
-    <h1
-      class="euiTitle euiTitle--large"
-    >
-      Ops_channel
-    </h1>
-  </div>
-  <div
-    class="euiFlexItem euiFlexItem--flexGrowZero"
-  >
-    <div
-      class="euiHealth"
-    >
-      <div
-        class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
-      >
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <svg
-            aria-hidden="true"
-            class="euiIcon euiIcon--medium euiIcon--success"
-            focusable="false"
-            height="16"
-            role="img"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle
-              cx="8"
-              cy="8"
-              r="4"
-            />
-          </svg>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          Active
-        </div>
-      </div>
-    </div>
-  </div>
-  <div
-    class="euiFlexItem"
-  />
-  <div
-    class="euiFlexItem euiFlexItem--flexGrowZero"
-  >
-    <button
-      class="euiButton euiButton--danger euiButton--small"
-      type="button"
-    >
-      <span
-        class="euiButtonContent euiButton__content"
-      >
-        <span
-          class="euiButton__text"
-        >
-          Delete
-        </span>
-      </span>
-    </button>
-  </div>
-  <div
-    class="euiFlexItem euiFlexItem--flexGrowZero"
-  >
-    <button
-      class="euiButton euiButton--primary euiButton--small"
-      type="button"
-    >
-      <span
-        class="euiButtonContent euiButton__content"
-      >
-        <svg
-          aria-hidden="true"
-          class="euiIcon euiIcon--medium euiButtonContent__icon"
-          focusable="false"
-          height="16"
-          role="img"
-          viewBox="0 0 16 16"
-          width="16"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M9.5 14l-.005.15a2 2 0 01-3.972.153l-.018-.154L5.5 14h4zm5.38-12.825a.5.5 0 01.008.64l-.063.065-14 12a.5.5 0 01-.713-.695l.063-.065 14-12a.5.5 0 01.705.055zM13.036 5.51l.055.353.048.368c.066.554.103.98.145 1.724l.08 1.491c.146 2.371.402 3.053 1.136 3.053a.5.5 0 110 1c-.603 0-1.031-.146-1.34-.499H4.185l1.182-1h7.317c-.172-.644-.264-1.528-.33-2.708l-.09-1.638c-.033-.514-.066-.87-.118-1.304l-.011-.077.901-.763zM7.5 0a2 2 0 011.98 1.717c.476.113.907.27 1.292.472l-.838.71a5.728 5.728 0 00-1.591-.36 1 1 0 10-1.684 0C4.455 2.75 3.26 3.78 2.95 5.671l-.05.334-.046.347c-.08.676-.115 1.161-.176 2.347l-.014.265-.005.09-1.058.897c.018-.234.035-.488.05-.763l.077-1.427c.038-.626.073-1.025.134-1.528.03-.25.063-.49.102-.724.334-2.04 1.546-3.313 3.555-3.792l.004-.019A2 2 0 017.5 0z"
-          />
-        </svg>
-        <span
-          class="euiButton__text"
-        >
-          Mute channel
-        </span>
-      </span>
-    </button>
-  </div>
-</div>
-`;
-
 exports[`<ChannelDetails/> spec clicks mute or unmute button 1`] = `
 <div
   class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
@@ -115,47 +8,22 @@ exports[`<ChannelDetails/> spec clicks mute or unmute button 1`] = `
   <div
     class="euiFlexItem euiFlexItem--flexGrowZero"
   >
-    <h1
-      class="euiTitle euiTitle--large"
-    >
-      Ops_channel
-    </h1>
-  </div>
-  <div
-    class="euiFlexItem euiFlexItem--flexGrowZero"
-  >
     <div
-      class="euiHealth"
+      class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+        class="euiFlexItem euiFlexItem--flexGrowZero"
       >
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
+        <h1
+          class="euiTitle euiTitle--large"
         >
-          <svg
-            aria-hidden="true"
-            class="euiIcon euiIcon--medium euiIcon--success"
-            focusable="false"
-            height="16"
-            role="img"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle
-              cx="8"
-              cy="8"
-              r="4"
-            />
-          </svg>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          Active
-        </div>
+          -
+        </h1>
       </div>
+      <div
+        class="euiFlexItem euiFlexItem--flexGrowZero"
+        style="padding-bottom: 5px;"
+      />
     </div>
   </div>
   <div
@@ -163,27 +31,13 @@ exports[`<ChannelDetails/> spec clicks mute or unmute button 1`] = `
   />
   <div
     class="euiFlexItem euiFlexItem--flexGrowZero"
-  >
-    <button
-      class="euiButton euiButton--danger euiButton--small"
-      type="button"
-    >
-      <span
-        class="euiButtonContent euiButton__content"
-      >
-        <span
-          class="euiButton__text"
-        >
-          Delete
-        </span>
-      </span>
-    </button>
-  </div>
+  />
   <div
     class="euiFlexItem euiFlexItem--flexGrowZero"
   >
     <button
-      class="euiButton euiButton--primary euiButton--small"
+      class="euiButton euiButton--primary"
+      data-test-subj="channel-details-mute-button"
       type="button"
     >
       <span
@@ -200,16 +54,280 @@ exports[`<ChannelDetails/> spec clicks mute or unmute button 1`] = `
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M9.5 14l-.005.15a2 2 0 01-3.972.153l-.018-.154L5.5 14h4zm5.38-12.825a.5.5 0 01.008.64l-.063.065-14 12a.5.5 0 01-.713-.695l.063-.065 14-12a.5.5 0 01.705.055zM13.036 5.51l.055.353.048.368c.066.554.103.98.145 1.724l.08 1.491c.146 2.371.402 3.053 1.136 3.053a.5.5 0 110 1c-.603 0-1.031-.146-1.34-.499H4.185l1.182-1h7.317c-.172-.644-.264-1.528-.33-2.708l-.09-1.638c-.033-.514-.066-.87-.118-1.304l-.011-.077.901-.763zM7.5 0a2 2 0 011.98 1.717c.476.113.907.27 1.292.472l-.838.71a5.728 5.728 0 00-1.591-.36 1 1 0 10-1.684 0C4.455 2.75 3.26 3.78 2.95 5.671l-.05.334-.046.347c-.08.676-.115 1.161-.176 2.347l-.014.265-.005.09-1.058.897c.018-.234.035-.488.05-.763l.077-1.427c.038-.626.073-1.025.134-1.528.03-.25.063-.49.102-.724.334-2.04 1.546-3.313 3.555-3.792l.004-.019A2 2 0 017.5 0z"
+            d="M2.316 12h10.368c-.188-.704-.28-1.691-.348-3.037-.07-1.382-.103-1.888-.19-2.612-.028-.236-.06-.462-.096-.68-.31-1.892-1.506-2.923-3.708-3.131a1 1 0 10-1.684 0c-2.202.208-3.397 1.24-3.708 3.13a16.01 16.01 0 00-.096.68c-.087.725-.12 1.23-.19 2.613-.068 1.346-.16 2.333-.348 3.037zm10.843 1H1.84c-.308.353-.737.5-1.341.5a.5.5 0 110-1c.786 0 1.024-.783 1.166-3.587.07-1.407.105-1.926.196-2.681.03-.25.063-.49.102-.724.334-2.041 1.546-3.313 3.556-3.792a2 2 0 013.96 0c2.01.479 3.222 1.75 3.557 3.792a17 17 0 01.102.724c.09.755.125 1.274.196 2.681.14 2.804.379 3.587 1.165 3.587a.5.5 0 110 1c-.604 0-1.033-.147-1.341-.5zM5.5 14h4a2 2 0 11-4 0z"
+            fill-rule="evenodd"
           />
         </svg>
         <span
           class="euiButton__text"
         >
-          Mute channel
+          Unmute channel
         </span>
       </span>
     </button>
+  </div>
+</div>
+`;
+
+exports[`<ChannelDetails/> spec renders a specific channel 1`] = `
+<div>
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+    style="max-width: 1316px;"
+  >
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
+      >
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+        >
+          <h1
+            class="euiTitle euiTitle--large"
+          >
+            -
+          </h1>
+        </div>
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+          style="padding-bottom: 5px;"
+        />
+      </div>
+    </div>
+    <div
+      class="euiFlexItem"
+    />
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    />
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <button
+        class="euiButton euiButton--primary"
+        data-test-subj="channel-details-mute-button"
+        type="button"
+      >
+        <span
+          class="euiButtonContent euiButton__content"
+        >
+          <svg
+            aria-hidden="true"
+            class="euiIcon euiIcon--medium euiButtonContent__icon"
+            focusable="false"
+            height="16"
+            role="img"
+            viewBox="0 0 16 16"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M2.316 12h10.368c-.188-.704-.28-1.691-.348-3.037-.07-1.382-.103-1.888-.19-2.612-.028-.236-.06-.462-.096-.68-.31-1.892-1.506-2.923-3.708-3.131a1 1 0 10-1.684 0c-2.202.208-3.397 1.24-3.708 3.13a16.01 16.01 0 00-.096.68c-.087.725-.12 1.23-.19 2.613-.068 1.346-.16 2.333-.348 3.037zm10.843 1H1.84c-.308.353-.737.5-1.341.5a.5.5 0 110-1c.786 0 1.024-.783 1.166-3.587.07-1.407.105-1.926.196-2.681.03-.25.063-.49.102-.724.334-2.041 1.546-3.313 3.556-3.792a2 2 0 013.96 0c2.01.479 3.222 1.75 3.557 3.792a17 17 0 01.102.724c.09.755.125 1.274.196 2.681.14 2.804.379 3.587 1.165 3.587a.5.5 0 110 1c-.604 0-1.033-.147-1.341-.5zM5.5 14h4a2 2 0 11-4 0z"
+              fill-rule="evenodd"
+            />
+          </svg>
+          <span
+            class="euiButton__text"
+          >
+            Unmute channel
+          </span>
+        </span>
+      </button>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+  <div
+    class="euiPanel euiPanel--paddingMedium"
+    style="max-width: 1300px;"
+  >
+    <div
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
+      style="padding: 0px 0px;"
+    >
+      <div
+        class="euiFlexItem"
+      >
+        <h3
+          class="euiTitle euiTitle--small"
+        >
+          Name and description
+        </h3>
+      </div>
+    </div>
+    <hr
+      class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginSmall"
+    />
+    <div
+      style="padding: initial;"
+    >
+      <div>
+        <div
+          class="euiSpacer euiSpacer--s"
+        />
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        >
+          <div
+            class="euiFlexItem"
+          >
+            <dl
+              class="euiDescriptionList euiDescriptionList--row"
+              style="word-break: break-word; white-space: pre-line;"
+            >
+              <dt
+                class="euiDescriptionList__title"
+              >
+                Channel name
+              </dt>
+              <dd
+                class="euiDescriptionList__description"
+              >
+                -
+              </dd>
+            </dl>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
+            <dl
+              class="euiDescriptionList euiDescriptionList--row"
+              style="word-break: break-word; white-space: pre-line;"
+            >
+              <dt
+                class="euiDescriptionList__title"
+              >
+                Description
+              </dt>
+              <dd
+                class="euiDescriptionList__description"
+              >
+                -
+              </dd>
+            </dl>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
+            <dl
+              class="euiDescriptionList euiDescriptionList--row"
+              style="word-break: break-word; white-space: pre-line;"
+            >
+              <dt
+                class="euiDescriptionList__title"
+              >
+                Last updated
+              </dt>
+              <dd
+                class="euiDescriptionList__description"
+              >
+                12/31/69 3:59 pm PDT
+              </dd>
+            </dl>
+          </div>
+        </div>
+        <div
+          class="euiSpacer euiSpacer--m"
+        />
+      </div>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+  <div
+    class="euiPanel euiPanel--paddingMedium"
+    style="max-width: 1300px;"
+  >
+    <div
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
+      style="padding: 0px 0px;"
+    >
+      <div
+        class="euiFlexItem"
+      >
+        <h3
+          class="euiTitle euiTitle--small"
+        >
+          Configurations
+        </h3>
+      </div>
+    </div>
+    <hr
+      class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginSmall"
+    />
+    <div
+      style="padding: initial;"
+    />
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+  <div
+    class="euiPanel euiPanel--paddingMedium"
+    style="max-width: 1300px;"
+  >
+    <div
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
+      style="padding: 0px 0px;"
+    >
+      <div
+        class="euiFlexItem"
+      >
+        <h3
+          class="euiTitle euiTitle--small"
+        >
+          Availability
+        </h3>
+      </div>
+    </div>
+    <hr
+      class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginSmall"
+    />
+    <div
+      style="padding: initial;"
+    >
+      <div>
+        <div
+          class="euiSpacer euiSpacer--s"
+        />
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        >
+          <div
+            class="euiFlexItem"
+          >
+            <dl
+              class="euiDescriptionList euiDescriptionList--row"
+              style="word-break: break-word; white-space: pre-line;"
+            >
+              <dt
+                class="euiDescriptionList__title"
+              >
+                Notification sources
+              </dt>
+              <dd
+                class="euiDescriptionList__description"
+              >
+                -
+              </dd>
+            </dl>
+          </div>
+          <div
+            class="euiFlexItem"
+          />
+          <div
+            class="euiFlexItem"
+          />
+        </div>
+        <div
+          class="euiSpacer euiSpacer--m"
+        />
+      </div>
+    </div>
   </div>
 </div>
 `;
@@ -222,41 +340,22 @@ exports[`<ChannelDetails/> spec renders the component 1`] = `
   <div
     class="euiFlexItem euiFlexItem--flexGrowZero"
   >
-    <h1
-      class="euiTitle euiTitle--large"
-    >
-      Ops_channel
-    </h1>
-  </div>
-  <div
-    class="euiFlexItem euiFlexItem--flexGrowZero"
-  >
     <div
-      class="euiHealth"
+      class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+        class="euiFlexItem euiFlexItem--flexGrowZero"
       >
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
+        <h1
+          class="euiTitle euiTitle--large"
         >
-          <svg
-            aria-hidden="true"
-            class="euiIcon euiIcon--medium euiIcon--success euiIcon-isLoading"
-            focusable="false"
-            height="16"
-            role="img"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          />
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          Active
-        </div>
+          -
+        </h1>
       </div>
+      <div
+        class="euiFlexItem euiFlexItem--flexGrowZero"
+        style="padding-bottom: 5px;"
+      />
     </div>
   </div>
   <div
@@ -264,27 +363,13 @@ exports[`<ChannelDetails/> spec renders the component 1`] = `
   />
   <div
     class="euiFlexItem euiFlexItem--flexGrowZero"
-  >
-    <button
-      class="euiButton euiButton--danger euiButton--small"
-      type="button"
-    >
-      <span
-        class="euiButtonContent euiButton__content"
-      >
-        <span
-          class="euiButton__text"
-        >
-          Delete
-        </span>
-      </span>
-    </button>
-  </div>
+  />
   <div
     class="euiFlexItem euiFlexItem--flexGrowZero"
   >
     <button
-      class="euiButton euiButton--primary euiButton--small"
+      class="euiButton euiButton--primary"
+      data-test-subj="channel-details-mute-button"
       type="button"
     >
       <span
@@ -303,7 +388,7 @@ exports[`<ChannelDetails/> spec renders the component 1`] = `
         <span
           class="euiButton__text"
         >
-          Mute channel
+          Unmute channel
         </span>
       </span>
     </button>

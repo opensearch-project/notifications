@@ -1,5 +1,59 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`<CreateSenderForm/> spec renders errors 1`] = `
+<div
+  class="euiFormRow"
+  id="random_html_id-row"
+  style="max-width: 650px;"
+>
+  <div
+    class="euiFormRow__labelWrapper"
+  >
+    <label
+      aria-invalid="true"
+      class="euiFormLabel euiFormRow__label euiFormLabel-isInvalid"
+      for="random_html_id"
+    >
+      Sender name
+    </label>
+  </div>
+  <div
+    class="euiFormRow__fieldWrapper"
+  >
+    <div
+      class="euiFormControlLayout euiFormControlLayout--fullWidth"
+    >
+      <div
+        class="euiFormControlLayout__childrenWrapper"
+      >
+        <input
+          aria-describedby="random_html_id-help random_html_id-error-0"
+          class="euiFieldText euiFieldText--fullWidth"
+          data-test-subj="create-sender-form-name-input"
+          id="random_html_id"
+          placeholder="Enter sender name"
+          type="text"
+          value="test"
+        />
+      </div>
+    </div>
+    <div
+      aria-live="polite"
+      class="euiFormErrorText euiFormRow__text"
+      id="random_html_id-error-0"
+    >
+      test error
+    </div>
+    <div
+      class="euiFormHelpText euiFormRow__text"
+      id="random_html_id-help"
+    >
+      Use a unique, descriptive name. The sender name must contain from 2 to 50 characters. Valid characters are lowercase a-z, 0-9, and - (hyphen).
+    </div>
+  </div>
+</div>
+`;
+
 exports[`<CreateSenderForm/> spec renders the component 1`] = `
 <div
   class="euiFormRow"
@@ -10,6 +64,7 @@ exports[`<CreateSenderForm/> spec renders the component 1`] = `
     class="euiFormRow__labelWrapper"
   >
     <label
+      aria-invalid="false"
       class="euiFormLabel euiFormRow__label"
       for="random_html_id"
     >
@@ -28,8 +83,9 @@ exports[`<CreateSenderForm/> spec renders the component 1`] = `
         <input
           aria-describedby="random_html_id-help"
           class="euiFieldText euiFieldText--fullWidth"
+          data-test-subj="create-sender-form-name-input"
           id="random_html_id"
-          placeholder=""
+          placeholder="Enter sender name"
           type="text"
           value="test"
         />
@@ -39,7 +95,7 @@ exports[`<CreateSenderForm/> spec renders the component 1`] = `
       class="euiFormHelpText euiFormRow__text"
       id="random_html_id-help"
     >
-      Use a unique and descriptive name that's easy to search. The sender name must contain from m to n characters. Valid characters are lowercase a-z, 0-9, and - (hyphen).
+      Use a unique, descriptive name. The sender name must contain from 2 to 50 characters. Valid characters are lowercase a-z, 0-9, and - (hyphen).
     </div>
   </div>
 </div>

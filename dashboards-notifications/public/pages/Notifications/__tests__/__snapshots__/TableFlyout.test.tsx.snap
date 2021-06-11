@@ -70,7 +70,7 @@ exports[`<TableFlyout /> spec renders the component 1`] = `
               <dd
                 class="euiDescriptionList__description"
               >
-                Alert notification on high error rate
+                test notification
               </dd>
             </dl>
             <div
@@ -93,7 +93,25 @@ exports[`<TableFlyout /> spec renders the component 1`] = `
                   <dd
                     class="euiDescriptionList__description"
                   >
-                    TODO
+                    <a
+                      class="euiLink euiLink--primary"
+                      href="reports-dashboards#/report_details/reference_id"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      Report
+                      <svg
+                        aria-hidden="true"
+                        aria-label="External link"
+                        class="euiIcon euiIcon--small euiIcon-isLoading euiLink__externalIcon"
+                        focusable="false"
+                        height="16"
+                        role="img"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      />
+                    </a>
                   </dd>
                 </dl>
               </div>
@@ -111,7 +129,7 @@ exports[`<TableFlyout /> spec renders the component 1`] = `
                   <dd
                     class="euiDescriptionList__description"
                   >
-                    Alerting
+                    Reporting
                   </dd>
                 </dl>
               </div>
@@ -130,7 +148,7 @@ exports[`<TableFlyout /> spec renders the component 1`] = `
               <dd
                 class="euiDescriptionList__description"
               >
-                02/01/21 5:23 pm
+                07/06/03 11:42 am PDT
               </dd>
             </dl>
             <div
@@ -159,7 +177,7 @@ exports[`<TableFlyout /> spec renders the component 1`] = `
                       class="euiLink euiLink--primary"
                       type="button"
                     >
-                      dev_email_channel
+                      slack test
                     </button>
                   </span>
                   <div
@@ -186,124 +204,7 @@ exports[`<TableFlyout /> spec renders the component 1`] = `
                         <dd
                           class="euiDescriptionList__description"
                         >
-                          Email
-                        </dd>
-                      </dl>
-                    </div>
-                    <div
-                      class="euiFlexItem"
-                    >
-                      <dl
-                        class="euiDescriptionList euiDescriptionList--row"
-                      >
-                        <dt
-                          class="euiDescriptionList__title"
-                          style="color: rgb(105, 112, 125); font-size: 0.6875rem; font-weight: normal;"
-                        >
-                          Sent status
-                        </dt>
-                        <dd
-                          class="euiDescriptionList__description"
-                        >
-                          <div
-                            class="euiHealth"
-                          >
-                            <div
-                              class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
-                            >
-                              <div
-                                class="euiFlexItem euiFlexItem--flexGrowZero"
-                              >
-                                <svg
-                                  aria-hidden="true"
-                                  class="euiIcon euiIcon--medium euiIcon--danger euiIcon-isLoading"
-                                  focusable="false"
-                                  height="16"
-                                  role="img"
-                                  viewBox="0 0 16 16"
-                                  width="16"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                />
-                              </div>
-                              <div
-                                class="euiFlexItem euiFlexItem--flexGrowZero"
-                              >
-                                <div
-                                  class="euiText euiText--small"
-                                >
-                                  Errors
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </dd>
-                      </dl>
-                    </div>
-                  </div>
-                  <dl
-                    class="euiDescriptionList euiDescriptionList--row"
-                  >
-                    <dt
-                      class="euiDescriptionList__title"
-                      style="color: rgb(105, 112, 125); font-size: 0.6875rem; font-weight: normal;"
-                    >
-                      Error details
-                    </dt>
-                    <dd
-                      class="euiDescriptionList__description"
-                    >
-                      Error
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div
-                class="euiSpacer euiSpacer--s"
-              />
-              <div
-                class="euiCard euiCard--paddingMedium euiCard--leftAligned euiCard--hasChildren"
-              >
-                <div
-                  class="euiCard__content"
-                >
-                  <span
-                    class="euiTitle euiTitle--xsmall euiCard__title"
-                    id="random_html_idTitle"
-                  >
-                    <button
-                      class="euiLink euiLink--primary"
-                      type="button"
-                    >
-                      manage_slack_channel
-                    </button>
-                  </span>
-                  <div
-                    class="euiText euiText--small euiCard__description"
-                    id="random_html_idDescription"
-                  >
-                    <p />
-                  </div>
-                  <div
-                    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
-                  >
-                    <div
-                      class="euiFlexItem"
-                    >
-                      <dl
-                        class="euiDescriptionList euiDescriptionList--row"
-                      >
-                        <dt
-                          class="euiDescriptionList__title"
-                          style="color: rgb(105, 112, 125); font-size: 0.6875rem; font-weight: normal;"
-                        >
-                          Channel type
-                        </dt>
-                        <dd
-                          class="euiDescriptionList__description"
-                        >
-                          Slack
+                          slack
                         </dd>
                       </dl>
                     </div>
@@ -357,6 +258,123 @@ exports[`<TableFlyout /> spec renders the component 1`] = `
                       </dl>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div
+                class="euiSpacer euiSpacer--s"
+              />
+              <div
+                class="euiCard euiCard--paddingMedium euiCard--leftAligned euiCard--hasChildren"
+              >
+                <div
+                  class="euiCard__content"
+                >
+                  <span
+                    class="euiTitle euiTitle--xsmall euiCard__title"
+                    id="random_html_idTitle"
+                  >
+                    <button
+                      class="euiLink euiLink--primary"
+                      type="button"
+                    >
+                      emailtest
+                    </button>
+                  </span>
+                  <div
+                    class="euiText euiText--small euiCard__description"
+                    id="random_html_idDescription"
+                  >
+                    <p />
+                  </div>
+                  <div
+                    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+                  >
+                    <div
+                      class="euiFlexItem"
+                    >
+                      <dl
+                        class="euiDescriptionList euiDescriptionList--row"
+                      >
+                        <dt
+                          class="euiDescriptionList__title"
+                          style="color: rgb(105, 112, 125); font-size: 0.6875rem; font-weight: normal;"
+                        >
+                          Channel type
+                        </dt>
+                        <dd
+                          class="euiDescriptionList__description"
+                        >
+                          email
+                        </dd>
+                      </dl>
+                    </div>
+                    <div
+                      class="euiFlexItem"
+                    >
+                      <dl
+                        class="euiDescriptionList euiDescriptionList--row"
+                      >
+                        <dt
+                          class="euiDescriptionList__title"
+                          style="color: rgb(105, 112, 125); font-size: 0.6875rem; font-weight: normal;"
+                        >
+                          Sent status
+                        </dt>
+                        <dd
+                          class="euiDescriptionList__description"
+                        >
+                          <div
+                            class="euiHealth"
+                          >
+                            <div
+                              class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                            >
+                              <div
+                                class="euiFlexItem euiFlexItem--flexGrowZero"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="euiIcon euiIcon--medium euiIcon--danger euiIcon-isLoading"
+                                  focusable="false"
+                                  height="16"
+                                  role="img"
+                                  viewBox="0 0 16 16"
+                                  width="16"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                />
+                              </div>
+                              <div
+                                class="euiFlexItem euiFlexItem--flexGrowZero"
+                              >
+                                <div
+                                  class="euiText euiText--small"
+                                >
+                                  Error
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </dd>
+                      </dl>
+                    </div>
+                  </div>
+                  <dl
+                    class="euiDescriptionList euiDescriptionList--row"
+                  >
+                    <dt
+                      class="euiDescriptionList__title"
+                      style="color: rgb(105, 112, 125); font-size: 0.6875rem; font-weight: normal;"
+                    >
+                      Error details
+                    </dt>
+                    <dd
+                      class="euiDescriptionList__description"
+                    >
+                      failed
+                    </dd>
+                  </dl>
                 </div>
               </div>
             </div>

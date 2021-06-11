@@ -1,3 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`<MuteChannelModal /> spec handles failures 1`] = `null`;
+
 exports[`<MuteChannelModal /> spec renders the component 1`] = `null`;

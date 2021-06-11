@@ -24,22 +24,166 @@
  * permissions and limitations under the License.
  */
 
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import { coreServicesMock } from '../../../../test/mocks/serviceMock';
+import { MOCK_DATA } from '../../../../test/mocks/mockData';
+import {
+  coreServicesMock,
+  notificationServiceMock,
+} from '../../../../test/mocks/serviceMock';
 import { CoreServicesContext } from '../../../components/coreServices';
+import { ServicesContext } from '../../../services';
 import { CreateChannel } from '../CreateChannel';
 
 describe('<CreateChannel/> spec', () => {
   it('renders the component', () => {
     const props = { match: { params: { id: 'test' } } };
     const utils = render(
-      <CoreServicesContext.Provider value={coreServicesMock}>
-        <CreateChannel {...(props as RouteComponentProps<{ id: string }>)} />
-      </CoreServicesContext.Provider>
+      <ServicesContext.Provider value={notificationServiceMock}>
+        <CoreServicesContext.Provider value={coreServicesMock}>
+          <CreateChannel {...(props as RouteComponentProps<{ id: string }>)} />
+        </CoreServicesContext.Provider>
+      </ServicesContext.Provider>
     );
+    utils.getByTestId('create-channel-create-button').click();
+    utils.getByText('Alerting').click();
+    utils.getByTestId('create-channel-send-test-message-button').click();
     expect(utils.container.firstChild).toMatchSnapshot();
   });
 
+  it('renders the component for editing slack', async () => {
+    const notificationServiceMockSlack = jest.fn() as any;
+    const getSlackChannel = jest.fn(
+      async (queryObject: object) => MOCK_DATA.slack
+    );
+    const updateConfigSuccess = jest.fn(async (configId: string, config: any) =>
+      Promise.resolve()
+    );
+    notificationServiceMockSlack.notificationService = {
+      getChannel: getSlackChannel,
+      updateConfig: updateConfigSuccess,
+    };
+    const props = {
+      location: { search: '' },
+      match: { params: { id: 'test' } },
+    };
+    const utilsSlack = render(
+      <ServicesContext.Provider value={notificationServiceMockSlack}>
+        <CoreServicesContext.Provider value={coreServicesMock}>
+          <CreateChannel
+            {...(props as RouteComponentProps<{ id: string }>)}
+            edit={true}
+          />
+        </CoreServicesContext.Provider>
+      </ServicesContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(utilsSlack.container.firstChild).toMatchSnapshot();
+      expect(getSlackChannel).toBeCalled();
+    });
+
+    utilsSlack.getByTestId('create-channel-create-button').click();
+    utilsSlack.getByTestId('create-channel-send-test-message-button').click();
+    await waitFor(() => {
+      expect(updateConfigSuccess).toBeCalled();
+    });
+  });
+
+  it('renders the component for editing chime', async () => {
+    const updateConfigFailure = jest.fn(async (configId: string, config: any) =>
+      Promise.reject()
+    );
+    const notificationServiceMockChime = jest.fn() as any;
+    const getChimeChannel = jest.fn(
+      async (queryObject: object) => MOCK_DATA.chime
+    );
+    notificationServiceMockChime.notificationService = {
+      getChannel: getChimeChannel,
+      updateConfig: updateConfigFailure,
+    };
+    const props = {
+      location: { search: '' },
+      match: { params: { id: 'test' } },
+    };
+    const utilsChime = render(
+      <ServicesContext.Provider value={notificationServiceMockChime}>
+        <CoreServicesContext.Provider value={coreServicesMock}>
+          <CreateChannel
+            {...(props as RouteComponentProps<{ id: string }>)}
+            edit={true}
+          />
+        </CoreServicesContext.Provider>
+      </ServicesContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(utilsChime.container.firstChild).toMatchSnapshot();
+      expect(getChimeChannel).toBeCalled();
+    });
+
+    utilsChime.getByTestId('create-channel-create-button').click();
+    await waitFor(() => {
+      expect(updateConfigFailure).toBeCalled();
+    });
+  });
+
+  it('renders the component for editing email', async () => {
+    const notificationServiceMockEmail = jest.fn() as any;
+    const getEmailChannel = jest.fn(
+      async (queryObject: object) => MOCK_DATA.email
+    );
+    notificationServiceMockEmail.notificationService = {
+      getChannel: getEmailChannel,
+    };
+    const props = {
+      location: { search: '' },
+      match: { params: { id: 'test' } },
+    };
+    const utilsEmail = render(
+      <ServicesContext.Provider value={notificationServiceMockEmail}>
+        <CoreServicesContext.Provider value={coreServicesMock}>
+          <CreateChannel
+            {...(props as RouteComponentProps<{ id: string }>)}
+            edit={true}
+          />
+        </CoreServicesContext.Provider>
+      </ServicesContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(utilsEmail.container.firstChild).toMatchSnapshot();
+      expect(getEmailChannel).toBeCalled();
+    });
+  });
+
+  it('renders the component for editing webhook', async () => {
+    const notificationServiceMockWebhook = jest.fn() as any;
+    const getWebhookChannel = jest.fn(
+      async (queryObject: object) => MOCK_DATA.webhook
+    );
+    notificationServiceMockWebhook.notificationService = {
+      getChannel: getWebhookChannel,
+    };
+    const props = {
+      location: { search: '' },
+      match: { params: { id: 'test' } },
+    };
+    const utilsWebhook = render(
+      <ServicesContext.Provider value={notificationServiceMockWebhook}>
+        <CoreServicesContext.Provider value={coreServicesMock}>
+          <CreateChannel
+            {...(props as RouteComponentProps<{ id: string }>)}
+            edit={true}
+          />
+        </CoreServicesContext.Provider>
+      </ServicesContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(utilsWebhook.container.firstChild).toMatchSnapshot();
+      expect(getWebhookChannel).toBeCalled();
+    });
+  });
 });

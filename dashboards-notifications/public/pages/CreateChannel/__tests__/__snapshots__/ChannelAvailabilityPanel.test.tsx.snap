@@ -47,7 +47,7 @@ exports[`<ChannelAvailabilityPanel/> spec renders the component 1`] = `
           <div
             class="euiTextColor euiTextColor--subdued"
           >
-            Select sources where this channel will be available.
+            Select the features that can use this channel.
           </div>
         </div>
         <div
@@ -59,7 +59,7 @@ exports[`<ChannelAvailabilityPanel/> spec renders the component 1`] = `
           >
             <input
               class="euiCheckbox__input"
-              id="ALERTING"
+              id="alerting"
               type="checkbox"
             />
             <div
@@ -67,7 +67,7 @@ exports[`<ChannelAvailabilityPanel/> spec renders the component 1`] = `
             />
             <label
               class="euiCheckbox__label"
-              for="ALERTING"
+              for="alerting"
             >
               Alerting
             </label>
@@ -77,7 +77,7 @@ exports[`<ChannelAvailabilityPanel/> spec renders the component 1`] = `
           >
             <input
               class="euiCheckbox__input"
-              id="ISM"
+              id="index_management"
               type="checkbox"
             />
             <div
@@ -85,7 +85,7 @@ exports[`<ChannelAvailabilityPanel/> spec renders the component 1`] = `
             />
             <label
               class="euiCheckbox__label"
-              for="ISM"
+              for="index_management"
             >
               ISM
             </label>
@@ -95,7 +95,7 @@ exports[`<ChannelAvailabilityPanel/> spec renders the component 1`] = `
           >
             <input
               class="euiCheckbox__input"
-              id="REPORTING"
+              id="reports"
               type="checkbox"
             />
             <div
@@ -103,7 +103,7 @@ exports[`<ChannelAvailabilityPanel/> spec renders the component 1`] = `
             />
             <label
               class="euiCheckbox__label"
-              for="REPORTING"
+              for="reports"
             >
               Reporting
             </label>
