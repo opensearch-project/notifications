@@ -29,34 +29,39 @@ import {
   CHANNEL_TYPE,
   ENCRYPTION_TYPE,
   NOTIFICATION_SOURCE,
+  SEVERITY_TYPE,
 } from '../public/utils/constants';
 
 export interface NotificationItem {
-  id: string;
-  title: string;
-  referenceId: string; // TODO: this should probably be sourcelink, which is created by OpenSearch Dashboards server using source + ref_id and a dictionary of plugin url
-  source: string;
-  severity: string;
-  tags?: string[];
-  lastUpdatedTime: number;
-  status: string;
-  statusList: ChannelStatus[]; // could be multiple channels in a notification item
+  event_id: string;
+  created_time_ms: number;
+  last_updated_time_ms: number;
+  tenant?: string;
+  event_source: {
+    title: string;
+    reference_id: string;
+    feature: keyof typeof NOTIFICATION_SOURCE;
+    severity: keyof typeof SEVERITY_TYPE;
+    tags?: string[];
+  };
+  status_list: ChannelStatus[]; // could be multiple channels in a notification item
+  success: boolean; // calculated in the frontend based on status_list
 }
 
 export interface ChannelStatus {
-  configId: string;
-  configName: string;
-  configType: string;
-  emailRecipientStatus?: {
+  config_id: string;
+  config_name: string;
+  config_type: keyof typeof CHANNEL_TYPE;
+  email_recipient_status?: {
     recipient: string;
-    deliveryStatus: DeliveryStatus;
+    delivery_status: DeliveryStatus;
   }[];
-  deliveryStatus: DeliveryStatus;
+  delivery_status: DeliveryStatus;
 }
 
-export interface DeliveryStatus {
-  statusCode: string;
-  statusText: string;
+interface DeliveryStatus {
+  status_code: string;
+  status_text: string;
 }
 
 export interface ChannelItemType extends ConfigType {

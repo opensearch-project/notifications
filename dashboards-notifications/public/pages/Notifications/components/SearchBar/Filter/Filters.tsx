@@ -39,7 +39,6 @@ import React, { useMemo, useState } from 'react';
 import {
   FilterFieldType,
   FilterOperatorType,
-  filterToQueryString,
   isSingleSelection,
 } from '../utils/filterHelpers';
 import { AddFilterButton } from './AddFilterButton';

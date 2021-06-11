@@ -59,30 +59,48 @@ export const BREADCRUMBS = Object.freeze({
   EDIT_RECIPIENT_GROUP: { text: 'Edit recipient group' },
 });
 
-export const NOTIFICATION_STATUS = Object.freeze({
-  SENT: 'Sent',
-  ERROR: 'Error',
-});
-
 export const NOTIFICATION_SOURCE = Object.freeze({
   alerting: 'Alerting',
   index_management: 'ISM',
   reports: 'Reporting',
 });
 
-export const CHANNEL_TYPE = Object.freeze({
-  slack: 'Slack',
-  email: 'Email',
-  chime: 'Chime',
-  webhook: 'Custom webhook',
-  SES: 'Amazon SES',
-  SNS: 'Amazon SNS',
+export const BACKEND_CHANNEL_TYPE = Object.freeze({
+  SLACK: 'slack',
+  EMAIL: 'email',
+  CHIME: 'chime',
+  CUSTOM_WEBHOOK: 'webhook',
+  SES: 'ses',
+  SNS: 'sns',
 });
+
+export const CHANNEL_TYPE = Object.freeze({
+  [BACKEND_CHANNEL_TYPE.SLACK]: 'Slack',
+  [BACKEND_CHANNEL_TYPE.EMAIL]: 'Email',
+  [BACKEND_CHANNEL_TYPE.CHIME]: 'Chime',
+  [BACKEND_CHANNEL_TYPE.CUSTOM_WEBHOOK]: 'Custom webhook',
+  [BACKEND_CHANNEL_TYPE.SES]: 'Amazon SES',
+  [BACKEND_CHANNEL_TYPE.SNS]: 'Amazon SNS',
+}) as {
+  slack: string;
+  email: string;
+  chime: string;
+  webhook: string;
+  ses: string;
+  sns: string;
+};
 
 export const ENCRYPTION_TYPE = Object.freeze({
   ssl: 'SSL',
   start_tls: 'TLS',
   none: 'None',
+});
+
+export const SEVERITY_TYPE = Object.freeze({
+  none: 'None',
+  info: 'Info',
+  high: 'High',
+  critical: 'Critical',
 });
 
 export const CUSTOM_WEBHOOK_ENDPOINT_TYPE = Object.freeze({

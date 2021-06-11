@@ -34,7 +34,8 @@ import {
 } from '@elastic/eui';
 import React, { useContext } from 'react';
 import { CUSTOM_WEBHOOK_ENDPOINT_TYPE } from '../../../utils/constants';
-import { CreateChannelContext, HeaderType } from '../CreateChannel';
+import { HeaderItemType } from '../../Channels/types';
+import { CreateChannelContext } from '../CreateChannel';
 import {
   validateCustomURLHost,
   validateCustomURLPort,
@@ -55,10 +56,10 @@ interface CustomWebhookSettingsProps {
   setCustomURLPort: (customURLPort: string) => void;
   customURLPath: string;
   setCustomURLPath: (customURLPath: string) => void;
-  webhookParams: HeaderType[];
-  setWebhookParams: (webhookParams: HeaderType[]) => void;
-  webhookHeaders: HeaderType[];
-  setWebhookHeaders: (webhookHeaders: HeaderType[]) => void;
+  webhookParams: HeaderItemType[];
+  setWebhookParams: (webhookParams: HeaderItemType[]) => void;
+  webhookHeaders: HeaderItemType[];
+  setWebhookHeaders: (webhookHeaders: HeaderItemType[]) => void;
 }
 
 export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
@@ -79,6 +80,7 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
       >
         <EuiFieldText
           placeholder="https://name.example.com/XXXXX..."
+          data-test-subj="custom-webhook-url-input"
           value={props.webhookURL}
           onChange={(e) => props.setWebhookURL(e.target.value)}
           isInvalid={context.inputErrors.webhookURL.length > 0}
@@ -103,6 +105,7 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
         >
           <EuiFieldText
             placeholder="name.example.com"
+            data-test-subj="custom-webhook-host-input"
             value={props.customURLHost}
             onChange={(e) => props.setCustomURLHost(e.target.value)}
             isInvalid={context.inputErrors.customURLHost.length > 0}
@@ -125,6 +128,7 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
         >
           <EuiFieldNumber
             placeholder="Enter port"
+            data-test-subj="custom-webhook-port-input"
             value={props.customURLPort}
             onChange={(e) => props.setCustomURLPort(e.target.value)}
             isInvalid={context.inputErrors.customURLPort.length > 0}
@@ -145,6 +149,7 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
         >
           <EuiFieldText
             placeholder="Enter path"
+            data-test-subj="custom-webhook-path-input"
             value={props.customURLPath}
             onChange={(e) => props.setCustomURLPath(e.target.value)}
           />

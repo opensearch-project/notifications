@@ -25,6 +25,7 @@
  */
 
 import { Datum } from '@elastic/charts';
+import dateMath from '@elastic/datemath';
 import {
   EuiButton,
   EuiFlexGroup,
@@ -42,22 +43,21 @@ import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { NotificationItem, TableState } from '../../../../models/interfaces';
 import { CoreServicesContext } from '../../../components/coreServices';
-import { NotificationService } from '../../../services';
+import { BrowserServices } from '../../../models/interfaces';
 import { BREADCRUMBS, HISTOGRAM_TYPE, ROUTES } from '../../../utils/constants';
 import { getErrorMessage } from '../../../utils/helpers';
+import { MainState } from '../../Main/Main';
 import { EmptyState } from '../components/EmptyState/EmptyState';
-import { NotificationsHistogram } from '../components/NotificationsHistogram/NotificationsHistogram';
 import { NotificationsTable } from '../components/NotificationsTable/NotificationsTable';
 import { FilterType } from '../components/SearchBar/Filter/Filters';
 import { NotificationsSearchBar } from '../components/SearchBar/NotificationsSearchBar';
-import {
-  DEFAULT_PAGE_SIZE_OPTIONS,
-  DEFAULT_QUERY_PARAMS,
-} from '../utils/constants';
+import { filtersToQueryParams } from '../components/SearchBar/utils/filterHelpers';
+import { DEFAULT_PAGE_SIZE_OPTIONS } from '../utils/constants';
 import { getURLQueryParams } from '../utils/helpers';
 
 interface NotificationsProps extends RouteComponentProps {
-  notificationService: NotificationService;
+  services: BrowserServices;
+  mainProps: MainState;
 }
 
 interface NotificationsState extends TableState<NotificationItem> {
@@ -79,7 +79,8 @@ export default class Notifications extends Component<
 
     const urlParams =
       this.props.location.search ||
-      localStorage.getItem('NotificationsQueryParams');
+      sessionStorage.getItem('NotificationsQueryParams') ||
+      '';
     const {
       from,
       size,
@@ -109,9 +110,7 @@ export default class Notifications extends Component<
       histogramData: [],
     };
 
-    this.getNotifications = _.debounce(this.getNotifications, 500, {
-      leading: true,
-    });
+    this.getNotifications = _.debounce(this.getNotifications, 200);
   }
 
   async componentDidMount() {
@@ -127,45 +126,61 @@ export default class Notifications extends Component<
     prevProps: NotificationsProps,
     prevState: NotificationsState
   ) {
-    const prevQuery = Notifications.getQueryObjectFromState(prevState);
-    const currQuery = Notifications.getQueryObjectFromState(this.state);
+    const prevQuery = Notifications.serializeSearchParams(prevState);
+    const currQuery = Notifications.serializeSearchParams(this.state);
     if (!_.isEqual(prevQuery, currQuery)) {
       await this.getNotifications();
     }
   }
 
-  static getQueryObjectFromState(state: NotificationsState) {
+  static serializeSearchParams(state: NotificationsState) {
     return {
-      from: state.from,
-      size: state.size,
-      search: state.search,
-      sortField: state.sortField,
-      sortDirection: state.sortDirection,
+      from_index: state.from,
+      max_items: state.size,
+      query: state.search,
+      sort_field: state.sortField,
+      sort_order: state.sortDirection,
       startTime: state.startTime,
       endTime: state.endTime,
       filters: JSON.stringify(state.filters),
-      histogramType: state.histogramType,
+      // histogramType: state.histogramType,
+    };
+  }
+
+  static getQueryObjectFromState(state: NotificationsState) {
+    const filterParams = filtersToQueryParams(state.filters);
+    return {
+      from_index: state.from,
+      max_items: state.size,
+      query: state.search,
+      sort_field: state.sortField,
+      sort_order: state.sortDirection,
+      last_updated_time_ms: `${dateMath
+        .parse(state.startTime)
+        ?.valueOf()}..${dateMath.parse(state.endTime)?.valueOf()}`,
+      ...filterParams,
     };
   }
 
   getNotifications = async () => {
     this.setState({ loading: true });
     try {
-      const { notificationService, history } = this.props;
-      const queryObject = Notifications.getQueryObjectFromState(this.state);
-      const queryParamsString = queryString.stringify(queryObject);
+      const { services, history } = this.props;
+      const searchParams = Notifications.serializeSearchParams(this.state);
+      const queryParamsString = queryString.stringify(searchParams);
       history.replace({ ...this.props.location, search: queryParamsString });
-      localStorage.setItem('NotificationsQueryParams', queryParamsString);
-      const getNotificationsResponse = await notificationService.getNotifications(
+      sessionStorage.setItem('NotificationsQueryParams', queryParamsString);
+
+      const queryObject = Notifications.getQueryObjectFromState(this.state);
+      const getNotificationsResponse = await services.eventService.getNotifications(
         queryObject
       );
-      const getHistogramResponse = await notificationService.getHistogram(
+      const getHistogramResponse = await services.eventService.getHistogram(
         queryObject
       );
-      const { notifications, totalNotifications } = getNotificationsResponse;
       this.setState({
-        items: notifications,
-        total: totalNotifications,
+        items: getNotificationsResponse.items,
+        total: getNotificationsResponse.total,
         histogramData: getHistogramResponse,
       });
     } catch (err) {
@@ -185,17 +200,8 @@ export default class Notifications extends Component<
     this.setState({ from: page * size, size, sortField, sortDirection });
   };
 
-  // onSelectionChange = (selectedItems: NotificationItem[]): void => {
-  //   this.setState({ selectedItems });
-  // };
-
   onSearchChange = (search: string): void => {
     this.setState({ from: 0, search });
-  };
-
-  onPageChange = (page: number): void => {
-    const { size } = this.state;
-    this.setState({ from: page * size });
   };
 
   setStartTime = (startTime: ShortDate) => {
@@ -206,53 +212,34 @@ export default class Notifications extends Component<
   };
   setFilters = (filters: FilterType[]) => {
     this.setState({ from: 0, filters });
+    this.getNotifications();
   };
   setHistogramType = (histogramType: keyof typeof HISTOGRAM_TYPE) => {
     this.setState({ histogramType });
   };
 
-  // onClickModalEdit = (item: NotificationItem, onClose: () => void): void => {
-  //   onClose();
-  //   if (!item || !item.policyId) return;
-  //   this.props.history.push(`${ROUTES.EDIT_POLICY}?id=${item.policyId}`);
-  // };
-
-  resetFilters = (): void => {
-    this.setState({ search: DEFAULT_QUERY_PARAMS.search });
-  };
-
   render() {
-    const {
-      total,
-      from,
-      size,
-      search,
-      sortField,
-      sortDirection,
-      selectedItems,
-      items,
-      loading,
-    } = this.state;
-
-    const filterIsApplied = !!search;
-    const page = Math.floor(from / size);
+    const page = Math.floor(this.state.from / this.state.size);
 
     const pagination: Pagination = {
       pageIndex: page,
-      pageSize: size,
+      pageSize: this.state.size,
       pageSizeOptions: DEFAULT_PAGE_SIZE_OPTIONS,
-      totalItemCount: total,
+      totalItemCount: this.state.total,
     };
 
     const sorting: EuiTableSortingType<NotificationItem> = {
       sort: {
-        direction: sortDirection,
-        field: sortField,
+        direction: this.state.sortDirection,
+        field: this.state.sortField,
       },
     };
 
-    // TODO check if no channels
-    if (this.state.items.length === 0) {
+    if (
+      !this.state.loading &&
+      this.state.total === 0 &&
+      !this.props.mainProps.isChannelConfigured
+    ) {
       return <EmptyState channels={false} />;
     }
 
@@ -281,33 +268,33 @@ export default class Notifications extends Component<
           setStartTime={this.setStartTime}
           endTime={this.state.endTime}
           setEndTime={this.setEndTime}
-          search={search}
+          search={this.state.search}
           setSearch={this.onSearchChange}
           filters={this.state.filters}
           setFilters={this.setFilters}
           refresh={this.getNotifications}
         />
 
-        {/* TODO: change back to items.length > 0 */}
-        {this.state.search.length === 0 ? (
+        {this.state.loading || this.state.total > 0 ? (
           <>
-            <EuiSpacer />
+            {/* <EuiSpacer />
             <NotificationsHistogram
               histogramType={this.state.histogramType}
               setHistogramType={this.setHistogramType}
               histogramData={this.state.histogramData}
-            />
+            /> */}
 
             <EuiSpacer />
             <NotificationsTable
-              items={items}
+              items={this.state.items}
               onTableChange={this.onTableChange}
               pagination={pagination}
               sorting={sorting}
+              loading={this.state.loading}
             />
           </>
         ) : (
-          <EmptyState channels />
+          <EmptyState channels={true} />
         )}
       </div>
     );

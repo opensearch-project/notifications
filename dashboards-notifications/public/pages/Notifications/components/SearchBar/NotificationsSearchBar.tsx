@@ -57,9 +57,7 @@ export function NotificationsSearchBar(props: NotificationsSearchBarProps) {
             fullWidth
             isClearable={false}
             placeholder="Search"
-            value={props.search}
-            onChange={(e) => props.setSearch(e.target.value)}
-            onSearch={props.refresh}
+            onSearch={props.setSearch}
           />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>

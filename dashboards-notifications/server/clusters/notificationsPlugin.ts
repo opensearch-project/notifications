@@ -86,4 +86,25 @@ export function NotificationsPlugin(Client: any, config: any, components: any) {
     method: 'PUT',
     needBody: true,
   });
+
+  notifications.getEvents = clientAction({
+    url: {
+      fmt: OPENSEARCH_API.EVENTS,
+    },
+    method: 'GET',
+  });
+
+  notifications.getEventById = clientAction({
+    url: {
+      fmt: `${OPENSEARCH_API.EVENTS}/<%=eventId%>`,
+      req: {
+        eventId: {
+          type: 'string',
+          required: true,
+        },
+      },
+    },
+    method: 'GET',
+  });
+
 }

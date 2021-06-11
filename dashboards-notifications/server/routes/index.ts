@@ -11,7 +11,9 @@
 
 import { IRouter } from '../../../../src/core/server';
 import { configRoutes } from './configRoutes';
+import { eventRoutes } from './eventRoutes';
 
 export function defineRoutes(router: IRouter) {
   configRoutes(router);
+  eventRoutes(router);
 }
