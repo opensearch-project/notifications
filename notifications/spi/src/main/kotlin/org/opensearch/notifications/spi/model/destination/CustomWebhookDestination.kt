@@ -11,6 +11,9 @@
 
 package org.opensearch.notifications.spi.model.destination
 
+/**
+ * This class holds the contents of a custom webhook destination
+ */
 class CustomWebhookDestination(
     url: String,
     val headerParams: Map<String, String>,

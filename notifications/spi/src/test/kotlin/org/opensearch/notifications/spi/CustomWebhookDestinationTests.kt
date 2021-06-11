@@ -40,13 +40,13 @@ import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
 import org.opensearch.notifications.spi.factory.WebhookDestinationFactory
 import org.opensearch.notifications.spi.model.ChannelMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
-import org.opensearch.notifications.spi.model.destination.ChimeDestination
+import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
 import org.opensearch.rest.RestStatus
 
-internal class WebhookTests {
+internal class CustomWebhookDestinationTests {
     @Test
     @Throws(Exception::class)
-    fun `test webhook message null entity response`() {
+    fun `test custom webook message null entity response`() {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
 
         // The DestinationHttpClient replaces a null entity with "{}".
@@ -66,26 +66,26 @@ internal class WebhookTests {
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationFactory = WebhookDestinationFactory()
         webhookDestinationFactory.destinationHttpClient = httpClient
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("Chime" to webhookDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("Webhook" to webhookDestinationFactory)
 
-        val title = "test Chime"
+        val title = "test custom webhook"
         val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
             "link test: http://sample.com email test: marymajor@example.com All member callout: " +
             "@All All Present member callout: @Present"
         val url = "https://abc/com"
 
-        val destination = ChimeDestination(url)
+        val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"))
         val message = MessageContent(title, messageText)
 
-        val actualChimeResponse: ChannelMessageResponse = Notification.sendMessage(destination, message)
+        val actualCustomWebhookResponse: ChannelMessageResponse = Notification.sendMessage(destination, message)
 
-        assertEquals(expectedWebhookResponse.statusText, actualChimeResponse.statusText)
-        assertEquals(expectedWebhookResponse.statusCode, actualChimeResponse.statusCode)
+        assertEquals(expectedWebhookResponse.statusText, actualCustomWebhookResponse.statusText)
+        assertEquals(expectedWebhookResponse.statusCode, actualCustomWebhookResponse.statusCode)
     }
 
     @Test
     @Throws(Exception::class)
-    fun `test webhook message empty entity response`() {
+    fun `test custom webook message empty entity response`() {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
         val expectedWebhookResponse = ChannelMessageResponse(statusText = "", statusCode = RestStatus.OK)
 
@@ -102,39 +102,66 @@ internal class WebhookTests {
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationFactory = WebhookDestinationFactory()
         webhookDestinationFactory.destinationHttpClient = httpClient
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("Chime" to webhookDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("Webhook" to webhookDestinationFactory)
 
-        val title = "test Chime"
+        val title = "test custom webhook"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
             "link test: http://sample.com email test: marymajor@example.com All member callout: " +
             "@All All Present member callout: @Present\"}"
         val url = "https://abc/com"
 
-        val destination = ChimeDestination(url)
+        val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"))
         val message = MessageContent(title, messageText)
 
-        val actualChimeResponse: ChannelMessageResponse = Notification.sendMessage(destination, message)
+        val actualCustomWebhookResponse: ChannelMessageResponse = Notification.sendMessage(destination, message)
 
-        assertEquals(expectedWebhookResponse.statusText, actualChimeResponse.statusText)
-        assertEquals(expectedWebhookResponse.statusCode, actualChimeResponse.statusCode)
+        assertEquals(expectedWebhookResponse.statusText, actualCustomWebhookResponse.statusText)
+        assertEquals(expectedWebhookResponse.statusCode, actualCustomWebhookResponse.statusCode)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun `test custom webhook message non-empty entity response`() {
+        val responseContent = "It worked!"
+        val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
+        val expectedWebhookResponse = ChannelMessageResponse(statusText = responseContent, statusCode = RestStatus.OK)
+
+        val httpResponse: CloseableHttpResponse = EasyMock.createMock(CloseableHttpResponse::class.java)
+        EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
+        val mockStatusLine: BasicStatusLine = EasyMock.createMock(BasicStatusLine::class.java)
+        EasyMock.expect(httpResponse.statusLine).andReturn(mockStatusLine)
+        EasyMock.expect(httpResponse.entity).andReturn(StringEntity(responseContent)).anyTimes()
+        EasyMock.expect(mockStatusLine.statusCode).andReturn(RestStatus.OK.status)
+        EasyMock.replay(mockHttpClient)
+        EasyMock.replay(httpResponse)
+        EasyMock.replay(mockStatusLine)
+
+        val httpClient = DestinationHttpClient(mockHttpClient)
+        val webhookDestinationFactory = WebhookDestinationFactory()
+        webhookDestinationFactory.destinationHttpClient = httpClient
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("Webhook" to webhookDestinationFactory)
+
+        val title = "test custom webhook"
+        val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
+            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
+            "@All All Present member callout: @Present\"}"
+        val url = "https://abc/com"
+
+        val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"))
+        val message = MessageContent(title, messageText)
+
+        val actualCustomWebhookResponse: ChannelMessageResponse = Notification.sendMessage(destination, message)
+
+        assertEquals(expectedWebhookResponse.statusText, actualCustomWebhookResponse.statusText)
+        assertEquals(expectedWebhookResponse.statusCode, actualCustomWebhookResponse.statusCode)
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun testUrlMissingMessage() {
         try {
-            ChimeDestination("")
+            CustomWebhookDestination("", mapOf("headerKey" to "headerValue"))
         } catch (ex: Exception) {
             assertEquals("url is invalid or empty", ex.message)
-            throw ex
-        }
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun testContentMissingMessage() {
-        try {
-            MessageContent("title", "")
-        } catch (ex: Exception) {
-            assertEquals("text message part is null or empty", ex.message)
             throw ex
         }
     }
