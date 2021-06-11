@@ -35,11 +35,11 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import React from 'react';
-import { HeaderType } from '../CreateChannel';
+import { HeaderItemType } from '../../Channels/types';
 
 interface WebhookHeadersProps {
-  headers: HeaderType[];
-  setHeaders: (headers: HeaderType[]) => void;
+  headers: HeaderItemType[];
+  setHeaders: (headers: HeaderItemType[]) => void;
   type: 'header' | 'parameter';
 }
 
@@ -83,7 +83,11 @@ export function WebhookHeaders(props: WebhookHeadersProps) {
                     placeholder=""
                     value={header.key}
                     onChange={(e) => setHeader(e.target.value, null, i)}
-                    disabled={props.type === 'header' && i === 0} // first header needs to be Content-Type
+                    disabled={
+                      props.type === 'header' &&
+                      i === 0 &&
+                      header.key === 'Content-Type'
+                    } // first header needs to be Content-Type
                   />
                 </EuiFormRow>
               </EuiFlexItem>
@@ -104,7 +108,11 @@ export function WebhookHeaders(props: WebhookHeadersProps) {
                       newHeaders.splice(i, 1);
                       props.setHeaders(newHeaders);
                     }}
-                    disabled={props.type === 'header' && i === 0}
+                    disabled={
+                      props.type === 'header' &&
+                      i === 0 &&
+                      header.key === 'Content-Type'
+                    }
                   >
                     {`Remove ${props.type}`}
                   </EuiButton>

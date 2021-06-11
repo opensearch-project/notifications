@@ -40,6 +40,7 @@ import {
 import queryString from 'query-string';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import { SERVER_DELAY } from '../../../common';
 import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
 import { ServicesContext } from '../../services';
@@ -49,6 +50,8 @@ import {
   CUSTOM_WEBHOOK_ENDPOINT_TYPE,
   ROUTES,
 } from '../../utils/constants';
+import { getErrorMessage } from '../../utils/helpers';
+import { HeaderItemType } from '../Channels/types';
 import { ChannelAvailabilityPanel } from './components/ChannelAvailabilityPanel';
 import { ChannelNamePanel } from './components/ChannelNamePanel';
 import { ChimeSettings } from './components/ChimeSettings';
@@ -56,6 +59,12 @@ import { CustomWebhookSettings } from './components/CustomWebhookSettings';
 import { EmailSettings } from './components/EmailSettings';
 import { SlackSettings } from './components/SlackSettings';
 import { SNSSettings } from './components/SNSSettings';
+import {
+  constructEmailObject,
+  constructWebhookObject,
+  deconstructEmailObject,
+  deconstructWebhookObject,
+} from './utils/helper';
 import {
   validateArn,
   validateChannelName,
@@ -78,8 +87,6 @@ export const CreateChannelContext = createContext<{
   setInputErrors: (errors: InputErrorsType) => void;
 } | null>(null);
 
-export type HeaderType = { key: string; value: string };
-
 export function CreateChannel(props: CreateChannelsProps) {
   const isOdfe = true;
 
@@ -90,6 +97,8 @@ export function CreateChannel(props: CreateChannelsProps) {
     props.edit && queryString.parse(props.location.search).from === 'details'
       ? `#${ROUTES.CHANNEL_DETAILS}/${id}`
       : `#${ROUTES.CHANNELS}`;
+
+  const [isEnabled, setIsEnabled] = useState(true); // should be true unless editing muted channel
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -105,19 +114,10 @@ export function CreateChannel(props: CreateChannelsProps) {
   const [slackWebhook, setSlackWebhook] = useState('');
   const [chimeWebhook, setChimeWebhook] = useState('');
 
-  const [
-    headerFooterCheckboxIdToSelectedMap,
-    setHeaderFooterCheckboxIdToSelectedMap,
-  ] = useState<{
-    [x: string]: boolean;
-  }>({});
-  const [emailHeader, setEmailHeader] = useState(
-    `Example header in markdown:\n## Company XYZ\n### Operations team alerts`
-  );
-  const [emailFooter, setEmailFooter] = useState(
-    `Example footer in markdown:\n### Operations team alerts\nContact the team [ops@company.com](mailto://ops@company.com).`
-  );
-  const [sender, setSender] = useState('');
+  const [selectedSenderOptions, setSelectedSenderOptions] = useState<
+    Array<EuiComboBoxOptionOption<string>>
+  >([]);
+  // "value" field is the config_id of recipient groups, if it doesn't exist means it's a custom email address
   const [
     selectedRecipientGroupOptions,
     setSelectedRecipientGroupOptions,
@@ -132,8 +132,8 @@ export function CreateChannel(props: CreateChannelsProps) {
   const [customURLHost, setCustomURLHost] = useState('');
   const [customURLPort, setCustomURLPort] = useState('');
   const [customURLPath, setCustomURLPath] = useState('');
-  const [webhookParams, setWebhookParams] = useState<HeaderType[]>([]);
-  const [webhookHeaders, setWebhookHeaders] = useState<HeaderType[]>([
+  const [webhookParams, setWebhookParams] = useState<HeaderItemType[]>([]);
+  const [webhookHeaders, setWebhookHeaders] = useState<HeaderItemType[]>([
     { key: 'Content-Type', value: 'application/json' },
   ]);
   const [topicArn, setTopicArn] = useState(''); // SNS topic ARN
@@ -177,43 +177,55 @@ export function CreateChannel(props: CreateChannelsProps) {
     const id = props.match.params.id;
     if (typeof id !== 'string') return;
 
-    const response = await servicesContext.notificationService.getChannel(id);
-    const type = response.type as keyof typeof CHANNEL_TYPE;
-    setName(response.name);
-    setDescription(response.description);
-    setChannelType(type);
-    setSourceCheckboxIdToSelectedMap(
-      Object.fromEntries(
-        response.allowedFeatures.map((feature) => [feature, true])
-      )
-    );
-
-    if (!response.destination) return;
-
-    if (type === 'SLACK') {
-      setSlackWebhook(response.destination.slack?.url || '');
-    } else if (type === 'CHIME') {
-      setChimeWebhook(response.destination.chime?.url || '');
-    } else if (type === 'SNS') {
-      setTopicArn(response.destination.sns?.topic_arn || '');
-      setRoleArn(response.destination.sns?.role_arn || '');
-    } else if (type === 'EMAIL') {
-      setSender(response.destination.email?.email_account_id || '');
-      setSelectedRecipientGroupOptions(
-        response.destination.email?.recipients.map((recipient) => ({
-          label: recipient,
-        })) || []
+    try {
+      const response = await servicesContext.notificationService
+        .getChannel(id)
+        .then((response) => {
+          if (response.config_type === 'email') {
+            return servicesContext.notificationService.getEmailConfigDetails(
+              response
+            );
+          }
+          return response;
+        });
+      const type = response.config_type as keyof typeof CHANNEL_TYPE;
+      setIsEnabled(response.is_enabled);
+      setName(response.name);
+      setDescription(response.description || '');
+      setChannelType(type);
+      setSourceCheckboxIdToSelectedMap(
+        Object.fromEntries(
+          response.feature_list.map((feature) => [feature, true])
+        )
       );
-      setHeaderFooterCheckboxIdToSelectedMap({
-        header: !!response.destination.email?.header,
-        footer: !!response.destination.email?.footer,
-      });
-      setEmailHeader(response.destination.email?.header || '');
-      setEmailFooter(response.destination.email?.footer || '');
-    } else if (type === 'CUSTOM_WEBHOOK') {
-      // TODO
-    } else if (type === 'SES') {
-      // TODO
+
+      if (type === 'slack') {
+        setSlackWebhook(response.slack?.url || '');
+      } else if (type === 'chime') {
+        setChimeWebhook(response.chime?.url || '');
+      } else if (type === 'email') {
+        const emailObject = deconstructEmailObject(response.email!);
+        setSelectedSenderOptions(emailObject.selectedSenderOptions);
+        setSelectedRecipientGroupOptions(
+          emailObject.selectedRecipientGroupOptions
+        );
+      } else if (type === 'webhook') {
+        const webhookObject = deconstructWebhookObject(response.webhook!);
+        setWebhookURL(webhookObject.webhookURL);
+        setCustomURLHost(webhookObject.customURLHost);
+        setCustomURLPort(webhookObject.customURLPort);
+        setCustomURLPath(webhookObject.customURLPath);
+        setWebhookParams(webhookObject.webhookParams);
+        setWebhookHeaders(webhookObject.webhookHeaders);
+      } else if (type === 'SNS') {
+        // TODO
+      } else if (type === 'SES') {
+        // TODO
+      }
+    } catch (error) {
+      coreContext.notifications.toasts.addDanger(
+        getErrorMessage(error, 'There was a problem loading channel.')
+      );
     }
   };
 
@@ -231,14 +243,14 @@ export function CreateChannel(props: CreateChannelsProps) {
       roleArn: [],
       sesSender: [],
     };
-    if (channelType === 'SLACK') {
+    if (channelType === 'slack') {
       errors.slackWebhook = validateWebhookURL(slackWebhook);
-    } else if (channelType === 'CHIME') {
+    } else if (channelType === 'chime') {
       errors.chimeWebhook = validateWebhookURL(chimeWebhook);
-    } else if (channelType === 'EMAIL') {
-      errors.sender = validateEmailSender(sender);
+    } else if (channelType === 'email') {
+      errors.sender = validateEmailSender(selectedSenderOptions);
       errors.recipients = validateRecipients(selectedRecipientGroupOptions);
-    } else if (channelType === 'CUSTOM_WEBHOOK') {
+    } else if (channelType === 'webhook') {
       if (webhookTypeIdSelected === 'WEBHOOK_URL') {
         errors.webhookURL = validateWebhookURL(webhookURL);
       } else {
@@ -254,6 +266,39 @@ export function CreateChannel(props: CreateChannelsProps) {
       (errorFlag, error) => errorFlag || error.length > 0,
       false
     );
+  };
+
+  const createConfigObject = () => {
+    const config: any = {
+      name,
+      description,
+      config_type: channelType,
+      feature_list: Object.entries(sourceCheckboxIdToSelectedMap)
+        .filter(([key, value]) => value)
+        .map(([key, value]) => key),
+      is_enabled: isEnabled,
+    };
+    if (channelType === 'slack') {
+      config.slack = { url: slackWebhook };
+    } else if (channelType === 'chime') {
+      config.chime = { url: chimeWebhook };
+    } else if (channelType === 'webhook') {
+      config.webhook = constructWebhookObject(
+        webhookTypeIdSelected,
+        webhookURL,
+        customURLHost,
+        customURLPort,
+        customURLPath,
+        webhookParams,
+        webhookHeaders
+      );
+    } else if (channelType === 'email') {
+      config.email = constructEmailObject(
+        selectedSenderOptions,
+        selectedRecipientGroupOptions
+      );
+    }
+    return config;
   };
 
   return (
@@ -296,31 +341,21 @@ export function CreateChannel(props: CreateChannelsProps) {
               </>
             )}
           </EuiFormRow>
-          {channelType === 'SLACK' ? (
+          {channelType === 'slack' ? (
             <SlackSettings
               slackWebhook={slackWebhook}
               setSlackWebhook={setSlackWebhook}
             />
-          ) : channelType === 'CHIME' ? (
+          ) : channelType === 'chime' ? (
             <ChimeSettings
               chimeWebhook={chimeWebhook}
               setChimeWebhook={setChimeWebhook}
             />
-          ) : channelType === 'EMAIL' || channelType === 'SES' ? (
+          ) : channelType === 'email' || channelType === 'SES' ? (
             <EmailSettings
               isAmazonSES={channelType === 'SES'}
-              headerFooterCheckboxIdToSelectedMap={
-                headerFooterCheckboxIdToSelectedMap
-              }
-              setHeaderFooterCheckboxIdToSelectedMap={
-                setHeaderFooterCheckboxIdToSelectedMap
-              }
-              emailHeader={emailHeader}
-              setEmailHeader={setEmailHeader}
-              emailFooter={emailFooter}
-              setEmailFooter={setEmailFooter}
-              sender={sender}
-              setSender={setSender}
+              selectedSenderOptions={selectedSenderOptions}
+              setSelectedSenderOptions={setSelectedSenderOptions}
               selectedRecipientGroupOptions={selectedRecipientGroupOptions}
               setSelectedRecipientGroupOptions={
                 setSelectedRecipientGroupOptions
@@ -328,7 +363,7 @@ export function CreateChannel(props: CreateChannelsProps) {
               sesSender={sesSender}
               setSesSender={setSesSender}
             />
-          ) : channelType === 'CUSTOM_WEBHOOK' ? (
+          ) : channelType === 'webhook' ? (
             <CustomWebhookSettings
               webhookTypeIdSelected={webhookTypeIdSelected}
               setWebhookTypeIdSelected={setWebhookTypeIdSelected}
@@ -369,6 +404,10 @@ export function CreateChannel(props: CreateChannelsProps) {
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButton
+              data-test-subj="create-channel-send-test-message-button"
+              disabled={Object.values(sourceCheckboxIdToSelectedMap).every(
+                (enabled) => !enabled
+              )}
               onClick={() => {
                 if (!isInputValid()) {
                   coreContext.notifications.toasts.addDanger(
@@ -376,7 +415,7 @@ export function CreateChannel(props: CreateChannelsProps) {
                   );
                   return;
                 }
-                if (Math.random() < 0.5) {
+                if (true) {
                   coreContext.notifications.toasts.addSuccess(
                     'Successfully sent a test message.'
                   );
@@ -401,19 +440,37 @@ export function CreateChannel(props: CreateChannelsProps) {
           <EuiFlexItem grow={false}>
             <EuiButton
               fill
-              onClick={() => {
+              data-test-subj="create-channel-create-button"
+              onClick={async () => {
                 if (!isInputValid()) {
                   coreContext.notifications.toasts.addDanger(
                     'Some fields are invalid. Fix all highlighted error(s) before continuing.'
                   );
                   return;
                 }
-                coreContext.notifications.toasts.addSuccess(
-                  `Channel ${name} successfully ${
-                    props.edit ? 'updated' : 'created'
-                  }.`
-                );
-                location.assign(prevURL);
+                const config = createConfigObject();
+                const request = props.edit
+                  ? servicesContext.notificationService.updateConfig(
+                      id!,
+                      config
+                    )
+                  : servicesContext.notificationService.createConfig(config);
+                await request
+                  .then((response) => {
+                    coreContext.notifications.toasts.addSuccess(
+                      `Channel ${name} successfully ${
+                        props.edit ? 'updated' : 'created'
+                      }.`
+                    );
+                    setTimeout(() => location.assign(prevURL), SERVER_DELAY);
+                  })
+                  .catch((error) => {
+                    coreContext.notifications.toasts.addError(error, {
+                      title: `Failed to ${
+                        props.edit ? 'update' : 'create'
+                      } channel.`,
+                    });
+                  });
               }}
             >
               {props.edit ? 'Save' : 'Create'}

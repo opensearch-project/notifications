@@ -26,21 +26,20 @@
 
 import {
   EuiButton,
-  EuiCheckboxGroup,
-  EuiCheckboxGroupOption,
   EuiComboBox,
   EuiComboBoxOptionOption,
   EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
-  EuiMarkdownEditor,
   EuiSpacer,
-  EuiSuperSelect,
-  EuiSuperSelectOption,
+  SortDirection,
 } from '@elastic/eui';
-import React, { useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { CoreServicesContext } from '../../../components/coreServices';
 import { ModalConsumer } from '../../../components/Modal';
+import { ServicesContext } from '../../../services';
+import { getErrorMessage } from '../../../utils/helpers';
 import { CreateChannelContext } from '../CreateChannel';
 import {
   validateEmailSender,
@@ -51,16 +50,10 @@ import { CreateSenderModal } from './modals/CreateSenderModal';
 
 interface EmailSettingsProps {
   isAmazonSES: boolean;
-  headerFooterCheckboxIdToSelectedMap: { [x: string]: boolean };
-  setHeaderFooterCheckboxIdToSelectedMap: (map: {
-    [x: string]: boolean;
-  }) => void;
-  emailHeader: string;
-  setEmailHeader: (emailHeader: string) => void;
-  emailFooter: string;
-  setEmailFooter: (emailFooter: string) => void;
-  sender: string;
-  setSender: (sender: string) => void;
+  selectedSenderOptions: Array<EuiComboBoxOptionOption<string>>;
+  setSelectedSenderOptions: (
+    options: Array<EuiComboBoxOptionOption<string>>
+  ) => void;
   selectedRecipientGroupOptions: Array<EuiComboBoxOptionOption<string>>;
   setSelectedRecipientGroupOptions: (
     options: Array<EuiComboBoxOptionOption<string>>
@@ -71,32 +64,65 @@ interface EmailSettingsProps {
 
 export function EmailSettings(props: EmailSettingsProps) {
   const context = useContext(CreateChannelContext)!;
-  const checkboxOptions: EuiCheckboxGroupOption[] = [
-    {
-      id: 'header',
-      label: 'Add header',
-    },
-    {
-      id: 'footer',
-      label: 'Add footer',
-    },
-  ];
+  const coreContext = useContext(CoreServicesContext)!;
+  const servicesContext = useContext(ServicesContext)!;
 
   const [senderOptions, setSenderOptions] = useState<
-    Array<EuiSuperSelectOption<string>>
-  >([
-    {
-      value: 'Admin',
-      inputDisplay: 'Admin',
-    },
-  ]);
+    Array<EuiComboBoxOptionOption<string>>
+  >([]);
   const [recipientGroupOptions, setRecipientGroupOptions] = useState<
     Array<EuiComboBoxOptionOption<string>>
-  >([
-    {
-      label: 'no-reply@company.com',
-    },
-  ]);
+  >([]);
+
+  const getQueryObject = (config_type: string, query?: string) => ({
+    from_index: 0,
+    max_items: 10000,
+    config_type,
+    sort_field: 'name',
+    sort_order: SortDirection.ASC,
+    ...(query ? { query } : {}),
+  });
+
+  const refreshSenders = useCallback(async (query?: string) => {
+    try {
+      const senders = await servicesContext.notificationService.getSenders(
+        getQueryObject('smtp_account', query)
+      );
+      setSenderOptions(
+        senders.items.map((sender) => ({
+          label: sender.name,
+          value: sender.config_id,
+        }))
+      );
+    } catch (error) {
+      coreContext.notifications.toasts.addDanger(
+        getErrorMessage(error, 'There was a problem loading senders.')
+      );
+    }
+  }, []);
+
+  const refreshRecipientGroups = useCallback(async (query?: string) => {
+    try {
+      const recipientGroups = await servicesContext.notificationService.getRecipientGroups(
+        getQueryObject('email_group', query)
+      );
+      setRecipientGroupOptions(
+        recipientGroups.items.map((recipientGroup) => ({
+          label: recipientGroup.name,
+          value: recipientGroup.config_id,
+        }))
+      );
+    } catch (error) {
+      coreContext.notifications.toasts.addDanger(
+        getErrorMessage(error, 'There was a problem loading recipient groups.')
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshSenders();
+    refreshRecipientGroups();
+  }, []);
 
   const onCreateEmailOption = (
     searchValue: string,
@@ -118,6 +144,7 @@ export function EmailSettings(props: EmailSettingsProps) {
       newOption,
     ]);
   };
+
   return (
     <>
       {props.isAmazonSES ? (
@@ -133,7 +160,7 @@ export function EmailSettings(props: EmailSettingsProps) {
               placeholder="Enter a sender email address"
               value={props.sesSender}
               onChange={(e) => props.setSesSender(e.target.value)}
-              isInvalid={context.inputErrors.slackWebhook.length > 0}
+              isInvalid={context.inputErrors.sesSender.length > 0}
               onBlur={() => {
                 context.setInputErrors({
                   ...context.inputErrors,
@@ -155,16 +182,19 @@ export function EmailSettings(props: EmailSettingsProps) {
                 error={context.inputErrors.sender.join(' ')}
                 isInvalid={context.inputErrors.sender.length > 0}
               >
-                <EuiSuperSelect
+                <EuiComboBox
+                  placeholder="Sender name"
                   fullWidth
+                  singleSelection
                   options={senderOptions}
-                  valueOfSelected={props.sender}
-                  onChange={props.setSender}
+                  selectedOptions={props.selectedSenderOptions}
+                  onChange={props.setSelectedSenderOptions}
+                  isClearable={true}
                   isInvalid={context.inputErrors.sender.length > 0}
                   onBlur={() => {
                     context.setInputErrors({
                       ...context.inputErrors,
-                      sender: validateEmailSender(props.sender),
+                      sender: validateEmailSender(props.selectedSenderOptions),
                     });
                   }}
                 />
@@ -178,10 +208,10 @@ export function EmailSettings(props: EmailSettingsProps) {
                       onClick={() =>
                         onShow(CreateSenderModal, {
                           addSenderOptionAndSelect: (
-                            newOption: EuiSuperSelectOption<string>
+                            newOption: EuiComboBoxOptionOption<string>
                           ) => {
                             setSenderOptions([...senderOptions, newOption]);
-                            props.setSender(newOption.value);
+                            props.setSelectedSenderOptions([newOption]);
                           },
                         })
                       }
@@ -254,45 +284,6 @@ export function EmailSettings(props: EmailSettingsProps) {
           </EuiFormRow>
         </EuiFlexItem>
       </EuiFlexGroup>
-
-      <EuiSpacer size="m" />
-      <EuiFormRow>
-        <EuiCheckboxGroup
-          options={checkboxOptions}
-          idToSelectedMap={props.headerFooterCheckboxIdToSelectedMap}
-          onChange={(optionId: string) => {
-            props.setHeaderFooterCheckboxIdToSelectedMap({
-              ...props.headerFooterCheckboxIdToSelectedMap,
-              ...{
-                [optionId]: !props.headerFooterCheckboxIdToSelectedMap[
-                  optionId
-                ],
-              },
-            });
-          }}
-          legend={{ children: 'Header and footer' }}
-        />
-      </EuiFormRow>
-
-      {props.headerFooterCheckboxIdToSelectedMap.header && (
-        <EuiFormRow label="Header" fullWidth={true}>
-          <EuiMarkdownEditor
-            aria-labelledby="email-header-markdown-editor"
-            value={props.emailHeader}
-            onChange={props.setEmailHeader}
-          />
-        </EuiFormRow>
-      )}
-
-      {props.headerFooterCheckboxIdToSelectedMap.footer && (
-        <EuiFormRow label="Footer" fullWidth={true}>
-          <EuiMarkdownEditor
-            aria-labelledby="email-footer-markdown-editor"
-            value={props.emailFooter}
-            onChange={props.setEmailFooter}
-          />
-        </EuiFormRow>
-      )}
     </>
   );
 }
