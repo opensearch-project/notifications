@@ -45,6 +45,7 @@ import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
 import { ServicesContext } from '../../services';
 import {
+  BACKEND_CHANNEL_TYPE,
   BREADCRUMBS,
   CHANNEL_TYPE,
   CUSTOM_WEBHOOK_ENDPOINT_TYPE,
@@ -199,17 +200,17 @@ export function CreateChannel(props: CreateChannelsProps) {
         )
       );
 
-      if (type === 'slack') {
+      if (type === BACKEND_CHANNEL_TYPE.SLACK) {
         setSlackWebhook(response.slack?.url || '');
-      } else if (type === 'chime') {
+      } else if (type === BACKEND_CHANNEL_TYPE.CHIME) {
         setChimeWebhook(response.chime?.url || '');
-      } else if (type === 'email') {
+      } else if (type === BACKEND_CHANNEL_TYPE.EMAIL) {
         const emailObject = deconstructEmailObject(response.email!);
         setSelectedSenderOptions(emailObject.selectedSenderOptions);
         setSelectedRecipientGroupOptions(
           emailObject.selectedRecipientGroupOptions
         );
-      } else if (type === 'webhook') {
+      } else if (type === BACKEND_CHANNEL_TYPE.CUSTOM_WEBHOOK) {
         const webhookObject = deconstructWebhookObject(response.webhook!);
         setWebhookURL(webhookObject.webhookURL);
         setCustomURLHost(webhookObject.customURLHost);
@@ -217,9 +218,9 @@ export function CreateChannel(props: CreateChannelsProps) {
         setCustomURLPath(webhookObject.customURLPath);
         setWebhookParams(webhookObject.webhookParams);
         setWebhookHeaders(webhookObject.webhookHeaders);
-      } else if (type === 'SNS') {
+      } else if (type === BACKEND_CHANNEL_TYPE.SES) {
         // TODO
-      } else if (type === 'SES') {
+      } else if (type === BACKEND_CHANNEL_TYPE.SNS) {
         // TODO
       }
     } catch (error) {
@@ -243,21 +244,21 @@ export function CreateChannel(props: CreateChannelsProps) {
       roleArn: [],
       sesSender: [],
     };
-    if (channelType === 'slack') {
+    if (channelType === BACKEND_CHANNEL_TYPE.SLACK) {
       errors.slackWebhook = validateWebhookURL(slackWebhook);
-    } else if (channelType === 'chime') {
+    } else if (channelType === BACKEND_CHANNEL_TYPE.CHIME) {
       errors.chimeWebhook = validateWebhookURL(chimeWebhook);
-    } else if (channelType === 'email') {
+    } else if (channelType === BACKEND_CHANNEL_TYPE.EMAIL) {
       errors.sender = validateEmailSender(selectedSenderOptions);
       errors.recipients = validateRecipients(selectedRecipientGroupOptions);
-    } else if (channelType === 'webhook') {
+    } else if (channelType === BACKEND_CHANNEL_TYPE.CUSTOM_WEBHOOK) {
       if (webhookTypeIdSelected === 'WEBHOOK_URL') {
         errors.webhookURL = validateWebhookURL(webhookURL);
       } else {
         errors.customURLHost = validateCustomURLHost(customURLHost);
         errors.customURLPort = validateCustomURLPort(customURLPort);
       }
-    } else if (channelType === 'SNS') {
+    } else if (channelType === BACKEND_CHANNEL_TYPE.SNS) {
       errors.topicArn = validateArn(topicArn);
       if (!isOdfe) errors.roleArn = validateArn(roleArn);
     }
@@ -278,11 +279,11 @@ export function CreateChannel(props: CreateChannelsProps) {
         .map(([key, value]) => key),
       is_enabled: isEnabled,
     };
-    if (channelType === 'slack') {
+    if (channelType === BACKEND_CHANNEL_TYPE.SLACK) {
       config.slack = { url: slackWebhook };
-    } else if (channelType === 'chime') {
+    } else if (channelType === BACKEND_CHANNEL_TYPE.CHIME) {
       config.chime = { url: chimeWebhook };
-    } else if (channelType === 'webhook') {
+    } else if (channelType === BACKEND_CHANNEL_TYPE.CUSTOM_WEBHOOK) {
       config.webhook = constructWebhookObject(
         webhookTypeIdSelected,
         webhookURL,
@@ -292,7 +293,7 @@ export function CreateChannel(props: CreateChannelsProps) {
         webhookParams,
         webhookHeaders
       );
-    } else if (channelType === 'email') {
+    } else if (channelType === BACKEND_CHANNEL_TYPE.EMAIL) {
       config.email = constructEmailObject(
         selectedSenderOptions,
         selectedRecipientGroupOptions
@@ -341,19 +342,20 @@ export function CreateChannel(props: CreateChannelsProps) {
               </>
             )}
           </EuiFormRow>
-          {channelType === 'slack' ? (
+          {channelType === BACKEND_CHANNEL_TYPE.SLACK ? (
             <SlackSettings
               slackWebhook={slackWebhook}
               setSlackWebhook={setSlackWebhook}
             />
-          ) : channelType === 'chime' ? (
+          ) : channelType === BACKEND_CHANNEL_TYPE.CHIME ? (
             <ChimeSettings
               chimeWebhook={chimeWebhook}
               setChimeWebhook={setChimeWebhook}
             />
-          ) : channelType === 'email' || channelType === 'SES' ? (
+          ) : channelType === BACKEND_CHANNEL_TYPE.EMAIL ||
+            channelType === BACKEND_CHANNEL_TYPE.SES ? (
             <EmailSettings
-              isAmazonSES={channelType === 'SES'}
+              isAmazonSES={channelType === BACKEND_CHANNEL_TYPE.SES}
               selectedSenderOptions={selectedSenderOptions}
               setSelectedSenderOptions={setSelectedSenderOptions}
               selectedRecipientGroupOptions={selectedRecipientGroupOptions}
@@ -363,7 +365,7 @@ export function CreateChannel(props: CreateChannelsProps) {
               sesSender={sesSender}
               setSesSender={setSesSender}
             />
-          ) : channelType === 'webhook' ? (
+          ) : channelType === BACKEND_CHANNEL_TYPE.CUSTOM_WEBHOOK ? (
             <CustomWebhookSettings
               webhookTypeIdSelected={webhookTypeIdSelected}
               setWebhookTypeIdSelected={setWebhookTypeIdSelected}
@@ -380,7 +382,7 @@ export function CreateChannel(props: CreateChannelsProps) {
               webhookHeaders={webhookHeaders}
               setWebhookHeaders={setWebhookHeaders}
             />
-          ) : channelType === 'SNS' ? (
+          ) : channelType === BACKEND_CHANNEL_TYPE.SNS ? (
             <SNSSettings
               isOdfe={isOdfe}
               topicArn={topicArn}
