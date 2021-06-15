@@ -33,3 +33,9 @@ export interface HeaderItemType {
   key: string;
   value: string;
 }
+
+export interface ChannelFiltersType {
+  state?: string;
+  type?: string[];
+  source?: string[];
+}

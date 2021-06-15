@@ -169,7 +169,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
         helpText={
           <div>
             SSL or TLS is recommended for security. To use either one, you must
-            enter each sender account's credentials to the Elasticsearch
+            enter each sender account's credentials to the OpenSearch
             keystore using the CLI.{' '}
             <EuiLink
               href={ALERTING_DOCUMENTATION_LINK}

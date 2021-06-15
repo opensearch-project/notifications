@@ -4,7 +4,7 @@ Dashboards Notifications plugin provides an interface that helps users to manage
 
 ## Documentation
 
-Please see our technical [documentation](https://opendistro.github.io/for-elasticsearch-docs/) to learn more about its features.
+Please see our technical [documentation](https://docs-beta.opensearch.org/) to learn more about its features.
 
 ## Setup
 

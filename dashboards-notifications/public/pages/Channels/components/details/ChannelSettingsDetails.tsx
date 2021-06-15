@@ -28,7 +28,11 @@ import { EuiLink } from '@elastic/eui';
 import React from 'react';
 import { ChannelItemType } from '../../../../../models/interfaces';
 import { ModalConsumer } from '../../../../components/Modal';
-import { CHANNEL_TYPE } from '../../../../utils/constants';
+import { BACKEND_CHANNEL_TYPE, CHANNEL_TYPE } from '../../../../utils/constants';
+import {
+  deconstructEmailObject,
+  deconstructWebhookObject,
+} from '../../../CreateChannel/utils/helper';
 import { HeaderItemType, ListItemType } from '../../types';
 import { DetailsListModal } from '../modals/DetailsListModal';
 import { DetailsTableModal } from '../modals/DetailsTableModal';
@@ -57,7 +61,7 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
             .map((item: string | HeaderItemType) =>
               typeof item === 'string' ? item : `${item.key}: ${item.value}`
             )
-            .join(separator)}
+            .join(separator) || '-'}
         </div>
         {items.length > 5 && (
           <>
@@ -91,53 +95,37 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
     );
   };
 
-  const type = props.channel.type as keyof typeof CHANNEL_TYPE;
-  if (type === 'SLACK') {
+  const type = props.channel.config_type as keyof typeof CHANNEL_TYPE;
+  if (type === BACKEND_CHANNEL_TYPE.SLACK) {
     settingsList.push(
       ...[
         {
           title: 'Channel type',
-          description: CHANNEL_TYPE.SLACK,
+          description: CHANNEL_TYPE.slack,
         },
         {
           title: 'Webhook URL',
-          description: props.channel.destination.slack.url || '-',
+          description: props.channel.slack!.url || '-',
         },
       ]
     );
-  } else if (type === 'CHIME') {
+  } else if (type === BACKEND_CHANNEL_TYPE.CHIME) {
     settingsList.push(
       ...[
         {
           title: 'Channel type',
-          description: CHANNEL_TYPE.CHIME,
+          description: CHANNEL_TYPE.chime,
         },
         {
           title: 'Webhook URL',
-          description: props.channel.destination.chime.url || '-',
+          description: props.channel.chime!.url || '-',
         },
       ]
     );
-  } else if (type === 'SNS') {
-    settingsList.push(
-      ...[
-        {
-          title: 'Channel type',
-          description: CHANNEL_TYPE.SNS,
-        },
-        {
-          title: 'SNS topic ARN',
-          description: props.channel.destination.sns.topic_arn || '-',
-        },
-        {
-          title: 'IAM role ARN',
-          description: props.channel.destination.sns.role_arn || '-',
-        },
-      ]
-    );
-  } else if (type === 'EMAIL') {
+  } else if (type === BACKEND_CHANNEL_TYPE.EMAIL) {
+    const emailObject = deconstructEmailObject(props.channel.email!);
     const recipientsDescription = getModalComponent(
-      props.channel.destination.email.recipients,
+      emailObject.selectedRecipientGroupOptions.map((group) => group.label),
       'Default recipients',
       'Recipients'
     );
@@ -145,44 +133,42 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
       ...[
         {
           title: 'Channel type',
-          description: CHANNEL_TYPE.EMAIL,
+          description: CHANNEL_TYPE.email,
         },
         {
           title: 'Sender',
-          description: props.channel.destination.email.email_account_id || '-',
+          description: emailObject.selectedSenderOptions[0].label || '-',
         },
         {
           title: 'Default recipients',
           description: recipientsDescription,
         },
-        {
-          title: 'Email header',
-          description: props.channel.destination.email.header
-            ? 'Enabled'
-            : 'Disabled',
-        },
-        {
-          title: 'Email footer',
-          description: props.channel.destination.email.footer
-            ? 'Enabled'
-            : 'Disabled',
-        },
+        // TODO remove when removing header/footer functionality
+        // {
+        //   title: 'Email header',
+        //   description: props.channel.destination.email.header
+        //     ? 'Enabled'
+        //     : 'Disabled',
+        // },
+        // {
+        //   title: 'Email footer',
+        //   description: props.channel.destination.email.footer
+        //     ? 'Enabled'
+        //     : 'Disabled',
+        // },
       ]
     );
-  } else if (type === 'CUSTOM_WEBHOOK') {
+  } else if (type === BACKEND_CHANNEL_TYPE.CUSTOM_WEBHOOK) {
+    const webhookObject = deconstructWebhookObject(props.channel.webhook!);
     const parametersDescription = getModalComponent(
-      Object.entries(props.channel.destination.custom_webhook.parameters).map(
-        ([key, value]) => ({ key, value } as HeaderItemType)
-      ),
+      webhookObject.webhookParams,
       'Query parameters',
       undefined,
       '\n',
       true
     );
     const headersDescription = getModalComponent(
-      Object.entries(props.channel.destination.custom_webhook.headers).map(
-        ([key, value]) => ({ key, value } as HeaderItemType)
-      ),
+      webhookObject.webhookHeaders,
       'Webhook headers',
       undefined,
       '\n',
@@ -192,19 +178,19 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
       ...[
         {
           title: 'Channel type',
-          description: CHANNEL_TYPE.CUSTOM_WEBHOOK,
+          description: CHANNEL_TYPE.webhook,
         },
         {
           title: 'Host',
-          description: props.channel.destination.custom_webhook.host || '-',
+          description: webhookObject.customURLHost || '-',
         },
         {
           title: 'Port',
-          description: props.channel.destination.custom_webhook.port || '-',
+          description: webhookObject.customURLPort || '-',
         },
         {
           title: 'Path',
-          description: props.channel.destination.custom_webhook.path || '-',
+          description: webhookObject.customURLPath || '-',
         },
         {
           title: 'Query parameters',
@@ -216,40 +202,25 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
         },
       ]
     );
-  } else if (type === 'SES') {
-    const recipientsDescription = getModalComponent(
-      props.channel.destination.ses.recipients,
-      'Default recipients',
-      'Recipients'
-    );
-    settingsList.push(
-      ...[
-        {
-          title: 'Channel type',
-          description: CHANNEL_TYPE.SES,
-        },
-        {
-          title: 'Sender',
-          description: props.channel.destination.ses.email_account_id || '-',
-        },
-        {
-          title: 'Default recipients',
-          description: recipientsDescription,
-        },
-        {
-          title: 'Email header',
-          description: props.channel.destination.ses.header
-            ? 'Enabled'
-            : 'Disabled',
-        },
-        {
-          title: 'Email footer',
-          description: props.channel.destination.ses.footer
-            ? 'Enabled'
-            : 'Disabled',
-        },
-      ]
-    );
+  } else if (type === BACKEND_CHANNEL_TYPE.SNS) {
+    // settingsList.push(
+    //   ...[
+    //     {
+    //       title: 'Channel type',
+    //       description: CHANNEL_TYPE.SNS,
+    //     },
+    //     {
+    //       title: 'SNS topic ARN',
+    //       description: props.channel.destination.sns.topic_arn || '-',
+    //     },
+    //     {
+    //       title: 'IAM role ARN',
+    //       description: props.channel.destination.sns.role_arn || '-',
+    //     },
+    //   ]
+    // );
+  } else if (type === BACKEND_CHANNEL_TYPE.SES) {
+    // TODO
   }
 
   return (

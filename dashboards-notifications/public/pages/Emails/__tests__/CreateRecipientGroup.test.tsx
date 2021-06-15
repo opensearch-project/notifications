@@ -24,7 +24,7 @@
  * permissions and limitations under the License.
  */
 
-import { MOCK_CONFIG } from '../../../../test/mocks/mockData';
+import { MOCK_DATA } from '../../../../test/mocks/mockData';
 import { render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
@@ -51,7 +51,7 @@ describe('<CreateRecipientGroup/> spec', () => {
     const notificationServiceMock = jest.fn() as any;
     const updateConfig = jest.fn(async () => Promise.resolve());
     notificationServiceMock.notificationService = {
-      getRecipientGroup: async (id: string) => MOCK_CONFIG.recipientGroup,
+      getRecipientGroup: async (id: string) => MOCK_DATA.recipientGroup,
       updateConfig,
     };
     const props = { match: { params: { id: 'test' } } };

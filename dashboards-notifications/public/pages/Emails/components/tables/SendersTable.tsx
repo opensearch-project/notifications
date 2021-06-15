@@ -32,12 +32,13 @@ import {
   EuiHorizontalRule,
   EuiTableFieldDataColumnType,
   EuiTableSortingType,
+  SortDirection,
 } from '@elastic/eui';
 import { Criteria } from '@elastic/eui/src/components/basic_table/basic_table';
 import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_bar';
 import _ from 'lodash';
 import React, { Component } from 'react';
-import { SORT_DIRECTION } from '../../../../../common';
+import { CoreStart } from '../../../../../../../src/core/public';
 import { SenderItemType, TableState } from '../../../../../models/interfaces';
 import {
   ContentPanel,
@@ -50,7 +51,9 @@ import { getErrorMessage } from '../../../../utils/helpers';
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '../../../Notifications/utils/constants';
 import { DeleteSenderModal } from '../modals/DeleteSenderModal';
 
-interface SendersTableProps {}
+interface SendersTableProps {
+  coreContext: CoreStart;
+}
 
 interface SendersTableState extends TableState<SenderItemType> {}
 
@@ -70,7 +73,7 @@ export class SendersTable extends Component<
       size: 5,
       search: '',
       sortField: 'name',
-      sortDirection: SORT_DIRECTION.ASC,
+      sortDirection: SortDirection.ASC,
       items: [],
       selectedItems: [],
       loading: true,
@@ -152,7 +155,7 @@ export class SendersTable extends Component<
       );
       this.setState({ items: senders.items, total: senders.total });
     } catch (error) {
-      this.context.notifications.toasts.addDanger(
+      this.props.coreContext.notifications.toasts.addDanger(
         getErrorMessage(error, 'There was a problem loading senders.')
       );
     }
@@ -177,7 +180,6 @@ export class SendersTable extends Component<
   };
 
   render() {
-    const filterIsApplied = !!this.state.search;
     const page = Math.floor(this.state.from / this.state.size);
 
     const pagination: Pagination = {

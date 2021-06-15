@@ -40,6 +40,7 @@ import { DeleteChannelModal } from '../modals/DeleteChannelModal';
 
 interface ChannelDetailsActionsParams {
   label: string;
+  disabled?: boolean;
   color?: TextColor;
   modal?: React.ReactNode;
   modalParams?: object;
@@ -62,6 +63,7 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
     },
     {
       label: 'Send test message',
+      disabled: props.channel.feature_list.length === 0,
       action: () => {
         if (true) {
           coreContext.notifications.toasts.addSuccess(
@@ -111,6 +113,7 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
           {actions.map((params) => (
             <EuiContextMenuItem
               key={params.label}
+              disabled={params.disabled}
               onClick={() => {
                 setIsPopoverOpen(false);
                 if (params.modal) {

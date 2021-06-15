@@ -33,12 +33,13 @@ import {
   EuiLink,
   EuiTableFieldDataColumnType,
   EuiTableSortingType,
+  SortDirection,
 } from '@elastic/eui';
 import { Criteria } from '@elastic/eui/src/components/basic_table/basic_table';
 import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_bar';
 import _ from 'lodash';
 import React, { Component } from 'react';
-import { SORT_DIRECTION } from '../../../../../common';
+import { CoreStart } from '../../../../../../../src/core/public';
 import {
   RecipientGroupItemType,
   TableState,
@@ -55,7 +56,9 @@ import { DetailsListModal } from '../../../Channels/components/modals/DetailsLis
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '../../../Notifications/utils/constants';
 import { DeleteRecipientGroupModal } from '../modals/DeleteRecipientGroupModal';
 
-interface RecipientGroupsTableProps {}
+interface RecipientGroupsTableProps {
+  coreContext: CoreStart;
+}
 
 interface RecipientGroupsTableState
   extends TableState<RecipientGroupItemType> {}
@@ -76,7 +79,7 @@ export class RecipientGroupsTable extends Component<
       size: 5,
       search: '',
       sortField: 'name',
-      sortDirection: SORT_DIRECTION.ASC,
+      sortDirection: SortDirection.ASC,
       items: [],
       selectedItems: [],
       loading: true,
@@ -176,7 +179,7 @@ export class RecipientGroupsTable extends Component<
         total: recipientGroups.total,
       });
     } catch (error) {
-      this.context.notifications.toasts.addDanger(
+      this.props.coreContext.notifications.toasts.addDanger(
         getErrorMessage(error, 'There was a problem loading senders.')
       );
     }
@@ -201,32 +204,19 @@ export class RecipientGroupsTable extends Component<
   };
 
   render() {
-    const {
-      total,
-      from,
-      size,
-      search,
-      sortField,
-      sortDirection,
-      selectedItems,
-      items,
-      loading,
-    } = this.state;
-
-    const filterIsApplied = !!search;
-    const page = Math.floor(from / size);
+    const page = Math.floor(this.state.from / this.state.size);
 
     const pagination: Pagination = {
       pageIndex: page,
-      pageSize: size,
+      pageSize: this.state.size,
       pageSizeOptions: DEFAULT_PAGE_SIZE_OPTIONS,
-      totalItemCount: total,
+      totalItemCount: this.state.total,
     };
 
     const sorting: EuiTableSortingType<RecipientGroupItemType> = {
       sort: {
-        direction: sortDirection,
-        field: sortField,
+        direction: this.state.sortDirection,
+        field: this.state.sortField,
       },
     };
 
@@ -298,7 +288,7 @@ export class RecipientGroupsTable extends Component<
 
           <EuiBasicTable
             columns={this.columns}
-            items={items}
+            items={this.state.items}
             itemId="config_id"
             isSelectable={true}
             selection={selection}

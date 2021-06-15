@@ -13,7 +13,7 @@ import { render } from '@testing-library/react';
 import { configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import React from 'react';
-import { MOCK_CONFIG } from '../../../../test/mocks/mockData';
+import { MOCK_DATA } from '../../../../test/mocks/mockData';
 import {
   coreServicesMock,
   notificationServiceMock,
@@ -26,7 +26,7 @@ describe('<ChannelDetailsActions /> spec', () => {
   configure({ adapter: new Adapter() });
 
   it('renders the component', () => {
-    const channel = MOCK_CONFIG.chime;
+    const channel = MOCK_DATA.chime;
     const utils = render(
       <ServicesContext.Provider value={notificationServiceMock}>
         <CoreServicesContext.Provider value={coreServicesMock}>
@@ -38,7 +38,7 @@ describe('<ChannelDetailsActions /> spec', () => {
   });
 
   it('opens popover', () => {
-    const channel = MOCK_CONFIG.chime;
+    const channel = MOCK_DATA.chime;
     const utils = render(
       <ServicesContext.Provider value={notificationServiceMock}>
         <CoreServicesContext.Provider value={coreServicesMock}>
@@ -51,7 +51,7 @@ describe('<ChannelDetailsActions /> spec', () => {
   });
 
   it('clicks buttons in popover', () => {
-    const channel = MOCK_CONFIG.chime;
+    const channel = MOCK_DATA.chime;
     const utils = render(
       <ServicesContext.Provider value={notificationServiceMock}>
         <CoreServicesContext.Provider value={coreServicesMock}>
