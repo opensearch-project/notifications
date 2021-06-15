@@ -15,3 +15,11 @@ exports[`<CreateSender/> spec renders the component for editing 1`] = `
   Edit sender
 </h1>
 `;
+
+exports[`<CreateSender/> spec renders the component for editing 2`] = `
+<h1
+  class="euiTitle euiTitle--large"
+>
+  Edit sender
+</h1>
+`;

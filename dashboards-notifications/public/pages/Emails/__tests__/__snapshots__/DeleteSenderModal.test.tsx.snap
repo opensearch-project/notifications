@@ -1,5 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<DeleteSenderModal /> spec renders multiple channels 1`] = `null`;
+exports[`<DeleteSenderModal /> spec deletes senders 1`] = `null`;
+
+exports[`<DeleteSenderModal /> spec handles failures when deleting senders 1`] = `null`;
+
+exports[`<DeleteSenderModal /> spec renders multiple senders 1`] = `null`;
 
 exports[`<DeleteSenderModal /> spec renders the component 1`] = `null`;

@@ -1,3 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<CreateRecipientGroupModal/> spec renders the component 1`] = `null`;
+
+exports[`<CreateRecipientGroupModal/> spec validates input 1`] = `null`;

@@ -1,5 +1,110 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`<ChannelNamePanel/> spec renders errors 1`] = `
+<div
+  class="euiPanel euiPanel--paddingMedium"
+>
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
+    style="padding: 0px 0px;"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <h3
+        class="euiTitle euiTitle--small"
+      >
+        Name and description
+      </h3>
+    </div>
+  </div>
+  <hr
+    class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginSmall"
+  />
+  <div
+    style="padding: initial;"
+  >
+    <div
+      class="euiFormRow"
+      id="random_html_id-row"
+    >
+      <div
+        class="euiFormRow__labelWrapper"
+      >
+        <label
+          aria-invalid="true"
+          class="euiFormLabel euiFormRow__label euiFormLabel-isInvalid"
+          for="random_html_id"
+        >
+          Name
+        </label>
+      </div>
+      <div
+        class="euiFormRow__fieldWrapper"
+      >
+        <div
+          class="euiFormControlLayout"
+        >
+          <div
+            class="euiFormControlLayout__childrenWrapper"
+          >
+            <input
+              aria-describedby="random_html_id-error-0"
+              class="euiFieldText"
+              id="random_html_id"
+              placeholder="Enter channel name"
+              type="text"
+              value="test"
+            />
+          </div>
+        </div>
+        <div
+          aria-live="polite"
+          class="euiFormErrorText euiFormRow__text"
+          id="random_html_id-error-0"
+        >
+          test error
+        </div>
+      </div>
+    </div>
+    <div
+      class="euiFormRow"
+      id="random_html_id-row"
+    >
+      <div
+        class="euiFormRow__labelWrapper"
+      >
+        <label
+          class="euiFormLabel euiFormRow__label"
+          for="random_html_id"
+        >
+          <span>
+            Description - 
+            <i
+              style="font-weight: normal;"
+            >
+              optional
+            </i>
+          </span>
+        </label>
+      </div>
+      <div
+        class="euiFormRow__fieldWrapper"
+      >
+        <textarea
+          class="euiTextArea euiTextArea--resizeVertical"
+          placeholder="What is the purpose of this channel?"
+          rows="6"
+          style="height: 4.1rem;"
+        >
+          test description
+        </textarea>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`<ChannelNamePanel/> spec renders the component 1`] = `
 <div
   class="euiPanel euiPanel--paddingMedium"
@@ -32,8 +137,8 @@ exports[`<ChannelNamePanel/> spec renders the component 1`] = `
         class="euiFormRow__labelWrapper"
       >
         <label
-          aria-invalid="mockConstructor"
-          class="euiFormLabel euiFormRow__label euiFormLabel-isInvalid"
+          aria-invalid="false"
+          class="euiFormLabel euiFormRow__label"
           for="random_html_id"
         >
           Name
@@ -49,7 +154,6 @@ exports[`<ChannelNamePanel/> spec renders the component 1`] = `
             class="euiFormControlLayout__childrenWrapper"
           >
             <input
-              aria-describedby="random_html_id-error-0"
               class="euiFieldText"
               id="random_html_id"
               placeholder="Enter channel name"
@@ -57,13 +161,6 @@ exports[`<ChannelNamePanel/> spec renders the component 1`] = `
               value="test"
             />
           </div>
-        </div>
-        <div
-          aria-live="polite"
-          class="euiFormErrorText euiFormRow__text"
-          id="random_html_id-error-0"
-        >
-          Name is required.
         </div>
       </div>
     </div>
@@ -91,20 +188,11 @@ exports[`<ChannelNamePanel/> spec renders the component 1`] = `
       <div
         class="euiFormRow__fieldWrapper"
       >
-        <div
-          class="euiText euiText--extraSmall"
-        >
-          <div
-            class="euiTextColor euiTextColor--subdued"
-          >
-            Describe the purpose of the channel.
-          </div>
-        </div>
         <textarea
           class="euiTextArea euiTextArea--resizeVertical"
-          placeholder="Describe the channel"
+          placeholder="What is the purpose of this channel?"
           rows="6"
-          style="height: 2.8rem;"
+          style="height: 4.1rem;"
         >
           test description
         </textarea>

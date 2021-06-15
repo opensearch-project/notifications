@@ -1,0 +1,271 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ChannelSettingsDetails /> spec renders Chime channel 1`] = `
+<div>
+  <div
+    class="euiSpacer euiSpacer--s"
+  />
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
+        style="word-break: break-word; white-space: pre-line;"
+      >
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Channel type
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          Chime
+        </dd>
+      </dl>
+    </div>
+    <div
+      class="euiFlexItem"
+    >
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
+        style="word-break: break-word; white-space: pre-line;"
+      >
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Webhook URL
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          https://chimehook
+        </dd>
+      </dl>
+    </div>
+    <div
+      class="euiFlexItem"
+    />
+  </div>
+  <div
+    class="euiSpacer euiSpacer--m"
+  />
+</div>
+`;
+
+exports[`<ChannelSettingsDetails /> spec renders Email channel 1`] = `
+<div>
+  <div
+    class="euiSpacer euiSpacer--s"
+  />
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
+        style="word-break: break-word; white-space: pre-line;"
+      >
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Channel type
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          Email
+        </dd>
+      </dl>
+    </div>
+    <div
+      class="euiFlexItem"
+    >
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
+        style="word-break: break-word; white-space: pre-line;"
+      >
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Sender
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          name1
+        </dd>
+      </dl>
+    </div>
+    <div
+      class="euiFlexItem"
+    >
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
+        style="word-break: break-word; white-space: pre-line;"
+      >
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Default recipients
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          <div
+            style="white-space: pre-line;"
+          >
+            name1, name2, name3, name4, name5
+          </div>
+           
+          <button
+            class="euiLink euiLink--primary"
+            type="button"
+          >
+            4
+             more
+          </button>
+        </dd>
+      </dl>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--m"
+  />
+</div>
+`;
+
+exports[`<ChannelSettingsDetails /> spec renders Slack channel 1`] = `
+<div>
+  <div
+    class="euiSpacer euiSpacer--s"
+  />
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
+        style="word-break: break-word; white-space: pre-line;"
+      >
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Channel type
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          Slack
+        </dd>
+      </dl>
+    </div>
+    <div
+      class="euiFlexItem"
+    >
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
+        style="word-break: break-word; white-space: pre-line;"
+      >
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Webhook URL
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          https://chimehook
+        </dd>
+      </dl>
+    </div>
+    <div
+      class="euiFlexItem"
+    />
+  </div>
+  <div
+    class="euiSpacer euiSpacer--m"
+  />
+</div>
+`;
+
+exports[`<ChannelSettingsDetails /> spec renders Webhook channel 1`] = `
+<div>
+  <div
+    class="euiSpacer euiSpacer--s"
+  />
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
+        style="word-break: break-word; white-space: pre-line;"
+      >
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Channel type
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          Custom webhook
+        </dd>
+      </dl>
+    </div>
+    <div
+      class="euiFlexItem"
+    >
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
+        style="word-break: break-word; white-space: pre-line;"
+      >
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Host
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          host
+        </dd>
+      </dl>
+    </div>
+    <div
+      class="euiFlexItem"
+    >
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
+        style="word-break: break-word; white-space: pre-line;"
+      >
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Port
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          23
+        </dd>
+      </dl>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--m"
+  />
+</div>
+`;
+
+exports[`<ChannelSettingsDetails /> spec renders the empty component 1`] = `null`;
