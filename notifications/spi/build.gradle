@@ -89,6 +89,10 @@ task javadocJar(type: Jar) {
     dependsOn javadoc
 }
 
+allOpen {
+    annotation("org.opensearch.notifications.spi.util.OpenForTesting")
+}
+
 test {
     doFirst {
         // reverse operation of https://github.com/elastic/elasticsearch/blob/7.6/buildSrc/src/main/groovy/org/elasticsearch/gradle/BuildPlugin.groovy#L736-L743

@@ -64,8 +64,7 @@ internal class ChimeDestinationTests {
         EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
-        val webhookDestinationFactory = WebhookDestinationFactory()
-        webhookDestinationFactory.destinationHttpClient = httpClient
+        val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
         DestinationFactoryProvider.destinationFactoryMap = mapOf("Chime" to webhookDestinationFactory)
 
         val title = "test Chime"
@@ -100,8 +99,7 @@ internal class ChimeDestinationTests {
         EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
-        val webhookDestinationFactory = WebhookDestinationFactory()
-        webhookDestinationFactory.destinationHttpClient = httpClient
+        val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
         DestinationFactoryProvider.destinationFactoryMap = mapOf("Chime" to webhookDestinationFactory)
 
         val title = "test Chime"
@@ -137,8 +135,7 @@ internal class ChimeDestinationTests {
         EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
-        val webhookDestinationFactory = WebhookDestinationFactory()
-        webhookDestinationFactory.destinationHttpClient = httpClient
+        val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
         DestinationFactoryProvider.destinationFactoryMap = mapOf("Chime" to webhookDestinationFactory)
 
         val title = "test Chime"

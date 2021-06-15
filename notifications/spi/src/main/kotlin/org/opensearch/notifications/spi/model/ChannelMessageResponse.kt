@@ -33,7 +33,6 @@ import org.opensearch.rest.RestStatus
  * Data class for storing channel message response per recipient.
  */
 class ChannelMessageResponse(
-    val recipient: String? = null,
     val statusCode: RestStatus,
     val statusText: String
 )

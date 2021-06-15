@@ -27,11 +27,12 @@
 
 package org.opensearch.notifications.spi.factory
 
+import org.opensearch.notifications.spi.client.DestinationClientPool
 import org.opensearch.notifications.spi.client.DestinationHttpClient
-import org.opensearch.notifications.spi.client.DestinationHttpClientPool
 import org.opensearch.notifications.spi.model.ChannelMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.WebhookDestination
+import org.opensearch.notifications.spi.utils.OpenForTesting
 import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.rest.RestStatus
 import java.io.IOException
@@ -42,20 +43,26 @@ import java.io.IOException
 internal class WebhookDestinationFactory : DestinationFactory<WebhookDestination> {
 
     private val log by logger(WebhookDestinationFactory::class.java)
-    var destinationHttpClient: DestinationHttpClient = DestinationHttpClientPool.httpClient
+    private val destinationHttpClient: DestinationHttpClient
+
+    constructor() {
+        this.destinationHttpClient = DestinationClientPool.httpClient
+    }
+    @OpenForTesting
+    constructor(destinationHttpClient: DestinationHttpClient) {
+        this.destinationHttpClient = destinationHttpClient
+    }
 
     override fun sendMessage(destination: WebhookDestination, message: MessageContent): ChannelMessageResponse {
         return try {
             val response = destinationHttpClient.execute(destination, message)
             ChannelMessageResponse(
-                recipient = destination.destinationType,
                 statusCode = RestStatus.OK,
                 statusText = response
             )
         } catch (exception: IOException) {
             log.error("Exception sending message: $message", exception)
             ChannelMessageResponse(
-                recipient = destination.destinationType,
                 statusCode = RestStatus.INTERNAL_SERVER_ERROR,
                 statusText = "Failed to send message"
             )

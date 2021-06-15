@@ -45,6 +45,7 @@ import org.opensearch.common.unit.TimeValue
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
 import org.opensearch.notifications.spi.model.destination.WebhookDestination
+import org.opensearch.notifications.spi.utils.OpenForTesting
 import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.rest.RestStatus
 import java.io.IOException
@@ -62,7 +63,7 @@ class DestinationHttpClient {
     constructor() {
         this.httpClient = createHttpClient()
     }
-
+    @OpenForTesting
     constructor(httpClient: CloseableHttpClient) {
         this.httpClient = httpClient
     }
@@ -172,11 +173,4 @@ class DestinationHttpClient {
     private fun extractBody(message: MessageContent): String {
         return message.textDescription
     }
-
-//    /**
-//     * This method is useful for Mocking the client
-//     */
-//    fun setHttpClient(httpClient: CloseableHttpClient) {
-//        httpClient = httpClient
-//    }
 }

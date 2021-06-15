@@ -30,9 +30,8 @@ package org.opensearch.notifications.spi.factory
 import org.opensearch.notifications.spi.model.destination.BaseDestination
 
 /**
- * This class helps in fetching the right Channel Factory based on the
- * type of the channel.
- * A channel could be Email, Webhook etc
+ * This class helps in fetching the right destination factory based on type
+ * A Destination could be Email, Webhook etc
  */
 internal object DestinationFactoryProvider {
 
@@ -44,7 +43,7 @@ internal object DestinationFactoryProvider {
     )
 
     /**
-     * Fetches the right channel factory based on the type of the channel
+     * Fetches the right destination factory based on the type
      *
      * @param destinationType [{@link DestinationType}]
      * @return DestinationFactory factory object for above destination type

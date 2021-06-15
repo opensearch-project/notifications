@@ -30,6 +30,6 @@ package org.opensearch.notifications.spi.client
 /**
  * This class provides Client to the relevant destinations
  */
-internal object DestinationHttpClientPool {
+internal object DestinationClientPool {
     val httpClient: DestinationHttpClient = DestinationHttpClient()
 }

@@ -64,8 +64,7 @@ internal class CustomWebhookDestinationTests {
         EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
-        val webhookDestinationFactory = WebhookDestinationFactory()
-        webhookDestinationFactory.destinationHttpClient = httpClient
+        val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
         DestinationFactoryProvider.destinationFactoryMap = mapOf("Webhook" to webhookDestinationFactory)
 
         val title = "test custom webhook"
@@ -100,8 +99,7 @@ internal class CustomWebhookDestinationTests {
         EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
-        val webhookDestinationFactory = WebhookDestinationFactory()
-        webhookDestinationFactory.destinationHttpClient = httpClient
+        val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
         DestinationFactoryProvider.destinationFactoryMap = mapOf("Webhook" to webhookDestinationFactory)
 
         val title = "test custom webhook"
@@ -137,8 +135,7 @@ internal class CustomWebhookDestinationTests {
         EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
-        val webhookDestinationFactory = WebhookDestinationFactory()
-        webhookDestinationFactory.destinationHttpClient = httpClient
+        val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
         DestinationFactoryProvider.destinationFactoryMap = mapOf("Webhook" to webhookDestinationFactory)
 
         val title = "test custom webhook"
