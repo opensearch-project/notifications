@@ -78,15 +78,21 @@ export default class Main extends Component<MainProps, MainState> {
   }
 
   async componentDidMount() {
-    const isChannelConfigured = await this.context.notificationService.getChannels({
-      config_type: Object.keys(CHANNEL_TYPE),
-      from_index: 0,
-      max_items: 1,
-      sort_field: 'name',
-      sort_order: SortDirection.ASC,
-    });
-    if (!isChannelConfigured) {
-      this.setState({ isChannelConfigured });
+    try {
+      const isChannelConfigured = await this.context.notificationService.getChannels(
+        {
+          config_type: Object.keys(CHANNEL_TYPE),
+          from_index: 0,
+          max_items: 1,
+          sort_field: 'name',
+          sort_order: SortDirection.ASC,
+        }
+      );
+      if (!isChannelConfigured?.total) {
+        this.setState({ isChannelConfigured: false });
+      }
+    } catch (error) {
+      this.setState({ isChannelConfigured: false });
     }
   }
 

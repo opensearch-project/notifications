@@ -28,6 +28,7 @@ exports[`<SlackSettings /> spec renders the component 1`] = `
       >
         <input
           class="euiFieldText euiFieldText--fullWidth"
+          data-test-subj="create-channel-slack-webhook-input"
           id="random_html_id"
           placeholder="https://hook.slack.com/services/XXXXX/XXXXX/XXXXX..."
           type="text"
@@ -68,6 +69,7 @@ exports[`<SlackSettings /> spec renders the component with error 1`] = `
         <input
           aria-describedby="random_html_id-error-0"
           class="euiFieldText euiFieldText--fullWidth"
+          data-test-subj="create-channel-slack-webhook-input"
           id="random_html_id"
           placeholder="https://hook.slack.com/services/XXXXX/XXXXX/XXXXX..."
           type="text"
