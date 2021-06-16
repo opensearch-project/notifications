@@ -57,6 +57,7 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
   const coreContext = useContext(CoreServicesContext)!;
   const servicesContext = useContext(ServicesContext)!;
 
+  const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedEmailOptions, setSelectedEmailOptions] = useState<
@@ -104,9 +105,8 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
     if (typeof id !== 'string') return;
 
     try {
-      const response = await servicesContext.notificationService.getRecipientGroup(
-        id
-      );
+      const response =
+        await servicesContext.notificationService.getRecipientGroup(id);
       setName(response.name);
       setDescription(response.description || '');
       setSelectedEmailOptions(
@@ -155,6 +155,7 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
         <EuiFlexItem grow={false}>
           <EuiButton
             fill
+            isLoading={loading}
             onClick={async () => {
               if (!isInputValid()) {
                 coreContext.notifications.toasts.addDanger(
@@ -162,6 +163,7 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
                 );
                 return;
               }
+              setLoading(true);
               const config = createRecipientGroupConfigObject(
                 name,
                 description,
@@ -186,6 +188,7 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
                   );
                 })
                 .catch((error) => {
+                  setLoading(false);
                   coreContext.notifications.toasts.addError(error, {
                     title: `Failed to ${
                       props.edit ? 'update' : 'create'

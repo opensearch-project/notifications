@@ -46,6 +46,7 @@ export function ChimeSettings(props: ChimeSettingsProps) {
     >
       <EuiFieldText
         fullWidth
+        data-test-subj="create-channel-slack-webhook-input"
         placeholder="https://hooks.chime.aws/incomingwebhooks/XXXXX..."
         value={props.chimeWebhook}
         onChange={(e) => props.setChimeWebhook(e.target.value)}

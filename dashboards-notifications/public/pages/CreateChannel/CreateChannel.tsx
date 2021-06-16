@@ -100,6 +100,7 @@ export function CreateChannel(props: CreateChannelsProps) {
       : `#${ROUTES.CHANNELS}`;
 
   const [isEnabled, setIsEnabled] = useState(true); // should be true unless editing muted channel
+  const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -443,6 +444,7 @@ export function CreateChannel(props: CreateChannelsProps) {
             <EuiButton
               fill
               data-test-subj="create-channel-create-button"
+              isLoading={loading}
               onClick={async () => {
                 if (!isInputValid()) {
                   coreContext.notifications.toasts.addDanger(
@@ -450,6 +452,7 @@ export function CreateChannel(props: CreateChannelsProps) {
                   );
                   return;
                 }
+                setLoading(true);
                 const config = createConfigObject();
                 const request = props.edit
                   ? servicesContext.notificationService.updateConfig(
@@ -467,6 +470,7 @@ export function CreateChannel(props: CreateChannelsProps) {
                     setTimeout(() => location.assign(prevURL), SERVER_DELAY);
                   })
                   .catch((error) => {
+                    setLoading(false);
                     coreContext.notifications.toasts.addError(error, {
                       title: `Failed to ${
                         props.edit ? 'update' : 'create'

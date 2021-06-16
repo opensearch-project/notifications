@@ -224,7 +224,7 @@ exports[`<ChannelDetails/> spec renders a specific channel 1`] = `
               <dd
                 class="euiDescriptionList__description"
               >
-                12/31/69 3:59 pm PDT
+                12/31/69 11:59 pm GMT
               </dd>
             </dl>
           </div>

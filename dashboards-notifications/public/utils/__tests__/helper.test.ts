@@ -11,15 +11,6 @@
 
 import { getErrorMessage, renderTime } from '../helpers';
 
-jest.mock('moment', () => {
-  const tz = jest.fn(() => ({ zoneAbbr: jest.fn() })) as any;
-  tz.guess = jest.fn();
-  return {
-    unix: () => ({ local: jest.fn() }),
-    tz,
-  };
-});
-
 describe('test helper functions', () => {
   it('returns default message if error not valid', () => {
     const message = getErrorMessage({}, 'default message');
