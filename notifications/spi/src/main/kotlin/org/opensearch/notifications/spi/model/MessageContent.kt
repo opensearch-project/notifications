@@ -10,7 +10,7 @@
  */
 
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -25,6 +25,26 @@
  *
  */
 
-rootProject.name = 'opensearch-notifications'
-include "spi"
-project(":spi").name = rootProject.name + "-spi"
+package org.opensearch.notifications.spi.model
+
+import org.opensearch.common.Strings
+
+/**
+ *  class for storing message.
+ */
+@SuppressWarnings("LongParameterList")
+class MessageContent(
+    val title: String,
+    val textDescription: String,
+    val htmlDescription: String? = null,
+    val fileName: String? = null,
+    val fileEncoding: String? = null,
+    val fileData: String? = null,
+    val fileContentType: String? = null
+) {
+
+    init {
+        require(!Strings.isNullOrEmpty(title)) { "title is null or empty" }
+        require(!Strings.isNullOrEmpty(textDescription)) { "text message part is null or empty" }
+    }
+}
