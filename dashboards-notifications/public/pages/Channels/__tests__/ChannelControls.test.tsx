@@ -26,6 +26,8 @@
 
 import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
+import { mainStateMock } from '../../../../test/mocks/serviceMock';
+import { MainContext } from '../../Main/Main';
 import { ChannelControls } from '../components/ChannelControls';
 
 describe('<ChannelControls /> spec', () => {
@@ -33,12 +35,14 @@ describe('<ChannelControls /> spec', () => {
     const onSearchChange = jest.fn();
     const onFiltersChange = jest.fn();
     const { container } = render(
-      <ChannelControls
-        search=""
-        onSearchChange={onSearchChange}
-        filters={{}}
-        onFiltersChange={onFiltersChange}
-      />
+      <MainContext.Provider value={mainStateMock}>
+        <ChannelControls
+          search=""
+          onSearchChange={onSearchChange}
+          filters={{}}
+          onFiltersChange={onFiltersChange}
+        />
+      </MainContext.Provider>
     );
     expect(container.firstChild).toMatchSnapshot();
   });
@@ -47,12 +51,14 @@ describe('<ChannelControls /> spec', () => {
     const onSearchChange = jest.fn();
     const onFiltersChange = jest.fn();
     const utils = render(
-      <ChannelControls
-        search=""
-        onSearchChange={onSearchChange}
-        filters={{}}
-        onFiltersChange={onFiltersChange}
-      />
+      <MainContext.Provider value={mainStateMock}>
+        <ChannelControls
+          search=""
+          onSearchChange={onSearchChange}
+          filters={{}}
+          onFiltersChange={onFiltersChange}
+        />
+      </MainContext.Provider>
     );
     const input = utils.getByPlaceholderText('Search');
 
@@ -64,12 +70,14 @@ describe('<ChannelControls /> spec', () => {
     const onSearchChange = jest.fn();
     const onFiltersChange = jest.fn();
     const utils = render(
-      <ChannelControls
-        search=""
-        onSearchChange={onSearchChange}
-        filters={{}}
-        onFiltersChange={onFiltersChange}
-      />
+      <MainContext.Provider value={mainStateMock}>
+        <ChannelControls
+          search=""
+          onSearchChange={onSearchChange}
+          filters={{}}
+          onFiltersChange={onFiltersChange}
+        />
+      </MainContext.Provider>
     );
     fireEvent.click(utils.getByText('Status'));
     fireEvent.click(utils.getByText('Active'));

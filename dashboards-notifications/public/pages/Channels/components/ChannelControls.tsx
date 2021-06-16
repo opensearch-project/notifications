@@ -34,11 +34,9 @@ import {
   EuiPopover,
 } from '@elastic/eui';
 import _ from 'lodash';
-import React, { useState } from 'react';
-import {
-  CHANNEL_TYPE,
-  NOTIFICATION_SOURCE,
-} from '../../../../public/utils/constants';
+import React, { useContext, useState } from 'react';
+import { NOTIFICATION_SOURCE } from '../../../../public/utils/constants';
+import { MainContext } from '../../Main/Main';
 import { ChannelFiltersType } from '../types';
 
 interface ChannelControlsProps {
@@ -49,6 +47,7 @@ interface ChannelControlsProps {
 }
 
 export const ChannelControls = (props: ChannelControlsProps) => {
+  const mainStateContext = useContext(MainContext)!;
   const [isStatePopoverOpen, setIsStatePopoverOpen] = useState(false);
   const [stateItems, setStateItems] = useState([
     { field: 'true', display: 'Active', checked: 'off' },
@@ -56,7 +55,7 @@ export const ChannelControls = (props: ChannelControlsProps) => {
   ]);
   const [isTypePopoverOpen, setIsTypePopoverOpen] = useState(false);
   const [typeItems, setTypeItems] = useState(
-    Object.entries(CHANNEL_TYPE).map(([key, value]) => ({
+    Object.entries(mainStateContext.availableFeatures).map(([key, value]) => ({
       field: key,
       display: value,
       checked: 'off',
@@ -105,7 +104,7 @@ export const ChannelControls = (props: ChannelControlsProps) => {
       case 'type':
         setTypeItems(newItems);
         newFilters.type = checkedItems;
-        break
+        break;
       default:
         break;
     }
@@ -180,9 +179,7 @@ export const ChannelControls = (props: ChannelControlsProps) => {
                 <EuiFilterSelectItem
                   key={`channel-type-filter-${index}`}
                   checked={item.checked === 'on' ? 'on' : undefined}
-                  onClick={() =>
-                    updateItem(typeItems, index, 'type')
-                  }
+                  onClick={() => updateItem(typeItems, index, 'type')}
                 >
                   {item.display}
                 </EuiFilterSelectItem>
@@ -208,9 +205,7 @@ export const ChannelControls = (props: ChannelControlsProps) => {
                 <EuiFilterSelectItem
                   key={`channel-source-filter-${index}`}
                   checked={item.checked === 'on' ? 'on' : undefined}
-                  onClick={() =>
-                    updateItem(sourceItems, index, 'source')
-                  }
+                  onClick={() => updateItem(sourceItems, index, 'source')}
                 >
                   {item.display}
                 </EuiFilterSelectItem>

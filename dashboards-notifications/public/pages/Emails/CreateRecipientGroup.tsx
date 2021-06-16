@@ -183,7 +183,7 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
                     }.`
                   );
                   setTimeout(
-                    () => location.assign(`#${ROUTES.EMAIL_GROUPS}`),
+                    () => location.hash = `#${ROUTES.EMAIL_GROUPS}`,
                     SERVER_DELAY
                   );
                 })

@@ -27,6 +27,7 @@ exports[`<DetailsListModal /> spec renders the component 1`] = `
       "notificationService": NotificationService {
         "createConfig": [Function],
         "deleteConfigs": [Function],
+        "getAvailableFeatures": [Function],
         "getChannel": [Function],
         "getChannels": [Function],
         "getConfig": [Function],

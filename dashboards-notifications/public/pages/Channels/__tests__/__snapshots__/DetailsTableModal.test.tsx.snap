@@ -28,6 +28,7 @@ exports[`<DetailsTableModal /> spec renders headers 1`] = `
       "notificationService": NotificationService {
         "createConfig": [Function],
         "deleteConfigs": [Function],
+        "getAvailableFeatures": [Function],
         "getChannel": [Function],
         "getChannels": [Function],
         "getConfig": [Function],
@@ -1859,6 +1860,7 @@ exports[`<DetailsTableModal /> spec renders parameters 1`] = `
       "notificationService": NotificationService {
         "createConfig": [Function],
         "deleteConfigs": [Function],
+        "getAvailableFeatures": [Function],
         "getChannel": [Function],
         "getChannels": [Function],
         "getConfig": [Function],

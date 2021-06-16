@@ -192,4 +192,28 @@ export function configRoutes(router: IRouter) {
       }
     }
   );
+
+  router.get(
+    {
+      path: NODE_API.AVAILABLE_FEATURES,
+      validate: false,
+    },
+    async (context, request, response) => {
+      // @ts-ignore
+      const client: ILegacyScopedClusterClient = context.notificationsContext.notificationsClient.asScoped(
+        request
+      );
+      try {
+        const resp = await client.callAsCurrentUser(
+          'notifications.getAvailableFeatures'
+        );
+        return response.ok({ body: resp });
+      } catch (error) {
+        return response.custom({
+          statusCode: error.statusCode || 500,
+          body: error.message,
+        });
+      }
+    }
+  );
 }

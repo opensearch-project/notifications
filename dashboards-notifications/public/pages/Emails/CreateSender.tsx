@@ -186,7 +186,7 @@ export function CreateSender(props: CreateSenderProps) {
                     }.`
                   );
                   setTimeout(
-                    () => location.assign(`#${ROUTES.EMAIL_GROUPS}`),
+                    () => location.hash = `#${ROUTES.EMAIL_GROUPS}`,
                     SERVER_DELAY
                   );
                 })

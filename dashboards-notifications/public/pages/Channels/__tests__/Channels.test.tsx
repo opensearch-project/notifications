@@ -28,24 +28,28 @@ import { fireEvent, render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { MOCK_DATA } from '../../../../test/mocks/mockData';
 import { routerComponentPropsMock } from '../../../../test/mocks/routerPropsMock';
-import { coreServicesMock } from '../../../../test/mocks/serviceMock';
+import {
+  coreServicesMock,
+  mainStateMock,
+} from '../../../../test/mocks/serviceMock';
 import { CoreServicesContext } from '../../../components/coreServices';
+import { MainContext } from '../../Main/Main';
 import { Channels } from '../Channels';
 
 describe('<Channels/> spec', () => {
   it('renders the empty component', () => {
     const notificationServiceMock = jest.fn() as any;
-    const getChannels = jest.fn(
-      async (queryObject: object) => []
-    );
+    const getChannels = jest.fn(async (queryObject: object) => []);
     notificationServiceMock.notificationService = { getChannels };
     const utils = render(
-      <CoreServicesContext.Provider value={coreServicesMock}>
-        <Channels
-          {...routerComponentPropsMock}
-          notificationService={notificationServiceMock}
-        />
-      </CoreServicesContext.Provider>
+      <MainContext.Provider value={mainStateMock}>
+        <CoreServicesContext.Provider value={coreServicesMock}>
+          <Channels
+            {...routerComponentPropsMock}
+            notificationService={notificationServiceMock}
+          />
+        </CoreServicesContext.Provider>
+      </MainContext.Provider>
     );
     expect(utils.container.firstChild).toMatchSnapshot();
   });
@@ -57,12 +61,14 @@ describe('<Channels/> spec', () => {
     const notificationService = jest.fn() as any;
     notificationService.getChannels = getChannels;
     const utils = render(
-      <CoreServicesContext.Provider value={coreServicesMock}>
-        <Channels
-          {...routerComponentPropsMock}
-          notificationService={notificationService}
-        />
-      </CoreServicesContext.Provider>
+      <MainContext.Provider value={mainStateMock}>
+        <CoreServicesContext.Provider value={coreServicesMock}>
+          <Channels
+            {...routerComponentPropsMock}
+            notificationService={notificationService}
+          />
+        </CoreServicesContext.Provider>
+      </MainContext.Provider>
     );
 
     await waitFor(() => expect(getChannels).toBeCalled());

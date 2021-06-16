@@ -25,9 +25,9 @@
  */
 
 import { fireEvent, render } from '@testing-library/react';
+import { CHANNEL_TYPE } from '../../../utils/constants';
 import { FilterType } from '../components/SearchBar/Filter/Filters';
 import {
-  filterToQueryString,
   getFilterFieldOptions,
   getFilterOperatorOptions,
   getOperatorString,
@@ -69,7 +69,9 @@ describe('test filter helper functions', () => {
 
   it('renders textfield', () => {
     const setValue = jest.fn();
-    const utils = render(getValueComponent('Channel', 'is', 0, setValue));
+    const utils = render(
+      getValueComponent('Channel', 'is', 0, setValue, CHANNEL_TYPE)
+    );
     expect(utils.container.firstChild).toMatchSnapshot();
 
     const input = utils.container.querySelector('input')!;
@@ -80,20 +82,20 @@ describe('test filter helper functions', () => {
   it('renders combobox', () => {
     const setValue = jest.fn();
     expect(
-      render(getValueComponent('Channel type', 'is', 0, setValue)).container
-        .firstChild
+      render(getValueComponent('Channel type', 'is', 0, setValue, CHANNEL_TYPE))
+        .container.firstChild
     ).toMatchSnapshot();
     expect(
-      render(getValueComponent('Severity', 'is', 0, setValue)).container
-        .firstChild
+      render(getValueComponent('Severity', 'is', 0, setValue, CHANNEL_TYPE))
+        .container.firstChild
     ).toMatchSnapshot();
     expect(
-      render(getValueComponent('Source', 'is', 0, setValue)).container
-        .firstChild
+      render(getValueComponent('Source', 'is', 0, setValue, CHANNEL_TYPE))
+        .container.firstChild
     ).toMatchSnapshot();
     expect(
-      render(getValueComponent('Status', 'is', 0, setValue)).container
-        .firstChild
+      render(getValueComponent('Status', 'is', 0, setValue, CHANNEL_TYPE))
+        .container.firstChild
     ).toMatchSnapshot();
   });
 

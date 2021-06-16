@@ -28,7 +28,7 @@ exports[`<ChimeSettings /> spec renders the component 1`] = `
       >
         <input
           class="euiFieldText euiFieldText--fullWidth"
-          data-test-subj="create-channel-slack-webhook-input"
+          data-test-subj="create-channel-chime-webhook-input"
           id="random_html_id"
           placeholder="https://hooks.chime.aws/incomingwebhooks/XXXXX..."
           type="text"
@@ -69,7 +69,7 @@ exports[`<ChimeSettings /> spec renders the component with error 1`] = `
         <input
           aria-describedby="random_html_id-error-0"
           class="euiFieldText euiFieldText--fullWidth"
-          data-test-subj="create-channel-slack-webhook-input"
+          data-test-subj="create-channel-chime-webhook-input"
           id="random_html_id"
           placeholder="https://hooks.chime.aws/incomingwebhooks/XXXXX..."
           type="text"
