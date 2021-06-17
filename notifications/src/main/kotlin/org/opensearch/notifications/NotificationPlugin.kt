@@ -62,7 +62,9 @@ import org.opensearch.notifications.resthandler.NotificationEventRestHandler
 import org.opensearch.notifications.resthandler.NotificationFeatureChannelListRestHandler
 import org.opensearch.notifications.resthandler.NotificationFeaturesRestHandler
 import org.opensearch.notifications.resthandler.SendMessageRestHandler
+import org.opensearch.notifications.resthandler.SendTestMessageRestHandler
 import org.opensearch.notifications.security.UserAccessManager
+import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.notifications.throttle.Accountant
 import org.opensearch.plugins.ActionPlugin
@@ -121,6 +123,7 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
         NotificationConfigIndex.initialize(client, clusterService)
         NotificationEventIndex.initialize(client, clusterService)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
+        SendMessageActionHelper.initialize(NotificationConfigIndex, NotificationEventIndex, UserAccessManager)
         EventIndexingActions.initialize(NotificationEventIndex, UserAccessManager)
         Accountant.initialize(client, clusterService)
         return listOf()
@@ -186,7 +189,8 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
             NotificationConfigRestHandler(),
             NotificationEventRestHandler(),
             NotificationFeaturesRestHandler(),
-            NotificationFeatureChannelListRestHandler()
+            NotificationFeatureChannelListRestHandler(),
+            SendTestMessageRestHandler()
         )
     }
 }

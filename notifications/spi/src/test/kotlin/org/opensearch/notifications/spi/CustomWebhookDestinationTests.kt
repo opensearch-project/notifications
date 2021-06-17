@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.opensearch.notifications.spi.client.DestinationHttpClient
 import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
 import org.opensearch.notifications.spi.factory.WebhookDestinationFactory
-import org.opensearch.notifications.spi.model.ChannelMessageResponse
+import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
 import org.opensearch.rest.RestStatus
@@ -50,7 +50,7 @@ internal class CustomWebhookDestinationTests {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
 
         // The DestinationHttpClient replaces a null entity with "{}".
-        val expectedWebhookResponse = ChannelMessageResponse(statusText = "{}", statusCode = RestStatus.OK)
+        val expectedWebhookResponse = DestinationMessageResponse(statusText = "{}", statusCode = RestStatus.OK)
 
         val httpResponse: CloseableHttpResponse = EasyMock.createMock(CloseableHttpResponse::class.java)
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
@@ -76,7 +76,7 @@ internal class CustomWebhookDestinationTests {
         val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"))
         val message = MessageContent(title, messageText)
 
-        val actualCustomWebhookResponse: ChannelMessageResponse = Notification.sendMessage(destination, message)
+        val actualCustomWebhookResponse: DestinationMessageResponse = Notification.sendMessage(destination, message)
 
         assertEquals(expectedWebhookResponse.statusText, actualCustomWebhookResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualCustomWebhookResponse.statusCode)
@@ -86,7 +86,7 @@ internal class CustomWebhookDestinationTests {
     @Throws(Exception::class)
     fun `test custom webook message empty entity response`() {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
-        val expectedWebhookResponse = ChannelMessageResponse(statusText = "", statusCode = RestStatus.OK)
+        val expectedWebhookResponse = DestinationMessageResponse(statusText = "", statusCode = RestStatus.OK)
 
         val httpResponse: CloseableHttpResponse = EasyMock.createMock(CloseableHttpResponse::class.java)
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
@@ -111,7 +111,7 @@ internal class CustomWebhookDestinationTests {
         val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"))
         val message = MessageContent(title, messageText)
 
-        val actualCustomWebhookResponse: ChannelMessageResponse = Notification.sendMessage(destination, message)
+        val actualCustomWebhookResponse: DestinationMessageResponse = Notification.sendMessage(destination, message)
 
         assertEquals(expectedWebhookResponse.statusText, actualCustomWebhookResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualCustomWebhookResponse.statusCode)
@@ -122,7 +122,7 @@ internal class CustomWebhookDestinationTests {
     fun `test custom webhook message non-empty entity response`() {
         val responseContent = "It worked!"
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
-        val expectedWebhookResponse = ChannelMessageResponse(statusText = responseContent, statusCode = RestStatus.OK)
+        val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK, responseContent)
 
         val httpResponse: CloseableHttpResponse = EasyMock.createMock(CloseableHttpResponse::class.java)
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
@@ -147,7 +147,7 @@ internal class CustomWebhookDestinationTests {
         val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"))
         val message = MessageContent(title, messageText)
 
-        val actualCustomWebhookResponse: ChannelMessageResponse = Notification.sendMessage(destination, message)
+        val actualCustomWebhookResponse: DestinationMessageResponse = Notification.sendMessage(destination, message)
 
         assertEquals(expectedWebhookResponse.statusText, actualCustomWebhookResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualCustomWebhookResponse.statusCode)

@@ -36,7 +36,6 @@ import org.opensearch.commons.notifications.model.NotificationEventSearchResult
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.security.UserAccess
-import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.rest.RestStatus
 
 /**
@@ -61,7 +60,7 @@ object EventIndexingActions {
      */
     fun get(request: GetNotificationEventRequest, user: User?): GetNotificationEventResponse {
         log.info("$LOG_PREFIX:NotificationEvent-get $request")
-        UserAccessManager.validateUser(user)
+        userAccess.validateUser(user)
         return when (request.eventIds.size) {
             0 -> getAll(request, user)
             1 -> info(request.eventIds.first(), user)
@@ -83,7 +82,7 @@ object EventIndexingActions {
                 throw OpenSearchStatusException("NotificationEvent $eventId not found", RestStatus.NOT_FOUND)
             }
         val metadata = eventDoc.eventDoc.metadata
-        if (!UserAccessManager.doesUserHasAccess(user, metadata.tenant, metadata.access)) {
+        if (!userAccess.doesUserHasAccess(user, metadata.tenant, metadata.access)) {
             throw OpenSearchStatusException("Permission denied for NotificationEvent $eventId", RestStatus.FORBIDDEN)
         }
         val eventInfo = NotificationEventInfo(
@@ -115,7 +114,7 @@ object EventIndexingActions {
         }
         eventDocs.forEach {
             val currentMetadata = it.eventDoc.metadata
-            if (!UserAccessManager.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+            if (!userAccess.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
                 throw OpenSearchStatusException(
                     "Permission denied for NotificationEvent ${it.docInfo.id}",
                     RestStatus.FORBIDDEN
@@ -143,8 +142,8 @@ object EventIndexingActions {
     private fun getAll(request: GetNotificationEventRequest, user: User?): GetNotificationEventResponse {
         log.info("$LOG_PREFIX:NotificationEvent-getAll")
         val searchResult = operations.getAllNotificationEvents(
-            UserAccessManager.getUserTenant(user),
-            UserAccessManager.getSearchAccessInfo(user),
+            userAccess.getUserTenant(user),
+            userAccess.getSearchAccessInfo(user),
             request
         )
         return GetNotificationEventResponse(searchResult)

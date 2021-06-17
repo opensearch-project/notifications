@@ -28,7 +28,7 @@
 package org.opensearch.notifications.spi
 
 import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
-import org.opensearch.notifications.spi.model.ChannelMessageResponse
+import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
 import java.security.AccessController
@@ -46,12 +46,12 @@ object Notification {
      * @param message
      * @return ChannelMessageResponse
      */
-    fun sendMessage(destination: BaseDestination, message: MessageContent): ChannelMessageResponse {
+    fun sendMessage(destination: BaseDestination, message: MessageContent): DestinationMessageResponse {
         val destinationFactory = DestinationFactoryProvider.getFactory(destination.destinationType)
         return AccessController.doPrivileged(
             PrivilegedAction {
                 destinationFactory.sendMessage(destination, message)
-            } as PrivilegedAction<ChannelMessageResponse>?
+            } as PrivilegedAction<DestinationMessageResponse>?
         )
     }
 }

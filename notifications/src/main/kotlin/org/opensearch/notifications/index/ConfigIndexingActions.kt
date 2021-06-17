@@ -57,7 +57,6 @@ import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.model.DocMetadata
 import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.security.UserAccess
-import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.rest.RestStatus
 import java.time.Instant
 import java.util.EnumSet
@@ -135,7 +134,7 @@ object ConfigIndexingActions {
             }
             // Validate that the user has access to underlying configurations as well.
             val currentMetadata = it.configDoc.metadata
-            if (!UserAccessManager.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+            if (!userAccess.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
                 throw OpenSearchStatusException(
                     "Permission denied for NotificationConfig ${it.docInfo.id}",
                     RestStatus.FORBIDDEN
@@ -188,14 +187,14 @@ object ConfigIndexingActions {
      */
     fun create(request: CreateNotificationConfigRequest, user: User?): CreateNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-create")
-        UserAccessManager.validateUser(user)
+        userAccess.validateUser(user)
         validateConfig(request.notificationConfig, user)
         val currentTime = Instant.now()
         val metadata = DocMetadata(
             currentTime,
             currentTime,
-            UserAccessManager.getUserTenant(user),
-            UserAccessManager.getAllAccessInfo(user)
+            userAccess.getUserTenant(user),
+            userAccess.getAllAccessInfo(user)
         )
         val configDoc = NotificationConfigDoc(metadata, request.notificationConfig)
         val docId = operations.createNotificationConfig(configDoc, request.configId)
@@ -214,7 +213,7 @@ object ConfigIndexingActions {
      */
     fun update(request: UpdateNotificationConfigRequest, user: User?): UpdateNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-update ${request.configId}")
-        UserAccessManager.validateUser(user)
+        userAccess.validateUser(user)
         validateConfig(request.notificationConfig, user)
         val currentConfigDoc = operations.getNotificationConfig(request.configId)
         currentConfigDoc
@@ -226,7 +225,7 @@ object ConfigIndexingActions {
             }
 
         val currentMetadata = currentConfigDoc.configDoc.metadata
-        if (!UserAccessManager.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+        if (!userAccess.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
             throw OpenSearchStatusException(
                 "Permission denied for NotificationConfig ${request.configId}",
                 RestStatus.FORBIDDEN
@@ -248,7 +247,7 @@ object ConfigIndexingActions {
      */
     fun get(request: GetNotificationConfigRequest, user: User?): GetNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-get $request")
-        UserAccessManager.validateUser(user)
+        userAccess.validateUser(user)
         return when (request.configIds.size) {
             0 -> getAll(request, user)
             1 -> info(request.configIds.first(), user)
@@ -270,7 +269,7 @@ object ConfigIndexingActions {
                 throw OpenSearchStatusException("NotificationConfig $configId not found", RestStatus.NOT_FOUND)
             }
         val metadata = configDoc.configDoc.metadata
-        if (!UserAccessManager.doesUserHasAccess(user, metadata.tenant, metadata.access)) {
+        if (!userAccess.doesUserHasAccess(user, metadata.tenant, metadata.access)) {
             throw OpenSearchStatusException("Permission denied for NotificationConfig $configId", RestStatus.FORBIDDEN)
         }
         val configInfo = NotificationConfigInfo(
@@ -302,7 +301,7 @@ object ConfigIndexingActions {
         }
         configDocs.forEach {
             val currentMetadata = it.configDoc.metadata
-            if (!UserAccessManager.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+            if (!userAccess.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
                 throw OpenSearchStatusException(
                     "Permission denied for NotificationConfig ${it.docInfo.id}",
                     RestStatus.FORBIDDEN
@@ -330,8 +329,8 @@ object ConfigIndexingActions {
     private fun getAll(request: GetNotificationConfigRequest, user: User?): GetNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-getAll")
         val searchResult = operations.getAllNotificationConfigs(
-            UserAccessManager.getUserTenant(user),
-            UserAccessManager.getSearchAccessInfo(user),
+            userAccess.getUserTenant(user),
+            userAccess.getSearchAccessInfo(user),
             request
         )
         return GetNotificationConfigResponse(searchResult)
@@ -345,7 +344,7 @@ object ConfigIndexingActions {
      */
     fun getFeatureChannelList(request: GetFeatureChannelListRequest, user: User?): GetFeatureChannelListResponse {
         log.info("$LOG_PREFIX:getFeatureChannelList $request")
-        UserAccessManager.validateUser(user)
+        userAccess.validateUser(user)
         val supportedChannelListString = getSupportedChannelList().joinToString(",")
         val filterParams = mapOf(
             Pair("feature_list", request.feature.tag),
@@ -353,8 +352,8 @@ object ConfigIndexingActions {
         )
         val getAllRequest = GetNotificationConfigRequest(filterParams = filterParams)
         val getAllResult = operations.getAllNotificationConfigs(
-            UserAccessManager.getUserTenant(user),
-            UserAccessManager.getSearchAccessInfo(user),
+            userAccess.getUserTenant(user),
+            userAccess.getSearchAccessInfo(user),
             getAllRequest
         )
         val searchResult = getAllResult.objectList.map {
@@ -383,7 +382,7 @@ object ConfigIndexingActions {
      */
     private fun delete(configId: String, user: User?): DeleteNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-delete $configId")
-        UserAccessManager.validateUser(user)
+        userAccess.validateUser(user)
         val currentConfigDoc = operations.getNotificationConfig(configId)
         currentConfigDoc
             ?: run {
@@ -394,7 +393,7 @@ object ConfigIndexingActions {
             }
 
         val currentMetadata = currentConfigDoc.configDoc.metadata
-        if (!UserAccessManager.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+        if (!userAccess.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
             throw OpenSearchStatusException(
                 "Permission denied for NotificationConfig $configId",
                 RestStatus.FORBIDDEN
@@ -417,7 +416,7 @@ object ConfigIndexingActions {
      */
     private fun delete(configIds: Set<String>, user: User?): DeleteNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-delete $configIds")
-        UserAccessManager.validateUser(user)
+        userAccess.validateUser(user)
         val configDocs = operations.getNotificationConfigs(configIds)
         if (configDocs.size != configIds.size) {
             val mutableSet = configIds.toMutableSet()
@@ -429,7 +428,7 @@ object ConfigIndexingActions {
         }
         configDocs.forEach {
             val currentMetadata = it.configDoc.metadata
-            if (!UserAccessManager.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+            if (!userAccess.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
                 throw OpenSearchStatusException(
                     "Permission denied for NotificationConfig ${it.docInfo.id}",
                     RestStatus.FORBIDDEN
