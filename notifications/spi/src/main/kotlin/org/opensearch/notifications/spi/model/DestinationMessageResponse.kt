@@ -25,13 +25,14 @@
  *
  */
 
-package org.opensearch.integtest.send
+package org.opensearch.notifications.spi.model
 
-import org.opensearch.integtest.PluginRestTestCase
+import org.opensearch.rest.RestStatus
 
-internal class SendMessageRestHandlerIT : PluginRestTestCase() {
-
-    @Suppress("EmptyFunctionBlock")
-    fun sendRestHandler() {
-    }
-}
+/**
+ * Data class for storing destination message response per recipient.
+ */
+class DestinationMessageResponse(
+    val statusCode: RestStatus,
+    val statusText: String
+)

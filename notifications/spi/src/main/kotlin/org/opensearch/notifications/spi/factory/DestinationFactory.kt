@@ -27,7 +27,7 @@
 
 package org.opensearch.notifications.spi.factory
 
-import org.opensearch.notifications.spi.model.ChannelMessageResponse
+import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
 
@@ -46,5 +46,5 @@ internal interface DestinationFactory<T : BaseDestination> {
     fun sendMessage(
         destination: T,
         message: MessageContent
-    ): ChannelMessageResponse
+    ): DestinationMessageResponse
 }

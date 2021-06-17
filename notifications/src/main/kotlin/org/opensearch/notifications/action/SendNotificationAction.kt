@@ -37,9 +37,7 @@ import org.opensearch.commons.notifications.action.NotificationsActions
 import org.opensearch.commons.notifications.action.SendNotificationRequest
 import org.opensearch.commons.notifications.action.SendNotificationResponse
 import org.opensearch.commons.utils.recreateObject
-import org.opensearch.notifications.spi.Notification
-import org.opensearch.notifications.spi.model.MessageContent
-import org.opensearch.notifications.spi.model.destination.ChimeDestination
+import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 
@@ -80,7 +78,6 @@ internal class SendNotificationAction @Inject constructor(
         request: SendNotificationRequest,
         user: User?
     ): SendNotificationResponse {
-        Notification.sendMessage(ChimeDestination(url = "TODO"), MessageContent(title = "TODO", textDescription = "TODO"))
-        return SendNotificationResponse("TODO-notificationId")
+        return SendMessageActionHelper.executeRequest(request)
     }
 }

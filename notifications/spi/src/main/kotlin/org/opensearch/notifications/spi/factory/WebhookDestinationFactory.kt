@@ -29,7 +29,7 @@ package org.opensearch.notifications.spi.factory
 
 import org.opensearch.notifications.spi.client.DestinationClientPool
 import org.opensearch.notifications.spi.client.DestinationHttpClient
-import org.opensearch.notifications.spi.model.ChannelMessageResponse
+import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.WebhookDestination
 import org.opensearch.notifications.spi.utils.OpenForTesting
@@ -53,16 +53,16 @@ internal class WebhookDestinationFactory : DestinationFactory<WebhookDestination
         this.destinationHttpClient = destinationHttpClient
     }
 
-    override fun sendMessage(destination: WebhookDestination, message: MessageContent): ChannelMessageResponse {
+    override fun sendMessage(destination: WebhookDestination, message: MessageContent): DestinationMessageResponse {
         return try {
             val response = destinationHttpClient.execute(destination, message)
-            ChannelMessageResponse(
+            DestinationMessageResponse(
                 statusCode = RestStatus.OK,
                 statusText = response
             )
         } catch (exception: IOException) {
             log.error("Exception sending message: $message", exception)
-            ChannelMessageResponse(
+            DestinationMessageResponse(
                 statusCode = RestStatus.INTERNAL_SERVER_ERROR,
                 statusText = "Failed to send message"
             )
