@@ -1,0 +1,85 @@
+@startuml
+autoactivate on
+
+title ** Send Notification sequence **
+
+box "Kibana"
+participant "Alerting" as kbn_alert
+participant "Notification" as kbn_notify
+end box
+
+
+box "ES Alerting Plugin"
+participant "Monitor module" as monitor
+end box
+
+box "ElasticSearch Notification plugin"
+participant "Notification plugin interface" as npi
+end box
+box "SPI"
+participant "Email module" as email
+
+end box
+box "Elasticsearch"
+database ".config index" as pi
+database ".notificaiton index" as ni
+end box
+skinparam BoxPadding 15
+participant "External Email Service" as email_service
+
+== notification sequence ==
+' monitor -> monitor : Create Monitor with notification
+monitor -> monitor : monitor triggers an alert
+monitor -> npi : Plugin call to send notification
+
+alt notification_type == email
+npi -> ni: Save notification [status == pending/in-progress]
+ni --> npi: Saved
+
+npi -> email : Send email
+email -> email_service : Send email (SMTP / AWS SES API)
+email_service --> email : Send email status
+alt on failure
+
+loop till retry limits hit, or retry succeeds
+email -> email_service: retry send email
+email_service --> email: send retry status
+end
+
+end
+email --> npi : Send email status
+end
+
+
+npi --> monitor : send notification status
+alt on acknowledged (failed/closed)
+monitor -> npi: update status
+npi -> ni: update status field
+ni --> npi: on status updated
+npi --> monitor: updated
+monitor --> monitor : Acknowledged
+end
+
+
+
+
+== Manage Configurations Sequence ==
+
+kbn_alert -> monitor: create monitor with notification
+
+kbn_alert -> npi : get/list configs(profile, sender/recipient group)
+kbn_alert -> kbn_notify: create/update configs
+kbn_notify -> npi: CRUD configs
+npi -> pi: write to index
+pi --> npi: saved
+npi --> kbn_notify: saved
+kbn_notify --> kbn_alert
+npi --> kbn_alert
+
+
+note over monitor
+refer notification sequence
+end note
+
+monitor --> kbn_alert: created
+@enduml
