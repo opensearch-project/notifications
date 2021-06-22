@@ -131,7 +131,7 @@ dependencies {
 //    compile ("software.amazon.awssdk:ses:2.14.16") {
 //        exclude module: 'annotations' // conflict with org.jetbrains:annotations, integTestRunner fails with error "codebase property already set"
 //    }
-//    compile "com.sun.mail:javax.mail:1.6.2"
+    compile "com.sun.mail:javax.mail:1.6.2"
 
     testImplementation(
             'org.assertj:assertj-core:3.16.1',

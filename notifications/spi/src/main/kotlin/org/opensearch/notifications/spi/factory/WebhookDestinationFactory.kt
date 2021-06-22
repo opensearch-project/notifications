@@ -48,6 +48,7 @@ internal class WebhookDestinationFactory : DestinationFactory<WebhookDestination
     constructor() {
         this.destinationHttpClient = DestinationClientPool.httpClient
     }
+
     @OpenForTesting
     constructor(destinationHttpClient: DestinationHttpClient) {
         this.destinationHttpClient = destinationHttpClient
@@ -56,16 +57,10 @@ internal class WebhookDestinationFactory : DestinationFactory<WebhookDestination
     override fun sendMessage(destination: WebhookDestination, message: MessageContent): DestinationMessageResponse {
         return try {
             val response = destinationHttpClient.execute(destination, message)
-            DestinationMessageResponse(
-                statusCode = RestStatus.OK,
-                statusText = response
-            )
+            DestinationMessageResponse(RestStatus.OK, response)
         } catch (exception: IOException) {
             log.error("Exception sending message: $message", exception)
-            DestinationMessageResponse(
-                statusCode = RestStatus.INTERNAL_SERVER_ERROR,
-                statusText = "Failed to send message"
-            )
+            DestinationMessageResponse(RestStatus.INTERNAL_SERVER_ERROR, "Failed to send message")
         }
     }
 }

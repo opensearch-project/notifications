@@ -39,7 +39,8 @@ internal object DestinationFactoryProvider {
         // TODO Add other channel
         "Slack" to WebhookDestinationFactory(),
         "Chime" to WebhookDestinationFactory(),
-        "Webhook" to WebhookDestinationFactory()
+        "Webhook" to WebhookDestinationFactory(),
+        "Email" to SmtpEmailDestinationFactory()
     )
 
     /**
