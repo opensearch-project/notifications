@@ -25,7 +25,9 @@
  */
 
 import { CoreStart } from 'opensearch-dashboards/public';
+import { MainState } from '../../public/pages/Main/Main';
 import { EventService, NotificationService } from '../../public/services';
+import { CHANNEL_TYPE } from '../../public/utils/constants';
 import httpClientMock from './httpClientMock';
 
 const coreServicesMock = ({
@@ -51,4 +53,9 @@ const notificationServiceMock = {
   eventService: eventServiceMock,
 };
 
-export { notificationServiceMock, coreServicesMock };
+const mainStateMock: MainState = {
+  isChannelConfigured: true,
+  availableFeatures: CHANNEL_TYPE,
+};
+
+export { notificationServiceMock, coreServicesMock, mainStateMock };

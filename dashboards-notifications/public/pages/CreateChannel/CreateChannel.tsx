@@ -53,6 +53,7 @@ import {
 } from '../../utils/constants';
 import { getErrorMessage } from '../../utils/helpers';
 import { HeaderItemType } from '../Channels/types';
+import { MainContext } from '../Main/Main';
 import { ChannelAvailabilityPanel } from './components/ChannelAvailabilityPanel';
 import { ChannelNamePanel } from './components/ChannelNamePanel';
 import { ChimeSettings } from './components/ChimeSettings';
@@ -93,6 +94,7 @@ export function CreateChannel(props: CreateChannelsProps) {
 
   const coreContext = useContext(CoreServicesContext)!;
   const servicesContext = useContext(ServicesContext)!;
+  const mainStateContext = useContext(MainContext)!;
   const id = props.match.params.id;
   const prevURL =
     props.edit && queryString.parse(props.location.search).from === 'details'
@@ -107,10 +109,12 @@ export function CreateChannel(props: CreateChannelsProps) {
 
   const channelTypeOptions: Array<EuiSuperSelectOption<
     keyof typeof CHANNEL_TYPE
-  >> = Object.entries(CHANNEL_TYPE).map(([key, value]) => ({
-    value: key as keyof typeof CHANNEL_TYPE,
-    inputDisplay: value,
-  }));
+  >> = Object.entries(mainStateContext.availableFeatures).map(
+    ([key, value]) => ({
+      value: key as keyof typeof CHANNEL_TYPE,
+      inputDisplay: value,
+    })
+  );
   const [channelType, setChannelType] = useState(channelTypeOptions[0].value);
 
   const [slackWebhook, setSlackWebhook] = useState('');
@@ -467,7 +471,7 @@ export function CreateChannel(props: CreateChannelsProps) {
                         props.edit ? 'updated' : 'created'
                       }.`
                     );
-                    setTimeout(() => location.assign(prevURL), SERVER_DELAY);
+                    setTimeout(() => (location.hash = prevURL), SERVER_DELAY);
                   })
                   .catch((error) => {
                     setLoading(false);

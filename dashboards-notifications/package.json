@@ -14,7 +14,7 @@
     "lint": "eslint .",
     "start": "yarn plugin_helpers start",
     "build": "yarn plugin_helpers build",
-    "test": "../../node_modules/.bin/jest --config ./test/jest.config.js",
+    "test": "TZ=UTC ../../node_modules/.bin/jest --config ./test/jest.config.js",
     "cypress:run": "cypress run",
     "cypress:open": "cypress open",
     "plugin_helpers": "node ../../scripts/plugin_helpers"

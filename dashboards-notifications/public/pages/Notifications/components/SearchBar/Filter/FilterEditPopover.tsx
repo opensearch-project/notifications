@@ -34,7 +34,8 @@ import {
   EuiFormRow,
   EuiSpacer,
 } from '@elastic/eui';
-import React, { useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
+import { MainContext } from '../../../../Main/Main';
 import {
   FilterOperatorType,
   FilterFieldType,
@@ -53,6 +54,7 @@ interface FilterEditPopoverProps {
 }
 
 export function FilterEditPopover(props: FilterEditPopoverProps) {
+  const mainStateContext = useContext(MainContext)!;
   const [selectedFieldOptions, setSelectedFieldOptions] = useState<
     Array<EuiComboBoxOptionOption<string>>
   >(props.filter ? [{ label: props.filter.field }] : []);
@@ -135,7 +137,8 @@ export function FilterEditPopover(props: FilterEditPopoverProps) {
           selectedFieldOptions[0].label as FilterFieldType,
           selectedOperatorOptions[0].label as FilterOperatorType,
           filterValue,
-          setFilterValue
+          setFilterValue,
+          mainStateContext.availableFeatures
         )}
       <EuiSpacer size="m" />
       <EuiFlexGroup gutterSize="s" justifyContent="flexEnd">

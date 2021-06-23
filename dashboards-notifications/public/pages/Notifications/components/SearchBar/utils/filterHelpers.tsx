@@ -93,7 +93,8 @@ export const getValueComponent = (
   field: FilterFieldType,
   operator: FilterOperatorType,
   value: any,
-  setValue: (v: any) => void
+  setValue: (v: any) => void,
+  availableFeatures: { [feature: string]: string }
 ) => {
   // only Channel filters should be inputbox, others should be combobox
   if (field === 'Channel')
@@ -113,7 +114,7 @@ export const getValueComponent = (
   let options;
 
   if (field === 'Channel type')
-    options = Object.entries(CHANNEL_TYPE).map(([key, value]) => ({
+    options = Object.entries(availableFeatures).map(([key, value]) => ({
       label: value,
       value: key,
     }));

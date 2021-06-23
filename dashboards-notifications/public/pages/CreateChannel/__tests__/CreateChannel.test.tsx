@@ -30,21 +30,27 @@ import { RouteComponentProps } from 'react-router-dom';
 import { MOCK_DATA } from '../../../../test/mocks/mockData';
 import {
   coreServicesMock,
+  mainStateMock,
   notificationServiceMock,
 } from '../../../../test/mocks/serviceMock';
 import { CoreServicesContext } from '../../../components/coreServices';
 import { ServicesContext } from '../../../services';
+import { MainContext } from '../../Main/Main';
 import { CreateChannel } from '../CreateChannel';
 
 describe('<CreateChannel/> spec', () => {
   it('renders the component', () => {
     const props = { match: { params: { id: 'test' } } };
     const utils = render(
-      <ServicesContext.Provider value={notificationServiceMock}>
-        <CoreServicesContext.Provider value={coreServicesMock}>
-          <CreateChannel {...(props as RouteComponentProps<{ id: string }>)} />
-        </CoreServicesContext.Provider>
-      </ServicesContext.Provider>
+      <MainContext.Provider value={mainStateMock}>
+        <ServicesContext.Provider value={notificationServiceMock}>
+          <CoreServicesContext.Provider value={coreServicesMock}>
+            <CreateChannel
+              {...(props as RouteComponentProps<{ id: string }>)}
+            />
+          </CoreServicesContext.Provider>
+        </ServicesContext.Provider>
+      </MainContext.Provider>
     );
     utils.getByTestId('create-channel-create-button').click();
     utils.getByText('Alerting').click();
@@ -69,14 +75,16 @@ describe('<CreateChannel/> spec', () => {
       match: { params: { id: 'test' } },
     };
     const utilsSlack = render(
-      <ServicesContext.Provider value={notificationServiceMockSlack}>
-        <CoreServicesContext.Provider value={coreServicesMock}>
-          <CreateChannel
-            {...(props as RouteComponentProps<{ id: string }>)}
-            edit={true}
-          />
-        </CoreServicesContext.Provider>
-      </ServicesContext.Provider>
+      <MainContext.Provider value={mainStateMock}>
+        <ServicesContext.Provider value={notificationServiceMockSlack}>
+          <CoreServicesContext.Provider value={coreServicesMock}>
+            <CreateChannel
+              {...(props as RouteComponentProps<{ id: string }>)}
+              edit={true}
+            />
+          </CoreServicesContext.Provider>
+        </ServicesContext.Provider>
+      </MainContext.Provider>
     );
 
     await waitFor(() => {
@@ -107,14 +115,16 @@ describe('<CreateChannel/> spec', () => {
       match: { params: { id: 'test' } },
     };
     const utilsChime = render(
-      <ServicesContext.Provider value={notificationServiceMockChime}>
-        <CoreServicesContext.Provider value={coreServicesMock}>
-          <CreateChannel
-            {...(props as RouteComponentProps<{ id: string }>)}
-            edit={true}
-          />
-        </CoreServicesContext.Provider>
-      </ServicesContext.Provider>
+      <MainContext.Provider value={mainStateMock}>
+        <ServicesContext.Provider value={notificationServiceMockChime}>
+          <CoreServicesContext.Provider value={coreServicesMock}>
+            <CreateChannel
+              {...(props as RouteComponentProps<{ id: string }>)}
+              edit={true}
+            />
+          </CoreServicesContext.Provider>
+        </ServicesContext.Provider>
+      </MainContext.Provider>
     );
 
     await waitFor(() => {
@@ -135,21 +145,25 @@ describe('<CreateChannel/> spec', () => {
     notificationServiceMockEmail.notificationService = {
       getChannel: getEmailChannel,
       getSenders: jest.fn(async (query) => MOCK_DATA.senders),
-      getEmailConfigDetails: jest.fn(async (channel) => Promise.resolve(channel))
+      getEmailConfigDetails: jest.fn(async (channel) =>
+        Promise.resolve(channel)
+      ),
     };
     const props = {
       location: { search: '' },
       match: { params: { id: 'test' } },
     };
     const utilsEmail = render(
-      <ServicesContext.Provider value={notificationServiceMockEmail}>
-        <CoreServicesContext.Provider value={coreServicesMock}>
-          <CreateChannel
-            {...(props as RouteComponentProps<{ id: string }>)}
-            edit={true}
-          />
-        </CoreServicesContext.Provider>
-      </ServicesContext.Provider>
+      <MainContext.Provider value={mainStateMock}>
+        <ServicesContext.Provider value={notificationServiceMockEmail}>
+          <CoreServicesContext.Provider value={coreServicesMock}>
+            <CreateChannel
+              {...(props as RouteComponentProps<{ id: string }>)}
+              edit={true}
+            />
+          </CoreServicesContext.Provider>
+        </ServicesContext.Provider>
+      </MainContext.Provider>
     );
 
     await waitFor(() => {
@@ -170,14 +184,16 @@ describe('<CreateChannel/> spec', () => {
       match: { params: { id: 'test' } },
     };
     const utilsWebhook = render(
-      <ServicesContext.Provider value={notificationServiceMockWebhook}>
-        <CoreServicesContext.Provider value={coreServicesMock}>
-          <CreateChannel
-            {...(props as RouteComponentProps<{ id: string }>)}
-            edit={true}
-          />
-        </CoreServicesContext.Provider>
-      </ServicesContext.Provider>
+      <MainContext.Provider value={mainStateMock}>
+        <ServicesContext.Provider value={notificationServiceMockWebhook}>
+          <CoreServicesContext.Provider value={coreServicesMock}>
+            <CreateChannel
+              {...(props as RouteComponentProps<{ id: string }>)}
+              edit={true}
+            />
+          </CoreServicesContext.Provider>
+        </ServicesContext.Provider>
+      </MainContext.Provider>
     );
 
     await waitFor(() => {

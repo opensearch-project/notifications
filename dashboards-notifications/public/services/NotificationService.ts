@@ -31,6 +31,7 @@ import {
   RecipientGroupItemType,
   SenderItemType,
 } from '../../models/interfaces';
+import { CHANNEL_TYPE } from '../utils/constants';
 import {
   configListToChannels,
   configListToRecipientGroups,
@@ -159,5 +160,25 @@ export default class NotificationService {
   getRecipientGroup = async (id: string): Promise<RecipientGroupItemType> => {
     const response = await this.getConfig(id);
     return configToRecipientGroup(response.config_list[0]);
+  };
+
+  getAvailableFeatures = async () => {
+    try {
+      const channels = (await this.httpClient
+        .get(NODE_API.AVAILABLE_FEATURES)
+        .then((response) => response.config_type_list)) as Array<
+        keyof typeof CHANNEL_TYPE
+      >;
+      const channelTypes: Partial<typeof CHANNEL_TYPE> = {};
+      for (let i = 0; i < channels.length; i++) {
+        const channel = channels[i];
+        if (!CHANNEL_TYPE[channel]) continue;
+        channelTypes[channel] = CHANNEL_TYPE[channel];
+      }
+      return channelTypes;
+    } catch (error) {
+      console.error('error fetching available features', error);
+      return null;
+    }
   };
 }

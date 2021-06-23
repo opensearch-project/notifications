@@ -63,6 +63,7 @@ interface MainProps extends RouteComponentProps {}
 
 export interface MainState {
   isChannelConfigured: boolean;
+  availableFeatures: Partial<typeof CHANNEL_TYPE>;
 }
 
 export const MainContext = createContext<MainState | null>(null);
@@ -74,10 +75,13 @@ export default class Main extends Component<MainProps, MainState> {
     super(props);
     this.state = {
       isChannelConfigured: true,
+      availableFeatures: CHANNEL_TYPE,
     };
   }
 
   async componentDidMount() {
+    const availableFeatures = await this.context.notificationService.getAvailableFeatures();
+    if (availableFeatures != null) this.setState({ availableFeatures });
     try {
       const isChannelConfigured = await this.context.notificationService.getChannels(
         {
