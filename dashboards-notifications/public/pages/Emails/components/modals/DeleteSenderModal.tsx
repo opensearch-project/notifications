@@ -102,6 +102,7 @@ export const DeleteSenderModal = (props: DeleteSenderModalProps) => {
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButton
+                data-test-subj="delete-sender-modal-delete-button"
                 fill
                 color="danger"
                 onClick={async () => {

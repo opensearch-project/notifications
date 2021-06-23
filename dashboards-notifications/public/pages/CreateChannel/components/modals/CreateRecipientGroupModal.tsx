@@ -108,6 +108,7 @@ export function CreateRecipientGroupModal(
         <EuiModalFooter>
           <EuiButtonEmpty onClick={props.onClose}>Cancel</EuiButtonEmpty>
           <EuiButton
+            data-test-subj="create-recipient-group-modal-create-button"
             fill
             onClick={async () => {
               if (!isInputValid()) {

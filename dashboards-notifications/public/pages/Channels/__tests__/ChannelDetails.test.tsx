@@ -55,21 +55,6 @@ describe('<ChannelDetails/> spec', () => {
     expect(utils.container.firstChild).toMatchSnapshot();
   });
 
-  it('clicks mute or unmute button', () => {
-    const props = { match: { params: { id: 'test' } } };
-    const utils = render(
-      <ServicesContext.Provider value={notificationServiceMock}>
-        <CoreServicesContext.Provider value={coreServicesMock}>
-          <ChannelDetails {...(props as RouteComponentProps<{ id: string }>)} />
-        </CoreServicesContext.Provider>
-      </ServicesContext.Provider>
-    );
-
-    const button = utils.getByText('ute channel', { exact: false });
-    fireEvent.click(button);
-    expect(utils.container.firstChild).toMatchSnapshot();
-  });
-
   it('renders a specific channel', async () => {
     const props = { match: { params: { id: 'test' } } };
     const notificationServiceMock = jest.fn() as any;

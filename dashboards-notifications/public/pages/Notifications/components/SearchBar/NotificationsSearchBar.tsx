@@ -33,7 +33,7 @@ import {
   EuiSuperDatePicker,
   ShortDate,
 } from '@elastic/eui';
-import React from 'react';
+import React, { useState } from 'react';
 import { Filters, FilterType } from './Filter/Filters';
 
 interface NotificationsSearchBarProps {
@@ -49,14 +49,19 @@ interface NotificationsSearchBarProps {
 }
 
 export function NotificationsSearchBar(props: NotificationsSearchBarProps) {
+  const [query, setQuery] = useState(props.search);
+
   return (
     <>
       <EuiFlexGroup gutterSize="s" alignItems="center">
         <EuiFlexItem>
           <EuiFieldSearch
+            data-test-subj="notifications-search-bar-input"
             fullWidth
             isClearable={false}
             placeholder="Search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
             onSearch={props.setSearch}
           />
         </EuiFlexItem>
@@ -72,7 +77,13 @@ export function NotificationsSearchBar(props: NotificationsSearchBarProps) {
           />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiButton iconType="refresh" onClick={props.refresh}>
+          <EuiButton
+            iconType="refresh"
+            onClick={() => {
+              props.setSearch(query);
+              props.refresh();
+            }}
+          >
             Refresh
           </EuiButton>
         </EuiFlexItem>

@@ -212,6 +212,7 @@ export class SendersTable extends Component<
                     <ModalConsumer>
                       {({ onShow }) => (
                         <EuiButton
+                          data-test-subj="senders-table-delete-button"
                           disabled={this.state.selectedItems.length === 0}
                           onClick={() =>
                             onShow(DeleteSenderModal, {
@@ -229,6 +230,7 @@ export class SendersTable extends Component<
                 {
                   component: (
                     <EuiButton
+                      data-test-subj="senders-table-edit-button"
                       disabled={this.state.selectedItems.length !== 1}
                       onClick={() =>
                         location.assign(
@@ -256,6 +258,7 @@ export class SendersTable extends Component<
           total={this.state.total}
         >
           <EuiFieldSearch
+            data-test-subj="senders-table-search-input"
             fullWidth={true}
             placeholder="Search"
             onSearch={this.onSearchChange}

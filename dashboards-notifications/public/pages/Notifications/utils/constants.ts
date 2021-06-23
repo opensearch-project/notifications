@@ -33,7 +33,7 @@ export const DEFAULT_QUERY_PARAMS = {
   from: 0,
   search: '',
   size: 10,
-  sortDirection: SortDirection.ASC,
+  sortDirection: SortDirection.DESC,
   sortField: 'last_updated_time_ms',
   startTime: 'now-7d',
   endTime: 'now',
