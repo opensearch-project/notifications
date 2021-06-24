@@ -104,6 +104,7 @@ export const DeleteChannelModal = (props: DeleteChannelModalProps) => {
             <EuiFlexItem grow={false}>
               <EuiButton
                 fill
+                data-test-subj="delete-channel-modal-delete-button"
                 color="danger"
                 onClick={async () => {
                   props.services.notificationService
@@ -121,7 +122,7 @@ export const DeleteChannelModal = (props: DeleteChannelModalProps) => {
                       props.onClose();
                       if (props.href)
                         setTimeout(
-                          () => location.assign(props.href!),
+                          () => (location.hash = props.href!),
                           SERVER_DELAY
                         );
                       else if (props.refresh)
