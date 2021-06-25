@@ -11,7 +11,6 @@
 
 /// <reference types="cypress" />
 
-import { isTSObjectKeyword } from '@babel/types';
 import { delay } from '../utils/constants';
 
 describe('Test create email sender and recipients', () => {
@@ -124,7 +123,7 @@ describe('Test edit sender and recipients', () => {
 })
 
 
-describe('Test search and delete email sender and recipients', () => {
+describe('Test display popup and delete', () => {
   beforeEach(() => {
     cy.visit(
       `${Cypress.env(
@@ -134,19 +133,6 @@ describe('Test search and delete email sender and recipients', () => {
     cy.wait(delay * 3);
   });
 
-  it('searches ssl sender', () => {
-    cy.get('[data-test-subj="senders-table-search-input"]').type('ssl{enter}')
-    cy.contains('Test ssl sender').should('exist')
-    cy.contains('edited.test@email.com').should('exist');
-    cy.contains('Test tls sender').should('not.exist')
-  });
-  
-  it('searches non existing values', () => {
-    cy.contains('Updated group description').should('exist');
-    cy.get('[data-test-subj="recipient-groups-table-search-input"]').type('aninvalidemailgroup{enter}')
-    cy.contains('No recipient groups to display').should('exist');
-  });
-  
   it('opens email addresses popup', () => {
     cy.get('.euiLink').contains('1 more').click();
     cy.contains('custom.email.6@test.com').should('exist')
