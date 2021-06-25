@@ -1,3 +1,14 @@
+/*
+ *  SPDX-License-Identifier: Apache-2.0
+ *
+ *  The OpenSearch Contributors require contributions made to
+ *  this file be licensed under the Apache-2.0 license or a
+ *  compatible open source license.
+ *
+ *  Modifications Copyright OpenSearch Contributors. See
+ *  GitHub history for details.
+ */
+
 package org.opensearch.notifications.spi.client
 
 import com.sun.mail.util.MailConnectException
@@ -7,20 +18,13 @@ import org.opensearch.notifications.spi.model.destination.EmailDestination
 import org.opensearch.notifications.spi.utils.SecurityAccess
 import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.rest.RestStatus
-import java.io.IOException
-import java.util.*
-import javax.mail.Authenticator
+import java.util.Properties
 import javax.mail.Message
 import javax.mail.MessagingException
-import javax.mail.PasswordAuthentication
 import javax.mail.SendFailedException
 import javax.mail.Session
 import javax.mail.Transport
-import javax.mail.internet.AddressException
-import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeMessage
-import kotlin.collections.ArrayList
-
 
 /**
  * This class handles the connections to the given Destination.
@@ -29,7 +33,7 @@ class DestinationEmailClient {
 
     companion object {
         private val log by logger(DestinationEmailClient::class.java)
-        // TODO get constant from config
+        // TODO get constants from config
         private const val SMTP_EMAIL_SIZE_LIMIT = 10000000
         private const val MINIMUM_EMAIL_HEADER_LENGTH = 160 // minimum value from 100 reference emails
     }
@@ -52,7 +56,8 @@ class DestinationEmailClient {
 
         when (emailDestination.method) {
             "ssl" -> prop["mail.smtp.ssl.enable"] = true
-            "starttls" -> prop["mail.smtp.starttls.enable"] = true
+            "start_tls" -> prop["mail.smtp.starttls.enable"] = true
+            "none" -> {}
             else -> throw IllegalArgumentException("Invalid method supplied")
         }
 
@@ -61,8 +66,7 @@ class DestinationEmailClient {
 
         // send Mime Message
         return sendMimeMessage(mimeMessage)
-        }
-
+    }
 
     /**
      * {@inheritDoc}
@@ -70,7 +74,7 @@ class DestinationEmailClient {
     private fun sendMimeMessage(mimeMessage: MimeMessage): DestinationMessageResponse {
         return try {
             log.debug("Sending Email-SMTP")
-            SecurityAccess.doPrivileged { Transport.send(mimeMessage) }
+            SecurityAccess.doPrivileged { sendMessage(mimeMessage) }
             log.info("Email-SMTP sent")
             DestinationMessageResponse(RestStatus.OK, "Success")
         } catch (exception: SendFailedException) {
@@ -88,15 +92,6 @@ class DestinationEmailClient {
     @Throws(Exception::class)
     fun sendMessage(msg: Message?) {
         Transport.send(msg)
-    }
-
-    @Throws(Exception::class)
-    private fun getRecipientsAsAddresses(recipients: List<String>): Array<InternetAddress> {
-        val addresses = ArrayList<InternetAddress>()
-        for (recipient in recipients) {
-            addresses.add(InternetAddress(recipient))
-        }
-        return addresses.toTypedArray()
     }
 
     /**
@@ -118,10 +113,10 @@ class DestinationEmailClient {
         }
 
         val approxEmailLength = MINIMUM_EMAIL_HEADER_LENGTH +
-                message.title.length +
-                message.textDescription.length +
-                (message.htmlDescription?.length ?: 0) +
-                approxAttachmentLength
+            message.title.length +
+            message.textDescription.length +
+            (message.htmlDescription?.length ?: 0) +
+            approxAttachmentLength
 
         return approxEmailLength > SMTP_EMAIL_SIZE_LIMIT
     }

@@ -97,6 +97,7 @@ internal object EmailMimeProvider {
         // Add the multipart/alternative part to the mimeMessage
         msg.addBodyPart(bodyWrapper)
 
+        @SuppressWarnings("ComplexCondition")
         if (messageContent.fileName != null &&
             messageContent.fileData != null &&
             messageContent.fileContentType != null &&
@@ -112,6 +113,7 @@ internal object EmailMimeProvider {
                 msg.addBodyPart(attachmentMime)
             }
         }
+
         return mimeMessage
     }
 

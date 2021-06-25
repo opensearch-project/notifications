@@ -20,7 +20,7 @@ import java.net.URISyntaxException
 /**
  * This class holds the contents of generic webbook destination
  */
-open class WebhookDestination(
+abstract class WebhookDestination(
     val url: String,
     destinationType: String
 ) : BaseDestination(destinationType) {

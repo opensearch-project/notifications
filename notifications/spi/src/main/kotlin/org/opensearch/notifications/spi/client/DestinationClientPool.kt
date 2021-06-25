@@ -32,4 +32,5 @@ package org.opensearch.notifications.spi.client
  */
 internal object DestinationClientPool {
     val httpClient: DestinationHttpClient = DestinationHttpClient()
+    val emailClient: DestinationEmailClient = DestinationEmailClient()
 }

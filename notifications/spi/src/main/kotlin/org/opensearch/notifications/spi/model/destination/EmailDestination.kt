@@ -9,23 +9,48 @@
  *  GitHub history for details.
  */
 
+/*
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ *
+ */
+
 package org.opensearch.notifications.spi.model.destination
 
 import org.opensearch.common.Strings
 import org.opensearch.notifications.spi.utils.validateEmail
 
+/**
+ * This class holds the contents of email destination
+ */
 class EmailDestination(
     val host: String,
     val port: Int,
     val method: String,
     val fromAddress: String,
     val recipient: String,
-    destinationType: String,
+    destinationType: String, // Smtp or Ses
 ) : BaseDestination(destinationType) {
 
     init {
-        require(!Strings.isNullOrEmpty(host)) { "host is null or empty" }
-        require(port > 0) { "port should be positive value" }
-        validateEmail(fromAddress)
+        when (destinationType) {
+            "Smtp" -> {
+                require(!Strings.isNullOrEmpty(host)) { "host is null or empty" }
+                require(port > 0) { "port should be positive value" }
+                validateEmail(fromAddress)
+                validateEmail(recipient)
+            }
+            // TODO Add Ses here
+        }
     }
 }

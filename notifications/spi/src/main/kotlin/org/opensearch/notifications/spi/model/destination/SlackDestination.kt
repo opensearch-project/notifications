@@ -12,7 +12,7 @@
 package org.opensearch.notifications.spi.model.destination
 
 /**
- * This class holds the contents of a Chime destination
+ * This class holds the contents of a Slack destination
  */
 class SlackDestination(
     url: String,

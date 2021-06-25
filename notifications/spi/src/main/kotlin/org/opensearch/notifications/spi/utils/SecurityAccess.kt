@@ -35,7 +35,7 @@ import java.security.PrivilegedExceptionAction
 /**
  * Class for providing the elevated permission for the function call.
  */
-internal object SecurityAccess {
+object SecurityAccess {
     /**
      * Execute the operation in privileged mode.
      */

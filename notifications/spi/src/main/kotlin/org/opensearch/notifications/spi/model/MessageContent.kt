@@ -47,4 +47,8 @@ class MessageContent(
         require(!Strings.isNullOrEmpty(title)) { "title is null or empty" }
         require(!Strings.isNullOrEmpty(textDescription)) { "text message part is null or empty" }
     }
+
+    fun buildWebhookMessage(): String {
+        return "$title $textDescription"
+    }
 }

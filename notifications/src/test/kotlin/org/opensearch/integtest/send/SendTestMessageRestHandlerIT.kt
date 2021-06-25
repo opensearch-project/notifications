@@ -34,28 +34,23 @@ import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
 
 internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
-
     @Suppress("EmptyFunctionBlock")
-    fun `test send test webhook message`() {
+    fun `test send test slack message`() {
         // Create webhook notification config
-        // TODO:update url when actual webhook can be tested
         val createRequestJsonString = """
         {
             "config":{
                 "name":"this is a sample config name",
                 "description":"this is a sample config description",
-                "config_type":"webhook",
+                "config_type":"slack",
                 "feature_list":[
                     "index_management",
                     "reports",
                     "alerting"
                 ],
                 "is_enabled":true,
-                "webhook":{
-                    "url":"https://domain.com/sample_webhook_url#1234567890",
-                    "header_params":{
-                        "User-Agent":"Mozilla/5.0"
-                    }
+                "slack":{
+                    "url":"https://hooks.slack.com/services/xxx/xxx"
                 }
             }
         }
