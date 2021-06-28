@@ -112,11 +112,11 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
     }
 
     private fun getMessageTitle(feature: Feature, configId: String): String {
-        return "[$feature] Test Message-$configId" // TODO: change as spec
+        return "[$feature] Test Message Title-$configId" // TODO: change as spec
     }
 
     private fun getMessageTextDescription(feature: Feature, configId: String): String {
-        return "Test Message for config id $configId from feature ${feature.tag}" // TODO: change as spec
+        return "Test message content bodyfor config id $configId from feature ${feature.tag}" // TODO: change as spec
     }
 
     private fun getMessageHtmlDescription(feature: Feature, configId: String): String {

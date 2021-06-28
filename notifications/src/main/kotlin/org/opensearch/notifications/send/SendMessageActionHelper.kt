@@ -38,6 +38,7 @@ import org.opensearch.notifications.model.DocMetadata
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.model.NotificationEventDoc
 import org.opensearch.notifications.security.UserAccess
+import org.opensearch.notifications.spi.Notification
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
@@ -288,8 +289,7 @@ object SendMessageActionHelper {
         message: MessageContent
     ): DestinationMessageResponse {
         return try {
-            // TODO status = Notification.sendMessage(destination, message)
-            val status = DestinationMessageResponse(RestStatus.NOT_IMPLEMENTED, "Send notification not implemented")
+            val status = Notification.sendMessage(destination, message)
             log.info("$LOG_PREFIX:sendMessage:statusCode=${status.statusCode}, statusText=${status.statusText}")
             status
         } catch (exception: Exception) {

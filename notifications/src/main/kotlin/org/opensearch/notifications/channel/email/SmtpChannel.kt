@@ -32,8 +32,8 @@ import org.opensearch.commons.notifications.model.ChannelMessage
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.model.ChannelMessageResponse
-import org.opensearch.notifications.security.SecurityAccess
 import org.opensearch.notifications.settings.PluginSettings
+import org.opensearch.notifications.spi.utils.SecurityAccess
 import org.opensearch.rest.RestStatus
 import java.util.Properties
 import javax.mail.MessagingException
