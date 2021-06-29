@@ -45,8 +45,8 @@ class EmailDestination(
     init {
         when (destinationType) {
             "Smtp" -> {
-                require(!Strings.isNullOrEmpty(host)) { "host is null or empty" }
-                require(port > 0) { "port should be positive value" }
+                require(!Strings.isNullOrEmpty(host)) { "Host name should be provided" }
+                require(port > 0) { "Port should be positive value" }
                 validateEmail(fromAddress)
                 validateEmail(recipient)
             }

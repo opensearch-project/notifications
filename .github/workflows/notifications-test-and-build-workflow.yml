@@ -28,7 +28,7 @@ on: [push, pull_request]
 env:
   OPENSEARCH_VERSION: '1.0'
   COMMON_UTILS_VERSION: main
-  OPENSEARCH_PLUGIN_VERSION: 1.0.0-rc1
+  OPENSEARCH_PLUGIN_VERSION: 1.0.0
 
 jobs:
   build:
@@ -49,7 +49,7 @@ jobs:
           ref: ${{ env.OPENSEARCH_VERSION }}
       - name: Build OpenSearch
         working-directory: ./OpenSearch
-        run: ./gradlew publishToMavenLocal -Dbuild.version_qualifier=rc1 -Dbuild.snapshot=false
+        run: ./gradlew publishToMavenLocal -Dbuild.snapshot=false
 
       # dependencies: common-utils
       - name: Checkout common-utils

@@ -29,7 +29,7 @@ import org.opensearch.gradle.test.RestIntegTestTask
 
 buildscript {
     ext {
-        opensearch_version = System.getProperty("opensearch.version", "1.0.0-rc1")
+        opensearch_version = System.getProperty("opensearch.version", "1.0.0")
         kotlin_version = System.getProperty("kotlin.version", "1.4.32")
         junit_version = System.getProperty("junit.version", "5.7.2")
     }
@@ -157,7 +157,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
     compile "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3" // ${kotlin_version} does not work for coroutines
-    compile "${group}:common-utils:1.0.0.0-rc1" // TODO: change to ${opensearch_version}
+    compile "${group}:common-utils:${opensearch_version}.0" // TODO: change to ${opensearch_version}
     compile ("software.amazon.awssdk:ses:2.16.75") {
         exclude module: 'annotations' // conflict with org.jetbrains:annotations, integTestRunner fails with error "codebase property already set"
     }
