@@ -27,6 +27,7 @@
 
 package org.opensearch.notifications.spi.utils
 
+import org.opensearch.common.Strings
 import java.net.URL
 
 fun validateUrl(urlString: String) {
@@ -37,6 +38,7 @@ fun validateUrl(urlString: String) {
 }
 
 fun validateEmail(email: String) {
+    require(!Strings.isNullOrEmpty(email)) { "FromAddress and recipient should be provided" }
     require(isValidEmail(email)) { "Invalid email address" }
 }
 

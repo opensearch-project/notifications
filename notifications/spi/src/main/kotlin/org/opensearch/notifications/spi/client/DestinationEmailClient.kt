@@ -29,7 +29,7 @@ import javax.mail.internet.MimeMessage
 /**
  * This class handles the connections to the given Destination.
  */
-class DestinationEmailClient {
+open class DestinationEmailClient {
 
     companion object {
         private val log by logger(DestinationEmailClient::class.java)
@@ -40,7 +40,6 @@ class DestinationEmailClient {
 
     @Throws(Exception::class)
     fun execute(emailDestination: EmailDestination, message: MessageContent): DestinationMessageResponse {
-
         if (isMessageSizeOverLimit(message)) {
             return DestinationMessageResponse(
                 RestStatus.REQUEST_ENTITY_TOO_LARGE,
@@ -89,8 +88,9 @@ class DestinationEmailClient {
     /*
      * This method is useful for mocking the client
      */
+    // TODO remove open keyword after adding other framework that can mock final class/method. e.g. Mockito2 ?
     @Throws(Exception::class)
-    fun sendMessage(msg: Message?) {
+    open fun sendMessage(msg: Message?) {
         Transport.send(msg)
     }
 
@@ -105,7 +105,6 @@ class DestinationEmailClient {
     }
 
     private fun isMessageSizeOverLimit(message: MessageContent): Boolean {
-
         val approxAttachmentLength = if (message.fileData != null && message.fileName != null) {
             MINIMUM_EMAIL_HEADER_LENGTH + message.fileData.length + message.fileName.length
         } else {
