@@ -25,12 +25,32 @@
  *
  */
 
-package org.opensearch.notifications.spi.client
+package org.opensearch.notifications.spi.model.destination
+
+import org.opensearch.common.Strings
+import org.opensearch.notifications.spi.utils.validateEmail
 
 /**
- * This class provides Client to the relevant destinations
+ * This class holds the contents of email destination
  */
-internal object DestinationClientPool {
-    val httpClient: DestinationHttpClient = DestinationHttpClient()
-    val emailClient: DestinationEmailClient = DestinationEmailClient()
+class EmailDestination(
+    val host: String,
+    val port: Int,
+    val method: String,
+    val fromAddress: String,
+    val recipient: String,
+    destinationType: String, // Smtp or Ses
+) : BaseDestination(destinationType) {
+
+    init {
+        when (destinationType) {
+            "Smtp" -> {
+                require(!Strings.isNullOrEmpty(host)) { "Host name should be provided" }
+                require(port > 0) { "Port should be positive value" }
+                validateEmail(fromAddress)
+                validateEmail(recipient)
+            }
+            // TODO Add Ses here
+        }
+    }
 }

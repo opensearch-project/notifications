@@ -46,7 +46,7 @@ import org.opensearch.rest.RestStatus
 internal class CustomWebhookDestinationTests {
     @Test
     @Throws(Exception::class)
-    fun `test custom webook message null entity response`() {
+    fun `test custom webhook message null entity response`() {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
 
         // The DestinationHttpClient replaces a null entity with "{}".
@@ -84,7 +84,7 @@ internal class CustomWebhookDestinationTests {
 
     @Test
     @Throws(Exception::class)
-    fun `test custom webook message empty entity response`() {
+    fun `test custom webhook message empty entity response`() {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
         val expectedWebhookResponse = DestinationMessageResponse(statusText = "", statusCode = RestStatus.OK)
 
@@ -103,9 +103,9 @@ internal class CustomWebhookDestinationTests {
         DestinationFactoryProvider.destinationFactoryMap = mapOf("Webhook" to webhookDestinationFactory)
 
         val title = "test custom webhook"
-        val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
+        val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
             "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present\"}"
+            "@All All Present member callout: @Present"
         val url = "https://abc/com"
 
         val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"))
