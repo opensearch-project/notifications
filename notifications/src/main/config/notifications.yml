@@ -40,7 +40,7 @@ opensearch.notifications:
       awsRegion: "us-west-2"
     smtp: # Configuration for SMTP email delivery
       host: "localhost"
-      port: 587
+      port: 10255
       transportMethod: "starttls" # starttls, ssl or plain
   access:
     adminAccess: "All"
