@@ -68,7 +68,7 @@ jobs:
       - name: Build with Gradle
         run: |
           cd notifications
-          ./gradlew build -x :integTest -x :opensearch-notifications-spi:integTest -Dopensearch.version=${{ env.OPENSEARCH_VERSION }}.0 # exclude integTest task to avoid permission denied issue
+          ./gradlew build -PexcludeTests="**/SesChannelIT*" -Dopensearch.version=${{ env.OPENSEARCH_VERSION }}.0
 
       # - name: Upload coverage
       #   uses: codecov/codecov-action@v1

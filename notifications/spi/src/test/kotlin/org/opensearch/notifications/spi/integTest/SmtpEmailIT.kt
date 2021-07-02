@@ -22,7 +22,7 @@ import org.springframework.integration.test.mail.TestMailServer
 internal class SmtpEmailIT : OpenSearchRestTestCase() {
 
     private val smtpServer: TestMailServer.SmtpServer
-    private val smtpPort = 568
+    private val smtpPort = 10255 // use non-standard port > 1024 to avoid permission issue
 
     init {
         smtpServer = TestMailServer.smtp(smtpPort)
@@ -65,7 +65,7 @@ internal class SmtpEmailIT : OpenSearchRestTestCase() {
         )
         val response = Notification.sendMessage(emailDestination, message)
         assertEquals(
-            "sendEmail Error, status:Couldn't connect to host, port: invalidHost, 568; timeout -1",
+            "sendEmail Error, status:Couldn't connect to host, port: invalidHost, $smtpPort; timeout -1",
             response.statusText
         )
         assertEquals(RestStatus.SERVICE_UNAVAILABLE, response.statusCode)

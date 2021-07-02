@@ -183,7 +183,7 @@ internal object PluginSettings {
     /**
      * Default SMTP port number to connect to.
      */
-    private const val DEFAULT_SMTP_PORT = 587
+    private const val DEFAULT_SMTP_PORT = 10255
 
     /**
      * Default SMTP transport method.

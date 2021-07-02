@@ -224,6 +224,11 @@ tasks.named("check").configure { dependsOn(integTest) }
 
 
 integTest {
+    if (project.hasProperty('excludeTests')) {
+        project.properties['excludeTests']?.replaceAll('\\s', '')?.split('[,;]')?.each {
+            exclude "${it}"
+        }
+    }
     systemProperty 'tests.security.manager', 'false'
     systemProperty 'java.io.tmpdir', es_tmp_dir.absolutePath
 
