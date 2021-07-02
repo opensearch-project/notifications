@@ -12,9 +12,9 @@ name: Test and Build Dashboards Notifications
 on: [pull_request, push]
 
 env:
-  PLUGIN_NAME: notificationsDashboards
+  PLUGIN_NAME: notifications-dashboards
   OPENSEARCH_DASHBOARDS_VERSION: '1.0'
-  OPENSEARCH_PLUGIN_VERSION: 1.0.0.0-rc1
+  OPENSEARCH_PLUGIN_VERSION: 1.0.0.0
 
 jobs:
 
