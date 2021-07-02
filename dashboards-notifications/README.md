@@ -55,7 +55,7 @@ We welcome you to get involved in development, documentation, testing the Notifi
 
 ## Bugs, Enhancements or Questions
 
-Please file an issue to report any bugs you may find, enhancements you may need or questions you may have [here](https://github.com/opensearch-project/dashboards-notifications/issues).
+Please file an issue to report any bugs you may find, enhancements you may need or questions you may have [here](https://github.com/opensearch-project/notifications/issues).
 
 ## License
 
