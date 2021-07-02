@@ -28,6 +28,7 @@
 package org.opensearch.notifications.spi.client
 
 import org.apache.http.HttpEntity
+import org.apache.http.HttpResponse
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
@@ -44,6 +45,7 @@ import org.apache.http.util.EntityUtils
 import org.opensearch.common.unit.TimeValue
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
+import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.WebhookDestination
 import org.opensearch.notifications.spi.utils.OpenForTesting
 import org.opensearch.notifications.spi.utils.logger
@@ -70,7 +72,7 @@ class DestinationHttpClient {
 
     companion object {
         private val log by logger(DestinationHttpClient::class.java)
-        // TODO get the following constants
+        // TODO get the following constants from config
         private const val MAX_CONNECTIONS = 60
         private const val MAX_CONNECTIONS_PER_ROUTE = 20
         private val TIMEOUT_MILLISECONDS = TimeValue.timeValueSeconds(5).millis().toInt()
@@ -125,20 +127,18 @@ class DestinationHttpClient {
 
     @Throws(Exception::class)
     private fun getHttpResponse(destination: WebhookDestination, message: MessageContent): CloseableHttpResponse {
-        val httpRequest = HttpPost()
-        val uri = destination.buildUri()
+        val httpRequest = HttpPost(destination.url)
 
         if (destination is CustomWebhookDestination) {
             if (destination.headerParams.isEmpty()) {
                 // set default header
-                httpRequest.setHeader("Content-Type", "application/json")
+                httpRequest.setHeader("Content-type", "application/json")
             } else {
                 for ((key, value) in destination.headerParams.entries) httpRequest.setHeader(key, value)
             }
         }
 
-        httpRequest.uri = uri
-        val entity = StringEntity(extractBody(message), StandardCharsets.UTF_8)
+        val entity = StringEntity(buildRequestBody(destination, message), StandardCharsets.UTF_8)
         (httpRequest as HttpEntityEnclosingRequestBase).entity = entity
 
         return httpClient.execute(httpRequest)
@@ -163,14 +163,19 @@ class DestinationHttpClient {
     }
 
     @Throws(IOException::class)
-    private fun validateResponseStatus(response: org.apache.http.HttpResponse) {
+    private fun validateResponseStatus(response: HttpResponse) {
         val statusCode: Int = response.statusLine.statusCode
         if (!VALID_RESPONSE_STATUS.contains(statusCode)) {
             throw IOException("Failed: $response")
         }
     }
 
-    private fun extractBody(message: MessageContent): String {
-        return message.textDescription
+    private fun buildRequestBody(destination: WebhookDestination, message: MessageContent): String {
+        // Slack webhook request body has required format https://api.slack.com/messaging/webhooks
+        return if (destination is SlackDestination) {
+            "{\"text\" : \"${message.buildWebhookMessage()}\"}"
+        } else {
+            "{\"Content\" : \"${message.buildWebhookMessage()}\"}"
+        }
     }
 }

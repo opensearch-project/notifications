@@ -9,22 +9,6 @@
  *  GitHub history for details.
  */
 
-/*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
- *
- */
-
 package org.opensearch.notifications.spi.factory
 
 import org.opensearch.notifications.spi.client.DestinationClientPool
@@ -48,6 +32,7 @@ internal class WebhookDestinationFactory : DestinationFactory<WebhookDestination
     constructor() {
         this.destinationHttpClient = DestinationClientPool.httpClient
     }
+
     @OpenForTesting
     constructor(destinationHttpClient: DestinationHttpClient) {
         this.destinationHttpClient = destinationHttpClient
@@ -56,16 +41,10 @@ internal class WebhookDestinationFactory : DestinationFactory<WebhookDestination
     override fun sendMessage(destination: WebhookDestination, message: MessageContent): DestinationMessageResponse {
         return try {
             val response = destinationHttpClient.execute(destination, message)
-            DestinationMessageResponse(
-                statusCode = RestStatus.OK,
-                statusText = response
-            )
+            DestinationMessageResponse(RestStatus.OK, response)
         } catch (exception: IOException) {
             log.error("Exception sending message: $message", exception)
-            DestinationMessageResponse(
-                statusCode = RestStatus.INTERNAL_SERVER_ERROR,
-                statusText = "Failed to send message"
-            )
+            DestinationMessageResponse(RestStatus.INTERNAL_SERVER_ERROR, "Failed to send message ${exception.message}")
         }
     }
 }

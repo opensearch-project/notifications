@@ -40,16 +40,15 @@ import java.security.PrivilegedAction
  */
 object Notification {
     /**
-     * Send the notification message to the corresponding notification
-     * channel
+     * Send the notification message to the corresponding destination
      *
-     * @param message
+     * @param message metadata for message
      * @return ChannelMessageResponse
      */
     fun sendMessage(destination: BaseDestination, message: MessageContent): DestinationMessageResponse {
-        val destinationFactory = DestinationFactoryProvider.getFactory(destination.destinationType)
         return AccessController.doPrivileged(
             PrivilegedAction {
+                val destinationFactory = DestinationFactoryProvider.getFactory(destination.destinationType)
                 destinationFactory.sendMessage(destination, message)
             } as PrivilegedAction<DestinationMessageResponse>?
         )

@@ -64,9 +64,9 @@ class SesChannelIT : NotificationsRestTestCase() {
         val response = executeRequest(refTag, recipients, title, textDescription, htmlDescription, attachment)
 
         val statusCode = getStatusCode(response)
-        assertEquals(RestStatus.SERVICE_UNAVAILABLE.status, statusCode)
+        assertEquals(RestStatus.FAILED_DEPENDENCY.status, statusCode)
 
         val statusText = getStatusText(response)
-        assertEquals("sendEmail Error, SES status:400:Optional[Bad Request]", statusText)
+        assertEquals("sendEmail Error, SES status:403:Optional[Forbidden]", statusText)
     }
 }
