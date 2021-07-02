@@ -77,7 +77,9 @@ task integTest(type: RestIntegTestTask) {
     description = "Run tests against a cluster that has security enabled"
     testClassesDirs = sourceSets.test.output.classesDirs
     classpath = sourceSets.test.runtimeClasspath
+    systemProperty 'tests.security.manager', 'false'
 }
+
 task sourcesJar(type: Jar) {
     archiveClassifier.set 'sources'
     from sourceSets.main.allJava
@@ -140,6 +142,8 @@ dependencies {
             "org.apache.logging.log4j:log4j-core:${versions.log4j}",
             "org.opensearch.test:framework:${opensearch_version}",
     )
+    testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
+    testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
     testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.2')
     testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
 }
