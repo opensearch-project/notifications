@@ -24,6 +24,7 @@ exports[`<DetailsTableModal /> spec renders headers 1`] = `
         "getNotification": [Function],
         "getNotifications": [Function],
         "httpClient": [MockFunction],
+        "sendTestMessage": [Function],
       },
       "notificationService": NotificationService {
         "createConfig": [Function],
@@ -1856,6 +1857,7 @@ exports[`<DetailsTableModal /> spec renders parameters 1`] = `
         "getNotification": [Function],
         "getNotifications": [Function],
         "httpClient": [MockFunction],
+        "sendTestMessage": [Function],
       },
       "notificationService": NotificationService {
         "createConfig": [Function],

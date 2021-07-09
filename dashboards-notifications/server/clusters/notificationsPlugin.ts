@@ -107,6 +107,19 @@ export function NotificationsPlugin(Client: any, config: any, components: any) {
     method: 'GET',
   });
 
+  notifications.sendTestMessage = clientAction({
+    url: {
+      fmt: `${OPENSEARCH_API.TEST_MESSAGE}/<%=configId%>`,
+      req: {
+        configId: {
+          type: 'string',
+          required: true,
+        },
+      },
+    },
+    method: 'GET',
+  });
+
   notifications.getAvailableFeatures = clientAction({
     url: {
       fmt: OPENSEARCH_API.FEATURES,

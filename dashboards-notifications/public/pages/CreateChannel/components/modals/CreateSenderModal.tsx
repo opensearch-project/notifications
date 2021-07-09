@@ -112,6 +112,7 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
         <EuiModalFooter>
           <EuiButtonEmpty onClick={props.onClose}>Cancel</EuiButtonEmpty>
           <EuiButton
+            data-test-subj="create-sender-modal-create-button"
             fill
             onClick={async () => {
               if (!isInputValid()) {

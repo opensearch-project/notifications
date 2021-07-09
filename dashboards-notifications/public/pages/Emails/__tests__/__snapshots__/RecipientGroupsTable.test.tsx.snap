@@ -39,6 +39,7 @@ exports[`<RecipientGroupsTable /> spec renders empty state 1`] = `
             >
               <button
                 class="euiButton euiButton--primary euiButton-isDisabled"
+                data-test-subj="recipient-groups-table-delete-button"
                 disabled=""
                 type="button"
               >
@@ -58,6 +59,7 @@ exports[`<RecipientGroupsTable /> spec renders empty state 1`] = `
             >
               <button
                 class="euiButton euiButton--primary euiButton-isDisabled"
+                data-test-subj="recipient-groups-table-edit-button"
                 disabled=""
                 type="button"
               >
@@ -110,6 +112,7 @@ exports[`<RecipientGroupsTable /> spec renders empty state 1`] = `
       >
         <input
           class="euiFieldSearch euiFieldSearch--fullWidth euiFieldSearch-isClearable"
+          data-test-subj="recipient-groups-table-search-input"
           placeholder="Search"
           type="search"
         />

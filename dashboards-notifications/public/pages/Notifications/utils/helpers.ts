@@ -47,11 +47,11 @@ export const getURLQueryParams = (
   queryParams: string
 ): NotificationsQueryParams => {
   const {
-    from,
-    size,
-    search,
-    sortField,
-    sortDirection,
+    from_index: from,
+    max_items: size,
+    query: search,
+    sort_field: sortField,
+    sort_order: sortDirection,
     startTime,
     endTime,
     filters,

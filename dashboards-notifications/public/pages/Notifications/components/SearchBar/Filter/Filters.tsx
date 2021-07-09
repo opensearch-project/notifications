@@ -217,6 +217,7 @@ export function Filters(props: FiltersProps) {
         alignItems="center"
         responsive={false}
         style={{ minHeight: 32 }}
+        wrap
       >
         <EuiFlexItem grow={false}>
           <GlobalFilterButton

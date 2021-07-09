@@ -105,6 +105,7 @@ export const DeleteRecipientGroupModal = (
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButton
+                data-test-subj="delete-recipient-group-modal-delete-button"
                 fill
                 color="danger"
                 onClick={async() => {

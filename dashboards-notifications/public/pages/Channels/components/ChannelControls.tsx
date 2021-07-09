@@ -34,8 +34,11 @@ import {
   EuiPopover,
 } from '@elastic/eui';
 import _ from 'lodash';
-import React, { useContext, useState } from 'react';
-import { NOTIFICATION_SOURCE } from '../../../../public/utils/constants';
+import React, { useContext, useEffect, useState } from 'react';
+import {
+  CHANNEL_TYPE,
+  NOTIFICATION_SOURCE,
+} from '../../../../public/utils/constants';
 import { MainContext } from '../../Main/Main';
 import { ChannelFiltersType } from '../types';
 
@@ -69,6 +72,14 @@ export const ChannelControls = (props: ChannelControlsProps) => {
       checked: 'off',
     }))
   );
+
+  useEffect(() => {
+    const newItems = typeItems.filter(
+      ({ field }) =>
+        !!mainStateContext.availableFeatures[field as keyof typeof CHANNEL_TYPE]
+    );
+    if (newItems.length !== typeItems.length) setTypeItems(newItems);
+  }, [mainStateContext.availableFeatures]);
 
   function updateItem(
     items: Array<{ field: string; display: string; checked: string }>,

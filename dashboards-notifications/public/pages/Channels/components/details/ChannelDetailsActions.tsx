@@ -35,6 +35,7 @@ import React, { useContext, useState } from 'react';
 import { ChannelItemType } from '../../../../../models/interfaces';
 import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalConsumer } from '../../../../components/Modal';
+import { ServicesContext } from '../../../../services';
 import { ROUTES } from '../../../../utils/constants';
 import { DeleteChannelModal } from '../modals/DeleteChannelModal';
 
@@ -54,7 +55,34 @@ interface ChannelDetailsActionsProps {
 
 export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
   const coreContext = useContext(CoreServicesContext)!;
+  const servicesContext = useContext(ServicesContext)!;
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  const sendTestMessage = async () => {
+    try {
+      const eventId = await servicesContext.eventService
+        .sendTestMessage(props.channel.config_id, props.channel.feature_list[0])
+        .then((response) => response.event_id);
+
+      await servicesContext.eventService
+        .getNotification(eventId)
+        .then((response) => {
+          if (!response.success) {
+            const error = new Error('Failed to send the test message.');
+            error.stack = JSON.stringify(response.status_list, null, 2);
+            throw error;
+          }
+        });
+      coreContext.notifications.toasts.addSuccess(
+        'Successfully sent a test message.'
+      );
+    } catch (error) {
+      coreContext.notifications.toasts.addError(error, {
+        title: 'Failed to send the test message.',
+        toastMessage: 'View error details and adjust the channel settings.',
+      });
+    }
+  };
 
   const actions: ChannelDetailsActionsParams[] = [
     {
@@ -63,25 +91,9 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
     },
     {
       label: 'Send test message',
-      disabled: props.channel.feature_list.length === 0,
-      action: () => {
-        if (true) {
-          coreContext.notifications.toasts.addSuccess(
-            'Successfully sent a test message.'
-          );
-        } else {
-          const error: Error = {
-            name: 'Error details',
-            message:
-              'Message cannot be sent. Security_team (PagerDuty) webhook is invalid.',
-            stack: `TypeError: Failed to fetch\n\tat Fetch.fetchResponse (http://localhost:5601/9007199254740991/bundles/core/core.entry.js:17006:13)\n\tat async interceptResponse (http://localhost:5601/9007199254740991/bundles/core/core.entry.js:17444:10)\n\tat async http://localhost:5601/9007199254740991/bundles/core/core.entry.js:16930:39`,
-          };
-          coreContext.notifications.toasts.addError(error, {
-            title: 'Failed to send the test message.',
-            toastMessage: 'View error details and adjust the channel settings.',
-          });
-        }
-      },
+      disabled:
+        props.channel.feature_list.length === 0 || !props.channel.config_id,
+      action: sendTestMessage,
     },
     {
       label: 'Delete',
