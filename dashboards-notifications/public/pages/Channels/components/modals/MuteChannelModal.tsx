@@ -74,6 +74,7 @@ export const MuteChannelModal = (props: MuteChannelModalProps) => {
             <EuiFlexItem grow={false}>
               <EuiButton
                 fill
+                data-test-subj="mute-channel-modal-mute-button"
                 onClick={async () => {
                   const channel = { ...props.selected[0], is_enabled: false };
                   await props.services.notificationService
