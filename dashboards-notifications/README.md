@@ -4,7 +4,7 @@ Dashboards Notifications plugin provides an interface that helps users to manage
 
 ## Documentation
 
-Please see our technical [documentation](https://docs-beta.opensearch.org/) to learn more about its features.
+Please see our technical [documentation](https://opensearch.org/docs) to learn more about its features.
 
 ## Setup
 
@@ -28,8 +28,8 @@ Ultimately, your directory structure should look like this:
 ```md
 .
 ├── OpenSearch Dashboards
-│   └── plugins
-│       └── dashboards-notifications
+│ └── plugins
+│ └── dashboards-notifications
 ```
 
 ## Build
@@ -37,7 +37,6 @@ Ultimately, your directory structure should look like this:
 To build the plugin's distributable zip simply run `yarn build`.
 
 Example output: `./build/notificationsDashboards*.zip`
-
 
 ## Run
 
