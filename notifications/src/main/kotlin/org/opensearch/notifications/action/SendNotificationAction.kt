@@ -28,6 +28,8 @@
 package org.opensearch.notifications.action
 
 import org.opensearch.action.ActionListener
+import org.opensearch.action.ActionRequest
+import org.opensearch.action.ActionResponse
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.client.Client
 import org.opensearch.common.inject.Inject
@@ -63,7 +65,7 @@ internal class SendNotificationAction @Inject constructor(
      */
     override fun doExecute(
         task: Task?,
-        request: SendNotificationRequest,
+        request: ActionRequest,
         listener: ActionListener<SendNotificationResponse>
     ) {
         val transformedRequest = request as? SendNotificationRequest
