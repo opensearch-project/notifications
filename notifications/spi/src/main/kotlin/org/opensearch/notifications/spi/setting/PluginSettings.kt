@@ -191,7 +191,6 @@ internal object PluginSettings {
         socketTimeout = (settings?.get(SOCKET_TIMEOUT_MILLISECONDS_KEY)?.toInt()) ?: DEFAULT_SOCKET_TIMEOUT_MILLISECONDS
         allowedConfigTypes = settings?.getAsList(ALLOWED_CONFIG_TYPE_KEY, null) ?: DEFAULT_ALLOWED_CONFIG_TYPES
 
-
         defaultSettings = mapOf(
             EMAIL_SIZE_LIMIT_KEY to emailSizeLimit.toString(DECIMAL_RADIX),
             EMAIL_MINIMUM_HEADER_LENGTH_KEY to emailMinimumHeaderLength.toString(DECIMAL_RADIX),
@@ -245,8 +244,6 @@ internal object PluginSettings {
         { it },
         NodeScope, Dynamic
     )
-
-
 
     /**
      * Returns list of additional settings available specific to this plugin.
