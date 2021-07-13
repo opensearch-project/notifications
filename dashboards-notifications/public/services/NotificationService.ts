@@ -1,3 +1,4 @@
+import { SortDirection } from '@elastic/eui';
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -108,27 +109,32 @@ export default class NotificationService {
     channel: ChannelItemType
   ): Promise<ChannelItemType> => {
     if (!channel.email) return channel;
-    channel.email.email_account_name = await this.getChannel(
-      channel.email.email_account_id
-    ).then((channel) => channel.name);
 
-    channel.email.email_group_id_map = {};
-    await channel.email.email_group_id_list
-      .map((id) => () =>
-        this.getChannel(id).then((channel) => ({ id, name: channel.name }))
-      )
-      .reduce(
-        (prev, curr) =>
-          prev.then(() =>
-            curr().then(
-              (response) =>
-                (channel.email!.email_group_id_map![response.id] =
-                  response.name)
-            )
-          ),
-        Promise.resolve() as any
+    const idMap: { [id: string]: string } = {};
+    const ids = [
+      channel.email.email_account_id,
+      ...channel.email.email_group_id_list,
+    ];
+    await this.getConfigs({
+      from_index: 0,
+      max_items: ids.length,
+      config_id_list: ids,
+      sort_order: SortDirection.ASC,
+      sort_field: 'name',
+      config_type: ['smtp_account', 'email_group'],
+    }).then((response) => {
+      response.config_list.map(
+        (config) => (idMap[config.config_id] = config.config.name)
       );
+    });
 
+    channel.email.email_account_name = idMap[channel.email.email_account_id];
+    channel.email.email_group_id_map = {};
+    channel.email.email_group_id_list.map(
+      (id) => (channel.email!.email_group_id_map![id] = idMap[id])
+    );
+
+    console.log('channel:', channel);
     return channel;
   };
 
