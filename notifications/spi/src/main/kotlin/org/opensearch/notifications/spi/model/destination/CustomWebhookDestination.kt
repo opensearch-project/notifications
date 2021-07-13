@@ -17,4 +17,4 @@ package org.opensearch.notifications.spi.model.destination
 class CustomWebhookDestination(
     url: String,
     val headerParams: Map<String, String>,
-) : WebhookDestination(url, "webhook")
+) : WebhookDestination(url, DestinationType.CUSTOMWEBHOOK)

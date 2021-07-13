@@ -32,4 +32,4 @@ package org.opensearch.notifications.spi.model.destination
  */
 class ChimeDestination(
     url: String,
-) : WebhookDestination(url, "chime")
+) : WebhookDestination(url, DestinationType.CHIME)

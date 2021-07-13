@@ -22,7 +22,7 @@ import java.net.URISyntaxException
  */
 abstract class WebhookDestination(
     val url: String,
-    destinationType: String
+    destinationType: DestinationType
 ) : BaseDestination(destinationType) {
 
     init {

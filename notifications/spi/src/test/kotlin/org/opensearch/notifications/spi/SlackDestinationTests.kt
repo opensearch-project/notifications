@@ -40,6 +40,7 @@ import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
 import org.opensearch.notifications.spi.factory.WebhookDestinationFactory
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.rest.RestStatus
 
@@ -50,7 +51,7 @@ internal class SlackDestinationTests {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
 
         // The DestinationHttpClient replaces a null entity with "{}".
-        val expectedWebhookResponse = DestinationMessageResponse(statusText = "{}", statusCode = RestStatus.OK)
+        val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "{}")
 
         val httpResponse: CloseableHttpResponse = EasyMock.createMock(CloseableHttpResponse::class.java)
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
@@ -65,7 +66,7 @@ internal class SlackDestinationTests {
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("slack" to webhookDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf(DestinationType.SLACK to webhookDestinationFactory)
 
         val title = "test Slack"
         val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -86,7 +87,7 @@ internal class SlackDestinationTests {
     @Throws(Exception::class)
     fun `test Slack message empty entity response`() {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
-        val expectedWebhookResponse = DestinationMessageResponse(statusText = "", statusCode = RestStatus.OK)
+        val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "")
 
         val httpResponse: CloseableHttpResponse = EasyMock.createMock(CloseableHttpResponse::class.java)
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
@@ -100,7 +101,7 @@ internal class SlackDestinationTests {
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("slack" to webhookDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf(DestinationType.SLACK to webhookDestinationFactory)
 
         val title = "test Slack"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -122,7 +123,7 @@ internal class SlackDestinationTests {
     fun `test Slack message non-empty entity response`() {
         val responseContent = "It worked!"
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
-        val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK, responseContent)
+        val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, responseContent)
 
         val httpResponse: CloseableHttpResponse = EasyMock.createMock(CloseableHttpResponse::class.java)
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
@@ -136,7 +137,7 @@ internal class SlackDestinationTests {
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("slack" to webhookDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf(DestinationType.SLACK to webhookDestinationFactory)
 
         val title = "test Slack"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +

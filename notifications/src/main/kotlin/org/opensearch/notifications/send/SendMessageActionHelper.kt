@@ -206,7 +206,7 @@ object SendMessageActionHelper {
     private fun sendSlackMessage(slack: Slack, message: MessageContent, eventStatus: EventStatus): EventStatus {
         val destination = SlackDestination(slack.url)
         val status = sendMessageThroughSpi(destination, message)
-        return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.name, status.statusText))
+        return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
 
     /**
@@ -215,7 +215,7 @@ object SendMessageActionHelper {
     private fun sendChimeMessage(chime: Chime, message: MessageContent, eventStatus: EventStatus): EventStatus {
         val destination = ChimeDestination(chime.url)
         val status = sendMessageThroughSpi(destination, message)
-        return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.name, status.statusText))
+        return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
 
     /**
@@ -224,7 +224,7 @@ object SendMessageActionHelper {
     private fun sendWebhookMessage(webhook: Webhook, message: MessageContent, eventStatus: EventStatus): EventStatus {
         val destination = CustomWebhookDestination(webhook.url, webhook.headerParams)
         val status = sendMessageThroughSpi(destination, message)
-        return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.name, status.statusText))
+        return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
 
     /**
@@ -294,7 +294,7 @@ object SendMessageActionHelper {
             status
         } catch (exception: Exception) {
             log.warn("sendMessage Exception:$exception")
-            DestinationMessageResponse(RestStatus.FAILED_DEPENDENCY, "Failed to send notification")
+            DestinationMessageResponse(RestStatus.FAILED_DEPENDENCY.status, "Failed to send notification")
         }
     }
 

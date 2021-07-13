@@ -40,7 +40,7 @@ open class DestinationEmailClient {
     fun execute(emailDestination: EmailDestination, message: MessageContent): DestinationMessageResponse {
         if (isMessageSizeOverLimit(message)) {
             return DestinationMessageResponse(
-                RestStatus.REQUEST_ENTITY_TOO_LARGE,
+                RestStatus.REQUEST_ENTITY_TOO_LARGE.status,
                 "Email size larger than ${PluginSettings.emailSizeLimit}"
             )
         }
@@ -73,13 +73,13 @@ open class DestinationEmailClient {
             log.debug("Sending Email-SMTP")
             SecurityAccess.doPrivileged { sendMessage(mimeMessage) }
             log.info("Email-SMTP sent")
-            DestinationMessageResponse(RestStatus.OK, "Success")
+            DestinationMessageResponse(RestStatus.OK.status, "Success")
         } catch (exception: SendFailedException) {
-            DestinationMessageResponse(RestStatus.BAD_GATEWAY, getMessagingExceptionText(exception))
+            DestinationMessageResponse(RestStatus.BAD_GATEWAY.status, getMessagingExceptionText(exception))
         } catch (exception: MailConnectException) {
-            DestinationMessageResponse(RestStatus.SERVICE_UNAVAILABLE, getMessagingExceptionText(exception))
+            DestinationMessageResponse(RestStatus.SERVICE_UNAVAILABLE.status, getMessagingExceptionText(exception))
         } catch (exception: MessagingException) {
-            DestinationMessageResponse(RestStatus.FAILED_DEPENDENCY, getMessagingExceptionText(exception))
+            DestinationMessageResponse(RestStatus.FAILED_DEPENDENCY.status, getMessagingExceptionText(exception))
         }
     }
 

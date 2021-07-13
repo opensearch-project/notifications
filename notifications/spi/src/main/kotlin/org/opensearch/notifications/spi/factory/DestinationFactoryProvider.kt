@@ -12,6 +12,7 @@
 package org.opensearch.notifications.spi.factory
 
 import org.opensearch.notifications.spi.model.destination.BaseDestination
+import org.opensearch.notifications.spi.model.destination.DestinationType
 
 /**
  * This class helps in fetching the right destination factory based on type
@@ -20,11 +21,11 @@ import org.opensearch.notifications.spi.model.destination.BaseDestination
 internal object DestinationFactoryProvider {
 
     var destinationFactoryMap = mapOf(
-        // TODO Add other channel
-        "slack" to WebhookDestinationFactory(),
-        "chime" to WebhookDestinationFactory(),
-        "webhook" to WebhookDestinationFactory(),
-        "smtp" to SmtpEmailDestinationFactory()
+        // TODO Add other destinations, ses, sns
+        DestinationType.SLACK to WebhookDestinationFactory(),
+        DestinationType.CHIME to WebhookDestinationFactory(),
+        DestinationType.CUSTOMWEBHOOK to WebhookDestinationFactory(),
+        DestinationType.SMTP to SmtpEmailDestinationFactory()
     )
 
     /**
@@ -33,17 +34,8 @@ internal object DestinationFactoryProvider {
      * @param destinationType [{@link DestinationType}]
      * @return DestinationFactory factory object for above destination type
      */
-    fun getFactory(destinationType: String): DestinationFactory<BaseDestination> {
+    fun getFactory(destinationType: DestinationType): DestinationFactory<BaseDestination> {
         require(destinationFactoryMap.containsKey(destinationType)) { "Invalid channel type" }
         return destinationFactoryMap[destinationType] as DestinationFactory<BaseDestination>
-    }
-
-    /**
-     * Fetch the allowed destinations
-     *
-     * @return List<String> list of allowed destinations
-     */
-    fun getAllowedDestinationList(): List<String> {
-        return destinationFactoryMap.keys.toList()
     }
 }
