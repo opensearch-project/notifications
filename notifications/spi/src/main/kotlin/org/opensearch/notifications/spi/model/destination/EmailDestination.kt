@@ -44,13 +44,13 @@ class EmailDestination(
 
     init {
         when (destinationType) {
-            "Smtp" -> {
+            "smtp" -> {
                 require(!Strings.isNullOrEmpty(host)) { "Host name should be provided" }
                 require(port > 0) { "Port should be positive value" }
                 validateEmail(fromAddress)
                 validateEmail(recipient)
             }
-            // TODO Add Ses here
+            // TODO Add ses here
         }
     }
 }

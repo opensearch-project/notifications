@@ -65,7 +65,7 @@ internal class CustomWebhookDestinationTests {
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("Webhook" to webhookDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("webhook" to webhookDestinationFactory)
 
         val title = "test custom webhook"
         val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -76,7 +76,7 @@ internal class CustomWebhookDestinationTests {
         val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"))
         val message = MessageContent(title, messageText)
 
-        val actualCustomWebhookResponse: DestinationMessageResponse = Notification.sendMessage(destination, message)
+        val actualCustomWebhookResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
 
         assertEquals(expectedWebhookResponse.statusText, actualCustomWebhookResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualCustomWebhookResponse.statusCode)
@@ -100,7 +100,7 @@ internal class CustomWebhookDestinationTests {
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("Webhook" to webhookDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("webhook" to webhookDestinationFactory)
 
         val title = "test custom webhook"
         val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -111,7 +111,7 @@ internal class CustomWebhookDestinationTests {
         val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"))
         val message = MessageContent(title, messageText)
 
-        val actualCustomWebhookResponse: DestinationMessageResponse = Notification.sendMessage(destination, message)
+        val actualCustomWebhookResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
 
         assertEquals(expectedWebhookResponse.statusText, actualCustomWebhookResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualCustomWebhookResponse.statusCode)
@@ -136,7 +136,7 @@ internal class CustomWebhookDestinationTests {
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("Webhook" to webhookDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("webhook" to webhookDestinationFactory)
 
         val title = "test custom webhook"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -147,7 +147,7 @@ internal class CustomWebhookDestinationTests {
         val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"))
         val message = MessageContent(title, messageText)
 
-        val actualCustomWebhookResponse: DestinationMessageResponse = Notification.sendMessage(destination, message)
+        val actualCustomWebhookResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
 
         assertEquals(expectedWebhookResponse.statusText, actualCustomWebhookResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualCustomWebhookResponse.statusCode)

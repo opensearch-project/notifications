@@ -15,6 +15,7 @@ import com.sun.mail.util.MailConnectException
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.EmailDestination
+import org.opensearch.notifications.spi.setting.PluginSettings
 import org.opensearch.notifications.spi.utils.SecurityAccess
 import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.rest.RestStatus
@@ -33,9 +34,6 @@ open class DestinationEmailClient {
 
     companion object {
         private val log by logger(DestinationEmailClient::class.java)
-        // TODO get constants from config
-        private const val SMTP_EMAIL_SIZE_LIMIT = 10000000
-        private const val MINIMUM_EMAIL_HEADER_LENGTH = 160 // minimum value from 100 reference emails
     }
 
     @Throws(Exception::class)
@@ -43,7 +41,7 @@ open class DestinationEmailClient {
         if (isMessageSizeOverLimit(message)) {
             return DestinationMessageResponse(
                 RestStatus.REQUEST_ENTITY_TOO_LARGE,
-                "Email size larger than $SMTP_EMAIL_SIZE_LIMIT"
+                "Email size larger than ${PluginSettings.emailSizeLimit}"
             )
         }
 
@@ -106,17 +104,17 @@ open class DestinationEmailClient {
 
     private fun isMessageSizeOverLimit(message: MessageContent): Boolean {
         val approxAttachmentLength = if (message.fileData != null && message.fileName != null) {
-            MINIMUM_EMAIL_HEADER_LENGTH + message.fileData.length + message.fileName.length
+            PluginSettings.emailMinimumHeaderLength + message.fileData.length + message.fileName.length
         } else {
             0
         }
 
-        val approxEmailLength = MINIMUM_EMAIL_HEADER_LENGTH +
+        val approxEmailLength = PluginSettings.emailMinimumHeaderLength +
             message.title.length +
             message.textDescription.length +
             (message.htmlDescription?.length ?: 0) +
             approxAttachmentLength
 
-        return approxEmailLength > SMTP_EMAIL_SIZE_LIMIT
+        return approxEmailLength > PluginSettings.emailSizeLimit
     }
 }

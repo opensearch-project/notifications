@@ -65,7 +65,7 @@ internal class SlackDestinationTests {
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("Slack" to webhookDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("slack" to webhookDestinationFactory)
 
         val title = "test Slack"
         val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -76,7 +76,7 @@ internal class SlackDestinationTests {
         val destination = SlackDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualSlackResponse: DestinationMessageResponse = Notification.sendMessage(destination, message)
+        val actualSlackResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
 
         assertEquals(expectedWebhookResponse.statusText, actualSlackResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualSlackResponse.statusCode)
@@ -100,7 +100,7 @@ internal class SlackDestinationTests {
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("Slack" to webhookDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("slack" to webhookDestinationFactory)
 
         val title = "test Slack"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -111,7 +111,7 @@ internal class SlackDestinationTests {
         val destination = SlackDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualSlackResponse: DestinationMessageResponse = Notification.sendMessage(destination, message)
+        val actualSlackResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
 
         assertEquals(expectedWebhookResponse.statusText, actualSlackResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualSlackResponse.statusCode)
@@ -136,7 +136,7 @@ internal class SlackDestinationTests {
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("Slack" to webhookDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("slack" to webhookDestinationFactory)
 
         val title = "test Slack"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -147,7 +147,7 @@ internal class SlackDestinationTests {
         val destination = SlackDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualSlackResponse: DestinationMessageResponse = Notification.sendMessage(destination, message)
+        val actualSlackResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
 
         assertEquals(expectedWebhookResponse.statusText, actualSlackResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualSlackResponse.statusCode)

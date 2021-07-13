@@ -16,4 +16,4 @@ package org.opensearch.notifications.spi.model.destination
  */
 class SlackDestination(
     url: String,
-) : WebhookDestination(url, "Slack")
+) : WebhookDestination(url, "slack")

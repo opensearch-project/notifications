@@ -34,16 +34,16 @@ internal class EmailDestinationTests {
             .addMockedMethod("sendMessage").createMock()
         emailClient.sendMessage(EasyMock.anyObject(Message::class.java))
         val smtpEmailDestinationFactory = SmtpEmailDestinationFactory(emailClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("Smtp" to smtpEmailDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("smtp" to smtpEmailDestinationFactory)
 
         val subject = "Test SMTP Email subject"
         val messageText = "{Message gughjhjlkh Body emoji test: :) :+1: " +
             "link test: http://sample.com email test: marymajor@example.com All member callout: " +
             "@All All Present member callout: @Present}"
         val message = MessageContent(subject, messageText)
-        val destination = EmailDestination("abc", 465, "ssl", "test@abc.com", "to@abc.com", "Smtp")
+        val destination = EmailDestination("abc", 465, "ssl", "test@abc.com", "to@abc.com", "smtp")
 
-        val actualEmailResponse: DestinationMessageResponse = Notification.sendMessage(destination, message)
+        val actualEmailResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
         assertEquals(expectedEmailResponse.statusCode, actualEmailResponse.statusCode)
         assertEquals(expectedEmailResponse.statusText, actualEmailResponse.statusText)
     }
@@ -62,16 +62,16 @@ internal class EmailDestinationTests {
             .andThrow(MessagingException("Couldn't connect to host, port: localhost, 55555; timeout -1"))
         EasyMock.replay(emailClient)
         val smtpEmailDestinationFactory = SmtpEmailDestinationFactory(emailClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("Smtp" to smtpEmailDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("smtp" to smtpEmailDestinationFactory)
 
         val subject = "Test SMTP Email subject"
         val messageText = "{Vamshi Message gughjhjlkh Body emoji test: :) :+1: " +
             "link test: http://sample.com email test: marymajor@example.com All member callout: " +
             "@All All Present member callout: @Present}"
         val message = MessageContent(subject, messageText)
-        val destination = EmailDestination("localhost", 55555, "none", "test@abc.com", "to@abc.com", "Smtp")
+        val destination = EmailDestination("localhost", 55555, "none", "test@abc.com", "to@abc.com", "smtp")
 
-        val actualEmailResponse: DestinationMessageResponse = Notification.sendMessage(destination, message)
+        val actualEmailResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
         EasyMock.verify(emailClient)
         assertEquals(expectedEmailResponse.statusCode, actualEmailResponse.statusCode)
         assertEquals("sendEmail Error, status:${expectedEmailResponse.statusText}", actualEmailResponse.statusText)
@@ -80,7 +80,7 @@ internal class EmailDestinationTests {
     @Test(expected = IllegalArgumentException::class)
     fun testHostMissingEmailDestination() {
         try {
-            EmailDestination("", 465, "ssl", "from@test.com", "to@test.com", "Smtp")
+            EmailDestination("", 465, "ssl", "from@test.com", "to@test.com", "smtp")
         } catch (exception: Exception) {
             Assert.assertEquals("Host name should be provided", exception.message)
             throw exception
@@ -90,7 +90,7 @@ internal class EmailDestinationTests {
     @Test(expected = IllegalArgumentException::class)
     fun testInvalidPortEmailDestination() {
         try {
-            EmailDestination("localhost", -1, "ssl", "from@test.com", "to@test.com", "Smtp")
+            EmailDestination("localhost", -1, "ssl", "from@test.com", "to@test.com", "smtp")
         } catch (exception: Exception) {
             Assert.assertEquals("Port should be positive value", exception.message)
             throw exception
@@ -100,7 +100,7 @@ internal class EmailDestinationTests {
     @Test(expected = IllegalArgumentException::class)
     fun testMissingFromOrRecipientEmailDestination() {
         try {
-            EmailDestination("localhost", 465, "ssl", "", "to@test.com", "Smtp")
+            EmailDestination("localhost", 465, "ssl", "", "to@test.com", "smtp")
         } catch (exception: Exception) {
             Assert.assertEquals("FromAddress and recipient should be provided", exception.message)
             throw exception

@@ -38,7 +38,7 @@ import org.opensearch.notifications.model.DocMetadata
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.model.NotificationEventDoc
 import org.opensearch.notifications.security.UserAccess
-import org.opensearch.notifications.spi.Notification
+import org.opensearch.notifications.spi.NotificationSpi
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
@@ -289,7 +289,7 @@ object SendMessageActionHelper {
         message: MessageContent
     ): DestinationMessageResponse {
         return try {
-            val status = Notification.sendMessage(destination, message)
+            val status = NotificationSpi.sendMessage(destination, message)
             log.info("$LOG_PREFIX:sendMessage:statusCode=${status.statusCode}, statusText=${status.statusText}")
             status
         } catch (exception: Exception) {

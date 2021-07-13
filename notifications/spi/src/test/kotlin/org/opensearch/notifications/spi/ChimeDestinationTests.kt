@@ -65,7 +65,7 @@ internal class ChimeDestinationTests {
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("Chime" to webhookDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("chime" to webhookDestinationFactory)
 
         val title = "test Chime"
         val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -76,7 +76,7 @@ internal class ChimeDestinationTests {
         val destination = ChimeDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualChimeResponse: DestinationMessageResponse = Notification.sendMessage(destination, message)
+        val actualChimeResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
 
         assertEquals(expectedWebhookResponse.statusText, actualChimeResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualChimeResponse.statusCode)
@@ -100,7 +100,7 @@ internal class ChimeDestinationTests {
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("Chime" to webhookDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("chime" to webhookDestinationFactory)
 
         val title = "test Chime"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -111,7 +111,7 @@ internal class ChimeDestinationTests {
         val destination = ChimeDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualChimeResponse: DestinationMessageResponse = Notification.sendMessage(destination, message)
+        val actualChimeResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
 
         assertEquals(expectedWebhookResponse.statusText, actualChimeResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualChimeResponse.statusCode)
@@ -136,7 +136,7 @@ internal class ChimeDestinationTests {
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf("Chime" to webhookDestinationFactory)
+        DestinationFactoryProvider.destinationFactoryMap = mapOf("chime" to webhookDestinationFactory)
 
         val title = "test Chime"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -147,7 +147,7 @@ internal class ChimeDestinationTests {
         val destination = ChimeDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualChimeResponse: DestinationMessageResponse = Notification.sendMessage(destination, message)
+        val actualChimeResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
 
         assertEquals(expectedWebhookResponse.statusText, actualChimeResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualChimeResponse.statusCode)

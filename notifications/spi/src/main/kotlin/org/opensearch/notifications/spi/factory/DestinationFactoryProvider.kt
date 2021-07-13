@@ -21,10 +21,10 @@ internal object DestinationFactoryProvider {
 
     var destinationFactoryMap = mapOf(
         // TODO Add other channel
-        "Slack" to WebhookDestinationFactory(),
-        "Chime" to WebhookDestinationFactory(),
-        "Webhook" to WebhookDestinationFactory(),
-        "Smtp" to SmtpEmailDestinationFactory()
+        "slack" to WebhookDestinationFactory(),
+        "chime" to WebhookDestinationFactory(),
+        "webhook" to WebhookDestinationFactory(),
+        "smtp" to SmtpEmailDestinationFactory()
     )
 
     /**
@@ -36,5 +36,14 @@ internal object DestinationFactoryProvider {
     fun getFactory(destinationType: String): DestinationFactory<BaseDestination> {
         require(destinationFactoryMap.containsKey(destinationType)) { "Invalid channel type" }
         return destinationFactoryMap[destinationType] as DestinationFactory<BaseDestination>
+    }
+
+    /**
+     * Fetch the allowed destinations
+     *
+     * @return List<String> list of allowed destinations
+     */
+    fun getAllowedDestinationList(): List<String> {
+        return destinationFactoryMap.keys.toList()
     }
 }
