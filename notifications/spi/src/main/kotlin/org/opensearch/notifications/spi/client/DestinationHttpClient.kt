@@ -72,12 +72,6 @@ class DestinationHttpClient {
 
     companion object {
         private val log by logger(DestinationHttpClient::class.java)
-//        // TODO get the following constants from config
-//        private const val MAX_CONNECTIONS = 60
-//        private const val MAX_CONNECTIONS_PER_ROUTE = 20
-//        private val TIMEOUT_MILLISECONDS = TimeValue.timeValueSeconds(5).millis().toInt()
-//        private val SOCKET_TIMEOUT_MILLISECONDS = TimeValue.timeValueSeconds(50).millis().toInt()
-
         /**
          * all valid response status
          */
