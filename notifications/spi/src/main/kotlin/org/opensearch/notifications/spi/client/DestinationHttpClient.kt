@@ -42,11 +42,11 @@ import org.apache.http.impl.client.DefaultHttpRequestRetryHandler
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
 import org.apache.http.util.EntityUtils
-import org.opensearch.common.unit.TimeValue
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.WebhookDestination
+import org.opensearch.notifications.spi.setting.PluginSettings
 import org.opensearch.notifications.spi.utils.OpenForTesting
 import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.rest.RestStatus
@@ -72,12 +72,6 @@ class DestinationHttpClient {
 
     companion object {
         private val log by logger(DestinationHttpClient::class.java)
-        // TODO get the following constants from config
-        private const val MAX_CONNECTIONS = 60
-        private const val MAX_CONNECTIONS_PER_ROUTE = 20
-        private val TIMEOUT_MILLISECONDS = TimeValue.timeValueSeconds(5).millis().toInt()
-        private val SOCKET_TIMEOUT_MILLISECONDS = TimeValue.timeValueSeconds(50).millis().toInt()
-
         /**
          * all valid response status
          */
@@ -94,13 +88,13 @@ class DestinationHttpClient {
 
         private fun createHttpClient(): CloseableHttpClient {
             val config: RequestConfig = RequestConfig.custom()
-                .setConnectTimeout(TIMEOUT_MILLISECONDS)
-                .setConnectionRequestTimeout(TIMEOUT_MILLISECONDS)
-                .setSocketTimeout(SOCKET_TIMEOUT_MILLISECONDS)
+                .setConnectTimeout(PluginSettings.connectionTimeout)
+                .setConnectionRequestTimeout(PluginSettings.connectionTimeout)
+                .setSocketTimeout(PluginSettings.socketTimeout)
                 .build()
             val connectionManager = PoolingHttpClientConnectionManager()
-            connectionManager.maxTotal = MAX_CONNECTIONS
-            connectionManager.defaultMaxPerRoute = MAX_CONNECTIONS_PER_ROUTE
+            connectionManager.maxTotal = PluginSettings.maxConnections
+            connectionManager.defaultMaxPerRoute = PluginSettings.maxConnectionsPerRoute
 
             return HttpClientBuilder.create()
                 .setDefaultRequestConfig(config)

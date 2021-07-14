@@ -90,7 +90,7 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
 
         const val PLUGIN_NAME = "opensearch-notifications"
         const val LOG_PREFIX = "notifications"
-        const val PLUGIN_BASE_URI = "/_opensearch/_notifications"
+        const val PLUGIN_BASE_URI = "/_plugins/_notifications"
     }
 
     /**

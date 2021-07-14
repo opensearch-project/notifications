@@ -41,10 +41,13 @@ internal class WebhookDestinationFactory : DestinationFactory<WebhookDestination
     override fun sendMessage(destination: WebhookDestination, message: MessageContent): DestinationMessageResponse {
         return try {
             val response = destinationHttpClient.execute(destination, message)
-            DestinationMessageResponse(RestStatus.OK, response)
+            DestinationMessageResponse(RestStatus.OK.status, response)
         } catch (exception: IOException) {
             log.error("Exception sending message: $message", exception)
-            DestinationMessageResponse(RestStatus.INTERNAL_SERVER_ERROR, "Failed to send message ${exception.message}")
+            DestinationMessageResponse(
+                RestStatus.INTERNAL_SERVER_ERROR.status,
+                "Failed to send message ${exception.message}"
+            )
         }
     }
 }

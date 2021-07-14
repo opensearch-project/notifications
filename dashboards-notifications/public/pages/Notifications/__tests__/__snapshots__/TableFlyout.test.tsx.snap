@@ -148,7 +148,7 @@ exports[`<TableFlyout /> spec renders the component 1`] = `
               <dd
                 class="euiDescriptionList__description"
               >
-                07/06/03 6:42 pm GMT
+                06/07/21 4:53 pm GMT
               </dd>
             </dl>
             <div
@@ -204,7 +204,7 @@ exports[`<TableFlyout /> spec renders the component 1`] = `
                         <dd
                           class="euiDescriptionList__description"
                         >
-                          slack
+                          Slack
                         </dd>
                       </dl>
                     </div>
@@ -306,7 +306,7 @@ exports[`<TableFlyout /> spec renders the component 1`] = `
                         <dd
                           class="euiDescriptionList__description"
                         >
-                          email
+                          Email
                         </dd>
                       </dl>
                     </div>

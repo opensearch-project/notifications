@@ -46,7 +46,7 @@ internal class SendMessageRestHandlerTests : OpenSearchTestCase() {
         val routes = restHandler.routes()
         val actualRouteSize = routes.size
         val actualRoute = routes[0]
-        val expectedRoute = RestHandler.Route(POST, "/_opensearch/_notifications/send")
+        val expectedRoute = RestHandler.Route(POST, "/_plugins/_notifications/send")
         assertEquals(1, actualRouteSize)
         assertEquals(expectedRoute.method, actualRoute.method)
         assertEquals(expectedRoute.path, actualRoute.path)

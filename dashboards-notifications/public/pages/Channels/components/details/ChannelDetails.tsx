@@ -28,10 +28,13 @@ import {
   EuiButton,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiGlobalToastList,
   EuiHealth,
   EuiSpacer,
+  EuiText,
   EuiTitle,
 } from '@elastic/eui';
+import { Toast } from '@elastic/eui/src/components/toast/global_toast_list';
 import _ from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
@@ -40,7 +43,11 @@ import { ContentPanel } from '../../../../components/ContentPanel';
 import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalConsumer } from '../../../../components/Modal';
 import { ServicesContext } from '../../../../services';
-import { BREADCRUMBS, NOTIFICATION_SOURCE } from '../../../../utils/constants';
+import {
+  BREADCRUMBS,
+  NOTIFICATION_SOURCE,
+  ROUTES,
+} from '../../../../utils/constants';
 import { renderTime } from '../../../../utils/helpers';
 import { ListItemType } from '../../types';
 import { MuteChannelModal } from '../modals/MuteChannelModal';
@@ -55,6 +62,7 @@ export function ChannelDetails(props: ChannelDetailsProps) {
   const servicesContext = useContext(ServicesContext)!;
   const id = props.match.params.id;
   const [channel, setChannel] = useState<ChannelItemType>();
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
   useEffect(() => {
     coreContext.chrome.setBreadcrumbs([
@@ -86,11 +94,37 @@ export function ChannelDetails(props: ChannelDetailsProps) {
           },
         ]);
       })
-      .catch((error) =>
-        coreContext.notifications.toasts.addError(error, {
-          title: 'There was a problem loading channel.',
-        })
-      );
+      .catch((error) => {
+        const newToast: Toast = {
+          id: 'channel-not-found-toast',
+          title: 'Channel not found',
+          color: 'danger',
+          iconType: 'alert',
+          text: (
+            <>
+              <EuiText
+                size="s"
+                style={{
+                  fontWeight: 400,
+                  color: 'rgb(52, 55, 65)',
+                  marginTop: 10,
+                  marginBottom: 20,
+                }}
+              >
+                The channel might have been deleted.
+              </EuiText>
+              <EuiFlexGroup justifyContent="flexEnd">
+                <EuiFlexItem grow={false}>
+                  <EuiButton size="s" href={`#${ROUTES.NOTIFICATIONS}`}>
+                    View Notifications dashboard
+                  </EuiButton>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </>
+          ),
+        };
+        setToasts([...toasts, newToast]);
+      });
   };
 
   const nameList: Array<ListItemType> = [
@@ -104,7 +138,7 @@ export function ChannelDetails(props: ChannelDetailsProps) {
     },
     {
       title: 'Last updated',
-      description: renderTime(channel?.last_updated_time_ms || -1),
+      description: renderTime(channel?.last_updated_time_ms || NaN),
     },
   ];
 
@@ -120,6 +154,14 @@ export function ChannelDetails(props: ChannelDetailsProps) {
 
   return (
     <>
+      <EuiGlobalToastList
+        toasts={toasts}
+        dismissToast={(removedToast) => {
+          setToasts(toasts.filter((toast) => toast.id !== removedToast.id));
+        }}
+        toastLifeTimeMs={60000}
+      />
+
       <EuiFlexGroup
         alignItems="center"
         gutterSize="m"
@@ -146,36 +188,38 @@ export function ChannelDetails(props: ChannelDetailsProps) {
           {channel && <ChannelDetailsActions channel={channel} />}
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <ModalConsumer>
-            {({ onShow }) => (
-              <EuiButton
-                data-test-subj="channel-details-mute-button"
-                iconType={channel?.is_enabled ? 'bellSlash' : 'bell'}
-                onClick={() => {
-                  if (!channel) return;
-                  if (channel.is_enabled) {
-                    onShow(MuteChannelModal, {
-                      selected: [channel],
-                      setSelected: (selected: ChannelItemType[]) =>
-                        setChannel(selected[0]),
-                    });
-                  } else {
-                    const newChannel = { ...channel, is_enabled: true };
-                    servicesContext.notificationService
-                      .updateConfig(channel.config_id, newChannel)
-                      .then((resp) => {
-                        coreContext.notifications.toasts.addSuccess(
-                          `Channel ${channel.name} successfully unmuted.`
-                        );
-                        setChannel(newChannel);
+          {channel && (
+            <ModalConsumer>
+              {({ onShow }) => (
+                <EuiButton
+                  data-test-subj="channel-details-mute-button"
+                  iconType={channel?.is_enabled ? 'bellSlash' : 'bell'}
+                  onClick={() => {
+                    if (!channel) return;
+                    if (channel.is_enabled) {
+                      onShow(MuteChannelModal, {
+                        selected: [channel],
+                        setSelected: (selected: ChannelItemType[]) =>
+                          setChannel(selected[0]),
                       });
-                  }
-                }}
-              >
-                {channel?.is_enabled ? 'Mute channel' : 'Unmute channel'}
-              </EuiButton>
-            )}
-          </ModalConsumer>
+                    } else {
+                      const newChannel = { ...channel, is_enabled: true };
+                      servicesContext.notificationService
+                        .updateConfig(channel.config_id, newChannel)
+                        .then((resp) => {
+                          coreContext.notifications.toasts.addSuccess(
+                            `Channel ${channel.name} successfully unmuted.`
+                          );
+                          setChannel(newChannel);
+                        });
+                    }
+                  }}
+                >
+                  {channel?.is_enabled ? 'Mute channel' : 'Unmute channel'}
+                </EuiButton>
+              )}
+            </ModalConsumer>
+          )}
         </EuiFlexItem>
       </EuiFlexGroup>
 

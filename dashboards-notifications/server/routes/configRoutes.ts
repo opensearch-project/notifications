@@ -195,7 +195,7 @@ export function configRoutes(router: IRouter) {
 
   router.get(
     {
-      path: NODE_API.AVAILABLE_FEATURES,
+      path: NODE_API.GET_AVAILABLE_FEATURES,
       validate: false,
     },
     async (context, request, response) => {

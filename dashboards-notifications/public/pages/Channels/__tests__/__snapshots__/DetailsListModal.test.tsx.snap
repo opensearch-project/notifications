@@ -23,6 +23,7 @@ exports[`<DetailsListModal /> spec renders the component 1`] = `
         "getNotification": [Function],
         "getNotifications": [Function],
         "httpClient": [MockFunction],
+        "sendTestMessage": [Function],
       },
       "notificationService": NotificationService {
         "createConfig": [Function],

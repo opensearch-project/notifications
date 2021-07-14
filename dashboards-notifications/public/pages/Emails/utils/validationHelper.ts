@@ -25,10 +25,11 @@
  */
 
 import { EuiComboBoxOptionOption } from '@elastic/eui';
+import _ from 'lodash';
 
 export const validateSenderName = (name: string) => {
   const errors = [];
-  if (name.length === 0) errors.push('Sender name cannot be empty.');
+  if (_.trim(name).length === 0) errors.push('Sender name cannot be empty.');
   return errors;
 };
 
@@ -55,7 +56,8 @@ export const validatePort = (port: string) => {
 
 export const validateRecipientGroupName = (name: string) => {
   const errors = [];
-  if (name.length === 0) errors.push('Recipient group name cannot be empty.');
+  if (_.trim(name).length === 0)
+    errors.push('Recipient group name cannot be empty.');
   return errors;
 };
 

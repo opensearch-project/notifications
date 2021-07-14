@@ -27,12 +27,10 @@
 
 package org.opensearch.notifications.spi.model
 
-import org.opensearch.rest.RestStatus
-
 /**
  * Data class for storing destination message response per recipient.
  */
 class DestinationMessageResponse(
-    val statusCode: RestStatus,
+    val statusCode: Int,
     val statusText: String
 )

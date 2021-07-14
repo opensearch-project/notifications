@@ -12,8 +12,9 @@
 package org.opensearch.notifications.spi.integTest
 
 import org.junit.After
-import org.opensearch.notifications.spi.Notification
+import org.opensearch.notifications.spi.NotificationSpi
 import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.notifications.spi.model.destination.EmailDestination
 import org.opensearch.rest.RestStatus
 import org.opensearch.test.rest.OpenSearchRestTestCase
@@ -34,11 +35,17 @@ internal class SmtpEmailIT : OpenSearchRestTestCase() {
         smtpServer.resetServer()
     }
 
-    fun `test send email to one recipient over Smtp server`() {
-        val emailDestination =
-            EmailDestination("localhost", smtpPort, "none", "from@email.com", "test@localhost.com", "Smtp")
+    fun `test send email to one recipient over smtp server`() {
+        val emailDestination = EmailDestination(
+            "localhost",
+            smtpPort,
+            "none",
+            "from@email.com",
+            "test@localhost.com",
+            DestinationType.SMTP
+        )
         val message = MessageContent(
-            "Test Smtp email title",
+            "Test smtp email title",
             "Description for notification in text",
             "Description for notification in json encode html format",
             "opensearch.data",
@@ -46,16 +53,22 @@ internal class SmtpEmailIT : OpenSearchRestTestCase() {
             "VGVzdCBtZXNzYWdlCgo=",
             "application/octet-stream",
         )
-        val response = Notification.sendMessage(emailDestination, message)
+        val response = NotificationSpi.sendMessage(emailDestination, message)
         assertEquals("Success", response.statusText)
-        assertEquals(RestStatus.OK, response.statusCode)
+        assertEquals(RestStatus.OK.status, response.statusCode)
     }
 
     fun `test send email with non-available host`() {
-        val emailDestination =
-            EmailDestination("invalidHost", smtpPort, "none", "from@email.com", "test@localhost.com", "Smtp")
+        val emailDestination = EmailDestination(
+            "invalidHost",
+            smtpPort,
+            "none",
+            "from@email.com",
+            "test@localhost.com",
+            DestinationType.SMTP
+        )
         val message = MessageContent(
-            "Test Smtp email title",
+            "Test smtp email title",
             "Description for notification in text",
             "Description for notification in json encode html format",
             "opensearch.data",
@@ -63,11 +76,11 @@ internal class SmtpEmailIT : OpenSearchRestTestCase() {
             "VGVzdCBtZXNzYWdlCgo=",
             "application/octet-stream",
         )
-        val response = Notification.sendMessage(emailDestination, message)
+        val response = NotificationSpi.sendMessage(emailDestination, message)
         assertEquals(
             "sendEmail Error, status:Couldn't connect to host, port: invalidHost, $smtpPort; timeout -1",
             response.statusText
         )
-        assertEquals(RestStatus.SERVICE_UNAVAILABLE, response.statusCode)
+        assertEquals(RestStatus.SERVICE_UNAVAILABLE.status, response.statusCode)
     }
 }

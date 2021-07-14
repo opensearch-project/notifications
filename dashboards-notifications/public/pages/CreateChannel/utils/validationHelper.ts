@@ -25,10 +25,11 @@
  */
 
 import { EuiComboBoxOptionOption } from '@elastic/eui';
+import _ from 'lodash';
 
 export const validateChannelName = (name: string) => {
   const errors = [];
-  if (name.length === 0) errors.push('Channel name cannot be empty.');
+  if (_.trim(name).length === 0) errors.push('Channel name cannot be empty.');
   return errors;
 };
 

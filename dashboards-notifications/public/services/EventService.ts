@@ -26,6 +26,7 @@
 
 import { HttpFetchQuery, HttpSetup } from '../../../../src/core/public';
 import { NODE_API } from '../../common';
+import { NOTIFICATION_SOURCE } from '../utils/constants';
 import { MOCK_GET_HISTOGRAM } from './mockData';
 import { eventListToNotifications, eventToNotification } from './utils/helper';
 
@@ -63,5 +64,20 @@ export default class EventService {
       `${NODE_API.GET_EVENT}/${id}`
     );
     return eventToNotification(response.event_list[0]);
+  };
+
+  sendTestMessage = async (
+    configId: string,
+    feature: keyof typeof NOTIFICATION_SOURCE
+  ) => {
+    const response = await this.httpClient.get(
+      `${NODE_API.SEND_TEST_MESSAGE}/${configId}`,
+      {
+        query: {
+          feature,
+        },
+      }
+    );
+    return response;
   };
 }

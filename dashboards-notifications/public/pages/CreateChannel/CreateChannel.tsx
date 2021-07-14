@@ -307,6 +307,67 @@ export function CreateChannel(props: CreateChannelsProps) {
     return config;
   };
 
+  const sendTestMessage = async () => {
+    const config = createConfigObject();
+    config.name = 'temp-' + config.name;
+    let tempChannelId;
+    try {
+      tempChannelId = await servicesContext.notificationService
+        .createConfig(config)
+        .then((response) => {
+          console.info(
+            'Created temporary channel to test send message:',
+            response
+          );
+          return response.config_id;
+        })
+        .catch((error) => {
+          error.message =
+            'Failed to create temporary channel for test message. ' +
+            error.message;
+          throw error;
+        });
+
+      const eventId = await servicesContext.eventService
+        .sendTestMessage(
+          tempChannelId,
+          config.feature_list[0] // for test message any source works
+        )
+        .then((response) => response.event_id);
+
+      await servicesContext.eventService
+        .getNotification(eventId)
+        .then((response) => {
+          if (!response.success) {
+            const error = new Error('Failed to send the test message.');
+            error.stack = JSON.stringify(response.status_list, null, 2);
+            throw error;
+          }
+        });
+      coreContext.notifications.toasts.addSuccess(
+        'Successfully sent a test message.'
+      );
+    } catch (error) {
+      coreContext.notifications.toasts.addError(error, {
+        title: 'Failed to send the test message.',
+        toastMessage: 'View error details and adjust the channel settings.',
+      });
+    } finally {
+      if (tempChannelId) {
+        servicesContext.notificationService
+          .deleteConfigs([tempChannelId])
+          .then((response) => {
+            console.info('Deleted temporary channel:', response);
+          })
+          .catch((error) => {
+            coreContext.notifications.toasts.addError(error, {
+              title: 'Failed to delete temporary channel for test message.',
+            });
+          });
+      }
+    }
+  };
+
   return (
     <>
       <CreateChannelContext.Provider
@@ -422,23 +483,7 @@ export function CreateChannel(props: CreateChannelsProps) {
                   );
                   return;
                 }
-                if (true) {
-                  coreContext.notifications.toasts.addSuccess(
-                    'Successfully sent a test message.'
-                  );
-                } else {
-                  const error: Error = {
-                    name: 'Error details',
-                    message:
-                      'Message cannot be sent. Security_team (PagerDuty) webhook is invalid.',
-                    stack: `TypeError: Failed to fetch\n\tat Fetch.fetchResponse (http://localhost:5601/9007199254740991/bundles/core/core.entry.js:17006:13)\n\tat async interceptResponse (http://localhost:5601/9007199254740991/bundles/core/core.entry.js:17444:10)\n\tat async http://localhost:5601/9007199254740991/bundles/core/core.entry.js:16930:39`,
-                  };
-                  coreContext.notifications.toasts.addError(error, {
-                    title: 'Failed to send the test message.',
-                    toastMessage:
-                      'View error details and adjust the channel settings.',
-                  });
-                }
+                sendTestMessage();
               }}
             >
               Send test message

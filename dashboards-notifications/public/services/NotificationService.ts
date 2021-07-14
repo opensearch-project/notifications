@@ -165,7 +165,7 @@ export default class NotificationService {
   getAvailableFeatures = async () => {
     try {
       const channels = (await this.httpClient
-        .get(NODE_API.AVAILABLE_FEATURES)
+        .get(NODE_API.GET_AVAILABLE_FEATURES)
         .then((response) => response.config_type_list)) as Array<
         keyof typeof CHANNEL_TYPE
       >;

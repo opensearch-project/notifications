@@ -236,6 +236,7 @@ export class RecipientGroupsTable extends Component<
                     <ModalConsumer>
                       {({ onShow }) => (
                         <EuiButton
+                          data-test-subj="recipient-groups-table-delete-button"
                           disabled={this.state.selectedItems.length === 0}
                           onClick={() =>
                             onShow(DeleteRecipientGroupModal, {
@@ -253,6 +254,7 @@ export class RecipientGroupsTable extends Component<
                 {
                   component: (
                     <EuiButton
+                      data-test-subj="recipient-groups-table-edit-button"
                       disabled={this.state.selectedItems.length !== 1}
                       onClick={() =>
                         location.assign(
@@ -280,6 +282,7 @@ export class RecipientGroupsTable extends Component<
           total={this.state.total}
         >
           <EuiFieldSearch
+            data-test-subj="recipient-groups-table-search-input"
             fullWidth={true}
             placeholder="Search"
             onSearch={this.onSearchChange}

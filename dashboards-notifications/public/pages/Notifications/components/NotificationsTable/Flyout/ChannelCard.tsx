@@ -33,10 +33,11 @@ import {
   EuiLink,
   EuiText,
 } from '@elastic/eui';
+import _ from 'lodash';
 import React from 'react';
 import { ChannelStatus } from '../../../../../../models/interfaces';
 import { isStatusCodeSuccess } from '../../../../../services/utils/helper';
-import { ROUTES } from '../../../../../utils/constants';
+import { CHANNEL_TYPE, ROUTES } from '../../../../../utils/constants';
 
 interface ChannelCardProps {
   channel: ChannelStatus;
@@ -94,7 +95,10 @@ export function ChannelCard(props: ChannelCardProps) {
       >
         <EuiFlexGroup>
           <EuiFlexItem>
-            {renderList('Channel type', props.channel.config_type)}
+            {renderList(
+              'Channel type',
+              _.get(CHANNEL_TYPE, props.channel.config_type, '-')
+            )}
           </EuiFlexItem>
           <EuiFlexItem>
             {renderList(
