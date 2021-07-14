@@ -46,19 +46,19 @@ internal class SmtpEmailDestinationFactory : DestinationFactory<EmailDestination
         } catch (addressException: AddressException) {
             log.error("Error sending Email: recipient parsing failed with status:${addressException.message}")
             DestinationMessageResponse(
-                RestStatus.BAD_REQUEST,
+                RestStatus.BAD_REQUEST.status,
                 "recipient parsing failed with status:${addressException.message}"
             )
         } catch (messagingException: MessagingException) {
             log.error("Error sending Email: Email message creation failed with status:${messagingException.message}")
             DestinationMessageResponse(
-                RestStatus.FAILED_DEPENDENCY,
+                RestStatus.FAILED_DEPENDENCY.status,
                 "Email message creation failed with status:${messagingException.message}"
             )
         } catch (ioException: IOException) {
             log.error("Error sending Email: Email message creation failed with status:${ioException.message}")
             DestinationMessageResponse(
-                RestStatus.FAILED_DEPENDENCY,
+                RestStatus.FAILED_DEPENDENCY.status,
                 "Email message creation failed with status:${ioException.message}"
             )
         } catch (illegalArgumentException: IllegalArgumentException) {
@@ -66,7 +66,7 @@ internal class SmtpEmailDestinationFactory : DestinationFactory<EmailDestination
                 "Error sending Email: Email message creation failed with status:${illegalArgumentException.message}"
             )
             DestinationMessageResponse(
-                RestStatus.FAILED_DEPENDENCY,
+                RestStatus.FAILED_DEPENDENCY.status,
                 "Email message creation failed with status:${illegalArgumentException.message}"
             )
         }

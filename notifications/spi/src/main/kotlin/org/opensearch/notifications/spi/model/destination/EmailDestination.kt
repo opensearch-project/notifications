@@ -39,18 +39,18 @@ class EmailDestination(
     val method: String,
     val fromAddress: String,
     val recipient: String,
-    destinationType: String, // Smtp or Ses
+    destinationType: DestinationType, // smtp or ses
 ) : BaseDestination(destinationType) {
 
     init {
         when (destinationType) {
-            "Smtp" -> {
+            DestinationType.SMTP -> {
                 require(!Strings.isNullOrEmpty(host)) { "Host name should be provided" }
                 require(port > 0) { "Port should be positive value" }
                 validateEmail(fromAddress)
                 validateEmail(recipient)
             }
-            // TODO Add Ses here
+            // TODO Add ses here
         }
     }
 }

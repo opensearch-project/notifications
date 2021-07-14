@@ -26,7 +26,7 @@
 
 export const DOCUMENTATION_LINK = '';
 export const ALERTING_DOCUMENTATION_LINK =
-  'https://docs-beta.opensearch.org/docs/alerting/monitors/#authenticate-sender-account';
+  'https://opensearch.org/docs/alerting/monitors/#authenticate-sender-account';
 
 export const ROUTES = Object.freeze({
   // notification
