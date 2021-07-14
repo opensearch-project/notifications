@@ -68,9 +68,9 @@ integTest {
 
 jacocoTestReport {
     dependsOn integTest, test
-    executionData dummyTest.jacoco.destinationFile // remove dummyIntegTest for now, because the trick doesn't seem working fully
-    sourceDirectories.from = "src/main/kotlin"
-    classDirectories.from = sourceSets.main.output
+    executionData dummyTest.jacoco.destinationFile, dummyIntegTest.jacoco.destinationFile // remove dummyIntegTest for now, because the trick doesn't seem working fully
+    getSourceDirectories().from(sourceSets.main.allSource)
+    getClassDirectories().from(sourceSets.main.output)
     reports {
         html.enabled = true // human readable
         xml.enabled = true // for coverlay
