@@ -121,9 +121,10 @@ class DestinationHttpClient {
 
     @Throws(Exception::class)
     private fun getHttpResponse(destination: WebhookDestination, message: MessageContent): CloseableHttpResponse {
-        val httpRequest = HttpPost(destination.url)
+        var httpRequest: HttpRequestBase = HttpPost(destination.url)
 
         if (destination is CustomWebhookDestination) {
+            httpRequest = constructHttpRequest(destination.method)
             if (destination.headerParams.isEmpty()) {
                 // set default header
                 httpRequest.setHeader("Content-type", "application/json")
@@ -138,13 +139,14 @@ class DestinationHttpClient {
         return httpClient.execute(httpRequest)
     }
 
-    @SuppressWarnings("UnusedPrivateMember")
     private fun constructHttpRequest(method: String): HttpRequestBase {
         return when (method) {
-            "POST" -> HttpPost()
-            "PUT" -> HttpPut()
-            "PATCH" -> HttpPatch()
-            else -> throw IllegalArgumentException("Invalid method supplied")
+            HttpPost.METHOD_NAME -> HttpPost()
+            HttpPut.METHOD_NAME -> HttpPut()
+            HttpPatch.METHOD_NAME -> HttpPatch()
+            else -> throw IllegalArgumentException(
+                "Invalid or empty method supplied. Only POST, PUT and PATCH are allowed"
+            )
         }
     }
 

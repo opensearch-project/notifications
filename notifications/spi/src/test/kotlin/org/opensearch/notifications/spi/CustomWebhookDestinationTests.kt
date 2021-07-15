@@ -28,13 +28,19 @@
 package org.opensearch.notifications.spi
 
 import org.apache.http.client.methods.CloseableHttpResponse
+import org.apache.http.client.methods.HttpPatch
 import org.apache.http.client.methods.HttpPost
+import org.apache.http.client.methods.HttpPut
+import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.message.BasicStatusLine
 import org.easymock.EasyMock
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.assertThrows
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 import org.opensearch.notifications.spi.client.DestinationHttpClient
 import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
 import org.opensearch.notifications.spi.factory.WebhookDestinationFactory
@@ -43,8 +49,30 @@ import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
 import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.rest.RestStatus
+import java.net.MalformedURLException
 
+@RunWith(Parameterized::class)
 internal class CustomWebhookDestinationTests {
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters(name = "Param: {0}={1}")
+        fun params(): Array<Array<Any>> {
+            return arrayOf(
+                arrayOf("POST", HttpPost::class.java),
+                arrayOf("PUT", HttpPut::class.java),
+                arrayOf("PATCH", HttpPatch::class.java)
+            )
+        }
+    }
+
+    @JvmField
+    @Parameterized.Parameter(0)
+    var method: String = ""
+
+    @JvmField
+    @Parameterized.Parameter(1)
+    var expectedHttpClass: Class<HttpUriRequest>? = null
+
     @Test
     @Throws(Exception::class)
     fun `test custom webhook message null entity response`() {
@@ -55,6 +83,7 @@ internal class CustomWebhookDestinationTests {
 
         val httpResponse: CloseableHttpResponse = EasyMock.createMock(CloseableHttpResponse::class.java)
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
+        EasyMock.expect(mockHttpClient.execute(EasyMock.isA(expectedHttpClass))).andReturn(httpResponse)
 
         val mockStatusLine: BasicStatusLine = EasyMock.createMock(BasicStatusLine::class.java)
         EasyMock.expect(httpResponse.statusLine).andReturn(mockStatusLine)
@@ -76,7 +105,7 @@ internal class CustomWebhookDestinationTests {
             "@All All Present member callout: @Present"
         val url = "https://abc/com"
 
-        val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"))
+        val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"), method)
         val message = MessageContent(title, messageText)
 
         val actualCustomWebhookResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
@@ -93,6 +122,8 @@ internal class CustomWebhookDestinationTests {
 
         val httpResponse: CloseableHttpResponse = EasyMock.createMock(CloseableHttpResponse::class.java)
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
+        EasyMock.expect(mockHttpClient.execute(EasyMock.isA(expectedHttpClass))).andReturn(httpResponse)
+
         val mockStatusLine: BasicStatusLine = EasyMock.createMock(BasicStatusLine::class.java)
         EasyMock.expect(httpResponse.statusLine).andReturn(mockStatusLine)
         EasyMock.expect(httpResponse.entity).andReturn(StringEntity("")).anyTimes()
@@ -113,7 +144,7 @@ internal class CustomWebhookDestinationTests {
             "@All All Present member callout: @Present"
         val url = "https://abc/com"
 
-        val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"))
+        val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"), method)
         val message = MessageContent(title, messageText)
 
         val actualCustomWebhookResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
@@ -128,9 +159,10 @@ internal class CustomWebhookDestinationTests {
         val responseContent = "It worked!"
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
         val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, responseContent)
-
         val httpResponse: CloseableHttpResponse = EasyMock.createMock(CloseableHttpResponse::class.java)
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
+        EasyMock.expect(mockHttpClient.execute(EasyMock.isA(expectedHttpClass))).andReturn(httpResponse)
+
         val mockStatusLine: BasicStatusLine = EasyMock.createMock(BasicStatusLine::class.java)
         EasyMock.expect(httpResponse.statusLine).andReturn(mockStatusLine)
         EasyMock.expect(httpResponse.entity).andReturn(StringEntity(responseContent)).anyTimes()
@@ -151,7 +183,7 @@ internal class CustomWebhookDestinationTests {
             "@All All Present member callout: @Present\"}"
         val url = "https://abc/com"
 
-        val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"))
+        val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"), method)
         val message = MessageContent(title, messageText)
 
         val actualCustomWebhookResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
@@ -161,11 +193,28 @@ internal class CustomWebhookDestinationTests {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun testUrlMissingMessage() {
+    fun `Test missing url will throw exception`() {
         try {
-            CustomWebhookDestination("", mapOf("headerKey" to "headerValue"))
+            CustomWebhookDestination("", mapOf("headerKey" to "headerValue"), method)
         } catch (ex: Exception) {
-            assertEquals("url is invalid or empty", ex.message)
+            assertEquals("url is null or empty", ex.message)
+            throw ex
+        }
+    }
+
+    @Test
+    fun testUrlInvalidMessage() {
+        assertThrows<MalformedURLException> {
+            CustomWebhookDestination("invalidUrl", mapOf("headerKey" to "headerValue"), method)
+        }
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `Test invalid method type will throw exception`() {
+        try {
+            CustomWebhookDestination("https://abc/com", mapOf("headerKey" to "headerValue"), "GET")
+        } catch (ex: Exception) {
+            assertEquals("Invalid method supplied. Only POST, PUT and PATCH are allowed", ex.message)
             throw ex
         }
     }

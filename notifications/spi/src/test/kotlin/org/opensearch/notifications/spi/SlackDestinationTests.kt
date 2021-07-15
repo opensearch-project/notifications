@@ -35,14 +35,17 @@ import org.apache.http.message.BasicStatusLine
 import org.easymock.EasyMock
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.assertThrows
 import org.opensearch.notifications.spi.client.DestinationHttpClient
 import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
 import org.opensearch.notifications.spi.factory.WebhookDestinationFactory
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.rest.RestStatus
+import java.net.MalformedURLException
 
 internal class SlackDestinationTests {
     @Test
@@ -159,8 +162,15 @@ internal class SlackDestinationTests {
         try {
             SlackDestination("")
         } catch (ex: Exception) {
-            assertEquals("url is invalid or empty", ex.message)
+            assertEquals("url is null or empty", ex.message)
             throw ex
+        }
+    }
+
+    @Test
+    fun testUrlInvalidMessage() {
+        assertThrows<MalformedURLException> {
+            ChimeDestination("invalidUrl")
         }
     }
 }
