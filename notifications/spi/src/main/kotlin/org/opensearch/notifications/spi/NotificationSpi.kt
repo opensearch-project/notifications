@@ -31,14 +31,15 @@ import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
+import org.opensearch.notifications.spi.setting.PluginSettings
 import java.security.AccessController
 import java.security.PrivilegedAction
 
 /**
- * This is a client facing Notification class to send the messages
- * to the Notification channels like chime, slack, webhooks, email etc
+ * This is a client facing NotificationSpi class to send the messages
+ * to the NotificationSpi channels like chime, slack, webhooks, email etc
  */
-object Notification {
+object NotificationSpi {
     /**
      * Send the notification message to the corresponding destination
      *
@@ -51,6 +52,28 @@ object Notification {
                 val destinationFactory = DestinationFactoryProvider.getFactory(destination.destinationType)
                 destinationFactory.sendMessage(destination, message)
             } as PrivilegedAction<DestinationMessageResponse>?
+        )
+    }
+
+    /**
+     * Get list of allowed destinations
+     */
+    fun getAllowedConfigTypes(): List<String> {
+        return AccessController.doPrivileged(
+            PrivilegedAction {
+                PluginSettings.allowedConfigTypes
+            } as PrivilegedAction<List<String>>?
+        )
+    }
+
+    /**
+     * Get map of plugin features
+     */
+    fun getPluginFeatures(): Map<String, String> {
+        return AccessController.doPrivileged(
+            PrivilegedAction {
+                PluginSettings.defaultSettings
+            } as PrivilegedAction<Map<String, String>>?
         )
     }
 }

@@ -10,10 +10,9 @@
  */
 
 package org.opensearch.notifications.spi.model.destination
-
 /**
- * This class holds the contents of a Slack destination
+ * Supported notification destinations
  */
-class SlackDestination(
-    url: String,
-) : WebhookDestination(url, DestinationType.SLACK)
+enum class DestinationType {
+    CHIME, SLACK, CUSTOMWEBHOOK, SMTP, SES, SNS
+}

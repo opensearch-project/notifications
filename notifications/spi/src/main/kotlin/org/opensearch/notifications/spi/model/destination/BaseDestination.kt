@@ -32,5 +32,5 @@ package org.opensearch.notifications.spi.model.destination
  */
 @SuppressWarnings("UnnecessaryAbstractClass")
 abstract class BaseDestination(
-    val destinationType: String
+    val destinationType: DestinationType
 )
