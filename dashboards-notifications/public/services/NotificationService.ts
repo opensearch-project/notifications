@@ -1,4 +1,3 @@
-import { SortDirection } from '@elastic/eui';
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -25,6 +24,7 @@ import { SortDirection } from '@elastic/eui';
  * permissions and limitations under the License.
  */
 
+import { SortDirection } from '@elastic/eui';
 import { HttpFetchQuery, HttpSetup } from '../../../../src/core/public';
 import { NODE_API } from '../../common';
 import {
@@ -134,7 +134,6 @@ export default class NotificationService {
       (id) => (channel.email!.email_group_id_map![id] = idMap[id])
     );
 
-    console.log('channel:', channel);
     return channel;
   };
 
