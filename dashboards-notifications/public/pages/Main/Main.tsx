@@ -24,13 +24,7 @@
  * permissions and limitations under the License.
  */
 
-import {
-  EuiPage,
-  EuiPageBody,
-  EuiPageSideBar,
-  EuiSideNav,
-  SortDirection,
-} from '@elastic/eui';
+import { EuiPage, EuiPageBody, EuiPageSideBar, EuiSideNav } from '@elastic/eui';
 import React, { Component, createContext } from 'react';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
 import { CoreStart } from '../../../../../src/core/public';
@@ -62,7 +56,6 @@ enum Pathname {
 interface MainProps extends RouteComponentProps {}
 
 export interface MainState {
-  isChannelConfigured: boolean;
   availableFeatures: Partial<typeof CHANNEL_TYPE>;
 }
 
@@ -74,30 +67,14 @@ export default class Main extends Component<MainProps, MainState> {
   constructor(props: MainProps) {
     super(props);
     this.state = {
-      isChannelConfigured: true,
       availableFeatures: CHANNEL_TYPE,
     };
   }
 
   async componentDidMount() {
-    const availableFeatures = await this.context.notificationService.getAvailableFeatures();
+    const availableFeatures =
+      await this.context.notificationService.getAvailableFeatures();
     if (availableFeatures != null) this.setState({ availableFeatures });
-    try {
-      const isChannelConfigured = await this.context.notificationService.getChannels(
-        {
-          config_type: Object.keys(CHANNEL_TYPE),
-          from_index: 0,
-          max_items: 1,
-          sort_field: 'name',
-          sort_order: SortDirection.ASC,
-        }
-      );
-      if (!isChannelConfigured?.total) {
-        this.setState({ isChannelConfigured: false });
-      }
-    } catch (error) {
-      this.setState({ isChannelConfigured: false });
-    }
   }
 
   render() {

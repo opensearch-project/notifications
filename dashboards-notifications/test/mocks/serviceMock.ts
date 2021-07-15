@@ -54,7 +54,6 @@ const notificationServiceMock = {
 };
 
 const mainStateMock: MainState = {
-  isChannelConfigured: true,
   availableFeatures: CHANNEL_TYPE,
 };
 

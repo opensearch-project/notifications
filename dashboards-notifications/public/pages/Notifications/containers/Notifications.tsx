@@ -34,6 +34,7 @@ import {
   EuiTableSortingType,
   EuiTitle,
   ShortDate,
+  SortDirection,
 } from '@elastic/eui';
 import { Criteria } from '@elastic/eui/src/components/basic_table/basic_table';
 import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_bar';
@@ -44,7 +45,12 @@ import { RouteComponentProps } from 'react-router-dom';
 import { NotificationItem, TableState } from '../../../../models/interfaces';
 import { CoreServicesContext } from '../../../components/coreServices';
 import { BrowserServices } from '../../../models/interfaces';
-import { BREADCRUMBS, HISTOGRAM_TYPE, ROUTES } from '../../../utils/constants';
+import {
+  BREADCRUMBS,
+  CHANNEL_TYPE,
+  HISTOGRAM_TYPE,
+  ROUTES,
+} from '../../../utils/constants';
 import { getErrorMessage } from '../../../utils/helpers';
 import { MainState } from '../../Main/Main';
 import { EmptyState } from '../components/EmptyState/EmptyState';
@@ -66,6 +72,7 @@ interface NotificationsState extends TableState<NotificationItem> {
   filters: Array<FilterType>;
   histogramType: keyof typeof HISTOGRAM_TYPE;
   histogramData: Array<Datum>;
+  isChannelConfigured: boolean;
 }
 
 export default class Notifications extends Component<
@@ -108,6 +115,7 @@ export default class Notifications extends Component<
       filters,
       histogramType,
       histogramData: [],
+      isChannelConfigured: true,
     };
 
     this.getNotifications = _.debounce(this.getNotifications, 200);
@@ -120,6 +128,21 @@ export default class Notifications extends Component<
     ]);
     window.scrollTo(0, 0);
     await this.getNotifications();
+    try {
+      const isChannelConfigured =
+        await this.props.services.notificationService.getChannels({
+          config_type: Object.keys(CHANNEL_TYPE),
+          from_index: 0,
+          max_items: 1,
+          sort_field: 'name',
+          sort_order: SortDirection.ASC,
+        });
+      if (!isChannelConfigured?.total) {
+        this.setState({ isChannelConfigured: false });
+      }
+    } catch (error) {
+      this.setState({ isChannelConfigured: false });
+    }
   }
 
   async componentDidUpdate(
@@ -238,7 +261,7 @@ export default class Notifications extends Component<
     if (
       !this.state.loading &&
       this.state.total === 0 &&
-      !this.props.mainProps.isChannelConfigured
+      !this.state.isChannelConfigured
     ) {
       return <EmptyState channels={false} />;
     }
