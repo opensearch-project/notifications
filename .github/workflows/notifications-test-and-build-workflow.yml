@@ -70,12 +70,12 @@ jobs:
           cd notifications
           ./gradlew build -PexcludeTests="**/SesChannelIT*" -Dopensearch.version=${{ env.OPENSEARCH_VERSION }}.0
 
-      # - name: Upload coverage
-      #   uses: codecov/codecov-action@v1
-      #   with:
-      #     flags: notifications-es
-      #     directory: notifications/
-      #     token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          # flags: opensearch-notifications
+          # directory: notifications/
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Create Artifact Path
         run: |

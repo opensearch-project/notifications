@@ -68,7 +68,7 @@ integTest {
 
 jacocoTestReport {
     dependsOn integTest, test
-    executionData dummyTest.jacoco.destinationFile, dummyIntegTest.jacoco.destinationFile // remove dummyIntegTest for now, because the trick doesn't seem working fully
+    executionData dummyTest.jacoco.destinationFile, dummyIntegTest.jacoco.destinationFile
     getSourceDirectories().from(sourceSets.main.allSource)
     getClassDirectories().from(sourceSets.main.output)
     reports {

@@ -60,9 +60,18 @@ jobs:
           yarn osd bootstrap
 
       - name: Test
-        run: |
-          cd OpenSearch-Dashboards/plugins/dashboards-notifications
-          yarn test
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 30
+          max_attempts: 1
+          command: cd OpenSearch-Dashboards/plugins/dashboards-notifications; yarn test --coverage
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          flags: dashboards-notifications
+          directory: OpenSearch-Dashboards/plugins/
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Build Artifact
         run: |
