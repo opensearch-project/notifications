@@ -27,10 +27,14 @@
 
 package org.opensearch.notifications.spi.utils
 
+import org.apache.http.client.methods.HttpPatch
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.client.methods.HttpPut
 import org.opensearch.common.Strings
 import java.net.URL
 
 fun validateUrl(urlString: String) {
+    require(!Strings.isNullOrEmpty(urlString)) { "url is null or empty" }
     require(isValidUrl(urlString)) { "Invalid URL or unsupported" }
     val url = URL(urlString)
     require("https" == url.protocol) // Support only HTTPS. HTTP and other protocols not supported
@@ -65,4 +69,12 @@ fun isValidEmail(email: String): Boolean {
         RegexOption.IGNORE_CASE
     )
     return validEmailPattern.matches(email)
+}
+
+fun validateMethod(method: String) {
+    require(!Strings.isNullOrEmpty(method)) { "Method is null or empty" }
+    val validMethods = listOf(HttpPost.METHOD_NAME, HttpPut.METHOD_NAME, HttpPatch.METHOD_NAME)
+    require(
+        method.findAnyOf(validMethods) != null
+    ) { "Invalid method supplied. Only POST, PUT and PATCH are allowed" }
 }

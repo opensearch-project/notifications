@@ -222,7 +222,7 @@ object SendMessageActionHelper {
      * send message to custom webhook destination
      */
     private fun sendWebhookMessage(webhook: Webhook, message: MessageContent, eventStatus: EventStatus): EventStatus {
-        val destination = CustomWebhookDestination(webhook.url, webhook.headerParams)
+        val destination = CustomWebhookDestination(webhook.url, webhook.headerParams, "POST")
         val status = sendMessageThroughSpi(destination, message)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
