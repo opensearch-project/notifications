@@ -39,7 +39,6 @@ plugins {
 apply plugin: 'opensearch.java'
 apply plugin: 'opensearch.testclusters'
 apply plugin: 'opensearch.java-rest-test'
-apply plugin: 'io.gitlab.arturbosch.detekt'
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
 
@@ -48,30 +47,6 @@ ext {
     licenseFile = rootProject.file('LICENSE.txt')
     noticeFile = rootProject.file('NOTICE')
 }
-
-configurations {
-    ktlint
-}
-
-jacoco {
-    toolVersion = '0.8.5'
-    reportsDir = file("$buildDir/JacocoReport")
-}
-plugins.withId('java') {
-    sourceCompatibility = targetCompatibility = "1.8"
-}
-plugins.withId('org.jetbrains.kotlin.jvm') {
-    compileKotlin.kotlinOptions.jvmTarget = compileTestKotlin.kotlinOptions.jvmTarget = "1.8"
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled false
-        csv.enabled false
-        html.destination file("${buildDir}/jacoco/")
-    }
-}
-check.dependsOn jacocoTestReport
 
 task integTest(type: RestIntegTestTask) {
     description = "Run tests against a cluster that has security enabled"
@@ -128,7 +103,6 @@ dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
     compile "org.apache.httpcomponents:httpcore:4.4.5"
     compile "org.apache.httpcomponents:httpclient:4.5.10"
-    ktlint "com.pinterest:ktlint:0.41.0"
     //TODO: Add it back and remove from main project(to avoid jarhell) when implementing Email functionality
 //    compile ("software.amazon.awssdk:ses:2.14.16") {
 //        exclude module: 'annotations' // conflict with org.jetbrains:annotations, integTestRunner fails with error "codebase property already set"
@@ -155,23 +129,4 @@ shadowJar {
     relocate 'org.apache.commons.logging', 'org.opensearch.notifications.repackage.org.apache.commons.logging'
     relocate 'org.apache.commons.codec', 'org.opensearch.notifications.repackage.org.apache.commons.codec'
     classifier = null
-}
-
-task ktlint(type: JavaExec, group: "verification") {
-    description = "Check Kotlin code style."
-    main = "com.pinterest.ktlint.Main"
-    classpath = configurations.ktlint
-    args "src/**/*.kt"
-    // to generate report in checkstyle format prepend following args:
-    // "--reporter=plain", "--reporter=checkstyle,output=${buildDir}/ktlint.xml"
-    // see https://github.com/pinterest/ktlint#usage for more
-}
-
-check.dependsOn ktlint
-
-task ktlintFormat(type: JavaExec, group: "formatting") {
-    description = "Fix Kotlin code style deviations."
-    main = "com.pinterest.ktlint.Main"
-    classpath = configurations.ktlint
-    args "-F", "src/**/*.kt"
 }

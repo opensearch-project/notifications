@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/opendistro-for-elasticsearch/notifications/branch/develop/graph/badge.svg?token=VV8JDA5DKY)](https://codecov.io/gh/opendistro-for-elasticsearch/notifications)
+[![codecov](https://codecov.io/gh/opensearch-project/notifications/branch/develop/graph/badge.svg?token=NYBFN3EFE4)](https://codecov.io/gh/opensearch-project/notifications)
 
 
 # Notifications plugin for OpenSearch
