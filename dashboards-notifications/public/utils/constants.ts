@@ -26,10 +26,9 @@
 
 export const DOCUMENTATION_LINK = '';
 export const ALERTING_DOCUMENTATION_LINK =
-  'https://opensearch.org/docs/alerting/monitors/#authenticate-sender-account';
+  'https://opensearch.org/docs/monitoring-plugins/alerting/monitors/#authenticate-sender-account';
 
 export const ROUTES = Object.freeze({
-  // notification
   NOTIFICATIONS: '/notifications',
   CHANNELS: '/channels',
   CHANNEL_DETAILS: '/channel-details',

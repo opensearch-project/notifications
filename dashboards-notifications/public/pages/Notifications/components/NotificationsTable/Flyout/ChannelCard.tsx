@@ -110,7 +110,9 @@ export function ChannelCard(props: ChannelCardProps) {
         {!isStatusCodeSuccess(props.channel.delivery_status.status_code) &&
           renderList(
             'Error details',
-            props.channel.delivery_status.status_text
+            <EuiText style={{ lineBreak: 'anywhere' }} size="s">
+              {props.channel.delivery_status.status_text}
+            </EuiText>
           )}
       </EuiCard>
     </>
