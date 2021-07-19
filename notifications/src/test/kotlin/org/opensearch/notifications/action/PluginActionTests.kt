@@ -206,9 +206,9 @@ internal class PluginActionTests {
      * The reason why this is required is because it is harder to do the latter
      * (verify listener being called once) due to CoroutineScope used in execute()
      */
-    private class AssertionListener<Response: BaseResponse>(
+    private class AssertionListener<Response : BaseResponse>(
         val expected: Response
-    ): ActionListener<Response> {
+    ) : ActionListener<Response> {
 
         override fun onResponse(actual: Response?) {
             assertEquals(expected, actual)
