@@ -10,17 +10,15 @@
  */
 package org.opensearch.notifications.action
 
-import com.nhaarman.mockitokotlin2.verify
 import io.mockk.every
 import io.mockk.mockkObject
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.fail
 import org.mockito.Answers
-import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mock
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
 import org.opensearch.action.ActionListener
 import org.opensearch.action.support.ActionFilters
@@ -28,13 +26,10 @@ import org.opensearch.client.Client
 import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.commons.notifications.action.SendNotificationRequest
 import org.opensearch.commons.notifications.action.SendNotificationResponse
-import org.opensearch.commons.notifications.model.ChannelMessage
-import org.opensearch.commons.notifications.model.EventSource
-import org.opensearch.commons.notifications.model.Feature
-import org.opensearch.commons.notifications.model.SeverityType
 import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
+import kotlin.test.assertEquals
 
 @ExtendWith(MockitoExtension::class)
 internal class SendNotificationActionTests {
@@ -47,9 +42,6 @@ internal class SendNotificationActionTests {
 
     @Mock
     private lateinit var xContentRegistry: NamedXContentRegistry
-
-    @Mock
-    private lateinit var listener: ActionListener<SendNotificationResponse>
 
     private val actionFilters = ActionFilters(setOf())
 
@@ -65,35 +57,24 @@ internal class SendNotificationActionTests {
     fun doExecute() {
         val notificationId = "notification-1"
         val task = mock(Task::class.java)
-        val request = createSendNotificationRequest()
+        val request = mock(SendNotificationRequest::class.java)
         val response = SendNotificationResponse(notificationId)
 
         // Mock singleton's method by mockk framework
         mockkObject(SendMessageActionHelper)
         every { SendMessageActionHelper.executeRequest(request) } returns response
 
-        sendNotificationAction.execute(task, request, listener)
-        verify(listener, times(1)).onResponse(eq(response))
-    }
-
-    private fun createSendNotificationRequest(): SendNotificationRequest {
-        val notificationInfo = EventSource(
-                "title",
-                "reference_id",
-                Feature.REPORTS,
-                SeverityType.HIGH,
-                listOf("tag1", "tag2")
-        )
-        val channelMessage = ChannelMessage(
-                "text_description",
-                "<b>htmlDescription</b>",
-                null
-        )
-        return SendNotificationRequest(
-                notificationInfo,
-                channelMessage,
-                listOf("channelId1", "channelId2"),
-                "sample-thread-context"
+        // Assert on response rather than verify it called which is better but harder
+        // because the execute() runs in async CoroutineScope
+        sendNotificationAction.execute(task, request,
+            object: ActionListener<SendNotificationResponse> {
+                override fun onResponse(actual: SendNotificationResponse?) {
+                    assertEquals(response, actual)
+                }
+                override fun onFailure(error: Exception?) {
+                    fail("Unexpected error happened", error)
+                }
+            }
         )
     }
 }
