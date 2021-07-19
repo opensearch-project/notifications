@@ -50,7 +50,8 @@ internal class SendNotificationActionTests {
     @BeforeEach
     fun setUp() {
         sendNotificationAction = SendNotificationAction(
-                transportService, client, actionFilters, xContentRegistry)
+            transportService, client, actionFilters, xContentRegistry
+        )
     }
 
     @Test
@@ -66,8 +67,9 @@ internal class SendNotificationActionTests {
 
         // Assert on response rather than verify it called which is better but harder
         // because the execute() runs in async CoroutineScope
-        sendNotificationAction.execute(task, request,
-            object: ActionListener<SendNotificationResponse> {
+        sendNotificationAction.execute(
+            task, request,
+            object : ActionListener<SendNotificationResponse> {
                 override fun onResponse(actual: SendNotificationResponse?) {
                     assertEquals(response, actual)
                 }
