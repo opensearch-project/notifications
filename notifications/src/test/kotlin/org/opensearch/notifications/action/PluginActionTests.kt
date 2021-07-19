@@ -64,12 +64,14 @@ internal class PluginActionTests {
     @Mock
     private lateinit var xContentRegistry: NamedXContentRegistry
 
+    @Mock
+    private lateinit var task: Task
+
     private val actionFilters = ActionFilters(setOf())
 
     @Test
     fun `Create notification config action should call back action listener`() {
         val notificationId = "notification-1"
-        val task = mock(Task::class.java)
         val request = mock(CreateNotificationConfigRequest::class.java)
         val response = CreateNotificationConfigResponse(notificationId)
 
@@ -86,7 +88,6 @@ internal class PluginActionTests {
     @Test
     fun `Update notification config action should call back action listener`() {
         val notificationId = "notification-1"
-        val task = mock(Task::class.java)
         val request = mock(UpdateNotificationConfigRequest::class.java)
         val response = UpdateNotificationConfigResponse(notificationId)
 
@@ -102,7 +103,6 @@ internal class PluginActionTests {
 
     @Test
     fun `Delete notification config action should call back action listener`() {
-        val task = mock(Task::class.java)
         val request = mock(DeleteNotificationConfigRequest::class.java)
         val response = DeleteNotificationConfigResponse(
             mapOf(Pair("sample_config_id", RestStatus.OK))
@@ -120,7 +120,6 @@ internal class PluginActionTests {
 
     @Test
     fun `Get notification config action should call back action listener`() {
-        val task = mock(Task::class.java)
         val request = mock(GetNotificationConfigRequest::class.java)
         val response = GetNotificationConfigResponse(
             mock(NotificationConfigSearchResult::class.java)
@@ -138,7 +137,6 @@ internal class PluginActionTests {
 
     @Test
     fun `Get notification event action should call back action listener`() {
-        val task = mock(Task::class.java)
         val request = mock(GetNotificationEventRequest::class.java)
         val response = GetNotificationEventResponse(
             mock(NotificationEventSearchResult::class.java)
@@ -158,7 +156,6 @@ internal class PluginActionTests {
     fun `Get plugin features action should call back action listener`() {
         val allowedConfigTypes = listOf("type1")
         val pluginFeatures = mapOf(Pair("FeatureKey1", "Feature1"))
-        val task = mock(Task::class.java)
         val request = mock(GetPluginFeaturesRequest::class.java)
         val response = GetPluginFeaturesResponse(allowedConfigTypes, pluginFeatures)
 
@@ -175,7 +172,6 @@ internal class PluginActionTests {
 
     @Test
     fun `Get feature channel list action should call back action listener`() {
-        val task = mock(Task::class.java)
         val request = mock(GetFeatureChannelListRequest::class.java)
         val response = GetFeatureChannelListResponse(mock(FeatureChannelList::class.java))
 
@@ -192,7 +188,6 @@ internal class PluginActionTests {
     @Test
     fun `Send notification action should call back action listener`() {
         val notificationId = "notification-1"
-        val task = mock(Task::class.java)
         val request = mock(SendNotificationRequest::class.java)
         val response = SendNotificationResponse(notificationId)
 
