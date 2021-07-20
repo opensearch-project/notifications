@@ -166,11 +166,19 @@ dependencies {
             'org.assertj:assertj-core:3.19.0',
             'org.mockito:mockito-junit-jupiter:3.10.0',
             'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0',
+            'io.mockk:mockk:1.11.0',
+            'io.mockk:mockk-common:1.11.0',
+            'io.mockk:mockk-dsl:1.11.0',
+            'io.mockk:mockk-dsl-jvm:1.11.0',
+            'io.mockk:mockk-agent-api:1.11.0',
+            'io.mockk:mockk-agent-common:1.11.0',
+            'io.mockk:mockk-agent-jvm:1.11.0',
             "org.junit.jupiter:junit-jupiter-api:${junit_version}"
     )
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit_version}")
     testCompile "org.opensearch.test:framework:${opensearch_version}"
     testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
     testCompile "org.mockito:mockito-core:3.10.0"
     testCompile 'com.google.code.gson:gson:2.8.7'
     testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
