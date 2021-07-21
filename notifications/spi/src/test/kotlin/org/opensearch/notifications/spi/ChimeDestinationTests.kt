@@ -182,4 +182,17 @@ internal class ChimeDestinationTests {
             throw ex
         }
     }
+
+    @Test
+    fun `test build webhook request body for chime should have title included and prevent escape`() {
+        val httpClient = DestinationHttpClient()
+        val title = "test Chime"
+        val messageText = "line1\nline2"
+        val url = "https://abc/com"
+        val expectedRequestBody = """{"Content":"$title\n\nline1\nline2"}"""
+        val destination = ChimeDestination(url)
+        val message = MessageContent(title, messageText)
+        val actualRequestBody = httpClient.buildRequestBody(destination, message)
+        assertEquals(expectedRequestBody, actualRequestBody)
+    }
 }

@@ -169,7 +169,7 @@ class DestinationHttpClient {
         }
     }
 
-    private fun buildRequestBody(destination: WebhookDestination, message: MessageContent): String {
+    fun buildRequestBody(destination: WebhookDestination, message: MessageContent): String {
         val builder = XContentFactory.contentBuilder(XContentType.JSON)
         var keyName = "Content"
         // Slack webhook request body has required "text" as key name https://api.slack.com/messaging/webhooks

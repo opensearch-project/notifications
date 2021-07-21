@@ -173,4 +173,17 @@ internal class SlackDestinationTests {
             ChimeDestination("invalidUrl")
         }
     }
+
+    @Test
+    fun `test build webhook request body for slack should have title included and prevent escape`() {
+        val httpClient = DestinationHttpClient()
+        val title = "test Slack"
+        val messageText = "line1\nline2"
+        val url = "https://abc/com"
+        val expectedRequestBody = """{"text":"$title\n\nline1\nline2"}"""
+        val destination = SlackDestination(url)
+        val message = MessageContent(title, messageText)
+        val actualRequestBody = httpClient.buildRequestBody(destination, message)
+        assertEquals(expectedRequestBody, actualRequestBody)
+    }
 }
