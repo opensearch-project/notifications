@@ -42,6 +42,8 @@ import org.apache.http.impl.client.DefaultHttpRequestRetryHandler
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
 import org.apache.http.util.EntityUtils
+import org.opensearch.common.xcontent.XContentFactory
+import org.opensearch.common.xcontent.XContentType
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
@@ -49,6 +51,7 @@ import org.opensearch.notifications.spi.model.destination.WebhookDestination
 import org.opensearch.notifications.spi.setting.PluginSettings
 import org.opensearch.notifications.spi.utils.OpenForTesting
 import org.opensearch.notifications.spi.utils.logger
+import org.opensearch.notifications.spi.utils.string
 import org.opensearch.rest.RestStatus
 import java.io.IOException
 import java.nio.charset.StandardCharsets
@@ -167,11 +170,13 @@ class DestinationHttpClient {
     }
 
     private fun buildRequestBody(destination: WebhookDestination, message: MessageContent): String {
-        // Slack webhook request body has required format https://api.slack.com/messaging/webhooks
-        return if (destination is SlackDestination) {
-            "{\"text\" : \"${message.buildWebhookMessage()}\"}"
-        } else {
-            "{\"Content\" : \"${message.buildWebhookMessage()}\"}"
-        }
+        val builder = XContentFactory.contentBuilder(XContentType.JSON)
+        var keyName = "Content"
+        // Slack webhook request body has required "text" as key name https://api.slack.com/messaging/webhooks
+        if (destination is SlackDestination) keyName = "text"
+        builder.startObject()
+            .field(keyName, message.buildWebhookMessage())
+            .endObject()
+        return builder.string()
     }
 }

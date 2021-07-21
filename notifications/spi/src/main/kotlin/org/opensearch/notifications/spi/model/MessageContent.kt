@@ -49,6 +49,6 @@ class MessageContent(
     }
 
     fun buildWebhookMessage(): String {
-        return "$title $textDescription"
+        return "$title\n\n$textDescription"
     }
 }
