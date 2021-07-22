@@ -36,6 +36,9 @@ import org.easymock.EasyMock
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.opensearch.notifications.spi.client.DestinationHttpClient
 import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
 import org.opensearch.notifications.spi.factory.WebhookDestinationFactory
@@ -45,8 +48,21 @@ import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.rest.RestStatus
 import java.net.MalformedURLException
+import java.util.stream.Stream
 
 internal class ChimeDestinationTests {
+    companion object {
+        @JvmStatic
+        fun escapeSequenceToRaw(): Stream<Arguments> =
+            Stream.of(
+                Arguments.of("\n", """\n"""),
+                Arguments.of("\t", """\t"""),
+                Arguments.of("\b", """\b"""),
+                Arguments.of("\r", """\r"""),
+                Arguments.of("\"", """\""""),
+            )
+    }
+
     @Test
     @Throws(Exception::class)
     fun `test chime message null entity response`() {
@@ -181,5 +197,22 @@ internal class ChimeDestinationTests {
             assertEquals("text message part is null or empty", ex.message)
             throw ex
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("escapeSequenceToRaw")
+    fun `test build request body for chime webhook should have title included and prevent escape`(
+        escapeSequence: String,
+        rawString: String
+    ) {
+        val httpClient = DestinationHttpClient()
+        val title = "test chime webhook"
+        val messageText = "line1${escapeSequence}line2"
+        val url = "https://abc/com"
+        val expectedRequestBody = """{"Content":"$title\n\nline1${rawString}line2"}"""
+        val destination = ChimeDestination(url)
+        val message = MessageContent(title, messageText)
+        val actualRequestBody = httpClient.buildRequestBody(destination, message)
+        assertEquals(expectedRequestBody, actualRequestBody)
     }
 }

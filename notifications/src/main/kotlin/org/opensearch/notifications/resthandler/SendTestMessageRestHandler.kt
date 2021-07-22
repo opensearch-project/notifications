@@ -116,7 +116,7 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
     }
 
     private fun getMessageTextDescription(feature: Feature, configId: String): String {
-        return "Test message content bodyfor config id $configId from feature ${feature.tag}" // TODO: change as spec
+        return "Test message content body for config id $configId\nfrom feature ${feature.tag}" // TODO: change as spec
     }
 
     private fun getMessageHtmlDescription(feature: Feature, configId: String): String {

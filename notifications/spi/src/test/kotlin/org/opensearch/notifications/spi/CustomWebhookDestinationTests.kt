@@ -39,8 +39,9 @@ import org.easymock.EasyMock
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertThrows
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.opensearch.notifications.spi.client.DestinationHttpClient
 import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
 import org.opensearch.notifications.spi.factory.WebhookDestinationFactory
@@ -50,32 +51,31 @@ import org.opensearch.notifications.spi.model.destination.CustomWebhookDestinati
 import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.rest.RestStatus
 import java.net.MalformedURLException
+import java.util.stream.Stream
 
-@RunWith(Parameterized::class)
 internal class CustomWebhookDestinationTests {
     companion object {
         @JvmStatic
-        @Parameterized.Parameters(name = "Param: {0}={1}")
-        fun params(): Array<Array<Any>> {
-            return arrayOf(
-                arrayOf("POST", HttpPost::class.java),
-                arrayOf("PUT", HttpPut::class.java),
-                arrayOf("PATCH", HttpPatch::class.java)
+        fun methodToHttpRequestType(): Stream<Arguments> =
+            Stream.of(
+                Arguments.of("POST", HttpPost::class.java),
+                Arguments.of("PUT", HttpPut::class.java),
+                Arguments.of("PATCH", HttpPatch::class.java)
             )
-        }
+        @JvmStatic
+        fun escapeSequenceToRaw(): Stream<Arguments> =
+            Stream.of(
+                Arguments.of("\n", """\n"""),
+                Arguments.of("\t", """\t"""),
+                Arguments.of("\b", """\b"""),
+                Arguments.of("\r", """\r"""),
+                Arguments.of("\"", """\""""),
+            )
     }
 
-    @JvmField
-    @Parameterized.Parameter(0)
-    var method: String = ""
-
-    @JvmField
-    @Parameterized.Parameter(1)
-    var expectedHttpClass: Class<HttpUriRequest>? = null
-
-    @Test
-    @Throws(Exception::class)
-    fun `test custom webhook message null entity response`() {
+    @ParameterizedTest(name = "method {0} should return corresponding type of Http request object {1}")
+    @MethodSource("methodToHttpRequestType")
+    fun `test custom webhook message null entity response`(method: String, expectedHttpClass: Class<HttpUriRequest>) {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
 
         // The DestinationHttpClient replaces a null entity with "{}".
@@ -114,9 +114,10 @@ internal class CustomWebhookDestinationTests {
         assertEquals(expectedWebhookResponse.statusCode, actualCustomWebhookResponse.statusCode)
     }
 
-    @Test
+    @ParameterizedTest(name = "method {0} should return corresponding type of Http request object {1}")
+    @MethodSource("methodToHttpRequestType")
     @Throws(Exception::class)
-    fun `test custom webhook message empty entity response`() {
+    fun `test custom webhook message empty entity response`(method: String, expectedHttpClass: Class<HttpUriRequest>) {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
         val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "")
 
@@ -153,9 +154,13 @@ internal class CustomWebhookDestinationTests {
         assertEquals(expectedWebhookResponse.statusCode, actualCustomWebhookResponse.statusCode)
     }
 
-    @Test
+    @ParameterizedTest(name = "method {0} should return corresponding type of Http request object {1}")
+    @MethodSource("methodToHttpRequestType")
     @Throws(Exception::class)
-    fun `test custom webhook message non-empty entity response`() {
+    fun `test custom webhook message non-empty entity response`(
+        method: String,
+        expectedHttpClass: Class<HttpUriRequest>
+    ) {
         val responseContent = "It worked!"
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
         val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, responseContent)
@@ -193,7 +198,7 @@ internal class CustomWebhookDestinationTests {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `Test missing url will throw exception`() {
+    fun `Test missing url will throw exception`(method: String) {
         try {
             CustomWebhookDestination("", mapOf("headerKey" to "headerValue"), method)
         } catch (ex: Exception) {
@@ -203,7 +208,7 @@ internal class CustomWebhookDestinationTests {
     }
 
     @Test
-    fun testUrlInvalidMessage() {
+    fun testUrlInvalidMessage(method: String) {
         assertThrows<MalformedURLException> {
             CustomWebhookDestination("invalidUrl", mapOf("headerKey" to "headerValue"), method)
         }
@@ -217,5 +222,22 @@ internal class CustomWebhookDestinationTests {
             assertEquals("Invalid method supplied. Only POST, PUT and PATCH are allowed", ex.message)
             throw ex
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("escapeSequenceToRaw")
+    fun `test build request body for custom webhook should have title included and prevent escape`(
+        escapeSequence: String,
+        rawString: String
+    ) {
+        val httpClient = DestinationHttpClient()
+        val title = "test custom webhook"
+        val messageText = "line1${escapeSequence}line2"
+        val url = "https://abc/com"
+        val expectedRequestBody = """{"Content":"$title\n\nline1${rawString}line2"}"""
+        val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"), "POST")
+        val message = MessageContent(title, messageText)
+        val actualRequestBody = httpClient.buildRequestBody(destination, message)
+        assertEquals(expectedRequestBody, actualRequestBody)
     }
 }
