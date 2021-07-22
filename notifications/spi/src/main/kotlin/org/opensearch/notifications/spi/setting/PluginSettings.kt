@@ -115,7 +115,7 @@ internal object PluginSettings {
     private val DEFAULT_ALLOWED_CONFIG_TYPES = listOf(
         "slack",
         "chime",
-        "custom_webhook",
+        "webhook",
         "email",
         "smtp_account",
         "email_group"

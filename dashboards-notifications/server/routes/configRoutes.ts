@@ -36,12 +36,16 @@ export function configRoutes(router: IRouter) {
           is_enabled: schema.maybe(schema.boolean()),
           sort_field: schema.string(),
           sort_order: schema.string(),
+          config_id_list: schema.maybe(
+            schema.oneOf([schema.arrayOf(schema.string()), schema.string()])
+          ),
         }),
       },
     },
     async (context, request, response) => {
       const config_type = joinRequestParams(request.query.config_type);
       const feature_list = joinRequestParams(request.query.feature_list);
+      const config_id_list = joinRequestParams(request.query.config_id_list);
       const query = request.query.query;
       // @ts-ignore
       const client: ILegacyScopedClusterClient = context.notificationsContext.notificationsClient.asScoped(
@@ -59,6 +63,7 @@ export function configRoutes(router: IRouter) {
             config_type,
             ...(feature_list && { feature_list }),
             ...(query && { query }),
+            ...(config_id_list && { config_id_list }),
           }
         );
         return response.ok({ body: resp });

@@ -56,8 +56,8 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
     transportService: TransportService,
     val client: Client,
     actionFilters: ActionFilters,
-    requestReader: Writeable.Reader<Request>
-) : HandledTransportAction<Request, Response>(name, transportService, actionFilters, requestReader) {
+    requestReader: Writeable.Reader<ActionRequest>
+) : HandledTransportAction<ActionRequest, Response>(name, transportService, actionFilters, requestReader) {
     companion object {
         private val log by logger(PluginBaseAction::class.java)
         private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
@@ -66,10 +66,10 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
     /**
      * {@inheritDoc}
      */
-    @Suppress("TooGenericExceptionCaught")
+    @Suppress("TooGenericExceptionCaught", "UNCHECKED_CAST")
     override fun doExecute(
         task: Task?,
-        request: Request,
+        request: ActionRequest,
         listener: ActionListener<Response>
     ) {
         val userStr: String? =
@@ -77,7 +77,7 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
         val user: User? = User.parse(userStr)
         scope.launch {
             try {
-                listener.onResponse(executeRequest(request, user))
+                listener.onResponse(executeRequest(request as Request, user))
             } catch (exception: OpenSearchStatusException) {
                 log.warn("$LOG_PREFIX:OpenSearchStatusException:", exception)
                 listener.onFailure(exception)

@@ -11,10 +11,18 @@
 
 package org.opensearch.notifications.spi.model.destination
 
+import org.opensearch.notifications.spi.utils.validateMethod
+
 /**
  * This class holds the contents of a custom webhook destination
  */
 class CustomWebhookDestination(
     url: String,
     val headerParams: Map<String, String>,
-) : WebhookDestination(url, DestinationType.CUSTOMWEBHOOK)
+    val method: String
+) : WebhookDestination(url, DestinationType.CUSTOMWEBHOOK) {
+
+    init {
+        validateMethod(method)
+    }
+}

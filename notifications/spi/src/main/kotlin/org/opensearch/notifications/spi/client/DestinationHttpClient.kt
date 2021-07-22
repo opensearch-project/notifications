@@ -42,6 +42,8 @@ import org.apache.http.impl.client.DefaultHttpRequestRetryHandler
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
 import org.apache.http.util.EntityUtils
+import org.opensearch.common.xcontent.XContentFactory
+import org.opensearch.common.xcontent.XContentType
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
@@ -49,6 +51,7 @@ import org.opensearch.notifications.spi.model.destination.WebhookDestination
 import org.opensearch.notifications.spi.setting.PluginSettings
 import org.opensearch.notifications.spi.utils.OpenForTesting
 import org.opensearch.notifications.spi.utils.logger
+import org.opensearch.notifications.spi.utils.string
 import org.opensearch.rest.RestStatus
 import java.io.IOException
 import java.nio.charset.StandardCharsets
@@ -121,9 +124,10 @@ class DestinationHttpClient {
 
     @Throws(Exception::class)
     private fun getHttpResponse(destination: WebhookDestination, message: MessageContent): CloseableHttpResponse {
-        val httpRequest = HttpPost(destination.url)
+        var httpRequest: HttpRequestBase = HttpPost(destination.url)
 
         if (destination is CustomWebhookDestination) {
+            httpRequest = constructHttpRequest(destination.method)
             if (destination.headerParams.isEmpty()) {
                 // set default header
                 httpRequest.setHeader("Content-type", "application/json")
@@ -138,13 +142,14 @@ class DestinationHttpClient {
         return httpClient.execute(httpRequest)
     }
 
-    @SuppressWarnings("UnusedPrivateMember")
     private fun constructHttpRequest(method: String): HttpRequestBase {
         return when (method) {
-            "POST" -> HttpPost()
-            "PUT" -> HttpPut()
-            "PATCH" -> HttpPatch()
-            else -> throw IllegalArgumentException("Invalid method supplied")
+            HttpPost.METHOD_NAME -> HttpPost()
+            HttpPut.METHOD_NAME -> HttpPut()
+            HttpPatch.METHOD_NAME -> HttpPatch()
+            else -> throw IllegalArgumentException(
+                "Invalid or empty method supplied. Only POST, PUT and PATCH are allowed"
+            )
         }
     }
 
@@ -164,12 +169,14 @@ class DestinationHttpClient {
         }
     }
 
-    private fun buildRequestBody(destination: WebhookDestination, message: MessageContent): String {
-        // Slack webhook request body has required format https://api.slack.com/messaging/webhooks
-        return if (destination is SlackDestination) {
-            "{\"text\" : \"${message.buildWebhookMessage()}\"}"
-        } else {
-            "{\"Content\" : \"${message.buildWebhookMessage()}\"}"
-        }
+    fun buildRequestBody(destination: WebhookDestination, message: MessageContent): String {
+        val builder = XContentFactory.contentBuilder(XContentType.JSON)
+        var keyName = "Content"
+        // Slack webhook request body has required "text" as key name https://api.slack.com/messaging/webhooks
+        if (destination is SlackDestination) keyName = "text"
+        builder.startObject()
+            .field(keyName, message.buildWebhookMessage())
+            .endObject()
+        return builder.string()
     }
 }
