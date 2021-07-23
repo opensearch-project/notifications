@@ -70,17 +70,17 @@ jobs:
           cd notifications
           ./gradlew build -PexcludeTests="**/SesChannelIT*" -Dopensearch.version=${{ env.OPENSEARCH_VERSION }}.0
 
-      # - name: Upload coverage
-      #   uses: codecov/codecov-action@v1
-      #   with:
-      #     flags: notifications-es
-      #     directory: notifications/
-      #     token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          flags: opensearch-notifications
+          directory: notifications/
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Create Artifact Path
         run: |
           mkdir -p notifications-build
-          cp -r ./notifications/build/distributions/*.zip notifications-build/
+          cp -r ./notifications/notifications/build/distributions/*.zip notifications-build/
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1

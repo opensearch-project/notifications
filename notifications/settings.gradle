@@ -27,4 +27,6 @@
 
 rootProject.name = 'opensearch-notifications'
 include "spi"
+include "notifications"
+
 project(":spi").name = rootProject.name + "-spi"

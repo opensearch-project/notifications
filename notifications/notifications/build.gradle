@@ -1,0 +1,236 @@
+/*
+ *  SPDX-License-Identifier: Apache-2.0
+ *
+ *  The OpenSearch Contributors require contributions made to
+ *  this file be licensed under the Apache-2.0 license or a
+ *  compatible open source license.
+ *
+ *  Modifications Copyright OpenSearch Contributors. See
+ *  GitHub history for details.
+ */
+
+/*
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ *
+ */
+
+import org.opensearch.gradle.test.RestIntegTestTask
+
+plugins {
+    id 'nebula.ospackage' version "8.5.4"
+    id "com.dorongold.task-tree" version "1.5"
+}
+
+apply plugin: 'java'
+apply plugin: 'jacoco'
+apply plugin: 'idea'
+apply plugin: 'opensearch.opensearchplugin'
+apply plugin: 'opensearch.testclusters'
+apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
+
+def usingRemoteCluster = System.properties.containsKey('tests.rest.cluster') || System.properties.containsKey('tests.cluster')
+def usingMultiNode = project.properties.containsKey('numNodes')
+
+//check.dependsOn jacocoTestReport
+
+opensearchplugin {
+    name 'opensearch-notifications'
+    description 'OpenSearch Notifications Plugin'
+    classname 'org.opensearch.notifications.NotificationPlugin'
+}
+
+allOpen {
+    annotation("org.opensearch.notifications.util.OpenForTesting")
+}
+
+ext {
+    projectSubstitutions = [:]
+    isSnapshot = "true" == System.getProperty("build.snapshot", "true")
+    licenseFile = rootProject.file('LICENSE')
+    noticeFile = rootProject.file('NOTICE')
+}
+
+configurations.testCompile {
+    exclude module: "securemock"
+}
+
+configurations.all {
+    if (it.state != Configuration.State.UNRESOLVED) return
+    resolutionStrategy {
+        force "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+        force "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
+        force "commons-logging:commons-logging:1.2" // resolve for awssdk:ses
+        force "commons-codec:commons-codec:1.13" // resolve for awssdk:ses
+        force "io.netty:netty-codec-http:4.1.63.Final" // resolve for awssdk:ses
+        force "io.netty:netty-handler:4.1.63.Final" // resolve for awssdk:ses
+        force "org.apache.httpcomponents:httpclient:4.5.10" // resolve for awssdk:ses
+        force "org.apache.httpcomponents:httpcore:4.4.13" // resolve for awssdk:ses
+        force "com.fasterxml.jackson.core:jackson-core:2.12.3" // resolve for awssdk:ses
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.12.3" // resolve for awssdk:ses
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.12.3" // resolve for awssdk:ses
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.3" // resolve for awssdk:ses
+        force "junit:junit:4.12" // resolve for awssdk:ses
+    }
+}
+
+dependencies {
+    compileOnly "${group}:opensearch:${opensearch_version}"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3" // ${kotlin_version} does not work for coroutines
+    compile "${group}:common-utils:${opensearch_version}.0"
+    compile ("software.amazon.awssdk:ses:2.16.75") {
+        exclude module: 'annotations' // conflict with org.jetbrains:annotations, integTestRunner fails with error "codebase property already set"
+    }
+
+    testImplementation(
+            'org.assertj:assertj-core:3.19.0',
+            'org.mockito:mockito-junit-jupiter:3.10.0',
+            'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0',
+            'io.mockk:mockk:1.11.0',
+            'io.mockk:mockk-common:1.11.0',
+            'io.mockk:mockk-dsl:1.11.0',
+            'io.mockk:mockk-dsl-jvm:1.11.0',
+            'io.mockk:mockk-agent-api:1.11.0',
+            'io.mockk:mockk-agent-common:1.11.0',
+            'io.mockk:mockk-agent-jvm:1.11.0',
+            "org.junit.jupiter:junit-jupiter-api:${junit_version}"
+    )
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit_version}")
+    testCompile "org.opensearch.test:framework:${opensearch_version}"
+    testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
+    testCompile "org.mockito:mockito-core:3.10.0"
+    testCompile 'com.google.code.gson:gson:2.8.7'
+    testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
+    testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
+
+    compile project(path: ":${rootProject.name}-spi", configuration: 'shadow')
+}
+
+// turn off javadoc as it barfs on Kotlin code
+javadoc.enabled = false
+licenseHeaders.enabled = true
+// no need to validate pom, as we do not upload to maven/sonatype
+validateNebulaPom.enabled = false
+dependencyLicenses.enabled = false
+thirdPartyAudit.enabled = false
+// Allow @Test to be used in test classes not inherited from LuceneTestCase.
+forbiddenApis.ignoreFailures = true
+// Allow test cases to be named Tests without having to be inherited from LuceneTestCase.
+testingConventions.enabled = false
+loggerUsageCheck.enabled = false
+
+def es_tmp_dir = rootProject.file('build/private/es_tmp').absoluteFile
+es_tmp_dir.mkdirs()
+
+afterEvaluate {
+    testClusters.integTest.nodes.each { node ->
+        def plugins = node.plugins
+        def firstPlugin = plugins.get(0)
+        plugins.remove(0)
+        plugins.add(firstPlugin)
+    }
+}
+
+test {
+    systemProperty 'tests.security.manager', 'false'
+    useJUnitPlatform()
+}
+
+File repo = file("$buildDir/testclusters/repo")
+def _numNodes = findProperty('numNodes') as Integer ?: 1
+
+task integTest(type: RestIntegTestTask) {
+    description = "Run tests against a cluster that has security enabled"
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+}
+tasks.named("check").configure { dependsOn(integTest) }
+
+integTest {
+    if (project.hasProperty('excludeTests')) {
+        project.properties['excludeTests']?.replaceAll('\\s', '')?.split('[,;]')?.each {
+            exclude "${it}"
+        }
+    }
+    systemProperty 'tests.security.manager', 'false'
+    systemProperty 'java.io.tmpdir', es_tmp_dir.absolutePath
+
+    systemProperty "https", System.getProperty("https")
+    systemProperty "user", System.getProperty("user")
+    systemProperty "password", System.getProperty("password")
+    // Tell the test JVM if the cluster JVM is running under a debugger so that tests can use longer timeouts for
+    // requests. The 'doFirst' delays reading the debug setting on the cluster till execution time.
+    doFirst {
+        // Tell the test JVM if the cluster JVM is running under a debugger so that tests can
+        // use longer timeouts for requests.
+        def isDebuggingCluster = getDebug() || System.getProperty("test.debug") != null
+        systemProperty 'cluster.debug', isDebuggingCluster
+        // Set number of nodes system property to be used in tests
+        systemProperty 'cluster.number_of_nodes', "${_numNodes}"
+        // There seems to be an issue when running multi node run or integ tasks with unicast_hosts
+        // not being written, the waitForAllConditions ensures it's written
+        getClusters().forEach { cluster ->
+            cluster.waitForAllConditions()
+        }
+    }
+
+    // The -Dcluster.debug option makes the cluster debuggable; this makes the tests debuggable
+    if (System.getProperty("test.debug") != null) {
+        jvmArgs '-agentlib:jdwp=transport=dt_socket,server=n,suspend=y,address=8000'
+    }
+}
+
+Zip bundle = (Zip) project.getTasks().getByName("bundlePlugin");
+integTest.dependsOn(bundle)
+integTest.getClusters().forEach{c -> c.plugin(project.getObjects().fileProperty().value(bundle.getArchiveFile()))}
+
+testClusters.integTest {
+    testDistribution = 'INTEG_TEST'
+    // Cluster shrink exception thrown if we try to set numberOfNodes to 1, so only apply if > 1
+    if (_numNodes > 1) numberOfNodes = _numNodes
+    // When running integration tests it doesn't forward the --debug-jvm to the cluster anymore
+    // i.e. we have to use a custom property to flag when we want to debug OpenSearch JVM
+    // since we also support multi node integration tests we increase debugPort per node
+    if (System.getProperty("cluster.debug") != null) {
+        def debugPort = 5005
+        nodes.forEach { node ->
+            node.jvmArgs("-agentlib:jdwp=transport=dt_socket,server=n,suspend=y,address=*:${debugPort}")
+            debugPort += 1
+        }
+    }
+    setting 'path.repo', repo.absolutePath
+}
+
+run {
+    doFirst {
+        // There seems to be an issue when running multi node run or integ tasks with unicast_hosts
+        // not being written, the waitForAllConditions ensures it's written
+        getClusters().forEach { cluster ->
+            cluster.waitForAllConditions()
+        }
+    }
+    useCluster testClusters.integTest
+}
+
+compileKotlin { kotlinOptions.freeCompilerArgs = ['-Xjsr305=strict'] }
+
+// Only apply jacoco test coverage if we are running a local single node cluster
+if (!usingRemoteCluster && !usingMultiNode) {
+    apply from: '../build-tools/plugin-coverage.gradle'
+}
+
+apply from: '../build-tools/pkgbuild.gradle'
