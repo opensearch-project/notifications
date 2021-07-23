@@ -75,109 +75,9 @@ configurations {
 }
 
 dependencies {
-    compileOnly "${group}:opensearch:${opensearch_version}"
-    compile "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3" // ${kotlin_version} does not work for coroutines
-    compile "${group}:common-utils:${opensearch_version}.0" // TODO: change to ${opensearch_version}
-    compile ("software.amazon.awssdk:ses:2.16.75") {
-        exclude module: 'annotations' // conflict with org.jetbrains:annotations, integTestRunner fails with error "codebase property already set"
-    }
-
-    testImplementation(
-            'org.assertj:assertj-core:3.19.0',
-            'org.mockito:mockito-junit-jupiter:3.10.0',
-            'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0',
-            'io.mockk:mockk:1.11.0',
-            'io.mockk:mockk-common:1.11.0',
-            'io.mockk:mockk-dsl:1.11.0',
-            'io.mockk:mockk-dsl-jvm:1.11.0',
-            'io.mockk:mockk-agent-api:1.11.0',
-            'io.mockk:mockk-agent-common:1.11.0',
-            'io.mockk:mockk-agent-jvm:1.11.0',
-            "org.junit.jupiter:junit-jupiter-api:${junit_version}"
-    )
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit_version}")
-    testCompile "org.opensearch.test:framework:${opensearch_version}"
-    testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
-    testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
-    testCompile "org.mockito:mockito-core:3.10.0"
-    testCompile 'com.google.code.gson:gson:2.8.7'
-    testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
-    testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
-
-    ktlint "com.pinterest:ktlint:0.41.0"
-
-    compile project(path: ":${rootProject.name}-spi", configuration: 'shadow')
-
-}
-
-// turn off javadoc as it barfs on Kotlin code
-javadoc.enabled = false
-licenseHeaders.enabled = true
-// no need to validate pom, as we do not upload to maven/sonatype
-validateNebulaPom.enabled = false
-dependencyLicenses.enabled = false
-thirdPartyAudit.enabled = false
-// Allow @Test to be used in test classes not inherited from LuceneTestCase.
-forbiddenApis.ignoreFailures = true
-// Allow test cases to be named Tests without having to be inherited from LuceneTestCase.
-testingConventions.enabled = false
-loggerUsageCheck.enabled = false
-
-def es_tmp_dir = rootProject.file('build/private/es_tmp').absoluteFile
-es_tmp_dir.mkdirs()
-
-afterEvaluate {
-    testClusters.integTest.nodes.each { node ->
-        def plugins = node.plugins
-        def firstPlugin = plugins.get(0)
-        plugins.remove(0)
-        plugins.add(firstPlugin)
-    }
-}
-
-test {
-    systemProperty 'tests.security.manager', 'false'
-    useJUnitPlatform()
-}
-
-File repo = file("$buildDir/testclusters/repo")
-def _numNodes = findProperty('numNodes') as Integer ?: 1
-
-task integTest(type: RestIntegTestTask) {
-    description = "Run tests against a cluster that has security enabled"
-    testClassesDirs = sourceSets.test.output.classesDirs
-    classpath = sourceSets.test.runtimeClasspath
-}
-tasks.named("check").configure { dependsOn(integTest) }
-
-
-integTest {
-    if (project.hasProperty('excludeTests')) {
-        project.properties['excludeTests']?.replaceAll('\\s', '')?.split('[,;]')?.each {
-            exclude "${it}"
-        }
-    }
-    systemProperty 'tests.security.manager', 'false'
-    systemProperty 'java.io.tmpdir', es_tmp_dir.absolutePath
-
-    systemProperty "https", System.getProperty("https")
-    systemProperty "user", System.getProperty("user")
-    systemProperty "password", System.getProperty("password")
-    // Tell the test JVM if the cluster JVM is running under a debugger so that tests can use longer timeouts for
-    // requests. The 'doFirst' delays reading the debug setting on the cluster till execution time.
-    doFirst {
-        // Tell the test JVM if the cluster JVM is running under a debugger so that tests can
-        // use longer timeouts for requests.
-        def isDebuggingCluster = getDebug() || System.getProperty("test.debug") != null
-        systemProperty 'cluster.debug', isDebuggingCluster
-        // Set number of nodes system property to be used in tests
-        systemProperty 'cluster.number_of_nodes', "${_numNodes}"
-        // There seems to be an issue when running multi node run or integ tasks with unicast_hosts
-        // not being written, the waitForAllConditions ensures it's written
-        getClusters().forEach { cluster ->
-            cluster.waitForAllConditions()
+    add("ktlint", "com.pinterest:ktlint:0.41.0") {
+        attributes {
+            attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling, Bundling.EXTERNAL))
         }
     }
 }
@@ -210,3 +110,4 @@ check.dependsOn ktlint
 evaluationDependsOnChildren()
 
 check.dependsOn subprojects*.check
+
