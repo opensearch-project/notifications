@@ -30,7 +30,7 @@ import javax.mail.internet.MimeMessage
 /**
  * This class handles the connections to the given Destination.
  */
-open class DestinationEmailClient {
+class DestinationEmailClient {
 
     companion object {
         private val log by logger(DestinationEmailClient::class.java)
@@ -86,9 +86,8 @@ open class DestinationEmailClient {
     /*
      * This method is useful for mocking the client
      */
-    // TODO remove open keyword after adding other framework that can mock final class/method. e.g. Mockito2 ?
     @Throws(Exception::class)
-    open fun sendMessage(msg: Message?) {
+    fun sendMessage(msg: Message?) {
         Transport.send(msg)
     }
 

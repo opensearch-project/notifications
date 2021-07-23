@@ -116,12 +116,29 @@ dependencies {
             "org.junit.jupiter:junit-jupiter-params:5.6.2",
             "org.easymock:easymock:4.0.1",
             "org.apache.logging.log4j:log4j-core:${versions.log4j}",
-            "org.opensearch.test:framework:${opensearch_version}",
+            'org.mockito:mockito-junit-jupiter:3.10.0',
+            'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0',
+            'io.mockk:mockk:1.11.0',
+            'io.mockk:mockk-common:1.11.0',
+            'io.mockk:mockk-dsl:1.11.0',
+            'io.mockk:mockk-dsl-jvm:1.11.0',
+            'io.mockk:mockk-agent-api:1.11.0',
+            'io.mockk:mockk-agent-common:1.11.0',
+            'io.mockk:mockk-agent-jvm:1.11.0',
     )
     testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
     testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.2')
     testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
+    testCompile "org.mockito:mockito-core:3.10.0"
+    testCompile "org.opensearch.test:framework:${opensearch_version}"
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
+}
+
+configurations {
+    testCompile {
+        exclude group: 'org.elasticsearch', module: 'securemock' // resolve jarhell with mockito
+    }
 }
 
 shadowJar {

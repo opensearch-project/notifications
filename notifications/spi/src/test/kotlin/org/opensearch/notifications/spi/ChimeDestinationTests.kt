@@ -70,7 +70,7 @@ internal class ChimeDestinationTests {
 
         // The DestinationHttpClient replaces a null entity with "{}".
         val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "{}")
-
+        // TODO replace EasyMock in all UTs with mockk which fits Kotlin better
         val httpResponse: CloseableHttpResponse = EasyMock.createMock(CloseableHttpResponse::class.java)
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
 

@@ -11,10 +11,13 @@
 
 package org.opensearch.notifications.spi
 
+import io.mockk.every
+import io.mockk.spyk
 import junit.framework.Assert.assertEquals
-import org.easymock.EasyMock
 import org.junit.Assert
 import org.junit.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.junit.jupiter.MockitoExtension
 import org.opensearch.notifications.spi.client.DestinationEmailClient
 import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
 import org.opensearch.notifications.spi.factory.SmtpEmailDestinationFactory
@@ -23,17 +26,18 @@ import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.notifications.spi.model.destination.EmailDestination
 import org.opensearch.rest.RestStatus
-import javax.mail.Message
 import javax.mail.MessagingException
 
+@ExtendWith(MockitoExtension::class)
 internal class EmailDestinationTests {
+
     @Test
     @Throws(Exception::class)
     fun testSmtpEmailMessage() {
         val expectedEmailResponse = DestinationMessageResponse(RestStatus.OK.status, "Success")
-        val emailClient: DestinationEmailClient = EasyMock.partialMockBuilder(DestinationEmailClient::class.java)
-            .addMockedMethod("sendMessage").createMock()
-        emailClient.sendMessage(EasyMock.anyObject(Message::class.java))
+        val emailClient = spyk<DestinationEmailClient>()
+        every { emailClient.sendMessage(any()) } returns Unit
+
         val smtpEmailDestinationFactory = SmtpEmailDestinationFactory(emailClient)
         DestinationFactoryProvider.destinationFactoryMap = mapOf(DestinationType.SMTP to smtpEmailDestinationFactory)
 
@@ -56,12 +60,11 @@ internal class EmailDestinationTests {
             RestStatus.FAILED_DEPENDENCY.status,
             "Couldn't connect to host, port: localhost, 55555; timeout -1"
         )
-        val emailClient: DestinationEmailClient = EasyMock.partialMockBuilder(DestinationEmailClient::class.java)
-            .addMockedMethod("sendMessage").createMock()
-        emailClient.sendMessage(EasyMock.anyObject(Message::class.java))
-        EasyMock.expectLastCall<Any>()
-            .andThrow(MessagingException("Couldn't connect to host, port: localhost, 55555; timeout -1"))
-        EasyMock.replay(emailClient)
+        val emailClient = spyk<DestinationEmailClient>()
+        every { emailClient.sendMessage(any()) } throws MessagingException(
+            "Couldn't connect to host, port: localhost, 55555; timeout -1"
+        )
+
         val smtpEmailDestinationFactory = SmtpEmailDestinationFactory(emailClient)
         DestinationFactoryProvider.destinationFactoryMap = mapOf(DestinationType.SMTP to smtpEmailDestinationFactory)
 
@@ -80,7 +83,7 @@ internal class EmailDestinationTests {
         )
 
         val actualEmailResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
-        EasyMock.verify(emailClient)
+
         assertEquals(expectedEmailResponse.statusCode, actualEmailResponse.statusCode)
         assertEquals("sendEmail Error, status:${expectedEmailResponse.statusText}", actualEmailResponse.statusText)
     }
