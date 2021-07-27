@@ -14,7 +14,7 @@ import {
   ILegacyScopedClusterClient,
   IRouter,
 } from '../../../../src/core/server';
-import { NODE_API } from '../../../dashboards-notifications/common';
+import { NODE_API } from '../../common';
 import { joinRequestParams } from '../utils/helper';
 
 export function eventRoutes(router: IRouter) {
