@@ -47,7 +47,7 @@ export function SlackSettings(props: SlackSettingsProps) {
       <EuiFieldText
         fullWidth
         data-test-subj="create-channel-slack-webhook-input"
-        placeholder="https://hook.slack.com/services/XXXXX/XXXXX/XXXXX..."
+        placeholder="https://hooks.slack.com/services/XXXXX/XXXXX/XXXXX..."
         value={props.slackWebhook}
         onChange={(e) => props.setSlackWebhook(e.target.value)}
         isInvalid={context.inputErrors.slackWebhook.length > 0}
