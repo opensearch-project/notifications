@@ -50,16 +50,16 @@ internal class NotificationEventIndexTest {
     fun `index operation to get single event` () {
 
         val id = "index-1"
-        val NotificationEventIndex = mock(NotificationEventIndex::class.java)
+       // val NotificationEventIndex = mock(NotificationEventIndex::class.java)
         val getRequest = GetRequest(NotificationEventIndex.INDEX_NAME).id(id)
         val actionFuture = NotificationEventIndex.client.get(getRequest)
-        val PluginSettings = mock(PluginSettings::class.java)
+        //val PluginSettings = mock(PluginSettings::class.java)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        //NotificationEventIndex.parseNotificationEventDoc(id, response)
+        val expected = NotificationEventIndex.parseNotificationEventDoc(id, response)
 
 
-        mockkObject(NotificationEventIndex)
-        every { NotificationEventIndex.parseNotificationEventDoc(id, response)} returns response
+        //mockkObject(NotificationEventIndex)
+        //every { NotificationEventIndex.parseNotificationEventDoc(id, response)} returns response
 
         val getNotificationEvent = getNotificationEvent(id)
 
