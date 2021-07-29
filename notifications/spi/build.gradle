@@ -95,6 +95,14 @@ configurations.all {
         force "io.netty:netty-handler:4.1.63.Final" // resolve for awssdk:ses
         force "org.apache.httpcomponents:httpclient:4.5.10" // resolve for awssdk:ses
         force "org.apache.httpcomponents:httpcore:4.4.13" // resolve for awssdk:ses
+
+        // Resolve for awssdk:sns
+        force "joda-time:joda-time:2.8.1"
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.12.3"
+        force "com.fasterxml.jackson.core:jackson-core:2.12.3"
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.12.3"
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.3"
+        force "junit:junit:4.12"
     }
 }
 
@@ -104,6 +112,7 @@ dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
     compile "org.apache.httpcomponents:httpcore:4.4.5"
     compile "org.apache.httpcomponents:httpclient:4.5.10"
+    compile "com.amazonaws:aws-java-sdk-sns:${aws_version}"
     //TODO: Add it back and remove from main project(to avoid jarhell) when implementing Email functionality
 //    compile ("software.amazon.awssdk:ses:2.14.16") {
 //        exclude module: 'annotations' // conflict with org.jetbrains:annotations, integTestRunner fails with error "codebase property already set"
@@ -112,6 +121,7 @@ dependencies {
 
     testImplementation(
             'org.assertj:assertj-core:3.16.1',
+            'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0',
             'org.junit.jupiter:junit-jupiter-api:5.6.2',
             "org.junit.jupiter:junit-jupiter-params:5.6.2",
             "org.easymock:easymock:4.0.1",
@@ -125,12 +135,15 @@ dependencies {
             'io.mockk:mockk-agent-api:1.11.0',
             'io.mockk:mockk-agent-common:1.11.0',
             'io.mockk:mockk-agent-jvm:1.11.0',
+            //'net.bytebuddy:byte-buddy:1.10.0', // required by mockk for final class mock
+            "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}", // required by mockk
     )
     testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
     testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.2')
     testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
     testCompile "org.mockito:mockito-core:3.10.0"
+    //testCompile "org.mockito:mockito-inline:3.10.0"
     testCompile "org.opensearch.test:framework:${opensearch_version}"
     testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
 }
@@ -143,7 +156,8 @@ configurations {
 
 shadowJar {
     // fix jarhell by relocating packages
-    relocate 'com.fasterxml.jackson.core', 'org.opensearch.notifications.repackage.com.fasterxml.jackson.core'
+    relocate 'org.joda.time', 'org.opensearch.notifications.repackage.org.joda.time'
+    relocate 'com.fasterxml.jackson', 'org.opensearch.notifications.repackage.com.fasterxml.jackson'
     relocate 'org.apache.http', 'org.opensearch.notifications.repackage.org.apache.http'
     relocate 'org.apache.commons.logging', 'org.opensearch.notifications.repackage.org.apache.commons.logging'
     relocate 'org.apache.commons.codec', 'org.opensearch.notifications.repackage.org.apache.commons.codec'

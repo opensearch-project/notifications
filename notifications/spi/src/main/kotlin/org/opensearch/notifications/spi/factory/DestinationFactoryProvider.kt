@@ -21,11 +21,12 @@ import org.opensearch.notifications.spi.model.destination.DestinationType
 internal object DestinationFactoryProvider {
 
     var destinationFactoryMap = mapOf(
-        // TODO Add other destinations, ses, sns
+        // TODO Add other destinations, ses
         DestinationType.SLACK to WebhookDestinationFactory(),
         DestinationType.CHIME to WebhookDestinationFactory(),
         DestinationType.CUSTOMWEBHOOK to WebhookDestinationFactory(),
-        DestinationType.SMTP to SmtpEmailDestinationFactory()
+        DestinationType.SMTP to SmtpEmailDestinationFactory(),
+        DestinationType.SNS to SNSDestinationFactory()
     )
 
     /**

@@ -27,10 +27,17 @@
 
 package org.opensearch.notifications.spi.client
 
+import org.opensearch.notifications.spi.model.destination.SNSDestination
+
 /**
  * This class provides Client to the relevant destinations
  */
 internal object DestinationClientPool {
     val httpClient: DestinationHttpClient = DestinationHttpClient()
     val emailClient: DestinationEmailClient = DestinationEmailClient()
+
+    // TODO: cache by cred and region?
+    fun getSNSClient(destination: SNSDestination): DestinationSNSClient {
+        return DestinationSNSClient(destination)
+    }
 }
