@@ -33,7 +33,7 @@ import {
   EuiText,
 } from '@elastic/eui';
 import React, { useContext } from 'react';
-import { ALERTING_DOCUMENTATION_LINK } from '../../../utils/constants';
+import { DOCUMENTATION_LINK } from '../../../utils/constants';
 import { CreateChannelContext } from '../CreateChannel';
 import { validateArn } from '../utils/validationHelper';
 
@@ -100,7 +100,7 @@ export function SNSSettings(props: SNSSettingsProps) {
               If your cluster is not running on AWS, you must add your access
               key, secret key, and optional session token to the OpenSearch
               keystore.{' '}
-              <EuiLink href={ALERTING_DOCUMENTATION_LINK} target="_blank" external>
+              <EuiLink href={DOCUMENTATION_LINK} target="_blank" external>
                 Learn more
               </EuiLink>
             </div>
