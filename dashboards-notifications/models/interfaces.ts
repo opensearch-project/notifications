@@ -88,6 +88,10 @@ export interface ChannelItemType extends ConfigType {
       [id: string]: string;
     };
   };
+  sns?: {
+    topic_arn: string;
+    role_arn?: string;
+  }
 }
 
 interface ConfigType {

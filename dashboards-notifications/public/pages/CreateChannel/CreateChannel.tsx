@@ -226,7 +226,8 @@ export function CreateChannel(props: CreateChannelsProps) {
       } else if (type === BACKEND_CHANNEL_TYPE.SES) {
         // TODO
       } else if (type === BACKEND_CHANNEL_TYPE.SNS) {
-        // TODO
+        setTopicArn(response.sns?.topic_arn || '');
+        setRoleArn(response.sns?.role_arn || '');
       }
     } catch (error) {
       coreContext.notifications.toasts.addDanger(
@@ -303,6 +304,13 @@ export function CreateChannel(props: CreateChannelsProps) {
         selectedSenderOptions,
         selectedRecipientGroupOptions
       );
+    } else if (channelType === BACKEND_CHANNEL_TYPE.SES) {
+      // TODO
+    } else if (channelType === BACKEND_CHANNEL_TYPE.SNS) {
+      config.sns = {
+        topic_arn: topicArn,
+        ...(roleArn && { role_arn: roleArn }),
+      };
     }
     return config;
   };
