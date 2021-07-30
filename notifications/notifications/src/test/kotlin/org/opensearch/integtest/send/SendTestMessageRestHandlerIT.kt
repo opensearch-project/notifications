@@ -143,4 +143,62 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         Assert.assertNotNull(getResponseItem.get("event").asJsonObject)
         Thread.sleep(100)
     }
+
+    @Suppress("EmptyFunctionBlock")
+    fun `test send custom webhook message`() {
+        // Create webhook notification config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"this is a sample config name",
+                "description":"this is a sample config description",
+                "config_type":"webhook",
+                "feature_list":[
+                    "index_management",
+                    "reports",
+                    "alerting"
+                ],
+                "is_enabled":true,
+                "webhook":{
+                    "url":"https://xxx.com/my-webhook@dev",
+                    "header_params": {
+                       "Content-type": "text/plain"
+                    }
+                }
+            }
+        }
+        """.trimIndent()
+        val createResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createRequestJsonString,
+            RestStatus.OK.status
+        )
+        val configId = createResponse.get("config_id").asString
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        // send test message
+        val sendResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/feature/test/$configId?feature=alerting",
+            "",
+            RestStatus.OK.status
+        )
+        val eventId = sendResponse.get("event_id").asString
+
+        val getEventResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/events/$eventId",
+            "",
+            RestStatus.OK.status
+        )
+        val items = getEventResponse.get("event_list").asJsonArray
+        Assert.assertEquals(1, items.size())
+        val getResponseItem = items[0].asJsonObject
+        Assert.assertEquals(eventId, getResponseItem.get("event_id").asString)
+        Assert.assertEquals("", getResponseItem.get("tenant").asString)
+        Assert.assertNotNull(getResponseItem.get("event").asJsonObject)
+        Thread.sleep(100)
+    }
 }
