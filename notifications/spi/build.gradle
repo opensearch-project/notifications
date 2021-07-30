@@ -113,6 +113,7 @@ dependencies {
     compile "org.apache.httpcomponents:httpcore:4.4.5"
     compile "org.apache.httpcomponents:httpclient:4.5.10"
     compile "com.amazonaws:aws-java-sdk-sns:${aws_version}"
+    compile "com.amazonaws:aws-java-sdk-sts:${aws_version}"
     //TODO: Add it back and remove from main project(to avoid jarhell) when implementing Email functionality
 //    compile ("software.amazon.awssdk:ses:2.14.16") {
 //        exclude module: 'annotations' // conflict with org.jetbrains:annotations, integTestRunner fails with error "codebase property already set"

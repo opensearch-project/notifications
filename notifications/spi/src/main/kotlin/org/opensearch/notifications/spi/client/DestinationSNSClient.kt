@@ -13,9 +13,13 @@ package org.opensearch.notifications.spi.client
 import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.auth.BasicSessionCredentials
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
+import com.amazonaws.auth.profile.ProfileCredentialsProvider
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.AmazonSNSClientBuilder
+import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder
+import com.amazonaws.services.securitytoken.model.AssumeRoleRequest
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.SNSDestination
 
@@ -31,19 +35,39 @@ class DestinationSNSClient(destination: SNSDestination) {
             .build()
 
     fun execute(topicArn: String, message: MessageContent): String {
-        val result = amazonSNS.publish(topicArn, message.textDescription, message.title) // TODO: check title is null
+        val result = amazonSNS.publish(topicArn, message.textDescription, message.title)
         return result.messageId // TODO: return what?
     }
 
     private fun getCredentialProvider(destination: SNSDestination): AWSCredentialsProvider {
-        return if (destination.isIAMCredentialConfigured()) {
-            val awsCredentials = BasicAWSCredentials(
-                destination.accessKey.toString(),
-                destination.secretKey.toString()
-            )
-            AWSStaticCredentialsProvider(awsCredentials)
-        } else {
-            DefaultAWSCredentialsProviderChain()
+        return when {
+            destination.isIAMCredentialConfigured() -> {
+                val awsCredentials = BasicAWSCredentials(
+                    destination.accessKey.toString(),
+                    destination.secretKey.toString()
+                )
+                AWSStaticCredentialsProvider(awsCredentials)
+            }
+            destination.roleArn != null -> {
+                val stsClient = AWSSecurityTokenServiceClientBuilder.standard()
+                    .withCredentials(ProfileCredentialsProvider()) // TODO confirm if this is needed?
+                    .withRegion(getRegion((destination.topicArn)))
+                    .build()
+                val roleRequest = AssumeRoleRequest()
+                    .withRoleArn(destination.roleArn)
+                    .withRoleSessionName("NotificationsTempSession")
+                val roleResponse = stsClient.assumeRole(roleRequest)
+                val sessionCredentials = roleResponse.credentials
+                val awsCredentials = BasicSessionCredentials(
+                    sessionCredentials.accessKeyId,
+                    sessionCredentials.secretAccessKey,
+                    sessionCredentials.sessionToken
+                )
+                AWSStaticCredentialsProvider(awsCredentials)
+            }
+            else -> {
+                DefaultAWSCredentialsProviderChain()
+            }
         }
     }
 
