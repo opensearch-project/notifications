@@ -27,18 +27,19 @@
 
 package org.opensearch.notifications.spi.utils
 
+import inet.ipaddr.IPAddressString
 import org.apache.http.client.methods.HttpPatch
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.methods.HttpPut
 import org.opensearch.common.Strings
 import java.net.URL
 
-fun validateUrl(urlString: String) {
+fun validateUrl(urlString: String, hostDenyList: List<String>) {
     require(!Strings.isNullOrEmpty(urlString)) { "url is null or empty" }
     require(isValidUrl(urlString)) { "Invalid URL or unsupported" }
-    val url = URL(urlString)
-    require("https" == url.protocol) // Support only HTTPS. HTTP and other protocols not supported
-    // TODO : Add hosts deny list
+    require(!isHostInDenylist(urlString, hostDenyList)) {
+        "Host of url is denied, based on plugin setting [notification.spi.email.host_deny_list]"
+    }
 }
 
 fun validateEmail(email: String) {
@@ -48,8 +49,22 @@ fun validateEmail(email: String) {
 
 fun isValidUrl(urlString: String): Boolean {
     val url = URL(urlString) // throws MalformedURLException if URL is invalid
-    // TODO : Add hosts deny list
     return ("https" == url.protocol) // Support only HTTPS. HTTP and other protocols not supported
+}
+
+fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
+    val url = URL(urlString)
+    if (url.host != null) {
+        val ipStr = IPAddressString(url.host)
+        for (network in hostDenyList) {
+            val netStr = IPAddressString(network)
+            if (netStr.contains(ipStr)) {
+                return true
+            }
+        }
+    }
+
+    return false
 }
 
 /**

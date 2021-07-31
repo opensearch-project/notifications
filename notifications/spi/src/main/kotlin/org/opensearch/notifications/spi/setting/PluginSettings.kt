@@ -80,6 +80,11 @@ internal object PluginSettings {
     private const val TOOLTIP_SUPPORT_KEY = "$KEY_PREFIX.tooltip_support"
 
     /**
+     * Setting to enable tooltip in UI
+     */
+    private const val HOST_DENY_LIST_KEY = "$EMAIL_KEY_PREFIX.host_deny_list"
+
+    /**
      * Default email size limit as 10MB.
      */
     private const val DEFAULT_EMAIL_SIZE_LIMIT = 10000000
@@ -125,6 +130,11 @@ internal object PluginSettings {
         "smtp_account",
         "email_group"
     )
+
+    /**
+     * Default email host deny list
+     */
+    private val DEFAULT_HOST_DENY_LIST = emptyList<String>()
 
     /**
      * Default disable tooltip support
@@ -179,6 +189,12 @@ internal object PluginSettings {
     @Volatile
     var tooltipSupport: Boolean
 
+    /**
+     * list of allowed config types.
+     */
+    @Volatile
+    var hostDenyList: List<String>
+
     private const val DECIMAL_RADIX: Int = 10
 
     private val log by logger(javaClass)
@@ -207,6 +223,7 @@ internal object PluginSettings {
         socketTimeout = (settings?.get(SOCKET_TIMEOUT_MILLISECONDS_KEY)?.toInt()) ?: DEFAULT_SOCKET_TIMEOUT_MILLISECONDS
         allowedConfigTypes = settings?.getAsList(ALLOWED_CONFIG_TYPE_KEY, null) ?: DEFAULT_ALLOWED_CONFIG_TYPES
         tooltipSupport = settings?.getAsBoolean(TOOLTIP_SUPPORT_KEY, false) ?: DEFAULT_TOOLTIP_SUPPORT
+        hostDenyList = settings?.getAsList(HOST_DENY_LIST_KEY, null) ?: DEFAULT_HOST_DENY_LIST
 
         defaultSettings = mapOf(
             EMAIL_SIZE_LIMIT_KEY to emailSizeLimit.toString(DECIMAL_RADIX),
@@ -269,6 +286,13 @@ internal object PluginSettings {
         NodeScope, Dynamic
     )
 
+    private val HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
+        HOST_DENY_LIST_KEY,
+        DEFAULT_HOST_DENY_LIST,
+        { it },
+        NodeScope, Dynamic
+    )
+
     /**
      * Returns list of additional settings available specific to this plugin.
      *
@@ -283,7 +307,8 @@ internal object PluginSettings {
             CONNECTION_TIMEOUT_MILLISECONDS,
             SOCKET_TIMEOUT_MILLISECONDS,
             ALLOWED_CONFIG_TYPES,
-            TOOLTIP_SUPPORT
+            TOOLTIP_SUPPORT,
+            HOST_DENY_LIST
         )
     }
     /**
@@ -299,6 +324,7 @@ internal object PluginSettings {
         connectionTimeout = CONNECTION_TIMEOUT_MILLISECONDS.get(clusterService.settings)
         socketTimeout = SOCKET_TIMEOUT_MILLISECONDS.get(clusterService.settings)
         tooltipSupport = TOOLTIP_SUPPORT.get(clusterService.settings)
+        hostDenyList = HOST_DENY_LIST.get(clusterService.settings)
     }
 
     /**
@@ -347,6 +373,11 @@ internal object PluginSettings {
             log.debug("$LOG_PREFIX:$TOOLTIP_SUPPORT_KEY -autoUpdatedTo-> $clusterAllowedConfigTypes")
             tooltipSupport = clusterTooltipSupport
         }
+        val clusterHostDenyList = clusterService.clusterSettings.get(HOST_DENY_LIST)
+        if (clusterHostDenyList != null) {
+            log.debug("$LOG_PREFIX:$HOST_DENY_LIST_KEY -autoUpdatedTo-> $clusterHostDenyList")
+            hostDenyList = clusterHostDenyList
+        }
     }
 
     /**
@@ -390,6 +421,10 @@ internal object PluginSettings {
         clusterService.clusterSettings.addSettingsUpdateConsumer(TOOLTIP_SUPPORT) {
             tooltipSupport = it
             log.info("$LOG_PREFIX:$TOOLTIP_SUPPORT_KEY -updatedTo-> $it")
+        }
+        clusterService.clusterSettings.addSettingsUpdateConsumer(HOST_DENY_LIST) {
+            hostDenyList = it
+            log.info("$LOG_PREFIX:$HOST_DENY_LIST_KEY -updatedTo-> $it")
         }
     }
 }
