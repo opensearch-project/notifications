@@ -207,10 +207,19 @@ internal class CustomWebhookDestinationTests {
 
     @ParameterizedTest(name = "method {0} should return corresponding type of Http request object {1}")
     @MethodSource("methodToHttpRequestType")
-    fun testUrlInvalidMessage(method: String) {
+    fun `Custom webhook should throw exception if url is invalid`(method: String) {
         assertThrows<MalformedURLException> {
             CustomWebhookDestination("invalidUrl", mapOf("headerKey" to "headerValue"), method)
         }
+    }
+
+    @ParameterizedTest(name = "method {0} should return corresponding type of Http request object {1}")
+    @MethodSource("methodToHttpRequestType")
+    fun `Custom webhook should throw exception if url protocol is not http or https`(method: String) {
+        val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
+            CustomWebhookDestination("ftp://abc/com", mapOf("headerKey" to "headerValue"), method)
+        }
+        assertEquals("Invalid URL or unsupported", exception.message)
     }
 
     @Test

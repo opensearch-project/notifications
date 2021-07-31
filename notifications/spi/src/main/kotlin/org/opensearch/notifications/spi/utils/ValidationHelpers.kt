@@ -36,8 +36,6 @@ import java.net.URL
 fun validateUrl(urlString: String) {
     require(!Strings.isNullOrEmpty(urlString)) { "url is null or empty" }
     require(isValidUrl(urlString)) { "Invalid URL or unsupported" }
-    val url = URL(urlString)
-    require("https" == url.protocol) // Support only HTTPS. HTTP and other protocols not supported
     // TODO : Add hosts deny list
 }
 
@@ -49,7 +47,7 @@ fun validateEmail(email: String) {
 fun isValidUrl(urlString: String): Boolean {
     val url = URL(urlString) // throws MalformedURLException if URL is invalid
     // TODO : Add hosts deny list
-    return ("https" == url.protocol) // Support only HTTPS. HTTP and other protocols not supported
+    return ("https" == url.protocol || "http" == url.protocol) // Support only HTTPS. HTTP and other protocols not supported
 }
 
 /**
