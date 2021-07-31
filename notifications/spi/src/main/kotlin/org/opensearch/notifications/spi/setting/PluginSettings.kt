@@ -75,6 +75,11 @@ internal object PluginSettings {
     private const val ALLOWED_CONFIG_TYPE_KEY = "$KEY_PREFIX.allowedConfigTypes"
 
     /**
+     * Setting to enable tooltip in UI
+     */
+    private const val TOOLTIP_SUPPORT_KEY = "$KEY_PREFIX.tooltip_support"
+
+    /**
      * Default email size limit as 10MB.
      */
     private const val DEFAULT_EMAIL_SIZE_LIMIT = 10000000
@@ -122,6 +127,11 @@ internal object PluginSettings {
     )
 
     /**
+     * Default disable tooltip support
+     */
+    private const val DEFAULT_TOOLTIP_SUPPORT = false
+
+    /**
      * list of allowed config types.
      */
     @Volatile
@@ -163,6 +173,12 @@ internal object PluginSettings {
     @Volatile
     var socketTimeout: Int
 
+    /**
+     * Tooltip support
+     */
+    @Volatile
+    var tooltipSupport: Boolean
+
     private const val DECIMAL_RADIX: Int = 10
 
     private val log by logger(javaClass)
@@ -190,6 +206,7 @@ internal object PluginSettings {
             ?: DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS
         socketTimeout = (settings?.get(SOCKET_TIMEOUT_MILLISECONDS_KEY)?.toInt()) ?: DEFAULT_SOCKET_TIMEOUT_MILLISECONDS
         allowedConfigTypes = settings?.getAsList(ALLOWED_CONFIG_TYPE_KEY, null) ?: DEFAULT_ALLOWED_CONFIG_TYPES
+        tooltipSupport = settings?.getAsBoolean(TOOLTIP_SUPPORT_KEY, false) ?: DEFAULT_TOOLTIP_SUPPORT
 
         defaultSettings = mapOf(
             EMAIL_SIZE_LIMIT_KEY to emailSizeLimit.toString(DECIMAL_RADIX),
@@ -197,7 +214,8 @@ internal object PluginSettings {
             MAX_CONNECTIONS_KEY to maxConnections.toString(DECIMAL_RADIX),
             MAX_CONNECTIONS_PER_ROUTE_KEY to maxConnectionsPerRoute.toString(DECIMAL_RADIX),
             CONNECTION_TIMEOUT_MILLISECONDS_KEY to connectionTimeout.toString(DECIMAL_RADIX),
-            SOCKET_TIMEOUT_MILLISECONDS_KEY to socketTimeout.toString(DECIMAL_RADIX)
+            SOCKET_TIMEOUT_MILLISECONDS_KEY to socketTimeout.toString(DECIMAL_RADIX),
+            TOOLTIP_SUPPORT_KEY to tooltipSupport.toString()
         )
     }
 
@@ -245,6 +263,12 @@ internal object PluginSettings {
         NodeScope, Dynamic
     )
 
+    private val TOOLTIP_SUPPORT: Setting<Boolean> = Setting.boolSetting(
+        TOOLTIP_SUPPORT_KEY,
+        defaultSettings[TOOLTIP_SUPPORT_KEY]!!.toBoolean(),
+        NodeScope, Dynamic
+    )
+
     /**
      * Returns list of additional settings available specific to this plugin.
      *
@@ -258,7 +282,8 @@ internal object PluginSettings {
             MAX_CONNECTIONS_PER_ROUTE,
             CONNECTION_TIMEOUT_MILLISECONDS,
             SOCKET_TIMEOUT_MILLISECONDS,
-            ALLOWED_CONFIG_TYPES
+            ALLOWED_CONFIG_TYPES,
+            TOOLTIP_SUPPORT
         )
     }
     /**
@@ -273,6 +298,7 @@ internal object PluginSettings {
         maxConnectionsPerRoute = MAX_CONNECTIONS_PER_ROUTE.get(clusterService.settings)
         connectionTimeout = CONNECTION_TIMEOUT_MILLISECONDS.get(clusterService.settings)
         socketTimeout = SOCKET_TIMEOUT_MILLISECONDS.get(clusterService.settings)
+        tooltipSupport = TOOLTIP_SUPPORT.get(clusterService.settings)
     }
 
     /**
@@ -311,10 +337,15 @@ internal object PluginSettings {
             log.debug("$LOG_PREFIX:$SOCKET_TIMEOUT_MILLISECONDS_KEY -autoUpdatedTo-> $clusterSocketTimeout")
             socketTimeout = clusterSocketTimeout
         }
-        val clusterallowedConfigTypes = clusterService.clusterSettings.get(ALLOWED_CONFIG_TYPES)
-        if (clusterallowedConfigTypes != null) {
-            log.debug("$LOG_PREFIX:$ALLOWED_CONFIG_TYPE_KEY -autoUpdatedTo-> $clusterallowedConfigTypes")
-            allowedConfigTypes = clusterallowedConfigTypes
+        val clusterAllowedConfigTypes = clusterService.clusterSettings.get(ALLOWED_CONFIG_TYPES)
+        if (clusterAllowedConfigTypes != null) {
+            log.debug("$LOG_PREFIX:$ALLOWED_CONFIG_TYPE_KEY -autoUpdatedTo-> $clusterAllowedConfigTypes")
+            allowedConfigTypes = clusterAllowedConfigTypes
+        }
+        val clusterTooltipSupport = clusterService.clusterSettings.get(TOOLTIP_SUPPORT)
+        if (clusterTooltipSupport != null) {
+            log.debug("$LOG_PREFIX:$TOOLTIP_SUPPORT_KEY -autoUpdatedTo-> $clusterAllowedConfigTypes")
+            tooltipSupport = clusterTooltipSupport
         }
     }
 
@@ -355,6 +386,10 @@ internal object PluginSettings {
         clusterService.clusterSettings.addSettingsUpdateConsumer(SOCKET_TIMEOUT_MILLISECONDS) {
             socketTimeout = it
             log.info("$LOG_PREFIX:$SOCKET_TIMEOUT_MILLISECONDS_KEY -updatedTo-> $it")
+        }
+        clusterService.clusterSettings.addSettingsUpdateConsumer(TOOLTIP_SUPPORT) {
+            tooltipSupport = it
+            log.info("$LOG_PREFIX:$TOOLTIP_SUPPORT_KEY -updatedTo-> $it")
         }
     }
 }
