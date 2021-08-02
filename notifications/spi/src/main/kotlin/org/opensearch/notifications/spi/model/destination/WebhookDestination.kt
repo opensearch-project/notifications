@@ -11,10 +11,8 @@
 
 package org.opensearch.notifications.spi.model.destination
 
-import org.apache.http.client.utils.URIBuilder
+import org.opensearch.notifications.spi.setting.PluginSettings
 import org.opensearch.notifications.spi.utils.validateUrl
-import java.net.URI
-import java.net.URISyntaxException
 
 /**
  * This class holds the contents of generic webbook destination
@@ -25,16 +23,7 @@ abstract class WebhookDestination(
 ) : BaseDestination(destinationType) {
 
     init {
-        validateUrl(url)
-    }
-
-    @SuppressWarnings("SwallowedException")
-    internal fun buildUri(): URI {
-        return try {
-            URIBuilder(url).build()
-        } catch (exception: URISyntaxException) {
-            throw IllegalStateException("Error creating URI")
-        }
+        validateUrl(url, PluginSettings.hostDenyList)
     }
 
     override fun toString(): String {
