@@ -8,6 +8,7 @@
  *  Modifications Copyright OpenSearch Contributors. See
  *  GitHub history for details.
  */
+
 package org.opensearch.notifications.spi.client
 
 import com.amazonaws.auth.AWSCredentialsProvider
@@ -55,7 +56,7 @@ class DestinationSNSClient(destination: SNSDestination) {
                     .build()
                 val roleRequest = AssumeRoleRequest()
                     .withRoleArn(destination.roleArn)
-                    .withRoleSessionName("NotificationsTempSession")
+                    .withRoleSessionName("opensearch-notifications")
                 val roleResponse = stsClient.assumeRole(roleRequest)
                 val sessionCredentials = roleResponse.credentials
                 val awsCredentials = BasicSessionCredentials(
