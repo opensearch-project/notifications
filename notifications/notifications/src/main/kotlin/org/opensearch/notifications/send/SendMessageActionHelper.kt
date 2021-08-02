@@ -30,6 +30,7 @@ import org.opensearch.commons.notifications.model.EventStatus
 import org.opensearch.commons.notifications.model.NotificationEvent
 import org.opensearch.commons.notifications.model.SNS
 import org.opensearch.commons.notifications.model.Slack
+import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
@@ -46,6 +47,8 @@ import org.opensearch.notifications.spi.model.destination.BaseDestination
 import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
 import org.opensearch.notifications.spi.model.destination.SNSDestination
+import org.opensearch.notifications.spi.model.destination.DestinationType
+import org.opensearch.notifications.spi.model.destination.EmailDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.rest.RestStatus
 import java.time.Instant
@@ -153,19 +156,24 @@ object SendMessageActionHelper {
         childConfigs: List<NotificationConfigDocInfo>,
         message: MessageContent
     ): EventStatus {
+        val configType = channel.configDoc.config.configType
+        val configData = channel.configDoc.config.configData
+        var emailRecipientStatus = listOf<EmailRecipientStatus>()
+        if (configType == ConfigType.EMAIL) {
+            emailRecipientStatus = listOf(EmailRecipientStatus("placeholder@amazon.com", DeliveryStatus("Scheduled", "Pending execution")))
+        }
         val eventStatus = EventStatus(
             channel.docInfo.id!!, // ID from query so not expected to be null
             channel.configDoc.config.name,
             channel.configDoc.config.configType,
-            listOf(),
+            emailRecipientStatus,
             DeliveryStatus("Scheduled", "Pending execution")
         )
         val invalidStatus: DeliveryStatus? = getStatusIfChannelIsNotEligibleToSendMessage(eventSource, channel)
         if (invalidStatus != null) {
             return eventStatus.copy(deliveryStatus = invalidStatus)
         }
-        val configType = channel.configDoc.config.configType
-        val configData = channel.configDoc.config.configData
+
         val response = when (configType) {
             ConfigType.NONE -> null
             ConfigType.SLACK -> sendSlackMessage(configData as Slack, message, eventStatus)
@@ -246,7 +254,9 @@ object SendMessageActionHelper {
         val emailRecipientStatus: List<EmailRecipientStatus>
         runBlocking {
             val statusDeferredList = recipients.map {
-                async(Dispatchers.IO) { sendEmailFromSmtpAccount(smtpAccount, it, message) }
+                async(Dispatchers.IO) {
+                    sendEmailFromSmtpAccount(smtpAccount?.configDoc?.config?.configData as SmtpAccount, it, message)
+                }
             }
             emailRecipientStatus = statusDeferredList.awaitAll()
         }
@@ -272,14 +282,22 @@ object SendMessageActionHelper {
      */
     @Suppress("UnusedPrivateMember")
     private fun sendEmailFromSmtpAccount(
-        smtpAccount: NotificationConfigDocInfo?,
+        smtpAccount: SmtpAccount,
         recipient: String,
         message: MessageContent
     ): EmailRecipientStatus {
-        // TODO implement email channel conversion
+        val destination = EmailDestination(
+            smtpAccount.host,
+            smtpAccount.port,
+            smtpAccount.method.tag,
+            smtpAccount.fromAddress,
+            recipient,
+            DestinationType.SMTP
+        )
+        val status = sendMessageThroughSpi(destination, message)
         return EmailRecipientStatus(
             recipient,
-            DeliveryStatus(RestStatus.NOT_IMPLEMENTED.name, "SMTP Channel not implemented")
+            DeliveryStatus(status.statusCode.toString(), status.statusText)
         )
     }
 
