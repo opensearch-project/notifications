@@ -1,67 +1,68 @@
 package org.opensearch.notifications.index
 
-//import org.opensearch.commons.notifications.NotificationsPluginInterface.getNotificationEvent
-import org.opensearch.notifications.index.NotificationEventIndex.getNotificationEvent
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.mockito.Mock
 import org.mockito.Mockito.mock
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.junit.jupiter.MockitoExtension
-import io.mockk.every
-import io.mockk.mockkObject
+import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import org.opensearch.action.get.GetRequest
-import kotlin.text.*
-import org.opensearch.notifications.index.NotificationEventIndex
 import org.opensearch.client.Client
-import org.opensearch.cluster.service.ClusterService
 import org.opensearch.commons.utils.logger
+import org.opensearch.cluster.service.ClusterService
+import org.opensearch.commons.notifications.model.NotificationEvent
+import org.opensearch.commons.notifications.model.NotificationEventInfo
+import org.opensearch.commons.notifications.model.SearchResults
+import org.opensearch.notifications.settings.PluginSettings
+import org.junit.jupiter.api.BeforeEach
+import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.any
+import junit.framework.Assert.assertEquals
+import org.mockito.Mockito
+import org.mockito.MockitoAnnotations
 import org.opensearch.notifications.model.DocInfo
 import org.opensearch.notifications.model.NotificationEventDoc
-import org.opensearch.notifications.settings.PluginSettings
+import org.opensearch.notifications.model.NotificationEventDocInfo
 
 
-@ExtendWith(MockitoExtension::class)
-internal class NotificationEventIndexTest {
 
-    //private val NotificationEventIndex = NotificationEventIndex()
+
+internal class NotificationEventIndexTest{
 
     @Mock
     private lateinit var client: Client
-
-    @Mock
-    private const val INDEX_NAME = ".opensearch-notifications-event"
-
-    //@Mock
-    //private val log by logger(NotificationEventIndex::class.java)
-
-    @Mock
-    private const val MAPPING_FILE_NAME = "notifications-event-mapping.yml"
-
-    @Mock
-    private const val SETTINGS_FILE_NAME = "notifications-event-settings.yml"
-
-    @Mock
-    private const val MAPPING_TYPE = "_doc"
-
+  
+    private val INDEX_NAME = ".opensearch-notifications-event"
+    
     @Mock
     private lateinit var clusterService: ClusterService
 
+    @BeforeEach
+    fun setUp() {
+        NotificationEventIndex.initialize(client, clusterService)
+    }
+
     @Test
     fun `index operation to get single event` () {
-
         val id = "index-1"
-       // val NotificationEventIndex = mock(NotificationEventIndex::class.java)
-        val getRequest = GetRequest(NotificationEventIndex.INDEX_NAME).id(id)
-        val actionFuture = NotificationEventIndex.client.get(getRequest)
-        //val PluginSettings = mock(PluginSettings::class.java)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        val expected = NotificationEventIndex.parseNotificationEventDoc(id, response)
+        val docInfo = DocInfo("index-1", 1, 1, 1)
+        val eventDoc = mock(NotificationEventDoc::class.java, RETURNS_DEEP_STUBS)
+        val expectedEventDocInfo = NotificationEventDocInfo(docInfo, eventDoc)
 
+        val getRequest = GetRequest(INDEX_NAME).id(id)
+        val mockActionFuture = client.get(getRequest)
+        //whenever(NotificationEventIndex.client.get(any())).thenReturn(mockActionFuture)
 
-        //mockkObject(NotificationEventIndex)
-        //every { NotificationEventIndex.parseNotificationEventDoc(id, response)} returns response
+        whenever(NotificationEventIndex.client.get(getRequest)).thenReturn(mockActionFuture)
 
-        val getNotificationEvent = getNotificationEvent(id)
+        val actualEventDocInfo = NotificationEventIndex.getNotificationEvent(id)
+
+        /*
+        whenever(client.get(any())).thenReturn(mockFuture)
+         */
+
+       // val actualEventDocInfo = NotificationEventIndex.getNotificationEvent(id)
+
+        assertEquals(expectedEventDocInfo, actualEventDocInfo)
 
     }
+
 }
