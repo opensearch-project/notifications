@@ -33,8 +33,9 @@ import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.message.BasicStatusLine
 import org.easymock.EasyMock
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -65,7 +66,6 @@ internal class SlackDestinationTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `test Slack message null entity response`() {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
 
@@ -103,7 +103,6 @@ internal class SlackDestinationTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `test Slack message empty entity response`() {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
         val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "")
@@ -138,7 +137,6 @@ internal class SlackDestinationTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `test Slack message non-empty entity response`() {
         val responseContent = "It worked!"
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
@@ -173,14 +171,12 @@ internal class SlackDestinationTests {
         assertEquals(expectedWebhookResponse.statusCode, actualSlackResponse.statusCode)
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun testUrlMissingMessage() {
-        try {
+    @Test
+    fun `test url missing should throw IllegalArgumentException with message`() {
+        val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
             SlackDestination("")
-        } catch (ex: Exception) {
-            assertEquals("url is null or empty", ex.message)
-            throw ex
         }
+        assertEquals("url is null or empty", exception.message)
     }
 
     @Test

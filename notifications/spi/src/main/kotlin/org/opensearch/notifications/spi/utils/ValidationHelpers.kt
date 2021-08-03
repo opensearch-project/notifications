@@ -49,7 +49,7 @@ fun validateEmail(email: String) {
 
 fun isValidUrl(urlString: String): Boolean {
     val url = URL(urlString) // throws MalformedURLException if URL is invalid
-    return ("https" == url.protocol) // Support only HTTPS. HTTP and other protocols not supported
+    return ("https" == url.protocol || "http" == url.protocol) // Support only http/https, other protocols not supported
 }
 
 fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
