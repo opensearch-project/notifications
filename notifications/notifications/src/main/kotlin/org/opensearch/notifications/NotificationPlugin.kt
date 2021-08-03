@@ -50,6 +50,7 @@ import org.opensearch.notifications.action.GetFeatureChannelListAction
 import org.opensearch.notifications.action.GetNotificationConfigAction
 import org.opensearch.notifications.action.GetNotificationEventAction
 import org.opensearch.notifications.action.GetPluginFeaturesAction
+import org.opensearch.notifications.action.PublishNotificationAction
 import org.opensearch.notifications.action.SendMessageAction
 import org.opensearch.notifications.action.SendNotificationAction
 import org.opensearch.notifications.action.UpdateNotificationConfigAction
@@ -167,6 +168,10 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
             ActionPlugin.ActionHandler(
                 NotificationsActions.SEND_NOTIFICATION_ACTION_TYPE,
                 SendNotificationAction::class.java
+            ),
+            ActionPlugin.ActionHandler(
+                NotificationsActions.LEGACY_PUBLISH_NOTIFICATION_ACTION_TYPE,
+                PublishNotificationAction::class.java
             )
         )
     }
