@@ -244,15 +244,16 @@ object SendMessageActionHelper {
         message: MessageContent,
         eventStatus: EventStatus
     ): EventStatus {
-        val smtpAccount = childConfigs.find { it.docInfo.id == email.emailAccountID }
+        val smtpAccountDocInfo = childConfigs.find { it.docInfo.id == email.emailAccountID }
         val groups = childConfigs.filter { email.emailGroupIds.contains(it.docInfo.id) }
         val groupRecipients = groups.map { (it.configDoc.config.configData as EmailGroup).recipients }.flatten()
         val recipients = email.recipients.union(groupRecipients)
         val emailRecipientStatus: List<EmailRecipientStatus>
+        val smtpAccountConfig = smtpAccountDocInfo?.configDoc!!.config
         runBlocking {
             val statusDeferredList = recipients.map {
                 async(Dispatchers.IO) {
-                    sendEmailFromSmtpAccount(smtpAccount?.configDoc?.config?.configData as SmtpAccount, it, message)
+                    sendEmailFromSmtpAccount(smtpAccountConfig.name, smtpAccountConfig.configData as SmtpAccount, it, message)
                 }
             }
             emailRecipientStatus = statusDeferredList.awaitAll()
@@ -279,11 +280,13 @@ object SendMessageActionHelper {
      */
     @Suppress("UnusedPrivateMember")
     private fun sendEmailFromSmtpAccount(
+        accountName: String,
         smtpAccount: SmtpAccount,
         recipient: String,
         message: MessageContent
     ): EmailRecipientStatus {
         val destination = EmailDestination(
+            accountName,
             smtpAccount.host,
             smtpAccount.port,
             smtpAccount.method.tag,

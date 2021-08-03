@@ -12,16 +12,20 @@
 package org.opensearch.notifications.spi.client
 
 import com.sun.mail.util.MailConnectException
+import org.opensearch.common.settings.SecureString
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.SecureDestinationSettings
 import org.opensearch.notifications.spi.model.destination.EmailDestination
 import org.opensearch.notifications.spi.setting.PluginSettings
 import org.opensearch.notifications.spi.utils.SecurityAccess
 import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.rest.RestStatus
 import java.util.Properties
+import javax.mail.Authenticator
 import javax.mail.Message
 import javax.mail.MessagingException
+import javax.mail.PasswordAuthentication
 import javax.mail.SendFailedException
 import javax.mail.Session
 import javax.mail.Transport
@@ -49,7 +53,7 @@ class DestinationEmailClient {
         prop["mail.transport.protocol"] = "smtp"
         prop["mail.smtp.host"] = emailDestination.host
         prop["mail.smtp.port"] = emailDestination.port
-        val session = Session.getInstance(prop)
+        var session = Session.getInstance(prop)
 
         when (emailDestination.method) {
             "ssl" -> prop["mail.smtp.ssl.enable"] = true
@@ -58,11 +62,39 @@ class DestinationEmailClient {
             else -> throw IllegalArgumentException("Invalid method supplied")
         }
 
+        if (emailDestination.method != "none") {
+            val secureDestinationSetting = getSecureDestinationSetting(emailDestination)
+            if (secureDestinationSetting != null) {
+                prop["mail.smtp.auth"] = true
+                session = Session.getInstance(
+                    prop,
+                    object : Authenticator() {
+                        override fun getPasswordAuthentication(): PasswordAuthentication {
+                            return PasswordAuthentication(
+                                secureDestinationSetting.emailUsername.toString(),
+                                secureDestinationSetting.emailPassword.toString()
+                            )
+                        }
+                    }
+                )
+            }
+        }
+
         // prepare mimeMessage
         val mimeMessage = EmailMimeProvider.prepareMimeMessage(session, emailDestination, message)
 
         // send Mime Message
         return sendMimeMessage(mimeMessage)
+    }
+
+    fun getSecureDestinationSetting(emailDestination: EmailDestination): SecureDestinationSettings? {
+        val emailUsername: SecureString? = PluginSettings.destinationSettings[emailDestination.accountName]?.emailUsername
+        val emailPassword: SecureString? = PluginSettings.destinationSettings[emailDestination.accountName]?.emailPassword
+        return if (emailUsername == null || emailPassword == null) {
+            null
+        } else {
+            SecureDestinationSettings(emailUsername, emailPassword)
+        }
     }
 
     /**

@@ -37,6 +37,7 @@ internal class SmtpEmailIT : OpenSearchRestTestCase() {
 
     fun `test send email to one recipient over smtp server`() {
         val emailDestination = EmailDestination(
+            "testAccountName",
             "localhost",
             smtpPort,
             "none",
@@ -60,6 +61,7 @@ internal class SmtpEmailIT : OpenSearchRestTestCase() {
 
     fun `test send email with non-available host`() {
         val emailDestination = EmailDestination(
+            "testAccountName",
             "invalidHost",
             smtpPort,
             "none",
