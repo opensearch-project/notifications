@@ -14,7 +14,7 @@ package org.opensearch.notifications.spi.client
 import com.sun.mail.util.MailConnectException
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
-import org.opensearch.notifications.spi.model.destination.EmailDestination
+import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import org.opensearch.notifications.spi.setting.PluginSettings
 import org.opensearch.notifications.spi.utils.SecurityAccess
 import org.opensearch.notifications.spi.utils.logger
@@ -30,14 +30,14 @@ import javax.mail.internet.MimeMessage
 /**
  * This class handles the connections to the given Destination.
  */
-class DestinationEmailClient {
+class DestinationSmtpClient {
 
     companion object {
-        private val log by logger(DestinationEmailClient::class.java)
+        private val log by logger(DestinationSmtpClient::class.java)
     }
 
     @Throws(Exception::class)
-    fun execute(emailDestination: EmailDestination, message: MessageContent): DestinationMessageResponse {
+    fun execute(smtpDestination: SmtpDestination, message: MessageContent): DestinationMessageResponse {
         if (isMessageSizeOverLimit(message)) {
             return DestinationMessageResponse(
                 RestStatus.REQUEST_ENTITY_TOO_LARGE.status,
@@ -47,11 +47,11 @@ class DestinationEmailClient {
 
         val prop = Properties()
         prop["mail.transport.protocol"] = "smtp"
-        prop["mail.smtp.host"] = emailDestination.host
-        prop["mail.smtp.port"] = emailDestination.port
+        prop["mail.smtp.host"] = smtpDestination.host
+        prop["mail.smtp.port"] = smtpDestination.port
         val session = Session.getInstance(prop)
 
-        when (emailDestination.method) {
+        when (smtpDestination.method) {
             "ssl" -> prop["mail.smtp.ssl.enable"] = true
             "start_tls" -> prop["mail.smtp.starttls.enable"] = true
             "none" -> {}
@@ -59,7 +59,7 @@ class DestinationEmailClient {
         }
 
         // prepare mimeMessage
-        val mimeMessage = EmailMimeProvider.prepareMimeMessage(session, emailDestination, message)
+        val mimeMessage = EmailMimeProvider.prepareMimeMessage(session, smtpDestination, message)
 
         // send Mime Message
         return sendMimeMessage(mimeMessage)
