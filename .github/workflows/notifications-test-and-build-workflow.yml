@@ -27,7 +27,7 @@ on: [push, pull_request]
 
 env:
   OPENSEARCH_VERSION: '1.0'
-  COMMON_UTILS_VERSION: '1.0'
+  COMMON_UTILS_VERSION: 'main'
 
 jobs:
   build:
