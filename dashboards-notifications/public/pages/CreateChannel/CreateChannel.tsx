@@ -90,8 +90,6 @@ export const CreateChannelContext = createContext<{
 } | null>(null);
 
 export function CreateChannel(props: CreateChannelsProps) {
-  const isOdfe = true;
-
   const coreContext = useContext(CoreServicesContext)!;
   const servicesContext = useContext(ServicesContext)!;
   const mainStateContext = useContext(MainContext)!;
@@ -266,7 +264,7 @@ export function CreateChannel(props: CreateChannelsProps) {
       }
     } else if (channelType === BACKEND_CHANNEL_TYPE.SNS) {
       errors.topicArn = validateArn(topicArn);
-      if (!isOdfe) errors.roleArn = validateArn(roleArn);
+      if (!mainStateContext.tooltipSupport) errors.roleArn = validateArn(roleArn);
     }
     setInputErrors(errors);
     return !Object.values(errors).reduce(
@@ -458,7 +456,6 @@ export function CreateChannel(props: CreateChannelsProps) {
             />
           ) : channelType === BACKEND_CHANNEL_TYPE.SNS ? (
             <SNSSettings
-              isOdfe={isOdfe}
               topicArn={topicArn}
               setTopicArn={setTopicArn}
               roleArn={roleArn}

@@ -210,7 +210,7 @@ export function configRoutes(router: IRouter) {
       );
       try {
         const resp = await client.callAsCurrentUser(
-          'notifications.getAvailableFeatures'
+          'notifications.getServerFeatures'
         );
         return response.ok({ body: resp });
       } catch (error) {
