@@ -27,11 +27,11 @@
 
 package org.opensearch.notifications.spi
 
-import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
 import org.opensearch.notifications.spi.setting.PluginSettings
+import org.opensearch.notifications.spi.transport.DestinationTransportProvider
 import java.security.AccessController
 import java.security.PrivilegedAction
 
@@ -49,7 +49,7 @@ object NotificationSpi {
     fun sendMessage(destination: BaseDestination, message: MessageContent): DestinationMessageResponse {
         return AccessController.doPrivileged(
             PrivilegedAction {
-                val destinationFactory = DestinationFactoryProvider.getFactory(destination.destinationType)
+                val destinationFactory = DestinationTransportProvider.getTransport(destination.destinationType)
                 destinationFactory.sendMessage(destination, message)
             } as PrivilegedAction<DestinationMessageResponse>?
         )

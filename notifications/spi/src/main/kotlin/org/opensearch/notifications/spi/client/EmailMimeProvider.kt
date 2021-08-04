@@ -28,7 +28,7 @@
 package org.opensearch.notifications.spi.client
 
 import org.opensearch.notifications.spi.model.MessageContent
-import org.opensearch.notifications.spi.model.destination.EmailDestination
+import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import java.util.Base64
 import javax.activation.DataHandler
 import javax.mail.Message
@@ -45,23 +45,23 @@ internal object EmailMimeProvider {
     /**
      * Create and prepare mime mimeMessage to send mail
      * @param session The mail session to use to create mime mimeMessage
-     * @param emailDestination
+     * @param smtpDestination
      * @param mimeMessage The mimeMessage to send notification
      * @return The created and prepared mime mimeMessage object
      */
     fun prepareMimeMessage(
         session: Session,
-        emailDestination: EmailDestination,
+        smtpDestination: SmtpDestination,
         messageContent: MessageContent
     ): MimeMessage {
         // Create a new MimeMessage object
         val mimeMessage = MimeMessage(session)
 
         // Add from:
-        mimeMessage.setFrom(emailDestination.fromAddress)
+        mimeMessage.setFrom(smtpDestination.fromAddress)
 
         // Add to:
-        mimeMessage.setRecipients(Message.RecipientType.TO, emailDestination.recipient)
+        mimeMessage.setRecipients(Message.RecipientType.TO, smtpDestination.recipient)
 
         // Add Subject:
         mimeMessage.setSubject(messageContent.title, "UTF-8")

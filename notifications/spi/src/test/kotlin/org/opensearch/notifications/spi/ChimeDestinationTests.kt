@@ -41,12 +41,12 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.opensearch.notifications.spi.client.DestinationHttpClient
-import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
-import org.opensearch.notifications.spi.factory.WebhookDestinationFactory
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.DestinationType
+import org.opensearch.notifications.spi.transport.DestinationTransportProvider
+import org.opensearch.notifications.spi.transport.WebhookDestinationTransport
 import org.opensearch.rest.RestStatus
 import java.net.MalformedURLException
 import java.util.stream.Stream
@@ -83,8 +83,8 @@ internal class ChimeDestinationTests {
         EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
-        val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf(DestinationType.CHIME to webhookDestinationFactory)
+        val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
+        DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.CHIME to webhookDestinationTransport)
 
         val title = "test Chime"
         val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -117,8 +117,8 @@ internal class ChimeDestinationTests {
         EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
-        val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf(DestinationType.CHIME to webhookDestinationFactory)
+        val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
+        DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.CHIME to webhookDestinationTransport)
 
         val title = "test Chime"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -152,8 +152,8 @@ internal class ChimeDestinationTests {
         EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
-        val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf(DestinationType.CHIME to webhookDestinationFactory)
+        val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
+        DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.CHIME to webhookDestinationTransport)
 
         val title = "test Chime"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
