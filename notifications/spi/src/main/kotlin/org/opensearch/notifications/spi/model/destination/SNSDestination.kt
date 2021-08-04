@@ -18,14 +18,13 @@ import org.opensearch.common.settings.SecureString
 data class SNSDestination(
     val topicArn: String,
     val roleArn: String? = null,
-    val accessKey: SecureString? = null,
-    val secretKey: SecureString? = null
 ) : BaseDestination(DestinationType.SNS) {
 
     /**
-     * Check if IAM credential is configured.
+     * Get AWS region from topic arn
      */
-    fun isIAMCredentialConfigured(): Boolean {
-        return (accessKey != null && secretKey != null)
+    fun getRegion(): String {
+        // sample topic arn arn:aws:sns:us-west-2:075315751589:test-notification
+        return topicArn.split(":".toRegex()).toTypedArray()[3]
     }
 }
