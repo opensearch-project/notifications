@@ -9,13 +9,13 @@
  *  GitHub history for details.
  */
 
-package org.opensearch.notifications.spi.factory
+package org.opensearch.notifications.spi.transport
 
 import org.opensearch.notifications.spi.client.DestinationClientPool
-import org.opensearch.notifications.spi.client.DestinationEmailClient
+import org.opensearch.notifications.spi.client.DestinationSmtpClient
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
-import org.opensearch.notifications.spi.model.destination.EmailDestination
+import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import org.opensearch.notifications.spi.utils.OpenForTesting
 import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.rest.RestStatus
@@ -26,21 +26,21 @@ import javax.mail.internet.AddressException
 /**
  * This class handles the client responsible for submitting the messages to all types of email destinations.
  */
-internal class SmtpEmailDestinationFactory : DestinationFactory<EmailDestination> {
+internal class SmtpDestinationTransport : DestinationTransport<SmtpDestination> {
 
-    private val log by logger(SmtpEmailDestinationFactory::class.java)
-    private val destinationEmailClient: DestinationEmailClient
+    private val log by logger(SmtpDestinationTransport::class.java)
+    private val destinationEmailClient: DestinationSmtpClient
 
     constructor() {
-        this.destinationEmailClient = DestinationClientPool.emailClient
+        this.destinationEmailClient = DestinationClientPool.smtpClient
     }
 
     @OpenForTesting
-    constructor(destinationEmailClient: DestinationEmailClient) {
-        this.destinationEmailClient = destinationEmailClient
+    constructor(destinationSmtpClient: DestinationSmtpClient) {
+        this.destinationEmailClient = destinationSmtpClient
     }
 
-    override fun sendMessage(destination: EmailDestination, message: MessageContent): DestinationMessageResponse {
+    override fun sendMessage(destination: SmtpDestination, message: MessageContent): DestinationMessageResponse {
         return try {
             destinationEmailClient.execute(destination, message)
         } catch (addressException: AddressException) {

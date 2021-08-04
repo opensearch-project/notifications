@@ -44,12 +44,12 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.opensearch.notifications.spi.client.DestinationHttpClient
-import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
-import org.opensearch.notifications.spi.factory.WebhookDestinationFactory
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
 import org.opensearch.notifications.spi.model.destination.DestinationType
+import org.opensearch.notifications.spi.transport.DestinationTransportProvider
+import org.opensearch.notifications.spi.transport.WebhookDestinationTransport
 import org.opensearch.rest.RestStatus
 import java.net.MalformedURLException
 import java.util.stream.Stream
@@ -95,9 +95,9 @@ internal class CustomWebhookDestinationTests {
         EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
-        val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf(
-            DestinationType.CUSTOMWEBHOOK to webhookDestinationFactory
+        val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
+        DestinationTransportProvider.destinationTransportMap = mapOf(
+            DestinationType.CUSTOM_WEBHOOK to webhookDestinationTransport
         )
 
         val title = "test custom webhook"
@@ -134,9 +134,9 @@ internal class CustomWebhookDestinationTests {
         EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
-        val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf(
-            DestinationType.CUSTOMWEBHOOK to webhookDestinationFactory
+        val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
+        DestinationTransportProvider.destinationTransportMap = mapOf(
+            DestinationType.CUSTOM_WEBHOOK to webhookDestinationTransport
         )
 
         val title = "test custom webhook"
@@ -176,9 +176,9 @@ internal class CustomWebhookDestinationTests {
         EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
-        val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf(
-            DestinationType.CUSTOMWEBHOOK to webhookDestinationFactory
+        val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
+        DestinationTransportProvider.destinationTransportMap = mapOf(
+            DestinationType.CUSTOM_WEBHOOK to webhookDestinationTransport
         )
 
         val title = "test custom webhook"
