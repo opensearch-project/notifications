@@ -34,11 +34,11 @@ import {
 } from '@elastic/eui';
 import React, { useContext } from 'react';
 import { DOCUMENTATION_LINK } from '../../../utils/constants';
+import { MainContext } from '../../Main/Main';
 import { CreateChannelContext } from '../CreateChannel';
 import { validateArn } from '../utils/validationHelper';
 
 interface SNSSettingsProps {
-  isOdfe: boolean;
   topicArn: string;
   setTopicArn: (topicArn: string) => void;
   roleArn: string;
@@ -47,6 +47,7 @@ interface SNSSettingsProps {
 
 export function SNSSettings(props: SNSSettingsProps) {
   const context = useContext(CreateChannelContext)!;
+  const mainStateContext = useContext(MainContext)!;
   return (
     <>
       <EuiSpacer />
@@ -69,7 +70,7 @@ export function SNSSettings(props: SNSSettingsProps) {
         />
       </EuiFormRow>
 
-      {props.isOdfe ? (
+      {mainStateContext.tooltipSupport ? (
         <>
           <EuiFormRow
             label={
@@ -97,9 +98,8 @@ export function SNSSettings(props: SNSSettingsProps) {
             style={{ maxWidth: 720 }}
           >
             <div>
-              If your cluster is not running on AWS, you must add your access
-              key, secret key, and optional session token to the OpenSearch
-              keystore.{' '}
+              If your cluster is not running on AWS, you must configure aws
+              credentials on your OpenSearch cluster.{' '}
               <EuiLink href={DOCUMENTATION_LINK} target="_blank" external>
                 Learn more
               </EuiLink>

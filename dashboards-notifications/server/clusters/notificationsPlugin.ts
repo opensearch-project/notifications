@@ -120,7 +120,7 @@ export function NotificationsPlugin(Client: any, config: any, components: any) {
     method: 'GET',
   });
 
-  notifications.getAvailableFeatures = clientAction({
+  notifications.getServerFeatures = clientAction({
     url: {
       fmt: OPENSEARCH_API.FEATURES,
     },
