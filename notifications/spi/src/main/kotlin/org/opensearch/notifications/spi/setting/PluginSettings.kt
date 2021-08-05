@@ -150,7 +150,7 @@ internal object PluginSettings {
     private const val DEFAULT_TOOLTIP_SUPPORT = false
 
     /**
-     * Default disable tooltip support
+     * Default destination settings
      */
     private val DEFAULT_DESTINATION_SETTINGS = emptyMap<String, SecureDestinationSettings>()
 
@@ -316,14 +316,12 @@ internal object PluginSettings {
     private val EMAIL_USERNAME: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
         EMAIL_DESTINATION_SETTING_PREFIX,
         "username",
-        // Needed to coerce lambda to Function type for some reason to avoid argument mismatch compile error
         { key: String -> SecureSetting.secureString(key, null) }
     )
 
     private val EMAIL_PASSWORD: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
         EMAIL_DESTINATION_SETTING_PREFIX,
         "password",
-        // Needed to coerce lambda to Function type for some reason to avoid argument mismatch compile error
         { key: String -> SecureSetting.secureString(key, null) }
     )
 
