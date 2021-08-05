@@ -9,7 +9,7 @@
  *  GitHub history for details.
  */
 
-package org.opensearch.notifications.spi.factory
+package org.opensearch.notifications.spi.transport
 
 import org.opensearch.notifications.spi.client.DestinationClientPool
 import org.opensearch.notifications.spi.client.DestinationHttpClient
@@ -24,9 +24,9 @@ import java.io.IOException
 /**
  * This class handles the client responsible for submitting the messages to all types of webhook destinations.
  */
-internal class WebhookDestinationFactory : DestinationFactory<WebhookDestination> {
+internal class WebhookDestinationTransport : DestinationTransport<WebhookDestination> {
 
-    private val log by logger(WebhookDestinationFactory::class.java)
+    private val log by logger(WebhookDestinationTransport::class.java)
     private val destinationHttpClient: DestinationHttpClient
 
     constructor() {

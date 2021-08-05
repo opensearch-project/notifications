@@ -45,9 +45,8 @@ import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
 import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
-import org.opensearch.notifications.spi.model.destination.DestinationType
-import org.opensearch.notifications.spi.model.destination.EmailDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
+import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import org.opensearch.rest.RestStatus
 import java.time.Instant
 
@@ -285,14 +284,13 @@ object SendMessageActionHelper {
         recipient: String,
         message: MessageContent
     ): EmailRecipientStatus {
-        val destination = EmailDestination(
+        val destination = SmtpDestination(
             accountName,
             smtpAccount.host,
             smtpAccount.port,
             smtpAccount.method.tag,
             smtpAccount.fromAddress,
-            recipient,
-            DestinationType.SMTP
+            recipient
         )
         val status = sendMessageThroughSpi(destination, message)
         return EmailRecipientStatus(

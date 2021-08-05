@@ -16,7 +16,7 @@ import org.opensearch.common.settings.SecureString
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.SecureDestinationSettings
-import org.opensearch.notifications.spi.model.destination.EmailDestination
+import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import org.opensearch.notifications.spi.setting.PluginSettings
 import org.opensearch.notifications.spi.utils.SecurityAccess
 import org.opensearch.notifications.spi.utils.logger
@@ -34,14 +34,14 @@ import javax.mail.internet.MimeMessage
 /**
  * This class handles the connections to the given Destination.
  */
-class DestinationEmailClient {
+class DestinationSmtpClient {
 
     companion object {
-        private val log by logger(DestinationEmailClient::class.java)
+        private val log by logger(DestinationSmtpClient::class.java)
     }
 
     @Throws(Exception::class)
-    fun execute(emailDestination: EmailDestination, message: MessageContent): DestinationMessageResponse {
+    fun execute(smtpDestination: SmtpDestination, message: MessageContent): DestinationMessageResponse {
         if (isMessageSizeOverLimit(message)) {
             return DestinationMessageResponse(
                 RestStatus.REQUEST_ENTITY_TOO_LARGE.status,
@@ -51,19 +51,19 @@ class DestinationEmailClient {
 
         val prop = Properties()
         prop["mail.transport.protocol"] = "smtp"
-        prop["mail.smtp.host"] = emailDestination.host
-        prop["mail.smtp.port"] = emailDestination.port
+        prop["mail.smtp.host"] = smtpDestination.host
+        prop["mail.smtp.port"] = smtpDestination.port
         var session = Session.getInstance(prop)
 
-        when (emailDestination.method) {
+        when (smtpDestination.method) {
             "ssl" -> prop["mail.smtp.ssl.enable"] = true
             "start_tls" -> prop["mail.smtp.starttls.enable"] = true
             "none" -> {}
             else -> throw IllegalArgumentException("Invalid method supplied")
         }
 
-        if (emailDestination.method != "none") {
-            val secureDestinationSetting = getSecureDestinationSetting(emailDestination)
+        if (smtpDestination.method != "none") {
+            val secureDestinationSetting = getSecureDestinationSetting(smtpDestination)
             if (secureDestinationSetting != null) {
                 prop["mail.smtp.auth"] = true
                 session = Session.getInstance(
@@ -81,15 +81,15 @@ class DestinationEmailClient {
         }
 
         // prepare mimeMessage
-        val mimeMessage = EmailMimeProvider.prepareMimeMessage(session, emailDestination, message)
+        val mimeMessage = EmailMimeProvider.prepareMimeMessage(session, smtpDestination, message)
 
         // send Mime Message
         return sendMimeMessage(mimeMessage)
     }
 
-    fun getSecureDestinationSetting(emailDestination: EmailDestination): SecureDestinationSettings? {
-        val emailUsername: SecureString? = PluginSettings.destinationSettings[emailDestination.accountName]?.emailUsername
-        val emailPassword: SecureString? = PluginSettings.destinationSettings[emailDestination.accountName]?.emailPassword
+    fun getSecureDestinationSetting(SmtpDestination: SmtpDestination): SecureDestinationSettings? {
+        val emailUsername: SecureString? = PluginSettings.destinationSettings[SmtpDestination.accountName]?.emailUsername
+        val emailPassword: SecureString? = PluginSettings.destinationSettings[SmtpDestination.accountName]?.emailPassword
         return if (emailUsername == null || emailPassword == null) {
             null
         } else {
