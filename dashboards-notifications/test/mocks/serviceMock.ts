@@ -55,6 +55,7 @@ const notificationServiceMock = {
 
 const mainStateMock: MainState = {
   availableFeatures: CHANNEL_TYPE,
+  tooltipSupport: true,
 };
 
 export { notificationServiceMock, coreServicesMock, mainStateMock };

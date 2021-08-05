@@ -143,19 +143,6 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
           title: 'Default recipients',
           description: recipientsDescription,
         },
-        // TODO remove when removing header/footer functionality
-        // {
-        //   title: 'Email header',
-        //   description: props.channel.destination.email.header
-        //     ? 'Enabled'
-        //     : 'Disabled',
-        // },
-        // {
-        //   title: 'Email footer',
-        //   description: props.channel.destination.email.footer
-        //     ? 'Enabled'
-        //     : 'Disabled',
-        // },
       ]
     );
   } else if (type === BACKEND_CHANNEL_TYPE.CUSTOM_WEBHOOK) {
@@ -203,22 +190,22 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
       ]
     );
   } else if (type === BACKEND_CHANNEL_TYPE.SNS) {
-    // settingsList.push(
-    //   ...[
-    //     {
-    //       title: 'Channel type',
-    //       description: CHANNEL_TYPE.SNS,
-    //     },
-    //     {
-    //       title: 'SNS topic ARN',
-    //       description: props.channel.destination.sns.topic_arn || '-',
-    //     },
-    //     {
-    //       title: 'IAM role ARN',
-    //       description: props.channel.destination.sns.role_arn || '-',
-    //     },
-    //   ]
-    // );
+    settingsList.push(
+      ...[
+        {
+          title: 'Channel type',
+          description: CHANNEL_TYPE.sns,
+        },
+        {
+          title: 'SNS topic ARN',
+          description: props.channel.sns?.topic_arn || '-',
+        },
+        {
+          title: 'IAM role ARN',
+          description: props.channel.sns?.role_arn || '-',
+        },
+      ]
+    );
   } else if (type === BACKEND_CHANNEL_TYPE.SES) {
     // TODO
   }

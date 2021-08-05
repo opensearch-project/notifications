@@ -212,6 +212,10 @@ export function EmailSettings(props: EmailSettingsProps) {
                           ) => {
                             setSenderOptions([...senderOptions, newOption]);
                             props.setSelectedSenderOptions([newOption]);
+                            context.setInputErrors({
+                              ...context.inputErrors,
+                              sender: validateEmailSender([newOption]),
+                            });
                           },
                         })
                       }
@@ -273,6 +277,10 @@ export function EmailSettings(props: EmailSettingsProps) {
                           ...props.selectedRecipientGroupOptions,
                           newOption,
                         ]);
+                        context.setInputErrors({
+                          ...context.inputErrors,
+                          recipients: validateRecipients([newOption]),
+                        });
                       },
                     })
                   }

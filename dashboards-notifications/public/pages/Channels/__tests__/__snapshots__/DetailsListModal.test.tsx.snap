@@ -28,7 +28,6 @@ exports[`<DetailsListModal /> spec renders the component 1`] = `
       "notificationService": NotificationService {
         "createConfig": [Function],
         "deleteConfigs": [Function],
-        "getAvailableFeatures": [Function],
         "getChannel": [Function],
         "getChannels": [Function],
         "getConfig": [Function],
@@ -38,6 +37,7 @@ exports[`<DetailsListModal /> spec renders the component 1`] = `
         "getRecipientGroups": [Function],
         "getSender": [Function],
         "getSenders": [Function],
+        "getServerFeatures": [Function],
         "httpClient": [MockFunction],
         "updateConfig": [Function],
       },
