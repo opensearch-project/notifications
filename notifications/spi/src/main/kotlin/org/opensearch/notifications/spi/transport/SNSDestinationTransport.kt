@@ -8,7 +8,8 @@
  *  Modifications Copyright OpenSearch Contributors. See
  *  GitHub history for details.
  */
-package org.opensearch.notifications.spi.factory
+
+package org.opensearch.notifications.spi.transport
 
 import org.opensearch.notifications.spi.client.DestinationClientPool
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
@@ -21,9 +22,9 @@ import java.io.IOException
 /**
  * This class handles the client responsible for submitting the messages to SNS destinations.
  */
-internal class SNSDestinationFactory : DestinationFactory<SNSDestination> {
+internal class SNSDestinationTransport : DestinationTransport<SNSDestination> {
 
-    private val log by logger(SNSDestinationFactory::class.java)
+    private val log by logger(SNSDestinationTransport::class.java)
 
     override fun sendMessage(destination: SNSDestination, message: MessageContent): DestinationMessageResponse {
         return try {
