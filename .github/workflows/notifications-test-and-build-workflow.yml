@@ -65,6 +65,7 @@ jobs:
       - name: Checkout Notifications
         uses: actions/checkout@v2
 
+      # Temporarily exclude tests which causing CI to fail. Tracking in #251
       - name: Build with Gradle
         run: |
           cd notifications
