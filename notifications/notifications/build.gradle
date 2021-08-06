@@ -147,6 +147,11 @@ afterEvaluate {
 }
 
 test {
+    if (project.hasProperty('excludeTests')) {
+        project.properties['excludeTests']?.replaceAll('\\s', '')?.split('[,;]')?.each {
+            exclude "${it}"
+        }
+    }
     systemProperty 'tests.security.manager', 'false'
     useJUnitPlatform()
 }

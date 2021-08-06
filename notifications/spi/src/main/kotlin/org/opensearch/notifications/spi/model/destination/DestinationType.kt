@@ -14,5 +14,5 @@ package org.opensearch.notifications.spi.model.destination
  * Supported notification destinations
  */
 enum class DestinationType {
-    CHIME, SLACK, CUSTOMWEBHOOK, SMTP, SES, SNS
+    CHIME, SLACK, CUSTOM_WEBHOOK, SMTP, SES, SNS
 }

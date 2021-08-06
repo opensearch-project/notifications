@@ -57,6 +57,7 @@ interface MainProps extends RouteComponentProps {}
 
 export interface MainState {
   availableFeatures: Partial<typeof CHANNEL_TYPE>;
+  tooltipSupport: boolean; // if true, IAM role for SNS is optional and helper text should be available
 }
 
 export const MainContext = createContext<MainState | null>(null);
@@ -68,13 +69,17 @@ export default class Main extends Component<MainProps, MainState> {
     super(props);
     this.state = {
       availableFeatures: CHANNEL_TYPE,
+      tooltipSupport: false,
     };
   }
 
   async componentDidMount() {
-    const availableFeatures =
-      await this.context.notificationService.getAvailableFeatures();
-    if (availableFeatures != null) this.setState({ availableFeatures });
+    const serverFeatures = await this.context.notificationService.getServerFeatures();
+    if (serverFeatures != null)
+      this.setState({
+        availableFeatures: serverFeatures.availableFeatures,
+        tooltipSupport: serverFeatures.tooltipSupport,
+      });
   }
 
   render() {

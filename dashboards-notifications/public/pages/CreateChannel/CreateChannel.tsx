@@ -90,8 +90,6 @@ export const CreateChannelContext = createContext<{
 } | null>(null);
 
 export function CreateChannel(props: CreateChannelsProps) {
-  const isOdfe = true;
-
   const coreContext = useContext(CoreServicesContext)!;
   const servicesContext = useContext(ServicesContext)!;
   const mainStateContext = useContext(MainContext)!;
@@ -226,7 +224,8 @@ export function CreateChannel(props: CreateChannelsProps) {
       } else if (type === BACKEND_CHANNEL_TYPE.SES) {
         // TODO
       } else if (type === BACKEND_CHANNEL_TYPE.SNS) {
-        // TODO
+        setTopicArn(response.sns?.topic_arn || '');
+        setRoleArn(response.sns?.role_arn || '');
       }
     } catch (error) {
       coreContext.notifications.toasts.addDanger(
@@ -265,7 +264,7 @@ export function CreateChannel(props: CreateChannelsProps) {
       }
     } else if (channelType === BACKEND_CHANNEL_TYPE.SNS) {
       errors.topicArn = validateArn(topicArn);
-      if (!isOdfe) errors.roleArn = validateArn(roleArn);
+      if (!mainStateContext.tooltipSupport) errors.roleArn = validateArn(roleArn);
     }
     setInputErrors(errors);
     return !Object.values(errors).reduce(
@@ -303,6 +302,13 @@ export function CreateChannel(props: CreateChannelsProps) {
         selectedSenderOptions,
         selectedRecipientGroupOptions
       );
+    } else if (channelType === BACKEND_CHANNEL_TYPE.SES) {
+      // TODO
+    } else if (channelType === BACKEND_CHANNEL_TYPE.SNS) {
+      config.sns = {
+        topic_arn: topicArn,
+        ...(roleArn && { role_arn: roleArn }),
+      };
     }
     return config;
   };
@@ -450,7 +456,6 @@ export function CreateChannel(props: CreateChannelsProps) {
             />
           ) : channelType === BACKEND_CHANNEL_TYPE.SNS ? (
             <SNSSettings
-              isOdfe={isOdfe}
               topicArn={topicArn}
               setTopicArn={setTopicArn}
               roleArn={roleArn}

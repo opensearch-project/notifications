@@ -18,35 +18,35 @@ import org.junit.Assert
 import org.junit.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
-import org.opensearch.notifications.spi.client.DestinationEmailClient
-import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
-import org.opensearch.notifications.spi.factory.SmtpEmailDestinationFactory
+import org.opensearch.notifications.spi.client.DestinationSmtpClient
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.DestinationType
-import org.opensearch.notifications.spi.model.destination.EmailDestination
+import org.opensearch.notifications.spi.model.destination.SmtpDestination
+import org.opensearch.notifications.spi.transport.DestinationTransportProvider
+import org.opensearch.notifications.spi.transport.SmtpDestinationTransport
 import org.opensearch.rest.RestStatus
 import javax.mail.MessagingException
 
 @ExtendWith(MockitoExtension::class)
-internal class EmailDestinationTests {
+internal class SmtpDestinationTests {
 
     @Test
     @Throws(Exception::class)
     fun testSmtpEmailMessage() {
         val expectedEmailResponse = DestinationMessageResponse(RestStatus.OK.status, "Success")
-        val emailClient = spyk<DestinationEmailClient>()
+        val emailClient = spyk<DestinationSmtpClient>()
         every { emailClient.sendMessage(any()) } returns Unit
 
-        val smtpEmailDestinationFactory = SmtpEmailDestinationFactory(emailClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf(DestinationType.SMTP to smtpEmailDestinationFactory)
+        val smtpEmailDestinationTransport = SmtpDestinationTransport(emailClient)
+        DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SMTP to smtpEmailDestinationTransport)
 
         val subject = "Test SMTP Email subject"
         val messageText = "{Message gughjhjlkh Body emoji test: :) :+1: " +
             "link test: http://sample.com email test: marymajor@example.com All member callout: " +
             "@All All Present member callout: @Present}"
         val message = MessageContent(subject, messageText)
-        val destination = EmailDestination("abc", 465, "ssl", "test@abc.com", "to@abc.com", DestinationType.SMTP)
+        val destination = SmtpDestination("abc", 465, "ssl", "test@abc.com", "to@abc.com")
 
         val actualEmailResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
         assertEquals(expectedEmailResponse.statusCode, actualEmailResponse.statusCode)
@@ -60,26 +60,25 @@ internal class EmailDestinationTests {
             RestStatus.FAILED_DEPENDENCY.status,
             "Couldn't connect to host, port: localhost, 55555; timeout -1"
         )
-        val emailClient = spyk<DestinationEmailClient>()
+        val emailClient = spyk<DestinationSmtpClient>()
         every { emailClient.sendMessage(any()) } throws MessagingException(
             "Couldn't connect to host, port: localhost, 55555; timeout -1"
         )
 
-        val smtpEmailDestinationFactory = SmtpEmailDestinationFactory(emailClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf(DestinationType.SMTP to smtpEmailDestinationFactory)
+        val smtpEmailDestinationTransport = SmtpDestinationTransport(emailClient)
+        DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SMTP to smtpEmailDestinationTransport)
 
         val subject = "Test SMTP Email subject"
         val messageText = "{Vamshi Message gughjhjlkh Body emoji test: :) :+1: " +
             "link test: http://sample.com email test: marymajor@example.com All member callout: " +
             "@All All Present member callout: @Present}"
         val message = MessageContent(subject, messageText)
-        val destination = EmailDestination(
+        val destination = SmtpDestination(
             "localhost",
             55555,
             "none",
             "test@abc.com",
-            "to@abc.com",
-            DestinationType.SMTP
+            "to@abc.com"
         )
 
         val actualEmailResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
@@ -91,7 +90,7 @@ internal class EmailDestinationTests {
     @Test(expected = IllegalArgumentException::class)
     fun testHostMissingEmailDestination() {
         try {
-            EmailDestination("", 465, "ssl", "from@test.com", "to@test.com", DestinationType.SMTP)
+            SmtpDestination("", 465, "ssl", "from@test.com", "to@test.com")
         } catch (exception: Exception) {
             Assert.assertEquals("Host name should be provided", exception.message)
             throw exception
@@ -101,7 +100,7 @@ internal class EmailDestinationTests {
     @Test(expected = IllegalArgumentException::class)
     fun testInvalidPortEmailDestination() {
         try {
-            EmailDestination("localhost", -1, "ssl", "from@test.com", "to@test.com", DestinationType.SMTP)
+            SmtpDestination("localhost", -1, "ssl", "from@test.com", "to@test.com")
         } catch (exception: Exception) {
             Assert.assertEquals("Port should be positive value", exception.message)
             throw exception
@@ -111,7 +110,7 @@ internal class EmailDestinationTests {
     @Test(expected = IllegalArgumentException::class)
     fun testMissingFromOrRecipientEmailDestination() {
         try {
-            EmailDestination("localhost", 465, "ssl", "", "to@test.com", DestinationType.SMTP)
+            SmtpDestination("localhost", 465, "ssl", "", "to@test.com")
         } catch (exception: Exception) {
             Assert.assertEquals("FromAddress and recipient should be provided", exception.message)
             throw exception

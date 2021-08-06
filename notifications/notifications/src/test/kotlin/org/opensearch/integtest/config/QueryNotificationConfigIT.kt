@@ -28,19 +28,23 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
+import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.Feature.ALERTING
 import org.opensearch.commons.notifications.model.Feature.INDEX_MANAGEMENT
 import org.opensearch.commons.notifications.model.Feature.REPORTS
+import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.verifyMultiConfigIdEquals
 import org.opensearch.notifications.verifyOrderedConfigList
+import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.notifications.verifySingleConfigIdEquals
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
 import java.time.Instant
+import java.util.EnumSet
 import kotlin.random.Random
 
 class QueryNotificationConfigIT : PluginRestTestCase() {
@@ -816,5 +820,66 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         )
         verifyMultiConfigIdEquals(domainIds, getDomainResponse, domainIds.size)
         Thread.sleep(100)
+    }
+
+    fun `test Get single absent config should fail and then create a config using absent id should pass`() {
+        val absentId = "absent_id"
+        Thread.sleep(1000)
+        // Get notification config with absent id
+        executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs/$absentId",
+            "",
+            RestStatus.NOT_FOUND.status
+        )
+
+        Thread.sleep(1000)
+
+        // Create sample config request reference
+        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.CHIME,
+            EnumSet.of(ALERTING, REPORTS),
+            isEnabled = true,
+            configData = sampleChime
+        )
+
+        // Create chime notification config
+        val createRequestJsonString = """
+        {
+            "config_id":"$absentId",
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"chime",
+                "feature_list":[
+                    "${referenceObject.features.elementAt(0)}",
+                    "${referenceObject.features.elementAt(1)}"
+                ],
+                "is_enabled":${referenceObject.isEnabled},
+                "chime":{"url":"${(referenceObject.configData as Chime).url}"}
+            }
+        }
+        """.trimIndent()
+        val createResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createRequestJsonString,
+            RestStatus.OK.status
+        )
+        Assert.assertEquals(absentId, createResponse.get("config_id").asString)
+        Thread.sleep(1000)
+
+        // Get chime notification config
+
+        val getConfigResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs/$absentId",
+            "",
+            RestStatus.OK.status
+        )
+        verifySingleConfigEquals(absentId, referenceObject, getConfigResponse)
     }
 }
