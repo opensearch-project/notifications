@@ -10,8 +10,6 @@
  */
 package org.opensearch.notifications.spi.model.destination
 
-import org.opensearch.common.settings.SecureString
-
 /**
  * This class holds the contents of SNS destination
  */

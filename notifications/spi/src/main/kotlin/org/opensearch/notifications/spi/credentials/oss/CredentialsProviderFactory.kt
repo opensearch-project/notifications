@@ -31,8 +31,9 @@ class CredentialsProviderFactory : CredentialsProvider {
     }
 
     private fun getCredentialsProviderByIAMRole(destination: SNSDestination): AWSCredentialsProvider {
+        // TODO cache credentials by role ARN?
         val stsClient = AWSSecurityTokenServiceClientBuilder.standard()
-            .withCredentials(ProfileCredentialsProvider()) // TODO confirm if this is needed?
+            .withCredentials(ProfileCredentialsProvider())
             .withRegion(destination.getRegion())
             .build()
         val roleRequest = AssumeRoleRequest()

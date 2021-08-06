@@ -47,7 +47,6 @@ import org.opensearch.notifications.spi.model.destination.BaseDestination
 import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
 import org.opensearch.notifications.spi.model.destination.SNSDestination
-import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import org.opensearch.rest.RestStatus

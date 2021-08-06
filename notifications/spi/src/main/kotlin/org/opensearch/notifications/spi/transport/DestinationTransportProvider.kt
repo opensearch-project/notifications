@@ -27,7 +27,7 @@ internal object DestinationTransportProvider {
 
     @OpenForTesting
     var destinationTransportMap = mapOf(
-        // TODO Add other destinations, ses, sns
+        // TODO Add other destinations, ses
         DestinationType.SLACK to webhookDestinationTransport,
         DestinationType.CHIME to webhookDestinationTransport,
         DestinationType.CUSTOM_WEBHOOK to webhookDestinationTransport,
