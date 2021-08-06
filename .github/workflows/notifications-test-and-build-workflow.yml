@@ -26,8 +26,9 @@ name: Test and Build Notifications
 on: [push, pull_request]
 
 env:
-  OPENSEARCH_VERSION: '1.0'
-  COMMON_UTILS_VERSION: 'main'
+  OPENSEARCH_VERSION: '1.1'
+  COMMON_UTILS_BRANCH: 'main'
+  OPENSEARCH_BRANCH: 'main'
 
 jobs:
   build:
@@ -45,7 +46,7 @@ jobs:
         with:
           repository: 'opensearch-project/OpenSearch'
           path: OpenSearch
-          ref: ${{ env.OPENSEARCH_VERSION }}
+          ref: ${{ env.OPENSEARCH_BRANCH }}
       - name: Build OpenSearch
         working-directory: ./OpenSearch
         run: ./gradlew publishToMavenLocal -Dbuild.snapshot=false
