@@ -28,7 +28,7 @@
 
 buildscript {
     ext {
-        opensearch_version = System.getProperty("opensearch.version", "1.0.0")
+        opensearch_version = System.getProperty("opensearch.version", "1.1.0")
         kotlin_version = System.getProperty("kotlin.version", "1.4.32")
         junit_version = System.getProperty("junit.version", "5.7.2")
         aws_version = System.getProperty("aws.version", "1.12.20")
