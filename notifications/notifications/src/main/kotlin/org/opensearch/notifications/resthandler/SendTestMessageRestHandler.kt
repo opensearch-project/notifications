@@ -20,6 +20,7 @@ import org.opensearch.commons.notifications.model.EventSource
 import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.SeverityType
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
+import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
 import org.opensearch.rest.BytesRestResponse
 import org.opensearch.rest.RestHandler.Route
@@ -84,6 +85,8 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
         request: RestRequest,
         client: NodeClient
     ) = RestChannelConsumer {
+        Metrics.NOTIFICATIONS_SEND_TEST_MESSAGE_TOTAL.counter.increment()
+        Metrics.NOTIFICATIONS_SEND_TEST_MESSAGE_INTERVAL_COUNT.counter.increment()
         val feature = Feature.fromTagOrDefault(request.param(FEATURE_TAG, Feature.NONE.tag))
         val configId = request.param(CONFIG_ID_TAG)
         val source = generateEventSource(feature, configId)

@@ -61,6 +61,7 @@ import org.opensearch.notifications.resthandler.NotificationConfigRestHandler
 import org.opensearch.notifications.resthandler.NotificationEventRestHandler
 import org.opensearch.notifications.resthandler.NotificationFeatureChannelListRestHandler
 import org.opensearch.notifications.resthandler.NotificationFeaturesRestHandler
+import org.opensearch.notifications.resthandler.NotificationStatsRestHandler
 import org.opensearch.notifications.resthandler.SendMessageRestHandler
 import org.opensearch.notifications.resthandler.SendTestMessageRestHandler
 import org.opensearch.notifications.security.UserAccessManager
@@ -190,7 +191,8 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
             NotificationEventRestHandler(),
             NotificationFeaturesRestHandler(),
             NotificationFeatureChannelListRestHandler(),
-            SendTestMessageRestHandler()
+            SendTestMessageRestHandler(),
+            NotificationStatsRestHandler()
         )
     }
 }

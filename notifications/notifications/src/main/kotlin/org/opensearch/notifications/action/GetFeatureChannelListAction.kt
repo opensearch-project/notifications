@@ -40,6 +40,7 @@ import org.opensearch.commons.notifications.action.NotificationsActions
 import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.utils.recreateObject
 import org.opensearch.notifications.index.ConfigIndexingActions
+import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 import java.lang.IllegalArgumentException
@@ -82,6 +83,7 @@ internal class GetFeatureChannelListAction @Inject constructor(
         user: User?
     ): GetFeatureChannelListResponse {
         if (request.feature == Feature.NONE) {
+            Metrics.NOTIFICATIONS_FEATURE_CHANNELS_INFO_USER_ERROR_INVALID_FEATURE_TAG.counter.increment()
             throw IllegalArgumentException("Not a valid feature")
         }
         return ConfigIndexingActions.getFeatureChannelList(request, user)

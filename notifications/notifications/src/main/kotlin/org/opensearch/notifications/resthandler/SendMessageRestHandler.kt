@@ -31,6 +31,7 @@ import org.opensearch.client.node.NodeClient
 import org.opensearch.commons.utils.contentParserNextToken
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.action.SendMessageAction
+import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.SendMessageRequest
 import org.opensearch.rest.BaseRestHandler
 import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
@@ -77,6 +78,8 @@ internal class SendMessageRestHandler : BaseRestHandler() {
     override fun prepareRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
         return when (request.method()) {
             POST -> RestChannelConsumer {
+                Metrics.NOTIFICATIONS_SEND_MESSAGE_TOTAL.counter.increment()
+                Metrics.NOTIFICATIONS_SEND_MESSAGE_INTERVAL_COUNT.counter.increment()
                 client.execute(
                     SendMessageAction.ACTION_TYPE,
                     SendMessageRequest(request.contentParserNextToken()),

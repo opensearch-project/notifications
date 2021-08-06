@@ -41,6 +41,7 @@ import org.opensearch.commons.authuser.User
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.channel.ChannelFactory
+import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.ChannelMessageResponse
 import org.opensearch.notifications.model.SendMessageRequest
 import org.opensearch.notifications.model.SendMessageResponse
@@ -77,6 +78,7 @@ internal class SendMessageAction @Inject constructor(
         log.debug("$LOG_PREFIX:send")
         if (!isMessageQuotaAvailable(request)) {
             log.info("$LOG_PREFIX:${request.refTag}:Message Sending quota not available")
+            Metrics.NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_SENDING_QUOTA_UNAVAILABLE.counter.increment()
             throw OpenSearchStatusException("Message Sending quota not available", RestStatus.TOO_MANY_REQUESTS)
         }
         val statusList: List<ChannelMessageResponse> = sendMessagesInParallel(request)
