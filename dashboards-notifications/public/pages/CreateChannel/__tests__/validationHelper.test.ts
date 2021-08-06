@@ -46,9 +46,11 @@ describe('test create channel validation helpers', () => {
 
   it('validates webhook', () => {
     const pass = validateWebhookURL('https://test-webhook');
+    const httpTest = validateWebhookURL('http://test-webhook');
     const emptyInput = validateWebhookURL('');
     const invalidURL = validateWebhookURL('hxxp://test-webhook');
     expect(pass).toHaveLength(0);
+    expect(httpTest).toHaveLength(0);
     expect(emptyInput).toHaveLength(1);
     expect(invalidURL).toHaveLength(1);
   });
@@ -69,11 +71,13 @@ describe('test create channel validation helpers', () => {
 
   it('validates custom url host', () => {
     const pass = validateCustomURLHost('test-webhook');
+    const httpTest = validateCustomURLHost('http://test-webhook');
+    const httpsTest = validateCustomURLHost('https://test-webhook');
     const emptyInput = validateCustomURLHost('');
-    const invalidURL = validateCustomURLHost('http://test-webhook'); // only https is allowed
     expect(pass).toHaveLength(0);
+    expect(httpTest).toHaveLength(0);
+    expect(httpsTest).toHaveLength(0);
     expect(emptyInput).toHaveLength(1);
-    expect(invalidURL).toHaveLength(1);
   });
 
   it('validates custom url port', () => {
