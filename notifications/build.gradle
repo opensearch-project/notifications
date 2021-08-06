@@ -80,8 +80,6 @@ dependencies {
             attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling, Bundling.EXTERNAL))
         }
     }
-//    compile "org.json:json:20180813"
-//    compile group: 'com.github.wnameless', name: 'json-flattener', version: '0.1.0'
 }
 
 task ktlint(type: JavaExec, group: "verification") {
