@@ -13,12 +13,15 @@ package org.opensearch.notifications.spi.setting
 
 import org.opensearch.bootstrap.BootstrapInfo
 import org.opensearch.cluster.service.ClusterService
+import org.opensearch.common.settings.SecureSetting
+import org.opensearch.common.settings.SecureString
 import org.opensearch.common.settings.Setting
 import org.opensearch.common.settings.Setting.Property.Dynamic
 import org.opensearch.common.settings.Setting.Property.NodeScope
 import org.opensearch.common.settings.Settings
 import org.opensearch.notifications.spi.NotificationSpiPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.spi.NotificationSpiPlugin.Companion.PLUGIN_NAME
+import org.opensearch.notifications.spi.model.SecureDestinationSettings
 import org.opensearch.notifications.spi.utils.logger
 import java.io.IOException
 import java.nio.file.Path
@@ -33,6 +36,11 @@ internal object PluginSettings {
      * Settings Key prefix for Email.
      */
     private const val EMAIL_KEY_PREFIX = "$KEY_PREFIX.email"
+
+    /**
+     * Settings Key prefix for Email.
+     */
+    private const val EMAIL_DESTINATION_SETTING_PREFIX = "$KEY_PREFIX.email."
 
     /**
      * Settings Key prefix for http connection.
@@ -142,6 +150,11 @@ internal object PluginSettings {
     private const val DEFAULT_TOOLTIP_SUPPORT = false
 
     /**
+     * Default destination settings
+     */
+    private val DEFAULT_DESTINATION_SETTINGS = emptyMap<String, SecureDestinationSettings>()
+
+    /**
      * list of allowed config types.
      */
     @Volatile
@@ -195,6 +208,12 @@ internal object PluginSettings {
     @Volatile
     var hostDenyList: List<String>
 
+    /**
+     * Destination Settings
+     */
+    @Volatile
+    var destinationSettings: Map<String, SecureDestinationSettings>
+
     private const val DECIMAL_RADIX: Int = 10
 
     private val log by logger(javaClass)
@@ -224,6 +243,7 @@ internal object PluginSettings {
         allowedConfigTypes = settings?.getAsList(ALLOWED_CONFIG_TYPE_KEY, null) ?: DEFAULT_ALLOWED_CONFIG_TYPES
         tooltipSupport = settings?.getAsBoolean(TOOLTIP_SUPPORT_KEY, false) ?: DEFAULT_TOOLTIP_SUPPORT
         hostDenyList = settings?.getAsList(HOST_DENY_LIST_KEY, null) ?: DEFAULT_HOST_DENY_LIST
+        destinationSettings = if (settings != null) loadDestinationSettings(settings) else DEFAULT_DESTINATION_SETTINGS
 
         defaultSettings = mapOf(
             EMAIL_SIZE_LIMIT_KEY to emailSizeLimit.toString(DECIMAL_RADIX),
@@ -293,6 +313,18 @@ internal object PluginSettings {
         NodeScope, Dynamic
     )
 
+    private val EMAIL_USERNAME: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
+        EMAIL_DESTINATION_SETTING_PREFIX,
+        "username",
+        { key: String -> SecureSetting.secureString(key, null) }
+    )
+
+    private val EMAIL_PASSWORD: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
+        EMAIL_DESTINATION_SETTING_PREFIX,
+        "password",
+        { key: String -> SecureSetting.secureString(key, null) }
+    )
+
     /**
      * Returns list of additional settings available specific to this plugin.
      *
@@ -308,7 +340,9 @@ internal object PluginSettings {
             SOCKET_TIMEOUT_MILLISECONDS,
             ALLOWED_CONFIG_TYPES,
             TOOLTIP_SUPPORT,
-            HOST_DENY_LIST
+            HOST_DENY_LIST,
+            EMAIL_USERNAME,
+            EMAIL_PASSWORD
         )
     }
     /**
@@ -426,5 +460,38 @@ internal object PluginSettings {
             hostDenyList = it
             log.info("$LOG_PREFIX:$HOST_DENY_LIST_KEY -updatedTo-> $it")
         }
+    }
+
+    fun loadDestinationSettings(settings: Settings): Map<String, SecureDestinationSettings> {
+        // Only loading Email Destination settings for now since those are the only secure settings needed.
+        // If this logic needs to be expanded to support other Destinations, different groups can be retrieved similar
+        // to emailAccountNames based on the setting namespace and SecureDestinationSettings should be expanded to support
+        // these new settings.
+        val emailAccountNames: Set<String> = settings.getGroups(EMAIL_DESTINATION_SETTING_PREFIX).keys
+        val emailAccounts: MutableMap<String, SecureDestinationSettings> = mutableMapOf()
+        for (emailAccountName in emailAccountNames) {
+            // Only adding the settings if they exist
+            getSecureDestinationSettings(settings, emailAccountName)?.let {
+                emailAccounts[emailAccountName] = it
+            }
+        }
+
+        return emailAccounts
+    }
+
+    private fun getSecureDestinationSettings(settings: Settings, emailAccountName: String): SecureDestinationSettings? {
+        // Using 'use' to emulate Java's try-with-resources on multiple closeable resources.
+        // Values are cloned so that we maintain a SecureString, the original SecureStrings will be closed after
+        // they have left the scope of this function.
+        return getEmailSettingValue(settings, emailAccountName, EMAIL_USERNAME)?.use { emailUsername ->
+            getEmailSettingValue(settings, emailAccountName, EMAIL_PASSWORD)?.use { emailPassword ->
+                SecureDestinationSettings(emailUsername = emailUsername.clone(), emailPassword = emailPassword.clone())
+            }
+        }
+    }
+
+    private fun <T> getEmailSettingValue(settings: Settings, emailAccountName: String, emailSetting: Setting.AffixSetting<T>): T? {
+        val concreteSetting = emailSetting.getConcreteSettingForNamespace(emailAccountName)
+        return concreteSetting.get(settings)
     }
 }

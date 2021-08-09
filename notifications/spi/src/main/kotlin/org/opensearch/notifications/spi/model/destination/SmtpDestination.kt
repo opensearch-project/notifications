@@ -34,6 +34,7 @@ import org.opensearch.notifications.spi.utils.validateEmail
  * This class holds the contents of smtp destination
  */
 class SmtpDestination(
+    val accountName: String,
     val host: String,
     val port: Int,
     val method: String,
