@@ -30,10 +30,13 @@ internal class SNSDestinationTransport : DestinationTransport<SNSDestination> {
         return try {
             val snsClient = DestinationClientPool.getSNSClient(destination)
             val response = snsClient.execute(destination.topicArn, message)
-            DestinationMessageResponse(RestStatus.OK.status, response)
+            DestinationMessageResponse(RestStatus.OK.status, "Success, message id: $response")
         } catch (exception: IOException) {
             log.error("Exception sending message: $message", exception)
-            DestinationMessageResponse(RestStatus.INTERNAL_SERVER_ERROR.status, "Failed to send message ${exception.message}")
+            DestinationMessageResponse(
+                RestStatus.INTERNAL_SERVER_ERROR.status,
+                "Failed to send message ${exception.message}"
+            )
         }
     }
 }

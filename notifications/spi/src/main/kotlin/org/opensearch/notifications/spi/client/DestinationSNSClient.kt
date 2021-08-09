@@ -25,6 +25,6 @@ class DestinationSNSClient(destination: SNSDestination) {
 
     fun execute(topicArn: String, message: MessageContent): String {
         val result = amazonSNS.publish(topicArn, message.textDescription, message.title)
-        return result.messageId // TODO: return what?
+        return result.messageId
     }
 }
