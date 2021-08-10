@@ -88,14 +88,14 @@ internal class ChimeDestinationTests {
 
         val title = "test Chime"
         val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present"
+            "link test: http://sample.com email test: marymajor@example.com All member call out: " +
+            "@All All Present member call out: @Present"
         val url = "https://abc/com"
 
         val destination = ChimeDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualChimeResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
+        val actualChimeResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message, "referenceId")
 
         assertEquals(expectedWebhookResponse.statusText, actualChimeResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualChimeResponse.statusCode)
@@ -122,14 +122,14 @@ internal class ChimeDestinationTests {
 
         val title = "test Chime"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present\"}"
+            "link test: http://sample.com email test: marymajor@example.com All member call out: " +
+            "@All All Present member call out: @Present\"}"
         val url = "https://abc/com"
 
         val destination = ChimeDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualChimeResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
+        val actualChimeResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message, "referenceId")
 
         assertEquals(expectedWebhookResponse.statusText, actualChimeResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualChimeResponse.statusCode)
@@ -157,14 +157,14 @@ internal class ChimeDestinationTests {
 
         val title = "test Chime"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present\"}"
+            "link test: http://sample.com email test: marymajor@example.com All member call out: " +
+            "@All All Present member call out: @Present\"}"
         val url = "https://abc/com"
 
         val destination = ChimeDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualChimeResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
+        val actualChimeResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message, "referenceId")
 
         assertEquals(expectedWebhookResponse.statusText, actualChimeResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualChimeResponse.statusCode)

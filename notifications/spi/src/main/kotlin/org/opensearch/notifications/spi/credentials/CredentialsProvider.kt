@@ -12,8 +12,16 @@
 package org.opensearch.notifications.spi.credentials
 
 import com.amazonaws.auth.AWSCredentialsProvider
-import org.opensearch.notifications.spi.model.destination.SNSDestination
 
+/**
+ * AWS Credential provider using region and/or role
+ */
 interface CredentialsProvider {
-    fun getCredentialsProvider(destination: SNSDestination): AWSCredentialsProvider
+    /**
+     * create/get AWS Credential provider using region and/or role
+     * @param region AWS region
+     * @param roleArn optional role ARN
+     * @return AWSCredentialsProvider
+     */
+    fun getCredentialsProvider(region: String, roleArn: String?): AWSCredentialsProvider
 }

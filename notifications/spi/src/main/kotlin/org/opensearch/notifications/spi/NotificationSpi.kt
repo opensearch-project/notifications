@@ -43,14 +43,20 @@ object NotificationSpi {
     /**
      * Send the notification message to the corresponding destination
      *
+     * @param destination destination configuration for sending message
      * @param message metadata for message
+     * @param referenceId referenceId for message
      * @return ChannelMessageResponse
      */
-    fun sendMessage(destination: BaseDestination, message: MessageContent): DestinationMessageResponse {
+    fun sendMessage(
+        destination: BaseDestination,
+        message: MessageContent,
+        referenceId: String
+    ): DestinationMessageResponse {
         return AccessController.doPrivileged(
             PrivilegedAction {
                 val destinationFactory = DestinationTransportProvider.getTransport(destination.destinationType)
-                destinationFactory.sendMessage(destination, message)
+                destinationFactory.sendMessage(destination, message, referenceId)
             } as PrivilegedAction<DestinationMessageResponse>?
         )
     }

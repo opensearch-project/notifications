@@ -41,8 +41,12 @@ class DestinationSmtpClient {
     }
 
     @Throws(Exception::class)
-    fun execute(smtpDestination: SmtpDestination, message: MessageContent): DestinationMessageResponse {
-        if (isMessageSizeOverLimit(message)) {
+    fun execute(
+        smtpDestination: SmtpDestination,
+        message: MessageContent,
+        referenceId: String
+    ): DestinationMessageResponse {
+        if (EmailMessageValidator.isMessageSizeOverLimit(message)) {
             return DestinationMessageResponse(
                 RestStatus.REQUEST_ENTITY_TOO_LARGE.status,
                 "Email size larger than ${PluginSettings.emailSizeLimit}"
@@ -58,7 +62,8 @@ class DestinationSmtpClient {
         when (smtpDestination.method) {
             "ssl" -> prop["mail.smtp.ssl.enable"] = true
             "start_tls" -> prop["mail.smtp.starttls.enable"] = true
-            "none" -> {}
+            "none" -> {
+            }
             else -> throw IllegalArgumentException("Invalid method supplied")
         }
 
@@ -81,15 +86,22 @@ class DestinationSmtpClient {
         }
 
         // prepare mimeMessage
-        val mimeMessage = EmailMimeProvider.prepareMimeMessage(session, smtpDestination, message)
+        val mimeMessage = EmailMimeProvider.prepareMimeMessage(
+            session,
+            smtpDestination.fromAddress,
+            smtpDestination.recipient,
+            message
+        )
 
         // send Mime Message
-        return sendMimeMessage(mimeMessage)
+        return sendMimeMessage(mimeMessage, referenceId)
     }
 
     fun getSecureDestinationSetting(SmtpDestination: SmtpDestination): SecureDestinationSettings? {
-        val emailUsername: SecureString? = PluginSettings.destinationSettings[SmtpDestination.accountName]?.emailUsername
-        val emailPassword: SecureString? = PluginSettings.destinationSettings[SmtpDestination.accountName]?.emailPassword
+        val emailUsername: SecureString? =
+            PluginSettings.destinationSettings[SmtpDestination.accountName]?.emailUsername
+        val emailPassword: SecureString? =
+            PluginSettings.destinationSettings[SmtpDestination.accountName]?.emailPassword
         return if (emailUsername == null || emailPassword == null) {
             null
         } else {
@@ -100,11 +112,11 @@ class DestinationSmtpClient {
     /**
      * {@inheritDoc}
      */
-    private fun sendMimeMessage(mimeMessage: MimeMessage): DestinationMessageResponse {
+    private fun sendMimeMessage(mimeMessage: MimeMessage, referenceId: String): DestinationMessageResponse {
         return try {
-            log.debug("Sending Email-SMTP")
+            log.debug("Sending Email-SMTP for $referenceId")
             SecurityAccess.doPrivileged { sendMessage(mimeMessage) }
-            log.info("Email-SMTP sent")
+            log.info("Email-SMTP sent for $referenceId")
             DestinationMessageResponse(RestStatus.OK.status, "Success")
         } catch (exception: SendFailedException) {
             DestinationMessageResponse(RestStatus.BAD_GATEWAY.status, getMessagingExceptionText(exception))
@@ -131,21 +143,5 @@ class DestinationSmtpClient {
     private fun getMessagingExceptionText(exception: MessagingException): String {
         log.info("EmailException $exception")
         return "sendEmail Error, status:${exception.message}"
-    }
-
-    private fun isMessageSizeOverLimit(message: MessageContent): Boolean {
-        val approxAttachmentLength = if (message.fileData != null && message.fileName != null) {
-            PluginSettings.emailMinimumHeaderLength + message.fileData.length + message.fileName.length
-        } else {
-            0
-        }
-
-        val approxEmailLength = PluginSettings.emailMinimumHeaderLength +
-            message.title.length +
-            message.textDescription.length +
-            (message.htmlDescription?.length ?: 0) +
-            approxAttachmentLength
-
-        return approxEmailLength > PluginSettings.emailSizeLimit
     }
 }

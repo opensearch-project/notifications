@@ -24,11 +24,14 @@ internal interface DestinationTransport<T : BaseDestination> {
     /**
      * Sending notification message over this channel.
      *
+     * @param destination destination configuration for sending message
      * @param message The message to send notification
+     * @param referenceId referenceId for message
      * @return Channel message response
      */
     fun sendMessage(
         destination: T,
-        message: MessageContent
+        message: MessageContent,
+        referenceId: String
     ): DestinationMessageResponse
 }
