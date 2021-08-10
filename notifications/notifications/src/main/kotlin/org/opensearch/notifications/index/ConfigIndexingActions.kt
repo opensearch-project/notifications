@@ -49,6 +49,7 @@ import org.opensearch.commons.notifications.model.FeatureChannelList
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.NotificationConfigInfo
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
+import org.opensearch.commons.notifications.model.SNS
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.notifications.model.Webhook
@@ -88,6 +89,11 @@ object ConfigIndexingActions {
 
     @Suppress("UnusedPrivateMember")
     private fun validateWebhookConfig(webhook: Webhook, user: User?) {
+        // TODO: URL validation with rules
+    }
+
+    @Suppress("UnusedPrivateMember")
+    private fun validateSnsConfig(sns: SNS, user: User?) {
         // TODO: URL validation with rules
     }
 
@@ -176,6 +182,7 @@ object ConfigIndexingActions {
             ConfigType.EMAIL -> validateEmailConfig(config.configData as Email, config.features, user)
             ConfigType.SMTP_ACCOUNT -> validateSmtpAccountConfig(config.configData as SmtpAccount, user)
             ConfigType.EMAIL_GROUP -> validateEmailGroupConfig(config.configData as EmailGroup, user)
+            ConfigType.SNS -> validateSnsConfig(config.configData as SNS, user)
         }
     }
 

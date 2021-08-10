@@ -46,9 +46,9 @@ import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
 import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
-import org.opensearch.notifications.spi.model.destination.SNSDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
+import org.opensearch.notifications.spi.model.destination.SnsDestination
 import org.opensearch.rest.RestStatus
 import java.time.Instant
 
@@ -159,7 +159,8 @@ object SendMessageActionHelper {
         val configData = channel.configDoc.config.configData
         var emailRecipientStatus = listOf<EmailRecipientStatus>()
         if (configType == ConfigType.EMAIL) {
-            emailRecipientStatus = listOf(EmailRecipientStatus("placeholder@amazon.com", DeliveryStatus("Scheduled", "Pending execution")))
+            emailRecipientStatus =
+                listOf(EmailRecipientStatus("placeholder@amazon.com", DeliveryStatus("Scheduled", "Pending execution")))
         }
         val eventStatus = EventStatus(
             channel.docInfo.id!!, // ID from query so not expected to be null
@@ -175,14 +176,24 @@ object SendMessageActionHelper {
 
         val response = when (configType) {
             ConfigType.NONE -> null
-            ConfigType.SLACK -> sendSlackMessage(configData as Slack, message, eventStatus)
-            ConfigType.CHIME -> sendChimeMessage(configData as Chime, message, eventStatus)
-            ConfigType.WEBHOOK -> sendWebhookMessage(configData as Webhook, message, eventStatus)
-            ConfigType.EMAIL -> sendEmailMessage(configData as Email, childConfigs, message, eventStatus)
-            ConfigType.SNS -> sendSNSMessage(configData as SNS, message, eventStatus)
+            ConfigType.SLACK -> sendSlackMessage(configData as Slack, message, eventStatus, eventSource.referenceId)
+            ConfigType.CHIME -> sendChimeMessage(configData as Chime, message, eventStatus, eventSource.referenceId)
+            ConfigType.WEBHOOK -> sendWebhookMessage(
+                configData as Webhook,
+                message,
+                eventStatus,
+                eventSource.referenceId
+            )
+            ConfigType.EMAIL -> sendEmailMessage(
+                configData as Email,
+                childConfigs,
+                message,
+                eventStatus,
+                eventSource.referenceId
+            )
             ConfigType.SMTP_ACCOUNT -> null
             ConfigType.EMAIL_GROUP -> null
-            ConfigType.SNS -> null
+            ConfigType.SNS -> sendSNSMessage(configData as SNS, message, eventStatus, eventSource.referenceId)
         }
         return if (response == null) {
             log.warn("Cannot send message to destination for config id :${channel.docInfo.id}")
@@ -214,27 +225,42 @@ object SendMessageActionHelper {
     /**
      * send message to slack destination
      */
-    private fun sendSlackMessage(slack: Slack, message: MessageContent, eventStatus: EventStatus): EventStatus {
+    private fun sendSlackMessage(
+        slack: Slack,
+        message: MessageContent,
+        eventStatus: EventStatus,
+        referenceId: String
+    ): EventStatus {
         val destination = SlackDestination(slack.url)
-        val status = sendMessageThroughSpi(destination, message)
+        val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
 
     /**
      * send message to chime destination
      */
-    private fun sendChimeMessage(chime: Chime, message: MessageContent, eventStatus: EventStatus): EventStatus {
+    private fun sendChimeMessage(
+        chime: Chime,
+        message: MessageContent,
+        eventStatus: EventStatus,
+        referenceId: String
+    ): EventStatus {
         val destination = ChimeDestination(chime.url)
-        val status = sendMessageThroughSpi(destination, message)
+        val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
 
     /**
      * send message to custom webhook destination
      */
-    private fun sendWebhookMessage(webhook: Webhook, message: MessageContent, eventStatus: EventStatus): EventStatus {
+    private fun sendWebhookMessage(
+        webhook: Webhook,
+        message: MessageContent,
+        eventStatus: EventStatus,
+        referenceId: String
+    ): EventStatus {
         val destination = CustomWebhookDestination(webhook.url, webhook.headerParams, webhook.method.tag)
-        val status = sendMessageThroughSpi(destination, message)
+        val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
 
@@ -245,7 +271,8 @@ object SendMessageActionHelper {
         email: Email,
         childConfigs: List<NotificationConfigDocInfo>,
         message: MessageContent,
-        eventStatus: EventStatus
+        eventStatus: EventStatus,
+        referenceId: String
     ): EventStatus {
         val smtpAccountDocInfo = childConfigs.find { it.docInfo.id == email.emailAccountID }
         val groups = childConfigs.filter { email.emailGroupIds.contains(it.docInfo.id) }
@@ -256,7 +283,13 @@ object SendMessageActionHelper {
         runBlocking {
             val statusDeferredList = recipients.map {
                 async(Dispatchers.IO) {
-                    sendEmailFromSmtpAccount(smtpAccountConfig.name, smtpAccountConfig.configData as SmtpAccount, it, message)
+                    sendEmailFromSmtpAccount(
+                        smtpAccountConfig.name,
+                        smtpAccountConfig.configData as SmtpAccount,
+                        it,
+                        message,
+                        referenceId
+                    )
                 }
             }
             emailRecipientStatus = statusDeferredList.awaitAll()
@@ -286,7 +319,8 @@ object SendMessageActionHelper {
         accountName: String,
         smtpAccount: SmtpAccount,
         recipient: String,
-        message: MessageContent
+        message: MessageContent,
+        referenceId: String
     ): EmailRecipientStatus {
         val destination = SmtpDestination(
             accountName,
@@ -296,7 +330,7 @@ object SendMessageActionHelper {
             smtpAccount.fromAddress,
             recipient
         )
-        val status = sendMessageThroughSpi(destination, message)
+        val status = sendMessageThroughSpi(destination, message, referenceId)
         return EmailRecipientStatus(
             recipient,
             DeliveryStatus(status.statusCode.toString(), status.statusText)
@@ -306,9 +340,14 @@ object SendMessageActionHelper {
     /**
      * send message to SNS destination
      */
-    private fun sendSNSMessage(sns: SNS, message: MessageContent, eventStatus: EventStatus): EventStatus {
-        val destination = SNSDestination(sns.topicARN, sns.roleARN)
-        val status = sendMessageThroughSpi(destination, message)
+    private fun sendSNSMessage(
+        sns: SNS,
+        message: MessageContent,
+        eventStatus: EventStatus,
+        referenceId: String
+    ): EventStatus {
+        val destination = SnsDestination(sns.topicARN, sns.roleARN)
+        val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
 
@@ -318,10 +357,11 @@ object SendMessageActionHelper {
     @Suppress("TooGenericExceptionCaught", "UnusedPrivateMember")
     private fun sendMessageThroughSpi(
         destination: BaseDestination,
-        message: MessageContent
+        message: MessageContent,
+        referenceId: String
     ): DestinationMessageResponse {
         return try {
-            val status = NotificationSpi.sendMessage(destination, message)
+            val status = NotificationSpi.sendMessage(destination, message, referenceId)
             log.info("$LOG_PREFIX:sendMessage:statusCode=${status.statusCode}, statusText=${status.statusText}")
             status
         } catch (exception: Exception) {

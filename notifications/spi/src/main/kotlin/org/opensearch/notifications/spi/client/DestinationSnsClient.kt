@@ -12,19 +12,18 @@
 package org.opensearch.notifications.spi.client
 
 import com.amazonaws.services.sns.AmazonSNS
-import org.opensearch.notifications.spi.credentials.oss.SNSClientFactory
+import org.opensearch.notifications.spi.credentials.SnsClientFactory
 import org.opensearch.notifications.spi.model.MessageContent
-import org.opensearch.notifications.spi.model.destination.SNSDestination
+import org.opensearch.notifications.spi.model.destination.SnsDestination
 
 /**
  * This class handles the SNS connections to the given Destination.
  */
-class DestinationSNSClient(destination: SNSDestination) {
+class DestinationSnsClient(private val snsClientFactory: SnsClientFactory) {
 
-    private val amazonSNS: AmazonSNS = SNSClientFactory().getClient(destination)
-
-    fun execute(topicArn: String, message: MessageContent): String {
-        val result = amazonSNS.publish(topicArn, message.textDescription, message.title)
+    fun execute(destination: SnsDestination, message: MessageContent, referenceId: String): String {
+        val amazonSNS: AmazonSNS = snsClientFactory.createSnsClient(destination.region, destination.roleArn)
+        val result = amazonSNS.publish(destination.topicArn, message.textDescription, message.title)
         return result.messageId
     }
 }

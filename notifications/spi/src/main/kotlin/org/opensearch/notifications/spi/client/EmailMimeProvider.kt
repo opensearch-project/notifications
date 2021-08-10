@@ -28,7 +28,6 @@
 package org.opensearch.notifications.spi.client
 
 import org.opensearch.notifications.spi.model.MessageContent
-import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import java.util.Base64
 import javax.activation.DataHandler
 import javax.mail.Message
@@ -45,23 +44,25 @@ internal object EmailMimeProvider {
     /**
      * Create and prepare mime mimeMessage to send mail
      * @param session The mail session to use to create mime mimeMessage
-     * @param smtpDestination
-     * @param mimeMessage The mimeMessage to send notification
+     * @param fromAddress The sender email address
+     * @param recipient The recipient email address
+     * @param messageContent The mimeMessage to send notification
      * @return The created and prepared mime mimeMessage object
      */
     fun prepareMimeMessage(
         session: Session,
-        smtpDestination: SmtpDestination,
+        fromAddress: String,
+        recipient: String,
         messageContent: MessageContent
     ): MimeMessage {
         // Create a new MimeMessage object
         val mimeMessage = MimeMessage(session)
 
         // Add from:
-        mimeMessage.setFrom(smtpDestination.fromAddress)
+        mimeMessage.setFrom(fromAddress)
 
         // Add to:
-        mimeMessage.setRecipients(Message.RecipientType.TO, smtpDestination.recipient)
+        mimeMessage.setRecipients(Message.RecipientType.TO, recipient)
 
         // Add Subject:
         mimeMessage.setSubject(messageContent.title, "UTF-8")
@@ -119,7 +120,7 @@ internal object EmailMimeProvider {
 
     /**
      * Create a binary attachment part from channel attachment mimeMessage
-     * @param attachment channel attachment mimeMessage
+     * @param messageContent channel attachment mimeMessage
      * @return created mime body part for binary attachment
      */
     private fun createBinaryAttachmentPart(messageContent: MessageContent): MimeBodyPart {
@@ -135,7 +136,7 @@ internal object EmailMimeProvider {
 
     /**
      * Create a text attachment part from channel attachment mimeMessage
-     * @param attachment channel attachment mimeMessage
+     * @param messageContent channel attachment mimeMessage
      * @return created mime body part for text attachment
      */
     private fun createTextAttachmentPart(messageContent: MessageContent): MimeBodyPart {

@@ -12,10 +12,10 @@
 package org.opensearch.notifications.spi.transport
 
 import org.opensearch.notifications.spi.client.DestinationClientPool
-import org.opensearch.notifications.spi.client.DestinationSmtpClient
+import org.opensearch.notifications.spi.client.DestinationSesClient
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
-import org.opensearch.notifications.spi.model.destination.SmtpDestination
+import org.opensearch.notifications.spi.model.destination.SesDestination
 import org.opensearch.notifications.spi.utils.OpenForTesting
 import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.rest.RestStatus
@@ -26,22 +26,22 @@ import javax.mail.internet.AddressException
 /**
  * This class handles the client responsible for submitting the messages to all types of email destinations.
  */
-internal class SmtpDestinationTransport : DestinationTransport<SmtpDestination> {
+internal class SesDestinationTransport : DestinationTransport<SesDestination> {
 
-    private val log by logger(SmtpDestinationTransport::class.java)
-    private val destinationEmailClient: DestinationSmtpClient
+    private val log by logger(SesDestinationTransport::class.java)
+    private val destinationEmailClient: DestinationSesClient
 
     constructor() {
-        this.destinationEmailClient = DestinationClientPool.smtpClient
+        this.destinationEmailClient = DestinationClientPool.sesClient
     }
 
     @OpenForTesting
-    constructor(destinationSmtpClient: DestinationSmtpClient) {
-        this.destinationEmailClient = destinationSmtpClient
+    constructor(destinationSesClient: DestinationSesClient) {
+        this.destinationEmailClient = destinationSesClient
     }
 
     override fun sendMessage(
-        destination: SmtpDestination,
+        destination: SesDestination,
         message: MessageContent,
         referenceId: String
     ): DestinationMessageResponse {

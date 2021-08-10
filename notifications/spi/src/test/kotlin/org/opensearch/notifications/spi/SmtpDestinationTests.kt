@@ -49,7 +49,7 @@ internal class SmtpDestinationTests {
         val message = MessageContent(subject, messageText)
         val destination = SmtpDestination("testAccountName", "abc", 465, "ssl", "test@abc.com", "to@abc.com")
 
-        val actualEmailResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
+        val actualEmailResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message, "referenceId")
         assertEquals(expectedEmailResponse.statusCode, actualEmailResponse.statusCode)
         assertEquals(expectedEmailResponse.statusText, actualEmailResponse.statusText)
     }
@@ -74,7 +74,7 @@ internal class SmtpDestinationTests {
         val message = MessageContent(subject, messageText)
         val destination = SmtpDestination("testAccountName", "abc", 465, "ssl", "test@abc.com", "to@abc.com")
 
-        val actualEmailResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
+        val actualEmailResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message, "referenceId")
         assertEquals(expectedEmailResponse.statusCode, actualEmailResponse.statusCode)
         assertEquals(expectedEmailResponse.statusText, actualEmailResponse.statusText)
     }
@@ -107,7 +107,7 @@ internal class SmtpDestinationTests {
             "to@abc.com"
         )
 
-        val actualEmailResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
+        val actualEmailResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message, "referenceId")
 
         assertEquals(expectedEmailResponse.statusCode, actualEmailResponse.statusCode)
         assertEquals("sendEmail Error, status:${expectedEmailResponse.statusText}", actualEmailResponse.statusText)
