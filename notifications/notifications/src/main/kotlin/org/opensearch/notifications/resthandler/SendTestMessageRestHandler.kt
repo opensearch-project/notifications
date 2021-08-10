@@ -14,18 +14,12 @@ package org.opensearch.notifications.resthandler
 import org.opensearch.client.node.NodeClient
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.notifications.NotificationConstants.FEATURE_TAG
-import org.opensearch.commons.notifications.NotificationsPluginInterface
-import org.opensearch.commons.notifications.action.SendNotificationResponse
 import org.opensearch.commons.notifications.model.ChannelMessage
 import org.opensearch.commons.notifications.model.EventSource
 import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.SeverityType
-import org.opensearch.commons.utils.contentParserNextToken
-import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
-import org.opensearch.notifications.action.SendMessageAction
 import org.opensearch.notifications.action.SendTestNotificationAction
-import org.opensearch.notifications.model.SendMessageRequest
 import org.opensearch.notifications.model.SendTestNotificationRequest
 import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
 import org.opensearch.rest.BytesRestResponse
@@ -33,7 +27,6 @@ import org.opensearch.rest.RestHandler.Route
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestRequest.Method.GET
 import org.opensearch.rest.RestStatus
-import org.opensearch.rest.action.RestToXContentListener
 
 /**
  * Rest handler for getting notification features.
@@ -91,52 +84,13 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
         request: RestRequest,
         client: NodeClient
     ) = RestChannelConsumer {
-        val log by logger(Exception::class.java)
-        log.info("debug execute send test message")
         val feature = Feature.fromTagOrDefault(request.param(FEATURE_TAG, Feature.NONE.tag))
         val configId = request.param(CONFIG_ID_TAG)
-        val source = generateEventSource(feature, configId)
-        val message = ChannelMessage(
-            getMessageTextDescription(feature, configId),
-            getMessageHtmlDescription(feature, configId),
-            null
-        )
-        val channelIds = listOf(configId)
-        // feature, configId
-        val sendTestNotificationRequest = SendTestNotificationRequest(source, message, channelIds)
-        log.info(sendTestNotificationRequest)
+        val sendTestNotificationRequest = SendTestNotificationRequest(feature, configId)
         client.execute(
             SendTestNotificationAction.ACTION_TYPE,
             sendTestNotificationRequest,
             RestResponseToXContentListener(it)
         )
-    }
-
-    private fun generateEventSource(feature: Feature, configId: String): EventSource {
-        return EventSource(
-            getMessageTitle(feature, configId),
-            configId,
-            feature,
-            SeverityType.INFO
-        )
-    }
-
-    private fun getMessageTitle(feature: Feature, configId: String): String {
-        return "[$feature] Test Message Title-$configId" // TODO: change as spec
-    }
-
-    private fun getMessageTextDescription(feature: Feature, configId: String): String {
-        return "Test message content body for config id $configId\nfrom feature ${feature.tag}" // TODO: change as spec
-    }
-
-    private fun getMessageHtmlDescription(feature: Feature, configId: String): String {
-        return """
-            <html>
-            <header><title>Test Message</title></header>
-            <body>
-            <p>Test Message for config id $configId from feature ${feature.tag}</p>
-            </body>
-            </html>
-        """.trimIndent() // TODO: change as spec
     }
 }

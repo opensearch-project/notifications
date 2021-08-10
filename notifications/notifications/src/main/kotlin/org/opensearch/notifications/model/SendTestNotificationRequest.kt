@@ -23,14 +23,10 @@ import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.CHANNEL_ID_LIST_TAG
-import org.opensearch.commons.notifications.NotificationConstants.CHANNEL_MESSAGE_TAG
-import org.opensearch.commons.notifications.NotificationConstants.EVENT_SOURCE_TAG
-import org.opensearch.commons.notifications.NotificationConstants.THREAD_CONTEXT_TAG
-import org.opensearch.commons.notifications.model.ChannelMessage
-import org.opensearch.commons.notifications.model.EventSource
-import org.opensearch.commons.utils.fieldIfNotNull
+import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_TAG
+import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.utils.logger
-import org.opensearch.commons.utils.stringList
 import java.io.IOException
 
 
@@ -38,9 +34,8 @@ import java.io.IOException
  * Action Request to send test notification.
  */
 class SendTestNotificationRequest : ActionRequest, ToXContentObject {
-    val eventSource: EventSource
-    val channelMessage: ChannelMessage
-    val channelIds: List<String>
+    val feature: Feature
+    val configId: String
 
     companion object {
         private val log by logger(SendTestNotificationRequest::class.java)
@@ -57,9 +52,8 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
         @JvmStatic
         @Throws(IOException::class)
         fun parse(parser: XContentParser): SendTestNotificationRequest {
-            var eventSource: EventSource? = null
-            var channelMessage: ChannelMessage? = null
-            var channelIds: List<String>? = null
+            var feature: Feature? = null
+            var configId: String? = null
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -70,19 +64,17 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    EVENT_SOURCE_TAG -> eventSource = EventSource.parse(parser)
-                    CHANNEL_MESSAGE_TAG -> channelMessage = ChannelMessage.parse(parser)
-                    CHANNEL_ID_LIST_TAG -> channelIds = parser.stringList()
+                    FEATURE_TAG -> feature = Feature.fromTagOrDefault(parser.text())
+                    CONFIG_ID_TAG -> configId = parser.text()
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing SendNotificationRequest")
                     }
                 }
             }
-            eventSource ?: throw IllegalArgumentException("$EVENT_SOURCE_TAG field absent")
-            channelMessage ?: throw IllegalArgumentException("$CHANNEL_MESSAGE_TAG field absent")
-            channelIds ?: throw IllegalArgumentException("$CHANNEL_ID_LIST_TAG field absent")
-            return SendTestNotificationRequest(eventSource, channelMessage, channelIds)
+            feature ?: throw IllegalArgumentException("$FEATURE_TAG field absent")
+            configId ?: throw IllegalArgumentException("$CHANNEL_ID_LIST_TAG field absent")
+            return SendTestNotificationRequest(feature, configId)
         }
     }
 
@@ -93,13 +85,11 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
      * @param channelIds the ids of the notification configuration channel
      */
     constructor(
-        eventSource: EventSource,
-        channelMessage: ChannelMessage,
-        channelIds: List<String>,
+        feature: Feature,
+        configId: String,
     ) {
-        this.eventSource = eventSource
-        this.channelMessage = channelMessage
-        this.channelIds = channelIds
+        this.feature = feature
+        this.configId = configId
     }
 
     /**
@@ -107,9 +97,8 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
      */
     @Throws(IOException::class)
     constructor(input: StreamInput) : super(input) {
-        eventSource = EventSource.reader.read(input)
-        channelMessage = ChannelMessage.reader.read(input)
-        channelIds = input.readStringList()
+        feature = Feature.fromTagOrDefault(input.readString())
+        configId = input.readString()
     }
 
     /**
@@ -118,9 +107,8 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
     @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
         super.writeTo(output)
-        eventSource.writeTo(output)
-        channelMessage.writeTo(output)
-        output.writeStringCollection(channelIds)
+        output.writeString(feature.tag)
+        output.writeString(configId)
     }
 
     /**
@@ -129,9 +117,8 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(EVENT_SOURCE_TAG, eventSource)
-            .field(CHANNEL_MESSAGE_TAG, channelMessage)
-            .field(CHANNEL_ID_LIST_TAG, channelIds)
+            .field(FEATURE_TAG, feature)
+            .field(CHANNEL_ID_LIST_TAG, configId)
             .endObject()
     }
 
@@ -140,8 +127,8 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
      */
     override fun validate(): ActionRequestValidationException? {
         var validationException: ActionRequestValidationException? = null
-        if (channelIds.isEmpty()) {
-            validationException = ValidateActions.addValidationError("channelIds is empty", validationException)
+        if (configId.isEmpty()) {
+            validationException = ValidateActions.addValidationError("config id is empty", validationException)
         }
         return validationException
     }
