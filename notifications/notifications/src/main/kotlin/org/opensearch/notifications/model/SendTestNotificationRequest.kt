@@ -22,13 +22,11 @@ import org.opensearch.common.xcontent.ToXContentObject
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
-import org.opensearch.commons.notifications.NotificationConstants.CHANNEL_ID_LIST_TAG
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.notifications.NotificationConstants.FEATURE_TAG
 import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.utils.logger
 import java.io.IOException
-
 
 /**
  * Action Request to send test notification.
@@ -68,21 +66,20 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
                     CONFIG_ID_TAG -> configId = parser.text()
                     else -> {
                         parser.skipChildren()
-                        log.info("Unexpected field: $fieldName, while parsing SendNotificationRequest")
+                        log.info("Unexpected field: $fieldName, while parsing SendTestNotificationRequest")
                     }
                 }
             }
             feature ?: throw IllegalArgumentException("$FEATURE_TAG field absent")
-            configId ?: throw IllegalArgumentException("$CHANNEL_ID_LIST_TAG field absent")
+            configId ?: throw IllegalArgumentException("$CONFIG_ID_TAG field absent")
             return SendTestNotificationRequest(feature, configId)
         }
     }
 
     /**
      * constructor for creating the class
-     * @param eventSource the notification info
-     * @param channelMessage the message to be sent to channel
-     * @param channelIds the ids of the notification configuration channel
+     * @param feature the notification info
+     * @param configId the id of the notification configuration channel
      */
     constructor(
         feature: Feature,
@@ -118,7 +115,7 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
         builder!!
         return builder.startObject()
             .field(FEATURE_TAG, feature)
-            .field(CHANNEL_ID_LIST_TAG, configId)
+            .field(CONFIG_ID_TAG, configId)
             .endObject()
     }
 

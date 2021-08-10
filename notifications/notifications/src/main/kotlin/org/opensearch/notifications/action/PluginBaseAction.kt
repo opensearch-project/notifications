@@ -165,5 +165,4 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
             cause.addSuppressed(closeException)
         }
     }
-
 }

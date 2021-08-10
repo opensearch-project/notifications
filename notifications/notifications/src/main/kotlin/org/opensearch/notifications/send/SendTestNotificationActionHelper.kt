@@ -9,7 +9,6 @@ import org.opensearch.commons.notifications.model.SeverityType
  * Helper function for send transport action.
  */
 object SendTestNotificationActionHelper {
-
     fun generateMessage(feature: Feature, configId: String): ChannelMessage {
         return ChannelMessage(
             getMessageTextDescription(feature, configId),

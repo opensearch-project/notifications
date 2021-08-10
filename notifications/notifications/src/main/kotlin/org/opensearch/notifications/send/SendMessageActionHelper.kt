@@ -38,7 +38,6 @@ import org.opensearch.notifications.index.EventOperations
 import org.opensearch.notifications.model.DocMetadata
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.model.NotificationEventDoc
-import org.opensearch.notifications.model.SendTestNotificationRequest
 import org.opensearch.notifications.security.UserAccess
 import org.opensearch.notifications.spi.NotificationSpi
 import org.opensearch.notifications.spi.model.DestinationMessageResponse

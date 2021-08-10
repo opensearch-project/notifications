@@ -14,10 +14,7 @@ package org.opensearch.notifications.resthandler
 import org.opensearch.client.node.NodeClient
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.notifications.NotificationConstants.FEATURE_TAG
-import org.opensearch.commons.notifications.model.ChannelMessage
-import org.opensearch.commons.notifications.model.EventSource
 import org.opensearch.commons.notifications.model.Feature
-import org.opensearch.commons.notifications.model.SeverityType
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.action.SendTestNotificationAction
 import org.opensearch.notifications.model.SendTestNotificationRequest
