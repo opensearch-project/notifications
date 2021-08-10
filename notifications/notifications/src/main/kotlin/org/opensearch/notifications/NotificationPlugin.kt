@@ -52,6 +52,7 @@ import org.opensearch.notifications.action.GetNotificationEventAction
 import org.opensearch.notifications.action.GetPluginFeaturesAction
 import org.opensearch.notifications.action.SendMessageAction
 import org.opensearch.notifications.action.SendNotificationAction
+import org.opensearch.notifications.action.SendTestNotificationAction
 import org.opensearch.notifications.action.UpdateNotificationConfigAction
 import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.notifications.index.EventIndexingActions
@@ -135,6 +136,7 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
     override fun getActions(): List<ActionPlugin.ActionHandler<out ActionRequest, out ActionResponse>> {
         log.debug("$LOG_PREFIX:getActions")
         return listOf(
+            ActionPlugin.ActionHandler(SendTestNotificationAction.ACTION_TYPE, SendTestNotificationAction::class.java),
             ActionPlugin.ActionHandler(SendMessageAction.ACTION_TYPE, SendMessageAction::class.java),
             ActionPlugin.ActionHandler(
                 NotificationsActions.CREATE_NOTIFICATION_CONFIG_ACTION_TYPE,

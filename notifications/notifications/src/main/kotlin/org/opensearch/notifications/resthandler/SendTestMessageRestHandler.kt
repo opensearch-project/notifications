@@ -15,11 +15,18 @@ import org.opensearch.client.node.NodeClient
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.notifications.NotificationConstants.FEATURE_TAG
 import org.opensearch.commons.notifications.NotificationsPluginInterface
+import org.opensearch.commons.notifications.action.SendNotificationResponse
 import org.opensearch.commons.notifications.model.ChannelMessage
 import org.opensearch.commons.notifications.model.EventSource
 import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.SeverityType
+import org.opensearch.commons.utils.contentParserNextToken
+import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
+import org.opensearch.notifications.action.SendMessageAction
+import org.opensearch.notifications.action.SendTestNotificationAction
+import org.opensearch.notifications.model.SendMessageRequest
+import org.opensearch.notifications.model.SendTestNotificationRequest
 import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
 import org.opensearch.rest.BytesRestResponse
 import org.opensearch.rest.RestHandler.Route
@@ -84,6 +91,8 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
         request: RestRequest,
         client: NodeClient
     ) = RestChannelConsumer {
+        val log by logger(Exception::class.java)
+        log.info("debug execute send test message")
         val feature = Feature.fromTagOrDefault(request.param(FEATURE_TAG, Feature.NONE.tag))
         val configId = request.param(CONFIG_ID_TAG)
         val source = generateEventSource(feature, configId)
@@ -93,12 +102,13 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
             null
         )
         val channelIds = listOf(configId)
-        NotificationsPluginInterface.sendNotification(
-            client,
-            source,
-            message,
-            channelIds,
-            RestToXContentListener(it)
+        // feature, configId
+        val sendTestNotificationRequest = SendTestNotificationRequest(source, message, channelIds)
+        log.info(sendTestNotificationRequest)
+        client.execute(
+            SendTestNotificationAction.ACTION_TYPE,
+            sendTestNotificationRequest,
+            RestResponseToXContentListener(it)
         )
     }
 
