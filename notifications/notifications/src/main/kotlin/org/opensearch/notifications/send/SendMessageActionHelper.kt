@@ -28,6 +28,7 @@ import org.opensearch.commons.notifications.model.EmailRecipientStatus
 import org.opensearch.commons.notifications.model.EventSource
 import org.opensearch.commons.notifications.model.EventStatus
 import org.opensearch.commons.notifications.model.NotificationEvent
+import org.opensearch.commons.notifications.model.SNS
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.notifications.model.Webhook
@@ -45,6 +46,7 @@ import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
 import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
+import org.opensearch.notifications.spi.model.destination.SNSDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import org.opensearch.rest.RestStatus
@@ -177,6 +179,7 @@ object SendMessageActionHelper {
             ConfigType.CHIME -> sendChimeMessage(configData as Chime, message, eventStatus)
             ConfigType.WEBHOOK -> sendWebhookMessage(configData as Webhook, message, eventStatus)
             ConfigType.EMAIL -> sendEmailMessage(configData as Email, childConfigs, message, eventStatus)
+            ConfigType.SNS -> sendSNSMessage(configData as SNS, message, eventStatus)
             ConfigType.SMTP_ACCOUNT -> null
             ConfigType.EMAIL_GROUP -> null
             ConfigType.SNS -> null
@@ -298,6 +301,15 @@ object SendMessageActionHelper {
             recipient,
             DeliveryStatus(status.statusCode.toString(), status.statusText)
         )
+    }
+
+    /**
+     * send message to SNS destination
+     */
+    private fun sendSNSMessage(sns: SNS, message: MessageContent, eventStatus: EventStatus): EventStatus {
+        val destination = SNSDestination(sns.topicARN, sns.roleARN)
+        val status = sendMessageThroughSpi(destination, message)
+        return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
 
     /**

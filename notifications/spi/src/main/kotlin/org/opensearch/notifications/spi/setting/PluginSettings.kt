@@ -135,6 +135,7 @@ internal object PluginSettings {
         "chime",
         "webhook",
         "email",
+        "sns",
         "smtp_account",
         "email_group"
     )
