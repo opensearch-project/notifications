@@ -166,7 +166,7 @@ class DestinationHttpClient {
     private fun validateResponseStatus(response: HttpResponse) {
         val statusCode: Int = response.statusLine.statusCode
         if (!VALID_RESPONSE_STATUS.contains(statusCode)) {
-            throw IOException("Failed: $response")
+            throw IOException("Failed: ${EntityUtils.toString(response.entity)}")
         }
     }
 

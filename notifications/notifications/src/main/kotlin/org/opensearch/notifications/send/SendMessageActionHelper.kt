@@ -15,6 +15,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.opensearch.OpenSearchStatusException
+import org.opensearch.common.xcontent.ToXContent
+import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.commons.authuser.User
 import org.opensearch.commons.destination.message.LegacyBaseMessage
 import org.opensearch.commons.destination.message.LegacyCustomWebhookMessage
@@ -59,6 +61,7 @@ import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import org.opensearch.notifications.spi.model.destination.SnsDestination
 import org.opensearch.rest.RestStatus
+import java.io.ByteArrayOutputStream
 import java.time.Instant
 
 /**
@@ -104,6 +107,21 @@ object SendMessageActionHelper {
         val eventDoc = NotificationEventDoc(docMetadata, event)
         val docId = eventOperations.createNotificationEvent(eventDoc)
             ?: throw OpenSearchStatusException("Indexing not Acknowledged", RestStatus.INSUFFICIENT_STORAGE)
+        // traverse status to determine HTTP status code
+        var overallStatusCode = eventStatusList.first().deliveryStatus?.statusCode
+        eventStatusList.forEach { eventStatus ->
+            if (eventStatus.deliveryStatus?.statusCode != overallStatusCode) {
+                overallStatusCode = RestStatus.MULTI_STATUS.status.toString()
+            }
+        }
+        val eventStatusListString = eventStatusList.joinToString(",", "[", "]") { getJsonString(it) }
+        if (overallStatusCode != RestStatus.OK.status.toString()) {
+            val errorMessage = "{\"notification_id\": \"$docId\",\"event_status_list\": $eventStatusListString}"
+            throw OpenSearchStatusException(
+                errorMessage, RestStatus.fromCode(overallStatusCode!!.toInt())
+            )
+        }
+
         return SendNotificationResponse(docId)
     }
 
@@ -537,5 +555,17 @@ object SendMessageActionHelper {
         val configDoc = configOperations.getNotificationConfig(configId)
             ?: throw OpenSearchStatusException("getConfigs $configId not found", RestStatus.NOT_FOUND)
         return listOf(configDoc)
+    }
+
+    /**
+     * Covert object to json String
+     */
+    private fun getJsonString(xContent: ToXContent): String {
+        ByteArrayOutputStream().use { byteArrayOutputStream ->
+            val builder = XContentFactory.jsonBuilder(byteArrayOutputStream)
+            xContent.toXContent(builder, ToXContent.EMPTY_PARAMS)
+            builder.close()
+            return byteArrayOutputStream.toString("UTF8")
+        }
     }
 }
