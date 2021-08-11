@@ -23,14 +23,16 @@ internal object DestinationTransportProvider {
 
     private val webhookDestinationTransport = WebhookDestinationTransport()
     private val smtpDestinationTransport = SmtpDestinationTransport()
+    private val snsDestinationTransport = SNSDestinationTransport()
 
     @OpenForTesting
     var destinationTransportMap = mapOf(
-        // TODO Add other destinations, ses, sns
+        // TODO Add other destinations, ses
         DestinationType.SLACK to webhookDestinationTransport,
         DestinationType.CHIME to webhookDestinationTransport,
         DestinationType.CUSTOM_WEBHOOK to webhookDestinationTransport,
-        DestinationType.SMTP to smtpDestinationTransport
+        DestinationType.SMTP to smtpDestinationTransport,
+        DestinationType.SNS to snsDestinationTransport
     )
 
     /**
