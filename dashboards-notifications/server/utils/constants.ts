@@ -255,12 +255,16 @@ export const DEFAULT_ROLLING_COUNTER: CountersType = {
   },
   ses: {
     send: {
-      total: 0
+      count: 0,
+      system_error: 0,
+      user_error: 0,
     }
   },
   sns: {
     send: {
-      total: 0
+      count: 0,
+      system_error: 0,
+      user_error: 0,
     }
   }
 }
