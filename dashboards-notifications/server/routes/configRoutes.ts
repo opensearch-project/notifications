@@ -15,7 +15,8 @@ import {
   IRouter,
 } from '../../../../src/core/server';
 import { NODE_API } from '../../common';
-import { joinRequestParams } from '../utils/helper';
+import { checkErrorType, joinRequestParams } from '../utils/helper';
+import { addToMetric } from '../utils/metricsHelper';
 
 export function configRoutes(router: IRouter) {
   router.get(
@@ -43,6 +44,7 @@ export function configRoutes(router: IRouter) {
       },
     },
     async (context, request, response) => {
+      addToMetric('config', 'list', 'count');
       const config_type = joinRequestParams(request.query.config_type);
       const feature_list = joinRequestParams(request.query.feature_list);
       const config_id_list = joinRequestParams(request.query.config_id_list);
@@ -68,6 +70,7 @@ export function configRoutes(router: IRouter) {
         );
         return response.ok({ body: resp });
       } catch (error) {
+        addToMetric('config', 'list', checkErrorType(error));
         return response.custom({
           statusCode: error.statusCode || 500,
           body: error.message,
@@ -86,6 +89,7 @@ export function configRoutes(router: IRouter) {
       },
     },
     async (context, request, response) => {
+      addToMetric('config', 'info', 'count');
       // @ts-ignore
       const client: ILegacyScopedClusterClient = context.notificationsContext.notificationsClient.asScoped(
         request
@@ -97,6 +101,7 @@ export function configRoutes(router: IRouter) {
         );
         return response.ok({ body: resp });
       } catch (error) {
+        addToMetric('config', 'info', checkErrorType(error));
         return response.custom({
           statusCode: error.statusCode || 500,
           body: error.message,
@@ -113,6 +118,7 @@ export function configRoutes(router: IRouter) {
       },
     },
     async (context, request, response) => {
+      addToMetric('config', 'create', 'count');
       // @ts-ignore
       const client: ILegacyScopedClusterClient = context.notificationsContext.notificationsClient.asScoped(
         request
@@ -122,8 +128,10 @@ export function configRoutes(router: IRouter) {
           'notifications.createConfig',
           { body: request.body }
         );
+        addToMetric('config', 'create', 'count', request.body);
         return response.ok({ body: resp });
       } catch (error) {
+        addToMetric('config', 'create', checkErrorType(error));
         return response.custom({
           statusCode: error.statusCode || 500,
           body: error.message,
@@ -143,6 +151,7 @@ export function configRoutes(router: IRouter) {
       },
     },
     async (context, request, response) => {
+      addToMetric('config', 'update', 'count');
       // @ts-ignore
       const client: ILegacyScopedClusterClient = context.notificationsContext.notificationsClient.asScoped(
         request
@@ -157,6 +166,7 @@ export function configRoutes(router: IRouter) {
         );
         return response.ok({ body: resp });
       } catch (error) {
+        addToMetric('config', 'update', checkErrorType(error));
         return response.custom({
           statusCode: error.statusCode || 500,
           body: error.message,
@@ -178,6 +188,7 @@ export function configRoutes(router: IRouter) {
       },
     },
     async (context, request, response) => {
+      addToMetric('config', 'delete', 'count');
       // @ts-ignore
       const client: ILegacyScopedClusterClient = context.notificationsContext.notificationsClient.asScoped(
         request
@@ -190,6 +201,7 @@ export function configRoutes(router: IRouter) {
         );
         return response.ok({ body: resp });
       } catch (error) {
+        addToMetric('config', 'delete', checkErrorType(error));
         return response.custom({
           statusCode: error.statusCode || 500,
           body: error.message,
@@ -204,6 +216,7 @@ export function configRoutes(router: IRouter) {
       validate: false,
     },
     async (context, request, response) => {
+      addToMetric('feature', 'list', 'count');
       // @ts-ignore
       const client: ILegacyScopedClusterClient = context.notificationsContext.notificationsClient.asScoped(
         request
@@ -214,6 +227,7 @@ export function configRoutes(router: IRouter) {
         );
         return response.ok({ body: resp });
       } catch (error) {
+        addToMetric('feature', 'list', checkErrorType(error));
         return response.custom({
           statusCode: error.statusCode || 500,
           body: error.message,

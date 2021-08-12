@@ -16,3 +16,11 @@ export const joinRequestParams = (
   if (typeof queryParams === 'string') return queryParams;
   return '';
 };
+
+export const checkErrorType = (error: any) => {
+  if (error.statusCode && Math.floor(error.statusCode / 100) === 4) {
+    return 'user_error';
+  } else {
+    return 'system_error';
+  }
+};

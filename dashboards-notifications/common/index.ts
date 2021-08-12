@@ -41,6 +41,7 @@ export const NODE_API = Object.freeze({
   GET_EVENT: `${NODE_API_BASE_PATH}/get_event`,
   GET_AVAILABLE_FEATURES: `${NODE_API_BASE_PATH}/features`,
   SEND_TEST_MESSAGE: `${NODE_API_BASE_PATH}/test_message`,
+  STATS: `${NODE_API_BASE_PATH}/stats`
 });
 
 // TODO change to _plugins when backend updates

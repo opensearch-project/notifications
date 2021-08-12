@@ -15,7 +15,8 @@ import {
   IRouter,
 } from '../../../../src/core/server';
 import { NODE_API } from '../../common';
-import { joinRequestParams } from '../utils/helper';
+import { checkErrorType, joinRequestParams } from '../utils/helper';
+import { addToMetric } from '../utils/metricsHelper';
 
 export function eventRoutes(router: IRouter) {
   router.get(
@@ -48,6 +49,7 @@ export function eventRoutes(router: IRouter) {
       },
     },
     async (context, request, response) => {
+      addToMetric('event', 'list', 'count');
       const query = request.query.query;
       const last_updated_time_ms = request.query.last_updated_time_ms;
       const config_name = joinRequestParams(
@@ -86,6 +88,7 @@ export function eventRoutes(router: IRouter) {
         });
         return response.ok({ body: resp });
       } catch (error) {
+        addToMetric('event', 'list', checkErrorType(error))
         return response.custom({
           statusCode: error.statusCode || 500,
           body: error.message,
@@ -104,6 +107,7 @@ export function eventRoutes(router: IRouter) {
       },
     },
     async (context, request, response) => {
+      addToMetric('event', 'info', 'count');
       // @ts-ignore
       const client: ILegacyScopedClusterClient = context.notificationsContext.notificationsClient.asScoped(
         request
@@ -115,6 +119,7 @@ export function eventRoutes(router: IRouter) {
         );
         return response.ok({ body: resp });
       } catch (error) {
+        addToMetric('event', 'info', checkErrorType(error))
         return response.custom({
           statusCode: error.statusCode || 500,
           body: error.message,
@@ -136,6 +141,7 @@ export function eventRoutes(router: IRouter) {
       },
     },
     async (context, request, response) => {
+      addToMetric('send_test_message', 'info', 'count');
       // @ts-ignore
       const client: ILegacyScopedClusterClient = context.notificationsContext.notificationsClient.asScoped(
         request
@@ -150,6 +156,7 @@ export function eventRoutes(router: IRouter) {
         );
         return response.ok({ body: resp });
       } catch (error) {
+        addToMetric('send_test_message', 'info', checkErrorType(error));
         return response.custom({
           statusCode: error.statusCode || 500,
           body: error.message,
