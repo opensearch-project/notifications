@@ -12,8 +12,10 @@
 package org.opensearch.notifications.spi.credentials
 
 import com.amazonaws.services.sns.AmazonSNS
-import org.opensearch.notifications.spi.model.destination.SNSDestination
 
-interface SNSClient {
-    fun getClient(destination: SNSDestination): AmazonSNS
+/**
+ * Interface for creating SNS client
+ */
+interface SnsClientFactory {
+    fun createSnsClient(region: String, roleArn: String?): AmazonSNS
 }

@@ -104,9 +104,15 @@ properties:
         type: object
         properties:
           topic_arn:
-            type: keyword
+            type: text
+            fields:
+              keyword:
+                type: keyword
           role_arn:
-            type: keyword
+            type: text
+            fields:
+              keyword:
+                type: keyword
       smtp_account: # smtp account configuration
         type: object
         properties:
