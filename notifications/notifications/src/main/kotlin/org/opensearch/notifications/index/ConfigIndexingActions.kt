@@ -238,6 +238,10 @@ object ConfigIndexingActions {
                 RestStatus.FORBIDDEN
             )
         }
+        if (currentConfigDoc.configDoc.config.configType != request.notificationConfig.configType) {
+            throw OpenSearchStatusException("Config type cannot be changed after creation", RestStatus.CONFLICT)
+        }
+
         val newMetadata = currentMetadata.copy(lastUpdateTime = Instant.now())
         val newConfigData = NotificationConfigDoc(newMetadata, request.notificationConfig)
         if (!operations.updateNotificationConfig(request.configId, newConfigData)) {
