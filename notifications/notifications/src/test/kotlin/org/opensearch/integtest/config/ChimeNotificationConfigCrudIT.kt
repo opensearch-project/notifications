@@ -203,4 +203,65 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.BAD_REQUEST.status
         )
     }
+
+    fun `test update existing config to different config type`() {
+        // Create sample config request reference
+        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.CHIME,
+            EnumSet.of(Feature.ALERTING, Feature.REPORTS),
+            isEnabled = true,
+            configData = sampleChime
+        )
+
+        // Create chime notification config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"chime",
+                "feature_list":[
+                    "${referenceObject.features.elementAt(0)}",
+                    "${referenceObject.features.elementAt(1)}"
+                ],
+                "is_enabled":${referenceObject.isEnabled},
+                "chime":{"url":"${(referenceObject.configData as Chime).url}"}
+            }
+        }
+        """.trimIndent()
+        val createResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createRequestJsonString,
+            RestStatus.OK.status
+        )
+        val configId = createResponse.get("config_id").asString
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        // Update to slack notification config
+        val updateRequestJsonString = """
+        {
+            "config":{
+                "name":"this is a updated config name",
+                "description":"this is a updated config description",
+                "config_type":"slack",
+                "feature_list":[
+                    "${Feature.INDEX_MANAGEMENT}"
+                ],
+                "is_enabled":"true",
+                "slack":{"url":"https://updated.domain.com/updated_slack_url#0987654321"}
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.PUT.name,
+            "$PLUGIN_BASE_URI/configs/$configId",
+            updateRequestJsonString,
+            RestStatus.CONFLICT.status
+        )
+    }
 }
