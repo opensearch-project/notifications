@@ -70,7 +70,7 @@ jobs:
       - name: Build with Gradle
         run: |
           cd notifications
-          ./gradlew build -PexcludeTests="**/SesChannelIT*, **/PluginActionTests*" -Dopensearch.version=${{ env.OPENSEARCH_VERSION }}.0
+          ./gradlew build -PexcludeTests="**/SesChannelIT*" -Dopensearch.version=${{ env.OPENSEARCH_VERSION }}.0
 
       - name: Upload coverage
         uses: codecov/codecov-action@v1
