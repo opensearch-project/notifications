@@ -20,6 +20,7 @@ import org.opensearch.commons.destination.message.LegacyBaseMessage
 import org.opensearch.commons.destination.message.LegacyCustomWebhookMessage
 import org.opensearch.commons.destination.message.LegacyDestinationType
 import org.opensearch.commons.destination.response.LegacyDestinationResponse
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
 import org.opensearch.commons.notifications.action.LegacyPublishNotificationRequest
 import org.opensearch.commons.notifications.action.LegacyPublishNotificationResponse
 import org.opensearch.commons.notifications.action.SendNotificationRequest
@@ -236,26 +237,27 @@ object SendMessageActionHelper {
      */
     private fun sendMessageToLegacyDestination(baseMessage: LegacyBaseMessage): LegacyDestinationResponse {
         val message = MessageContent(title = "Index Management Notification", textDescription = baseMessage.messageContent)
+        // These legacy destination calls do not have reference Ids, just passing index management feature constant
         return when (baseMessage.channelType) {
-            LegacyDestinationType.SLACK -> {
+            LegacyDestinationType.LEGACY_SLACK -> {
                 val destination = SlackDestination(baseMessage.url)
-                val status = sendMessageThroughSpi(destination, message)
+                val status = sendMessageThroughSpi(destination, message, FEATURE_INDEX_MANAGEMENT)
                 LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
                     .withResponseContent(status.statusText).build()
             }
-            LegacyDestinationType.CHIME -> {
+            LegacyDestinationType.LEGACY_CHIME -> {
                 val destination = ChimeDestination(baseMessage.url)
-                val status = sendMessageThroughSpi(destination, message)
+                val status = sendMessageThroughSpi(destination, message, FEATURE_INDEX_MANAGEMENT)
                 LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
                     .withResponseContent(status.statusText).build()
             }
-            LegacyDestinationType.CUSTOMWEBHOOK -> {
+            LegacyDestinationType.LEGACY_CUSTOM_WEBHOOK -> {
                 val destination = CustomWebhookDestination(
                     (baseMessage as LegacyCustomWebhookMessage).uri.toString(),
                     baseMessage.headerParams,
                     baseMessage.method
                 )
-                val status = sendMessageThroughSpi(destination, message)
+                val status = sendMessageThroughSpi(destination, message, FEATURE_INDEX_MANAGEMENT)
                 LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
                     .withResponseContent(status.statusText).build()
             }
