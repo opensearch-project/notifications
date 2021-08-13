@@ -28,8 +28,10 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_ALERTING
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.ConfigType
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.integtest.PluginRestTestCase
@@ -37,7 +39,6 @@ import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
-import java.util.EnumSet
 
 class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
 
@@ -51,7 +52,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.WEBHOOK,
-            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS, Feature.ALERTING),
+            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS, FEATURE_ALERTING),
             isEnabled = true,
             configData = sampleWebhook
         )
@@ -116,7 +117,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a updated config name",
             "this is a updated config description",
             ConfigType.WEBHOOK,
-            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS),
+            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
             isEnabled = true,
             configData = updatedWebhook
         )
@@ -185,7 +186,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.WEBHOOK,
-            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS, Feature.ALERTING),
+            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS, FEATURE_ALERTING),
             isEnabled = true,
             configData = sampleWebhook
         )

@@ -100,6 +100,19 @@ properties:
                 type: keyword
           email_group_id_list:
             type: keyword
+      sns: # sns configuration
+        type: object
+        properties:
+          topic_arn:
+            type: text
+            fields:
+              keyword:
+                type: keyword
+          role_arn:
+            type: text
+            fields:
+              keyword:
+                type: keyword
       smtp_account: # smtp account configuration
         type: object
         properties:

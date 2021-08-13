@@ -33,20 +33,21 @@ import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.message.BasicStatusLine
 import org.easymock.EasyMock
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.opensearch.notifications.spi.client.DestinationHttpClient
-import org.opensearch.notifications.spi.factory.DestinationFactoryProvider
-import org.opensearch.notifications.spi.factory.WebhookDestinationFactory
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.notifications.spi.model.destination.SlackDestination
+import org.opensearch.notifications.spi.transport.DestinationTransportProvider
+import org.opensearch.notifications.spi.transport.WebhookDestinationTransport
 import org.opensearch.rest.RestStatus
 import java.net.MalformedURLException
 import java.util.stream.Stream
@@ -65,7 +66,6 @@ internal class SlackDestinationTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `test Slack message null entity response`() {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
 
@@ -84,8 +84,8 @@ internal class SlackDestinationTests {
         EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
-        val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf(DestinationType.SLACK to webhookDestinationFactory)
+        val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
+        DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SLACK to webhookDestinationTransport)
 
         val title = "test Slack"
         val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -96,14 +96,13 @@ internal class SlackDestinationTests {
         val destination = SlackDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualSlackResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
+        val actualSlackResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message, "ref")
 
         assertEquals(expectedWebhookResponse.statusText, actualSlackResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualSlackResponse.statusCode)
     }
 
     @Test
-    @Throws(Exception::class)
     fun `test Slack message empty entity response`() {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
         val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "")
@@ -119,8 +118,8 @@ internal class SlackDestinationTests {
         EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
-        val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf(DestinationType.SLACK to webhookDestinationFactory)
+        val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
+        DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SLACK to webhookDestinationTransport)
 
         val title = "test Slack"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -131,14 +130,13 @@ internal class SlackDestinationTests {
         val destination = SlackDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualSlackResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
+        val actualSlackResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message, "ref")
 
         assertEquals(expectedWebhookResponse.statusText, actualSlackResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualSlackResponse.statusCode)
     }
 
     @Test
-    @Throws(Exception::class)
     fun `test Slack message non-empty entity response`() {
         val responseContent = "It worked!"
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
@@ -155,8 +153,8 @@ internal class SlackDestinationTests {
         EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
-        val webhookDestinationFactory = WebhookDestinationFactory(httpClient)
-        DestinationFactoryProvider.destinationFactoryMap = mapOf(DestinationType.SLACK to webhookDestinationFactory)
+        val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
+        DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SLACK to webhookDestinationTransport)
 
         val title = "test Slack"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
@@ -167,20 +165,18 @@ internal class SlackDestinationTests {
         val destination = SlackDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualSlackResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
+        val actualSlackResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message, "ref")
 
         assertEquals(expectedWebhookResponse.statusText, actualSlackResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualSlackResponse.statusCode)
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun testUrlMissingMessage() {
-        try {
+    @Test
+    fun `test url missing should throw IllegalArgumentException with message`() {
+        val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
             SlackDestination("")
-        } catch (ex: Exception) {
-            assertEquals("url is null or empty", ex.message)
-            throw ex
         }
+        assertEquals("url is null or empty", exception.message)
     }
 
     @Test

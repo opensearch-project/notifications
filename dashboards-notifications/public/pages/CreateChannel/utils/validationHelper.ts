@@ -36,7 +36,7 @@ export const validateChannelName = (name: string) => {
 export const validateWebhookURL = (url: string) => {
   const errors = [];
   if (url.length === 0) errors.push('Webhook URL cannot be empty.');
-  else if (!url.match(/^https:\/\/.+/)) errors.push('Invalid webhook URL.');
+  else if (!url.match(/^https?:\/\/.+/)) errors.push('Invalid webhook URL.');
   return errors;
 };
 
@@ -55,7 +55,6 @@ export const validateWebhookValue = (value: string) => {
 export const validateCustomURLHost = (host: string) => {
   const errors = [];
   if (host.length === 0) errors.push('Host cannot be empty.');
-  else if (host.match(/^http:\/\//)) errors.push('Invalid webhook URL.');
   return errors;
 };
 

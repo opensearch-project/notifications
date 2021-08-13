@@ -9,7 +9,7 @@
  *  GitHub history for details.
  */
 
-package org.opensearch.notifications.spi.factory
+package org.opensearch.notifications.spi.transport
 
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
@@ -20,15 +20,18 @@ import org.opensearch.notifications.spi.model.destination.BaseDestination
  *
  * @param <T> message object of type [{@link DestinationType}]
  */
-internal interface DestinationFactory<T : BaseDestination> {
+internal interface DestinationTransport<T : BaseDestination> {
     /**
      * Sending notification message over this channel.
      *
+     * @param destination destination configuration for sending message
      * @param message The message to send notification
+     * @param referenceId referenceId for message
      * @return Channel message response
      */
     fun sendMessage(
         destination: T,
-        message: MessageContent
+        message: MessageContent,
+        referenceId: String
     ): DestinationMessageResponse
 }

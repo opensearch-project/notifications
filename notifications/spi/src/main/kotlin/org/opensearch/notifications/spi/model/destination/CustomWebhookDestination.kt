@@ -20,7 +20,7 @@ class CustomWebhookDestination(
     url: String,
     val headerParams: Map<String, String>,
     val method: String
-) : WebhookDestination(url, DestinationType.CUSTOMWEBHOOK) {
+) : WebhookDestination(url, DestinationType.CUSTOM_WEBHOOK) {
 
     init {
         validateMethod(method)

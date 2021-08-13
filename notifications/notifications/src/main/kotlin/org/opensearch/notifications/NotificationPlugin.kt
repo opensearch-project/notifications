@@ -51,7 +51,6 @@ import org.opensearch.notifications.action.GetNotificationConfigAction
 import org.opensearch.notifications.action.GetNotificationEventAction
 import org.opensearch.notifications.action.GetPluginFeaturesAction
 import org.opensearch.notifications.action.PublishNotificationAction
-import org.opensearch.notifications.action.SendMessageAction
 import org.opensearch.notifications.action.SendNotificationAction
 import org.opensearch.notifications.action.UpdateNotificationConfigAction
 import org.opensearch.notifications.index.ConfigIndexingActions
@@ -62,12 +61,10 @@ import org.opensearch.notifications.resthandler.NotificationConfigRestHandler
 import org.opensearch.notifications.resthandler.NotificationEventRestHandler
 import org.opensearch.notifications.resthandler.NotificationFeatureChannelListRestHandler
 import org.opensearch.notifications.resthandler.NotificationFeaturesRestHandler
-import org.opensearch.notifications.resthandler.SendMessageRestHandler
 import org.opensearch.notifications.resthandler.SendTestMessageRestHandler
 import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.notifications.settings.PluginSettings
-import org.opensearch.notifications.throttle.Accountant
 import org.opensearch.plugins.ActionPlugin
 import org.opensearch.plugins.Plugin
 import org.opensearch.repositories.RepositoriesService
@@ -126,7 +123,6 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
         SendMessageActionHelper.initialize(NotificationConfigIndex, NotificationEventIndex, UserAccessManager)
         EventIndexingActions.initialize(NotificationEventIndex, UserAccessManager)
-        Accountant.initialize(client, clusterService)
         return listOf()
     }
 
@@ -136,7 +132,6 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
     override fun getActions(): List<ActionPlugin.ActionHandler<out ActionRequest, out ActionResponse>> {
         log.debug("$LOG_PREFIX:getActions")
         return listOf(
-            ActionPlugin.ActionHandler(SendMessageAction.ACTION_TYPE, SendMessageAction::class.java),
             ActionPlugin.ActionHandler(
                 NotificationsActions.CREATE_NOTIFICATION_CONFIG_ACTION_TYPE,
                 CreateNotificationConfigAction::class.java
@@ -190,7 +185,6 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
     ): List<RestHandler> {
         log.debug("$LOG_PREFIX:getRestHandlers")
         return listOf(
-            SendMessageRestHandler(),
             NotificationConfigRestHandler(),
             NotificationEventRestHandler(),
             NotificationFeaturesRestHandler(),

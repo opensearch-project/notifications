@@ -31,26 +31,21 @@ import org.opensearch.common.Strings
 import org.opensearch.notifications.spi.utils.validateEmail
 
 /**
- * This class holds the contents of email destination
+ * This class holds the contents of smtp destination
  */
-class EmailDestination(
+class SmtpDestination(
+    val accountName: String,
     val host: String,
     val port: Int,
     val method: String,
     val fromAddress: String,
-    val recipient: String,
-    destinationType: DestinationType, // smtp or ses
-) : BaseDestination(destinationType) {
+    val recipient: String
+) : BaseDestination(DestinationType.SMTP) {
 
     init {
-        when (destinationType) {
-            DestinationType.SMTP -> {
-                require(!Strings.isNullOrEmpty(host)) { "Host name should be provided" }
-                require(port > 0) { "Port should be positive value" }
-                validateEmail(fromAddress)
-                validateEmail(recipient)
-            }
-            // TODO Add ses here
-        }
+        require(!Strings.isNullOrEmpty(host)) { "Host name should be provided" }
+        require(port > 0) { "Port should be positive value" }
+        validateEmail(fromAddress)
+        validateEmail(recipient)
     }
 }

@@ -9,7 +9,7 @@
  *  GitHub history for details.
  */
 
-package org.opensearch.notifications.spi.factory
+package org.opensearch.notifications.spi.transport
 
 import org.opensearch.notifications.spi.client.DestinationClientPool
 import org.opensearch.notifications.spi.client.DestinationHttpClient
@@ -24,9 +24,9 @@ import java.io.IOException
 /**
  * This class handles the client responsible for submitting the messages to all types of webhook destinations.
  */
-internal class WebhookDestinationFactory : DestinationFactory<WebhookDestination> {
+internal class WebhookDestinationTransport : DestinationTransport<WebhookDestination> {
 
-    private val log by logger(WebhookDestinationFactory::class.java)
+    private val log by logger(WebhookDestinationTransport::class.java)
     private val destinationHttpClient: DestinationHttpClient
 
     constructor() {
@@ -38,12 +38,16 @@ internal class WebhookDestinationFactory : DestinationFactory<WebhookDestination
         this.destinationHttpClient = destinationHttpClient
     }
 
-    override fun sendMessage(destination: WebhookDestination, message: MessageContent): DestinationMessageResponse {
+    override fun sendMessage(
+        destination: WebhookDestination,
+        message: MessageContent,
+        referenceId: String
+    ): DestinationMessageResponse {
         return try {
-            val response = destinationHttpClient.execute(destination, message)
+            val response = destinationHttpClient.execute(destination, message, referenceId)
             DestinationMessageResponse(RestStatus.OK.status, response)
         } catch (exception: IOException) {
-            log.error("Exception sending message: $message", exception)
+            log.error("Exception sending message $referenceId: $message", exception)
             DestinationMessageResponse(
                 RestStatus.INTERNAL_SERVER_ERROR.status,
                 "Failed to send message ${exception.message}"
