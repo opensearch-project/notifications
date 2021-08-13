@@ -28,9 +28,11 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_ALERTING
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
@@ -41,7 +43,6 @@ import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
-import java.util.EnumSet
 
 class CreateNotificationConfigIT : PluginRestTestCase() {
 
@@ -52,7 +53,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.SLACK,
-            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS),
+            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSlack
         )
@@ -83,7 +84,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
-        // Get slack notification config
+        // Get Slack notification config
 
         val getConfigResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -102,7 +103,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.CHIME,
-            EnumSet.of(Feature.ALERTING, Feature.REPORTS),
+            setOf(FEATURE_ALERTING, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleChime
         )
@@ -151,7 +152,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.WEBHOOK,
-            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS, Feature.ALERTING),
+            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS, FEATURE_ALERTING),
             isEnabled = true,
             configData = sampleWebhook
         )
@@ -200,7 +201,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             "this is another config name",
             "this is another config description",
             ConfigType.WEBHOOK,
-            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS),
+            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
             isEnabled = true,
             configData = anotherWebhook
         )
@@ -244,7 +245,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             "this is a sample smtp account config name",
             "this is a sample smtp account config description",
             ConfigType.SMTP_ACCOUNT,
-            EnumSet.of(Feature.REPORTS),
+            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSmtpAccount
         )

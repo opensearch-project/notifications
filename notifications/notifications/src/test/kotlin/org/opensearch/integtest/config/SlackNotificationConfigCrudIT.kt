@@ -28,8 +28,9 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.ConfigType
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.integtest.PluginRestTestCase
@@ -37,7 +38,6 @@ import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
-import java.util.EnumSet
 
 class SlackNotificationConfigCrudIT : PluginRestTestCase() {
 
@@ -48,7 +48,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.SLACK,
-            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS),
+            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSlack
         )
@@ -79,7 +79,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
-        // Get slack notification config
+        // Get Slack notification config
 
         val getConfigResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -107,7 +107,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a updated config name",
             "this is a updated config description",
             ConfigType.SLACK,
-            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS),
+            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
             isEnabled = true,
             configData = updatedSlack
         )
@@ -137,7 +137,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         Assert.assertEquals(configId, updateResponse.get("config_id").asString)
         Thread.sleep(1000)
 
-        // Get updated slack notification config
+        // Get updated Slack notification config
 
         val getUpdatedConfigResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -176,7 +176,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.SLACK,
-            EnumSet.of(Feature.INDEX_MANAGEMENT, Feature.REPORTS),
+            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSlack
         )

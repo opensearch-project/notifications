@@ -28,9 +28,9 @@ import org.opensearch.commons.notifications.model.EmailRecipientStatus
 import org.opensearch.commons.notifications.model.EventSource
 import org.opensearch.commons.notifications.model.EventStatus
 import org.opensearch.commons.notifications.model.NotificationEvent
-import org.opensearch.commons.notifications.model.SNS
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.SmtpAccount
+import org.opensearch.commons.notifications.model.Sns
 import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
@@ -191,9 +191,10 @@ object SendMessageActionHelper {
                 eventStatus,
                 eventSource.referenceId
             )
+            ConfigType.SES_ACCOUNT -> null // TODO : Implement
             ConfigType.SMTP_ACCOUNT -> null
             ConfigType.EMAIL_GROUP -> null
-            ConfigType.SNS -> sendSNSMessage(configData as SNS, message, eventStatus, eventSource.referenceId)
+            ConfigType.SNS -> sendSNSMessage(configData as Sns, message, eventStatus, eventSource.referenceId)
         }
         return if (response == null) {
             log.warn("Cannot send message to destination for config id :${channel.docInfo.id}")
@@ -341,12 +342,12 @@ object SendMessageActionHelper {
      * send message to SNS destination
      */
     private fun sendSNSMessage(
-        sns: SNS,
+        sns: Sns,
         message: MessageContent,
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
-        val destination = SnsDestination(sns.topicARN, sns.roleARN)
+        val destination = SnsDestination(sns.topicArn, sns.roleArn)
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }

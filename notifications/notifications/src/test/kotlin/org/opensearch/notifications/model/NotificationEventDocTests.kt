@@ -29,11 +29,11 @@ package org.opensearch.notifications.model
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_ALERTING
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.DeliveryStatus
 import org.opensearch.commons.notifications.model.EventSource
 import org.opensearch.commons.notifications.model.EventStatus
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.NotificationEvent
 import org.opensearch.commons.notifications.model.SeverityType
 import org.opensearch.notifications.createObjectFromJsonString
@@ -55,7 +55,7 @@ internal class NotificationEventDocTests {
         val sampleEventSource = EventSource(
             "title",
             "reference_id",
-            Feature.ALERTING,
+            FEATURE_ALERTING,
             tags = listOf("tag1", "tag2"),
             severity = SeverityType.INFO
         )
@@ -85,7 +85,7 @@ internal class NotificationEventDocTests {
         val eventSource = EventSource(
             "title",
             "reference_id",
-            Feature.ALERTING,
+            FEATURE_ALERTING,
             tags = listOf("tag1", "tag2"),
             severity = SeverityType.INFO
         )

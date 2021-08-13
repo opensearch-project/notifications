@@ -28,10 +28,11 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Email
 import org.opensearch.commons.notifications.model.EmailGroup
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.SmtpAccount
@@ -43,7 +44,6 @@ import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.notifications.verifySingleConfigIdEquals
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
-import java.util.EnumSet
 
 class EmailNotificationConfigCrudIT : PluginRestTestCase() {
 
@@ -59,7 +59,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample smtp account config name",
             "this is a sample smtp account config description",
             ConfigType.SMTP_ACCOUNT,
-            EnumSet.of(Feature.REPORTS),
+            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSmtpAccount
         )
@@ -100,7 +100,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample email group config name",
             "this is a sample email group config description",
             ConfigType.EMAIL_GROUP,
-            EnumSet.of(Feature.REPORTS),
+            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleEmailGroup
         )
@@ -145,7 +145,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.EMAIL,
-            EnumSet.of(Feature.REPORTS),
+            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleEmail
         )
@@ -241,7 +241,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a updated smtp account config name",
             "this is a updated smtp account config description",
             ConfigType.SMTP_ACCOUNT,
-            EnumSet.of(Feature.REPORTS),
+            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = updatedSmtpAccount
         )
@@ -367,7 +367,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.EMAIL,
-            EnumSet.of(Feature.REPORTS),
+            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleEmail
         )
@@ -425,7 +425,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.EMAIL,
-            EnumSet.of(Feature.REPORTS),
+            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleEmail
         )
@@ -483,7 +483,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample smtp account config name",
             "this is a sample smtp account config description",
             ConfigType.SMTP_ACCOUNT,
-            EnumSet.of(Feature.REPORTS),
+            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSmtpAccount
         )
@@ -528,7 +528,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.EMAIL,
-            EnumSet.of(Feature.REPORTS),
+            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleEmail
         )
@@ -618,7 +618,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.EMAIL,
-            EnumSet.of(Feature.REPORTS, Feature.INDEX_MANAGEMENT),
+            setOf(FEATURE_REPORTS, FEATURE_INDEX_MANAGEMENT),
             isEnabled = true,
             configData = sampleEmail
         )
@@ -881,7 +881,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample smtp account config name",
             "this is a sample smtp account config description",
             ConfigType.SMTP_ACCOUNT,
-            EnumSet.of(Feature.REPORTS),
+            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSmtpAccount
         )
@@ -926,7 +926,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.EMAIL,
-            EnumSet.of(Feature.REPORTS),
+            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleEmail
         )

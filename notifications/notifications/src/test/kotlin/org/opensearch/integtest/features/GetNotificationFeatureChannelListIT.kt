@@ -13,8 +13,10 @@ package org.opensearch.integtest.features
 
 import com.google.gson.JsonObject
 import org.junit.Assert
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_ALERTING
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.ConfigType
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.rest.RestRequest
@@ -28,7 +30,7 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
         nameSubstring: String,
         configType: ConfigType,
         isEnabled: Boolean,
-        features: Set<Feature>,
+        features: Set<String>,
         smtpAccountId: String = "",
         emailGroupId: Set<String> = setOf()
     ): String {
@@ -91,7 +93,7 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
         nameSubstring: String = "",
         configType: ConfigType = ConfigType.SLACK,
         isEnabled: Boolean = true,
-        features: Set<Feature> = setOf(Feature.ALERTING, Feature.INDEX_MANAGEMENT, Feature.REPORTS),
+        features: Set<String> = setOf(FEATURE_ALERTING, FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
         smtpAccountId: String = "",
         emailGroupId: Set<String> = setOf()
     ): String {
@@ -156,15 +158,6 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
         )
     }
 
-    fun `test Get feature channel list should error for invalid feature`() {
-        executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/feature/channels/new_feature",
-            "",
-            RestStatus.BAD_REQUEST.status
-        )
-    }
-
     fun `test getFeatureChannelList should return only channels`() {
         val slackId = createConfig(configType = ConfigType.SLACK)
         val chimeId = createConfig(configType = ConfigType.CHIME)
@@ -191,10 +184,10 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
     }
 
     fun `test getFeatureChannelList should return only channels corresponding to feature`() {
-        val alertingOnlyIds: Set<String> = (1..5).map { createConfig(features = setOf(Feature.ALERTING)) }.toSet()
-        val reportsOnlyIds: Set<String> = (1..5).map { createConfig(features = setOf(Feature.REPORTS)) }.toSet()
+        val alertingOnlyIds: Set<String> = (1..5).map { createConfig(features = setOf(FEATURE_ALERTING)) }.toSet()
+        val reportsOnlyIds: Set<String> = (1..5).map { createConfig(features = setOf(FEATURE_REPORTS)) }.toSet()
         val ismAndAlertingIds: Set<String> = (1..5).map {
-            createConfig(features = setOf(Feature.ALERTING, Feature.INDEX_MANAGEMENT))
+            createConfig(features = setOf(FEATURE_ALERTING, FEATURE_INDEX_MANAGEMENT))
         }.toSet()
         Thread.sleep(1000)
         val alertingIds = alertingOnlyIds.union(ismAndAlertingIds)
