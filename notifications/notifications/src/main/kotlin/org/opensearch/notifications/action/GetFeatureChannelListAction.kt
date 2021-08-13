@@ -31,18 +31,17 @@ import org.opensearch.action.ActionListener
 import org.opensearch.action.ActionRequest
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.client.Client
+import org.opensearch.common.Strings
 import org.opensearch.common.inject.Inject
 import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.commons.authuser.User
 import org.opensearch.commons.notifications.action.GetFeatureChannelListRequest
 import org.opensearch.commons.notifications.action.GetFeatureChannelListResponse
 import org.opensearch.commons.notifications.action.NotificationsActions
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.utils.recreateObject
 import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
-import java.lang.IllegalArgumentException
 
 /**
  * Get feature channel list transport action
@@ -81,9 +80,7 @@ internal class GetFeatureChannelListAction @Inject constructor(
         request: GetFeatureChannelListRequest,
         user: User?
     ): GetFeatureChannelListResponse {
-        if (request.feature == Feature.NONE) {
-            throw IllegalArgumentException("Not a valid feature")
-        }
+        require(!Strings.isNullOrEmpty(request.feature)) { "Not a valid feature" } // TODO: Validate against allowed features
         return ConfigIndexingActions.getFeatureChannelList(request, user)
     }
 }

@@ -28,12 +28,11 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_ALERTING
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
-import org.opensearch.commons.notifications.model.Feature
-import org.opensearch.commons.notifications.model.Feature.ALERTING
-import org.opensearch.commons.notifications.model.Feature.INDEX_MANAGEMENT
-import org.opensearch.commons.notifications.model.Feature.REPORTS
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
@@ -44,7 +43,6 @@ import org.opensearch.notifications.verifySingleConfigIdEquals
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
 import java.time.Instant
-import java.util.EnumSet
 import kotlin.random.Random
 
 class QueryNotificationConfigIT : PluginRestTestCase() {
@@ -54,7 +52,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         nameSubstring: String,
         configType: ConfigType,
         isEnabled: Boolean,
-        features: Set<Feature>
+        features: Set<String>
     ): String {
         val randomString = (1..20)
             .map { Random.nextInt(0, charPool.size) }
@@ -108,7 +106,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         nameSubstring: String = "",
         configType: ConfigType = ConfigType.SLACK,
         isEnabled: Boolean = true,
-        features: Set<Feature> = setOf(ALERTING, INDEX_MANAGEMENT, Feature.REPORTS)
+        features: Set<String> = setOf(FEATURE_ALERTING, FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS)
     ): String {
         val createRequestJsonString = getCreateRequestJsonString(nameSubstring, configType, isEnabled, features)
         val createResponse = executeRequest(
@@ -401,13 +399,13 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
     }
 
     fun `test Get sorted notification config using multi keyword sort_field(features)`() {
-        val iId = createConfig(features = setOf(INDEX_MANAGEMENT))
-        val aId = createConfig(features = setOf(ALERTING))
-        val rId = createConfig(features = setOf(REPORTS))
-        val iaId = createConfig(features = setOf(INDEX_MANAGEMENT, ALERTING))
-        val raId = createConfig(features = setOf(REPORTS, ALERTING))
-        val riId = createConfig(features = setOf(REPORTS, INDEX_MANAGEMENT))
-        val iarId = createConfig(features = setOf(INDEX_MANAGEMENT, ALERTING, REPORTS))
+        val iId = createConfig(features = setOf(FEATURE_INDEX_MANAGEMENT))
+        val aId = createConfig(features = setOf(FEATURE_ALERTING))
+        val rId = createConfig(features = setOf(FEATURE_REPORTS))
+        val iaId = createConfig(features = setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_ALERTING))
+        val raId = createConfig(features = setOf(FEATURE_REPORTS, FEATURE_ALERTING))
+        val riId = createConfig(features = setOf(FEATURE_REPORTS, FEATURE_INDEX_MANAGEMENT))
+        val iarId = createConfig(features = setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_ALERTING, FEATURE_REPORTS))
         Thread.sleep(1000)
 
         val sortedConfigIds = listOf(aId, iaId, raId, iarId, iId, riId, rId)
@@ -576,13 +574,13 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
     }
 
     fun `test Get filtered notification config using keyword filter_param_list(features)`() {
-        val iId = createConfig(features = setOf(INDEX_MANAGEMENT))
-        val aId = createConfig(features = setOf(ALERTING))
-        val rId = createConfig(features = setOf(REPORTS))
-        val iaId = createConfig(features = setOf(INDEX_MANAGEMENT, ALERTING))
-        val raId = createConfig(features = setOf(REPORTS, ALERTING))
-        val riId = createConfig(features = setOf(REPORTS, INDEX_MANAGEMENT))
-        val iarId = createConfig(features = setOf(INDEX_MANAGEMENT, ALERTING, REPORTS))
+        val iId = createConfig(features = setOf(FEATURE_INDEX_MANAGEMENT))
+        val aId = createConfig(features = setOf(FEATURE_ALERTING))
+        val rId = createConfig(features = setOf(FEATURE_REPORTS))
+        val iaId = createConfig(features = setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_ALERTING))
+        val raId = createConfig(features = setOf(FEATURE_REPORTS, FEATURE_ALERTING))
+        val riId = createConfig(features = setOf(FEATURE_REPORTS, FEATURE_INDEX_MANAGEMENT))
+        val iarId = createConfig(features = setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_ALERTING, FEATURE_REPORTS))
         Thread.sleep(1000)
 
         val reportIds = setOf(rId, raId, riId, iarId)
@@ -841,7 +839,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.CHIME,
-            EnumSet.of(ALERTING, REPORTS),
+            setOf(FEATURE_ALERTING, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleChime
         )

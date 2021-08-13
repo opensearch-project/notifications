@@ -41,8 +41,8 @@ import org.opensearch.commons.notifications.NotificationConstants.METHOD_TAG
 import org.opensearch.commons.notifications.NotificationConstants.NAME_TAG
 import org.opensearch.commons.notifications.NotificationConstants.QUERY_TAG
 import org.opensearch.commons.notifications.NotificationConstants.RECIPIENT_LIST_TAG
-import org.opensearch.commons.notifications.NotificationConstants.ROLE_ARN_FIELD
-import org.opensearch.commons.notifications.NotificationConstants.TOPIC_ARN_FIELD
+import org.opensearch.commons.notifications.NotificationConstants.ROLE_ARN_TAG
+import org.opensearch.commons.notifications.NotificationConstants.TOPIC_ARN_TAG
 import org.opensearch.commons.notifications.NotificationConstants.UPDATED_TIME_TAG
 import org.opensearch.commons.notifications.NotificationConstants.URL_TAG
 import org.opensearch.commons.notifications.model.ConfigType.CHIME
@@ -88,8 +88,8 @@ object ConfigQueryHelper {
         "${SMTP_ACCOUNT.tag}.$HOST_TAG",
         "${SMTP_ACCOUNT.tag}.$FROM_ADDRESS_TAG",
         "${EMAIL_GROUP.tag}.$RECIPIENT_LIST_TAG",
-        "${SNS.tag}.$TOPIC_ARN_FIELD",
-        "${SNS.tag}.$ROLE_ARN_FIELD"
+        "${SNS.tag}.$TOPIC_ARN_TAG",
+        "${SNS.tag}.$ROLE_ARN_TAG"
     )
 
     private val METADATA_FIELDS = METADATA_RANGE_FIELDS

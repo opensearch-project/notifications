@@ -43,15 +43,15 @@ import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Email
 import org.opensearch.commons.notifications.model.EmailGroup
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.FeatureChannel
 import org.opensearch.commons.notifications.model.FeatureChannelList
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.NotificationConfigInfo
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
-import org.opensearch.commons.notifications.model.SNS
+import org.opensearch.commons.notifications.model.SesAccount
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.SmtpAccount
+import org.opensearch.commons.notifications.model.Sns
 import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
@@ -60,7 +60,6 @@ import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.security.UserAccess
 import org.opensearch.rest.RestStatus
 import java.time.Instant
-import java.util.EnumSet
 
 /**
  * NotificationConfig indexing operation actions.
@@ -93,11 +92,11 @@ object ConfigIndexingActions {
     }
 
     @Suppress("UnusedPrivateMember")
-    private fun validateSnsConfig(sns: SNS, user: User?) {
+    private fun validateSnsConfig(sns: Sns, user: User?) {
         // TODO: URL validation with rules
     }
 
-    private fun validateEmailConfig(email: Email, features: EnumSet<Feature>, user: User?) {
+    private fun validateEmailConfig(email: Email, features: Set<String>, user: User?) {
         if (email.emailGroupIds.contains(email.emailAccountID)) {
             throw OpenSearchStatusException(
                 "Config IDs ${email.emailAccountID} is in both emailAccountID and emailGroupIds",
@@ -166,6 +165,11 @@ object ConfigIndexingActions {
     }
 
     @Suppress("UnusedPrivateMember")
+    private fun validateSesAccountConfig(sesAccount: SesAccount, user: User?) {
+        // TODO: host validation with rules
+    }
+
+    @Suppress("UnusedPrivateMember")
     private fun validateEmailGroupConfig(emailGroup: EmailGroup, user: User?) {
         // No extra validation required. All email IDs are validated as part of model validation.
     }
@@ -181,8 +185,9 @@ object ConfigIndexingActions {
             ConfigType.WEBHOOK -> validateWebhookConfig(config.configData as Webhook, user)
             ConfigType.EMAIL -> validateEmailConfig(config.configData as Email, config.features, user)
             ConfigType.SMTP_ACCOUNT -> validateSmtpAccountConfig(config.configData as SmtpAccount, user)
+            ConfigType.SES_ACCOUNT -> validateSesAccountConfig(config.configData as SesAccount, user)
             ConfigType.EMAIL_GROUP -> validateEmailGroupConfig(config.configData as EmailGroup, user)
-            ConfigType.SNS -> validateSnsConfig(config.configData as SNS, user)
+            ConfigType.SNS -> validateSnsConfig(config.configData as Sns, user)
         }
     }
 
@@ -358,7 +363,7 @@ object ConfigIndexingActions {
         userAccess.validateUser(user)
         val supportedChannelListString = getSupportedChannelList().joinToString(",")
         val filterParams = mapOf(
-            Pair("feature_list", request.feature.tag),
+            Pair("feature_list", request.feature),
             Pair("config_type", supportedChannelListString)
         )
         val getAllRequest = GetNotificationConfigRequest(filterParams = filterParams)
