@@ -17,7 +17,6 @@ import org.opensearch.commons.notifications.NotificationConstants.FEATURE_TAG
 import org.opensearch.commons.notifications.NotificationsPluginInterface
 import org.opensearch.commons.notifications.model.ChannelMessage
 import org.opensearch.commons.notifications.model.EventSource
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.SeverityType
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.metrics.Metrics
@@ -87,7 +86,7 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
     ) = RestChannelConsumer {
         Metrics.NOTIFICATIONS_SEND_TEST_MESSAGE_TOTAL.counter.increment()
         Metrics.NOTIFICATIONS_SEND_TEST_MESSAGE_INTERVAL_COUNT.counter.increment()
-        val feature = Feature.fromTagOrDefault(request.param(FEATURE_TAG, Feature.NONE.tag))
+        val feature = request.param(FEATURE_TAG)
         val configId = request.param(CONFIG_ID_TAG)
         val source = generateEventSource(feature, configId)
         val message = ChannelMessage(
@@ -105,7 +104,7 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
         )
     }
 
-    private fun generateEventSource(feature: Feature, configId: String): EventSource {
+    private fun generateEventSource(feature: String, configId: String): EventSource {
         return EventSource(
             getMessageTitle(feature, configId),
             configId,
@@ -114,20 +113,20 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
         )
     }
 
-    private fun getMessageTitle(feature: Feature, configId: String): String {
+    private fun getMessageTitle(feature: String, configId: String): String {
         return "[$feature] Test Message Title-$configId" // TODO: change as spec
     }
 
-    private fun getMessageTextDescription(feature: Feature, configId: String): String {
-        return "Test message content body for config id $configId\nfrom feature ${feature.tag}" // TODO: change as spec
+    private fun getMessageTextDescription(feature: String, configId: String): String {
+        return "Test message content body for config id $configId\nfrom feature $feature" // TODO: change as spec
     }
 
-    private fun getMessageHtmlDescription(feature: Feature, configId: String): String {
+    private fun getMessageHtmlDescription(feature: String, configId: String): String {
         return """
             <html>
             <header><title>Test Message</title></header>
             <body>
-            <p>Test Message for config id $configId from feature ${feature.tag}</p>
+            <p>Test Message for config id $configId from feature $feature</p>
             </body>
             </html>
         """.trimIndent() // TODO: change as spec

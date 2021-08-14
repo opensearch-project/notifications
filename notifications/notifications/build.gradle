@@ -71,17 +71,6 @@ configurations.all {
     resolutionStrategy {
         force "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
         force "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
-        force "commons-logging:commons-logging:1.2" // resolve for awssdk:ses
-        force "commons-codec:commons-codec:1.13" // resolve for awssdk:ses
-        force "io.netty:netty-codec-http:4.1.63.Final" // resolve for awssdk:ses
-        force "io.netty:netty-handler:4.1.63.Final" // resolve for awssdk:ses
-        force "org.apache.httpcomponents:httpclient:4.5.10" // resolve for awssdk:ses
-        force "org.apache.httpcomponents:httpcore:4.4.13" // resolve for awssdk:ses
-        force "com.fasterxml.jackson.core:jackson-core:2.12.3" // resolve for awssdk:ses
-        force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.12.3" // resolve for awssdk:ses
-        force "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.12.3" // resolve for awssdk:ses
-        force "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.3" // resolve for awssdk:ses
-        force "junit:junit:4.12" // resolve for awssdk:ses
     }
 }
 
@@ -91,9 +80,6 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3" // ${kotlin_version} does not work for coroutines
     compile "${group}:common-utils:${opensearch_version}.0"
-    compile ("software.amazon.awssdk:ses:2.16.75") {
-        exclude module: 'annotations' // conflict with org.jetbrains:annotations, integTestRunner fails with error "codebase property already set"
-    }
 
     testImplementation(
             'org.assertj:assertj-core:3.19.0',

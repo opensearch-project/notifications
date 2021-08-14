@@ -36,6 +36,7 @@ internal class SmtpEmailIT : OpenSearchRestTestCase() {
 
     fun `test send email to one recipient over smtp server`() {
         val smtpDestination = SmtpDestination(
+            "testAccountName",
             "localhost",
             smtpPort,
             "none",
@@ -51,13 +52,14 @@ internal class SmtpEmailIT : OpenSearchRestTestCase() {
             "VGVzdCBtZXNzYWdlCgo=",
             "application/octet-stream",
         )
-        val response = NotificationSpi.sendMessage(smtpDestination, message)
+        val response = NotificationSpi.sendMessage(smtpDestination, message, "ref")
         assertEquals("Success", response.statusText)
         assertEquals(RestStatus.OK.status, response.statusCode)
     }
 
     fun `test send email with non-available host`() {
         val smtpDestination = SmtpDestination(
+            "testAccountName",
             "invalidHost",
             smtpPort,
             "none",
@@ -73,7 +75,7 @@ internal class SmtpEmailIT : OpenSearchRestTestCase() {
             "VGVzdCBtZXNzYWdlCgo=",
             "application/octet-stream",
         )
-        val response = NotificationSpi.sendMessage(smtpDestination, message)
+        val response = NotificationSpi.sendMessage(smtpDestination, message, "ref")
         assertEquals(
             "sendEmail Error, status:Couldn't connect to host, port: invalidHost, $smtpPort; timeout -1",
             response.statusText

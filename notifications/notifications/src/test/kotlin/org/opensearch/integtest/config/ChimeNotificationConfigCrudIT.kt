@@ -27,16 +27,17 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_ALERTING
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
-import java.util.EnumSet
 
 class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
 
@@ -47,7 +48,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.CHIME,
-            EnumSet.of(Feature.ALERTING, Feature.REPORTS),
+            setOf(FEATURE_ALERTING, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleChime
         )
@@ -106,7 +107,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a updated config name",
             "this is a updated config description",
             ConfigType.CHIME,
-            EnumSet.of(Feature.INDEX_MANAGEMENT),
+            setOf(FEATURE_INDEX_MANAGEMENT),
             isEnabled = true,
             configData = updatedChime
         )
@@ -174,7 +175,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.CHIME,
-            EnumSet.of(Feature.ALERTING, Feature.REPORTS),
+            setOf(FEATURE_ALERTING, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleChime
         )
@@ -201,6 +202,67 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "$PLUGIN_BASE_URI/configs",
             createRequestJsonString,
             RestStatus.BAD_REQUEST.status
+        )
+    }
+
+    fun `test update existing config to different config type`() {
+        // Create sample config request reference
+        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.CHIME,
+            setOf(FEATURE_ALERTING, FEATURE_REPORTS),
+            isEnabled = true,
+            configData = sampleChime
+        )
+
+        // Create chime notification config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"chime",
+                "feature_list":[
+                    "${referenceObject.features.elementAt(0)}",
+                    "${referenceObject.features.elementAt(1)}"
+                ],
+                "is_enabled":${referenceObject.isEnabled},
+                "chime":{"url":"${(referenceObject.configData as Chime).url}"}
+            }
+        }
+        """.trimIndent()
+        val createResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createRequestJsonString,
+            RestStatus.OK.status
+        )
+        val configId = createResponse.get("config_id").asString
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        // Update to slack notification config
+        val updateRequestJsonString = """
+        {
+            "config":{
+                "name":"this is a updated config name",
+                "description":"this is a updated config description",
+                "config_type":"slack",
+                "feature_list":[
+                    "$FEATURE_INDEX_MANAGEMENT"
+                ],
+                "is_enabled":"true",
+                "slack":{"url":"https://updated.domain.com/updated_slack_url#0987654321"}
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.PUT.name,
+            "$PLUGIN_BASE_URI/configs/$configId",
+            updateRequestJsonString,
+            RestStatus.CONFLICT.status
         )
     }
 }

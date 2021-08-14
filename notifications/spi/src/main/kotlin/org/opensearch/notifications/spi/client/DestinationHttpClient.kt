@@ -110,12 +110,14 @@ class DestinationHttpClient {
     }
 
     @Throws(Exception::class)
-    fun execute(destination: WebhookDestination, message: MessageContent): String {
+    fun execute(destination: WebhookDestination, message: MessageContent, referenceId: String): String {
         var response: CloseableHttpResponse? = null
         return try {
             response = getHttpResponse(destination, message)
             validateResponseStatus(response)
-            getResponseString(response)
+            val responseString = getResponseString(response)
+            log.debug("Http response for id $referenceId: $responseString")
+            responseString
         } finally {
             if (response != null) {
                 EntityUtils.consumeQuietly(response.entity)
@@ -157,9 +159,7 @@ class DestinationHttpClient {
     @Throws(IOException::class)
     fun getResponseString(response: CloseableHttpResponse): String {
         val entity: HttpEntity = response.entity ?: return "{}"
-        val responseString: String = EntityUtils.toString(entity)
-        log.debug("Http response: $responseString")
-        return responseString
+        return EntityUtils.toString(entity)
     }
 
     @Throws(IOException::class)
@@ -180,7 +180,7 @@ class DestinationHttpClient {
             is ChimeDestination -> "Content"
             is CustomWebhookDestination -> return message.textDescription
             else -> throw IllegalArgumentException(
-                "Invalid destination type is provided, Only Slack, Chime and CustomWebook are allowed"
+                "Invalid destination type is provided, Only Slack, Chime and CustomWebhook are allowed"
             )
         }
 
