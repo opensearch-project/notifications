@@ -109,7 +109,7 @@ internal class CustomWebhookDestinationTests {
         val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"), method)
         val message = MessageContent(title, messageText)
 
-        val actualCustomWebhookResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
+        val actualCustomWebhookResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message, "ref")
 
         assertEquals(expectedWebhookResponse.statusText, actualCustomWebhookResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualCustomWebhookResponse.statusCode)
@@ -148,7 +148,7 @@ internal class CustomWebhookDestinationTests {
         val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"), method)
         val message = MessageContent(title, messageText)
 
-        val actualCustomWebhookResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
+        val actualCustomWebhookResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message, "ref")
 
         assertEquals(expectedWebhookResponse.statusText, actualCustomWebhookResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualCustomWebhookResponse.statusCode)
@@ -190,7 +190,7 @@ internal class CustomWebhookDestinationTests {
         val destination = CustomWebhookDestination(url, mapOf("headerKey" to "headerValue"), method)
         val message = MessageContent(title, messageText)
 
-        val actualCustomWebhookResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
+        val actualCustomWebhookResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message, "ref")
 
         assertEquals(expectedWebhookResponse.statusText, actualCustomWebhookResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualCustomWebhookResponse.statusCode)

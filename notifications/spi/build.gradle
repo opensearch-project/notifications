@@ -93,16 +93,22 @@ configurations.all {
         force "commons-codec:commons-codec:1.13" // resolve for awssdk:ses
         force "io.netty:netty-codec-http:4.1.63.Final" // resolve for awssdk:ses
         force "io.netty:netty-handler:4.1.63.Final" // resolve for awssdk:ses
+        force "io.netty:netty-common:4.1.63.Final" // resolve for awssdk:ses
+        force "io.netty:netty-buffer:4.1.63.Final" // resolve for awssdk:ses
+        force "io.netty:netty-transport:4.1.63.Final" // resolve for awssdk:ses
+        force "io.netty:netty-codec:4.1.63.Final" // resolve for awssdk:ses
         force "org.apache.httpcomponents:httpclient:4.5.10" // resolve for awssdk:ses
         force "org.apache.httpcomponents:httpcore:4.4.13" // resolve for awssdk:ses
-
         // Resolve for awssdk:sns
         force "joda-time:joda-time:2.8.1"
-        force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.12.3"
-        force "com.fasterxml.jackson.core:jackson-core:2.12.3"
-        force "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.12.3"
-        force "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.3"
-        force "junit:junit:4.12"
+        force "com.fasterxml.jackson.core:jackson-core:2.12.3" // resolve for awssdk:ses
+        force "com.fasterxml.jackson.core:jackson-annotations:2.12.3" // resolve for awssdk:ses
+        force "com.fasterxml.jackson.core:jackson-databind:2.12.3" // resolve for awssdk:ses
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.12.3" // resolve for awssdk:ses
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.12.3" // resolve for awssdk:ses
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.3" // resolve for awssdk:ses
+        force "org.reactivestreams:reactive-streams:1.0.3" // resolve for awssdk:ses
+        force "junit:junit:4.12" // resolve for awssdk:ses
     }
 }
 
@@ -114,10 +120,9 @@ dependencies {
     compile "org.apache.httpcomponents:httpclient:4.5.10"
     compile "com.amazonaws:aws-java-sdk-sns:${aws_version}"
     compile "com.amazonaws:aws-java-sdk-sts:${aws_version}"
-    //TODO: Add it back and remove from main project(to avoid jarhell) when implementing Email functionality
-//    compile ("software.amazon.awssdk:ses:2.14.16") {
-//        exclude module: 'annotations' // conflict with org.jetbrains:annotations, integTestRunner fails with error "codebase property already set"
-//    }
+    compile ("software.amazon.awssdk:ses:2.14.16") {
+        exclude module: 'annotations' // conflict with org.jetbrains:annotations, integTestRunner fails with error "codebase property already set"
+    }
     compile "com.sun.mail:javax.mail:1.6.2"
     implementation "com.github.seancfoley:ipaddress:5.3.3"
     testImplementation(

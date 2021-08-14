@@ -52,7 +52,7 @@ internal class SmtpEmailIT : OpenSearchRestTestCase() {
             "VGVzdCBtZXNzYWdlCgo=",
             "application/octet-stream",
         )
-        val response = NotificationSpi.sendMessage(smtpDestination, message)
+        val response = NotificationSpi.sendMessage(smtpDestination, message, "ref")
         assertEquals("Success", response.statusText)
         assertEquals(RestStatus.OK.status, response.statusCode)
     }
@@ -75,7 +75,7 @@ internal class SmtpEmailIT : OpenSearchRestTestCase() {
             "VGVzdCBtZXNzYWdlCgo=",
             "application/octet-stream",
         )
-        val response = NotificationSpi.sendMessage(smtpDestination, message)
+        val response = NotificationSpi.sendMessage(smtpDestination, message, "ref")
         assertEquals(
             "sendEmail Error, status:Couldn't connect to host, port: invalidHost, $smtpPort; timeout -1",
             response.statusText

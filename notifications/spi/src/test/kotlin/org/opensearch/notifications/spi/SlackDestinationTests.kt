@@ -96,7 +96,7 @@ internal class SlackDestinationTests {
         val destination = SlackDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualSlackResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
+        val actualSlackResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message, "ref")
 
         assertEquals(expectedWebhookResponse.statusText, actualSlackResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualSlackResponse.statusCode)
@@ -130,7 +130,7 @@ internal class SlackDestinationTests {
         val destination = SlackDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualSlackResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
+        val actualSlackResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message, "ref")
 
         assertEquals(expectedWebhookResponse.statusText, actualSlackResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualSlackResponse.statusCode)
@@ -165,7 +165,7 @@ internal class SlackDestinationTests {
         val destination = SlackDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualSlackResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message)
+        val actualSlackResponse: DestinationMessageResponse = NotificationSpi.sendMessage(destination, message, "ref")
 
         assertEquals(expectedWebhookResponse.statusText, actualSlackResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualSlackResponse.statusCode)

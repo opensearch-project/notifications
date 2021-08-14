@@ -19,25 +19,24 @@ import com.amazonaws.auth.profile.ProfileCredentialsProvider
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder
 import com.amazonaws.services.securitytoken.model.AssumeRoleRequest
 import org.opensearch.notifications.spi.credentials.CredentialsProvider
-import org.opensearch.notifications.spi.model.destination.SNSDestination
 
 class CredentialsProviderFactory : CredentialsProvider {
-    override fun getCredentialsProvider(destination: SNSDestination): AWSCredentialsProvider {
-        return if (destination.roleArn != null) {
-            getCredentialsProviderByIAMRole(destination)
+    override fun getCredentialsProvider(region: String, roleArn: String?): AWSCredentialsProvider {
+        return if (roleArn != null) {
+            getCredentialsProviderByIAMRole(region, roleArn)
         } else {
             DefaultAWSCredentialsProviderChain()
         }
     }
 
-    private fun getCredentialsProviderByIAMRole(destination: SNSDestination): AWSCredentialsProvider {
+    private fun getCredentialsProviderByIAMRole(region: String, roleArn: String?): AWSCredentialsProvider {
         // TODO cache credentials by role ARN?
         val stsClient = AWSSecurityTokenServiceClientBuilder.standard()
             .withCredentials(ProfileCredentialsProvider())
-            .withRegion(destination.getRegion())
+            .withRegion(region)
             .build()
         val roleRequest = AssumeRoleRequest()
-            .withRoleArn(destination.roleArn)
+            .withRoleArn(roleArn)
             .withRoleSessionName("opensearch-notifications")
         val roleResponse = stsClient.assumeRole(roleRequest)
         val sessionCredentials = roleResponse.credentials
