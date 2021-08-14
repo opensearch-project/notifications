@@ -88,11 +88,22 @@ const updateCounters = (
 ) => {
   if (notificationsMetadata) {
     // @ts-ignore
-    rollingCounter[notificationsMetadata.config.config_type][action][counter] += count;
+    rollingCounter[notificationsMetadata.config.config_type][counter] += count;
+    // add plugin availability 
+    if (notificationsMetadata.config.feature_list.length != 0) {
+      for (let i = 0; i < notificationsMetadata.config.feature_list.length; ++i) {
+        // @ts-ignore
+        rollingCounter[notificationsMetadata.config.feature_list[i]][counter] += count;
+        if (counter === 'count') {
+          // @ts-ignore
+          ++GLOBAL_BASIC_COUNTER[notificationsMetadata.config.feature_list[i]]['total'];
+        }
+      }
+    }
     // update basic counter
     if (counter === 'count') {
       // @ts-ignore
-      ++GLOBAL_BASIC_COUNTER[notificationsMetadata.config.config_type][action]['total'];
+      ++GLOBAL_BASIC_COUNTER[notificationsMetadata.config.config_type]['total'];
     }
   } else {
     // update action metric

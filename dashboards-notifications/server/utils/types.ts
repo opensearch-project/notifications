@@ -9,9 +9,19 @@
  * GitHub history for details.
  */
 
-export type ConfigType = 'slack' | 'chime' | 'email' | 'webhook' | 'ses' | 'sns'
+import { NOTIFICATION_SOURCE } from "../../public/utils/constants";
 
-export type PluginAvailabilityType = 'reporting' | 'alerting' | 'index_state_management'
+export type ConfigType = 
+  | 'slack' 
+  | 'chime' 
+  | 'email' 
+  | 'custom_webhook' 
+  | 'ses' 
+  | 'sns'
+  | 'smtp_account'
+  | 'email_group'
+
+export type PluginAvailabilityType = keyof typeof NOTIFICATION_SOURCE
 
 export type EntityType = 'config' | 'event' | 'feature' | 'send_test_message';
 
@@ -30,7 +40,7 @@ export type ActionType =
   | 'list'
   | 'update';
 
-export type CountersType = ActionCountersType & UsageCountersType;
+export type CountersType = ActionCountersType & UsageCountersType & PluginAvailabilityCountersType;
 
 type ActionCountersType = {
   [entity in EntityType]: {
@@ -42,8 +52,12 @@ type ActionCountersType = {
 
 type UsageCountersType = {
   [channel in ConfigType]: {
-    [action in UsageActionType]: {
-      [counter in CountersNameType]?: number;
-    };
+    [counter in CountersNameType]?: number;
+  };
+};
+
+type PluginAvailabilityCountersType = {
+  [plugin in PluginAvailabilityType]: {
+    [counter in CountersNameType]?: number;
   };
 };

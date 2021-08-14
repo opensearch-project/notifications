@@ -34,85 +34,55 @@ export const GLOBAL_BASIC_COUNTER: CountersType = {
     }
   },
   event: {
-    create: {
-      total: 0,
-    },
-    delete: {
-      total: 0,
-    },
     info: {
       total: 0,
     },
     list: {
       total: 0,
     },
-    update: {
-      total: 0,
-    }
   },
   feature: {
-    create: {
-      total: 0,
-    },
-    delete: {
-      total: 0,
-    },
-    info: {
-      total: 0,
-    },
     list: {
       total: 0,
     },
-    update: {
-      total: 0,
-    }
   },
   send_test_message: {
-    create: {
-      total: 0,
-    },
-    delete: {
-      total: 0,
-    },
     info: {
       total: 0,
     },
-    list: {
-      total: 0,
-    },
-    update: {
-      total: 0,
-    }
   },
   slack: {
-    send: {
-      total: 0
-    }
+    total: 0
   },
   chime: {
-    send: {
-      total: 0
-    }
+    total: 0
   },
   email: { 
-    send: {
-      total: 0
-    }
+    total: 0
   }, 
-  webhook: {
-    send: {
-      total: 0
-    }
+  custom_webhook: {
+    total: 0
   },
   ses: {
-    send: {
-      total: 0
-    }
+    total: 0
   },
   sns: {
-    send: {
-      total: 0
-    }
+    total: 0
+  },
+  smtp_account: {
+    total: 0
+  },
+  email_group: {
+    total: 0
+  },
+  reports: {
+    total: 0
+  },
+  alerting: {
+    total: 0
+  },
+  index_management: {
+    total: 0
   }
 }
 
@@ -145,16 +115,6 @@ export const DEFAULT_ROLLING_COUNTER: CountersType = {
     }
   },
   event: {
-    create: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    },
-    delete: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    },
     info: {
       count: 0,
       system_error: 0,
@@ -165,106 +125,74 @@ export const DEFAULT_ROLLING_COUNTER: CountersType = {
       system_error: 0,
       user_error: 0,
     },
-    update: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    }
   },
   feature: {
-    create: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    },
-    delete: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    },
-    info: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    },
     list: {
       count: 0,
       system_error: 0,
       user_error: 0,
     },
-    update: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    }
   },
   send_test_message: {
-    create: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    },
-    delete: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    },
     info: {
       count: 0,
       system_error: 0,
       user_error: 0,
     },
-    list: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    },
-    update: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    }
   },
   slack: {
-    send: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    }
+    count: 0,
+    system_error: 0,
+    user_error: 0,
   },
   chime: {
-    send: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    }
+    count: 0,
+    system_error: 0,
+    user_error: 0,
   },
   email: { 
-    send: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    }
+    count: 0,
+    system_error: 0,
+    user_error: 0,
   }, 
-  webhook: {
-    send: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    }
+  custom_webhook: {
+    count: 0,
+    system_error: 0,
+    user_error: 0,
   },
   ses: {
-    send: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    }
+    count: 0,
+    system_error: 0,
+    user_error: 0,
   },
   sns: {
-    send: {
-      count: 0,
-      system_error: 0,
-      user_error: 0,
-    }
+    count: 0,
+    system_error: 0,
+    user_error: 0,
+  },
+  smtp_account: {
+    count: 0,
+    system_error: 0,
+    user_error: 0,
+  },
+  email_group: {
+    count: 0,
+    system_error: 0,
+    user_error: 0,
+  },
+  reports: {
+    count: 0,
+    system_error: 0,
+    user_error: 0,
+  },
+  alerting: {
+    count: 0,
+    system_error: 0,
+    user_error: 0,
+  },
+  index_management: {
+    count: 0,
+    system_error: 0,
+    user_error: 0,
   }
 }
