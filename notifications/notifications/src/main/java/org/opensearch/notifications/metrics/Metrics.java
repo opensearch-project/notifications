@@ -174,13 +174,13 @@ public enum Metrics {
     NOTIFICATIONS_SEND_MESSAGE_TOTAL("notifications.send_message.total", new BasicCounter()),
     NOTIFICATIONS_SEND_MESSAGE_INTERVAL_COUNT("notifications.send_message.count", new RollingCounter()),
     // user errors for send message?
-    NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_SENDING_QUOTA_UNAVAILABLE(
-            "notifications.send_message.user_error.sending_quota_unavailable", new RollingCounter()
+    NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND(
+            "notifications.send_message.user_error.not_found", new RollingCounter()
     ),
     NOTIFICATIONS_SEND_MESSAGE_SYSTEM_ERROR("notifications.send_message.system_error", new RollingCounter()),
 
 
-    // Send Test Message EndpointS
+    // Send Test Message Endpoints
 
     // GET _plugins/_notifications/feature/test/{configId}
     NOTIFICATIONS_SEND_TEST_MESSAGE_TOTAL("notifications.send_test_message.total", new BasicCounter()),

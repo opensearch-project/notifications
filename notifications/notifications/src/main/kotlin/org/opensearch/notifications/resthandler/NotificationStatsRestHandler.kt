@@ -59,7 +59,6 @@ internal class NotificationStatsRestHandler : BaseRestHandler() {
         return when (request.method()) {
             // TODO: Wrap this into TransportAction
             GET -> RestChannelConsumer {
-                // it.sendResponse(BytesRestResponse(RestStatus.OK, Metrics.getInstance().collectToFlattenedJSON()))
                 it.sendResponse(BytesRestResponse(RestStatus.OK, Metrics.collectToFlattenedJSON()))
             }
             else -> RestChannelConsumer {
