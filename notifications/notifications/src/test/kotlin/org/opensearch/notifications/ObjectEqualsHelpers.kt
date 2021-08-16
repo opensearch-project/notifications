@@ -33,7 +33,6 @@ import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Email
 import org.opensearch.commons.notifications.model.EmailGroup
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
@@ -82,7 +81,7 @@ fun verifyEquals(config: NotificationConfig, jsonObject: JsonObject) {
     Assert.assertEquals(config.isEnabled, jsonObject.get("is_enabled").asBoolean)
     val features = jsonObject.get("feature_list").asJsonArray
     Assert.assertEquals(config.features.size, features.size())
-    features.forEach { config.features.contains(Feature.fromTagOrDefault(it.asString)) }
+    features.forEach { config.features.contains(it.asString) }
     when (config.configType) {
         ConfigType.SLACK -> verifyEquals((config.configData as Slack), jsonObject.get("slack").asJsonObject)
         ConfigType.CHIME -> verifyEquals((config.configData as Chime), jsonObject.get("chime").asJsonObject)

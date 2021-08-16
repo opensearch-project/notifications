@@ -16,6 +16,13 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.opensearch.OpenSearchStatusException
 import org.opensearch.commons.authuser.User
+import org.opensearch.commons.destination.message.LegacyBaseMessage
+import org.opensearch.commons.destination.message.LegacyCustomWebhookMessage
+import org.opensearch.commons.destination.message.LegacyDestinationType
+import org.opensearch.commons.destination.response.LegacyDestinationResponse
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
+import org.opensearch.commons.notifications.action.LegacyPublishNotificationRequest
+import org.opensearch.commons.notifications.action.LegacyPublishNotificationResponse
 import org.opensearch.commons.notifications.action.SendNotificationRequest
 import org.opensearch.commons.notifications.action.SendNotificationResponse
 import org.opensearch.commons.notifications.model.ChannelMessage
@@ -28,9 +35,9 @@ import org.opensearch.commons.notifications.model.EmailRecipientStatus
 import org.opensearch.commons.notifications.model.EventSource
 import org.opensearch.commons.notifications.model.EventStatus
 import org.opensearch.commons.notifications.model.NotificationEvent
-import org.opensearch.commons.notifications.model.SNS
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.SmtpAccount
+import org.opensearch.commons.notifications.model.Sns
 import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
@@ -96,6 +103,19 @@ object SendMessageActionHelper {
         val docId = eventOperations.createNotificationEvent(eventDoc)
             ?: throw OpenSearchStatusException("Indexing not Acknowledged", RestStatus.INSUFFICIENT_STORAGE)
         return SendNotificationResponse(docId)
+    }
+
+    /**
+     * Send legacy notification message intended only for Index Management plugin.
+     * @param request request object
+     */
+    fun executeLegacyRequest(request: LegacyPublishNotificationRequest): LegacyPublishNotificationResponse {
+        val baseMessage = request.baseMessage
+        val response: LegacyDestinationResponse
+        runBlocking {
+            response = sendMessageToLegacyDestination(baseMessage)
+        }
+        return LegacyPublishNotificationResponse(response)
     }
 
     /**
@@ -191,15 +211,61 @@ object SendMessageActionHelper {
                 eventStatus,
                 eventSource.referenceId
             )
+            ConfigType.SES_ACCOUNT -> null // TODO : Implement
             ConfigType.SMTP_ACCOUNT -> null
             ConfigType.EMAIL_GROUP -> null
-            ConfigType.SNS -> sendSNSMessage(configData as SNS, message, eventStatus, eventSource.referenceId)
+            ConfigType.SNS -> sendSNSMessage(configData as Sns, message, eventStatus, eventSource.referenceId)
         }
         return if (response == null) {
             log.warn("Cannot send message to destination for config id :${channel.docInfo.id}")
             eventStatus.copy(deliveryStatus = DeliveryStatus(RestStatus.NOT_FOUND.name, "Channel not found"))
         } else {
             response
+        }
+    }
+
+    /**
+     * Send message to a legacy destination intended only for Index Management
+     *
+     * Currently this simply converts the legacy base message to the equivalent destination classes that exist
+     * for the notification channels and utilizes the [sendMessageThroughSpi] method. If we get to the point
+     * where this method seems to be holding back notification channels from adding new functionality we can
+     * refactor this to have it's own internal private spi call to completely decouple them instead.
+     *
+     * @param baseMessage legacy base message
+     * @return notification delivery status for the legacy destination
+     */
+    private fun sendMessageToLegacyDestination(baseMessage: LegacyBaseMessage): LegacyDestinationResponse {
+        val message = MessageContent(title = "Index Management Notification", textDescription = baseMessage.messageContent)
+        // These legacy destination calls do not have reference Ids, just passing index management feature constant
+        return when (baseMessage.channelType) {
+            LegacyDestinationType.LEGACY_SLACK -> {
+                val destination = SlackDestination(baseMessage.url)
+                val status = sendMessageThroughSpi(destination, message, FEATURE_INDEX_MANAGEMENT)
+                LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
+                    .withResponseContent(status.statusText).build()
+            }
+            LegacyDestinationType.LEGACY_CHIME -> {
+                val destination = ChimeDestination(baseMessage.url)
+                val status = sendMessageThroughSpi(destination, message, FEATURE_INDEX_MANAGEMENT)
+                LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
+                    .withResponseContent(status.statusText).build()
+            }
+            LegacyDestinationType.LEGACY_CUSTOM_WEBHOOK -> {
+                val destination = CustomWebhookDestination(
+                    (baseMessage as LegacyCustomWebhookMessage).uri.toString(),
+                    baseMessage.headerParams,
+                    baseMessage.method
+                )
+                val status = sendMessageThroughSpi(destination, message, FEATURE_INDEX_MANAGEMENT)
+                LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
+                    .withResponseContent(status.statusText).build()
+            }
+            null -> {
+                log.warn("No channel type given (null) for publishing to legacy destination")
+                LegacyDestinationResponse.Builder().withStatusCode(400)
+                    .withResponseContent("No channel type given (null) for publishing to legacy destination").build()
+            }
         }
     }
 
@@ -341,12 +407,12 @@ object SendMessageActionHelper {
      * send message to SNS destination
      */
     private fun sendSNSMessage(
-        sns: SNS,
+        sns: Sns,
         message: MessageContent,
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
-        val destination = SnsDestination(sns.topicARN, sns.roleARN)
+        val destination = SnsDestination(sns.topicArn, sns.roleArn)
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
