@@ -19,6 +19,7 @@ import software.amazon.awssdk.regions.Region
  * This class holds the contents of ses destination
  */
 class SesDestination(
+    val accountName: String,
     val awsRegion: String,
     val roleArn: String?,
     val fromAddress: String,

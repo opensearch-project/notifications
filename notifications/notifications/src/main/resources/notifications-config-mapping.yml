@@ -130,6 +130,21 @@ properties:
             fields:
               keyword:
                 type: keyword
+      ses_account: # smtp account configuration
+        type: object
+        properties:
+          region:
+            type: keyword
+          role_arn:
+            type: text
+            fields:
+              keyword:
+                type: keyword
+          from_address:
+            type: text
+            fields:
+              keyword:
+                type: keyword
       email_group: # email group configuration
         type: object
         properties:

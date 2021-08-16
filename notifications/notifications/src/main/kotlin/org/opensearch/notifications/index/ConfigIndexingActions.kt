@@ -129,6 +129,13 @@ object ConfigIndexingActions {
                         RestStatus.NOT_ACCEPTABLE
                     )
                 }
+                ConfigType.SES_ACCOUNT -> if (it.docInfo.id != email.emailAccountID) {
+                    // Email Account ID is specified as Email Group ID
+                    throw OpenSearchStatusException(
+                        "configId ${it.docInfo.id} is not a valid email group ID",
+                        RestStatus.NOT_ACCEPTABLE
+                    )
+                }
                 else -> {
                     // Config ID is neither Email Group ID or valid Email Account ID
                     throw OpenSearchStatusException(
@@ -386,7 +393,8 @@ object ConfigIndexingActions {
             ConfigType.SLACK.tag,
             ConfigType.CHIME.tag,
             ConfigType.WEBHOOK.tag,
-            ConfigType.EMAIL.tag
+            ConfigType.EMAIL.tag,
+            ConfigType.SNS.tag
         )
     }
 

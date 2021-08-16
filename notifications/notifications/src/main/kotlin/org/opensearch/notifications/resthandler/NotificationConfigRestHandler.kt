@@ -145,6 +145,9 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
              *     smtp_account.recipient_list=abc,xyz
              *     sns.topic_arn=abc,xyz
              *     sns.role_arn=abc,xyz
+             *     ses_account.region=abc,xyz
+             *     ses_account.role_arn=abc,xyz
+             *     ses_account.from_address=abc,xyz
              *     query=search all above fields
              * Request body: Ref [org.opensearch.commons.notifications.action.GetNotificationConfigRequest]
              * Response body: [org.opensearch.commons.notifications.action.GetNotificationConfigResponse]
