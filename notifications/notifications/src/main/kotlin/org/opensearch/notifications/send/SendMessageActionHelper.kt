@@ -305,6 +305,7 @@ object SendMessageActionHelper {
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
+        Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SLACK.counter.increment()
         val destination = SlackDestination(slack.url)
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
@@ -319,6 +320,7 @@ object SendMessageActionHelper {
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
+        Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_CHIME.counter.increment()
         val destination = ChimeDestination(chime.url)
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
@@ -333,6 +335,7 @@ object SendMessageActionHelper {
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
+        Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_WEBHOOK.counter.increment()
         val destination = CustomWebhookDestination(webhook.url, webhook.headerParams, webhook.method.tag)
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
@@ -348,6 +351,7 @@ object SendMessageActionHelper {
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
+        Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_EMAIL.counter.increment()
         val smtpAccountDocInfo = childConfigs.find { it.docInfo.id == email.emailAccountID }
         val groups = childConfigs.filter { email.emailGroupIds.contains(it.docInfo.id) }
         val groupRecipients = groups.map { (it.configDoc.config.configData as EmailGroup).recipients }.flatten()
@@ -420,6 +424,7 @@ object SendMessageActionHelper {
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
+        Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SNS.counter.increment()
         val destination = SnsDestination(sns.topicArn, sns.roleArn)
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))

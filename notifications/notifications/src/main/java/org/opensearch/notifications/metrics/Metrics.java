@@ -179,6 +179,22 @@ public enum Metrics {
     ),
     NOTIFICATIONS_SEND_MESSAGE_SYSTEM_ERROR("notifications.send_message.system_error", new RollingCounter()),
 
+    // Track message destinations
+    NOTIFICATIONS_MESSAGE_DESTINATION_SLACK("notifications.message_destination.slack", new BasicCounter()),
+    NOTIFICATIONS_MESSAGE_DESTINATION_CHIME("notifications.message_destination.chime", new BasicCounter()),
+    NOTIFICATIONS_MESSAGE_DESTINATION_WEBHOOK("notifications.message_destination.webhook", new BasicCounter()),
+    NOTIFICATIONS_MESSAGE_DESTINATION_EMAIL("notifications.message_destination.email", new BasicCounter()),
+    NOTIFICATIONS_MESSAGE_DESTINATION_SES_ACCOUNT(
+            "notifications.message_destination.ses_account", new BasicCounter()
+    ), // TODO: add after implementation added
+    NOTIFICATIONS_MESSAGE_DESTINATION_SMTP_ACCOUNT(
+            "notifications.message_destination.smtp_account", new BasicCounter()
+    ), // TODO: add after implementation added
+    NOTIFICATIONS_MESSAGE_DESTINATION_EMAIL_GROUP(
+            "notifications.message_destination.email_group", new BasicCounter()
+    ), // TODO: add after implementation added
+    NOTIFICATIONS_MESSAGE_DESTINATION_SNS("notifications.message_destination.sns", new BasicCounter()),
+
 
     // Send Test Message Endpoints
 
