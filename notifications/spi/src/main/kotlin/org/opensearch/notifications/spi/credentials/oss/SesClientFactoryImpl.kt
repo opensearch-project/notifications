@@ -10,22 +10,22 @@
  */
 package org.opensearch.notifications.spi.credentials.oss
 
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailService
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder
 import org.opensearch.notifications.spi.credentials.SesClientFactory
 import org.opensearch.notifications.spi.utils.SecurityAccess
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
-import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.ses.SesClient
 
 /**
  * Factory for creating SES client
  */
 object SesClientFactoryImpl : SesClientFactory {
-    override fun createSesClient(region: Region, roleArn: String?): SesClient {
+    override fun createSesClient(region: String, roleArn: String?): AmazonSimpleEmailService {
         return SecurityAccess.doPrivileged {
-            // TODO: use CredentialsProviderFactory when it supports AWS SDK v2
-            SesClient.builder()
-                .region(region)
-                .credentialsProvider(DefaultCredentialsProvider.create())
+            val credentials =
+                CredentialsProviderFactory().getCredentialsProvider(region, roleArn)
+            AmazonSimpleEmailServiceClientBuilder.standard()
+                .withRegion(region)
+                .withCredentials(credentials)
                 .build()
         }
     }
