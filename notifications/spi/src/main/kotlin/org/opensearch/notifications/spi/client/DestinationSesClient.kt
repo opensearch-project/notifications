@@ -11,6 +11,16 @@
 
 package org.opensearch.notifications.spi.client
 
+import com.amazonaws.AmazonServiceException
+import com.amazonaws.SdkBaseException
+import com.amazonaws.services.simpleemail.model.AccountSendingPausedException
+import com.amazonaws.services.simpleemail.model.AmazonSimpleEmailServiceException
+import com.amazonaws.services.simpleemail.model.ConfigurationSetDoesNotExistException
+import com.amazonaws.services.simpleemail.model.ConfigurationSetSendingPausedException
+import com.amazonaws.services.simpleemail.model.MailFromDomainNotVerifiedException
+import com.amazonaws.services.simpleemail.model.MessageRejectedException
+import com.amazonaws.services.simpleemail.model.RawMessage
+import com.amazonaws.services.simpleemail.model.SendRawEmailRequest
 import org.opensearch.notifications.spi.NotificationSpiPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.spi.credentials.SesClientFactory
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
@@ -20,18 +30,8 @@ import org.opensearch.notifications.spi.setting.PluginSettings
 import org.opensearch.notifications.spi.utils.SecurityAccess
 import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.rest.RestStatus
-import software.amazon.awssdk.core.SdkBytes
-import software.amazon.awssdk.core.exception.SdkException
-import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.ses.model.AccountSendingPausedException
-import software.amazon.awssdk.services.ses.model.ConfigurationSetDoesNotExistException
-import software.amazon.awssdk.services.ses.model.ConfigurationSetSendingPausedException
-import software.amazon.awssdk.services.ses.model.MailFromDomainNotVerifiedException
-import software.amazon.awssdk.services.ses.model.MessageRejectedException
-import software.amazon.awssdk.services.ses.model.RawMessage
-import software.amazon.awssdk.services.ses.model.SendRawEmailRequest
-import software.amazon.awssdk.services.ses.model.SesException
 import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
 import java.util.Properties
 import javax.mail.Session
 import javax.mail.internet.MimeMessage
@@ -91,22 +91,16 @@ class DestinationSesClient(private val sesClientFactory: SesClientFactory) {
     ): DestinationMessageResponse {
         return try {
             log.debug("$LOG_PREFIX:Sending Email-SES:$referenceId")
-            val region = Region.of(sesAwsRegion)
-            val client = sesClientFactory.createSesClient(region, roleArn)
+            val client = sesClientFactory.createSesClient(sesAwsRegion, roleArn)
             val outputStream = ByteArrayOutputStream()
             SecurityAccess.doPrivileged { mimeMessage.writeTo(outputStream) }
             val emailSize = outputStream.size()
             if (emailSize <= PluginSettings.emailSizeLimit) {
-                val data = SdkBytes.fromByteArray(outputStream.toByteArray())
-                val rawMessage = RawMessage.builder()
-                    .data(data)
-                    .build()
-                val rawEmailRequest = SendRawEmailRequest.builder()
-                    .rawMessage(rawMessage)
-                    .build()
+                val rawMessage = RawMessage(ByteBuffer.wrap(outputStream.toByteArray()))
+                val rawEmailRequest = SendRawEmailRequest(rawMessage)
                 val response = SecurityAccess.doPrivileged { client.sendRawEmail(rawEmailRequest) }
                 log.info("$LOG_PREFIX:Email-SES:$referenceId status:$response")
-                DestinationMessageResponse(RestStatus.OK.status, "Success")
+                DestinationMessageResponse(RestStatus.OK.status, "Success:${response.messageId}")
             } else {
                 DestinationMessageResponse(
                     RestStatus.REQUEST_ENTITY_TOO_LARGE.status,
@@ -123,9 +117,11 @@ class DestinationSesClient(private val sesClientFactory: SesClientFactory) {
             DestinationMessageResponse(RestStatus.SERVICE_UNAVAILABLE.status, getSesExceptionText(exception))
         } catch (exception: AccountSendingPausedException) {
             DestinationMessageResponse(RestStatus.INSUFFICIENT_STORAGE.status, getSesExceptionText(exception))
-        } catch (exception: SesException) {
+        } catch (exception: AmazonSimpleEmailServiceException) {
             DestinationMessageResponse(RestStatus.FAILED_DEPENDENCY.status, getSesExceptionText(exception))
-        } catch (exception: SdkException) {
+        } catch (exception: AmazonServiceException) {
+            DestinationMessageResponse(RestStatus.FAILED_DEPENDENCY.status, getServiceExceptionText(exception))
+        } catch (exception: SdkBaseException) {
             DestinationMessageResponse(RestStatus.FAILED_DEPENDENCY.status, getSdkExceptionText(exception))
         }
     }
@@ -135,10 +131,19 @@ class DestinationSesClient(private val sesClientFactory: SesClientFactory) {
      * @param exception SES Exception
      * @return generated error string
      */
-    private fun getSesExceptionText(exception: SesException): String {
-        val httpResponse = exception.awsErrorDetails().sdkHttpResponse()
+    private fun getSesExceptionText(exception: AmazonSimpleEmailServiceException): String {
         log.info("$LOG_PREFIX:SesException $exception")
-        return "sendEmail Error, SES status:${httpResponse.statusCode()}:${httpResponse.statusText()}"
+        return "sendEmail Error, SES status:${exception.errorMessage}"
+    }
+
+    /**
+     * Create error string from Amazon Service Exceptions
+     * @param exception Amazon Service Exception
+     * @return generated error string
+     */
+    private fun getServiceExceptionText(exception: AmazonServiceException): String {
+        log.info("$LOG_PREFIX:SesException $exception")
+        return "sendEmail Error(${exception.statusCode}), SES status:(${exception.errorType.name})${exception.errorCode}:${exception.errorMessage}"
     }
 
     /**
@@ -146,7 +151,7 @@ class DestinationSesClient(private val sesClientFactory: SesClientFactory) {
      * @param exception SDK Exception
      * @return generated error string
      */
-    private fun getSdkExceptionText(exception: SdkException): String {
+    private fun getSdkExceptionText(exception: SdkBaseException): String {
         log.info("$LOG_PREFIX:SdkException $exception")
         return "sendEmail Error, SDK status:${exception.message}"
     }
