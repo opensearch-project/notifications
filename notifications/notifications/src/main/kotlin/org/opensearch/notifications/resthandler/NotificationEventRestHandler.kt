@@ -147,8 +147,6 @@ internal class NotificationEventRestHandler : PluginBaseHandler() {
     ): RestChannelConsumer {
         Metrics.NOTIFICATIONS_EVENTS_INFO_TOTAL.counter.increment()
         Metrics.NOTIFICATIONS_EVENTS_INFO_INTERVAL_COUNT.counter.increment()
-        Metrics.NOTIFICATIONS_EVENTS_LIST_TOTAL.counter.increment()
-        Metrics.NOTIFICATIONS_EVENTS_LIST_INTERVAL_COUNT.counter.increment()
         val eventId: String? = request.param(EVENT_ID_TAG)
         val eventIdList: String? = request.param(EVENT_ID_LIST_TAG)
         val sortField: String? = request.param(SORT_FIELD_TAG)

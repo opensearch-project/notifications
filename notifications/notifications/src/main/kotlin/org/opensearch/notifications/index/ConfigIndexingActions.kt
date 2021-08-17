@@ -134,6 +134,7 @@ object ConfigIndexingActions {
                 }
                 ConfigType.SES_ACCOUNT -> if (it.docInfo.id != email.emailAccountID) {
                     // Email Account ID is specified as Email Group ID
+                    Metrics.NOTIFICATIONS_CONFIG_USER_ERROR_INVALID_EMAIL_GROUP_ID.counter.increment()
                     throw OpenSearchStatusException(
                         "configId ${it.docInfo.id} is not a valid email group ID",
                         RestStatus.NOT_ACCEPTABLE
@@ -331,7 +332,7 @@ object ConfigIndexingActions {
         if (configDocs.size != configIds.size) {
             val mutableSet = configIds.toMutableSet()
             configDocs.forEach { mutableSet.remove(it.docInfo.id) }
-            Metrics.NOTIFICATIONS_CONFIG_LIST_SYSTEM_ERROR.counter.increment()
+            Metrics.NOTIFICATIONS_CONFIG_INFO_USER_ERROR_SET_NOT_FOUND.counter.increment()
             throw OpenSearchStatusException(
                 "NotificationConfig $mutableSet not found",
                 RestStatus.NOT_FOUND
@@ -464,7 +465,7 @@ object ConfigIndexingActions {
         if (configDocs.size != configIds.size) {
             val mutableSet = configIds.toMutableSet()
             configDocs.forEach { mutableSet.remove(it.docInfo.id) }
-            Metrics.NOTIFICATIONS_CONFIG_DELETE_LIST_SYSTEM_ERROR.counter.increment()
+            Metrics.NOTIFICATIONS_CONFIG_DELETE_USER_ERROR_SET_NOT_FOUND.counter.increment()
             throw OpenSearchStatusException(
                 "NotificationConfig $mutableSet not found",
                 RestStatus.NOT_FOUND

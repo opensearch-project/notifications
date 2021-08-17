@@ -415,6 +415,7 @@ object SendMessageActionHelper {
         message: MessageContent,
         referenceId: String
     ): EmailRecipientStatus {
+        Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SMTP_ACCOUNT.counter.increment()
         val destination = SmtpDestination(
             accountName,
             smtpAccount.host,
@@ -440,6 +441,7 @@ object SendMessageActionHelper {
         message: MessageContent,
         referenceId: String
     ): EmailRecipientStatus {
+        Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SES_ACCOUNT.counter.increment()
         val destination = SesDestination(
             accountName,
             sesAccount.awsRegion,

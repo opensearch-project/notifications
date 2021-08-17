@@ -78,18 +78,10 @@ public enum Metrics {
     NOTIFICATIONS_CONFIG_DELETE_USER_ERROR_INVALID_CONFIG_ID(
             "notifications_config.delete.user_error.invalid_config_id", new RollingCounter()
     ),
+    NOTIFICATIONS_CONFIG_DELETE_USER_ERROR_SET_NOT_FOUND(
+            "notifications_config.delete.user_error.set_not_found", new RollingCounter()
+    ),
     NOTIFICATIONS_CONFIG_DELETE_SYSTEM_ERROR("notifications_config.delete.system_error", new RollingCounter()),
-
-
-    // DELETE _plugins/_notifications/configs?{config_id_list}, Delete multiple notification configs
-    NOTIFICATIONS_CONFIG_DELETE_LIST_TOTAL("notifications_config.delete_list.total", new BasicCounter()),
-    NOTIFICATIONS_CONFIG_DELETE_LIST_INTERVAL_COUNT("notifications_config.delete_list.count", new RollingCounter()),
-    NOTIFICATIONS_CONFIG_DELETE_LIST_USER_ERROR_INVALID_CONFIG_ID(
-            "notifications_config.delete_list.user_error.invalid_config_id", new RollingCounter()
-    ),
-    NOTIFICATIONS_CONFIG_DELETE_LIST_SYSTEM_ERROR(
-            "notifications_config.delete_list.system_error", new RollingCounter()
-    ),
 
 
     // GET _plugins/_notifications/configs/{configId}
@@ -99,22 +91,16 @@ public enum Metrics {
     NOTIFICATIONS_CONFIG_INFO_USER_ERROR_INVALID_CONFIG_ID(
             "notifications_config.info.user_error.invalid_config_id", new RollingCounter()
     ),
-    NOTIFICATIONS_CONFIG_INFO_SYSTEM_ERROR("notifications_config.info.system_error", new RollingCounter()),
-
-
-    // GET _plugins/_notifications/configs, Get list of notification configs
-    NOTIFICATIONS_CONFIG_LIST_TOTAL("notifications_config.list.total", new BasicCounter()),
-    NOTIFICATIONS_CONFIG_LIST_INTERVAL_COUNT("notifications_config.list.count", new RollingCounter()),
-    NOTIFICATIONS_CONFIG_LIST_USER_ERROR_INVALID_FROM_INDEX(
-            "notifications_config.list.user_error.invalid_from_index", new RollingCounter()
+    NOTIFICATIONS_CONFIG_INFO_USER_ERROR_SET_NOT_FOUND(
+            "notifications_config.info.user_error.set_not_found", new RollingCounter()
     ),
-    NOTIFICATIONS_CONFIG_LIST_SYSTEM_ERROR("notifications_config.list.system_error", new RollingCounter()),
+    NOTIFICATIONS_CONFIG_INFO_SYSTEM_ERROR("notifications_config.info.system_error", new RollingCounter()),
 
 
     // Event Endpoints
 
 
-    // GET _plugins/_notifications/configs/{configId}
+    // GET _plugins/_notifications/events/{configId}
     NOTIFICATIONS_EVENTS_INFO_TOTAL("notifications_events.info.total", new BasicCounter()),
     NOTIFICATIONS_EVENTS_INFO_INTERVAL_COUNT("notifications_events.info.count", new RollingCounter()),
     NOTIFICATIONS_EVENTS_INFO_USER_ERROR_INVALID_CONFIG_ID(
@@ -122,20 +108,6 @@ public enum Metrics {
     ),
     NOTIFICATIONS_EVENTS_INFO_SYSTEM_ERROR(
             "notifications_events.info.system_error", new RollingCounter()
-    ),
-
-
-    // GET _plugins/_notifications/configs
-    NOTIFICATIONS_EVENTS_LIST_TOTAL("notifications_events.list.total", new BasicCounter()),
-    NOTIFICATIONS_EVENTS_LIST_INTERVAL_COUNT("notifications_events.list.count", new RollingCounter()),
-    NOTIFICATIONS_EVENTS_LIST_USER_ERROR_INVALID_CONFIG_ID(
-            "notifications_events.list.user_error.invalid_config_id", new RollingCounter()
-    ),
-    NOTIFICATIONS_EVENTS_LIST_USER_ERROR_INVALID_FROM_INDEX(
-            "notifications_events.list.user_error.invalid_from_index", new RollingCounter()
-    ),
-    NOTIFICATIONS_EVENTS_LIST_SYSTEM_ERROR(
-            "notifications_events.list.system_error", new RollingCounter()
     ),
 
 
@@ -149,9 +121,6 @@ public enum Metrics {
     NOTIFICATIONS_FEATURE_CHANNELS_INFO_USER_ERROR_INVALID_FEATURE_TAG(
             "notifications_feature_channels.info.user_error.invalid_feature_tag", new RollingCounter()
     ),
-    NOTIFICATIONS_FEATURE_CHANNELS_INFO_USER_ERROR_INVALID_FROM_INDEX(
-            "notifications_feature_channels.info.user_error.invalid_from_index", new RollingCounter()
-    ),
     NOTIFICATIONS_FEATURE_CHANNELS_INFO_SYSTEM_ERROR(
             "notifications_feature_channels.info.system_error", new RollingCounter()
     ),
@@ -162,9 +131,6 @@ public enum Metrics {
     // GET _plugins/_notifications/features
     NOTIFICATIONS_FEATURES_INFO_TOTAL("notifications_features.info.total", new BasicCounter()),
     NOTIFICATIONS_FEATURES_INFO_INTERVAL_COUNT("notifications_features.info.count", new RollingCounter()),
-    NOTIFICATIONS_FEATURES_INFO_USER_ERROR_INVALID_FROM_INDEX(
-            "notifications_features.info.user_error.invalid_from_index", new RollingCounter()
-    ),
     NOTIFICATIONS_FEATURES_INFO_SYSTEM_ERROR("notifications_features.info.system_error", new RollingCounter()),
 
 
@@ -186,10 +152,10 @@ public enum Metrics {
     NOTIFICATIONS_MESSAGE_DESTINATION_EMAIL("notifications.message_destination.email", new BasicCounter()),
     NOTIFICATIONS_MESSAGE_DESTINATION_SES_ACCOUNT(
             "notifications.message_destination.ses_account", new BasicCounter()
-    ), // TODO: add after implementation added
+    ),
     NOTIFICATIONS_MESSAGE_DESTINATION_SMTP_ACCOUNT(
             "notifications.message_destination.smtp_account", new BasicCounter()
-    ), // TODO: add after implementation added
+    ),
     NOTIFICATIONS_MESSAGE_DESTINATION_EMAIL_GROUP(
             "notifications.message_destination.email_group", new BasicCounter()
     ), // TODO: add after implementation added

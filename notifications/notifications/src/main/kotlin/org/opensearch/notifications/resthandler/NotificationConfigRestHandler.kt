@@ -275,8 +275,6 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
     ): RestChannelConsumer {
         Metrics.NOTIFICATIONS_CONFIG_DELETE_TOTAL.counter.increment()
         Metrics.NOTIFICATIONS_CONFIG_DELETE_INTERVAL_COUNT.counter.increment()
-        Metrics.NOTIFICATIONS_CONFIG_DELETE_LIST_TOTAL.counter.increment()
-        Metrics.NOTIFICATIONS_CONFIG_DELETE_LIST_INTERVAL_COUNT.counter.increment()
         val configId: String? = request.param(CONFIG_ID_TAG)
         val configIdSet: Set<String> =
             request.paramAsStringArray(CONFIG_ID_LIST_TAG, arrayOf(configId))
