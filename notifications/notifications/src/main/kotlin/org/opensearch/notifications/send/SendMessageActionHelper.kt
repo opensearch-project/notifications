@@ -35,6 +35,7 @@ import org.opensearch.commons.notifications.model.EmailRecipientStatus
 import org.opensearch.commons.notifications.model.EventSource
 import org.opensearch.commons.notifications.model.EventStatus
 import org.opensearch.commons.notifications.model.NotificationEvent
+import org.opensearch.commons.notifications.model.SesAccount
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.notifications.model.Sns
@@ -54,6 +55,7 @@ import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
 import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
+import org.opensearch.notifications.spi.model.destination.SesDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import org.opensearch.notifications.spi.model.destination.SnsDestination
@@ -217,7 +219,7 @@ object SendMessageActionHelper {
                 eventStatus,
                 eventSource.referenceId
             )
-            ConfigType.SES_ACCOUNT -> null // TODO : Implement
+            ConfigType.SES_ACCOUNT -> null
             ConfigType.SMTP_ACCOUNT -> null
             ConfigType.EMAIL_GROUP -> null
             ConfigType.SNS -> sendSNSMessage(configData as Sns, message, eventStatus, eventSource.referenceId)
@@ -243,7 +245,8 @@ object SendMessageActionHelper {
      * @return notification delivery status for the legacy destination
      */
     private fun sendMessageToLegacyDestination(baseMessage: LegacyBaseMessage): LegacyDestinationResponse {
-        val message = MessageContent(title = "Index Management Notification", textDescription = baseMessage.messageContent)
+        val message =
+            MessageContent(title = "Index Management Notification", textDescription = baseMessage.messageContent)
         // These legacy destination calls do not have reference Ids, just passing index management feature constant
         return when (baseMessage.channelType) {
             LegacyDestinationType.LEGACY_SLACK -> {
@@ -352,22 +355,35 @@ object SendMessageActionHelper {
         referenceId: String
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_EMAIL.counter.increment()
-        val smtpAccountDocInfo = childConfigs.find { it.docInfo.id == email.emailAccountID }
+        val accountDocInfo = childConfigs.find { it.docInfo.id == email.emailAccountID }
         val groups = childConfigs.filter { email.emailGroupIds.contains(it.docInfo.id) }
         val groupRecipients = groups.map { (it.configDoc.config.configData as EmailGroup).recipients }.flatten()
         val recipients = email.recipients.union(groupRecipients)
         val emailRecipientStatus: List<EmailRecipientStatus>
-        val smtpAccountConfig = smtpAccountDocInfo?.configDoc!!.config
+        val accountConfig = accountDocInfo?.configDoc!!.config
         runBlocking {
             val statusDeferredList = recipients.map {
                 async(Dispatchers.IO) {
-                    sendEmailFromSmtpAccount(
-                        smtpAccountConfig.name,
-                        smtpAccountConfig.configData as SmtpAccount,
-                        it,
-                        message,
-                        referenceId
-                    )
+                    when (accountConfig.configType) {
+                        ConfigType.SMTP_ACCOUNT -> sendEmailFromSmtpAccount(
+                            accountConfig.name,
+                            accountConfig.configData as SmtpAccount,
+                            it,
+                            message,
+                            referenceId
+                        )
+                        ConfigType.SES_ACCOUNT -> sendEmailFromSesAccount(
+                            accountConfig.name,
+                            accountConfig.configData as SesAccount,
+                            it,
+                            message,
+                            referenceId
+                        )
+                        else -> EmailRecipientStatus(
+                            it,
+                            DeliveryStatus(RestStatus.NOT_ACCEPTABLE.name, "email account type not enabled")
+                        )
+                    }
                 }
             }
             emailRecipientStatus = statusDeferredList.awaitAll()
@@ -392,7 +408,6 @@ object SendMessageActionHelper {
     /**
      * send message to smtp destination
      */
-    @Suppress("UnusedPrivateMember")
     private fun sendEmailFromSmtpAccount(
         accountName: String,
         smtpAccount: SmtpAccount,
@@ -406,6 +421,30 @@ object SendMessageActionHelper {
             smtpAccount.port,
             smtpAccount.method.tag,
             smtpAccount.fromAddress,
+            recipient
+        )
+        val status = sendMessageThroughSpi(destination, message, referenceId)
+        return EmailRecipientStatus(
+            recipient,
+            DeliveryStatus(status.statusCode.toString(), status.statusText)
+        )
+    }
+
+    /**
+     * send message to ses destination
+     */
+    private fun sendEmailFromSesAccount(
+        accountName: String,
+        sesAccount: SesAccount,
+        recipient: String,
+        message: MessageContent,
+        referenceId: String
+    ): EmailRecipientStatus {
+        val destination = SesDestination(
+            accountName,
+            sesAccount.awsRegion,
+            sesAccount.roleArn,
+            sesAccount.fromAddress,
             recipient
         )
         val status = sendMessageThroughSpi(destination, message, referenceId)
