@@ -10,12 +10,11 @@
  */
 package org.opensearch.notifications.spi.credentials
 
-import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.ses.SesClient
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailService
 
 /**
  * Interface for creating SES client
  */
 interface SesClientFactory {
-    fun createSesClient(region: Region, roleArn: String?): SesClient
+    fun createSesClient(region: String, roleArn: String?): AmazonSimpleEmailService
 }
