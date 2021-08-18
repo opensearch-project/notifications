@@ -120,7 +120,7 @@ internal class NotificationPlugin : ActionPlugin, ReloadablePlugin, Plugin() {
     ): Collection<Any> {
         this.clusterService = clusterService
         PluginSettings.addSettingsUpdateConsumer(clusterService)
-        org.opensearch.notifications.spi.setting.SpiSettings.addSettingsUpdateConsumer(clusterService)
+        SpiSettings.addSettingsUpdateConsumer(clusterService)
         NotificationConfigIndex.initialize(client, clusterService)
         NotificationEventIndex.initialize(client, clusterService)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
