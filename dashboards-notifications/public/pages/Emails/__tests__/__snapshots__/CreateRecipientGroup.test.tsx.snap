@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<CreateRecipientGroup/> spec renders the component 1`] = `
+<h1
+  class="euiTitle euiTitle--large"
+>
+  Create recipient group
+</h1>
+`;

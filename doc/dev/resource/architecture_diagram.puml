@@ -1,0 +1,146 @@
+@startuml
+hide stereotype
+skinparam nodesep 6
+skinparam ranksep 10
+
+skinparam component {
+backgroundColor<<new>> Green
+backgroundColor<<modify>> Orange
+backgroundColor<<existing>> LightYellow
+backgroundColor<<external>> LightGrey
+backgroundColor<<AWS>> DarkKhaki
+backgroundColor<<AES>> Khaki
+backgroundColor<<Data>> Grey
+backgroundColor<<CS>> LightGrey
+}
+skinparam rectangle {
+backgroundColor<<new>> Green
+backgroundColor<<modify>> Orange
+backgroundColor<<existing>> LightYellow
+backgroundColor<<external>> LightGrey
+backgroundColor<<AWS>> DarkKhaki
+backgroundColor<<AES>> Khaki
+backgroundColor<<Data>> Grey
+backgroundColor<<CS>> LightGrey
+}
+skinparam node {
+backgroundColor<<new>> Green
+backgroundColor<<modify>> Orange
+backgroundColor<<existing>> LightYellow
+backgroundColor<<external>> LightGrey
+backgroundColor<<AWS>> DarkKhaki
+backgroundColor<<AES>> Khaki
+backgroundColor<<Data>> Grey
+backgroundColor<<CS>> LightGrey
+}
+
+title ** ES Notification plugin**
+
+actor User as user
+actor "recipient" as re
+
+
+node "ElasticSearch cluster/domain" as cluster {
+    rectangle "AES EC2 Instance" <<AWS>> {
+        rectangle "Kibana" as kibana <<AES>> {
+            rectangle "Kibana plugins" as kplugin  <<existing>>
+            rectangle "Notification Kibana Plugin" as notify_kbn_plugin <<new>> 
+         }
+             
+        
+        rectangle "Elasticsearch" as es <<AES>> {
+            rectangle "Notification plugin" as notify <<new>> {
+                
+              interface "Transport interface" as ti <<new>>
+              interface "REST interface" as ri <<new>>
+              rectangle "SPI" as spi <<new>> {
+                rectangle "Email module" as em <<modify>>
+                rectangle "SNS module" as snsm <<modify>>
+                rectangle "Slack module" as sm <<modify>>
+                rectangle "Chime module" as cm <<modify>>
+                rectangle "Custom Webhook module" as cwm <<modify>>
+
+              }
+
+            
+
+
+              rectangle "Transport Actions" as ta <<new>>
+              ri ---> ti
+              ti ---> ta
+              ta --> em
+              ta --> snsm
+              ta --> sm
+              ta --> cm
+              ta --> cwm
+
+            }
+            rectangle "Credential storage module" as credential <<new>>
+            rectangle "Security Plugin" as security <<existing>>
+            rectangle "Reporting plugin" as reports <<existing>>
+            rectangle "Alerting plugin" as alerting <<existing>>
+            rectangle "ISM plugin" as ism <<existing>>
+            rectangle "Other ES plugins" as esplugin <<existing>>
+        }
+    }
+    component "SES" as ses <<AWS>>
+    component "SNS" as sns <<AWS>>
+    component "external email service\n(e.g. gmail)" as ex_email_server <<external>>
+    component "Webhook service \n (Slack, Chime, custom)" as hook <<External>>
+  
+}
+
+node "User space" as customer <<CS>> {
+    rectangle "Kibana UI" as kibana_ui  <<Data>>
+    rectangle "ES Interface\n+ ES Data" as es_data  <<Data>>
+}
+
+user --> kibana_ui
+kibana_ui -[hidden]right-> kibana
+kibana_ui -[hidden]down-> es_data
+es_data -[hidden]right-> es
+kibana_ui -right- kibana
+es_data -right- es
+' ti -[hidden]up-> ri
+' credential -[hidden]up- security
+' cm -[hidden]right- snsm
+' em -[hidden]right- cm
+
+
+notify_kbn_plugin --> ri: Manage configuration
+kplugin -> notify_kbn_plugin: Redirect/Load configuration page
+
+credential <-- em : Get credentials
+ti -> security : Verify security
+kplugin -> ri : Submit notification \n Manage configuration
+reports ---> ti : Submit notification
+alerting ---> ti : Submit notification
+ism ---> ti : Submit notification
+esplugin ---> ti : Submit notification
+
+em ---> ex_email_server: submits email(SMTP)
+em ...> ses : submits email to server\n(AWS SES SDK)
+
+
+snsm ---> sns: submit message
+sm ---> hook: submit message
+cm ---> hook: submit message
+cwm ---> hook: submit message
+
+ses --> re : receive\nemail
+hook --> re: receive \n message
+sns --> re: recieve\nnotification
+
+
+rectangle "Legend" {
+    rectangle "New" as new <<new>>
+    rectangle "Modified" as modify <<modify>>
+    rectangle "Existing" as existing <<existing>>
+    rectangle "External" as external <<external>>
+    rectangle "AWS" as aws <<AWS>>
+    aws -[hidden]right- new
+    new -[hidden]right- modify
+    modify -[hidden]right- existing
+    existing -[hidden]right- external    
+}
+@enduml

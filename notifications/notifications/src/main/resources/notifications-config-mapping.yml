@@ -1,0 +1,155 @@
+---
+##
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+# Modifications Copyright OpenSearch Contributors. See
+# GitHub history for details.
+##
+
+##
+# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the License.
+# A copy of the License is located at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# or in the "license" file accompanying this file. This file is distributed
+# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+# express or implied. See the License for the specific language governing
+# permissions and limitations under the License.
+#
+##
+
+# Schema file for the notifications-config index
+# "dynamic" is set to "false" so that only specified fields are indexed instead of all fields.
+dynamic: false
+properties:
+  metadata:
+    type: object
+    properties:
+      last_updated_time_ms:
+        type: date
+        format: epoch_millis
+      created_time_ms:
+        type: date
+        format: epoch_millis
+      tenant:
+        type: keyword
+      access: # Array of access details like user,role,backend_role etc
+        type: keyword
+  config: # dynamic structure to store notifications configuration
+    type: object
+    properties:
+      name:
+        type: text
+        fields:
+          keyword:
+            type: keyword
+      description:
+        type: text
+        fields:
+          keyword:
+            type: keyword
+      config_type:
+        type: keyword
+      feature_list:
+        type: keyword
+      is_enabled:
+        type: boolean
+      slack: # slack configuration
+        type: object
+        properties:
+          url:
+            type: text
+            fields:
+              keyword:
+                type: keyword
+      chime: # chime configuration
+        type: object
+        properties:
+          url:
+            type: text
+            fields:
+              keyword:
+                type: keyword
+      webhook: # webhook configuration
+        type: object
+        properties:
+          url:
+            type: text
+            fields:
+              keyword:
+                type: keyword
+          header_params:
+            type: object
+      email: # email configuration
+        type: object
+        properties:
+          email_account_id:
+            type: keyword
+          recipient_list:
+            type: text
+            fields:
+              keyword:
+                type: keyword
+          email_group_id_list:
+            type: keyword
+      sns: # sns configuration
+        type: object
+        properties:
+          topic_arn:
+            type: text
+            fields:
+              keyword:
+                type: keyword
+          role_arn:
+            type: text
+            fields:
+              keyword:
+                type: keyword
+      smtp_account: # smtp account configuration
+        type: object
+        properties:
+          host:
+            type: text
+            fields:
+              keyword:
+                type: keyword
+          port:
+            type: integer
+          method:
+            type: keyword
+          from_address:
+            type: text
+            fields:
+              keyword:
+                type: keyword
+      ses_account: # smtp account configuration
+        type: object
+        properties:
+          region:
+            type: keyword
+          role_arn:
+            type: text
+            fields:
+              keyword:
+                type: keyword
+          from_address:
+            type: text
+            fields:
+              keyword:
+                type: keyword
+      email_group: # email group configuration
+        type: object
+        properties:
+          recipient_list:
+            type: text
+            fields:
+              keyword:
+                type: keyword

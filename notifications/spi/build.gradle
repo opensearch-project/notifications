@@ -1,0 +1,157 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ *
+ * Modifications Copyright OpenSearch Contributors. See
+ * GitHub history for details.
+ */
+
+/*
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ *
+ */
+
+import org.opensearch.gradle.test.RestIntegTestTask
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
+
+plugins {
+    id 'com.github.johnrengelman.shadow'
+    id 'jacoco'
+    id 'maven'
+    id 'maven-publish'
+    id 'signing'
+}
+
+apply plugin: 'opensearch.java'
+apply plugin: 'opensearch.testclusters'
+apply plugin: 'opensearch.java-rest-test'
+apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
+
+ext {
+    projectSubstitutions = [:]
+    licenseFile = rootProject.file('LICENSE.txt')
+    noticeFile = rootProject.file('NOTICE')
+}
+
+task integTest(type: RestIntegTestTask) {
+    description = "Run tests against a cluster that has security enabled"
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    systemProperty 'tests.security.manager', 'false'
+}
+
+task sourcesJar(type: Jar) {
+    archiveClassifier.set 'sources'
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar) {
+    archiveClassifier.set 'javadoc'
+    from javadoc.destinationDir
+    dependsOn javadoc
+}
+
+allOpen {
+    annotation("org.opensearch.notifications.spi.util.OpenForTesting")
+}
+
+test {
+    useJUnitPlatform()
+    doFirst {
+        // reverse operation of https://github.com/elastic/elasticsearch/blob/7.6/buildSrc/src/main/groovy/org/elasticsearch/gradle/BuildPlugin.groovy#L736-L743
+        // to fix the classpath for unit tests
+        test.classpath -= project.files(project.tasks.named('shadowJar'))
+        test.classpath -= project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
+        test.classpath += project.extensions.getByType(SourceSetContainer).getByName(SourceSet.MAIN_SOURCE_SET_NAME).runtimeClasspath
+    }
+    // add "-Dtests.security.manager=false" to VM options if you want to run integ tests in IntelliJ
+    systemProperty 'tests.security.manager', 'false'
+}
+
+//TODO: see if this can be only set at top level and apply to subprojects, or we remove from top project if possible
+configurations.all {
+    if (it.state != Configuration.State.UNRESOLVED) return
+    resolutionStrategy {
+        force "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+        force "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
+        force "commons-logging:commons-logging:1.2" // resolve for amazonaws
+        force "commons-codec:commons-codec:1.13" // resolve for amazonaws
+        force "org.apache.httpcomponents:httpclient:4.5.10" // resolve for amazonaws
+        force "org.apache.httpcomponents:httpcore:4.4.13" // resolve for amazonaws
+        force "joda-time:joda-time:2.8.1" // Resolve for amazonaws
+        force "com.fasterxml.jackson.core:jackson-core:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.core:jackson-annotations:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.core:jackson-databind:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.3" // resolve for amazonaws
+        force "junit:junit:4.12" // resolve for amazonaws
+    }
+}
+
+dependencies {
+    compileOnly "org.opensearch:opensearch:${opensearch_version}"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
+    compile "org.apache.httpcomponents:httpcore:4.4.5"
+    compile "org.apache.httpcomponents:httpclient:4.5.10"
+    compile "com.amazonaws:aws-java-sdk-sns:${aws_version}"
+    compile "com.amazonaws:aws-java-sdk-sts:${aws_version}"
+    compile "com.amazonaws:aws-java-sdk-ses:${aws_version}"
+    compile "com.sun.mail:javax.mail:1.6.2"
+    implementation "com.github.seancfoley:ipaddress:5.3.3"
+    testImplementation(
+            'org.assertj:assertj-core:3.16.1',
+            'org.junit.jupiter:junit-jupiter-api:5.6.2',
+            "org.junit.jupiter:junit-jupiter-params:5.6.2",
+            "org.easymock:easymock:4.0.1",
+            "org.apache.logging.log4j:log4j-core:${versions.log4j}",
+            'org.mockito:mockito-junit-jupiter:3.10.0',
+            'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0',
+            'io.mockk:mockk:1.11.0',
+            'io.mockk:mockk-common:1.11.0',
+            'io.mockk:mockk-dsl:1.11.0',
+            'io.mockk:mockk-dsl-jvm:1.11.0',
+            'io.mockk:mockk-agent-api:1.11.0',
+            'io.mockk:mockk-agent-common:1.11.0',
+            'io.mockk:mockk-agent-jvm:1.11.0',
+    )
+    testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
+    testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
+    testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.2')
+    testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
+    testCompile "org.mockito:mockito-core:3.10.0"
+    testCompile "org.opensearch.test:framework:${opensearch_version}"
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
+}
+
+configurations {
+    testCompile {
+        exclude group: 'org.elasticsearch', module: 'securemock' // resolve jarhell with mockito
+    }
+}
+
+shadowJar {
+    // fix jarhell by relocating packages
+    relocate 'org.joda.time', 'org.opensearch.notifications.repackage.org.joda.time'
+    relocate 'com.fasterxml.jackson', 'org.opensearch.notifications.repackage.com.fasterxml.jackson'
+    relocate 'org.apache.http', 'org.opensearch.notifications.repackage.org.apache.http'
+    relocate 'org.apache.commons.logging', 'org.opensearch.notifications.repackage.org.apache.commons.logging'
+    relocate 'org.apache.commons.codec', 'org.opensearch.notifications.repackage.org.apache.commons.codec'
+    classifier = null
+}

@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<CreateSender/> spec renders the component 1`] = `
+<h1
+  class="euiTitle euiTitle--large"
+>
+  Create sender
+</h1>
+`;
+
+exports[`<CreateSender/> spec renders the component for editing 1`] = `
+<h1
+  class="euiTitle euiTitle--large"
+>
+  Edit sender
+</h1>
+`;
+
+exports[`<CreateSender/> spec renders the component for editing 2`] = `
+<h1
+  class="euiTitle euiTitle--large"
+>
+  Edit sender
+</h1>
+`;
