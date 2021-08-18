@@ -55,6 +55,7 @@ import org.opensearch.commons.notifications.model.Sns
 import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
+import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.DocMetadata
 import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.security.UserAccess
@@ -117,6 +118,7 @@ object ConfigIndexingActions {
             when (it.configDoc.config.configType) {
                 ConfigType.EMAIL_GROUP -> if (it.docInfo.id == email.emailAccountID) {
                     // Email Group ID is specified as Email Account ID
+                    Metrics.NOTIFICATIONS_CONFIG_USER_ERROR_INVALID_EMAIL_ACCOUNT_ID.counter.increment()
                     throw OpenSearchStatusException(
                         "configId ${it.docInfo.id} is not a valid email account ID",
                         RestStatus.NOT_ACCEPTABLE
@@ -124,6 +126,7 @@ object ConfigIndexingActions {
                 }
                 ConfigType.SMTP_ACCOUNT -> if (it.docInfo.id != email.emailAccountID) {
                     // Email Account ID is specified as Email Group ID
+                    Metrics.NOTIFICATIONS_CONFIG_USER_ERROR_INVALID_EMAIL_GROUP_ID.counter.increment()
                     throw OpenSearchStatusException(
                         "configId ${it.docInfo.id} is not a valid email group ID",
                         RestStatus.NOT_ACCEPTABLE
@@ -131,6 +134,7 @@ object ConfigIndexingActions {
                 }
                 ConfigType.SES_ACCOUNT -> if (it.docInfo.id != email.emailAccountID) {
                     // Email Account ID is specified as Email Group ID
+                    Metrics.NOTIFICATIONS_CONFIG_USER_ERROR_INVALID_EMAIL_GROUP_ID.counter.increment()
                     throw OpenSearchStatusException(
                         "configId ${it.docInfo.id} is not a valid email group ID",
                         RestStatus.NOT_ACCEPTABLE
@@ -138,6 +142,7 @@ object ConfigIndexingActions {
                 }
                 else -> {
                     // Config ID is neither Email Group ID or valid Email Account ID
+                    Metrics.NOTIFICATIONS_CONFIG_USER_ERROR_NEITHER_EMAIL_NOR_GROUP.counter.increment()
                     throw OpenSearchStatusException(
                         "configId ${it.docInfo.id} is not a valid email group ID or email account ID",
                         RestStatus.NOT_ACCEPTABLE
@@ -147,6 +152,7 @@ object ConfigIndexingActions {
             // Validate that the user has access to underlying configurations as well.
             val currentMetadata = it.configDoc.metadata
             if (!userAccess.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+                Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
                 throw OpenSearchStatusException(
                     "Permission denied for NotificationConfig ${it.docInfo.id}",
                     RestStatus.FORBIDDEN
@@ -158,6 +164,7 @@ object ConfigIndexingActions {
                 val missingFeatures = features.filterNot { item ->
                     it.configDoc.config.features.contains(item)
                 }
+                Metrics.NOTIFICATIONS_SECURITY_USER_ERROR.counter.increment()
                 throw OpenSearchStatusException(
                     "Some Features not available in NotificationConfig ${it.docInfo.id}:$missingFeatures",
                     RestStatus.FORBIDDEN
@@ -217,10 +224,13 @@ object ConfigIndexingActions {
         )
         val configDoc = NotificationConfigDoc(metadata, request.notificationConfig)
         val docId = operations.createNotificationConfig(configDoc, request.configId)
-        docId ?: throw OpenSearchStatusException(
-            "NotificationConfig Creation failed",
-            RestStatus.INTERNAL_SERVER_ERROR
-        )
+        docId ?: run {
+            Metrics.NOTIFICATIONS_CONFIG_CREATE_SYSTEM_ERROR.counter.increment()
+            throw OpenSearchStatusException(
+                "NotificationConfig Creation failed",
+                RestStatus.INTERNAL_SERVER_ERROR
+            )
+        }
         return CreateNotificationConfigResponse(docId)
     }
 
@@ -237,6 +247,7 @@ object ConfigIndexingActions {
         val currentConfigDoc = operations.getNotificationConfig(request.configId)
         currentConfigDoc
             ?: run {
+                Metrics.NOTIFICATIONS_CONFIG_UPDATE_USER_ERROR_INVALID_CONFIG_ID.counter.increment()
                 throw OpenSearchStatusException(
                     "NotificationConfig ${request.configId} not found",
                     RestStatus.NOT_FOUND
@@ -245,6 +256,7 @@ object ConfigIndexingActions {
 
         val currentMetadata = currentConfigDoc.configDoc.metadata
         if (!userAccess.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+            Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
             throw OpenSearchStatusException(
                 "Permission denied for NotificationConfig ${request.configId}",
                 RestStatus.FORBIDDEN
@@ -257,6 +269,7 @@ object ConfigIndexingActions {
         val newMetadata = currentMetadata.copy(lastUpdateTime = Instant.now())
         val newConfigData = NotificationConfigDoc(newMetadata, request.notificationConfig)
         if (!operations.updateNotificationConfig(request.configId, newConfigData)) {
+            Metrics.NOTIFICATIONS_CONFIG_UPDATE_SYSTEM_ERROR.counter.increment()
             throw OpenSearchStatusException("NotificationConfig Update failed", RestStatus.INTERNAL_SERVER_ERROR)
         }
         return UpdateNotificationConfigResponse(request.configId)
@@ -289,10 +302,12 @@ object ConfigIndexingActions {
         val configDoc = operations.getNotificationConfig(configId)
         configDoc
             ?: run {
+                Metrics.NOTIFICATIONS_CONFIG_INFO_USER_ERROR_INVALID_CONFIG_ID.counter.increment()
                 throw OpenSearchStatusException("NotificationConfig $configId not found", RestStatus.NOT_FOUND)
             }
         val metadata = configDoc.configDoc.metadata
         if (!userAccess.doesUserHasAccess(user, metadata.tenant, metadata.access)) {
+            Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
             throw OpenSearchStatusException("Permission denied for NotificationConfig $configId", RestStatus.FORBIDDEN)
         }
         val configInfo = NotificationConfigInfo(
@@ -317,6 +332,7 @@ object ConfigIndexingActions {
         if (configDocs.size != configIds.size) {
             val mutableSet = configIds.toMutableSet()
             configDocs.forEach { mutableSet.remove(it.docInfo.id) }
+            Metrics.NOTIFICATIONS_CONFIG_INFO_USER_ERROR_SET_NOT_FOUND.counter.increment()
             throw OpenSearchStatusException(
                 "NotificationConfig $mutableSet not found",
                 RestStatus.NOT_FOUND
@@ -325,6 +341,7 @@ object ConfigIndexingActions {
         configDocs.forEach {
             val currentMetadata = it.configDoc.metadata
             if (!userAccess.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+                Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
                 throw OpenSearchStatusException(
                     "Permission denied for NotificationConfig ${it.docInfo.id}",
                     RestStatus.FORBIDDEN
@@ -410,6 +427,7 @@ object ConfigIndexingActions {
         val currentConfigDoc = operations.getNotificationConfig(configId)
         currentConfigDoc
             ?: run {
+                Metrics.NOTIFICATIONS_CONFIG_DELETE_USER_ERROR_INVALID_CONFIG_ID.counter.increment()
                 throw OpenSearchStatusException(
                     "NotificationConfig $configId not found",
                     RestStatus.NOT_FOUND
@@ -418,12 +436,14 @@ object ConfigIndexingActions {
 
         val currentMetadata = currentConfigDoc.configDoc.metadata
         if (!userAccess.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+            Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
             throw OpenSearchStatusException(
                 "Permission denied for NotificationConfig $configId",
                 RestStatus.FORBIDDEN
             )
         }
         if (!operations.deleteNotificationConfig(configId)) {
+            Metrics.NOTIFICATIONS_CONFIG_DELETE_SYSTEM_ERROR.counter.increment()
             throw OpenSearchStatusException(
                 "NotificationConfig $configId delete failed",
                 RestStatus.REQUEST_TIMEOUT
@@ -445,6 +465,7 @@ object ConfigIndexingActions {
         if (configDocs.size != configIds.size) {
             val mutableSet = configIds.toMutableSet()
             configDocs.forEach { mutableSet.remove(it.docInfo.id) }
+            Metrics.NOTIFICATIONS_CONFIG_DELETE_USER_ERROR_SET_NOT_FOUND.counter.increment()
             throw OpenSearchStatusException(
                 "NotificationConfig $mutableSet not found",
                 RestStatus.NOT_FOUND
@@ -453,6 +474,7 @@ object ConfigIndexingActions {
         configDocs.forEach {
             val currentMetadata = it.configDoc.metadata
             if (!userAccess.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+                Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
                 throw OpenSearchStatusException(
                     "Permission denied for NotificationConfig ${it.docInfo.id}",
                     RestStatus.FORBIDDEN

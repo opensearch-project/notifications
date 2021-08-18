@@ -79,6 +79,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3" // ${kotlin_version} does not work for coroutines
     compile "${group}:common-utils:${common_utils_version}"
+    compile "org.json:json:20180813"
 
     testImplementation(
             'org.assertj:assertj-core:3.19.0',
@@ -101,7 +102,7 @@ dependencies {
     testCompile 'com.google.code.gson:gson:2.8.7'
     testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
-
+    compile group: 'com.github.wnameless', name: 'json-flattener', version: '0.1.0'
     compile project(path: ":${rootProject.name}-spi", configuration: 'shadow')
 }
 

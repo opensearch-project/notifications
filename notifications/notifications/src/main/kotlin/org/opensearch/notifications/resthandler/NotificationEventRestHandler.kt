@@ -40,6 +40,7 @@ import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.index.EventQueryHelper
+import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
 import org.opensearch.rest.BytesRestResponse
 import org.opensearch.rest.RestHandler.Route
@@ -144,6 +145,8 @@ internal class NotificationEventRestHandler : PluginBaseHandler() {
         request: RestRequest,
         client: NodeClient
     ): RestChannelConsumer {
+        Metrics.NOTIFICATIONS_EVENTS_INFO_TOTAL.counter.increment()
+        Metrics.NOTIFICATIONS_EVENTS_INFO_INTERVAL_COUNT.counter.increment()
         val eventId: String? = request.param(EVENT_ID_TAG)
         val eventIdList: String? = request.param(EVENT_ID_LIST_TAG)
         val sortField: String? = request.param(SORT_FIELD_TAG)
