@@ -66,6 +66,7 @@ import org.opensearch.notifications.resthandler.SendTestMessageRestHandler
 import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.notifications.settings.PluginSettings
+import org.opensearch.notifications.spi.setting.SpiSettings
 import org.opensearch.plugins.ActionPlugin
 import org.opensearch.plugins.Plugin
 import org.opensearch.plugins.ReloadablePlugin
@@ -98,7 +99,7 @@ internal class NotificationPlugin : ActionPlugin, ReloadablePlugin, Plugin() {
      */
     override fun getSettings(): List<Setting<*>> {
         log.debug("$LOG_PREFIX:getSettings")
-        return PluginSettings.getAllSettings() + org.opensearch.notifications.spi.setting.SpiSettings.getAllSettings()
+        return PluginSettings.getAllSettings() + SpiSettings.getAllSettings()
     }
 
     /**
@@ -117,11 +118,9 @@ internal class NotificationPlugin : ActionPlugin, ReloadablePlugin, Plugin() {
         indexNameExpressionResolver: IndexNameExpressionResolver,
         repositoriesServiceSupplier: Supplier<RepositoriesService>
     ): Collection<Any> {
-        log.info("zhongnan main $LOG_PREFIX:createComponents")
         this.clusterService = clusterService
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         org.opensearch.notifications.spi.setting.SpiSettings.addSettingsUpdateConsumer(clusterService)
-        log.info("zhongnan main $LOG_PREFIX:createComponents:called spi load destination setting")
         NotificationConfigIndex.initialize(client, clusterService)
         NotificationEventIndex.initialize(client, clusterService)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
@@ -199,8 +198,6 @@ internal class NotificationPlugin : ActionPlugin, ReloadablePlugin, Plugin() {
     }
 
     override fun reload(setting: Settings) {
-        log.info("zhongnan notification main reload")
-        org.opensearch.notifications.spi.setting.SpiSettings.destinationSettings =
-            org.opensearch.notifications.spi.setting.SpiSettings.loadDestinationSettings(setting)
+        SpiSettings.destinationSettings = SpiSettings.loadDestinationSettings(setting)
     }
 }
