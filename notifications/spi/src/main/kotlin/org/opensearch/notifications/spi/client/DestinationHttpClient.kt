@@ -49,7 +49,7 @@ import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.WebhookDestination
-import org.opensearch.notifications.spi.setting.PluginSettings
+import org.opensearch.notifications.spi.setting.SpiSettings
 import org.opensearch.notifications.spi.utils.OpenForTesting
 import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.notifications.spi.utils.string
@@ -92,13 +92,13 @@ class DestinationHttpClient {
 
         private fun createHttpClient(): CloseableHttpClient {
             val config: RequestConfig = RequestConfig.custom()
-                .setConnectTimeout(PluginSettings.connectionTimeout)
-                .setConnectionRequestTimeout(PluginSettings.connectionTimeout)
-                .setSocketTimeout(PluginSettings.socketTimeout)
+                .setConnectTimeout(SpiSettings.connectionTimeout)
+                .setConnectionRequestTimeout(SpiSettings.connectionTimeout)
+                .setSocketTimeout(SpiSettings.socketTimeout)
                 .build()
             val connectionManager = PoolingHttpClientConnectionManager()
-            connectionManager.maxTotal = PluginSettings.maxConnections
-            connectionManager.defaultMaxPerRoute = PluginSettings.maxConnectionsPerRoute
+            connectionManager.maxTotal = SpiSettings.maxConnections
+            connectionManager.defaultMaxPerRoute = SpiSettings.maxConnectionsPerRoute
 
             return HttpClientBuilder.create()
                 .setDefaultRequestConfig(config)

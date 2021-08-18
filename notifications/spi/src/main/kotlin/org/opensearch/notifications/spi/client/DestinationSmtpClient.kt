@@ -17,7 +17,7 @@ import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.SecureDestinationSettings
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
-import org.opensearch.notifications.spi.setting.PluginSettings
+import org.opensearch.notifications.spi.setting.SpiSettings
 import org.opensearch.notifications.spi.utils.SecurityAccess
 import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.rest.RestStatus
@@ -49,7 +49,7 @@ class DestinationSmtpClient {
         if (EmailMessageValidator.isMessageSizeOverLimit(message)) {
             return DestinationMessageResponse(
                 RestStatus.REQUEST_ENTITY_TOO_LARGE.status,
-                "Email size larger than ${PluginSettings.emailSizeLimit}"
+                "Email size larger than ${SpiSettings.emailSizeLimit}"
             )
         }
 
@@ -99,9 +99,9 @@ class DestinationSmtpClient {
 
     fun getSecureDestinationSetting(SmtpDestination: SmtpDestination): SecureDestinationSettings? {
         val emailUsername: SecureString? =
-            PluginSettings.destinationSettings[SmtpDestination.accountName]?.emailUsername
+            SpiSettings.destinationSettings[SmtpDestination.accountName]?.emailUsername
         val emailPassword: SecureString? =
-            PluginSettings.destinationSettings[SmtpDestination.accountName]?.emailPassword
+            SpiSettings.destinationSettings[SmtpDestination.accountName]?.emailPassword
         return if (emailUsername == null || emailPassword == null) {
             null
         } else {

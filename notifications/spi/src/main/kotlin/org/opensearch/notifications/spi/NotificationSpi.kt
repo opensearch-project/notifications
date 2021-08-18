@@ -30,7 +30,7 @@ package org.opensearch.notifications.spi
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
-import org.opensearch.notifications.spi.setting.PluginSettings
+import org.opensearch.notifications.spi.setting.SpiSettings
 import org.opensearch.notifications.spi.transport.DestinationTransportProvider
 import java.security.AccessController
 import java.security.PrivilegedAction
@@ -67,7 +67,7 @@ object NotificationSpi {
     fun getAllowedConfigTypes(): List<String> {
         return AccessController.doPrivileged(
             PrivilegedAction {
-                PluginSettings.allowedConfigTypes
+                SpiSettings.allowedConfigTypes
             } as PrivilegedAction<List<String>>?
         )
     }
@@ -78,7 +78,7 @@ object NotificationSpi {
     fun getPluginFeatures(): Map<String, String> {
         return AccessController.doPrivileged(
             PrivilegedAction {
-                PluginSettings.defaultSettings
+                SpiSettings.defaultSettings
             } as PrivilegedAction<Map<String, String>>?
         )
     }

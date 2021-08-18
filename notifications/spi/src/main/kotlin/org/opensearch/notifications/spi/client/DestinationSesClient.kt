@@ -21,12 +21,12 @@ import com.amazonaws.services.simpleemail.model.MailFromDomainNotVerifiedExcepti
 import com.amazonaws.services.simpleemail.model.MessageRejectedException
 import com.amazonaws.services.simpleemail.model.RawMessage
 import com.amazonaws.services.simpleemail.model.SendRawEmailRequest
-import org.opensearch.notifications.spi.NotificationSpiPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.spi.credentials.SesClientFactory
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.SesDestination
-import org.opensearch.notifications.spi.setting.PluginSettings
+import org.opensearch.notifications.spi.setting.SpiSettings
+import org.opensearch.notifications.spi.setting.SpiSettings.LOG_PREFIX
 import org.opensearch.notifications.spi.utils.SecurityAccess
 import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.rest.RestStatus
@@ -63,7 +63,7 @@ class DestinationSesClient(private val sesClientFactory: SesClientFactory) {
         if (EmailMessageValidator.isMessageSizeOverLimit(message)) {
             return DestinationMessageResponse(
                 RestStatus.REQUEST_ENTITY_TOO_LARGE.status,
-                "Email size larger than ${PluginSettings.emailSizeLimit}"
+                "Email size larger than ${SpiSettings.emailSizeLimit}"
             )
         }
 
@@ -95,7 +95,7 @@ class DestinationSesClient(private val sesClientFactory: SesClientFactory) {
             val outputStream = ByteArrayOutputStream()
             SecurityAccess.doPrivileged { mimeMessage.writeTo(outputStream) }
             val emailSize = outputStream.size()
-            if (emailSize <= PluginSettings.emailSizeLimit) {
+            if (emailSize <= SpiSettings.emailSizeLimit) {
                 val rawMessage = RawMessage(ByteBuffer.wrap(outputStream.toByteArray()))
                 val rawEmailRequest = SendRawEmailRequest(rawMessage)
                 val response = SecurityAccess.doPrivileged { client.sendRawEmail(rawEmailRequest) }
@@ -104,7 +104,7 @@ class DestinationSesClient(private val sesClientFactory: SesClientFactory) {
             } else {
                 DestinationMessageResponse(
                     RestStatus.REQUEST_ENTITY_TOO_LARGE.status,
-                    "Email size($emailSize) larger than ${PluginSettings.emailSizeLimit}"
+                    "Email size($emailSize) larger than ${SpiSettings.emailSizeLimit}"
                 )
             }
         } catch (exception: MessageRejectedException) {

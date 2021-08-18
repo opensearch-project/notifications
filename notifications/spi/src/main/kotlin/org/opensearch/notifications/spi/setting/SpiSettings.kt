@@ -19,14 +19,12 @@ import org.opensearch.common.settings.Setting
 import org.opensearch.common.settings.Setting.Property.Dynamic
 import org.opensearch.common.settings.Setting.Property.NodeScope
 import org.opensearch.common.settings.Settings
-import org.opensearch.notifications.spi.NotificationSpiPlugin.Companion.LOG_PREFIX
-import org.opensearch.notifications.spi.NotificationSpiPlugin.Companion.PLUGIN_NAME
 import org.opensearch.notifications.spi.model.SecureDestinationSettings
 import org.opensearch.notifications.spi.utils.logger
 import java.io.IOException
 import java.nio.file.Path
 
-internal object PluginSettings {
+object SpiSettings {
     /**
      * Settings Key prefix for this plugin.
      */
@@ -217,6 +215,8 @@ internal object PluginSettings {
     var destinationSettings: Map<String, SecureDestinationSettings>
 
     private const val DECIMAL_RADIX: Int = 10
+    const val PLUGIN_NAME = "opensearch-notifications"
+    const val LOG_PREFIX = "notifications"
 
     private val log by logger(javaClass)
     val defaultSettings: Map<String, String>
@@ -361,6 +361,7 @@ internal object PluginSettings {
         socketTimeout = SOCKET_TIMEOUT_MILLISECONDS.get(clusterService.settings)
         tooltipSupport = TOOLTIP_SUPPORT.get(clusterService.settings)
         hostDenyList = HOST_DENY_LIST.get(clusterService.settings)
+        destinationSettings = loadDestinationSettings(clusterService.settings)
     }
 
     /**

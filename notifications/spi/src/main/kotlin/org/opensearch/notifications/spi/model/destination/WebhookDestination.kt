@@ -11,7 +11,7 @@
 
 package org.opensearch.notifications.spi.model.destination
 
-import org.opensearch.notifications.spi.setting.PluginSettings
+import org.opensearch.notifications.spi.setting.SpiSettings
 import org.opensearch.notifications.spi.utils.validateUrl
 
 /**
@@ -23,7 +23,7 @@ abstract class WebhookDestination(
 ) : BaseDestination(destinationType) {
 
     init {
-        validateUrl(url, PluginSettings.hostDenyList)
+        validateUrl(url, SpiSettings.hostDenyList)
     }
 
     override fun toString(): String {

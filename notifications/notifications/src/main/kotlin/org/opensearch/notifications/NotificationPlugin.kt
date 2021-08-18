@@ -68,6 +68,7 @@ import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.plugins.ActionPlugin
 import org.opensearch.plugins.Plugin
+import org.opensearch.plugins.ReloadablePlugin
 import org.opensearch.repositories.RepositoriesService
 import org.opensearch.rest.RestController
 import org.opensearch.rest.RestHandler
@@ -80,7 +81,7 @@ import java.util.function.Supplier
  * Entry point of the OpenSearch Notifications plugin
  * This class initializes the rest handlers.
  */
-internal class NotificationPlugin : ActionPlugin, Plugin() {
+internal class NotificationPlugin : ActionPlugin, ReloadablePlugin, Plugin() {
 
     lateinit var clusterService: ClusterService // initialized in createComponents()
 
@@ -97,7 +98,7 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
      */
     override fun getSettings(): List<Setting<*>> {
         log.debug("$LOG_PREFIX:getSettings")
-        return PluginSettings.getAllSettings()
+        return PluginSettings.getAllSettings() + org.opensearch.notifications.spi.setting.SpiSettings.getAllSettings()
     }
 
     /**
@@ -116,9 +117,11 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
         indexNameExpressionResolver: IndexNameExpressionResolver,
         repositoriesServiceSupplier: Supplier<RepositoriesService>
     ): Collection<Any> {
-        log.debug("$LOG_PREFIX:createComponents")
+        log.info("zhongnan main $LOG_PREFIX:createComponents")
         this.clusterService = clusterService
         PluginSettings.addSettingsUpdateConsumer(clusterService)
+        org.opensearch.notifications.spi.setting.SpiSettings.addSettingsUpdateConsumer(clusterService)
+        log.info("zhongnan main $LOG_PREFIX:createComponents:called spi load destination setting")
         NotificationConfigIndex.initialize(client, clusterService)
         NotificationEventIndex.initialize(client, clusterService)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
@@ -193,5 +196,11 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
             SendTestMessageRestHandler(),
             NotificationStatsRestHandler()
         )
+    }
+
+    override fun reload(setting: Settings) {
+        log.info("zhongnan notification main reload")
+        org.opensearch.notifications.spi.setting.SpiSettings.destinationSettings =
+            org.opensearch.notifications.spi.setting.SpiSettings.loadDestinationSettings(setting)
     }
 }
