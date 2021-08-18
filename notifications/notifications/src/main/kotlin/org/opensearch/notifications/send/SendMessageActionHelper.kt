@@ -46,6 +46,7 @@ import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.index.ConfigOperations
 import org.opensearch.notifications.index.EventOperations
+import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.DocMetadata
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.model.NotificationEventDoc
@@ -106,7 +107,10 @@ object SendMessageActionHelper {
         val event = NotificationEvent(eventSource, eventStatusList)
         val eventDoc = NotificationEventDoc(docMetadata, event)
         val docId = eventOperations.createNotificationEvent(eventDoc)
-            ?: throw OpenSearchStatusException("Indexing not Acknowledged", RestStatus.INSUFFICIENT_STORAGE)
+            ?: run {
+                Metrics.NOTIFICATIONS_SEND_MESSAGE_SYSTEM_ERROR.counter.increment()
+                throw OpenSearchStatusException("Indexing not Acknowledged", RestStatus.INSUFFICIENT_STORAGE)
+            }
         // traverse status to determine HTTP status code
         var overallStatusCode = eventStatusList.first().deliveryStatus?.statusCode
         eventStatusList.forEach { eventStatus ->
@@ -195,6 +199,8 @@ object SendMessageActionHelper {
         childConfigs: List<NotificationConfigDocInfo>,
         message: MessageContent
     ): EventStatus {
+        Metrics.NOTIFICATIONS_SEND_MESSAGE_TOTAL.counter.increment()
+        Metrics.NOTIFICATIONS_SEND_MESSAGE_INTERVAL_COUNT.counter.increment()
         val configType = channel.configDoc.config.configType
         val configData = channel.configDoc.config.configData
         var emailRecipientStatus = listOf<EmailRecipientStatus>()
@@ -238,6 +244,7 @@ object SendMessageActionHelper {
         }
         return if (response == null) {
             log.warn("Cannot send message to destination for config id :${channel.docInfo.id}")
+            Metrics.NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND.counter.increment()
             eventStatus.copy(deliveryStatus = DeliveryStatus(RestStatus.NOT_FOUND.name, "Channel not found"))
         } else {
             response
@@ -303,6 +310,7 @@ object SendMessageActionHelper {
         return if (!channel.configDoc.config.isEnabled) {
             DeliveryStatus(RestStatus.LOCKED.name, "The channel is muted")
         } else if (!channel.configDoc.config.features.contains(eventSource.feature)) {
+            Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
             DeliveryStatus(RestStatus.FORBIDDEN.name, "Feature is not enabled for channel")
         } else {
             null
@@ -318,6 +326,7 @@ object SendMessageActionHelper {
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
+        Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SLACK.counter.increment()
         val destination = SlackDestination(slack.url)
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
@@ -332,6 +341,7 @@ object SendMessageActionHelper {
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
+        Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_CHIME.counter.increment()
         val destination = ChimeDestination(chime.url)
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
@@ -346,6 +356,7 @@ object SendMessageActionHelper {
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
+        Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_WEBHOOK.counter.increment()
         val destination = CustomWebhookDestination(webhook.url, webhook.headerParams, webhook.method.tag)
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
@@ -361,6 +372,7 @@ object SendMessageActionHelper {
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
+        Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_EMAIL.counter.increment()
         val accountDocInfo = childConfigs.find { it.docInfo.id == email.emailAccountID }
         val groups = childConfigs.filter { email.emailGroupIds.contains(it.docInfo.id) }
         val groupRecipients = groups.map { (it.configDoc.config.configData as EmailGroup).recipients }.flatten()
@@ -421,6 +433,7 @@ object SendMessageActionHelper {
         message: MessageContent,
         referenceId: String
     ): EmailRecipientStatus {
+        Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SMTP_ACCOUNT.counter.increment()
         val destination = SmtpDestination(
             accountName,
             smtpAccount.host,
@@ -446,6 +459,7 @@ object SendMessageActionHelper {
         message: MessageContent,
         referenceId: String
     ): EmailRecipientStatus {
+        Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SES_ACCOUNT.counter.increment()
         val destination = SesDestination(
             accountName,
             sesAccount.awsRegion,
@@ -469,6 +483,7 @@ object SendMessageActionHelper {
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
+        Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SNS.counter.increment()
         val destination = SnsDestination(sns.topicArn, sns.roleArn)
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
