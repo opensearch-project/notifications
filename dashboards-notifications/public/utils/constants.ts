@@ -35,8 +35,10 @@ export const ROUTES = Object.freeze({
   CREATE_CHANNEL: '/create-channel',
   EDIT_CHANNEL: '/edit-channel',
   EMAIL_GROUPS: '/email-groups',
-  CREATE_SENDER: '/create-sender',
-  EDIT_SENDER: '/edit-sender',
+  CREATE_SENDER: '/create-smtp-sender',
+  EDIT_SENDER: '/edit-smtp-sender',
+  CREATE_SES_SENDER: '/create-ses-sender',
+  EDIT_SES_SENDER: '/edit-ses-sender',
   CREATE_RECIPIENT_GROUP: '/create-recipient-group',
   EDIT_RECIPIENT_GROUP: '/edit-recipient-group',
 });
@@ -49,8 +51,16 @@ export const BREADCRUMBS = Object.freeze({
   CREATE_CHANNEL: { text: 'Create channel', href: `#${ROUTES.CREATE_CHANNEL}` },
   EDIT_CHANNEL: { text: 'Edit channel' },
   EMAIL_GROUPS: { text: 'Email groups', href: `#${ROUTES.EMAIL_GROUPS}` },
-  CREATE_SENDER: { text: 'Create sender', href: `#${ROUTES.CREATE_SENDER}` },
-  EDIT_SENDER: { text: 'Edit sender' },
+  CREATE_SENDER: {
+    text: 'Create SMTP sender',
+    href: `#${ROUTES.CREATE_SENDER}`,
+  },
+  EDIT_SENDER: { text: 'Edit SMTP sender' },
+  CREATE_SES_SENDER: {
+    text: 'Create SES sender',
+    href: `#${ROUTES.CREATE_SENDER}`,
+  },
+  EDIT_SES_SENDER: { text: 'Edit SES sender' },
   CREATE_RECIPIENT_GROUP: {
     text: 'Create recipient group',
     href: `#${ROUTES.CREATE_RECIPIENT_GROUP}`,
@@ -69,7 +79,6 @@ export const BACKEND_CHANNEL_TYPE = Object.freeze({
   EMAIL: 'email',
   CHIME: 'chime',
   CUSTOM_WEBHOOK: 'webhook',
-  SES: 'ses',
   SNS: 'sns',
 });
 
@@ -78,14 +87,12 @@ export const CHANNEL_TYPE = Object.freeze({
   [BACKEND_CHANNEL_TYPE.EMAIL]: 'Email',
   [BACKEND_CHANNEL_TYPE.CHIME]: 'Chime',
   [BACKEND_CHANNEL_TYPE.CUSTOM_WEBHOOK]: 'Custom webhook',
-  [BACKEND_CHANNEL_TYPE.SES]: 'Amazon SES',
   [BACKEND_CHANNEL_TYPE.SNS]: 'Amazon SNS',
 }) as {
   slack: string;
   email: string;
   chime: string;
   webhook: string;
-  ses: string;
   sns: string;
 };
 

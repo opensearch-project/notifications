@@ -118,7 +118,11 @@ export function CreateChannel(props: CreateChannelsProps) {
   const [slackWebhook, setSlackWebhook] = useState('');
   const [chimeWebhook, setChimeWebhook] = useState('');
 
-  const [selectedSenderOptions, setSelectedSenderOptions] = useState<
+  const [senderType, setSenderType] = useState<'smtp' | 'ses'>('smtp');
+  const [selectedSmtpSenderOptions, setSelectedSmtpSenderOptions] = useState<
+    Array<EuiComboBoxOptionOption<string>>
+  >([]);
+  const [selectedSesSenderOptions, setSelectedSesSenderOptions] = useState<
     Array<EuiComboBoxOptionOption<string>>
   >([]);
   // "value" field is the config_id of recipient groups, if it doesn't exist means it's a custom email address
@@ -126,8 +130,6 @@ export function CreateChannel(props: CreateChannelsProps) {
     selectedRecipientGroupOptions,
     setSelectedRecipientGroupOptions,
   ] = useState<Array<EuiComboBoxOptionOption<string>>>([]);
-
-  const [sesSender, setSesSender] = useState('');
 
   const [webhookTypeIdSelected, setWebhookTypeIdSelected] = useState<
     keyof typeof CUSTOM_WEBHOOK_ENDPOINT_TYPE
@@ -154,14 +156,14 @@ export function CreateChannel(props: CreateChannelsProps) {
     name: [],
     slackWebhook: [],
     chimeWebhook: [],
-    sender: [],
+    smtpSender: [],
+    sesSender: [],
     recipients: [],
     webhookURL: [],
     customURLHost: [],
     customURLPort: [],
     topicArn: [],
     roleArn: [],
-    sesSender: [],
   });
 
   useEffect(() => {
@@ -209,7 +211,12 @@ export function CreateChannel(props: CreateChannelsProps) {
         setChimeWebhook(response.chime?.url || '');
       } else if (type === BACKEND_CHANNEL_TYPE.EMAIL) {
         const emailObject = deconstructEmailObject(response.email!);
-        setSelectedSenderOptions(emailObject.selectedSenderOptions);
+        setSenderType(emailObject.senderType)
+        if (emailObject.senderType === 'smtp') {
+          setSelectedSmtpSenderOptions(emailObject.selectedSenderOptions);
+        } else {
+          setSelectedSesSenderOptions(emailObject.selectedSenderOptions);
+        }
         setSelectedRecipientGroupOptions(
           emailObject.selectedRecipientGroupOptions
         );
@@ -221,8 +228,6 @@ export function CreateChannel(props: CreateChannelsProps) {
         setCustomURLPath(webhookObject.customURLPath);
         setWebhookParams(webhookObject.webhookParams);
         setWebhookHeaders(webhookObject.webhookHeaders);
-      } else if (type === BACKEND_CHANNEL_TYPE.SES) {
-        // TODO
       } else if (type === BACKEND_CHANNEL_TYPE.SNS) {
         setTopicArn(response.sns?.topic_arn || '');
         setRoleArn(response.sns?.role_arn || '');
@@ -239,21 +244,25 @@ export function CreateChannel(props: CreateChannelsProps) {
       name: validateChannelName(name),
       slackWebhook: [],
       chimeWebhook: [],
-      sender: [],
+      smtpSender: [],
+      sesSender: [],
       recipients: [],
       webhookURL: [],
       customURLHost: [],
       customURLPort: [],
       topicArn: [],
       roleArn: [],
-      sesSender: [],
     };
     if (channelType === BACKEND_CHANNEL_TYPE.SLACK) {
       errors.slackWebhook = validateWebhookURL(slackWebhook);
     } else if (channelType === BACKEND_CHANNEL_TYPE.CHIME) {
       errors.chimeWebhook = validateWebhookURL(chimeWebhook);
     } else if (channelType === BACKEND_CHANNEL_TYPE.EMAIL) {
-      errors.sender = validateEmailSender(selectedSenderOptions);
+      if (senderType === 'smtp') {
+        errors.smtpSender = validateEmailSender(selectedSmtpSenderOptions);
+      } else {
+        errors.sesSender = validateEmailSender(selectedSesSenderOptions);
+      }
       errors.recipients = validateRecipients(selectedRecipientGroupOptions);
     } else if (channelType === BACKEND_CHANNEL_TYPE.CUSTOM_WEBHOOK) {
       if (webhookTypeIdSelected === 'WEBHOOK_URL') {
@@ -264,7 +273,8 @@ export function CreateChannel(props: CreateChannelsProps) {
       }
     } else if (channelType === BACKEND_CHANNEL_TYPE.SNS) {
       errors.topicArn = validateArn(topicArn);
-      if (!mainStateContext.tooltipSupport) errors.roleArn = validateArn(roleArn);
+      if (!mainStateContext.tooltipSupport)
+        errors.roleArn = validateArn(roleArn);
     }
     setInputErrors(errors);
     return !Object.values(errors).reduce(
@@ -298,12 +308,17 @@ export function CreateChannel(props: CreateChannelsProps) {
         webhookHeaders
       );
     } else if (channelType === BACKEND_CHANNEL_TYPE.EMAIL) {
-      config.email = constructEmailObject(
-        selectedSenderOptions,
-        selectedRecipientGroupOptions
-      );
-    } else if (channelType === BACKEND_CHANNEL_TYPE.SES) {
-      // TODO
+      if (senderType === 'smtp') {
+        config.email = constructEmailObject(
+          selectedSmtpSenderOptions,
+          selectedRecipientGroupOptions
+        );
+      } else {
+        config.email = constructEmailObject(
+          selectedSesSenderOptions,
+          selectedRecipientGroupOptions
+        );
+      }
     } else if (channelType === BACKEND_CHANNEL_TYPE.SNS) {
       config.sns = {
         topic_arn: topicArn,
@@ -424,18 +439,18 @@ export function CreateChannel(props: CreateChannelsProps) {
               chimeWebhook={chimeWebhook}
               setChimeWebhook={setChimeWebhook}
             />
-          ) : channelType === BACKEND_CHANNEL_TYPE.EMAIL ||
-            channelType === BACKEND_CHANNEL_TYPE.SES ? (
+          ) : channelType === BACKEND_CHANNEL_TYPE.EMAIL ? (
             <EmailSettings
-              isAmazonSES={channelType === BACKEND_CHANNEL_TYPE.SES}
-              selectedSenderOptions={selectedSenderOptions}
-              setSelectedSenderOptions={setSelectedSenderOptions}
+              senderType={senderType}
+              setSenderType={setSenderType}
+              selectedSmtpSenderOptions={selectedSmtpSenderOptions}
+              setSelectedSmtpSenderOptions={setSelectedSmtpSenderOptions}
+              selectedSesSenderOptions={selectedSesSenderOptions}
+              setSelectedSesSenderOptions={setSelectedSesSenderOptions}
               selectedRecipientGroupOptions={selectedRecipientGroupOptions}
               setSelectedRecipientGroupOptions={
                 setSelectedRecipientGroupOptions
               }
-              sesSender={sesSender}
-              setSesSender={setSesSender}
             />
           ) : channelType === BACKEND_CHANNEL_TYPE.CUSTOM_WEBHOOK ? (
             <CustomWebhookSettings

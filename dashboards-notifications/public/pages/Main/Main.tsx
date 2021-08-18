@@ -38,6 +38,7 @@ import { ChannelDetails } from '../Channels/components/details/ChannelDetails';
 import { CreateChannel } from '../CreateChannel/CreateChannel';
 import { CreateRecipientGroup } from '../Emails/CreateRecipientGroup';
 import { CreateSender } from '../Emails/CreateSender';
+import { CreateSESSender } from '../Emails/CreateSESSender';
 import { EmailGroups } from '../Emails/EmailGroups';
 import Notifications from '../Notifications';
 
@@ -125,12 +126,13 @@ export default class Main extends Component<MainProps, MainState> {
                     <ModalProvider>
                       <ModalRoot services={services} />
                       <EuiPage>
-                        {/*Hide side navigation bar when creating or editing rollup job*/}
                         {pathname !== ROUTES.CREATE_CHANNEL &&
                           !pathname.startsWith(ROUTES.EDIT_CHANNEL) &&
                           !pathname.startsWith(ROUTES.CHANNEL_DETAILS) &&
                           pathname !== ROUTES.CREATE_SENDER &&
                           !pathname.startsWith(ROUTES.EDIT_SENDER) &&
+                          pathname !== ROUTES.CREATE_SES_SENDER &&
+                          !pathname.startsWith(ROUTES.EDIT_SES_SENDER) &&
                           pathname !== ROUTES.CREATE_RECIPIENT_GROUP &&
                           !pathname.startsWith(ROUTES.EDIT_RECIPIENT_GROUP) && (
                             <EuiPageSideBar style={{ minWidth: 150 }}>
@@ -197,6 +199,18 @@ export default class Main extends Component<MainProps, MainState> {
                               path={`${ROUTES.EDIT_SENDER}/:id`}
                               render={(props: RouteComponentProps) => (
                                 <CreateSender {...props} edit={true} />
+                              )}
+                            />
+                            <Route
+                              path={ROUTES.CREATE_SES_SENDER}
+                              render={(props: RouteComponentProps) => (
+                                <CreateSESSender {...props} />
+                              )}
+                            />
+                            <Route
+                              path={`${ROUTES.EDIT_SES_SENDER}/:id`}
+                              render={(props: RouteComponentProps) => (
+                                <CreateSESSender {...props} edit={true} />
                               )}
                             />
                             <Route

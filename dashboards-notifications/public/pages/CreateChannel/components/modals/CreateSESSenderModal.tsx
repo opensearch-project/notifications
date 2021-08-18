@@ -9,21 +9,6 @@
  * GitHub history for details.
  */
 
-/*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
- */
-
 import {
   EuiButton,
   EuiButtonEmpty,
@@ -38,45 +23,40 @@ import {
 import React, { useContext, useState } from 'react';
 import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
-import { ENCRYPTION_TYPE } from '../../../../utils/constants';
-import { CreateSenderForm } from '../../../Emails/components/forms/CreateSenderForm';
-import { createSenderConfigObject } from '../../../Emails/utils/helper';
+import { CreateSESSenderForm } from '../../../Emails/components/forms/CreateSESSenderForm';
+import { createSesSenderConfigObject } from '../../../Emails/utils/helper';
 import {
+  validateAwsRegion,
   validateEmail,
-  validateHost,
-  validatePort,
   validateSenderName,
 } from '../../../Emails/utils/validationHelper';
 
-interface CreateSenderModalProps extends ModalRootProps {
+interface CreateSESSenderModalProps extends ModalRootProps {
   addSenderOptionAndSelect: (
     senderOption: EuiComboBoxOptionOption<string>
   ) => void;
   onClose: () => void;
 }
 
-export function CreateSenderModal(props: CreateSenderModalProps) {
+export function CreateSESSenderModal(props: CreateSESSenderModalProps) {
   const coreContext = useContext(CoreServicesContext)!;
   const [senderName, setSenderName] = useState('');
   const [email, setEmail] = useState('');
-  const [host, setHost] = useState('');
-  const [port, setPort] = useState('');
-  const [encryption, setEncryption] = useState<keyof typeof ENCRYPTION_TYPE>(
-    Object.keys(ENCRYPTION_TYPE)[0] as keyof typeof ENCRYPTION_TYPE
-  );
+  const [roleArn, setRoleArn] = useState('');
+  const [awsRegion, setAwsRegion] = useState('');
   const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>({
     senderName: [],
     email: [],
-    host: [],
-    port: [],
+    roleArn: [],
+    awsRegion: [],
   });
 
   const isInputValid = (): boolean => {
     const errors: { [key: string]: string[] } = {
       senderName: validateSenderName(senderName),
       email: validateEmail(email),
-      host: validateHost(host),
-      port: validatePort(port),
+      awsRegion: validateAwsRegion(awsRegion),
+      roleArn: [],
     };
     setInputErrors(errors);
     return !Object.values(errors).reduce(
@@ -89,21 +69,19 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
     <EuiOverlayMask>
       <EuiModal onClose={props.onClose} style={{ width: 750 }}>
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Create SMTP sender</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>Create SES sender</EuiModalHeaderTitle>
         </EuiModalHeader>
 
         <EuiModalBody>
-          <CreateSenderForm
+          <CreateSESSenderForm
             senderName={senderName}
             setSenderName={setSenderName}
             email={email}
             setEmail={setEmail}
-            host={host}
-            setHost={setHost}
-            port={port}
-            setPort={setPort}
-            encryption={encryption}
-            setEncryption={setEncryption}
+            roleArn={roleArn}
+            setRoleArn={setRoleArn}
+            awsRegion={awsRegion}
+            setAwsRegion={setAwsRegion}
             inputErrors={inputErrors}
             setInputErrors={setInputErrors}
           />
@@ -121,12 +99,11 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
                 );
                 return;
               }
-              const config = createSenderConfigObject(
+              const config = createSesSenderConfigObject(
                 senderName,
-                host,
-                port,
-                encryption,
-                email
+                email,
+                awsRegion,
+                roleArn
               );
               await props.services.notificationService
                 .createConfig(config)

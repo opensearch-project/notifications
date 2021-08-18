@@ -32,15 +32,18 @@ import {
   ChannelItemType,
   RecipientGroupItemType,
   SenderItemType,
+  SESSenderItemType,
 } from '../../models/interfaces';
 import { CHANNEL_TYPE } from '../utils/constants';
 import {
   configListToChannels,
   configListToRecipientGroups,
   configListToSenders,
+  configListToSESSenders,
   configToChannel,
   configToRecipientGroup,
   configToSender,
+  configToSESSender,
 } from './utils/helper';
 
 interface ConfigsResponse {
@@ -116,19 +119,23 @@ export default class NotificationService {
       channel.email.email_account_id,
       ...channel.email.email_group_id_list,
     ];
+    let senderType: 'smtp' | 'ses';
     await this.getConfigs({
       from_index: 0,
       max_items: ids.length,
       config_id_list: ids,
       sort_order: SortDirection.ASC,
       sort_field: 'name',
-      config_type: ['smtp_account', 'email_group'],
+      config_type: ['smtp_account', 'ses_account', 'email_group'],
     }).then((response) => {
-      response.config_list.map(
-        (config) => (idMap[config.config_id] = config.config.name)
-      );
+      response.config_list.map((config) => {
+        if (config.config_id === channel.email?.email_account_id)
+          senderType = config.config.config_type === 'ses_account' ? 'ses' : 'smtp';
+        idMap[config.config_id] = config.config.name;
+      });
     });
 
+    channel.email.sender_type = senderType!;
     channel.email.email_account_name = idMap[channel.email.email_account_id];
     channel.email.email_group_id_map = {};
     channel.email.email_group_id_list.map(
@@ -151,6 +158,21 @@ export default class NotificationService {
   getSender = async (id: string): Promise<SenderItemType> => {
     const response = await this.getConfig(id);
     return configToSender(response.config_list[0]);
+  };
+
+  getSESSenders = async (
+    queryObject: HttpFetchQuery // config_type: 'ses_account'
+  ): Promise<{ items: SESSenderItemType[]; total: number }> => {
+    const response = await this.getConfigs(queryObject);
+    return {
+      items: configListToSESSenders(response.config_list),
+      total: response.total_hits || 0,
+    };
+  };
+
+  getSESSender = async (id: string): Promise<SESSenderItemType> => {
+    const response = await this.getConfig(id);
+    return configToSESSender(response.config_list[0]);
   };
 
   getRecipientGroups = async (

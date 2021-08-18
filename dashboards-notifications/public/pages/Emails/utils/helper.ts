@@ -33,6 +33,25 @@ export const createSenderConfigObject = (
   };
 };
 
+export const createSesSenderConfigObject = (
+  senderName: string,
+  email: string,
+  awsRegion: string,
+  roleArn?: string
+) => {
+  return {
+    name: senderName,
+    config_type: 'ses_account',
+    feature_list: Object.keys(NOTIFICATION_SOURCE),
+    is_enabled: true,
+    ses_account: {
+      from_address: email,
+      region: awsRegion,
+      ...(roleArn && { role_arn: roleArn }),
+    },
+  };
+};
+
 export const createRecipientGroupConfigObject = (
   name: string,
   description: string,

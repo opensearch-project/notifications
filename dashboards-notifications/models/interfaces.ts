@@ -83,6 +83,7 @@ export interface ChannelItemType extends ConfigType {
     recipient_list: string[]; // custom email addresses
     email_group_id_list: string[];
     // optional fields for displaying or editing email channel, needs more requests
+    sender_type?: 'smtp' | 'ses';
     email_account_name?: string;
     email_group_id_map?: {
       [id: string]: string;
@@ -108,6 +109,14 @@ export interface SenderItemType extends ConfigType {
     host: string;
     port: string;
     method: keyof typeof ENCRYPTION_TYPE;
+  };
+}
+
+export interface SESSenderItemType extends ConfigType {
+  ses_account: {
+    from_address: string; // outbound email address
+    region: string;
+    role_arn?: string;
   };
 }
 

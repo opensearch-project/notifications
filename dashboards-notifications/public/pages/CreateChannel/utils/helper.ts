@@ -113,6 +113,7 @@ export const constructEmailObject = (
 export const deconstructEmailObject = (
   email: NonNullable<ChannelItemType['email']>
 ): {
+  senderType: 'smtp' | 'ses';
   selectedSenderOptions: Array<EuiComboBoxOptionOption<string>>;
   selectedRecipientGroupOptions: Array<EuiComboBoxOptionOption<string>>;
 } => {
@@ -132,6 +133,7 @@ export const deconstructEmailObject = (
     ...email.recipient_list.map((address) => ({ label: address })),
   ];
   return {
+    senderType: email.sender_type!,
     selectedSenderOptions,
     selectedRecipientGroupOptions,
   };

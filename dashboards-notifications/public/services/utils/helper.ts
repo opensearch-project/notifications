@@ -14,6 +14,7 @@ import {
   NotificationItem,
   RecipientGroupItemType,
   SenderItemType,
+  SESSenderItemType,
 } from '../../../models/interfaces';
 
 export const configToChannel = (config: any): ChannelItemType => {
@@ -42,6 +43,21 @@ export const configToSender = (config: any): SenderItemType => {
 
 export const configListToSenders = (configs: any[]): SenderItemType[] => {
   return configs?.map((config) => configToSender(config)) || [];
+};
+
+export const configToSESSender = (config: any): SESSenderItemType => {
+  return {
+    name: config.config.name,
+    description: config.config.description,
+    config_id: config.config_id,
+    created_time_ms: config.created_time_ms,
+    last_updated_time_ms: config.last_updated_time_ms,
+    ses_account: config.config.ses_account,
+  };
+};
+
+export const configListToSESSenders = (configs: any[]): SESSenderItemType[] => {
+  return configs?.map((config) => configToSESSender(config)) || [];
 };
 
 export const configToRecipientGroup = (config: any): RecipientGroupItemType => {

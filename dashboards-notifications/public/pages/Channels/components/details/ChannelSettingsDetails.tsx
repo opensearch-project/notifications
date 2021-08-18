@@ -206,8 +206,6 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
         },
       ]
     );
-  } else if (type === BACKEND_CHANNEL_TYPE.SES) {
-    // TODO
   }
 
   return (

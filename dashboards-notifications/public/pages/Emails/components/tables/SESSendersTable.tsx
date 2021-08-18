@@ -9,21 +9,6 @@
  * GitHub history for details.
  */
 
-/*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
- */
-
 import {
   EuiBasicTable,
   EuiButton,
@@ -39,32 +24,35 @@ import { Pagination } from '@elastic/eui/src/components/basic_table/pagination_b
 import _ from 'lodash';
 import React, { Component } from 'react';
 import { CoreStart } from '../../../../../../../src/core/public';
-import { SenderItemType, TableState } from '../../../../../models/interfaces';
+import {
+  SESSenderItemType,
+  TableState,
+} from '../../../../../models/interfaces';
 import {
   ContentPanel,
   ContentPanelActions,
 } from '../../../../components/ContentPanel';
 import { ModalConsumer } from '../../../../components/Modal';
 import { ServicesContext } from '../../../../services';
-import { ENCRYPTION_TYPE, ROUTES } from '../../../../utils/constants';
+import { ROUTES } from '../../../../utils/constants';
 import { getErrorMessage } from '../../../../utils/helpers';
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '../../../Notifications/utils/constants';
 import { DeleteSenderModal } from '../modals/DeleteSenderModal';
 
-interface SendersTableProps {
+interface SESSendersTableProps {
   coreContext: CoreStart;
 }
 
-interface SendersTableState extends TableState<SenderItemType> {}
+interface SESSendersTableState extends TableState<SESSenderItemType> {}
 
-export class SendersTable extends Component<
-  SendersTableProps,
-  SendersTableState
+export class SESSendersTable extends Component<
+  SESSendersTableProps,
+  SESSendersTableState
 > {
   static contextType = ServicesContext;
-  columns: EuiTableFieldDataColumnType<SenderItemType>[];
+  columns: EuiTableFieldDataColumnType<SESSenderItemType>[];
 
-  constructor(props: SendersTableProps) {
+  constructor(props: SESSendersTableProps) {
     super(props);
 
     this.state = {
@@ -85,36 +73,25 @@ export class SendersTable extends Component<
         name: 'Name',
         sortable: true,
         truncateText: true,
-        width: '200px',
+        width: "200px"
       },
       {
-        field: 'smtp_account.from_address',
+        field: 'ses_account.from_address',
         name: 'Outbound email address',
         sortable: true,
         truncateText: true,
-        width: '200px',
       },
       {
-        field: 'smtp_account.host',
-        name: 'Host',
+        field: 'ses_account.region',
+        name: 'AWS region',
         sortable: true,
         truncateText: true,
-        width: '200px',
       },
       {
-        field: 'smtp_account.port',
-        name: 'Port',
+        field: 'ses_account.role_arn',
+        name: 'Role ARN',
         sortable: false,
         truncateText: true,
-        width: '200px',
-      },
-      {
-        field: 'smtp_account.method',
-        name: 'Encryption method',
-        sortable: true,
-        truncateText: true,
-        width: '200px',
-        render: (method: string) => _.get(ENCRYPTION_TYPE, method, '-'),
       },
     ];
     this.refresh = this.refresh.bind(this);
@@ -125,22 +102,22 @@ export class SendersTable extends Component<
   }
 
   async componentDidUpdate(
-    prevProps: SendersTableProps,
-    prevState: SendersTableState
+    prevProps: SESSendersTableProps,
+    prevState: SESSendersTableState
   ) {
-    const prevQuery = SendersTable.getQueryObjectFromState(prevState);
-    const currQuery = SendersTable.getQueryObjectFromState(this.state);
+    const prevQuery = SESSendersTable.getQueryObjectFromState(prevState);
+    const currQuery = SESSendersTable.getQueryObjectFromState(this.state);
     if (!_.isEqual(prevQuery, currQuery)) {
       await this.refresh();
     }
   }
 
-  static getQueryObjectFromState(state: SendersTableState) {
+  static getQueryObjectFromState(state: SESSendersTableState) {
     return {
       from_index: state.from,
       max_items: state.size,
       query: state.search,
-      config_type: 'smtp_account',
+      config_type: 'ses_account',
       sort_field: state.sortField,
       sort_order: state.sortDirection,
     };
@@ -149,14 +126,14 @@ export class SendersTable extends Component<
   async refresh() {
     this.setState({ loading: true });
     try {
-      const queryObject = SendersTable.getQueryObjectFromState(this.state);
-      const senders = await this.context.notificationService.getSenders(
+      const queryObject = SESSendersTable.getQueryObjectFromState(this.state);
+      const senders = await this.context.notificationService.getSESSenders(
         queryObject
       );
       this.setState({ items: senders.items, total: senders.total });
     } catch (error) {
       this.props.coreContext.notifications.toasts.addDanger(
-        getErrorMessage(error, 'There was a problem loading senders.')
+        getErrorMessage(error, 'There was a problem loading SES senders.')
       );
     }
     this.setState({ loading: false });
@@ -165,13 +142,13 @@ export class SendersTable extends Component<
   onTableChange = ({
     page: tablePage,
     sort,
-  }: Criteria<SenderItemType>): void => {
+  }: Criteria<SESSenderItemType>): void => {
     const { index: page, size } = tablePage!;
     const { field: sortField, direction: sortDirection } = sort!;
     this.setState({ from: page * size, size, sortField, sortDirection });
   };
 
-  onSelectionChange = (selectedItems: SenderItemType[]): void => {
+  onSelectionChange = (selectedItems: SESSenderItemType[]): void => {
     this.setState({ selectedItems });
   };
 
@@ -189,7 +166,7 @@ export class SendersTable extends Component<
       totalItemCount: this.state.total,
     };
 
-    const sorting: EuiTableSortingType<SenderItemType> = {
+    const sorting: EuiTableSortingType<SESSenderItemType> = {
       sort: {
         direction: this.state.sortDirection,
         field: this.state.sortField,
@@ -212,7 +189,7 @@ export class SendersTable extends Component<
                     <ModalConsumer>
                       {({ onShow }) => (
                         <EuiButton
-                          data-test-subj="senders-table-delete-button"
+                          data-test-subj="ses-senders-table-delete-button"
                           disabled={this.state.selectedItems.length === 0}
                           onClick={() =>
                             onShow(DeleteSenderModal, {
@@ -230,11 +207,11 @@ export class SendersTable extends Component<
                 {
                   component: (
                     <EuiButton
-                      data-test-subj="senders-table-edit-button"
+                      data-test-subj="ses-senders-table-edit-button"
                       disabled={this.state.selectedItems.length !== 1}
                       onClick={() =>
                         location.assign(
-                          `#${ROUTES.EDIT_SENDER}/${this.state.selectedItems[0]?.config_id}`
+                          `#${ROUTES.EDIT_SES_SENDER}/${this.state.selectedItems[0]?.config_id}`
                         )
                       }
                     >
@@ -244,8 +221,8 @@ export class SendersTable extends Component<
                 },
                 {
                   component: (
-                    <EuiButton fill href={`#${ROUTES.CREATE_SENDER}`}>
-                      Create SMTP sender
+                    <EuiButton fill href={`#${ROUTES.CREATE_SES_SENDER}`}>
+                      Create SES sender
                     </EuiButton>
                   ),
                 },
@@ -253,12 +230,12 @@ export class SendersTable extends Component<
             />
           }
           bodyStyles={{ padding: 'initial' }}
-          title="SMTP senders"
+          title="SES senders"
           titleSize="m"
           total={this.state.total}
         >
           <EuiFieldSearch
-            data-test-subj="senders-table-search-input"
+            data-test-subj="ses-senders-table-search-input"
             fullWidth={true}
             placeholder="Search"
             onSearch={this.onSearchChange}
@@ -273,11 +250,11 @@ export class SendersTable extends Component<
             selection={selection}
             noItemsMessage={
               <EuiEmptyPrompt
-                title={<h2>No SMTP senders to display</h2>}
+                title={<h2>No SES senders to display</h2>}
                 body="Set up an outbound email server by creating a sender. You will select a sender when configuring email channels."
                 actions={
-                  <EuiButton href={`#${ROUTES.CREATE_SENDER}`}>
-                    Create SMTP sender
+                  <EuiButton href={`#${ROUTES.CREATE_SES_SENDER}`}>
+                    Create SES sender
                   </EuiButton>
                 }
               />
@@ -286,6 +263,7 @@ export class SendersTable extends Component<
             pagination={pagination}
             sorting={sorting}
             loading={this.state.loading}
+            tableLayout="auto"
           />
         </ContentPanel>
       </>
