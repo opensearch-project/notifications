@@ -41,6 +41,7 @@ import { CoreServicesContext } from '../../../components/coreServices';
 import { ModalConsumer } from '../../../components/Modal';
 import { ServicesContext } from '../../../services';
 import { getErrorMessage } from '../../../utils/helpers';
+import { MainContext } from '../../Main/Main';
 import { CreateChannelContext } from '../CreateChannel';
 import {
   validateEmailSender,
@@ -71,6 +72,15 @@ export function EmailSettings(props: EmailSettingsProps) {
   const context = useContext(CreateChannelContext)!;
   const coreContext = useContext(CoreServicesContext)!;
   const servicesContext = useContext(ServicesContext)!;
+  const mainStateContext = useContext(MainContext)!;
+  const [smtpAvailable, setSmtpAvailable] = useState(true);
+
+  useEffect(() => {
+    if (!mainStateContext.availableConfigTypes.includes('smtp_account')) {
+      setSmtpAvailable(false);
+      props.setSenderType('ses_account');
+    }
+  }, []);
 
   const [sesSenderOptions, setSesSenderOptions] = useState<
     Array<EuiComboBoxOptionOption<string>>
@@ -96,14 +106,14 @@ export function EmailSettings(props: EmailSettingsProps) {
       const smtpSenders = await servicesContext.notificationService.getSenders(
         getQueryObject('smtp_account', query)
       );
-      const sesSenders = await servicesContext.notificationService.getSenders(
-        getQueryObject('ses_account', query)
-      );
       setSmtpSenderOptions(
         smtpSenders.items.map((sender) => ({
           label: sender.name,
           value: sender.config_id,
         }))
+      );
+      const sesSenders = await servicesContext.notificationService.getSenders(
+        getQueryObject('ses_account', query)
       );
       setSesSenderOptions(
         sesSenders.items.map((sender) => ({
@@ -164,23 +174,25 @@ export function EmailSettings(props: EmailSettingsProps) {
 
   return (
     <>
-      <EuiFormRow label="Sender type">
-        <EuiRadioGroup
-          options={[
-            {
-              id: 'smtp_account',
-              label: 'SMTP sender',
-            },
-            {
-              id: 'ses_account',
-              label: 'SES sender',
-            },
-          ]}
-          idSelected={props.senderType}
-          onChange={(id) => props.setSenderType(id as SenderType)}
-          name="sender type radio group"
-        />
-      </EuiFormRow>
+      {smtpAvailable && (
+        <EuiFormRow label="Sender type">
+          <EuiRadioGroup
+            options={[
+              {
+                id: 'smtp_account',
+                label: 'SMTP sender',
+              },
+              {
+                id: 'ses_account',
+                label: 'SES sender',
+              },
+            ]}
+            idSelected={props.senderType}
+            onChange={(id) => props.setSenderType(id as SenderType)}
+            name="sender type radio group"
+          />
+        </EuiFormRow>
+      )}
       {props.senderType === 'ses_account' ? (
         <>
           <EuiSpacer size="m" />
