@@ -36,6 +36,7 @@ import {
   SortDirection,
 } from '@elastic/eui';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { SenderType } from '../../../../models/interfaces';
 import { CoreServicesContext } from '../../../components/coreServices';
 import { ModalConsumer } from '../../../components/Modal';
 import { ServicesContext } from '../../../services';
@@ -47,11 +48,11 @@ import {
 } from '../utils/validationHelper';
 import { CreateRecipientGroupModal } from './modals/CreateRecipientGroupModal';
 import { CreateSenderModal } from './modals/CreateSenderModal';
-import { CreateSESSenderModal } from './modals/CreateSesSenderModal';
+import { CreateSESSenderModal } from './modals/CreateSESSenderModal';
 
 interface EmailSettingsProps {
-  senderType: 'smtp' | 'ses';
-  setSenderType: (senderType: 'smtp' | 'ses') => void;
+  senderType: SenderType;
+  setSenderType: (senderType: SenderType) => void;
   selectedSmtpSenderOptions: Array<EuiComboBoxOptionOption<string>>;
   setSelectedSmtpSenderOptions: (
     options: Array<EuiComboBoxOptionOption<string>>
@@ -167,20 +168,20 @@ export function EmailSettings(props: EmailSettingsProps) {
         <EuiRadioGroup
           options={[
             {
-              id: 'smtp',
+              id: 'smtp_account',
               label: 'SMTP sender',
             },
             {
-              id: 'ses',
+              id: 'ses_account',
               label: 'SES sender',
             },
           ]}
           idSelected={props.senderType}
-          onChange={(id) => props.setSenderType(id as 'smtp' | 'ses')}
+          onChange={(id) => props.setSenderType(id as SenderType)}
           name="sender type radio group"
         />
       </EuiFormRow>
-      {props.senderType === 'ses' ? (
+      {props.senderType === 'ses_account' ? (
         <>
           <EuiSpacer size="m" />
           <EuiFlexGroup>

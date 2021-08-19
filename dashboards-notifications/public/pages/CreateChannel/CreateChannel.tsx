@@ -41,6 +41,7 @@ import queryString from 'query-string';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { SERVER_DELAY } from '../../../common';
+import { SenderType } from '../../../models/interfaces';
 import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
 import { ServicesContext } from '../../services';
@@ -118,7 +119,7 @@ export function CreateChannel(props: CreateChannelsProps) {
   const [slackWebhook, setSlackWebhook] = useState('');
   const [chimeWebhook, setChimeWebhook] = useState('');
 
-  const [senderType, setSenderType] = useState<'smtp' | 'ses'>('smtp');
+  const [senderType, setSenderType] = useState<SenderType>('smtp_account');
   const [selectedSmtpSenderOptions, setSelectedSmtpSenderOptions] = useState<
     Array<EuiComboBoxOptionOption<string>>
   >([]);
@@ -212,7 +213,7 @@ export function CreateChannel(props: CreateChannelsProps) {
       } else if (type === BACKEND_CHANNEL_TYPE.EMAIL) {
         const emailObject = deconstructEmailObject(response.email!);
         setSenderType(emailObject.senderType)
-        if (emailObject.senderType === 'smtp') {
+        if (emailObject.senderType === 'smtp_account') {
           setSelectedSmtpSenderOptions(emailObject.selectedSenderOptions);
         } else {
           setSelectedSesSenderOptions(emailObject.selectedSenderOptions);
@@ -258,7 +259,7 @@ export function CreateChannel(props: CreateChannelsProps) {
     } else if (channelType === BACKEND_CHANNEL_TYPE.CHIME) {
       errors.chimeWebhook = validateWebhookURL(chimeWebhook);
     } else if (channelType === BACKEND_CHANNEL_TYPE.EMAIL) {
-      if (senderType === 'smtp') {
+      if (senderType === 'smtp_account') {
         errors.smtpSender = validateEmailSender(selectedSmtpSenderOptions);
       } else {
         errors.sesSender = validateEmailSender(selectedSesSenderOptions);
@@ -308,7 +309,7 @@ export function CreateChannel(props: CreateChannelsProps) {
         webhookHeaders
       );
     } else if (channelType === BACKEND_CHANNEL_TYPE.EMAIL) {
-      if (senderType === 'smtp') {
+      if (senderType === 'smtp_account') {
         config.email = constructEmailObject(
           selectedSmtpSenderOptions,
           selectedRecipientGroupOptions

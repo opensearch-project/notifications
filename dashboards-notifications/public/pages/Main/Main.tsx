@@ -40,13 +40,15 @@ import { CreateRecipientGroup } from '../Emails/CreateRecipientGroup';
 import { CreateSender } from '../Emails/CreateSender';
 import { CreateSESSender } from '../Emails/CreateSESSender';
 import { EmailGroups } from '../Emails/EmailGroups';
+import { EmailSenders } from '../Emails/EmailSenders';
 import Notifications from '../Notifications';
 
 enum Navigation {
   Notifications = 'Notifications',
   Dashboard = 'Dashboard',
   Channels = 'Channels',
-  EmailGroups = 'Email groups',
+  EmailSenders = 'Email senders',
+  EmailGroups = 'Email recipient groups',
 }
 
 enum Pathname {
@@ -119,8 +121,14 @@ export default class Main extends Component<MainProps, MainState> {
             isSelected: pathname === Pathname.Channels,
           },
           {
-            name: Navigation.EmailGroups,
+            name: Navigation.EmailSenders,
             id: 3,
+            href: `#${ROUTES.EMAIL_SENDERS}`,
+            isSelected: pathname === ROUTES.EMAIL_SENDERS,
+          },
+          {
+            name: Navigation.EmailGroups,
+            id: 4,
             href: `#${ROUTES.EMAIL_GROUPS}`,
             isSelected: pathname === ROUTES.EMAIL_GROUPS,
           },
@@ -147,9 +155,9 @@ export default class Main extends Component<MainProps, MainState> {
                           !pathname.startsWith(ROUTES.EDIT_SES_SENDER) &&
                           pathname !== ROUTES.CREATE_RECIPIENT_GROUP &&
                           !pathname.startsWith(ROUTES.EDIT_RECIPIENT_GROUP) && (
-                            <EuiPageSideBar style={{ minWidth: 150 }}>
+                            <EuiPageSideBar style={{ minWidth: 155 }}>
                               <EuiSideNav
-                                style={{ width: 150 }}
+                                style={{ width: 155 }}
                                 items={sideNav}
                               />
                             </EuiPageSideBar>
@@ -193,6 +201,12 @@ export default class Main extends Component<MainProps, MainState> {
                                   services={services}
                                   mainProps={this.state}
                                 />
+                              )}
+                            />
+                            <Route
+                              path={ROUTES.EMAIL_SENDERS}
+                              render={(props: RouteComponentProps) => (
+                                <EmailSenders {...props} />
                               )}
                             />
                             <Route

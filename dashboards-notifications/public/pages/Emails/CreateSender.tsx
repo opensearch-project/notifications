@@ -75,7 +75,7 @@ export function CreateSender(props: CreateSenderProps) {
   useEffect(() => {
     coreContext.chrome.setBreadcrumbs([
       BREADCRUMBS.NOTIFICATIONS,
-      BREADCRUMBS.EMAIL_GROUPS,
+      BREADCRUMBS.EMAIL_SENDERS,
       props.edit ? BREADCRUMBS.EDIT_SENDER : BREADCRUMBS.CREATE_SENDER,
     ]);
     window.scrollTo(0, 0);
@@ -149,7 +149,7 @@ export function CreateSender(props: CreateSenderProps) {
       <EuiSpacer />
       <EuiFlexGroup justifyContent="flexEnd" style={{ maxWidth: 1024 }}>
         <EuiFlexItem grow={false}>
-          <EuiButtonEmpty href={`#${ROUTES.EMAIL_GROUPS}`}>
+          <EuiButtonEmpty href={`#${ROUTES.EMAIL_SENDERS}`}>
             Cancel
           </EuiButtonEmpty>
         </EuiFlexItem>
@@ -186,7 +186,7 @@ export function CreateSender(props: CreateSenderProps) {
                     }.`
                   );
                   setTimeout(
-                    () => location.hash = `#${ROUTES.EMAIL_GROUPS}`,
+                    () => location.hash = `#${ROUTES.EMAIL_SENDERS}`,
                     SERVER_DELAY
                   );
                 })

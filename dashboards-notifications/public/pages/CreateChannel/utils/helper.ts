@@ -11,7 +11,7 @@
 
 import { EuiComboBoxOptionOption } from '@elastic/eui';
 import _ from 'lodash';
-import { ChannelItemType } from '../../../../models/interfaces';
+import { ChannelItemType, SenderType } from '../../../../models/interfaces';
 import { CUSTOM_WEBHOOK_ENDPOINT_TYPE } from '../../../utils/constants';
 import { HeaderItemType } from '../../Channels/types';
 
@@ -113,7 +113,7 @@ export const constructEmailObject = (
 export const deconstructEmailObject = (
   email: NonNullable<ChannelItemType['email']>
 ): {
-  senderType: 'smtp' | 'ses';
+  senderType: SenderType;
   selectedSenderOptions: Array<EuiComboBoxOptionOption<string>>;
   selectedRecipientGroupOptions: Array<EuiComboBoxOptionOption<string>>;
 } => {

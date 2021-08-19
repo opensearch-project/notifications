@@ -64,6 +64,8 @@ interface DeliveryStatus {
   status_text: string;
 }
 
+export type SenderType = 'smtp_account' | 'ses_account';
+
 export interface ChannelItemType extends ConfigType {
   config_type: keyof typeof CHANNEL_TYPE;
   feature_list: Array<keyof typeof NOTIFICATION_SOURCE>;
@@ -83,7 +85,7 @@ export interface ChannelItemType extends ConfigType {
     recipient_list: string[]; // custom email addresses
     email_group_id_list: string[];
     // optional fields for displaying or editing email channel, needs more requests
-    sender_type?: 'smtp' | 'ses';
+    sender_type?: SenderType;
     email_account_name?: string;
     email_group_id_map?: {
       [id: string]: string;

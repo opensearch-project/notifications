@@ -29,16 +29,17 @@ import React, { useContext, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { CoreServicesContext } from '../../components/coreServices';
 import { BREADCRUMBS } from '../../utils/constants';
-import { RecipientGroupsTable } from './components/tables/RecipientGroupsTable';
+import { SendersTable } from './components/tables/SendersTable';
+import { SESSendersTable } from './components/tables/SESSendersTable';
 
-interface EmailGroupsProps extends RouteComponentProps {}
+interface EmailSendersProps extends RouteComponentProps {}
 
-export function EmailGroups(props: EmailGroupsProps) {
+export function EmailSenders(props: EmailSendersProps) {
   const coreContext = useContext(CoreServicesContext)!;
   useEffect(() => {
     coreContext.chrome.setBreadcrumbs([
       BREADCRUMBS.NOTIFICATIONS,
-      BREADCRUMBS.EMAIL_GROUPS,
+      BREADCRUMBS.EMAIL_SENDERS,
     ]);
     window.scrollTo(0, 0);
   }, []);
@@ -46,11 +47,14 @@ export function EmailGroups(props: EmailGroupsProps) {
   return (
     <>
       <EuiTitle size="l">
-        <h1>Email recipient groups</h1>
+        <h1>Email senders</h1>
       </EuiTitle>
 
       <EuiSpacer />
-      <RecipientGroupsTable coreContext={coreContext} />
+      <SendersTable coreContext={coreContext} />
+
+      <EuiSpacer />
+      <SESSendersTable coreContext={coreContext} />
     </>
   );
 }
