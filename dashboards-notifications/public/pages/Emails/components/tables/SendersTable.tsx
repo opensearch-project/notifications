@@ -88,7 +88,7 @@ export class SendersTable extends Component<
         width: '200px',
       },
       {
-        field: 'smtp_account.from_address',
+        field: 'from_address',
         name: 'Outbound email address',
         sortable: true,
         truncateText: true,
@@ -99,22 +99,35 @@ export class SendersTable extends Component<
         name: 'Host',
         sortable: true,
         truncateText: true,
-        width: '200px',
+        render: (value: string) => value || '-',
       },
       {
         field: 'smtp_account.port',
         name: 'Port',
         sortable: false,
         truncateText: true,
-        width: '200px',
+        render: (value: string) => value || '-',
       },
       {
         field: 'smtp_account.method',
         name: 'Encryption method',
         sortable: true,
         truncateText: true,
-        width: '200px',
         render: (method: string) => _.get(ENCRYPTION_TYPE, method, '-'),
+      },
+      {
+        field: 'ses_account.region',
+        name: 'AWS region',
+        sortable: true,
+        truncateText: true,
+        render: (value: string) => value || '-',
+      },
+      {
+        field: 'ses_account.role_arn',
+        name: 'Role ARN',
+        sortable: false,
+        truncateText: true,
+        render: (value: string) => value || '-',
       },
     ];
     this.refresh = this.refresh.bind(this);
@@ -140,7 +153,7 @@ export class SendersTable extends Component<
       from_index: state.from,
       max_items: state.size,
       query: state.search,
-      config_type: 'smtp_account',
+      config_type: ['smtp_account', 'ses_account'],
       sort_field: state.sortField,
       sort_order: state.sortDirection,
     };
@@ -245,7 +258,7 @@ export class SendersTable extends Component<
                 {
                   component: (
                     <EuiButton fill href={`#${ROUTES.CREATE_SENDER}`}>
-                      Create SMTP sender
+                      Create sender
                     </EuiButton>
                   ),
                 },
@@ -253,7 +266,7 @@ export class SendersTable extends Component<
             />
           }
           bodyStyles={{ padding: 'initial' }}
-          title="SMTP senders"
+          title="Senders"
           titleSize="m"
           total={this.state.total}
         >

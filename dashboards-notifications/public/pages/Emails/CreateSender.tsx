@@ -43,9 +43,11 @@ import { getErrorMessage } from '../../utils/helpers';
 import { CreateSenderForm } from './components/forms/CreateSenderForm';
 import { createSenderConfigObject } from './utils/helper';
 import {
+  validateAwsRegion,
   validateEmail,
   validateHost,
   validatePort,
+  validateRoleArn,
   validateSenderName,
 } from './utils/validationHelper';
 
@@ -58,6 +60,7 @@ export function CreateSender(props: CreateSenderProps) {
   const servicesContext = useContext(ServicesContext)!;
 
   const [loading, setLoading] = useState(false);
+  const [senderType, setSenderType] = useState<'smtp' | 'ses'>('smtp');
   const [senderName, setSenderName] = useState('');
   const [email, setEmail] = useState('');
   const [host, setHost] = useState('');
@@ -65,11 +68,15 @@ export function CreateSender(props: CreateSenderProps) {
   const [encryption, setEncryption] = useState<keyof typeof ENCRYPTION_TYPE>(
     Object.keys(ENCRYPTION_TYPE)[0] as keyof typeof ENCRYPTION_TYPE
   );
+  const [roleArn, setRoleArn] = useState('');
+  const [awsRegion, setAwsRegion] = useState('');
   const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>({
     senderName: [],
     email: [],
     host: [],
     port: [],
+    roleArn: [],
+    awsRegion: [],
   });
 
   useEffect(() => {
@@ -92,10 +99,17 @@ export function CreateSender(props: CreateSenderProps) {
     try {
       const response = await servicesContext.notificationService.getSender(id);
       setSenderName(response.name);
-      setEmail(response.smtp_account.from_address);
-      setHost(response.smtp_account.host);
-      setPort(response.smtp_account.port);
-      setEncryption(response.smtp_account.method);
+      setEmail(response.from_address);
+      if (response.smtp_account) {
+        setSenderType('smtp');
+        setHost(response.smtp_account.host);
+        setPort(response.smtp_account.port);
+        setEncryption(response.smtp_account.method);
+      } else if (response.ses_account) {
+        setSenderType('ses');
+        setRoleArn(response.ses_account.role_arn || '');
+        setAwsRegion(response.ses_account.region);
+      }
     } catch (error) {
       coreContext.notifications.toasts.addDanger(
         getErrorMessage(error, 'There was a problem loading sender.')
@@ -107,9 +121,18 @@ export function CreateSender(props: CreateSenderProps) {
     const errors: { [key: string]: string[] } = {
       senderName: validateSenderName(senderName),
       email: validateEmail(email),
-      host: validateHost(host),
-      port: validatePort(port),
+      host: [],
+      port: [],
+      roleArn: [],
+      awsRegion: [],
     };
+    if (senderType === 'smtp') {
+      errors.host = validateHost(host);
+      errors.port = validatePort(port);
+    } else {
+      errors.roleArn = validateRoleArn(roleArn);
+      errors.awsRegion = validateAwsRegion(awsRegion);
+    }
     setInputErrors(errors);
     return !Object.values(errors).reduce(
       (errorFlag, error) => errorFlag || error.length > 0,
@@ -120,7 +143,7 @@ export function CreateSender(props: CreateSenderProps) {
   return (
     <>
       <EuiTitle size="l">
-        <h1>{`${props.edit ? 'Edit' : 'Create'} SMTP sender`}</h1>
+        <h1>{`${props.edit ? 'Edit' : 'Create'} sender`}</h1>
       </EuiTitle>
 
       <EuiSpacer />
@@ -131,6 +154,8 @@ export function CreateSender(props: CreateSenderProps) {
         panelStyles={{ maxWidth: 1000 }}
       >
         <CreateSenderForm
+          senderType={senderType}
+          setSenderType={setSenderType}
           senderName={senderName}
           setSenderName={setSenderName}
           email={email}
@@ -141,6 +166,10 @@ export function CreateSender(props: CreateSenderProps) {
           setPort={setPort}
           encryption={encryption}
           setEncryption={setEncryption}
+          roleArn={roleArn}
+          setRoleArn={setRoleArn}
+          awsRegion={awsRegion}
+          setAwsRegion={setAwsRegion}
           inputErrors={inputErrors}
           setInputErrors={setInputErrors}
         />
@@ -186,7 +215,7 @@ export function CreateSender(props: CreateSenderProps) {
                     }.`
                   );
                   setTimeout(
-                    () => location.hash = `#${ROUTES.EMAIL_GROUPS}`,
+                    () => (location.hash = `#${ROUTES.EMAIL_GROUPS}`),
                     SERVER_DELAY
                   );
                 })
