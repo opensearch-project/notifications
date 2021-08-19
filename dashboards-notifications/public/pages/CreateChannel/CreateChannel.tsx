@@ -41,6 +41,7 @@ import queryString from 'query-string';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { SERVER_DELAY } from '../../../common';
+import { SenderType } from '../../../models/interfaces';
 import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
 import { ServicesContext } from '../../services';
@@ -118,7 +119,11 @@ export function CreateChannel(props: CreateChannelsProps) {
   const [slackWebhook, setSlackWebhook] = useState('');
   const [chimeWebhook, setChimeWebhook] = useState('');
 
-  const [selectedSenderOptions, setSelectedSenderOptions] = useState<
+  const [senderType, setSenderType] = useState<SenderType>('smtp_account');
+  const [selectedSmtpSenderOptions, setSelectedSmtpSenderOptions] = useState<
+    Array<EuiComboBoxOptionOption<string>>
+  >([]);
+  const [selectedSesSenderOptions, setSelectedSesSenderOptions] = useState<
     Array<EuiComboBoxOptionOption<string>>
   >([]);
   // "value" field is the config_id of recipient groups, if it doesn't exist means it's a custom email address
@@ -152,7 +157,8 @@ export function CreateChannel(props: CreateChannelsProps) {
     name: [],
     slackWebhook: [],
     chimeWebhook: [],
-    sender: [],
+    smtpSender: [],
+    sesSender: [],
     recipients: [],
     webhookURL: [],
     customURLHost: [],
@@ -206,7 +212,12 @@ export function CreateChannel(props: CreateChannelsProps) {
         setChimeWebhook(response.chime?.url || '');
       } else if (type === BACKEND_CHANNEL_TYPE.EMAIL) {
         const emailObject = deconstructEmailObject(response.email!);
-        setSelectedSenderOptions(emailObject.selectedSenderOptions);
+        setSenderType(emailObject.senderType)
+        if (emailObject.senderType === 'smtp_account') {
+          setSelectedSmtpSenderOptions(emailObject.selectedSenderOptions);
+        } else {
+          setSelectedSesSenderOptions(emailObject.selectedSenderOptions);
+        }
         setSelectedRecipientGroupOptions(
           emailObject.selectedRecipientGroupOptions
         );
@@ -234,7 +245,8 @@ export function CreateChannel(props: CreateChannelsProps) {
       name: validateChannelName(name),
       slackWebhook: [],
       chimeWebhook: [],
-      sender: [],
+      smtpSender: [],
+      sesSender: [],
       recipients: [],
       webhookURL: [],
       customURLHost: [],
@@ -247,7 +259,11 @@ export function CreateChannel(props: CreateChannelsProps) {
     } else if (channelType === BACKEND_CHANNEL_TYPE.CHIME) {
       errors.chimeWebhook = validateWebhookURL(chimeWebhook);
     } else if (channelType === BACKEND_CHANNEL_TYPE.EMAIL) {
-      errors.sender = validateEmailSender(selectedSenderOptions);
+      if (senderType === 'smtp_account') {
+        errors.smtpSender = validateEmailSender(selectedSmtpSenderOptions);
+      } else {
+        errors.sesSender = validateEmailSender(selectedSesSenderOptions);
+      }
       errors.recipients = validateRecipients(selectedRecipientGroupOptions);
     } else if (channelType === BACKEND_CHANNEL_TYPE.CUSTOM_WEBHOOK) {
       if (webhookTypeIdSelected === 'WEBHOOK_URL') {
@@ -293,10 +309,17 @@ export function CreateChannel(props: CreateChannelsProps) {
         webhookHeaders
       );
     } else if (channelType === BACKEND_CHANNEL_TYPE.EMAIL) {
-      config.email = constructEmailObject(
-        selectedSenderOptions,
-        selectedRecipientGroupOptions
-      );
+      if (senderType === 'smtp_account') {
+        config.email = constructEmailObject(
+          selectedSmtpSenderOptions,
+          selectedRecipientGroupOptions
+        );
+      } else {
+        config.email = constructEmailObject(
+          selectedSesSenderOptions,
+          selectedRecipientGroupOptions
+        );
+      }
     } else if (channelType === BACKEND_CHANNEL_TYPE.SNS) {
       config.sns = {
         topic_arn: topicArn,
@@ -419,8 +442,12 @@ export function CreateChannel(props: CreateChannelsProps) {
             />
           ) : channelType === BACKEND_CHANNEL_TYPE.EMAIL ? (
             <EmailSettings
-              selectedSenderOptions={selectedSenderOptions}
-              setSelectedSenderOptions={setSelectedSenderOptions}
+              senderType={senderType}
+              setSenderType={setSenderType}
+              selectedSmtpSenderOptions={selectedSmtpSenderOptions}
+              setSelectedSmtpSenderOptions={setSelectedSmtpSenderOptions}
+              selectedSesSenderOptions={selectedSesSenderOptions}
+              setSelectedSesSenderOptions={setSelectedSesSenderOptions}
               selectedRecipientGroupOptions={selectedRecipientGroupOptions}
               setSelectedRecipientGroupOptions={
                 setSelectedRecipientGroupOptions

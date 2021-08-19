@@ -41,7 +41,6 @@ import { CoreServicesContext } from '../../components/coreServices';
 import { ServicesContext } from '../../services';
 import { BREADCRUMBS, ENCRYPTION_TYPE, ROUTES } from '../../utils/constants';
 import { getErrorMessage } from '../../utils/helpers';
-import { MainContext } from '../Main/Main';
 import { CreateSenderForm } from './components/forms/CreateSenderForm';
 import { createSenderConfigObject } from './utils/helper';
 import {
@@ -60,7 +59,6 @@ interface CreateSenderProps extends RouteComponentProps<{ id?: string }> {
 export function CreateSender(props: CreateSenderProps) {
   const coreContext = useContext(CoreServicesContext)!;
   const servicesContext = useContext(ServicesContext)!;
-  const mainStateContext = useContext(MainContext)!;
 
   const [loading, setLoading] = useState(false);
   const [senderType, setSenderType] = useState<SenderType>('smtp_account');
@@ -133,9 +131,7 @@ export function CreateSender(props: CreateSenderProps) {
       errors.host = validateHost(host);
       errors.port = validatePort(port);
     } else {
-      if (!mainStateContext.tooltipSupport) {
-        errors.roleArn = validateRoleArn(roleArn);
-      }
+      errors.roleArn = validateRoleArn(roleArn);
       errors.awsRegion = validateAwsRegion(awsRegion);
     }
     setInputErrors(errors);
@@ -200,14 +196,11 @@ export function CreateSender(props: CreateSenderProps) {
               }
               setLoading(true);
               const config = createSenderConfigObject(
-                senderType,
                 senderName,
                 host,
                 port,
                 encryption,
-                email,
-                roleArn,
-                awsRegion
+                email
               );
               const request = props.edit
                 ? servicesContext.notificationService.updateConfig(

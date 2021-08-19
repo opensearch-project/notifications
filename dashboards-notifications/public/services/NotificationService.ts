@@ -147,7 +147,7 @@ export default class NotificationService {
   };
 
   getSenders = async (
-    queryObject: HttpFetchQuery // config_type: 'smtp_account', 'ses_account'
+    queryObject: HttpFetchQuery // config_type: 'smtp_account'
   ): Promise<{ items: SenderItemType[]; total: number }> => {
     const response = await this.getConfigs(queryObject);
     return {
