@@ -31,7 +31,6 @@ import { CoreServicesContext } from '../../components/coreServices';
 import { BREADCRUMBS } from '../../utils/constants';
 import { RecipientGroupsTable } from './components/tables/RecipientGroupsTable';
 import { SendersTable } from './components/tables/SendersTable';
-import { SESSendersTable } from './components/tables/SESSendersTable';
 
 interface EmailGroupsProps extends RouteComponentProps {}
 
@@ -53,9 +52,6 @@ export function EmailGroups(props: EmailGroupsProps) {
 
       <EuiSpacer />
       <SendersTable coreContext={coreContext} />
-
-      <EuiSpacer />
-      <SESSendersTable coreContext={coreContext} />
 
       <EuiSpacer />
       <RecipientGroupsTable coreContext={coreContext} />

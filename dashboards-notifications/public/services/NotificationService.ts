@@ -32,6 +32,7 @@ import {
   ChannelItemType,
   RecipientGroupItemType,
   SenderItemType,
+  SenderType,
   SESSenderItemType,
 } from '../../models/interfaces';
 import { CHANNEL_TYPE } from '../utils/constants';
@@ -119,7 +120,7 @@ export default class NotificationService {
       channel.email.email_account_id,
       ...channel.email.email_group_id_list,
     ];
-    let senderType: 'smtp' | 'ses';
+    let senderType: SenderType;
     await this.getConfigs({
       from_index: 0,
       max_items: ids.length,
@@ -130,7 +131,7 @@ export default class NotificationService {
     }).then((response) => {
       response.config_list.map((config) => {
         if (config.config_id === channel.email?.email_account_id)
-          senderType = config.config.config_type === 'ses_account' ? 'ses' : 'smtp';
+          senderType = config.config.config_type;
         idMap[config.config_id] = config.config.name;
       });
     });

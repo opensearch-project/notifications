@@ -35,6 +35,7 @@ import {
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { SERVER_DELAY } from '../../../common';
+import { SenderType } from '../../../models/interfaces';
 import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
 import { ServicesContext } from '../../services';
@@ -60,7 +61,7 @@ export function CreateSender(props: CreateSenderProps) {
   const servicesContext = useContext(ServicesContext)!;
 
   const [loading, setLoading] = useState(false);
-  const [senderType, setSenderType] = useState<'smtp' | 'ses'>('smtp');
+  const [senderType, setSenderType] = useState<SenderType>('smtp_account');
   const [senderName, setSenderName] = useState('');
   const [email, setEmail] = useState('');
   const [host, setHost] = useState('');
@@ -101,12 +102,12 @@ export function CreateSender(props: CreateSenderProps) {
       setSenderName(response.name);
       setEmail(response.from_address);
       if (response.smtp_account) {
-        setSenderType('smtp');
+        setSenderType('smtp_account');
         setHost(response.smtp_account.host);
         setPort(response.smtp_account.port);
         setEncryption(response.smtp_account.method);
       } else if (response.ses_account) {
-        setSenderType('ses');
+        setSenderType('ses_account');
         setRoleArn(response.ses_account.role_arn || '');
         setAwsRegion(response.ses_account.region);
       }
@@ -126,7 +127,7 @@ export function CreateSender(props: CreateSenderProps) {
       roleArn: [],
       awsRegion: [],
     };
-    if (senderType === 'smtp') {
+    if (senderType === 'smtp_account') {
       errors.host = validateHost(host);
       errors.port = validatePort(port);
     } else {
