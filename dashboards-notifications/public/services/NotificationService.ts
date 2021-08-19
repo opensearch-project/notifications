@@ -113,7 +113,7 @@ export default class NotificationService {
   getEmailConfigDetails = async (
     channel: ChannelItemType
   ): Promise<ChannelItemType> => {
-    if (!channel.email) return channel;
+    if (!channel.email) return  channel;
 
     const idMap: { [id: string]: string } = {};
     const ids = [
@@ -121,7 +121,9 @@ export default class NotificationService {
       ...channel.email.email_group_id_list,
     ];
     let senderType: SenderType;
+    const invalidIds: string[] = [];
     try {
+      // try to get all sender/recipient configs used in email in one call
       await this.getConfigs({
         from_index: 0,
         max_items: ids.length,
@@ -129,22 +131,51 @@ export default class NotificationService {
         sort_order: SortDirection.ASC,
         sort_field: 'name',
         config_type: ['smtp_account', 'ses_account', 'email_group'],
-      }).then((response) => {
-        response.config_list.map((config) => {
-          if (config.config_id === channel.email?.email_account_id)
-            senderType = config.config.config_type;
-          idMap[config.config_id] = config.config.name;
+      })
+        .then((response) => {
+          response.config_list.map((config) => {
+            if (config.config_id === channel.email?.email_account_id)
+              senderType = config.config.config_type;
+            idMap[config.config_id] = config.config.name;
+          });
+        })
+        .catch(async (error) => {
+          console.error(
+            'error fetching email senders and recipients, retrying',
+            error
+          );
+          // some configs no longer exist and request failed, need to request one by one
+          // TODO limit concurrency here?
+          await Promise.all(
+            ids.map((config_id) =>
+              this.getConfig(config_id)
+                .then((response) => {
+                  const config = response.config_list[0];
+                  if (config.config_id === channel.email?.email_account_id)
+                    senderType = config.config.config_type;
+                  idMap[config_id] = config.config.name;
+                })
+                .catch((error) => {
+                  invalidIds.push(config_id);
+                  console.error(
+                    `error fetching config id ${config_id}:`,
+                    error
+                  );
+                  idMap[config_id] = '(invalid-id)';
+                })
+            )
+          );
         });
-      });
 
-      channel.email.sender_type = senderType!;
+      channel.email.sender_type = senderType! || 'smtp_account';
       channel.email.email_account_name = idMap[channel.email.email_account_id];
       channel.email.email_group_id_map = {};
       channel.email.email_group_id_list.map(
         (id) => (channel.email!.email_group_id_map![id] = idMap[id])
       );
+      channel.email.invalid_ids = invalidIds;
     } catch (error) {
-      // TODO: some configs do not exist and request failed, need to request separately
+      console.error('error fetching email senders and recipients', error);
     }
     return channel;
   };

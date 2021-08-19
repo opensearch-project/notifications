@@ -187,11 +187,17 @@ export function CreateChannel(props: CreateChannelsProps) {
     try {
       const response = await servicesContext.notificationService
         .getChannel(id)
-        .then((response) => {
+        .then(async (response) => {
           if (response.config_type === 'email') {
-            return servicesContext.notificationService.getEmailConfigDetails(
+            const channel = await servicesContext.notificationService.getEmailConfigDetails(
               response
             );
+            if (channel.email?.invalid_ids) {
+              coreContext.notifications.toasts.addWarning(
+                'The sender and/or some recipient groups might have been deleted.'
+              );
+            }
+            return channel;
           }
           return response;
         });
@@ -212,7 +218,7 @@ export function CreateChannel(props: CreateChannelsProps) {
         setChimeWebhook(response.chime?.url || '');
       } else if (type === BACKEND_CHANNEL_TYPE.EMAIL) {
         const emailObject = deconstructEmailObject(response.email!);
-        setSenderType(emailObject.senderType)
+        setSenderType(emailObject.senderType);
         if (emailObject.senderType === 'smtp_account') {
           setSelectedSmtpSenderOptions(emailObject.selectedSenderOptions);
         } else {

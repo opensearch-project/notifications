@@ -90,6 +90,7 @@ export interface ChannelItemType extends ConfigType {
     email_group_id_map?: {
       [id: string]: string;
     };
+    invalid_ids?: string[]; // invalid sender and/or recipient group ids, possible deleted
   };
   sns?: {
     topic_arn: string;
