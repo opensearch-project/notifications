@@ -187,7 +187,7 @@ export function EmailSettings(props: EmailSettingsProps) {
             <EuiFlexItem style={{ maxWidth: 400 }}>
               <EuiFormRow
                 label="SES sender"
-                helpText={`A destination only allows one SMTP or SES sender. Use "Create SES sender" to create a sender with its email address, host, port, encryption method.`}
+                helpText={`A destination only allows one SMTP or SES sender. Use "Create SES sender" to create a sender with its email address, IAM role, AWS region.`}
                 error={context.inputErrors.sesSender.join(' ')}
                 isInvalid={context.inputErrors.sesSender.length > 0}
               >
@@ -248,8 +248,8 @@ export function EmailSettings(props: EmailSettingsProps) {
           <EuiFlexGroup>
             <EuiFlexItem style={{ maxWidth: 400 }}>
               <EuiFormRow
-                label="Smtp sender"
-                helpText={`A destination only allows one sender. Use "Create sender" to create a sender with its email address, host, port, encryption method.`}
+                label="SMTP sender"
+                helpText={`A destination only allows one SMTP or SES sender. Use "Create SMTP sender" to create a sender with its email address, host, port, encryption method.`}
                 error={context.inputErrors.smtpSender.join(' ')}
                 isInvalid={context.inputErrors.smtpSender.length > 0}
               >

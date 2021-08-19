@@ -57,7 +57,8 @@ enum Pathname {
 interface MainProps extends RouteComponentProps {}
 
 export interface MainState {
-  availableFeatures: Partial<typeof CHANNEL_TYPE>;
+  availableChannels: Partial<typeof CHANNEL_TYPE>;
+  availableConfigTypes: string[]; // available backend config types
   tooltipSupport: boolean; // if true, IAM role for SNS is optional and helper text should be available
 }
 
@@ -69,7 +70,17 @@ export default class Main extends Component<MainProps, MainState> {
   constructor(props: MainProps) {
     super(props);
     this.state = {
-      availableFeatures: CHANNEL_TYPE,
+      availableChannels: CHANNEL_TYPE,
+      availableConfigTypes: [
+        'slack',
+        'chime',
+        'webhook',
+        'email',
+        'sns',
+        'smtp_account',
+        'ses_account',
+        'email_group',
+      ],
       tooltipSupport: false,
     };
   }
@@ -78,7 +89,8 @@ export default class Main extends Component<MainProps, MainState> {
     const serverFeatures = await this.context.notificationService.getServerFeatures();
     if (serverFeatures != null)
       this.setState({
-        availableFeatures: serverFeatures.availableFeatures,
+        availableChannels: serverFeatures.availableChannels,
+        availableConfigTypes: serverFeatures.availableConfigTypes,
         tooltipSupport: serverFeatures.tooltipSupport,
       });
   }

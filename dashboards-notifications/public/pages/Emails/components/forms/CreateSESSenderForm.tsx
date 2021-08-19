@@ -16,10 +16,12 @@ import {
   EuiFormRow,
   EuiSpacer,
 } from '@elastic/eui';
-import React from 'react';
+import React, { useContext } from 'react';
+import { MainContext } from '../../../Main/Main';
 import {
   validateAwsRegion,
   validateEmail,
+  validateRoleArn,
   validateSenderName,
 } from '../../utils/validationHelper';
 
@@ -37,6 +39,7 @@ interface CreateSESSenderFormProps {
 }
 
 export function CreateSESSenderForm(props: CreateSESSenderFormProps) {
+  const mainStateContext = useContext(MainContext)!;
   return (
     <>
       <EuiFormRow
@@ -70,7 +73,7 @@ export function CreateSESSenderForm(props: CreateSESSenderFormProps) {
         isInvalid={props.inputErrors.email.length > 0}
       >
         <EuiFieldText
-        fullWidth
+          fullWidth
           placeholder="name@example.com"
           data-test-subj="create-ses-sender-form-email-input"
           value={props.email}
@@ -89,7 +92,16 @@ export function CreateSESSenderForm(props: CreateSESSenderFormProps) {
       <EuiFlexGroup gutterSize="s" style={{ maxWidth: '658px' }}>
         <EuiFlexItem grow={6}>
           <EuiFormRow
-            label="Role ARN"
+            label={
+              mainStateContext.tooltipSupport ? (
+                <span>
+                  IAM Role ARN -{' '}
+                  <i style={{ fontWeight: 'normal' }}>optional</i>
+                </span>
+              ) : (
+                'IAM Role ARN'
+              )
+            }
             error={props.inputErrors.roleArn.join(' ')}
             isInvalid={props.inputErrors.roleArn.length > 0}
           >
@@ -100,10 +112,12 @@ export function CreateSESSenderForm(props: CreateSESSenderFormProps) {
               onChange={(e) => props.setRoleArn(e.target.value)}
               isInvalid={props.inputErrors.roleArn.length > 0}
               onBlur={() => {
-                props.setInputErrors({
-                  ...props.inputErrors,
-                  roleArn: [],
-                });
+                if (!mainStateContext.tooltipSupport) {
+                  props.setInputErrors({
+                    ...props.inputErrors,
+                    roleArn: validateRoleArn(props.roleArn),
+                  });
+                }
               }}
             />
           </EuiFormRow>

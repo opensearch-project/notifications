@@ -107,7 +107,7 @@ export function CreateChannel(props: CreateChannelsProps) {
 
   const channelTypeOptions: Array<EuiSuperSelectOption<
     keyof typeof CHANNEL_TYPE
-  >> = Object.entries(mainStateContext.availableFeatures).map(
+  >> = Object.entries(mainStateContext.availableChannels).map(
     ([key, value]) => ({
       value: key as keyof typeof CHANNEL_TYPE,
       inputDisplay: value,

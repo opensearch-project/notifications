@@ -205,7 +205,8 @@ export default class NotificationService {
         channelTypes[channel] = CHANNEL_TYPE[channel];
       }
       return {
-        availableFeatures: channelTypes,
+        availableChannels: channelTypes,
+        availableConfigTypes: config_type_list as string[],
         tooltipSupport:
           _.get(response, [
             'plugin_features',

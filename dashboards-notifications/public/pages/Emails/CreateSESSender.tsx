@@ -102,7 +102,7 @@ export function CreateSESSender(props: CreateSESSenderProps) {
   return (
     <>
       <EuiTitle size="l">
-        <h1>{`${props.edit ? 'Edit' : 'Create'} sender`}</h1>
+        <h1>{`${props.edit ? 'Edit' : 'Create'} SES sender`}</h1>
       </EuiTitle>
 
       <EuiSpacer />

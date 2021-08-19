@@ -58,7 +58,7 @@ export const ChannelControls = (props: ChannelControlsProps) => {
   ]);
   const [isTypePopoverOpen, setIsTypePopoverOpen] = useState(false);
   const [typeItems, setTypeItems] = useState(
-    Object.entries(mainStateContext.availableFeatures).map(([key, value]) => ({
+    Object.entries(mainStateContext.availableChannels).map(([key, value]) => ({
       field: key,
       display: value,
       checked: 'off',
@@ -76,10 +76,10 @@ export const ChannelControls = (props: ChannelControlsProps) => {
   useEffect(() => {
     const newItems = typeItems.filter(
       ({ field }) =>
-        !!mainStateContext.availableFeatures[field as keyof typeof CHANNEL_TYPE]
+        !!mainStateContext.availableChannels[field as keyof typeof CHANNEL_TYPE]
     );
     if (newItems.length !== typeItems.length) setTypeItems(newItems);
-  }, [mainStateContext.availableFeatures]);
+  }, [mainStateContext.availableChannels]);
 
   function updateItem(
     items: Array<{ field: string; display: string; checked: string }>,

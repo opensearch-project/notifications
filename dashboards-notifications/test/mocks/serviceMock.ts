@@ -54,7 +54,7 @@ const notificationServiceMock = {
 };
 
 const mainStateMock: MainState = {
-  availableFeatures: CHANNEL_TYPE,
+  availableChannels: CHANNEL_TYPE,
   tooltipSupport: true,
 };
 
