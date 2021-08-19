@@ -41,7 +41,6 @@ import queryString from 'query-string';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { SERVER_DELAY } from '../../../common';
-import { SenderType } from '../../../models/interfaces';
 import { ContentPanel } from '../../components/ContentPanel';
 import { CoreServicesContext } from '../../components/coreServices';
 import { ServicesContext } from '../../services';
@@ -119,7 +118,7 @@ export function CreateChannel(props: CreateChannelsProps) {
   const [slackWebhook, setSlackWebhook] = useState('');
   const [chimeWebhook, setChimeWebhook] = useState('');
 
-  const [senderType, setSenderType] = useState<SenderType>('smtp_account');
+  const [senderType, setSenderType] = useState<'smtp' | 'ses'>('smtp');
   const [selectedSmtpSenderOptions, setSelectedSmtpSenderOptions] = useState<
     Array<EuiComboBoxOptionOption<string>>
   >([]);
@@ -144,7 +143,7 @@ export function CreateChannel(props: CreateChannelsProps) {
     { key: 'Content-Type', value: 'application/json' },
   ]);
   const [topicArn, setTopicArn] = useState(''); // SNS topic ARN
-  const [roleArn, setRoleArn] = useState(''); // IAM role ARN
+  const [roleArn, setRoleArn] = useState(''); // IAM role ARN (optional for ODFE)
 
   const [
     sourceCheckboxIdToSelectedMap,
@@ -213,7 +212,7 @@ export function CreateChannel(props: CreateChannelsProps) {
       } else if (type === BACKEND_CHANNEL_TYPE.EMAIL) {
         const emailObject = deconstructEmailObject(response.email!);
         setSenderType(emailObject.senderType)
-        if (emailObject.senderType === 'smtp_account') {
+        if (emailObject.senderType === 'smtp') {
           setSelectedSmtpSenderOptions(emailObject.selectedSenderOptions);
         } else {
           setSelectedSesSenderOptions(emailObject.selectedSenderOptions);
@@ -259,7 +258,7 @@ export function CreateChannel(props: CreateChannelsProps) {
     } else if (channelType === BACKEND_CHANNEL_TYPE.CHIME) {
       errors.chimeWebhook = validateWebhookURL(chimeWebhook);
     } else if (channelType === BACKEND_CHANNEL_TYPE.EMAIL) {
-      if (senderType === 'smtp_account') {
+      if (senderType === 'smtp') {
         errors.smtpSender = validateEmailSender(selectedSmtpSenderOptions);
       } else {
         errors.sesSender = validateEmailSender(selectedSesSenderOptions);
@@ -309,7 +308,7 @@ export function CreateChannel(props: CreateChannelsProps) {
         webhookHeaders
       );
     } else if (channelType === BACKEND_CHANNEL_TYPE.EMAIL) {
-      if (senderType === 'smtp_account') {
+      if (senderType === 'smtp') {
         config.email = constructEmailObject(
           selectedSmtpSenderOptions,
           selectedRecipientGroupOptions

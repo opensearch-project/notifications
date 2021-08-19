@@ -37,7 +37,6 @@ import {
   EuiSuperSelectOption,
 } from '@elastic/eui';
 import React, { useContext } from 'react';
-import { SenderType } from '../../../../../models/interfaces';
 import {
   ALERTING_DOCUMENTATION_LINK,
   ENCRYPTION_TYPE,
@@ -55,8 +54,8 @@ import {
 interface CreateSenderFormProps {
   senderName: string;
   setSenderName: (name: string) => void;
-  senderType: SenderType;
-  setSenderType: (senderType: SenderType) => void;
+  senderType: 'smtp' | 'ses';
+  setSenderType: (senderType: 'smtp' | 'ses') => void;
   email: string;
   setEmail: (email: string) => void;
   host: string;
@@ -112,22 +111,22 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
         <EuiRadioGroup
           options={[
             {
-              id: 'smtp_account',
+              id: 'smtp',
               label: 'SMTP sender',
             },
             {
-              id: 'ses_account',
+              id: 'ses',
               label: 'SES sender',
             },
           ]}
           idSelected={props.senderType}
-          onChange={(id) => props.setSenderType(id as SenderType)}
+          onChange={(id) => props.setSenderType(id as 'smtp' | 'ses')}
           name="sender type radio group"
         />
       </EuiFormRow>
 
       <EuiSpacer size="m" />
-      {props.senderType === 'smtp_account' ? (
+      {props.senderType === 'smtp' ? (
         <>
           <EuiFlexGroup gutterSize="s" style={{ maxWidth: '658px' }}>
             <EuiFlexItem grow={4}>

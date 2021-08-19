@@ -90,7 +90,7 @@ export class SendersTable extends Component<
       {
         field: 'from_address',
         name: 'Outbound email address',
-        sortable: false,
+        sortable: true,
         truncateText: true,
         width: '200px',
       },
@@ -286,11 +286,11 @@ export class SendersTable extends Component<
             selection={selection}
             noItemsMessage={
               <EuiEmptyPrompt
-                title={<h2>No senders to display</h2>}
+                title={<h2>No SMTP senders to display</h2>}
                 body="Set up an outbound email server by creating a sender. You will select a sender when configuring email channels."
                 actions={
                   <EuiButton href={`#${ROUTES.CREATE_SENDER}`}>
-                    Create sender
+                    Create SMTP sender
                   </EuiButton>
                 }
               />
