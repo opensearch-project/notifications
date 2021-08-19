@@ -1,0 +1,126 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ *
+ * Modifications Copyright OpenSearch Contributors. See
+ * GitHub history for details.
+ */
+
+/*
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ *
+ */
+
+
+buildscript {
+    ext {
+        opensearch_version = System.getProperty("opensearch.version", "1.1.0-SNAPSHOT")
+        // 1.0.0 -> 1.0.0.0, and 1.0.0-SNAPSHOT -> 1.0.0.0-SNAPSHOT
+        opensearch_build = opensearch_version.replaceAll(/(\.\d)([^\d]*)$/, '$1.0$2')
+        common_utils_version = System.getProperty("common_utils.version", opensearch_build)
+        kotlin_version = System.getProperty("kotlin.version", "1.4.32")
+        junit_version = System.getProperty("junit.version", "5.7.2")
+        aws_version = System.getProperty("aws.version", "1.12.48")
+    }
+
+    repositories {
+        // For local publish dependency
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.opensearch.gradle:build-tools:${opensearch_version}"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:${kotlin_version}"
+        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.17.1"
+        classpath "org.jacoco:org.jacoco.agent:0.8.5"
+    }
+}
+
+apply plugin: 'base'
+apply plugin: 'jacoco'
+apply plugin: 'io.gitlab.arturbosch.detekt'
+apply from: 'build-tools/merged-coverage.gradle'
+
+ext {
+    isSnapshot = "true" == System.getProperty("build.snapshot", "true")    
+}
+
+allprojects {
+    version = "${opensearch_version}" - "-SNAPSHOT" + ".0"
+    if (isSnapshot) {
+        version += "-SNAPSHOT"
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+    group = "org.opensearch"
+    plugins.withId('java') {
+        sourceCompatibility = targetCompatibility = "1.8"
+    }
+    plugins.withId('org.jetbrains.kotlin.jvm') {
+        compileKotlin.kotlinOptions.jvmTarget = compileTestKotlin.kotlinOptions.jvmTarget = "1.8"
+        compileKotlin.dependsOn ktlint
+    }
+}
+
+configurations {
+    ktlint
+}
+
+dependencies {
+    add("ktlint", "com.pinterest:ktlint:0.41.0") {
+        attributes {
+            attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling, Bundling.EXTERNAL))
+        }
+    }
+}
+
+task ktlint(type: JavaExec, group: "verification") {
+    description = "Check Kotlin code style."
+    main = "com.pinterest.ktlint.Main"
+    classpath = configurations.ktlint
+    args "notifications/**/*.kt", "spi/**/*.kt"
+    // to generate report in checkstyle format prepend following args:
+    // "--reporter=plain", "--reporter=checkstyle,output=${buildDir}/ktlint.xml"
+    // see https://github.com/pinterest/ktlint#usage for more
+}
+
+task ktlintFormat(type: JavaExec, group: "formatting") {
+    description = "Fix Kotlin code style deviations."
+    main = "com.pinterest.ktlint.Main"
+    classpath = configurations.ktlint
+    args "-F", "notifications/**/*.kt", "spi/**/*.kt"
+}
+
+detekt {
+    config = files("detekt.yml")
+    buildUponDefaultConfig = true
+    parallel = true
+}
+
+check.dependsOn ktlint
+
+evaluationDependsOnChildren()
+
+check.dependsOn subprojects*.check
+

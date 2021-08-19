@@ -1,0 +1,21 @@
+.DS_Store
+
+*.iml
+.gradle
+out
+local-test
+.local-*
+
+npm-debug.log*
+node_modules
+/build/
+/public/app.css
+.idea/
+.vscode/
+yarn-error.log
+/coverage/
+.history/
+.eslintcache
+
+# Kibana
+.empty

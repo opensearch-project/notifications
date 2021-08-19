@@ -1,0 +1,427 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<TableFlyout /> spec renders the component 1`] = `
+<div>
+  <div
+    aria-hidden="true"
+    data-aria-hidden="true"
+    data-focus-guard="true"
+    style="width: 1px; height: 0px; padding: 0px; overflow: hidden; position: fixed; top: 1px; left: 1px;"
+    tabindex="0"
+  />
+  <div
+    aria-hidden="true"
+    data-aria-hidden="true"
+    data-focus-guard="true"
+    style="width: 1px; height: 0px; padding: 0px; overflow: hidden; position: fixed; top: 1px; left: 1px;"
+    tabindex="1"
+  />
+  <div
+    data-focus-lock-disabled="false"
+  >
+    <div
+      class="euiFlyout euiFlyout--small"
+      role="dialog"
+      tabindex="0"
+    >
+      <button
+        aria-label="Close this dialog"
+        class="euiButtonIcon euiButtonIcon--text euiFlyout__closeButton"
+        data-test-subj="euiFlyoutCloseButton"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonIcon__icon"
+          focusable="false"
+          height="16"
+          role="img"
+          viewBox="0 0 16 16"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        />
+      </button>
+      <div
+        class="euiFlyoutHeader euiFlyoutHeader--hasBorder"
+      >
+        <h2
+          class="euiTitle euiTitle--medium"
+        >
+          Notification details
+        </h2>
+      </div>
+      <div
+        class="euiFlyoutBody"
+      >
+        <div
+          class="euiFlyoutBody__overflow"
+        >
+          <div
+            class="euiFlyoutBody__overflowContent"
+          >
+            <dl
+              class="euiDescriptionList euiDescriptionList--row"
+            >
+              <dt
+                class="euiDescriptionList__title"
+              >
+                Notification
+              </dt>
+              <dd
+                class="euiDescriptionList__description"
+              >
+                test notification
+              </dd>
+            </dl>
+            <div
+              class="euiSpacer euiSpacer--l"
+            />
+            <div
+              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+            >
+              <div
+                class="euiFlexItem"
+              >
+                <dl
+                  class="euiDescriptionList euiDescriptionList--row"
+                >
+                  <dt
+                    class="euiDescriptionList__title"
+                  >
+                    Source
+                  </dt>
+                  <dd
+                    class="euiDescriptionList__description"
+                  >
+                    <a
+                      class="euiLink euiLink--primary"
+                      href="reports-dashboards#/report_details/reference_id"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      Report
+                      <svg
+                        aria-hidden="true"
+                        aria-label="External link"
+                        class="euiIcon euiIcon--small euiIcon-isLoading euiLink__externalIcon"
+                        focusable="false"
+                        height="16"
+                        role="img"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      />
+                    </a>
+                  </dd>
+                </dl>
+              </div>
+              <div
+                class="euiFlexItem"
+              >
+                <dl
+                  class="euiDescriptionList euiDescriptionList--row"
+                >
+                  <dt
+                    class="euiDescriptionList__title"
+                  >
+                    Source type
+                  </dt>
+                  <dd
+                    class="euiDescriptionList__description"
+                  >
+                    Reporting
+                  </dd>
+                </dl>
+              </div>
+            </div>
+            <div
+              class="euiSpacer euiSpacer--l"
+            />
+            <dl
+              class="euiDescriptionList euiDescriptionList--row"
+            >
+              <dt
+                class="euiDescriptionList__title"
+              >
+                Time sent
+              </dt>
+              <dd
+                class="euiDescriptionList__description"
+              >
+                06/07/21 4:53 pm GMT
+              </dd>
+            </dl>
+            <div
+              class="euiSpacer euiSpacer--l"
+            />
+            <h4
+              class="euiTitle euiTitle--xsmall"
+            >
+              Channels sent
+            </h4>
+            <div>
+              <div
+                class="euiSpacer euiSpacer--s"
+              />
+              <div
+                class="euiCard euiCard--paddingMedium euiCard--leftAligned euiCard--hasChildren"
+              >
+                <div
+                  class="euiCard__content"
+                >
+                  <span
+                    class="euiTitle euiTitle--xsmall euiCard__title"
+                    id="random_html_idTitle"
+                  >
+                    <button
+                      class="euiLink euiLink--primary"
+                      type="button"
+                    >
+                      slack test
+                    </button>
+                  </span>
+                  <div
+                    class="euiText euiText--small euiCard__description"
+                    id="random_html_idDescription"
+                  >
+                    <p />
+                  </div>
+                  <div
+                    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+                  >
+                    <div
+                      class="euiFlexItem"
+                    >
+                      <dl
+                        class="euiDescriptionList euiDescriptionList--row"
+                      >
+                        <dt
+                          class="euiDescriptionList__title"
+                          style="color: rgb(105, 112, 125); font-size: 0.6875rem; font-weight: normal;"
+                        >
+                          Channel type
+                        </dt>
+                        <dd
+                          class="euiDescriptionList__description"
+                        >
+                          Slack
+                        </dd>
+                      </dl>
+                    </div>
+                    <div
+                      class="euiFlexItem"
+                    >
+                      <dl
+                        class="euiDescriptionList euiDescriptionList--row"
+                      >
+                        <dt
+                          class="euiDescriptionList__title"
+                          style="color: rgb(105, 112, 125); font-size: 0.6875rem; font-weight: normal;"
+                        >
+                          Sent status
+                        </dt>
+                        <dd
+                          class="euiDescriptionList__description"
+                        >
+                          <div
+                            class="euiHealth"
+                          >
+                            <div
+                              class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                            >
+                              <div
+                                class="euiFlexItem euiFlexItem--flexGrowZero"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="euiIcon euiIcon--medium euiIcon--success euiIcon-isLoading"
+                                  focusable="false"
+                                  height="16"
+                                  role="img"
+                                  viewBox="0 0 16 16"
+                                  width="16"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                />
+                              </div>
+                              <div
+                                class="euiFlexItem euiFlexItem--flexGrowZero"
+                              >
+                                <div
+                                  class="euiText euiText--small"
+                                >
+                                  Sent
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </dd>
+                      </dl>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div
+                class="euiSpacer euiSpacer--s"
+              />
+              <div
+                class="euiCard euiCard--paddingMedium euiCard--leftAligned euiCard--hasChildren"
+              >
+                <div
+                  class="euiCard__content"
+                >
+                  <span
+                    class="euiTitle euiTitle--xsmall euiCard__title"
+                    id="random_html_idTitle"
+                  >
+                    <button
+                      class="euiLink euiLink--primary"
+                      type="button"
+                    >
+                      emailtest
+                    </button>
+                  </span>
+                  <div
+                    class="euiText euiText--small euiCard__description"
+                    id="random_html_idDescription"
+                  >
+                    <p />
+                  </div>
+                  <div
+                    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+                  >
+                    <div
+                      class="euiFlexItem"
+                    >
+                      <dl
+                        class="euiDescriptionList euiDescriptionList--row"
+                      >
+                        <dt
+                          class="euiDescriptionList__title"
+                          style="color: rgb(105, 112, 125); font-size: 0.6875rem; font-weight: normal;"
+                        >
+                          Channel type
+                        </dt>
+                        <dd
+                          class="euiDescriptionList__description"
+                        >
+                          Email
+                        </dd>
+                      </dl>
+                    </div>
+                    <div
+                      class="euiFlexItem"
+                    >
+                      <dl
+                        class="euiDescriptionList euiDescriptionList--row"
+                      >
+                        <dt
+                          class="euiDescriptionList__title"
+                          style="color: rgb(105, 112, 125); font-size: 0.6875rem; font-weight: normal;"
+                        >
+                          Sent status
+                        </dt>
+                        <dd
+                          class="euiDescriptionList__description"
+                        >
+                          <div
+                            class="euiHealth"
+                          >
+                            <div
+                              class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                            >
+                              <div
+                                class="euiFlexItem euiFlexItem--flexGrowZero"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="euiIcon euiIcon--medium euiIcon--danger euiIcon-isLoading"
+                                  focusable="false"
+                                  height="16"
+                                  role="img"
+                                  viewBox="0 0 16 16"
+                                  width="16"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                />
+                              </div>
+                              <div
+                                class="euiFlexItem euiFlexItem--flexGrowZero"
+                              >
+                                <div
+                                  class="euiText euiText--small"
+                                >
+                                  Error
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </dd>
+                      </dl>
+                    </div>
+                  </div>
+                  <dl
+                    class="euiDescriptionList euiDescriptionList--row"
+                  >
+                    <dt
+                      class="euiDescriptionList__title"
+                      style="color: rgb(105, 112, 125); font-size: 0.6875rem; font-weight: normal;"
+                    >
+                      Error details
+                    </dt>
+                    <dd
+                      class="euiDescriptionList__description"
+                    >
+                      <div
+                        class="euiText euiText--small"
+                        style="line-break: anywhere;"
+                      >
+                        failed
+                      </div>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiFlyoutFooter"
+      >
+        <button
+          class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--flushLeft"
+          type="button"
+        >
+          <span
+            class="euiButtonContent euiButtonEmpty__content"
+          >
+            <svg
+              aria-hidden="true"
+              class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+              focusable="false"
+              height="16"
+              role="img"
+              viewBox="0 0 16 16"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            />
+            <span
+              class="euiButtonEmpty__text"
+            >
+              Close
+            </span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div
+    aria-hidden="true"
+    data-aria-hidden="true"
+    data-focus-guard="true"
+    style="width: 1px; height: 0px; padding: 0px; overflow: hidden; position: fixed; top: 1px; left: 1px;"
+    tabindex="0"
+  />
+</div>
+`;

@@ -1,0 +1,87 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+# Modifications Copyright OpenSearch Contributors. See
+# GitHub history for details.
+
+name: Test and Build Dashboards Notifications
+
+on: [pull_request, push]
+
+env:
+  PLUGIN_NAME: notifications-dashboards
+  OPENSEARCH_DASHBOARDS_VERSION: '1.0'
+  OPENSEARCH_PLUGIN_VERSION: 1.0.0.0
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Plugin
+        uses: actions/checkout@v1
+
+      - name: Checkout OpenSearch Dashboards
+        uses: actions/checkout@v1
+        with:
+          repository: opensearch-project/Opensearch-Dashboards
+          ref: ${{ env.OPENSEARCH_DASHBOARDS_VERSION }}
+          path: notifications/OpenSearch-Dashboards
+
+      - name: Get node and yarn versions
+        id: versions_step
+        run: |
+          echo "::set-output name=node_version::$(node -p "(require('./OpenSearch-Dashboards/package.json').engines.node).match(/[.0-9]+/)[0]")"
+          echo "::set-output name=yarn_version::$(node -p "(require('./OpenSearch-Dashboards/package.json').engines.yarn).match(/[.0-9]+/)[0]")"
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ steps.versions_step.outputs.node_version }}
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install correct yarn version for OpenSearch Dashboards
+        run: |
+          npm uninstall -g yarn
+          echo "Installing yarn ${{ steps.versions_step.outputs.yarn_version }}"
+          npm i -g yarn@${{ steps.versions_step.outputs.yarn_version }}
+
+      - name: Move Notifications to Plugins Dir
+        run: mv dashboards-notifications OpenSearch-Dashboards/plugins/dashboards-notifications
+
+      - name: OpenSearch Dashboards Pluign Bootstrap
+        run: |
+          cd OpenSearch-Dashboards/plugins/dashboards-notifications
+          yarn osd bootstrap
+
+      - name: Test
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 30
+          max_attempts: 1
+          command: cd OpenSearch-Dashboards/plugins/dashboards-notifications; yarn test --coverage
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          flags: dashboards-notifications
+          directory: OpenSearch-Dashboards/plugins/
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Build Artifact
+        run: |
+          cd OpenSearch-Dashboards/plugins/dashboards-notifications
+          yarn build
+          mv ./build/*.zip ./build/${{ env.PLUGIN_NAME }}-${{ env.OPENSEARCH_PLUGIN_VERSION }}.zip
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: dashboards-notifications
+          path: OpenSearch-Dashboards/plugins/dashboards-notifications/build
+

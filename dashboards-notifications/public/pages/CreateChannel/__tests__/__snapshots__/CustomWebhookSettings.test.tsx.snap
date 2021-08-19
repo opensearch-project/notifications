@@ -1,0 +1,265 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<CustomWebhookSettings /> spec renders the component 1`] = `
+<div
+  class="euiFormRow"
+  id="random_html_id-row"
+  style="max-width: 700px;"
+>
+  <div
+    class="euiFormRow__labelWrapper"
+  >
+    <label
+      class="euiFormLabel euiFormRow__label"
+      for="random_html_id"
+    >
+      Define endpoints by
+    </label>
+  </div>
+  <div
+    class="euiFormRow__fieldWrapper"
+  >
+    <div
+      id="random_html_id"
+    >
+      <div
+        class="euiRadio euiRadioGroup__item"
+      >
+        <input
+          class="euiRadio__input"
+          id="WEBHOOK_URL"
+          type="radio"
+          value=""
+        />
+        <div
+          class="euiRadio__circle"
+        />
+        <label
+          class="euiRadio__label"
+          for="WEBHOOK_URL"
+        >
+          Webhook URL
+        </label>
+      </div>
+      <div
+        class="euiRadio euiRadioGroup__item"
+      >
+        <input
+          checked=""
+          class="euiRadio__input"
+          id="CUSTOM_URL"
+          type="radio"
+          value=""
+        />
+        <div
+          class="euiRadio__circle"
+        />
+        <label
+          class="euiRadio__label"
+          for="CUSTOM_URL"
+        >
+          Custom attributes URL with HTTPS
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<CustomWebhookSettings /> spec renders the component 2`] = `
+<div
+  class="euiFormRow"
+  id="random_html_id-row"
+  style="max-width: 700px;"
+>
+  <div
+    class="euiFormRow__labelWrapper"
+  >
+    <label
+      class="euiFormLabel euiFormRow__label"
+      for="random_html_id"
+    >
+      Define endpoints by
+    </label>
+  </div>
+  <div
+    class="euiFormRow__fieldWrapper"
+  >
+    <div
+      id="random_html_id"
+    >
+      <div
+        class="euiRadio euiRadioGroup__item"
+      >
+        <input
+          checked=""
+          class="euiRadio__input"
+          id="WEBHOOK_URL"
+          type="radio"
+          value=""
+        />
+        <div
+          class="euiRadio__circle"
+        />
+        <label
+          class="euiRadio__label"
+          for="WEBHOOK_URL"
+        >
+          Webhook URL
+        </label>
+      </div>
+      <div
+        class="euiRadio euiRadioGroup__item"
+      >
+        <input
+          class="euiRadio__input"
+          id="CUSTOM_URL"
+          type="radio"
+          value=""
+        />
+        <div
+          class="euiRadio__circle"
+        />
+        <label
+          class="euiRadio__label"
+          for="CUSTOM_URL"
+        >
+          Custom attributes URL with HTTPS
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<CustomWebhookSettings /> spec renders the component with errors 1`] = `
+<div
+  class="euiFormRow"
+  id="random_html_id-row"
+  style="max-width: 700px;"
+>
+  <div
+    class="euiFormRow__labelWrapper"
+  >
+    <label
+      class="euiFormLabel euiFormRow__label"
+      for="random_html_id"
+    >
+      Define endpoints by
+    </label>
+  </div>
+  <div
+    class="euiFormRow__fieldWrapper"
+  >
+    <div
+      id="random_html_id"
+    >
+      <div
+        class="euiRadio euiRadioGroup__item"
+      >
+        <input
+          class="euiRadio__input"
+          id="WEBHOOK_URL"
+          type="radio"
+          value=""
+        />
+        <div
+          class="euiRadio__circle"
+        />
+        <label
+          class="euiRadio__label"
+          for="WEBHOOK_URL"
+        >
+          Webhook URL
+        </label>
+      </div>
+      <div
+        class="euiRadio euiRadioGroup__item"
+      >
+        <input
+          checked=""
+          class="euiRadio__input"
+          id="CUSTOM_URL"
+          type="radio"
+          value=""
+        />
+        <div
+          class="euiRadio__circle"
+        />
+        <label
+          class="euiRadio__label"
+          for="CUSTOM_URL"
+        >
+          Custom attributes URL with HTTPS
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<CustomWebhookSettings /> spec renders the component with errors 2`] = `
+<div
+  class="euiFormRow"
+  id="random_html_id-row"
+  style="max-width: 700px;"
+>
+  <div
+    class="euiFormRow__labelWrapper"
+  >
+    <label
+      class="euiFormLabel euiFormRow__label"
+      for="random_html_id"
+    >
+      Define endpoints by
+    </label>
+  </div>
+  <div
+    class="euiFormRow__fieldWrapper"
+  >
+    <div
+      id="random_html_id"
+    >
+      <div
+        class="euiRadio euiRadioGroup__item"
+      >
+        <input
+          checked=""
+          class="euiRadio__input"
+          id="WEBHOOK_URL"
+          type="radio"
+          value=""
+        />
+        <div
+          class="euiRadio__circle"
+        />
+        <label
+          class="euiRadio__label"
+          for="WEBHOOK_URL"
+        >
+          Webhook URL
+        </label>
+      </div>
+      <div
+        class="euiRadio euiRadioGroup__item"
+      >
+        <input
+          class="euiRadio__input"
+          id="CUSTOM_URL"
+          type="radio"
+          value=""
+        />
+        <div
+          class="euiRadio__circle"
+        />
+        <label
+          class="euiRadio__label"
+          for="CUSTOM_URL"
+        >
+          Custom attributes URL with HTTPS
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+`;

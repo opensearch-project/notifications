@@ -1,0 +1,246 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ChannelDetails/> spec renders a specific channel 1`] = `
+<div>
+  <div
+    aria-live="polite"
+    class="euiGlobalToastList euiGlobalToastList--right"
+    role="region"
+  />
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+    style="max-width: 1316px;"
+  >
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
+      >
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+        >
+          <h1
+            class="euiTitle euiTitle--large"
+          >
+            -
+          </h1>
+        </div>
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+          style="padding-bottom: 5px;"
+        />
+      </div>
+    </div>
+    <div
+      class="euiFlexItem"
+    />
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    />
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    />
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+  <div
+    class="euiPanel euiPanel--paddingMedium"
+    style="max-width: 1300px;"
+  >
+    <div
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
+      style="padding: 0px 0px;"
+    >
+      <div
+        class="euiFlexItem"
+      >
+        <h3
+          class="euiTitle euiTitle--small"
+        >
+          Name and description
+        </h3>
+      </div>
+    </div>
+    <hr
+      class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginSmall"
+    />
+    <div
+      style="padding: initial;"
+    >
+      <div>
+        <div
+          class="euiSpacer euiSpacer--s"
+        />
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        >
+          <div
+            class="euiFlexItem"
+          >
+            <dl
+              class="euiDescriptionList euiDescriptionList--row"
+              style="word-break: break-word; white-space: pre-line;"
+            >
+              <dt
+                class="euiDescriptionList__title"
+              >
+                Channel name
+              </dt>
+              <dd
+                class="euiDescriptionList__description"
+              >
+                -
+              </dd>
+            </dl>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
+            <dl
+              class="euiDescriptionList euiDescriptionList--row"
+              style="word-break: break-word; white-space: pre-line;"
+            >
+              <dt
+                class="euiDescriptionList__title"
+              >
+                Description
+              </dt>
+              <dd
+                class="euiDescriptionList__description"
+              >
+                -
+              </dd>
+            </dl>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
+            <dl
+              class="euiDescriptionList euiDescriptionList--row"
+              style="word-break: break-word; white-space: pre-line;"
+            >
+              <dt
+                class="euiDescriptionList__title"
+              >
+                Last updated
+              </dt>
+              <dd
+                class="euiDescriptionList__description"
+              >
+                -
+              </dd>
+            </dl>
+          </div>
+        </div>
+        <div
+          class="euiSpacer euiSpacer--m"
+        />
+      </div>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+  <div
+    class="euiPanel euiPanel--paddingMedium"
+    style="max-width: 1300px;"
+  >
+    <div
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
+      style="padding: 0px 0px;"
+    >
+      <div
+        class="euiFlexItem"
+      >
+        <h3
+          class="euiTitle euiTitle--small"
+        >
+          Configurations
+        </h3>
+      </div>
+    </div>
+    <hr
+      class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginSmall"
+    />
+    <div
+      style="padding: initial;"
+    />
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+  <div
+    class="euiPanel euiPanel--paddingMedium"
+    style="max-width: 1300px;"
+  >
+    <div
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
+      style="padding: 0px 0px;"
+    >
+      <div
+        class="euiFlexItem"
+      >
+        <h3
+          class="euiTitle euiTitle--small"
+        >
+          Availability
+        </h3>
+      </div>
+    </div>
+    <hr
+      class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginSmall"
+    />
+    <div
+      style="padding: initial;"
+    >
+      <div>
+        <div
+          class="euiSpacer euiSpacer--s"
+        />
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        >
+          <div
+            class="euiFlexItem"
+          >
+            <dl
+              class="euiDescriptionList euiDescriptionList--row"
+              style="word-break: break-word; white-space: pre-line;"
+            >
+              <dt
+                class="euiDescriptionList__title"
+              >
+                Notification sources
+              </dt>
+              <dd
+                class="euiDescriptionList__description"
+              >
+                -
+              </dd>
+            </dl>
+          </div>
+          <div
+            class="euiFlexItem"
+          />
+          <div
+            class="euiFlexItem"
+          />
+        </div>
+        <div
+          class="euiSpacer euiSpacer--m"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ChannelDetails/> spec renders the component 1`] = `
+<div
+  aria-live="polite"
+  class="euiGlobalToastList euiGlobalToastList--right"
+  role="region"
+/>
+`;
