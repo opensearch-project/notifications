@@ -121,28 +121,31 @@ export default class NotificationService {
       ...channel.email.email_group_id_list,
     ];
     let senderType: SenderType;
-    await this.getConfigs({
-      from_index: 0,
-      max_items: ids.length,
-      config_id_list: ids,
-      sort_order: SortDirection.ASC,
-      sort_field: 'name',
-      config_type: ['smtp_account', 'ses_account', 'email_group'],
-    }).then((response) => {
-      response.config_list.map((config) => {
-        if (config.config_id === channel.email?.email_account_id)
-          senderType = config.config.config_type;
-        idMap[config.config_id] = config.config.name;
+    try {
+      await this.getConfigs({
+        from_index: 0,
+        max_items: ids.length,
+        config_id_list: ids,
+        sort_order: SortDirection.ASC,
+        sort_field: 'name',
+        config_type: ['smtp_account', 'ses_account', 'email_group'],
+      }).then((response) => {
+        response.config_list.map((config) => {
+          if (config.config_id === channel.email?.email_account_id)
+            senderType = config.config.config_type;
+          idMap[config.config_id] = config.config.name;
+        });
       });
-    });
 
-    channel.email.sender_type = senderType!;
-    channel.email.email_account_name = idMap[channel.email.email_account_id];
-    channel.email.email_group_id_map = {};
-    channel.email.email_group_id_list.map(
-      (id) => (channel.email!.email_group_id_map![id] = idMap[id])
-    );
-
+      channel.email.sender_type = senderType!;
+      channel.email.email_account_name = idMap[channel.email.email_account_id];
+      channel.email.email_group_id_map = {};
+      channel.email.email_group_id_list.map(
+        (id) => (channel.email!.email_group_id_map![id] = idMap[id])
+      );
+    } catch (error) {
+      // TODO: some configs do not exist and request failed, need to request separately
+    }
     return channel;
   };
 
