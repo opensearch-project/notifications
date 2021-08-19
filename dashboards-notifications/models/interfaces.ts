@@ -104,17 +104,11 @@ interface ConfigType {
 }
 
 export interface SenderItemType extends ConfigType {
-  from_address: string; // outbound email address
-  smtp_account?: {
-    from_address: string;
+  smtp_account: {
+    from_address: string; // outbound email address
     host: string;
     port: string;
     method: keyof typeof ENCRYPTION_TYPE;
-  };
-  ses_account?: {
-    from_address: string;
-    region: string;
-    role_arn?: string;
   };
 }
 

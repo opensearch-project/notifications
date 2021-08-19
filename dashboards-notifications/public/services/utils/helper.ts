@@ -37,15 +37,7 @@ export const configToSender = (config: any): SenderItemType => {
     config_id: config.config_id,
     created_time_ms: config.created_time_ms,
     last_updated_time_ms: config.last_updated_time_ms,
-    ...(config.config.config_type === 'smtp_account'
-      ? {
-          from_address: config.config.smtp_account.from_address,
-          smtp_account: config.config.smtp_account,
-        }
-      : {
-          from_address: config.config.ses_account.from_address,
-          ses_account: config.config.ses_account,
-        }),
+    smtp_account: config.config.smtp_account,
   };
 };
 
@@ -91,8 +83,8 @@ export const isStatusCodeSuccess = (statusCode: string) => {
 };
 
 export const eventToNotification = (event: any): NotificationItem => {
-  const success = event.event.status_list.every((status: any) =>
-    isStatusCodeSuccess(status.delivery_status.status_code)
+  const success = event.event.status_list.every(
+    (status: any) => isStatusCodeSuccess(status.delivery_status.status_code)
   );
   return {
     event_source: event.event.event_source,
