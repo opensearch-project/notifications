@@ -52,8 +52,8 @@ describe('<EmailSettings /> spec', () => {
           >
             <EmailSettings
               isAmazonSES={false}
-              selectedSmtpSenderOptions={[]}
-              setSelectedSmtpSenderOptions={setSelectedSenderOptions}
+              selectedSenderOptions={[]}
+              setSelectedSenderOptions={setSelectedSenderOptions}
               selectedRecipientGroupOptions={[]}
               setSelectedRecipientGroupOptions={
                 setSelectedRecipientGroupOptions

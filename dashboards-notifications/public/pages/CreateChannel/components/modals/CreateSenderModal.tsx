@@ -36,17 +36,21 @@ import {
   EuiOverlayMask,
 } from '@elastic/eui';
 import React, { useContext, useState } from 'react';
+import { SenderType } from '../../../../../models/interfaces';
 import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
 import { ENCRYPTION_TYPE } from '../../../../utils/constants';
 import { CreateSenderForm } from '../../../Emails/components/forms/CreateSenderForm';
 import { createSenderConfigObject } from '../../../Emails/utils/helper';
 import {
+  validateAwsRegion,
   validateEmail,
   validateHost,
   validatePort,
+  validateRoleArn,
   validateSenderName,
 } from '../../../Emails/utils/validationHelper';
+import { MainContext } from '../../../Main/Main';
 
 interface CreateSenderModalProps extends ModalRootProps {
   addSenderOptionAndSelect: (
@@ -57,6 +61,9 @@ interface CreateSenderModalProps extends ModalRootProps {
 
 export function CreateSenderModal(props: CreateSenderModalProps) {
   const coreContext = useContext(CoreServicesContext)!;
+  const mainStateContext = useContext(MainContext)!;
+
+  const [senderType, setSenderType] = useState<SenderType>('smtp_account');
   const [senderName, setSenderName] = useState('');
   const [email, setEmail] = useState('');
   const [host, setHost] = useState('');
@@ -64,20 +71,35 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
   const [encryption, setEncryption] = useState<keyof typeof ENCRYPTION_TYPE>(
     Object.keys(ENCRYPTION_TYPE)[0] as keyof typeof ENCRYPTION_TYPE
   );
+  const [roleArn, setRoleArn] = useState('');
+  const [awsRegion, setAwsRegion] = useState('');
   const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>({
     senderName: [],
     email: [],
     host: [],
     port: [],
+    roleArn: [],
+    awsRegion: [],
   });
 
   const isInputValid = (): boolean => {
     const errors: { [key: string]: string[] } = {
       senderName: validateSenderName(senderName),
       email: validateEmail(email),
-      host: validateHost(host),
-      port: validatePort(port),
+      host: [],
+      port: [],
+      roleArn: [],
+      awsRegion: [],
     };
+    if (senderType === 'smtp_account') {
+      errors.host = validateHost(host);
+      errors.port = validatePort(port);
+    } else {
+      if (!mainStateContext.tooltipSupport) {
+        errors.roleArn = validateRoleArn(roleArn);
+      }
+      errors.awsRegion = validateAwsRegion(awsRegion);
+    }
     setInputErrors(errors);
     return !Object.values(errors).reduce(
       (errorFlag, error) => errorFlag || error.length > 0,
@@ -89,11 +111,13 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
     <EuiOverlayMask>
       <EuiModal onClose={props.onClose} style={{ width: 750 }}>
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Create SMTP sender</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>Create sender</EuiModalHeaderTitle>
         </EuiModalHeader>
 
         <EuiModalBody>
           <CreateSenderForm
+            senderType={senderType}
+            setSenderType={setSenderType}
             senderName={senderName}
             setSenderName={setSenderName}
             email={email}
@@ -104,6 +128,10 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
             setPort={setPort}
             encryption={encryption}
             setEncryption={setEncryption}
+            roleArn={roleArn}
+            setRoleArn={setRoleArn}
+            awsRegion={awsRegion}
+            setAwsRegion={setAwsRegion}
             inputErrors={inputErrors}
             setInputErrors={setInputErrors}
           />
@@ -122,11 +150,14 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
                 return;
               }
               const config = createSenderConfigObject(
+                senderType,
                 senderName,
                 host,
                 port,
                 encryption,
-                email
+                email,
+                roleArn,
+                awsRegion
               );
               await props.services.notificationService
                 .createConfig(config)

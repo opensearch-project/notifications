@@ -10,26 +10,40 @@
  */
 
 import { EuiComboBoxOptionOption } from '@elastic/eui';
+import { SenderType } from '../../../../models/interfaces';
 import { ENCRYPTION_TYPE, NOTIFICATION_SOURCE } from '../../../utils/constants';
 
 export const createSenderConfigObject = (
+  senderType: SenderType,
   senderName: string,
   host: string,
   port: string,
   encryption: keyof typeof ENCRYPTION_TYPE,
-  email: string
+  email: string,
+  roleArn: string,
+  awsRegion: string
 ) => {
   return {
     name: senderName,
     config_type: 'smtp_account',
     feature_list: Object.keys(NOTIFICATION_SOURCE),
     is_enabled: true,
-    smtp_account: {
-      host,
-      port,
-      method: encryption,
-      from_address: email,
-    },
+    ...(senderType === 'smtp_account'
+      ? {
+          smtp_account: {
+            host,
+            port,
+            method: encryption,
+            from_address: email,
+          },
+        }
+      : {
+          ses_account: {
+            from_address: email,
+            role_arn: roleArn,
+            region: awsRegion,
+          },
+        }),
   };
 };
 
