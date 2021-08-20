@@ -133,7 +133,7 @@ export class SESSendersTable extends Component<
       this.setState({ items: senders.items, total: senders.total });
     } catch (error) {
       this.props.coreContext.notifications.toasts.addDanger(
-        getErrorMessage(error, 'There was a problem loading SES senders.')
+        getErrorMessage(error, 'There was a problem loading senders.')
       );
     }
     this.setState({ loading: false });

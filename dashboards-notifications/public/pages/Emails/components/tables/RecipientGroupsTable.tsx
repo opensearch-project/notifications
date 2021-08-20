@@ -180,7 +180,7 @@ export class RecipientGroupsTable extends Component<
       });
     } catch (error) {
       this.props.coreContext.notifications.toasts.addDanger(
-        getErrorMessage(error, 'There was a problem loading senders.')
+        getErrorMessage(error, 'There was a problem loading recipient groups.')
       );
     }
     this.setState({ loading: false });
