@@ -4,6 +4,6 @@ exports[`<EmailGroups/> spec renders the component 1`] = `
 <h1
   class="euiTitle euiTitle--large"
 >
-  Email senders and recipient groups
+  Email recipient groups
 </h1>
 `;

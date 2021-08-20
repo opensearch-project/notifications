@@ -14,7 +14,7 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
       <h3
         class="euiTitle euiTitle--medium"
       >
-        Senders
+        SMTP senders
         <span
           style="color: rgb(159, 159, 159); font-weight: 300;"
         >
@@ -79,7 +79,7 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
             >
               <a
                 class="euiButton euiButton--primary euiButton--fill"
-                href="#/create-sender"
+                href="#/create-smtp-sender"
                 rel="noreferrer"
               >
                 <span
@@ -88,7 +88,7 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
                   <span
                     class="euiButton__text"
                   >
-                    Create sender
+                    Create SMTP sender
                   </span>
                 </span>
               </a>
@@ -427,7 +427,7 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
                         <h2
                           class="euiTitle euiTitle--medium"
                         >
-                          No senders to display
+                          No SMTP senders to display
                         </h2>
                         <div
                           class="euiSpacer euiSpacer--m"
@@ -446,7 +446,7 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
                       />
                       <a
                         class="euiButton euiButton--primary"
-                        href="#/create-sender"
+                        href="#/create-smtp-sender"
                         rel="noreferrer"
                       >
                         <span
@@ -455,7 +455,7 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
                           <span
                             class="euiButton__text"
                           >
-                            Create sender
+                            Create SMTP sender
                           </span>
                         </span>
                       </a>

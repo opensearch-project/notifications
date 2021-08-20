@@ -14,9 +14,13 @@ import { configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import React from 'react';
 import { MOCK_DATA } from '../../../../test/mocks/mockData';
-import { coreServicesMock } from '../../../../test/mocks/serviceMock';
+import {
+  coreServicesMock,
+  mainStateMock,
+} from '../../../../test/mocks/serviceMock';
 import { CoreServicesContext } from '../../../components/coreServices';
 import { ServicesContext } from '../../../services';
+import { MainContext } from '../../Main/Main';
 import { EmailSettings } from '../components/EmailSettings';
 import { CreateChannelContext } from '../CreateChannel';
 
@@ -38,35 +42,38 @@ describe('<EmailSettings /> spec', () => {
 
     const setSelectedSenderOptions = jest.fn();
     const setSelectedRecipientGroupOptions = jest.fn();
-    const setSesSender = jest.fn();
     const setInputErrors = jest.fn();
+    const setSenderType = jest.fn();
     const utils = render(
       <ServicesContext.Provider value={notificationServiceMock}>
         <CoreServicesContext.Provider value={coreServicesMock}>
-          <CreateChannelContext.Provider
-            value={{
-              edit: false,
-              inputErrors: { sesSender: [], sender: [], recipients: [] },
-              setInputErrors,
-            }}
-          >
-            <EmailSettings
-              isAmazonSES={false}
-              selectedSmtpSenderOptions={[]}
-              setSelectedSmtpSenderOptions={setSelectedSenderOptions}
-              selectedRecipientGroupOptions={[]}
-              setSelectedRecipientGroupOptions={
-                setSelectedRecipientGroupOptions
-              }
-              sesSender={''}
-              setSesSender={setSesSender}
-            />
-          </CreateChannelContext.Provider>
+          <MainContext.Provider value={mainStateMock}>
+            <CreateChannelContext.Provider
+              value={{
+                edit: false,
+                inputErrors: { sesSender: [], smtpSender: [], recipients: [] },
+                setInputErrors,
+              }}
+            >
+              <EmailSettings
+                senderType={'smtp_account'}
+                setSenderType={setSenderType}
+                selectedSmtpSenderOptions={[]}
+                setSelectedSmtpSenderOptions={setSelectedSenderOptions}
+                selectedSesSenderOptions={[]}
+                setSelectedSesSenderOptions={setSelectedSenderOptions}
+                selectedRecipientGroupOptions={[]}
+                setSelectedRecipientGroupOptions={
+                  setSelectedRecipientGroupOptions
+                }
+              />
+            </CreateChannelContext.Provider>
+          </MainContext.Provider>
         </CoreServicesContext.Provider>
       </ServicesContext.Provider>
     );
 
-    utils.getByText('Create sender').click();
+    utils.getByText('Create SMTP sender').click();
     utils.getByText('Create recipient group').click();
 
     await waitFor(() => {
