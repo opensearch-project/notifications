@@ -192,8 +192,8 @@ export function CreateChannel(props: CreateChannelsProps) {
             const channel = await servicesContext.notificationService.getEmailConfigDetails(
               response
             );
-            if (channel.email?.invalid_ids) {
-              coreContext.notifications.toasts.addWarning(
+            if (channel.email?.invalid_ids?.length) {
+              coreContext.notifications.toasts.addDanger(
                 'The sender and/or some recipient groups might have been deleted.'
               );
             }
