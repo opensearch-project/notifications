@@ -54,14 +54,14 @@ internal class SendTestNotificationAction @Inject constructor(
             message,
             channelIds,
             object : ActionListener<SendNotificationResponse> {
-                override fun onResponse(p0: SendNotificationResponse) {
-                    log.info("$LOG_PREFIX:SendTestNotificationAction-send:${p0.notificationId}")
-                    listener.onResponse(p0)
+                override fun onResponse(sendNotificationResponse: SendNotificationResponse) {
+                    log.info("$LOG_PREFIX:SendTestNotificationAction-send:${sendNotificationResponse.notificationId}")
+                    listener.onResponse(sendNotificationResponse)
                 }
 
-                override fun onFailure(p0: java.lang.Exception) {
-                    log.error("$LOG_PREFIX:SendTestNotificationAction-send Error:$p0")
-                    listener.onFailure(p0)
+                override fun onFailure(exception: Exception) {
+                    log.error("$LOG_PREFIX:SendTestNotificationAction-send Error:$exception")
+                    listener.onFailure(exception)
                 }
             }
         )
