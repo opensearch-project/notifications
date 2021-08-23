@@ -26,8 +26,9 @@ name: Test and Build Notifications
 on: [push, pull_request]
 
 env:
-  OPENSEARCH_VERSION: '1.0'
-  COMMON_UTILS_VERSION: '1.0'
+  OPENSEARCH_VERSION: '1.1.0-SNAPSHOT'
+  OPENSEARCH_BRANCH: '1.x'
+  COMMON_UTILS_BRANCH: 'main'
 
 jobs:
   build:
@@ -45,30 +46,31 @@ jobs:
         with:
           repository: 'opensearch-project/OpenSearch'
           path: OpenSearch
-          ref: ${{ env.OPENSEARCH_VERSION }}
+          ref: ${{ env.OPENSEARCH_BRANCH }}
       - name: Build OpenSearch
         working-directory: ./OpenSearch
-        run: ./gradlew publishToMavenLocal -Dbuild.snapshot=false
+        run: ./gradlew publishToMavenLocal
 
       # dependencies: common-utils
       - name: Checkout common-utils
         uses: actions/checkout@v2
         with:
           repository: 'opensearch-project/common-utils'
-          ref: ${{ env.COMMON_UTILS_VERSION }}
+          ref: ${{ env.COMMON_UTILS_BRANCH }}
           path: common-utils
       - name: Build common-utils
         working-directory: ./common-utils
-        run: ./gradlew publishToMavenLocal -Dopensearch.version=${{ env.OPENSEARCH_VERSION }}.0
+        run: ./gradlew publishToMavenLocal -Dopensearch.version=${{ env.OPENSEARCH_VERSION }}
 
       # notifications
       - name: Checkout Notifications
         uses: actions/checkout@v2
 
+      # Temporarily exclude tests which causing CI to fail. Tracking in #251
       - name: Build with Gradle
         run: |
           cd notifications
-          ./gradlew build -PexcludeTests="**/SesChannelIT*" -Dopensearch.version=${{ env.OPENSEARCH_VERSION }}.0
+          ./gradlew build -PexcludeTests="**/SesChannelIT*" -Dopensearch.version=${{ env.OPENSEARCH_VERSION }}
 
       - name: Upload coverage
         uses: codecov/codecov-action@v1

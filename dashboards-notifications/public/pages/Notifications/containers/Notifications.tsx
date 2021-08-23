@@ -198,13 +198,13 @@ export default class Notifications extends Component<
       const getNotificationsResponse = await services.eventService.getNotifications(
         queryObject
       );
-      const getHistogramResponse = await services.eventService.getHistogram(
-        queryObject
-      );
+      // const getHistogramResponse = await services.eventService.getHistogram(
+      //   queryObject
+      // );
       this.setState({
         items: getNotificationsResponse.items,
         total: getNotificationsResponse.total,
-        histogramData: getHistogramResponse,
+        // histogramData: getHistogramResponse,
       });
     } catch (err) {
       this.context.notifications.toasts.addDanger(

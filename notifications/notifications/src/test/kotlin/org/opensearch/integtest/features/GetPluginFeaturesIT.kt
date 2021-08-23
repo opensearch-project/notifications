@@ -42,7 +42,7 @@ class GetPluginFeaturesIT : PluginRestTestCase() {
         val configTypes = getResponse.get("config_type_list").asJsonArray.map { it.asString }
         if (configTypes.contains(ConfigType.EMAIL.tag)) {
             Assert.assertTrue(configTypes.contains(ConfigType.EMAIL_GROUP.tag))
-            Assert.assertTrue(configTypes.contains(ConfigType.SMTP_ACCOUNT.tag))
+            Assert.assertTrue(configTypes.contains(ConfigType.SMTP_ACCOUNT.tag) || configTypes.contains(ConfigType.SES_ACCOUNT.tag))
         }
     }
 }

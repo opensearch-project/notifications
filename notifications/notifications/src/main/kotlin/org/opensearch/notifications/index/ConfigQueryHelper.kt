@@ -41,13 +41,18 @@ import org.opensearch.commons.notifications.NotificationConstants.METHOD_TAG
 import org.opensearch.commons.notifications.NotificationConstants.NAME_TAG
 import org.opensearch.commons.notifications.NotificationConstants.QUERY_TAG
 import org.opensearch.commons.notifications.NotificationConstants.RECIPIENT_LIST_TAG
+import org.opensearch.commons.notifications.NotificationConstants.REGION_TAG
+import org.opensearch.commons.notifications.NotificationConstants.ROLE_ARN_TAG
+import org.opensearch.commons.notifications.NotificationConstants.TOPIC_ARN_TAG
 import org.opensearch.commons.notifications.NotificationConstants.UPDATED_TIME_TAG
 import org.opensearch.commons.notifications.NotificationConstants.URL_TAG
 import org.opensearch.commons.notifications.model.ConfigType.CHIME
 import org.opensearch.commons.notifications.model.ConfigType.EMAIL
 import org.opensearch.commons.notifications.model.ConfigType.EMAIL_GROUP
+import org.opensearch.commons.notifications.model.ConfigType.SES_ACCOUNT
 import org.opensearch.commons.notifications.model.ConfigType.SLACK
 import org.opensearch.commons.notifications.model.ConfigType.SMTP_ACCOUNT
+import org.opensearch.commons.notifications.model.ConfigType.SNS
 import org.opensearch.commons.notifications.model.ConfigType.WEBHOOK
 import org.opensearch.index.query.BoolQueryBuilder
 import org.opensearch.index.query.QueryBuilder
@@ -73,7 +78,8 @@ object ConfigQueryHelper {
         FEATURE_LIST_TAG,
         "${EMAIL.tag}.$EMAIL_ACCOUNT_ID_TAG",
         "${EMAIL.tag}.$EMAIL_GROUP_ID_LIST_TAG",
-        "${SMTP_ACCOUNT.tag}.$METHOD_TAG"
+        "${SMTP_ACCOUNT.tag}.$METHOD_TAG",
+        "${SES_ACCOUNT.tag}.$REGION_TAG"
     )
     private val TEXT_FIELDS = setOf(
         NAME_TAG,
@@ -84,7 +90,11 @@ object ConfigQueryHelper {
         "${EMAIL.tag}.$RECIPIENT_LIST_TAG",
         "${SMTP_ACCOUNT.tag}.$HOST_TAG",
         "${SMTP_ACCOUNT.tag}.$FROM_ADDRESS_TAG",
-        "${EMAIL_GROUP.tag}.$RECIPIENT_LIST_TAG"
+        "${EMAIL_GROUP.tag}.$RECIPIENT_LIST_TAG",
+        "${SNS.tag}.$TOPIC_ARN_TAG",
+        "${SNS.tag}.$ROLE_ARN_TAG",
+        "${SES_ACCOUNT.tag}.$ROLE_ARN_TAG",
+        "${SES_ACCOUNT.tag}.$FROM_ADDRESS_TAG"
     )
 
     private val METADATA_FIELDS = METADATA_RANGE_FIELDS

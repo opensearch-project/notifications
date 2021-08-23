@@ -45,6 +45,7 @@ import org.apache.http.util.EntityUtils
 import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.common.xcontent.XContentType
 import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.WebhookDestination
@@ -109,12 +110,14 @@ class DestinationHttpClient {
     }
 
     @Throws(Exception::class)
-    fun execute(destination: WebhookDestination, message: MessageContent): String {
+    fun execute(destination: WebhookDestination, message: MessageContent, referenceId: String): String {
         var response: CloseableHttpResponse? = null
         return try {
             response = getHttpResponse(destination, message)
             validateResponseStatus(response)
-            getResponseString(response)
+            val responseString = getResponseString(response)
+            log.debug("Http response for id $referenceId: $responseString")
+            responseString
         } finally {
             if (response != null) {
                 EntityUtils.consumeQuietly(response.entity)
@@ -127,7 +130,7 @@ class DestinationHttpClient {
         var httpRequest: HttpRequestBase = HttpPost(destination.url)
 
         if (destination is CustomWebhookDestination) {
-            httpRequest = constructHttpRequest(destination.method)
+            httpRequest = constructHttpRequest(destination.method, destination.url)
             if (destination.headerParams.isEmpty()) {
                 // set default header
                 httpRequest.setHeader("Content-type", "application/json")
@@ -142,11 +145,11 @@ class DestinationHttpClient {
         return httpClient.execute(httpRequest)
     }
 
-    private fun constructHttpRequest(method: String): HttpRequestBase {
+    private fun constructHttpRequest(method: String, url: String): HttpRequestBase {
         return when (method) {
-            HttpPost.METHOD_NAME -> HttpPost()
-            HttpPut.METHOD_NAME -> HttpPut()
-            HttpPatch.METHOD_NAME -> HttpPatch()
+            HttpPost.METHOD_NAME -> HttpPost(url)
+            HttpPut.METHOD_NAME -> HttpPut(url)
+            HttpPatch.METHOD_NAME -> HttpPatch(url)
             else -> throw IllegalArgumentException(
                 "Invalid or empty method supplied. Only POST, PUT and PATCH are allowed"
             )
@@ -156,9 +159,7 @@ class DestinationHttpClient {
     @Throws(IOException::class)
     fun getResponseString(response: CloseableHttpResponse): String {
         val entity: HttpEntity = response.entity ?: return "{}"
-        val responseString: String = EntityUtils.toString(entity)
-        log.debug("Http response: $responseString")
-        return responseString
+        return EntityUtils.toString(entity)
     }
 
     @Throws(IOException::class)
@@ -171,11 +172,20 @@ class DestinationHttpClient {
 
     fun buildRequestBody(destination: WebhookDestination, message: MessageContent): String {
         val builder = XContentFactory.contentBuilder(XContentType.JSON)
-        var keyName = "Content"
-        // Slack webhook request body has required "text" as key name https://api.slack.com/messaging/webhooks
-        if (destination is SlackDestination) keyName = "text"
+        val keyName = when (destination) {
+            // Slack webhook request body has required "text" as key name https://api.slack.com/messaging/webhooks
+            // Chime webhook request body has required "Content" as key name
+            // Customer webhook allows input as json or plain text, so we just return the message as it is
+            is SlackDestination -> "text"
+            is ChimeDestination -> "Content"
+            is CustomWebhookDestination -> return message.textDescription
+            else -> throw IllegalArgumentException(
+                "Invalid destination type is provided, Only Slack, Chime and CustomWebhook are allowed"
+            )
+        }
+
         builder.startObject()
-            .field(keyName, message.buildWebhookMessage())
+            .field(keyName, message.buildMessageWithTitle())
             .endObject()
         return builder.string()
     }

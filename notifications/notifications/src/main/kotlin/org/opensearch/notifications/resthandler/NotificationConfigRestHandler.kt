@@ -44,6 +44,7 @@ import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.index.ConfigQueryHelper
+import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
 import org.opensearch.rest.BytesRestResponse
 import org.opensearch.rest.RestHandler.Route
@@ -143,6 +144,11 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
              *     smtp_account.host=domain
              *     smtp_account.from_address=abc,xyz
              *     smtp_account.recipient_list=abc,xyz
+             *     sns.topic_arn=abc,xyz
+             *     sns.role_arn=abc,xyz
+             *     ses_account.region=abc,xyz
+             *     ses_account.role_arn=abc,xyz
+             *     ses_account.from_address=abc,xyz
              *     query=search all above fields
              * Request body: Ref [org.opensearch.commons.notifications.action.GetNotificationConfigRequest]
              * Response body: [org.opensearch.commons.notifications.action.GetNotificationConfigResponse]
@@ -185,6 +191,8 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
         request: RestRequest,
         client: NodeClient
     ) = RestChannelConsumer {
+        Metrics.NOTIFICATIONS_CONFIG_UPDATE_TOTAL.counter.increment()
+        Metrics.NOTIFICATIONS_CONFIG_UPDATE_INTERVAL_COUNT.counter.increment()
         NotificationsPluginInterface.updateNotificationConfig(
             client,
             UpdateNotificationConfigRequest.parse(
@@ -199,6 +207,8 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
         request: RestRequest,
         client: NodeClient
     ) = RestChannelConsumer {
+        Metrics.NOTIFICATIONS_CONFIG_CREATE_TOTAL.counter.increment()
+        Metrics.NOTIFICATIONS_CONFIG_CREATE_INTERVAL_COUNT.counter.increment()
         NotificationsPluginInterface.createNotificationConfig(
             client,
             CreateNotificationConfigRequest.parse(request.contentParserNextToken()),
@@ -210,6 +220,8 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
         request: RestRequest,
         client: NodeClient
     ): RestChannelConsumer {
+        Metrics.NOTIFICATIONS_CONFIG_INFO_TOTAL.counter.increment()
+        Metrics.NOTIFICATIONS_CONFIG_INFO_INTERVAL_COUNT.counter.increment()
         val configId: String? = request.param(CONFIG_ID_TAG)
         val configIdList: String? = request.param(CONFIG_ID_LIST_TAG)
         val sortField: String? = request.param(SORT_FIELD_TAG)
@@ -261,6 +273,8 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
         request: RestRequest,
         client: NodeClient
     ): RestChannelConsumer {
+        Metrics.NOTIFICATIONS_CONFIG_DELETE_TOTAL.counter.increment()
+        Metrics.NOTIFICATIONS_CONFIG_DELETE_INTERVAL_COUNT.counter.increment()
         val configId: String? = request.param(CONFIG_ID_TAG)
         val configIdSet: Set<String> =
             request.paramAsStringArray(CONFIG_ID_LIST_TAG, arrayOf(configId))

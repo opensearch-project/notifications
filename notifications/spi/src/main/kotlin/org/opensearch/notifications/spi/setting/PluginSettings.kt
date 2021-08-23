@@ -13,12 +13,15 @@ package org.opensearch.notifications.spi.setting
 
 import org.opensearch.bootstrap.BootstrapInfo
 import org.opensearch.cluster.service.ClusterService
+import org.opensearch.common.settings.SecureSetting
+import org.opensearch.common.settings.SecureString
 import org.opensearch.common.settings.Setting
 import org.opensearch.common.settings.Setting.Property.Dynamic
 import org.opensearch.common.settings.Setting.Property.NodeScope
 import org.opensearch.common.settings.Settings
 import org.opensearch.notifications.spi.NotificationSpiPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.spi.NotificationSpiPlugin.Companion.PLUGIN_NAME
+import org.opensearch.notifications.spi.model.SecureDestinationSettings
 import org.opensearch.notifications.spi.utils.logger
 import java.io.IOException
 import java.nio.file.Path
@@ -33,6 +36,11 @@ internal object PluginSettings {
      * Settings Key prefix for Email.
      */
     private const val EMAIL_KEY_PREFIX = "$KEY_PREFIX.email"
+
+    /**
+     * Settings Key prefix for Email.
+     */
+    private const val EMAIL_DESTINATION_SETTING_PREFIX = "$KEY_PREFIX.email."
 
     /**
      * Settings Key prefix for http connection.
@@ -73,6 +81,16 @@ internal object PluginSettings {
      * Setting to choose allowed config types.
      */
     private const val ALLOWED_CONFIG_TYPE_KEY = "$KEY_PREFIX.allowedConfigTypes"
+
+    /**
+     * Setting to enable tooltip in UI
+     */
+    private const val TOOLTIP_SUPPORT_KEY = "$KEY_PREFIX.tooltip_support"
+
+    /**
+     * Setting to enable tooltip in UI
+     */
+    private const val HOST_DENY_LIST_KEY = "$EMAIL_KEY_PREFIX.host_deny_list"
 
     /**
      * Default email size limit as 10MB.
@@ -117,9 +135,26 @@ internal object PluginSettings {
         "chime",
         "webhook",
         "email",
+        "sns",
+        "ses_account",
         "smtp_account",
         "email_group"
     )
+
+    /**
+     * Default email host deny list
+     */
+    private val DEFAULT_HOST_DENY_LIST = emptyList<String>()
+
+    /**
+     * Default disable tooltip support
+     */
+    private const val DEFAULT_TOOLTIP_SUPPORT = false
+
+    /**
+     * Default destination settings
+     */
+    private val DEFAULT_DESTINATION_SETTINGS = emptyMap<String, SecureDestinationSettings>()
 
     /**
      * list of allowed config types.
@@ -163,6 +198,24 @@ internal object PluginSettings {
     @Volatile
     var socketTimeout: Int
 
+    /**
+     * Tooltip support
+     */
+    @Volatile
+    var tooltipSupport: Boolean
+
+    /**
+     * list of allowed config types.
+     */
+    @Volatile
+    var hostDenyList: List<String>
+
+    /**
+     * Destination Settings
+     */
+    @Volatile
+    var destinationSettings: Map<String, SecureDestinationSettings>
+
     private const val DECIMAL_RADIX: Int = 10
 
     private val log by logger(javaClass)
@@ -190,6 +243,9 @@ internal object PluginSettings {
             ?: DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS
         socketTimeout = (settings?.get(SOCKET_TIMEOUT_MILLISECONDS_KEY)?.toInt()) ?: DEFAULT_SOCKET_TIMEOUT_MILLISECONDS
         allowedConfigTypes = settings?.getAsList(ALLOWED_CONFIG_TYPE_KEY, null) ?: DEFAULT_ALLOWED_CONFIG_TYPES
+        tooltipSupport = settings?.getAsBoolean(TOOLTIP_SUPPORT_KEY, false) ?: DEFAULT_TOOLTIP_SUPPORT
+        hostDenyList = settings?.getAsList(HOST_DENY_LIST_KEY, null) ?: DEFAULT_HOST_DENY_LIST
+        destinationSettings = if (settings != null) loadDestinationSettings(settings) else DEFAULT_DESTINATION_SETTINGS
 
         defaultSettings = mapOf(
             EMAIL_SIZE_LIMIT_KEY to emailSizeLimit.toString(DECIMAL_RADIX),
@@ -197,7 +253,8 @@ internal object PluginSettings {
             MAX_CONNECTIONS_KEY to maxConnections.toString(DECIMAL_RADIX),
             MAX_CONNECTIONS_PER_ROUTE_KEY to maxConnectionsPerRoute.toString(DECIMAL_RADIX),
             CONNECTION_TIMEOUT_MILLISECONDS_KEY to connectionTimeout.toString(DECIMAL_RADIX),
-            SOCKET_TIMEOUT_MILLISECONDS_KEY to socketTimeout.toString(DECIMAL_RADIX)
+            SOCKET_TIMEOUT_MILLISECONDS_KEY to socketTimeout.toString(DECIMAL_RADIX),
+            TOOLTIP_SUPPORT_KEY to tooltipSupport.toString()
         )
     }
 
@@ -245,6 +302,31 @@ internal object PluginSettings {
         NodeScope, Dynamic
     )
 
+    private val TOOLTIP_SUPPORT: Setting<Boolean> = Setting.boolSetting(
+        TOOLTIP_SUPPORT_KEY,
+        defaultSettings[TOOLTIP_SUPPORT_KEY]!!.toBoolean(),
+        NodeScope, Dynamic
+    )
+
+    private val HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
+        HOST_DENY_LIST_KEY,
+        DEFAULT_HOST_DENY_LIST,
+        { it },
+        NodeScope, Dynamic
+    )
+
+    private val EMAIL_USERNAME: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
+        EMAIL_DESTINATION_SETTING_PREFIX,
+        "username",
+        { key: String -> SecureSetting.secureString(key, null) }
+    )
+
+    private val EMAIL_PASSWORD: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
+        EMAIL_DESTINATION_SETTING_PREFIX,
+        "password",
+        { key: String -> SecureSetting.secureString(key, null) }
+    )
+
     /**
      * Returns list of additional settings available specific to this plugin.
      *
@@ -258,7 +340,11 @@ internal object PluginSettings {
             MAX_CONNECTIONS_PER_ROUTE,
             CONNECTION_TIMEOUT_MILLISECONDS,
             SOCKET_TIMEOUT_MILLISECONDS,
-            ALLOWED_CONFIG_TYPES
+            ALLOWED_CONFIG_TYPES,
+            TOOLTIP_SUPPORT,
+            HOST_DENY_LIST,
+            EMAIL_USERNAME,
+            EMAIL_PASSWORD
         )
     }
     /**
@@ -273,6 +359,8 @@ internal object PluginSettings {
         maxConnectionsPerRoute = MAX_CONNECTIONS_PER_ROUTE.get(clusterService.settings)
         connectionTimeout = CONNECTION_TIMEOUT_MILLISECONDS.get(clusterService.settings)
         socketTimeout = SOCKET_TIMEOUT_MILLISECONDS.get(clusterService.settings)
+        tooltipSupport = TOOLTIP_SUPPORT.get(clusterService.settings)
+        hostDenyList = HOST_DENY_LIST.get(clusterService.settings)
     }
 
     /**
@@ -311,10 +399,20 @@ internal object PluginSettings {
             log.debug("$LOG_PREFIX:$SOCKET_TIMEOUT_MILLISECONDS_KEY -autoUpdatedTo-> $clusterSocketTimeout")
             socketTimeout = clusterSocketTimeout
         }
-        val clusterallowedConfigTypes = clusterService.clusterSettings.get(ALLOWED_CONFIG_TYPES)
-        if (clusterallowedConfigTypes != null) {
-            log.debug("$LOG_PREFIX:$ALLOWED_CONFIG_TYPE_KEY -autoUpdatedTo-> $clusterallowedConfigTypes")
-            allowedConfigTypes = clusterallowedConfigTypes
+        val clusterAllowedConfigTypes = clusterService.clusterSettings.get(ALLOWED_CONFIG_TYPES)
+        if (clusterAllowedConfigTypes != null) {
+            log.debug("$LOG_PREFIX:$ALLOWED_CONFIG_TYPE_KEY -autoUpdatedTo-> $clusterAllowedConfigTypes")
+            allowedConfigTypes = clusterAllowedConfigTypes
+        }
+        val clusterTooltipSupport = clusterService.clusterSettings.get(TOOLTIP_SUPPORT)
+        if (clusterTooltipSupport != null) {
+            log.debug("$LOG_PREFIX:$TOOLTIP_SUPPORT_KEY -autoUpdatedTo-> $clusterAllowedConfigTypes")
+            tooltipSupport = clusterTooltipSupport
+        }
+        val clusterHostDenyList = clusterService.clusterSettings.get(HOST_DENY_LIST)
+        if (clusterHostDenyList != null) {
+            log.debug("$LOG_PREFIX:$HOST_DENY_LIST_KEY -autoUpdatedTo-> $clusterHostDenyList")
+            hostDenyList = clusterHostDenyList
         }
     }
 
@@ -356,5 +454,46 @@ internal object PluginSettings {
             socketTimeout = it
             log.info("$LOG_PREFIX:$SOCKET_TIMEOUT_MILLISECONDS_KEY -updatedTo-> $it")
         }
+        clusterService.clusterSettings.addSettingsUpdateConsumer(TOOLTIP_SUPPORT) {
+            tooltipSupport = it
+            log.info("$LOG_PREFIX:$TOOLTIP_SUPPORT_KEY -updatedTo-> $it")
+        }
+        clusterService.clusterSettings.addSettingsUpdateConsumer(HOST_DENY_LIST) {
+            hostDenyList = it
+            log.info("$LOG_PREFIX:$HOST_DENY_LIST_KEY -updatedTo-> $it")
+        }
+    }
+
+    fun loadDestinationSettings(settings: Settings): Map<String, SecureDestinationSettings> {
+        // Only loading Email Destination settings for now since those are the only secure settings needed.
+        // If this logic needs to be expanded to support other Destinations, different groups can be retrieved similar
+        // to emailAccountNames based on the setting namespace and SecureDestinationSettings should be expanded to support
+        // these new settings.
+        val emailAccountNames: Set<String> = settings.getGroups(EMAIL_DESTINATION_SETTING_PREFIX).keys
+        val emailAccounts: MutableMap<String, SecureDestinationSettings> = mutableMapOf()
+        for (emailAccountName in emailAccountNames) {
+            // Only adding the settings if they exist
+            getSecureDestinationSettings(settings, emailAccountName)?.let {
+                emailAccounts[emailAccountName] = it
+            }
+        }
+
+        return emailAccounts
+    }
+
+    private fun getSecureDestinationSettings(settings: Settings, emailAccountName: String): SecureDestinationSettings? {
+        // Using 'use' to emulate Java's try-with-resources on multiple closeable resources.
+        // Values are cloned so that we maintain a SecureString, the original SecureStrings will be closed after
+        // they have left the scope of this function.
+        return getEmailSettingValue(settings, emailAccountName, EMAIL_USERNAME)?.use { emailUsername ->
+            getEmailSettingValue(settings, emailAccountName, EMAIL_PASSWORD)?.use { emailPassword ->
+                SecureDestinationSettings(emailUsername = emailUsername.clone(), emailPassword = emailPassword.clone())
+            }
+        }
+    }
+
+    private fun <T> getEmailSettingValue(settings: Settings, emailAccountName: String, emailSetting: Setting.AffixSetting<T>): T? {
+        val concreteSetting = emailSetting.getConcreteSettingForNamespace(emailAccountName)
+        return concreteSetting.get(settings)
     }
 }

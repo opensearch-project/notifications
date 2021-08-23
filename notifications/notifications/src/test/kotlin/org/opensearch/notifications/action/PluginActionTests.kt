@@ -23,6 +23,7 @@ import org.opensearch.action.ActionListener
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.client.Client
 import org.opensearch.common.xcontent.NamedXContentRegistry
+import org.opensearch.commons.destination.response.LegacyDestinationResponse
 import org.opensearch.commons.notifications.action.BaseResponse
 import org.opensearch.commons.notifications.action.CreateNotificationConfigRequest
 import org.opensearch.commons.notifications.action.CreateNotificationConfigResponse
@@ -36,6 +37,8 @@ import org.opensearch.commons.notifications.action.GetNotificationEventRequest
 import org.opensearch.commons.notifications.action.GetNotificationEventResponse
 import org.opensearch.commons.notifications.action.GetPluginFeaturesRequest
 import org.opensearch.commons.notifications.action.GetPluginFeaturesResponse
+import org.opensearch.commons.notifications.action.LegacyPublishNotificationRequest
+import org.opensearch.commons.notifications.action.LegacyPublishNotificationResponse
 import org.opensearch.commons.notifications.action.SendNotificationRequest
 import org.opensearch.commons.notifications.action.SendNotificationResponse
 import org.opensearch.commons.notifications.action.UpdateNotificationConfigRequest
@@ -199,6 +202,23 @@ internal class PluginActionTests {
             transportService, client, actionFilters, xContentRegistry
         )
         sendNotificationAction.execute(task, request, AssertionListener(response))
+    }
+
+    @Test
+    fun `Publish notification action should call back action listener`() {
+        val request = mock(LegacyPublishNotificationRequest::class.java)
+        val response = LegacyPublishNotificationResponse(
+            LegacyDestinationResponse.Builder().withStatusCode(200).withResponseContent("Hello world").build()
+        )
+
+        // Mock singleton's method by mockk framework
+        mockkObject(SendMessageActionHelper)
+        every { SendMessageActionHelper.executeLegacyRequest(request) } returns response
+
+        val publishNotificationAction = PublishNotificationAction(
+            transportService, client, actionFilters, xContentRegistry
+        )
+        publishNotificationAction.execute(task, request, AssertionListener(response))
     }
 
     /**

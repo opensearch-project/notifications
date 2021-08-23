@@ -33,11 +33,12 @@ import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Email
 import org.opensearch.commons.notifications.model.EmailGroup
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.NotificationConfig
+import org.opensearch.commons.notifications.model.SesAccount
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.SmtpAccount
+import org.opensearch.commons.notifications.model.Sns
 import org.opensearch.commons.notifications.model.Webhook
 
 fun verifyEquals(slack: Slack, jsonObject: JsonObject) {
@@ -75,6 +76,17 @@ fun verifyEquals(smtpAccount: SmtpAccount, jsonObject: JsonObject) {
     Assert.assertEquals(smtpAccount.fromAddress, jsonObject.get("from_address").asString)
 }
 
+fun verifyEquals(sesAccount: SesAccount, jsonObject: JsonObject) {
+    Assert.assertEquals(sesAccount.awsRegion, jsonObject.get("region").asString)
+    Assert.assertEquals(sesAccount.roleArn, jsonObject.get("role_arn").asString)
+    Assert.assertEquals(sesAccount.fromAddress, jsonObject.get("from_address").asString)
+}
+
+fun verifyEquals(sns: Sns, jsonObject: JsonObject) {
+    Assert.assertEquals(sns.topicArn, jsonObject.get("topic_arn").asString)
+    Assert.assertEquals(sns.roleArn, jsonObject.get("role_arn").asString)
+}
+
 fun verifyEquals(config: NotificationConfig, jsonObject: JsonObject) {
     Assert.assertEquals(config.name, jsonObject.get("name").asString)
     Assert.assertEquals(config.description, jsonObject.get("description").asString)
@@ -82,7 +94,7 @@ fun verifyEquals(config: NotificationConfig, jsonObject: JsonObject) {
     Assert.assertEquals(config.isEnabled, jsonObject.get("is_enabled").asBoolean)
     val features = jsonObject.get("feature_list").asJsonArray
     Assert.assertEquals(config.features.size, features.size())
-    features.forEach { config.features.contains(Feature.fromTagOrDefault(it.asString)) }
+    features.forEach { config.features.contains(it.asString) }
     when (config.configType) {
         ConfigType.SLACK -> verifyEquals((config.configData as Slack), jsonObject.get("slack").asJsonObject)
         ConfigType.CHIME -> verifyEquals((config.configData as Chime), jsonObject.get("chime").asJsonObject)
@@ -92,10 +104,15 @@ fun verifyEquals(config: NotificationConfig, jsonObject: JsonObject) {
             (config.configData as SmtpAccount),
             jsonObject.get("smtp_account").asJsonObject
         )
+        ConfigType.SES_ACCOUNT -> verifyEquals(
+            (config.configData as SesAccount),
+            jsonObject.get("ses_account").asJsonObject
+        )
         ConfigType.EMAIL_GROUP -> verifyEquals(
             (config.configData as EmailGroup),
             jsonObject.get("email_group").asJsonObject
         )
+        ConfigType.SNS -> verifyEquals((config.configData as Sns), jsonObject.get("sns").asJsonObject)
         else -> Assert.fail("configType:${config.configType} not handled in test")
     }
 }

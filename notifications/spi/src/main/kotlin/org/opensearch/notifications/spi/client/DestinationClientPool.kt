@@ -27,10 +27,15 @@
 
 package org.opensearch.notifications.spi.client
 
+import org.opensearch.notifications.spi.credentials.oss.SesClientFactoryImpl
+import org.opensearch.notifications.spi.credentials.oss.SnsClientFactoryImpl
+
 /**
  * This class provides Client to the relevant destinations
  */
 internal object DestinationClientPool {
     val httpClient: DestinationHttpClient = DestinationHttpClient()
-    val emailClient: DestinationEmailClient = DestinationEmailClient()
+    val smtpClient: DestinationSmtpClient = DestinationSmtpClient()
+    val snsClient: DestinationSnsClient = DestinationSnsClient(SnsClientFactoryImpl)
+    val sesClient: DestinationSesClient = DestinationSesClient(SesClientFactoryImpl)
 }

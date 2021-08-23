@@ -16,12 +16,15 @@ import org.opensearch.cluster.metadata.IndexNameExpressionResolver
 import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.io.stream.NamedWriteableRegistry
 import org.opensearch.common.settings.Setting
+import org.opensearch.common.settings.Settings
 import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.env.Environment
 import org.opensearch.env.NodeEnvironment
 import org.opensearch.notifications.spi.setting.PluginSettings
+import org.opensearch.notifications.spi.setting.PluginSettings.loadDestinationSettings
 import org.opensearch.notifications.spi.utils.logger
 import org.opensearch.plugins.Plugin
+import org.opensearch.plugins.ReloadablePlugin
 import org.opensearch.repositories.RepositoriesService
 import org.opensearch.script.ScriptService
 import org.opensearch.threadpool.ThreadPool
@@ -31,7 +34,7 @@ import java.util.function.Supplier
 /**
  *  This is a dummy plugin for SPI to load configurations
  */
-internal class NotificationSpiPlugin : Plugin() {
+internal class NotificationSpiPlugin : ReloadablePlugin, Plugin() {
     lateinit var clusterService: ClusterService // initialized in createComponents()
 
     internal companion object {
@@ -68,5 +71,9 @@ internal class NotificationSpiPlugin : Plugin() {
         this.clusterService = clusterService
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         return listOf()
+    }
+
+    override fun reload(settings: Settings) {
+        PluginSettings.destinationSettings = loadDestinationSettings(settings)
     }
 }
