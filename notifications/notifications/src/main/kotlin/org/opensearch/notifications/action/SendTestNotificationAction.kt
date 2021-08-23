@@ -1,0 +1,80 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ *
+ * Modifications Copyright OpenSearch Contributors. See
+ * GitHub history for details.
+ */
+
+package org.opensearch.notifications.action
+
+import org.opensearch.action.ActionListener
+import org.opensearch.action.ActionType
+import org.opensearch.action.support.ActionFilters
+import org.opensearch.action.support.HandledTransportAction
+import org.opensearch.client.Client
+import org.opensearch.client.node.NodeClient
+import org.opensearch.common.inject.Inject
+import org.opensearch.common.xcontent.NamedXContentRegistry
+import org.opensearch.commons.notifications.NotificationsPluginInterface
+import org.opensearch.commons.notifications.action.SendNotificationResponse
+import org.opensearch.commons.utils.logger
+import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
+import org.opensearch.notifications.model.SendTestNotificationRequest
+import org.opensearch.notifications.send.SendTestNotificationActionHelper
+import org.opensearch.tasks.Task
+import org.opensearch.transport.TransportService
+
+/**
+ * Send Test Notification transport action
+ */
+internal class SendTestNotificationAction @Inject constructor(
+    transportService: TransportService,
+    val client: Client,
+    actionFilters: ActionFilters,
+    val xContentRegistry: NamedXContentRegistry,
+) : HandledTransportAction<SendTestNotificationRequest, SendNotificationResponse>(
+    NAME,
+    transportService,
+    actionFilters,
+    ::SendTestNotificationRequest
+) {
+    companion object {
+        private const val NAME = "cluster:admin/opensearch/notifications/test_notification"
+        internal val ACTION_TYPE = ActionType(NAME, ::SendNotificationResponse)
+        private val log by logger(SendTestNotificationAction::class.java)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun doExecute(
+        task: Task?,
+        request: SendTestNotificationRequest,
+        listener: ActionListener<SendNotificationResponse>
+    ) {
+        val source = SendTestNotificationActionHelper.generateEventSource(request.feature, request.configId)
+        val message = SendTestNotificationActionHelper.generateMessage(request.feature, request.configId)
+        val channelIds = listOf(request.configId)
+        NotificationsPluginInterface.sendNotification(
+            client as NodeClient,
+            source,
+            message,
+            channelIds,
+            object : ActionListener<SendNotificationResponse> {
+                override fun onResponse(sendNotificationResponse: SendNotificationResponse) {
+                    log.info("$LOG_PREFIX:SendTestNotificationAction-send:${sendNotificationResponse.notificationId}")
+                    listener.onResponse(sendNotificationResponse)
+                }
+
+                override fun onFailure(exception: Exception) {
+                    log.error("$LOG_PREFIX:SendTestNotificationAction-send Error:$exception")
+                    listener.onFailure(exception)
+                }
+            }
+        )
+    }
+}
