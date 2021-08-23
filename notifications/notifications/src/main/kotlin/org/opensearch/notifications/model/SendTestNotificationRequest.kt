@@ -24,7 +24,6 @@ import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.notifications.NotificationConstants.FEATURE_TAG
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.utils.logger
 import java.io.IOException
 
@@ -32,7 +31,7 @@ import java.io.IOException
  * Action Request to send test notification.
  */
 class SendTestNotificationRequest : ActionRequest, ToXContentObject {
-    val feature: Feature
+    val feature: String
     val configId: String
 
     companion object {
@@ -50,7 +49,7 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
         @JvmStatic
         @Throws(IOException::class)
         fun parse(parser: XContentParser): SendTestNotificationRequest {
-            var feature: Feature? = null
+            var feature: String? = null
             var configId: String? = null
 
             XContentParserUtils.ensureExpectedToken(
@@ -62,7 +61,7 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    FEATURE_TAG -> feature = Feature.fromTagOrDefault(parser.text())
+                    FEATURE_TAG -> feature = parser.text()
                     CONFIG_ID_TAG -> configId = parser.text()
                     else -> {
                         parser.skipChildren()
@@ -82,7 +81,7 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
      * @param configId the id of the notification configuration channel
      */
     constructor(
-        feature: Feature,
+        feature: String,
         configId: String,
     ) {
         this.feature = feature
@@ -94,7 +93,7 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
      */
     @Throws(IOException::class)
     constructor(input: StreamInput) : super(input) {
-        feature = Feature.fromTagOrDefault(input.readString())
+        feature = input.readString()
         configId = input.readString()
     }
 
@@ -104,7 +103,7 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
     @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
         super.writeTo(output)
-        output.writeString(feature.tag)
+        output.writeString(feature)
         output.writeString(configId)
     }
 
