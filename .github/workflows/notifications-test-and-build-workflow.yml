@@ -26,9 +26,9 @@ name: Test and Build Notifications
 on: [push, pull_request]
 
 env:
-  OPENSEARCH_VERSION: '1.0'
-  COMMON_UTILS_BRANCH: 'notification-dev'
-  OPENSEARCH_BRANCH: '1.0'
+  OPENSEARCH_VERSION: '1.1.0-SNAPSHOT'
+  OPENSEARCH_BRANCH: '1.x'
+  COMMON_UTILS_BRANCH: 'main'
 
 jobs:
   build:
@@ -49,7 +49,7 @@ jobs:
           ref: ${{ env.OPENSEARCH_BRANCH }}
       - name: Build OpenSearch
         working-directory: ./OpenSearch
-        run: ./gradlew publishToMavenLocal -Dbuild.snapshot=false
+        run: ./gradlew publishToMavenLocal
 
       # dependencies: common-utils
       - name: Checkout common-utils
@@ -60,7 +60,7 @@ jobs:
           path: common-utils
       - name: Build common-utils
         working-directory: ./common-utils
-        run: ./gradlew publishToMavenLocal -Dopensearch.version=${{ env.OPENSEARCH_VERSION }}.0
+        run: ./gradlew publishToMavenLocal -Dopensearch.version=${{ env.OPENSEARCH_VERSION }}
 
       # notifications
       - name: Checkout Notifications
@@ -70,7 +70,7 @@ jobs:
       - name: Build with Gradle
         run: |
           cd notifications
-          ./gradlew build -PexcludeTests="**/SesChannelIT*, **/PluginActionTests*" -Dopensearch.version=${{ env.OPENSEARCH_VERSION }}.0
+          ./gradlew build -PexcludeTests="**/SesChannelIT*" -Dopensearch.version=${{ env.OPENSEARCH_VERSION }}
 
       - name: Upload coverage
         uses: codecov/codecov-action@v1

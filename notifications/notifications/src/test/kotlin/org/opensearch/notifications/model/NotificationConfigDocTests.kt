@@ -29,14 +29,13 @@ package org.opensearch.notifications.model
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.ConfigType
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.notifications.createObjectFromJsonString
 import org.opensearch.notifications.getJsonString
 import java.time.Instant
-import java.util.EnumSet
 
 internal class NotificationConfigDocTests {
 
@@ -55,7 +54,7 @@ internal class NotificationConfigDocTests {
             "name",
             "description",
             ConfigType.SLACK,
-            EnumSet.of(Feature.REPORTS),
+            setOf(FEATURE_REPORTS),
             configData = sampleSlack
         )
         val configDoc = NotificationConfigDoc(metadata, config)
@@ -79,7 +78,7 @@ internal class NotificationConfigDocTests {
             "name",
             "description",
             ConfigType.SLACK,
-            EnumSet.of(Feature.REPORTS),
+            setOf(FEATURE_REPORTS),
             configData = sampleSlack
         )
         val configDoc = NotificationConfigDoc(metadata, config)

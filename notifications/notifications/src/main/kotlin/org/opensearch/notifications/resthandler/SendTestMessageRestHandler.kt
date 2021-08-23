@@ -14,9 +14,9 @@ package org.opensearch.notifications.resthandler
 import org.opensearch.client.node.NodeClient
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.notifications.NotificationConstants.FEATURE_TAG
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.action.SendTestNotificationAction
+import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.SendTestNotificationRequest
 import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
 import org.opensearch.rest.BytesRestResponse
@@ -81,7 +81,9 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
         request: RestRequest,
         client: NodeClient
     ) = RestChannelConsumer {
-        val feature = Feature.fromTagOrDefault(request.param(FEATURE_TAG, Feature.NONE.tag))
+        Metrics.NOTIFICATIONS_SEND_TEST_MESSAGE_TOTAL.counter.increment()
+        Metrics.NOTIFICATIONS_SEND_TEST_MESSAGE_INTERVAL_COUNT.counter.increment()
+        val feature = request.param(FEATURE_TAG)
         val configId = request.param(CONFIG_ID_TAG)
         val sendTestNotificationRequest = SendTestNotificationRequest(feature, configId)
         client.execute(

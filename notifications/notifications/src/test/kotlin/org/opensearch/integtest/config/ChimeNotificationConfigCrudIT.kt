@@ -27,16 +27,17 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_ALERTING
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
+import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
-import java.util.EnumSet
 
 class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
 
@@ -47,7 +48,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.CHIME,
-            EnumSet.of(Feature.ALERTING, Feature.REPORTS),
+            setOf(FEATURE_ALERTING, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleChime
         )
@@ -106,7 +107,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a updated config name",
             "this is a updated config description",
             ConfigType.CHIME,
-            EnumSet.of(Feature.INDEX_MANAGEMENT),
+            setOf(FEATURE_INDEX_MANAGEMENT),
             isEnabled = true,
             configData = updatedChime
         )
@@ -174,7 +175,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.CHIME,
-            EnumSet.of(Feature.ALERTING, Feature.REPORTS),
+            setOf(FEATURE_ALERTING, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleChime
         )
@@ -211,7 +212,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.CHIME,
-            EnumSet.of(Feature.ALERTING, Feature.REPORTS),
+            setOf(FEATURE_ALERTING, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleChime
         )
@@ -250,7 +251,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                 "description":"this is a updated config description",
                 "config_type":"slack",
                 "feature_list":[
-                    "${Feature.INDEX_MANAGEMENT}"
+                    "$FEATURE_INDEX_MANAGEMENT"
                 ],
                 "is_enabled":"true",
                 "slack":{"url":"https://updated.domain.com/updated_slack_url#0987654321"}

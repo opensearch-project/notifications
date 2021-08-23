@@ -50,6 +50,7 @@ import org.opensearch.notifications.action.GetFeatureChannelListAction
 import org.opensearch.notifications.action.GetNotificationConfigAction
 import org.opensearch.notifications.action.GetNotificationEventAction
 import org.opensearch.notifications.action.GetPluginFeaturesAction
+import org.opensearch.notifications.action.PublishNotificationAction
 import org.opensearch.notifications.action.SendNotificationAction
 import org.opensearch.notifications.action.SendTestNotificationAction
 import org.opensearch.notifications.action.UpdateNotificationConfigAction
@@ -61,6 +62,7 @@ import org.opensearch.notifications.resthandler.NotificationConfigRestHandler
 import org.opensearch.notifications.resthandler.NotificationEventRestHandler
 import org.opensearch.notifications.resthandler.NotificationFeatureChannelListRestHandler
 import org.opensearch.notifications.resthandler.NotificationFeaturesRestHandler
+import org.opensearch.notifications.resthandler.NotificationStatsRestHandler
 import org.opensearch.notifications.resthandler.SendTestMessageRestHandler
 import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.send.SendMessageActionHelper
@@ -164,6 +166,10 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
             ActionPlugin.ActionHandler(
                 NotificationsActions.SEND_NOTIFICATION_ACTION_TYPE,
                 SendNotificationAction::class.java
+            ),
+            ActionPlugin.ActionHandler(
+                NotificationsActions.LEGACY_PUBLISH_NOTIFICATION_ACTION_TYPE,
+                PublishNotificationAction::class.java
             )
         )
     }
@@ -186,7 +192,8 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
             NotificationEventRestHandler(),
             NotificationFeaturesRestHandler(),
             NotificationFeatureChannelListRestHandler(),
-            SendTestMessageRestHandler()
+            SendTestMessageRestHandler(),
+            NotificationStatsRestHandler()
         )
     }
 }

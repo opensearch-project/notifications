@@ -35,6 +35,7 @@ import org.opensearch.commons.notifications.model.NotificationEventInfo
 import org.opensearch.commons.notifications.model.NotificationEventSearchResult
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
+import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.security.UserAccess
 import org.opensearch.rest.RestStatus
 
@@ -79,10 +80,12 @@ object EventIndexingActions {
         val eventDoc = operations.getNotificationEvent(eventId)
         eventDoc
             ?: run {
+                Metrics.NOTIFICATIONS_EVENTS_INFO_USER_ERROR_INVALID_CONFIG_ID.counter.increment()
                 throw OpenSearchStatusException("NotificationEvent $eventId not found", RestStatus.NOT_FOUND)
             }
         val metadata = eventDoc.eventDoc.metadata
         if (!userAccess.doesUserHasAccess(user, metadata.tenant, metadata.access)) {
+            Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
             throw OpenSearchStatusException("Permission denied for NotificationEvent $eventId", RestStatus.FORBIDDEN)
         }
         val eventInfo = NotificationEventInfo(
@@ -107,6 +110,7 @@ object EventIndexingActions {
         if (eventDocs.size != eventIds.size) {
             val mutableSet = eventIds.toMutableSet()
             eventDocs.forEach { mutableSet.remove(it.docInfo.id) }
+            Metrics.NOTIFICATIONS_EVENTS_INFO_SYSTEM_ERROR.counter.increment()
             throw OpenSearchStatusException(
                 "NotificationEvent $mutableSet not found",
                 RestStatus.NOT_FOUND
@@ -115,6 +119,7 @@ object EventIndexingActions {
         eventDocs.forEach {
             val currentMetadata = it.eventDoc.metadata
             if (!userAccess.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+                Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
                 throw OpenSearchStatusException(
                     "Permission denied for NotificationEvent ${it.docInfo.id}",
                     RestStatus.FORBIDDEN

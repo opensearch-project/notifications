@@ -27,7 +27,6 @@
 import { HttpFetchQuery, HttpSetup } from '../../../../src/core/public';
 import { NODE_API } from '../../common';
 import { NOTIFICATION_SOURCE } from '../utils/constants';
-import { MOCK_GET_HISTOGRAM } from './mockData';
 import { eventListToNotifications, eventToNotification } from './utils/helper';
 
 interface EventsResponse {
@@ -43,7 +42,8 @@ export default class EventService {
   }
 
   getHistogram = async (queryObject: object) => {
-    return MOCK_GET_HISTOGRAM();
+    // TODO needs backend support
+    // return MOCK_GET_HISTOGRAM();
   };
 
   getNotifications = async (queryObject: HttpFetchQuery) => {

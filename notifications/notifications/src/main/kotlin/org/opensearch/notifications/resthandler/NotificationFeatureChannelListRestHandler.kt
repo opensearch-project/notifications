@@ -15,8 +15,8 @@ import org.opensearch.client.node.NodeClient
 import org.opensearch.commons.notifications.NotificationConstants.FEATURE_TAG
 import org.opensearch.commons.notifications.NotificationsPluginInterface
 import org.opensearch.commons.notifications.action.GetFeatureChannelListRequest
-import org.opensearch.commons.notifications.model.Feature
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
+import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
 import org.opensearch.rest.BytesRestResponse
 import org.opensearch.rest.RestHandler.Route
@@ -71,7 +71,9 @@ internal class NotificationFeatureChannelListRestHandler : PluginBaseHandler() {
     override fun executeRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
         return when (request.method()) {
             GET -> {
-                val feature = Feature.fromTagOrDefault(request.param(FEATURE_TAG))
+                Metrics.NOTIFICATIONS_FEATURE_CHANNELS_INFO_TOTAL.counter.increment()
+                Metrics.NOTIFICATIONS_FEATURE_CHANNELS_INFO_INTERVAL_COUNT.counter.increment()
+                val feature = request.param(FEATURE_TAG)
                 RestChannelConsumer {
                     NotificationsPluginInterface.getFeatureChannelList(
                         client,

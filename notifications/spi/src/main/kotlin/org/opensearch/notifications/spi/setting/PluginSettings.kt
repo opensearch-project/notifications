@@ -136,6 +136,7 @@ internal object PluginSettings {
         "webhook",
         "email",
         "sns",
+        "ses_account",
         "smtp_account",
         "email_group"
     )

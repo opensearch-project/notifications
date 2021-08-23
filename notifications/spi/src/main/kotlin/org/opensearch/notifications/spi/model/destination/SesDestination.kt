@@ -11,14 +11,15 @@
 
 package org.opensearch.notifications.spi.model.destination
 
+import com.amazonaws.regions.Regions
 import org.opensearch.common.Strings
 import org.opensearch.notifications.spi.utils.validateEmail
-import software.amazon.awssdk.regions.Region
 
 /**
  * This class holds the contents of ses destination
  */
 class SesDestination(
+    val accountName: String,
     val awsRegion: String,
     val roleArn: String?,
     val fromAddress: String,
@@ -27,7 +28,7 @@ class SesDestination(
 
     init {
         require(!Strings.isNullOrEmpty(awsRegion)) { "aws region should be provided" }
-        require(Region.regions().any { it.id() == awsRegion }) { "aws region is not valid" }
+        require(Regions.values().any { it.name == awsRegion }) { "aws region is not valid" }
         validateEmail(fromAddress)
         validateEmail(recipient)
     }

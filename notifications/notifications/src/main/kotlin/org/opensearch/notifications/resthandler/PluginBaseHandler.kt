@@ -27,6 +27,7 @@
 package org.opensearch.notifications.resthandler
 
 import org.opensearch.client.node.NodeClient
+import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.rest.BaseRestHandler
 import org.opensearch.rest.RestRequest
 
@@ -39,6 +40,8 @@ abstract class PluginBaseHandler : BaseRestHandler() {
      * {@inheritDoc}
      */
     override fun prepareRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
+        Metrics.REQUEST_TOTAL.counter.increment()
+        Metrics.REQUEST_INTERVAL_COUNT.counter.increment()
         return executeRequest(request, client)
     }
 
