@@ -28,7 +28,7 @@ class SesDestination(
 
     init {
         require(!Strings.isNullOrEmpty(awsRegion)) { "aws region should be provided" }
-        require(Regions.values().any { it.name == awsRegion }) { "aws region is not valid" }
+        require(Regions.values().any { it.getName() == awsRegion }) { "aws region is not valid" }
         validateEmail(fromAddress)
         validateEmail(recipient)
     }
