@@ -265,6 +265,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.CONFLICT.status
         )
     }
+
     fun `test BAD create request with invalid webhook URL`() {
         // Create sample config request reference
         val sampleChimeConfigData = Chime("https://")
@@ -299,6 +300,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.INTERNAL_SERVER_ERROR.status
         )
     }
+
     fun `test BAD delete request on non-existent config ID`() {
         val configId = "abcdefghijk"
         executeRequest(
@@ -308,6 +310,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.NOT_FOUND.status
         )
     }
+
     fun `test update Chime webhook URL`() {
         // Create sample config request reference
         val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
