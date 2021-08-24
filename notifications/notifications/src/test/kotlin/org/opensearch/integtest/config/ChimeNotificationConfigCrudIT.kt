@@ -265,4 +265,128 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.CONFLICT.status
         )
     }
+    fun `test BAD create request with invalid webhook URL`() {
+        // Create sample config request reference
+        val sampleChimeConfigData = Chime("https://")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.CHIME,
+            setOf(FEATURE_REPORTS),
+            isEnabled = true,
+            configData = sampleChimeConfigData
+        )
+
+        // Create chime notification config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"chime",
+                "feature_list":[
+                    "${referenceObject.features.elementAt(0)}"                
+                ],
+                "is_enabled":${referenceObject.isEnabled},
+                "chime":{"url":"http"}
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createRequestJsonString,
+            RestStatus.INTERNAL_SERVER_ERROR.status
+        )
+    }
+    fun `test BAD delete request on non-existent config ID`() {
+        val configId = "abcdefghijk"
+        executeRequest(
+            RestRequest.Method.DELETE.name,
+            "$PLUGIN_BASE_URI/configs/$configId",
+            "",
+            RestStatus.NOT_FOUND.status
+        )
+    }
+    fun `test update Chime webhook URL`() {
+        // Create sample config request reference
+        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.CHIME,
+            setOf(FEATURE_ALERTING, FEATURE_REPORTS),
+            isEnabled = true,
+            configData = sampleChime
+        )
+
+        // Create chime notification config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"chime",
+                "feature_list":[
+                    "${referenceObject.features.elementAt(0)}",
+                    "${referenceObject.features.elementAt(1)}"
+                ],
+                "is_enabled":${referenceObject.isEnabled},
+                "chime":{"url":"${(referenceObject.configData as Chime).url}"}
+            }
+        }
+        """.trimIndent()
+        val createResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/configs",
+            createRequestJsonString,
+            RestStatus.OK.status
+        )
+        val configId = createResponse.get("config_id").asString
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        // update to new webhook URL
+        val updateRequestJsonString = """
+        {
+            "config":{
+                "name":"this is a updated config name",
+                "description":"this is a updated config description",
+                "config_type":"chime",
+                "feature_list":[
+                    "$FEATURE_INDEX_MANAGEMENT"
+                ],
+                "is_enabled":"true",
+                "chime":{"url":"https://updated.domain.com/updated_chime_url#0987654321"}
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.PUT.name,
+            "$PLUGIN_BASE_URI/configs/$configId",
+            updateRequestJsonString,
+            RestStatus.OK.status
+        )
+        // test BAD update with invalid webhook URL
+        val badUpdateRequestJsonString = """
+        {
+            "config":{
+                "name":"this is a updated config name",
+                "description":"this is a updated config description",
+                "config_type":"chime",
+                "feature_list":[
+                    "$FEATURE_INDEX_MANAGEMENT"
+                ],
+                "is_enabled":"true",
+                "chime":{"url":"http"}
+            }
+        }
+        """.trimIndent()
+        executeRequest(
+            RestRequest.Method.PUT.name,
+            "$PLUGIN_BASE_URI/configs/$configId",
+            badUpdateRequestJsonString,
+            RestStatus.INTERNAL_SERVER_ERROR.status
+        )
+    }
 }
