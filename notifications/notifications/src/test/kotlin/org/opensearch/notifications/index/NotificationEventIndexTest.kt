@@ -14,7 +14,9 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
 import io.mockk.every
 import io.mockk.mockkObject
-import org.junit.Assert.assertEquals
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.anyLong
@@ -101,7 +103,8 @@ internal class NotificationEventIndexTest {
 
         val admin = mock(AdminClient::class.java)
         val indices = mock(IndicesAdminClient::class.java)
-        val mockCreateClient: ActionFuture<CreateIndexResponse> = mock(ActionFuture::class.java) as ActionFuture<CreateIndexResponse>
+        val mockCreateClient: ActionFuture<CreateIndexResponse> =
+            mock(ActionFuture::class.java) as ActionFuture<CreateIndexResponse>
 
         whenever(client.admin()).thenReturn(admin)
         whenever(admin.indices()).thenReturn(indices)
@@ -138,5 +141,100 @@ internal class NotificationEventIndexTest {
 
         val actualEventDocInfo = NotificationEventIndex.getNotificationEvent(id)
         assertEquals(expectedEventDocInfo, actualEventDocInfo)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    @Test
+    fun `NotificationEventIndex should safely return null if response source is null`() {
+        val id = "index-1"
+
+        val clusterState = mock(ClusterState::class.java)
+
+        whenever(clusterService.state()).thenReturn(clusterState)
+        val mockRoutingTable = mock(RoutingTable::class.java)
+        val mockHasIndex = mockRoutingTable.hasIndex(indexName)
+
+        whenever(clusterState.routingTable).thenReturn(mockRoutingTable)
+        whenever(mockRoutingTable.hasIndex(indexName)).thenReturn(mockHasIndex)
+
+        val admin = mock(AdminClient::class.java)
+        val indices = mock(IndicesAdminClient::class.java)
+        val mockCreateClient: ActionFuture<CreateIndexResponse> =
+            mock(ActionFuture::class.java) as ActionFuture<CreateIndexResponse>
+
+        whenever(client.admin()).thenReturn(admin)
+        whenever(admin.indices()).thenReturn(indices)
+        whenever(indices.create(any())).thenReturn(mockCreateClient)
+
+        val mockActionGet = mock(CreateIndexResponse::class.java)
+
+        whenever(mockCreateClient.actionGet(anyLong())).thenReturn(mockActionGet)
+        whenever(mockActionGet.isAcknowledged).thenReturn(true)
+
+        val getRequest = GetRequest(indexName).id(id)
+        val mockActionFuture: ActionFuture<GetResponse> = mock(ActionFuture::class.java) as ActionFuture<GetResponse>
+        whenever(client.get(getRequest)).thenReturn(mockActionFuture)
+
+        val mockThreadPool = mock(ThreadPool::class.java)
+        val mockThreadContext = mock(ThreadContext::class.java)
+        val mockStashContext = mock(StoredContext::class.java)
+
+        whenever(client.threadPool()).thenReturn(mockThreadPool)
+        whenever(mockThreadPool.threadContext).thenReturn(mockThreadContext)
+        whenever(mockThreadContext.stashContext()).thenReturn(mockStashContext)
+        whenever(client.get(any())).thenReturn(mockActionFuture)
+
+        val mockGetResponse = mock(GetResponse::class.java)
+        whenever(mockActionFuture.actionGet(anyLong())).thenReturn(mockGetResponse)
+        val actualEventDocInfo = NotificationEventIndex.getNotificationEvent(id)
+        assertNull(actualEventDocInfo)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    @Test
+    fun `NotificationEventIndex should throw exception if response isn't acknowledged`() {
+        val id = "index-1"
+        val clusterState = mock(ClusterState::class.java)
+
+        whenever(clusterService.state()).thenReturn(clusterState)
+        val mockRoutingTable = mock(RoutingTable::class.java)
+        val mockHasIndex = mockRoutingTable.hasIndex(indexName)
+
+        whenever(clusterState.routingTable).thenReturn(mockRoutingTable)
+        whenever(mockRoutingTable.hasIndex(indexName)).thenReturn(mockHasIndex)
+
+        val admin = mock(AdminClient::class.java)
+        val indices = mock(IndicesAdminClient::class.java)
+        val mockCreateClient: ActionFuture<CreateIndexResponse> =
+            mock(ActionFuture::class.java) as ActionFuture<CreateIndexResponse>
+
+        whenever(client.admin()).thenReturn(admin)
+        whenever(admin.indices()).thenReturn(indices)
+        whenever(indices.create(any())).thenReturn(mockCreateClient)
+
+        val mockActionGet = mock(CreateIndexResponse::class.java)
+
+        whenever(mockCreateClient.actionGet(anyLong())).thenReturn(mockActionGet)
+        Assertions.assertThrows(IllegalStateException::class.java) {
+            NotificationEventIndex.getNotificationEvent(id)
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    @Test
+    fun `NotificationEventIndex should throw exception if index couldn't be created`() {
+        val id = "index-1"
+        val clusterState = mock(ClusterState::class.java)
+
+        whenever(clusterService.state()).thenReturn(clusterState)
+        val mockRoutingTable = mock(RoutingTable::class.java)
+        val mockHasIndex = mockRoutingTable.hasIndex(indexName)
+
+        whenever(clusterState.routingTable).thenReturn(mockRoutingTable)
+        whenever(mockRoutingTable.hasIndex(indexName)).thenReturn(mockHasIndex)
+
+        Assertions.assertThrows(Exception::class.java) {
+            NotificationEventIndex.getNotificationEvent(id)
+        }
     }
 }
