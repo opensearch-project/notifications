@@ -30,7 +30,6 @@ class CredentialsProviderFactory : CredentialsProvider {
     }
 
     private fun getCredentialsProviderByIAMRole(region: String, roleArn: String?): AWSCredentialsProvider {
-        // TODO cache credentials by role ARN?
         val stsClient = AWSSecurityTokenServiceClientBuilder.standard()
             .withCredentials(ProfileCredentialsProvider())
             .withRegion(region)
