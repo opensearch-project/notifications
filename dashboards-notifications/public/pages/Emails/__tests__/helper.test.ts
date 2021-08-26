@@ -12,6 +12,7 @@
 import {
   createRecipientGroupConfigObject,
   createSenderConfigObject,
+  onComboBoxCreateOption,
 } from '../utils/helper';
 
 describe('creates sender and recipient groups as config object', () => {
@@ -67,5 +68,41 @@ describe('creates sender and recipient groups as config object', () => {
         ],
       },
     });
+  });
+});
+
+describe('handles combo box create option', () => {
+  it('adds new option to combo box options', () => {
+    const options = [{label: 'selected-option'}, { label: 'existing-option' }];
+    const selectedOptions = [options[0]];
+    const setOptions = jest.fn();
+    const setSelectedOptions = jest.fn();
+    onComboBoxCreateOption(
+      'new-option',
+      options,
+      options,
+      setOptions,
+      selectedOptions,
+      setSelectedOptions
+    );
+    expect(setOptions).toBeCalledWith([...options, { label: 'new-option' }]);
+    expect(setSelectedOptions).toBeCalledWith([...selectedOptions, { label: 'new-option' }]);
+  });
+  
+  it('selects existing option', () => {
+    const options = [{label: 'selected-option'}, { label: 'existing-option' }];
+    const selectedOptions = [options[0]];
+    const setOptions = jest.fn();
+    const setSelectedOptions = jest.fn();
+    onComboBoxCreateOption(
+      'existing-option',
+      options,
+      options,
+      setOptions,
+      selectedOptions,
+      setSelectedOptions
+    );
+    expect(setOptions).not.toBeCalled();
+    expect(setSelectedOptions).toBeCalledWith([...selectedOptions, { label: 'existing-option' }]);
   });
 });

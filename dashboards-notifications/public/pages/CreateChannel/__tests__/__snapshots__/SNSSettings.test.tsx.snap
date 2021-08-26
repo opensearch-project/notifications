@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<SNSSettings /> spec renders and edits fields 1`] = `
+<div
+  class="euiSpacer euiSpacer--l"
+/>
+`;
+
+exports[`<SNSSettings /> spec renders the component 1`] = `
+<div
+  class="euiSpacer euiSpacer--l"
+/>
+`;

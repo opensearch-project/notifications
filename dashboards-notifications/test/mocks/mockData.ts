@@ -14,6 +14,7 @@ import {
   NotificationItem,
   RecipientGroupItemType,
   SenderItemType,
+  SESSenderItemType,
 } from '../../models/interfaces';
 
 const mockChime: ChannelItemType = {
@@ -70,8 +71,44 @@ const mockEmail: ChannelItemType = {
       'dD_8tHkBCzVy9Vy-5si0': 'name5',
       '52XGr3kBqFjWrmvL43mv': 'name6',
     },
+    invalid_ids: [],
+    sender_type: 'smtp_account',
   },
   config_id: 'DMG3zXkBPa6YFxmVfNmm',
+  created_time_ms: 1622654024861,
+  last_updated_time_ms: 1622656665674,
+};
+
+const mockEmailWithSES: ChannelItemType = {
+  name: 'Email test channel',
+  description: 'test description',
+  config_type: 'email',
+  feature_list: ['alerting'],
+  is_enabled: true,
+  email: {
+    email_account_id: 'dj8etXkBCzVy9Vy-nsiL',
+    recipient_list: ['custom@email.com', 'email@test.com', 'test@email.com'],
+    email_group_id_list: [
+      '1y8ud3xO0KjvOyRonaFb',
+      'qm8rgKxOPmIl9Il-0ftu',
+      'rQ8xgKxOPmIl9Il-N8w-',
+      '1I8td3xO0KjvOyRoNKFV',
+      'qQ_8gUxOPmIl9Il-5fv0',
+      '52KTe3xOdSwJeziY43zi',
+    ],
+    email_account_name: 'name1',
+    email_group_id_map: {
+      '1y8ud3xO0KjvOyRonaFb': 'name1',
+      'qm8rgKxOPmIl9Il-0ftu': 'name2',
+      'rQ8xgKxOPmIl9Il-N8w-': 'name3',
+      '1I8td3xO0KjvOyRoNKFV': 'name4',
+      'qQ_8gUxOPmIl9Il-5fv0': 'name5',
+      '52KTe3xOdSwJeziY43zi': 'name6',
+    },
+    invalid_ids: ["52KTe3xOdSwJeziY43zi"],
+    sender_type: 'ses_account',
+  },
+  config_id: 'QZT3mKxOCn6LSkzIsAzz',
   created_time_ms: 1622654024861,
   last_updated_time_ms: 1622656665674,
 };
@@ -98,6 +135,21 @@ const mockWebhook: ChannelItemType = {
   last_updated_time_ms: 1622581084050,
 };
 
+const mockSNS: ChannelItemType = {
+  name: 'SNS test channel',
+  description: 'test description',
+  config_type: 'sns',
+  feature_list: ['alerting'],
+  is_enabled: true,
+  sns: {
+    topic_arn: 'arn:aws:sns:us-west-2:012345678912:notifications-test',
+    role_arn: 'arn:aws:iam::012345678912:role/NotificationsSNSRole',
+  },
+  config_id: 'erCDYHsBUMRLC5PZXfPN',
+  created_time_ms: 1622157784037,
+  last_updated_time_ms: 1622581084050,
+};
+
 const mockSender: SenderItemType = {
   name: 'Test sender',
   description: 'test description',
@@ -109,6 +161,19 @@ const mockSender: SenderItemType = {
     port: '23',
     method: 'start_tls',
     from_address: 'sample@email.com',
+  },
+};
+
+const mockSESSender: SESSenderItemType = {
+  name: 'Test SES sender',
+  description: 'test description',
+  config_id: '72HlfUxOdSwJeziYSKxO',
+  created_time_ms: 1622158742784,
+  last_updated_time_ms: 1622158742784,
+  ses_account: {
+    from_address: 'sample@email.com',
+    region: 'us-west-2',
+    role_arn: 'arn:aws:iam::012345678912:role/TestNotificationsSESRole',
   },
 };
 
@@ -177,16 +242,23 @@ const mockNotification: NotificationItem = {
 
 export const MOCK_DATA = {
   channels: {
-    items: [mockChime, mockSlack, mockEmail, mockWebhook],
-    total: 4,
+    items: [mockChime, mockSlack, mockEmail, mockEmailWithSES, mockWebhook, mockSNS],
+    total: 6,
   },
   chime: mockChime,
   slack: mockSlack,
   email: mockEmail,
+  emailWithSES: mockEmailWithSES,
   webhook: mockWebhook,
+  sns: mockSNS,
   sender: mockSender,
+  sesSender: mockSESSender,
   senders: {
     items: [mockSender],
+    total: 1,
+  },
+  sesSenders: {
+    items: [mockSESSender],
     total: 1,
   },
   recipientGroup: mockRecipientGroup,

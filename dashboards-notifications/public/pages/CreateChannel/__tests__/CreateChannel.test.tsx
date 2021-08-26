@@ -39,6 +39,12 @@ import { MainContext } from '../../Main/Main';
 import { CreateChannel } from '../CreateChannel';
 
 describe('<CreateChannel/> spec', () => {
+    const updateConfigSuccess = jest.fn(async (configId: string, config: any) =>
+      Promise.resolve()
+    );
+    const updateConfigFailure = jest.fn(async (configId: string, config: any) =>
+      Promise.reject()
+    );
   it('renders the component', () => {
     const props = { match: { params: { id: 'test' } } };
     const utils = render(
@@ -62,9 +68,6 @@ describe('<CreateChannel/> spec', () => {
     const notificationServiceMockSlack = jest.fn() as any;
     const getSlackChannel = jest.fn(
       async (queryObject: object) => MOCK_DATA.slack
-    );
-    const updateConfigSuccess = jest.fn(async (configId: string, config: any) =>
-      Promise.resolve()
     );
     notificationServiceMockSlack.notificationService = {
       getChannel: getSlackChannel,
@@ -99,9 +102,6 @@ describe('<CreateChannel/> spec', () => {
   });
 
   it('renders the component for editing chime', async () => {
-    const updateConfigFailure = jest.fn(async (configId: string, config: any) =>
-      Promise.reject()
-    );
     const notificationServiceMockChime = jest.fn() as any;
     const getChimeChannel = jest.fn(
       async (queryObject: object) => MOCK_DATA.chime
@@ -148,6 +148,47 @@ describe('<CreateChannel/> spec', () => {
       getEmailConfigDetails: jest.fn(async (channel) =>
         Promise.resolve(channel)
       ),
+      updateConfig: updateConfigSuccess,
+    };
+    const props = {
+      location: { search: '' },
+      match: { params: { id: 'test' } },
+    };
+    const utilsEmail = render(
+      <MainContext.Provider value={mainStateMock}>
+        <ServicesContext.Provider value={notificationServiceMockEmail}>
+          <CoreServicesContext.Provider value={coreServicesMock}>
+            <CreateChannel
+              {...(props as RouteComponentProps<{ id: string }>)}
+              edit={true}
+            />
+          </CoreServicesContext.Provider>
+        </ServicesContext.Provider>
+      </MainContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(getEmailChannel).toBeCalled();
+    });
+
+    utilsEmail.getByTestId('create-channel-create-button').click();
+    await waitFor(() => {
+      expect(updateConfigSuccess).toBeCalled();
+    });
+  });
+
+  it('renders the component for editing email with SES', async () => {
+    const notificationServiceMockEmail = jest.fn() as any;
+    const getEmailChannel = jest.fn(
+      async (queryObject: object) => MOCK_DATA.emailWithSES
+    );
+    notificationServiceMockEmail.notificationService = {
+      getChannel: getEmailChannel,
+      getSenders: jest.fn(async (query) => MOCK_DATA.senders),
+      getEmailConfigDetails: jest.fn(async (channel) =>
+        Promise.resolve(channel)
+      ),
+      updateConfig: updateConfigSuccess,
     };
     const props = {
       location: { search: '' },
@@ -178,6 +219,7 @@ describe('<CreateChannel/> spec', () => {
     );
     notificationServiceMockWebhook.notificationService = {
       getChannel: getWebhookChannel,
+      updateConfig: updateConfigSuccess,
     };
     const props = {
       location: { search: '' },
@@ -198,6 +240,45 @@ describe('<CreateChannel/> spec', () => {
 
     await waitFor(() => {
       expect(getWebhookChannel).toBeCalled();
+    });
+
+    utilsWebhook.getByTestId('create-channel-create-button').click();
+    await waitFor(() => {
+      expect(updateConfigSuccess).toBeCalled();
+    });
+  });
+
+  it('renders the component for editing sns', async () => {
+    const notificationServiceMockSNS = jest.fn() as any;
+    const getSNSChannel = jest.fn(async (queryObject: object) => MOCK_DATA.sns);
+    notificationServiceMockSNS.notificationService = {
+      getChannel: getSNSChannel,
+      updateConfig: updateConfigSuccess,
+    };
+    const props = {
+      location: { search: '' },
+      match: { params: { id: 'test' } },
+    };
+    const utilsSNS = render(
+      <MainContext.Provider value={mainStateMock}>
+        <ServicesContext.Provider value={notificationServiceMockSNS}>
+          <CoreServicesContext.Provider value={coreServicesMock}>
+            <CreateChannel
+              {...(props as RouteComponentProps<{ id: string }>)}
+              edit={true}
+            />
+          </CoreServicesContext.Provider>
+        </ServicesContext.Provider>
+      </MainContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(getSNSChannel).toBeCalled();
+    });
+
+    utilsSNS.getByTestId('create-channel-create-button').click();
+    await waitFor(() => {
+      expect(updateConfigSuccess).toBeCalled();
     });
   });
 });
