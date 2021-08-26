@@ -37,7 +37,6 @@ import org.opensearch.action.get.GetResponse
 import org.opensearch.action.get.MultiGetRequest
 import org.opensearch.action.index.IndexRequest
 import org.opensearch.action.search.SearchRequest
-import org.opensearch.action.update.UpdateRequest
 import org.opensearch.client.Client
 import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.unit.TimeValue
@@ -250,12 +249,11 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     override fun updateNotificationConfig(id: String, notificationConfigDoc: NotificationConfigDoc): Boolean {
         createIndex()
-        val updateRequest = UpdateRequest()
-            .index(INDEX_NAME)
+        val indexRequest = IndexRequest(INDEX_NAME)
+            .source(notificationConfigDoc.toXContent())
+            .create(false)
             .id(id)
-            .doc(notificationConfigDoc.toXContent())
-            .fetchSource(true)
-        val actionFuture = client.update(updateRequest)
+        val actionFuture = client.index(indexRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
         if (response.result != DocWriteResponse.Result.UPDATED) {
             log.warn("$LOG_PREFIX:updateNotificationConfig failed for $id; response:$response")

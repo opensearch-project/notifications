@@ -112,7 +112,10 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Updated notification config object
-        val updatedWebhook = Webhook("https://updated.domain.com/updated_webhook_url#0987654321")
+        val updatedWebhook = Webhook(
+            "https://updated.domain.com/updated_webhook_url#0987654321",
+            mapOf(Pair("key", "value"))
+        )
         val updatedObject = NotificationConfig(
             "this is a updated config name",
             "this is a updated config description",
@@ -134,7 +137,12 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
                     "${updatedObject.features.elementAt(1)}"
                 ],
                 "is_enabled":${updatedObject.isEnabled},
-                "webhook":{"url":"${(updatedObject.configData as Webhook).url}"}
+                "webhook":{
+                    "url":"${(updatedObject.configData as Webhook).url}",
+                    "header_params": {
+                        "key":"value"
+                    }
+                }
             }
         }
         """.trimIndent()

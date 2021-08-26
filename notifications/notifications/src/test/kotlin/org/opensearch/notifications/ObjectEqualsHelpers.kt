@@ -27,6 +27,7 @@
 
 package org.opensearch.notifications
 
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.junit.Assert
 import org.opensearch.commons.notifications.model.Chime
@@ -51,6 +52,8 @@ fun verifyEquals(chime: Chime, jsonObject: JsonObject) {
 
 fun verifyEquals(webhook: Webhook, jsonObject: JsonObject) {
     Assert.assertEquals(webhook.url, jsonObject.get("url").asString)
+    Assert.assertEquals(webhook.headerParams, Gson().fromJson(jsonObject.get("header_params"), HashMap::class.java))
+    Assert.assertEquals(webhook.method.tag, jsonObject.get("method").asString)
 }
 
 fun verifyEquals(email: Email, jsonObject: JsonObject) {
