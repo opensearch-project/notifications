@@ -30,13 +30,14 @@ describe('Test create channels', () => {
     cy.get('[placeholder="Enter channel name"]').type('Test slack channel');
     cy.get('.euiCheckbox__input[id="alerting"]').click({ force: true });
     cy.get('[data-test-subj="create-channel-slack-webhook-input"]').type(
-      'https://test.slack.com'
+      'https://sample-slack-webhook'
     );
     cy.wait(delay);
     cy.get('[data-test-subj="create-channel-send-test-message-button"]').click({
       force: true,
     });
     cy.wait(delay);
+    // This needs some time to appear as it will wait for backend call to timeout
     cy.contains('test message.').should('exist');
 
     cy.get('[data-test-subj="create-channel-create-button"]').click({
@@ -57,7 +58,7 @@ describe('Test create channels', () => {
     cy.wait(delay);
 
     cy.get('[data-test-subj="create-channel-chime-webhook-input"]').type(
-      'https://test.chime.com'
+      'https://sample-chime-webhook'
     );
     cy.wait(delay);
 
@@ -102,6 +103,49 @@ describe('Test create channels', () => {
     cy.contains('successfully created.').should('exist');
   });
 
+  it('creates a email channel with ses sender', () => {
+    cy.get('[placeholder="Enter channel name"]').type('Test email channel with ses');
+    cy.get('.euiCheckbox__input[id="reports"]').click({ force: true });
+
+    cy.get('.euiSuperSelectControl').contains('Slack').click({ force: true });
+    cy.wait(delay);
+    cy.get('.euiContextMenuItem__text')
+      .contains('Email')
+      .click({ force: true });
+    cy.wait(delay);
+    
+    cy.get('input.euiRadio__input#ses_account').click({ force: true });
+    cy.wait(delay);
+
+    cy.get('.euiButton__text')
+      .contains('Create SES sender')
+      .click({ force: true });
+    cy.get('[data-test-subj="create-ses-sender-form-name-input"]').type(
+      'Test ses sender'
+    );
+    cy.get('[data-test-subj="create-ses-sender-form-email-input"]').type(
+      'test@email.com'
+    );
+    cy.get('[data-test-subj="create-ses-sender-form-role-arn-input"]').type(
+      'arn:aws:iam::012345678912:role/NotificationsSESRole'
+    );
+    cy.get('[data-test-subj="create-ses-sender-form-aws-region-input"]').type(
+      'us-east-1'
+    );
+    cy.get(
+      '[data-test-subj="create-ses-sender-modal-create-button"]'
+    ).click();
+    cy.contains('successfully created.').should('exist');
+
+    // custom data-test-subj does not work on combo box
+    cy.get('[data-test-subj="comboBoxInput"]').eq(1).click({ force: true });
+    cy.contains('Test recipient group').click();
+    cy.wait(delay);
+
+    cy.get('[data-test-subj="create-channel-create-button"]').click();
+    cy.contains('successfully created.').should('exist');
+  });
+
   it('creates a webhook channel', () => {
     cy.get('[placeholder="Enter channel name"]').type('Test webhook channel');
     cy.get('.euiCheckbox__input[id="reports"]').click({ force: true });
@@ -115,6 +159,28 @@ describe('Test create channels', () => {
 
     cy.get('[data-test-subj="custom-webhook-url-input"]').type(
       'https://custom-webhook-test-url.com:8888/test-path?params1=value1&params2=value2&params3=value3&params4=value4&params5=values5&params6=values6&params7=values7'
+    );
+
+    cy.get('[data-test-subj="create-channel-create-button"]').click();
+    cy.contains('successfully created.').should('exist');
+  });
+
+  it('creates a sns channel', () => {
+    cy.get('[placeholder="Enter channel name"]').type('Test sns channel');
+    cy.get('.euiCheckbox__input[id="reports"]').click({ force: true });
+
+    cy.get('.euiSuperSelectControl').contains('Slack').click({ force: true });
+    cy.wait(delay);
+    cy.get('.euiContextMenuItem__text')
+      .contains('Amazon SNS')
+      .click({ force: true });
+    cy.wait(delay);
+
+    cy.get('[data-test-subj="sns-settings-topic-arn-input"]').type(
+      'arn:aws:sns:us-west-2:123456789012:notifications-test'
+    );
+    cy.get('[data-test-subj="sns-settings-role-arn-input"]').type(
+      'arn:aws:iam::012345678901:role/NotificationsSNSRole'
     );
 
     cy.get('[data-test-subj="create-channel-create-button"]').click();
