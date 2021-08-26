@@ -141,7 +141,7 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
                   props.onClose();
                 })
                 .catch((error) => {
-                  coreContext.notifications.toasts.addError(error, {
+                  coreContext.notifications.toasts.addError(error?.body || error, {
                     title: 'Failed to create sender.',
                   });
                 });

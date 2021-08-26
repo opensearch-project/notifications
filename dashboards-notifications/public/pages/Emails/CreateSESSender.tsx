@@ -171,7 +171,7 @@ export function CreateSESSender(props: CreateSESSenderProps) {
                 })
                 .catch((error) => {
                   setLoading(false);
-                  coreContext.notifications.toasts.addError(error, {
+                  coreContext.notifications.toasts.addError(error?.body || error, {
                     title: `Failed to ${
                       props.edit ? 'update' : 'create'
                     } sender.`,

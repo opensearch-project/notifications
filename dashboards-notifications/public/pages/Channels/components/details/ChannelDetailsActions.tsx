@@ -77,7 +77,7 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
         'Successfully sent a test message.'
       );
     } catch (error) {
-      coreContext.notifications.toasts.addError(error, {
+      coreContext.notifications.toasts.addError(error?.body || error, {
         title: 'Failed to send the test message.',
         toastMessage: 'View error details and adjust the channel settings.',
       });

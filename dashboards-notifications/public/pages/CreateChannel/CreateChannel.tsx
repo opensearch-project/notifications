@@ -376,7 +376,7 @@ export function CreateChannel(props: CreateChannelsProps) {
         'Successfully sent a test message.'
       );
     } catch (error) {
-      coreContext.notifications.toasts.addError(error, {
+      coreContext.notifications.toasts.addError(error?.body || error, {
         title: 'Failed to send the test message.',
         toastMessage: 'View error details and adjust the channel settings.',
       });
@@ -388,7 +388,7 @@ export function CreateChannel(props: CreateChannelsProps) {
             console.info('Deleted temporary channel:', response);
           })
           .catch((error) => {
-            coreContext.notifications.toasts.addError(error, {
+            coreContext.notifications.toasts.addError(error?.body || error, {
               title: 'Failed to delete temporary channel for test message.',
             });
           });
@@ -547,7 +547,7 @@ export function CreateChannel(props: CreateChannelsProps) {
                   })
                   .catch((error) => {
                     setLoading(false);
-                    coreContext.notifications.toasts.addError(error, {
+                    coreContext.notifications.toasts.addError(error?.body || error, {
                       title: `Failed to ${
                         props.edit ? 'update' : 'create'
                       } channel.`,

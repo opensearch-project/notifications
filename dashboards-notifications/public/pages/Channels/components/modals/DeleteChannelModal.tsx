@@ -129,7 +129,7 @@ export const DeleteChannelModal = (props: DeleteChannelModalProps) => {
                         setTimeout(() => props.refresh!(), SERVER_DELAY);
                     })
                     .catch((error) => {
-                      coreContext.notifications.toasts.addError(error, {
+                      coreContext.notifications.toasts.addError(error?.body || error, {
                         title: 'Failed to delete one or more channels.',
                       });
                       props.onClose();
