@@ -156,7 +156,7 @@ export class SendersTable extends Component<
       this.setState({ items: senders.items, total: senders.total });
     } catch (error) {
       this.props.coreContext.notifications.toasts.addDanger(
-        getErrorMessage(error, 'There was a problem loading senders.')
+        getErrorMessage(error, 'There was a problem loading SMTP senders.')
       );
     }
     this.setState({ loading: false });
@@ -202,93 +202,91 @@ export class SendersTable extends Component<
     };
 
     return (
-      <>
-        <ContentPanel
-          actions={
-            <ContentPanelActions
-              actions={[
-                {
-                  component: (
-                    <ModalConsumer>
-                      {({ onShow }) => (
-                        <EuiButton
-                          data-test-subj="senders-table-delete-button"
-                          disabled={this.state.selectedItems.length === 0}
-                          onClick={() =>
-                            onShow(DeleteSenderModal, {
-                              senders: this.state.selectedItems,
-                              refresh: this.refresh,
-                            })
-                          }
-                        >
-                          Delete
-                        </EuiButton>
-                      )}
-                    </ModalConsumer>
-                  ),
-                },
-                {
-                  component: (
-                    <EuiButton
-                      data-test-subj="senders-table-edit-button"
-                      disabled={this.state.selectedItems.length !== 1}
-                      onClick={() =>
-                        location.assign(
-                          `#${ROUTES.EDIT_SENDER}/${this.state.selectedItems[0]?.config_id}`
-                        )
-                      }
-                    >
-                      Edit
-                    </EuiButton>
-                  ),
-                },
-                {
-                  component: (
-                    <EuiButton fill href={`#${ROUTES.CREATE_SENDER}`}>
-                      Create SMTP sender
-                    </EuiButton>
-                  ),
-                },
-              ]}
-            />
-          }
-          bodyStyles={{ padding: 'initial' }}
-          title="SMTP senders"
-          titleSize="m"
-          total={this.state.total}
-        >
-          <EuiFieldSearch
-            data-test-subj="senders-table-search-input"
-            fullWidth={true}
-            placeholder="Search"
-            onSearch={this.onSearchChange}
-          />
-          <EuiHorizontalRule margin="s" />
-
-          <EuiBasicTable
-            columns={this.columns}
-            items={this.state.items}
-            itemId="config_id"
-            isSelectable={true}
-            selection={selection}
-            noItemsMessage={
-              <EuiEmptyPrompt
-                title={<h2>No SMTP senders to display</h2>}
-                body="Set up an outbound email server by creating a sender. You will select a sender when configuring email channels."
-                actions={
-                  <EuiButton href={`#${ROUTES.CREATE_SENDER}`}>
+      <ContentPanel
+        actions={
+          <ContentPanelActions
+            actions={[
+              {
+                component: (
+                  <ModalConsumer>
+                    {({ onShow }) => (
+                      <EuiButton
+                        data-test-subj="senders-table-delete-button"
+                        disabled={this.state.selectedItems.length === 0}
+                        onClick={() =>
+                          onShow(DeleteSenderModal, {
+                            senders: this.state.selectedItems,
+                            refresh: this.refresh,
+                          })
+                        }
+                      >
+                        Delete
+                      </EuiButton>
+                    )}
+                  </ModalConsumer>
+                ),
+              },
+              {
+                component: (
+                  <EuiButton
+                    data-test-subj="senders-table-edit-button"
+                    disabled={this.state.selectedItems.length !== 1}
+                    onClick={() =>
+                      location.assign(
+                        `#${ROUTES.EDIT_SENDER}/${this.state.selectedItems[0]?.config_id}`
+                      )
+                    }
+                  >
+                    Edit
+                  </EuiButton>
+                ),
+              },
+              {
+                component: (
+                  <EuiButton fill href={`#${ROUTES.CREATE_SENDER}`}>
                     Create SMTP sender
                   </EuiButton>
-                }
-              />
-            }
-            onChange={this.onTableChange}
-            pagination={pagination}
-            sorting={sorting}
-            loading={this.state.loading}
+                ),
+              },
+            ]}
           />
-        </ContentPanel>
-      </>
+        }
+        bodyStyles={{ padding: 'initial' }}
+        title="SMTP senders"
+        titleSize="m"
+        total={this.state.total}
+      >
+        <EuiFieldSearch
+          data-test-subj="senders-table-search-input"
+          fullWidth={true}
+          placeholder="Search"
+          onSearch={this.onSearchChange}
+        />
+        <EuiHorizontalRule margin="s" />
+
+        <EuiBasicTable
+          columns={this.columns}
+          items={this.state.items}
+          itemId="config_id"
+          isSelectable={true}
+          selection={selection}
+          noItemsMessage={
+            <EuiEmptyPrompt
+              title={<h2>No SMTP senders to display</h2>}
+              body="Set up an outbound email server by creating a sender. You will select a sender when configuring email channels."
+              actions={
+                <EuiButton href={`#${ROUTES.CREATE_SENDER}`}>
+                  Create SMTP sender
+                </EuiButton>
+              }
+            />
+          }
+          onChange={this.onTableChange}
+          pagination={pagination}
+          sorting={sorting}
+          loading={this.state.loading}
+        />
+      </ContentPanel>
     );
   }
 }

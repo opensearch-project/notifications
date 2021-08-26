@@ -68,3 +68,25 @@ export const createRecipientGroupConfigObject = (
     },
   };
 };
+
+export const onComboBoxCreateOption = (
+  searchValue: string,
+  flattenedOptions: Array<EuiComboBoxOptionOption<string>> = [],
+  options: Array<EuiComboBoxOptionOption<string>>,
+  setOptions: (options: Array<EuiComboBoxOptionOption<string>>) => void,
+  selectedOptions: Array<EuiComboBoxOptionOption<string>>,
+  setSelectedOptions: (options: Array<EuiComboBoxOptionOption<string>>) => void
+) => {
+  const normalizedSearchValue = searchValue.trim().toLowerCase();
+  if (!normalizedSearchValue) return;
+
+  const newOption = { label: searchValue };
+  if (
+    flattenedOptions.findIndex(
+      (option) => option.label.trim().toLowerCase() === normalizedSearchValue
+    ) === -1
+  ) {
+    setOptions([...options, newOption]);
+  }
+  setSelectedOptions([...selectedOptions, newOption]);
+};

@@ -41,6 +41,7 @@ import { CoreServicesContext } from '../../../components/coreServices';
 import { ModalConsumer } from '../../../components/Modal';
 import { ServicesContext } from '../../../services';
 import { getErrorMessage } from '../../../utils/helpers';
+import { onComboBoxCreateOption } from '../../Emails/utils/helper';
 import { MainContext } from '../../Main/Main';
 import { CreateChannelContext } from '../CreateChannel';
 import {
@@ -150,27 +151,6 @@ export function EmailSettings(props: EmailSettingsProps) {
     refreshSenders();
     refreshRecipientGroups();
   }, []);
-
-  const onCreateEmailOption = (
-    searchValue: string,
-    flattenedOptions: Array<EuiComboBoxOptionOption<string>> = []
-  ) => {
-    const normalizedSearchValue = searchValue.trim().toLowerCase();
-    if (!normalizedSearchValue) return;
-
-    const newOption = { label: searchValue };
-    if (
-      flattenedOptions.findIndex(
-        (option) => option.label.trim().toLowerCase() === normalizedSearchValue
-      ) === -1
-    ) {
-      setRecipientGroupOptions([...recipientGroupOptions, newOption]);
-    }
-    props.setSelectedRecipientGroupOptions([
-      ...props.selectedRecipientGroupOptions,
-      newOption,
-    ]);
-  };
 
   return (
     <>
@@ -333,7 +313,16 @@ export function EmailSettings(props: EmailSettingsProps) {
               options={recipientGroupOptions}
               selectedOptions={props.selectedRecipientGroupOptions}
               onChange={props.setSelectedRecipientGroupOptions}
-              onCreateOption={onCreateEmailOption}
+              onCreateOption={(searchValue, flattenedOptions) =>
+                onComboBoxCreateOption(
+                  searchValue,
+                  flattenedOptions,
+                  recipientGroupOptions,
+                  setRecipientGroupOptions,
+                  props.selectedRecipientGroupOptions,
+                  props.setSelectedRecipientGroupOptions
+                )
+              }
               customOptionText={'Add {searchValue} as a default recipient'}
               isClearable={true}
               isInvalid={context.inputErrors.recipients.length > 0}

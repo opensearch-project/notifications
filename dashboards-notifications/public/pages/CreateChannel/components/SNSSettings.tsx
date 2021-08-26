@@ -58,6 +58,7 @@ export function SNSSettings(props: SNSSettingsProps) {
       >
         <EuiFieldText
           placeholder="ARN key"
+          data-test-subj="sns-settings-topic-arn-input"
           value={props.topicArn}
           onChange={(e) => props.setTopicArn(e.target.value)}
           isInvalid={context.inputErrors.topicArn.length > 0}
@@ -86,6 +87,7 @@ export function SNSSettings(props: SNSSettingsProps) {
               </EuiText>
               <EuiSpacer size="s" />
               <EuiFieldText
+                data-test-subj="sns-settings-role-arn-input"
                 placeholder="ARN key"
                 value={props.roleArn}
                 onChange={(e) => props.setRoleArn(e.target.value)}
@@ -114,6 +116,7 @@ export function SNSSettings(props: SNSSettingsProps) {
         >
           <EuiFieldText
             placeholder="ARN key"
+            data-test-subj="sns-settings-role-arn-input"
             value={props.roleArn}
             onChange={(e) => props.setRoleArn(e.target.value)}
             isInvalid={context.inputErrors.roleArn.length > 0}

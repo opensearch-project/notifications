@@ -28,8 +28,10 @@ import { createSesSenderConfigObject } from '../../../Emails/utils/helper';
 import {
   validateAwsRegion,
   validateEmail,
+  validateRoleArn,
   validateSenderName,
 } from '../../../Emails/utils/validationHelper';
+import { MainContext } from '../../../Main/Main';
 
 interface CreateSESSenderModalProps extends ModalRootProps {
   addSenderOptionAndSelect: (
@@ -40,6 +42,8 @@ interface CreateSESSenderModalProps extends ModalRootProps {
 
 export function CreateSESSenderModal(props: CreateSESSenderModalProps) {
   const coreContext = useContext(CoreServicesContext)!;
+  const mainStateContext = useContext(MainContext)!;
+
   const [senderName, setSenderName] = useState('');
   const [email, setEmail] = useState('');
   const [roleArn, setRoleArn] = useState('');
@@ -58,6 +62,9 @@ export function CreateSESSenderModal(props: CreateSESSenderModalProps) {
       awsRegion: validateAwsRegion(awsRegion),
       roleArn: [],
     };
+    if (!mainStateContext.tooltipSupport) {
+      errors.roleArn = validateRoleArn(roleArn);
+    }
     setInputErrors(errors);
     return !Object.values(errors).reduce(
       (errorFlag, error) => errorFlag || error.length > 0,
@@ -90,7 +97,7 @@ export function CreateSESSenderModal(props: CreateSESSenderModalProps) {
         <EuiModalFooter>
           <EuiButtonEmpty onClick={props.onClose}>Cancel</EuiButtonEmpty>
           <EuiButton
-            data-test-subj="create-sender-modal-create-button"
+            data-test-subj="create-ses-sender-modal-create-button"
             fill
             onClick={async () => {
               if (!isInputValid()) {

@@ -25,11 +25,13 @@ import { CoreServicesContext } from '../../components/coreServices';
 import { ServicesContext } from '../../services';
 import { BREADCRUMBS, ROUTES } from '../../utils/constants';
 import { getErrorMessage } from '../../utils/helpers';
+import { MainContext } from '../Main/Main';
 import { CreateSESSenderForm } from './components/forms/CreateSESSenderForm';
 import { createSesSenderConfigObject } from './utils/helper';
 import {
   validateAwsRegion,
   validateEmail,
+  validateRoleArn,
   validateSenderName,
 } from './utils/validationHelper';
 
@@ -40,6 +42,7 @@ interface CreateSESSenderProps extends RouteComponentProps<{ id?: string }> {
 export function CreateSESSender(props: CreateSESSenderProps) {
   const coreContext = useContext(CoreServicesContext)!;
   const servicesContext = useContext(ServicesContext)!;
+  const mainStateContext = useContext(MainContext)!;
 
   const [loading, setLoading] = useState(false);
   const [senderName, setSenderName] = useState('');
@@ -92,6 +95,9 @@ export function CreateSESSender(props: CreateSESSenderProps) {
       awsRegion: validateAwsRegion(awsRegion),
       roleArn: [],
     };
+    if (!mainStateContext.tooltipSupport) {
+      errors.roleArn = validateRoleArn(roleArn);
+    }
     setInputErrors(errors);
     return !Object.values(errors).reduce(
       (errorFlag, error) => errorFlag || error.length > 0,

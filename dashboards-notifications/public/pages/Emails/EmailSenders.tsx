@@ -60,6 +60,7 @@ export function EmailSenders(props: EmailSendersProps) {
         </>
       )}
 
+      {/* UI currently does not fully handle this condition, adding it just to avoid flashing */}
       {mainStateContext.availableConfigTypes.includes('ses_account') && (
         <>
           <EuiSpacer />
