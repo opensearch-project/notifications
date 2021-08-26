@@ -44,13 +44,12 @@ internal class SnsDestinationTransport : DestinationTransport<SnsDestination> {
         referenceId: String
     ): DestinationMessageResponse {
         return try {
-            val response = destinationSNSClient.execute(destination, message, referenceId)
-            DestinationMessageResponse(RestStatus.OK.status, "Success, message id: $response")
-        } catch (exception: IOException) { // TODO:Add specific SNS exception and throw corresponding errors
+            destinationSNSClient.execute(destination, message, referenceId)
+        } catch (exception: IOException) {
             log.error("Exception sending message id $referenceId", exception)
             DestinationMessageResponse(
                 RestStatus.INTERNAL_SERVER_ERROR.status,
-                "Failed to send message ${exception.message}"
+                "Failed to send SNS message ${exception.message}"
             )
         }
     }
