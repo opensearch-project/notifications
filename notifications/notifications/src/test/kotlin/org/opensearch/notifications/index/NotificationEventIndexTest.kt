@@ -65,6 +65,7 @@ internal class NotificationEventIndexTest {
     @Suppress("UNCHECKED_CAST")
     @Test
     fun `index operation to get single event`() {
+        // creating expected value
         val id = "index-1"
         val docInfo = DocInfo("index-1", 1, 1, 1)
         val lastUpdatedTimeMs = Instant.ofEpochMilli(Instant.now().toEpochMilli())
@@ -92,42 +93,25 @@ internal class NotificationEventIndexTest {
         val eventDoc = NotificationEventDoc(metadata, sampleEvent)
         val expectedEventDocInfo = NotificationEventDocInfo(docInfo, eventDoc)
 
-        val clusterState = mock(ClusterState::class.java)
+        // mocking the dependencies for isIndexExists function
+        mockIsIndexExists()
 
-        whenever(clusterService.state()).thenReturn(clusterState)
-        val mockRoutingTable = mock(RoutingTable::class.java)
-        val mockHasIndex = mockRoutingTable.hasIndex(indexName)
-
-        whenever(clusterState.routingTable).thenReturn(mockRoutingTable)
-        whenever(mockRoutingTable.hasIndex(indexName)).thenReturn(mockHasIndex)
-
-        val admin = mock(AdminClient::class.java)
-        val indices = mock(IndicesAdminClient::class.java)
-        val mockCreateClient: ActionFuture<CreateIndexResponse> =
-            mock(ActionFuture::class.java) as ActionFuture<CreateIndexResponse>
-
-        whenever(client.admin()).thenReturn(admin)
-        whenever(admin.indices()).thenReturn(indices)
-        whenever(indices.create(any())).thenReturn(mockCreateClient)
-
+        // creating a mock index response for client
         val mockActionGet = mock(CreateIndexResponse::class.java)
-
-        whenever(mockCreateClient.actionGet(anyLong())).thenReturn(mockActionGet)
+        mockCreateIndex(mockActionGet)
         whenever(mockActionGet.isAcknowledged).thenReturn(true)
 
+        // creating a get request
         val getRequest = GetRequest(indexName).id(id)
+
+        // mocking ActionFuture to create response for the get request
         val mockActionFuture: ActionFuture<GetResponse> = mock(ActionFuture::class.java) as ActionFuture<GetResponse>
         whenever(client.get(getRequest)).thenReturn(mockActionFuture)
 
-        val mockThreadPool = mock(ThreadPool::class.java)
-        val mockThreadContext = mock(ThreadContext::class.java)
-        val mockStashContext = mock(StoredContext::class.java)
+        // mocking the get request of Secure Index client
+        mockGetSecureIndexClient(mockActionFuture)
 
-        whenever(client.threadPool()).thenReturn(mockThreadPool)
-        whenever(mockThreadPool.threadContext).thenReturn(mockThreadContext)
-        whenever(mockThreadContext.stashContext()).thenReturn(mockStashContext)
-        whenever(client.get(any())).thenReturn(mockActionFuture)
-
+        // create mock response for actionGet
         val mockGetResponse = mock(GetResponse::class.java)
         whenever(mockActionFuture.actionGet(anyLong())).thenReturn(mockGetResponse)
 
@@ -136,6 +120,7 @@ internal class NotificationEventIndexTest {
         whenever(mockGetResponse.primaryTerm).thenReturn(1)
         whenever(mockGetResponse.seqNo).thenReturn(1)
 
+        // mock object
         mockkObject(NotificationEventDoc)
         every { NotificationEventDoc.parse(any()) } returns eventDoc
 
@@ -147,45 +132,27 @@ internal class NotificationEventIndexTest {
     @Test
     fun `NotificationEventIndex should safely return null if response source is null`() {
         val id = "index-1"
+        // mocking the dependencies for isIndexExists function
+        mockIsIndexExists()
 
-        val clusterState = mock(ClusterState::class.java)
-
-        whenever(clusterService.state()).thenReturn(clusterState)
-        val mockRoutingTable = mock(RoutingTable::class.java)
-        val mockHasIndex = mockRoutingTable.hasIndex(indexName)
-
-        whenever(clusterState.routingTable).thenReturn(mockRoutingTable)
-        whenever(mockRoutingTable.hasIndex(indexName)).thenReturn(mockHasIndex)
-
-        val admin = mock(AdminClient::class.java)
-        val indices = mock(IndicesAdminClient::class.java)
-        val mockCreateClient: ActionFuture<CreateIndexResponse> =
-            mock(ActionFuture::class.java) as ActionFuture<CreateIndexResponse>
-
-        whenever(client.admin()).thenReturn(admin)
-        whenever(admin.indices()).thenReturn(indices)
-        whenever(indices.create(any())).thenReturn(mockCreateClient)
-
+        // creating a mock index response for client
         val mockActionGet = mock(CreateIndexResponse::class.java)
-
-        whenever(mockCreateClient.actionGet(anyLong())).thenReturn(mockActionGet)
+        mockCreateIndex(mockActionGet)
         whenever(mockActionGet.isAcknowledged).thenReturn(true)
 
+        // creating a get request
         val getRequest = GetRequest(indexName).id(id)
+        // mock ActionFuture to create response for the get request
         val mockActionFuture: ActionFuture<GetResponse> = mock(ActionFuture::class.java) as ActionFuture<GetResponse>
         whenever(client.get(getRequest)).thenReturn(mockActionFuture)
 
-        val mockThreadPool = mock(ThreadPool::class.java)
-        val mockThreadContext = mock(ThreadContext::class.java)
-        val mockStashContext = mock(StoredContext::class.java)
+        // mocking the get request of Secure Index client
+        mockGetSecureIndexClient(mockActionFuture)
 
-        whenever(client.threadPool()).thenReturn(mockThreadPool)
-        whenever(mockThreadPool.threadContext).thenReturn(mockThreadContext)
-        whenever(mockThreadContext.stashContext()).thenReturn(mockStashContext)
-        whenever(client.get(any())).thenReturn(mockActionFuture)
-
+        // create mock response for actionGet
         val mockGetResponse = mock(GetResponse::class.java)
         whenever(mockActionFuture.actionGet(anyLong())).thenReturn(mockGetResponse)
+
         val actualEventDocInfo = NotificationEventIndex.getNotificationEvent(id)
         assertNull(actualEventDocInfo)
     }
@@ -194,27 +161,12 @@ internal class NotificationEventIndexTest {
     @Test
     fun `NotificationEventIndex should throw exception if response isn't acknowledged`() {
         val id = "index-1"
-        val clusterState = mock(ClusterState::class.java)
+        // mocking the dependencies for isIndexExists function
+        mockIsIndexExists()
 
-        whenever(clusterService.state()).thenReturn(clusterState)
-        val mockRoutingTable = mock(RoutingTable::class.java)
-        val mockHasIndex = mockRoutingTable.hasIndex(indexName)
-
-        whenever(clusterState.routingTable).thenReturn(mockRoutingTable)
-        whenever(mockRoutingTable.hasIndex(indexName)).thenReturn(mockHasIndex)
-
-        val admin = mock(AdminClient::class.java)
-        val indices = mock(IndicesAdminClient::class.java)
-        val mockCreateClient: ActionFuture<CreateIndexResponse> =
-            mock(ActionFuture::class.java) as ActionFuture<CreateIndexResponse>
-
-        whenever(client.admin()).thenReturn(admin)
-        whenever(admin.indices()).thenReturn(indices)
-        whenever(indices.create(any())).thenReturn(mockCreateClient)
-
+        // creating a mock index response for client
         val mockActionGet = mock(CreateIndexResponse::class.java)
-
-        whenever(mockCreateClient.actionGet(anyLong())).thenReturn(mockActionGet)
+        mockCreateIndex(mockActionGet)
         Assertions.assertThrows(IllegalStateException::class.java) {
             NotificationEventIndex.getNotificationEvent(id)
         }
@@ -224,17 +176,44 @@ internal class NotificationEventIndexTest {
     @Test
     fun `NotificationEventIndex should throw exception if index couldn't be created`() {
         val id = "index-1"
-        val clusterState = mock(ClusterState::class.java)
-
-        whenever(clusterService.state()).thenReturn(clusterState)
-        val mockRoutingTable = mock(RoutingTable::class.java)
-        val mockHasIndex = mockRoutingTable.hasIndex(indexName)
-
-        whenever(clusterState.routingTable).thenReturn(mockRoutingTable)
-        whenever(mockRoutingTable.hasIndex(indexName)).thenReturn(mockHasIndex)
-
+        // mocking the dependencies for isIndexExists function
+        mockIsIndexExists()
         Assertions.assertThrows(Exception::class.java) {
             NotificationEventIndex.getNotificationEvent(id)
         }
+    }
+
+    private fun mockIsIndexExists() {
+        val clusterState = mock(ClusterState::class.java)
+        whenever(clusterService.state()).thenReturn(clusterState)
+
+        val mockRoutingTable = mock(RoutingTable::class.java)
+        val mockHasIndex = mockRoutingTable.hasIndex(indexName)
+        whenever(clusterState.routingTable).thenReturn(mockRoutingTable)
+        whenever(mockRoutingTable.hasIndex(indexName)).thenReturn(mockHasIndex)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun mockCreateIndex(mockActionGet: CreateIndexResponse) {
+        val admin = mock(AdminClient::class.java)
+        val indices = mock(IndicesAdminClient::class.java)
+        val mockCreateClient: ActionFuture<CreateIndexResponse> =
+            mock(ActionFuture::class.java) as ActionFuture<CreateIndexResponse>
+
+        whenever(client.admin()).thenReturn(admin)
+        whenever(admin.indices()).thenReturn(indices)
+        whenever(indices.create(any())).thenReturn(mockCreateClient)
+        whenever(mockCreateClient.actionGet(anyLong())).thenReturn(mockActionGet)
+    }
+
+    private fun mockGetSecureIndexClient(mockActionFuture: ActionFuture<GetResponse>) {
+        val mockThreadPool = mock(ThreadPool::class.java)
+        val mockThreadContext = mock(ThreadContext::class.java)
+        val mockStashContext = mock(StoredContext::class.java)
+
+        whenever(client.threadPool()).thenReturn(mockThreadPool)
+        whenever(mockThreadPool.threadContext).thenReturn(mockThreadContext)
+        whenever(mockThreadContext.stashContext()).thenReturn(mockStashContext)
+        whenever(client.get(any())).thenReturn(mockActionFuture)
     }
 }
