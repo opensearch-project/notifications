@@ -27,6 +27,7 @@
 
 package org.opensearch.integtest.send
 
+import com.google.gson.JsonParser
 import org.junit.Assert
 import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.SmtpAccount
@@ -72,10 +73,15 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
             RestRequest.Method.GET.name,
             "$PLUGIN_BASE_URI/feature/test/$configId?feature=alerting",
             "",
-            RestStatus.OK.status
+            RestStatus.INTERNAL_SERVER_ERROR.status
         )
-        val eventId = sendResponse.get("event_id").asString
 
+        // verify failure response is with message
+        val error = sendResponse.get("error").asJsonObject
+        Assert.assertNotNull(error.get("reason").asString)
+
+        // verify event is created correctly with status
+        val eventId = JsonParser.parseString(error.get("reason").asString).asJsonObject.get("notification_id").asString
         val getEventResponse = executeRequest(
             RestRequest.Method.GET.name,
             "$PLUGIN_BASE_URI/events/$eventId",
@@ -127,9 +133,15 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
             RestRequest.Method.GET.name,
             "$PLUGIN_BASE_URI/feature/test/$configId?feature=alerting",
             "",
-            RestStatus.OK.status
+            RestStatus.INTERNAL_SERVER_ERROR.status
         )
-        val eventId = sendResponse.get("event_id").asString
+
+        // verify failure response is with message
+        val error = sendResponse.get("error").asJsonObject
+        Assert.assertNotNull(error.get("reason").asString)
+
+        // verify event is created correctly with status
+        val eventId = JsonParser.parseString(error.get("reason").asString).asJsonObject.get("notification_id").asString
 
         val getEventResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -185,9 +197,15 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
             RestRequest.Method.GET.name,
             "$PLUGIN_BASE_URI/feature/test/$configId?feature=alerting",
             "",
-            RestStatus.OK.status
+            RestStatus.INTERNAL_SERVER_ERROR.status
         )
-        val eventId = sendResponse.get("event_id").asString
+
+        // verify failure response is with message
+        val error = sendResponse.get("error").asJsonObject
+        Assert.assertNotNull(error.get("reason").asString)
+
+        // verify event is created correctly with status
+        val eventId = JsonParser.parseString(error.get("reason").asString).asJsonObject.get("notification_id").asString
 
         val getEventResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -282,9 +300,15 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
             RestRequest.Method.GET.name,
             "$PLUGIN_BASE_URI/feature/test/$emailConfigId?feature=alerting",
             "",
-            RestStatus.OK.status
+            RestStatus.SERVICE_UNAVAILABLE.status
         )
-        val eventId = sendResponse.get("event_id").asString
+
+        // verify failure response is with message
+        val error = sendResponse.get("error").asJsonObject
+        Assert.assertNotNull(error.get("reason").asString)
+
+        // verify event is created correctly with status
+        val eventId = JsonParser.parseString(error.get("reason").asString).asJsonObject.get("notification_id").asString
 
         val getEventResponse = executeRequest(
             RestRequest.Method.GET.name,
