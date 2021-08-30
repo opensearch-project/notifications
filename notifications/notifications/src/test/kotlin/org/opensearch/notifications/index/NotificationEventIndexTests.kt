@@ -47,7 +47,7 @@ import org.opensearch.notifications.model.NotificationEventDocInfo
 import org.opensearch.threadpool.ThreadPool
 import java.time.Instant
 
-internal class NotificationEventIndexTest {
+internal class NotificationEventIndexTests {
 
     private lateinit var client: Client
 
