@@ -42,7 +42,14 @@ internal class NotificationStatsRestHandler : BaseRestHandler() {
      * {@inheritDoc}
      */
     override fun routes(): List<Route> {
-        return listOf()
+        return listOf(
+            /**
+             * Get Notifications Stats
+             * Request body: None
+             * TODO: Add response body in common-utils
+             */
+            Route(GET, NOTIFICATION_STATS_URL)
+        )
     }
 
     /**
