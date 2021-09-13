@@ -65,19 +65,19 @@ export function GlobalFilterButton(props: GlobalFilterButtonProps) {
             setIsPopoverOpen(false);
           },
         },
-        {
-          name: 'Invert inclusion',
-          icon: <EuiIcon type="invert" size="m" />,
-          onClick: () => {
-            props.setFilters(
-              props.filters.map((filter) => ({
-                ...filter,
-                inverted: !filter.inverted,
-              }))
-            );
-            setIsPopoverOpen(false);
-          },
-        },
+        // {
+        //   name: 'Invert inclusion',
+        //   icon: <EuiIcon type="invert" size="m" />,
+        //   onClick: () => {
+        //     props.setFilters(
+        //       props.filters.map((filter) => ({
+        //         ...filter,
+        //         inverted: !filter.inverted,
+        //       }))
+        //     );
+        //     setIsPopoverOpen(false);
+        //   },
+        // },
         {
           name: 'Invert enabled/disabled',
           icon: <EuiIcon type="eye" size="m" />,

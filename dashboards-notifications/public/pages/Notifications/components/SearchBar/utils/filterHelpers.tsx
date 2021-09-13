@@ -68,13 +68,16 @@ export const getFilterFieldOptions = () => {
 
 export const getFilterOperatorOptions = (field: FilterFieldType) => {
   if (field === 'Channel' || field === 'Status') {
-    return [{ label: 'is' }, { label: 'is not' }];
+    return [
+      { label: 'is' },
+      // { label: 'is not' },
+    ];
   }
   return [
     { label: 'is' },
-    { label: 'is not' },
+    // { label: 'is not' },
     { label: 'is one of' },
-    { label: 'is not one of' },
+    // { label: 'is not one of' },
   ];
 };
 
