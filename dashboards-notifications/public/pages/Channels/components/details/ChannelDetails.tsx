@@ -75,11 +75,17 @@ export function ChannelDetails(props: ChannelDetailsProps) {
   const refresh = async () => {
     servicesContext.notificationService
       .getChannel(id)
-      .then((response) => {
+      .then(async (response) => {
         if (response.config_type === 'email') {
-          return servicesContext.notificationService.getEmailConfigDetails(
+          const channel = await servicesContext.notificationService.getEmailConfigDetails(
             response
           );
+          if (channel.email?.invalid_ids?.length) {
+            coreContext.notifications.toasts.addDanger(
+              'The sender and/or some recipient groups might have been deleted.'
+            );
+          }
+          return channel;
         }
         return response;
       })

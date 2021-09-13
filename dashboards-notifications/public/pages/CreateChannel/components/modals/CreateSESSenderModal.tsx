@@ -9,21 +9,6 @@
  * GitHub history for details.
  */
 
-/*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
- */
-
 import {
   EuiButton,
   EuiButtonEmpty,
@@ -38,44 +23,48 @@ import {
 import React, { useContext, useState } from 'react';
 import { CoreServicesContext } from '../../../../components/coreServices';
 import { ModalRootProps } from '../../../../components/Modal/ModalRoot';
-import { CreateRecipientGroupForm } from '../../../Emails/components/forms/CreateRecipientGroupForm';
-import { createRecipientGroupConfigObject } from '../../../Emails/utils/helper';
+import { CreateSESSenderForm } from '../../../Emails/components/forms/CreateSESSenderForm';
+import { createSesSenderConfigObject } from '../../../Emails/utils/helper';
 import {
-  validateRecipientGroupEmails,
-  validateRecipientGroupName,
+  validateAwsRegion,
+  validateEmail,
+  validateRoleArn,
+  validateSenderName,
 } from '../../../Emails/utils/validationHelper';
+import { MainContext } from '../../../Main/Main';
 
-interface CreateRecipientGroupModalProps extends ModalRootProps {
-  addRecipientGroupOptionAndSelect: (
-    recipientGroupOption: EuiComboBoxOptionOption<string>
+interface CreateSESSenderModalProps extends ModalRootProps {
+  addSenderOptionAndSelect: (
+    senderOption: EuiComboBoxOptionOption<string>
   ) => void;
   onClose: () => void;
 }
 
-export function CreateRecipientGroupModal(
-  props: CreateRecipientGroupModalProps
-) {
+export function CreateSESSenderModal(props: CreateSESSenderModalProps) {
   const coreContext = useContext(CoreServicesContext)!;
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [selectedEmailOptions, setSelectedEmailOptions] = useState<
-    Array<EuiComboBoxOptionOption<string>>
-  >([]);
-  const [emailOptions, setEmailOptions] = useState([
-    {
-      label: 'no-reply@company.com',
-    },
-  ]);
+  const mainStateContext = useContext(MainContext)!;
+
+  const [senderName, setSenderName] = useState('');
+  const [email, setEmail] = useState('');
+  const [roleArn, setRoleArn] = useState('');
+  const [awsRegion, setAwsRegion] = useState('');
   const [inputErrors, setInputErrors] = useState<{ [key: string]: string[] }>({
-    name: [],
-    emailOptions: [],
+    senderName: [],
+    email: [],
+    roleArn: [],
+    awsRegion: [],
   });
 
   const isInputValid = (): boolean => {
     const errors: { [key: string]: string[] } = {
-      name: validateRecipientGroupName(name),
-      emailOptions: validateRecipientGroupEmails(emailOptions),
+      senderName: validateSenderName(senderName),
+      email: validateEmail(email),
+      awsRegion: validateAwsRegion(awsRegion),
+      roleArn: [],
     };
+    if (!mainStateContext.tooltipSupport) {
+      errors.roleArn = validateRoleArn(roleArn);
+    }
     setInputErrors(errors);
     return !Object.values(errors).reduce(
       (errorFlag, error) => errorFlag || error.length > 0,
@@ -85,21 +74,21 @@ export function CreateRecipientGroupModal(
 
   return (
     <EuiOverlayMask>
-      <EuiModal onClose={props.onClose} style={{ width: 650 }}>
+      <EuiModal onClose={props.onClose} style={{ width: 750 }}>
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Create recipient group</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>Create SES sender</EuiModalHeaderTitle>
         </EuiModalHeader>
 
         <EuiModalBody>
-          <CreateRecipientGroupForm
-            name={name}
-            setName={setName}
-            description={description}
-            setDescription={setDescription}
-            selectedEmailOptions={selectedEmailOptions}
-            setSelectedEmailOptions={setSelectedEmailOptions}
-            emailOptions={emailOptions}
-            setEmailOptions={setEmailOptions}
+          <CreateSESSenderForm
+            senderName={senderName}
+            setSenderName={setSenderName}
+            email={email}
+            setEmail={setEmail}
+            roleArn={roleArn}
+            setRoleArn={setRoleArn}
+            awsRegion={awsRegion}
+            setAwsRegion={setAwsRegion}
             inputErrors={inputErrors}
             setInputErrors={setInputErrors}
           />
@@ -108,7 +97,7 @@ export function CreateRecipientGroupModal(
         <EuiModalFooter>
           <EuiButtonEmpty onClick={props.onClose}>Cancel</EuiButtonEmpty>
           <EuiButton
-            data-test-subj="create-recipient-group-modal-create-button"
+            data-test-subj="create-ses-sender-modal-create-button"
             fill
             onClick={async () => {
               if (!isInputValid()) {
@@ -117,19 +106,20 @@ export function CreateRecipientGroupModal(
                 );
                 return;
               }
-              const config = createRecipientGroupConfigObject(
-                name,
-                description,
-                selectedEmailOptions
+              const config = createSesSenderConfigObject(
+                senderName,
+                email,
+                awsRegion,
+                roleArn
               );
               await props.services.notificationService
                 .createConfig(config)
                 .then((response) => {
                   coreContext.notifications.toasts.addSuccess(
-                    `Recipient group ${name} successfully created. You can select ${name} from the list of recipient groups.`
+                    `Sender ${senderName} successfully created. You can select ${senderName} from the list of senders.`
                   );
-                  props.addRecipientGroupOptionAndSelect({
-                    label: name,
+                  props.addSenderOptionAndSelect({
+                    label: senderName,
                     value: response.config_id,
                   });
                   props.onClose();

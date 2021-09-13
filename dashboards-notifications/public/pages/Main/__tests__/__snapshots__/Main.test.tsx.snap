@@ -6,11 +6,11 @@ exports[`<Main /> spec renders the component 1`] = `
 >
   <div
     class="euiPageSideBar"
-    style="min-width: 150px;"
+    style="min-width: 155px;"
   >
     <nav
       class="euiSideNav"
-      style="width: 150px;"
+      style="width: 155px;"
     >
       <button
         class="euiSideNav__mobileToggle euiLink"
@@ -101,7 +101,7 @@ exports[`<Main /> spec renders the component 1`] = `
             >
               <a
                 class="euiSideNavItemButton euiSideNavItemButton--isClickable"
-                href="#/email-groups"
+                href="#/email-senders"
                 rel="noreferrer"
               >
                 <span
@@ -110,7 +110,26 @@ exports[`<Main /> spec renders the component 1`] = `
                   <span
                     class="euiSideNavItemButton__label"
                   >
-                    Email groups
+                    Email senders
+                  </span>
+                </span>
+              </a>
+            </div>
+            <div
+              class="euiSideNavItem euiSideNavItem--trunk"
+            >
+              <a
+                class="euiSideNavItemButton euiSideNavItemButton--isClickable"
+                href="#/email-recipient-groups"
+                rel="noreferrer"
+              >
+                <span
+                  class="euiSideNavItemButton__content"
+                >
+                  <span
+                    class="euiSideNavItemButton__label"
+                  >
+                    Email recipient groups
                   </span>
                 </span>
               </a>

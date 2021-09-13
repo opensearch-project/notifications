@@ -43,7 +43,6 @@ export const NODE_API = Object.freeze({
   SEND_TEST_MESSAGE: `${NODE_API_BASE_PATH}/test_message`,
 });
 
-// TODO change to _plugins when backend updates
 const OPENSEARCH_API_BASE_PATH = '/_plugins/_notifications';
 export const OPENSEARCH_API = Object.freeze({
   CONFIGS: `${OPENSEARCH_API_BASE_PATH}/configs`,

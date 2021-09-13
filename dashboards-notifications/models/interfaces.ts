@@ -64,6 +64,8 @@ interface DeliveryStatus {
   status_text: string;
 }
 
+export type SenderType = 'smtp_account' | 'ses_account';
+
 export interface ChannelItemType extends ConfigType {
   config_type: keyof typeof CHANNEL_TYPE;
   feature_list: Array<keyof typeof NOTIFICATION_SOURCE>;
@@ -83,10 +85,12 @@ export interface ChannelItemType extends ConfigType {
     recipient_list: string[]; // custom email addresses
     email_group_id_list: string[];
     // optional fields for displaying or editing email channel, needs more requests
+    sender_type?: SenderType;
     email_account_name?: string;
     email_group_id_map?: {
       [id: string]: string;
     };
+    invalid_ids?: string[]; // invalid sender and/or recipient group ids, possible deleted
   };
   sns?: {
     topic_arn: string;
@@ -108,6 +112,14 @@ export interface SenderItemType extends ConfigType {
     host: string;
     port: string;
     method: keyof typeof ENCRYPTION_TYPE;
+  };
+}
+
+export interface SESSenderItemType extends ConfigType {
+  ses_account: {
+    from_address: string; // outbound email address
+    region: string;
+    role_arn?: string;
   };
 }
 

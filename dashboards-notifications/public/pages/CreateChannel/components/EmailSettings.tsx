@@ -28,18 +28,21 @@ import {
   EuiButton,
   EuiComboBox,
   EuiComboBoxOptionOption,
-  EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
+  EuiRadioGroup,
   EuiSpacer,
   SortDirection,
 } from '@elastic/eui';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { SenderType } from '../../../../models/interfaces';
 import { CoreServicesContext } from '../../../components/coreServices';
 import { ModalConsumer } from '../../../components/Modal';
 import { ServicesContext } from '../../../services';
 import { getErrorMessage } from '../../../utils/helpers';
+import { onComboBoxCreateOption } from '../../Emails/utils/helper';
+import { MainContext } from '../../Main/Main';
 import { CreateChannelContext } from '../CreateChannel';
 import {
   validateEmailSender,
@@ -47,27 +50,43 @@ import {
 } from '../utils/validationHelper';
 import { CreateRecipientGroupModal } from './modals/CreateRecipientGroupModal';
 import { CreateSenderModal } from './modals/CreateSenderModal';
+import { CreateSESSenderModal } from './modals/CreateSESSenderModal';
 
 interface EmailSettingsProps {
-  isAmazonSES: boolean;
-  selectedSenderOptions: Array<EuiComboBoxOptionOption<string>>;
-  setSelectedSenderOptions: (
+  senderType: SenderType;
+  setSenderType: (senderType: SenderType) => void;
+  selectedSmtpSenderOptions: Array<EuiComboBoxOptionOption<string>>;
+  setSelectedSmtpSenderOptions: (
+    options: Array<EuiComboBoxOptionOption<string>>
+  ) => void;
+  selectedSesSenderOptions: Array<EuiComboBoxOptionOption<string>>;
+  setSelectedSesSenderOptions: (
     options: Array<EuiComboBoxOptionOption<string>>
   ) => void;
   selectedRecipientGroupOptions: Array<EuiComboBoxOptionOption<string>>;
   setSelectedRecipientGroupOptions: (
     options: Array<EuiComboBoxOptionOption<string>>
   ) => void;
-  sesSender: string;
-  setSesSender: (sesSender: string) => void;
 }
 
 export function EmailSettings(props: EmailSettingsProps) {
   const context = useContext(CreateChannelContext)!;
   const coreContext = useContext(CoreServicesContext)!;
   const servicesContext = useContext(ServicesContext)!;
+  const mainStateContext = useContext(MainContext)!;
+  const [smtpAvailable, setSmtpAvailable] = useState(true);
 
-  const [senderOptions, setSenderOptions] = useState<
+  useEffect(() => {
+    if (!mainStateContext.availableConfigTypes.includes('smtp_account')) {
+      setSmtpAvailable(false);
+      props.setSenderType('ses_account');
+    }
+  }, []);
+
+  const [sesSenderOptions, setSesSenderOptions] = useState<
+    Array<EuiComboBoxOptionOption<string>>
+  >([]);
+  const [smtpSenderOptions, setSmtpSenderOptions] = useState<
     Array<EuiComboBoxOptionOption<string>>
   >([]);
   const [recipientGroupOptions, setRecipientGroupOptions] = useState<
@@ -85,11 +104,20 @@ export function EmailSettings(props: EmailSettingsProps) {
 
   const refreshSenders = useCallback(async (query?: string) => {
     try {
-      const senders = await servicesContext.notificationService.getSenders(
+      const smtpSenders = await servicesContext.notificationService.getSenders(
         getQueryObject('smtp_account', query)
       );
-      setSenderOptions(
-        senders.items.map((sender) => ({
+      setSmtpSenderOptions(
+        smtpSenders.items.map((sender) => ({
+          label: sender.name,
+          value: sender.config_id,
+        }))
+      );
+      const sesSenders = await servicesContext.notificationService.getSenders(
+        getQueryObject('ses_account', query)
+      );
+      setSesSenderOptions(
+        sesSenders.items.map((sender) => ({
           label: sender.name,
           value: sender.config_id,
         }))
@@ -124,52 +152,88 @@ export function EmailSettings(props: EmailSettingsProps) {
     refreshRecipientGroups();
   }, []);
 
-  const onCreateEmailOption = (
-    searchValue: string,
-    flattenedOptions: Array<EuiComboBoxOptionOption<string>> = []
-  ) => {
-    const normalizedSearchValue = searchValue.trim().toLowerCase();
-    if (!normalizedSearchValue) return;
-
-    const newOption = { label: searchValue };
-    if (
-      flattenedOptions.findIndex(
-        (option) => option.label.trim().toLowerCase() === normalizedSearchValue
-      ) === -1
-    ) {
-      setRecipientGroupOptions([...recipientGroupOptions, newOption]);
-    }
-    props.setSelectedRecipientGroupOptions([
-      ...props.selectedRecipientGroupOptions,
-      newOption,
-    ]);
-  };
-
   return (
     <>
-      {props.isAmazonSES ? (
+      {smtpAvailable && (
+        <EuiFormRow label="Sender type">
+          <EuiRadioGroup
+            options={[
+              {
+                id: 'smtp_account',
+                label: 'SMTP sender',
+              },
+              {
+                id: 'ses_account',
+                label: 'SES sender',
+              },
+            ]}
+            idSelected={props.senderType}
+            onChange={(id) => props.setSenderType(id as SenderType)}
+            name="sender type radio group"
+          />
+        </EuiFormRow>
+      )}
+      {props.senderType === 'ses_account' ? (
         <>
-          <EuiFormRow
-            label="Sender"
-            helpText="Enter a sender email address that has been verified by Amazon SES."
-            error={context.inputErrors.sesSender.join(' ')}
-            isInvalid={context.inputErrors.sesSender.length > 0}
-          >
-            <EuiFieldText
-              fullWidth
-              placeholder="Enter a sender email address"
-              value={props.sesSender}
-              onChange={(e) => props.setSesSender(e.target.value)}
-              isInvalid={context.inputErrors.sesSender.length > 0}
-              onBlur={() => {
-                context.setInputErrors({
-                  ...context.inputErrors,
-                  sesSender: validateEmailSender(props.sesSender),
-                });
-              }}
-            />
-          </EuiFormRow>
           <EuiSpacer size="m" />
+          <EuiFlexGroup>
+            <EuiFlexItem style={{ maxWidth: 400 }}>
+              <EuiFormRow
+                label="SES sender"
+                helpText={`A destination only allows one SMTP or SES sender. Use "Create SES sender" to create a sender with its email address, IAM role, AWS region.`}
+                error={context.inputErrors.sesSender.join(' ')}
+                isInvalid={context.inputErrors.sesSender.length > 0}
+              >
+                <EuiComboBox
+                  placeholder="Sender name"
+                  fullWidth
+                  singleSelection
+                  options={sesSenderOptions}
+                  selectedOptions={props.selectedSesSenderOptions}
+                  onChange={props.setSelectedSesSenderOptions}
+                  isClearable={true}
+                  isInvalid={context.inputErrors.sesSender.length > 0}
+                  onBlur={() => {
+                    context.setInputErrors({
+                      ...context.inputErrors,
+                      sesSender: validateEmailSender(
+                        props.selectedSesSenderOptions
+                      ),
+                    });
+                  }}
+                />
+              </EuiFormRow>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiFormRow hasEmptyLabelSpace>
+                <ModalConsumer>
+                  {({ onShow }) => (
+                    <EuiButton
+                      onClick={() =>
+                        onShow(CreateSESSenderModal, {
+                          addSenderOptionAndSelect: (
+                            newOption: EuiComboBoxOptionOption<string>
+                          ) => {
+                            setSesSenderOptions([
+                              ...sesSenderOptions,
+                              newOption,
+                            ]);
+                            props.setSelectedSesSenderOptions([newOption]);
+                            context.setInputErrors({
+                              ...context.inputErrors,
+                              sesSender: validateEmailSender([newOption]),
+                            });
+                          },
+                        })
+                      }
+                    >
+                      Create SES sender
+                    </EuiButton>
+                  )}
+                </ModalConsumer>
+              </EuiFormRow>
+            </EuiFlexItem>
+          </EuiFlexGroup>
         </>
       ) : (
         <>
@@ -177,24 +241,26 @@ export function EmailSettings(props: EmailSettingsProps) {
           <EuiFlexGroup>
             <EuiFlexItem style={{ maxWidth: 400 }}>
               <EuiFormRow
-                label="Sender"
-                helpText={`A destination only allows one sender. Use "Create sender" to create a sender with its email address, host, port, encryption method.`}
-                error={context.inputErrors.sender.join(' ')}
-                isInvalid={context.inputErrors.sender.length > 0}
+                label="SMTP sender"
+                helpText={`A destination only allows one SMTP or SES sender. Use "Create SMTP sender" to create a sender with its email address, host, port, encryption method.`}
+                error={context.inputErrors.smtpSender.join(' ')}
+                isInvalid={context.inputErrors.smtpSender.length > 0}
               >
                 <EuiComboBox
                   placeholder="Sender name"
                   fullWidth
                   singleSelection
-                  options={senderOptions}
-                  selectedOptions={props.selectedSenderOptions}
-                  onChange={props.setSelectedSenderOptions}
+                  options={smtpSenderOptions}
+                  selectedOptions={props.selectedSmtpSenderOptions}
+                  onChange={props.setSelectedSmtpSenderOptions}
                   isClearable={true}
-                  isInvalid={context.inputErrors.sender.length > 0}
+                  isInvalid={context.inputErrors.smtpSender.length > 0}
                   onBlur={() => {
                     context.setInputErrors({
                       ...context.inputErrors,
-                      sender: validateEmailSender(props.selectedSenderOptions),
+                      smtpSender: validateEmailSender(
+                        props.selectedSmtpSenderOptions
+                      ),
                     });
                   }}
                 />
@@ -210,17 +276,20 @@ export function EmailSettings(props: EmailSettingsProps) {
                           addSenderOptionAndSelect: (
                             newOption: EuiComboBoxOptionOption<string>
                           ) => {
-                            setSenderOptions([...senderOptions, newOption]);
-                            props.setSelectedSenderOptions([newOption]);
+                            setSmtpSenderOptions([
+                              ...smtpSenderOptions,
+                              newOption,
+                            ]);
+                            props.setSelectedSmtpSenderOptions([newOption]);
                             context.setInputErrors({
                               ...context.inputErrors,
-                              sender: validateEmailSender([newOption]),
+                              smtpSender: validateEmailSender([newOption]),
                             });
                           },
                         })
                       }
                     >
-                      Create sender
+                      Create SMTP sender
                     </EuiButton>
                   )}
                 </ModalConsumer>
@@ -244,7 +313,16 @@ export function EmailSettings(props: EmailSettingsProps) {
               options={recipientGroupOptions}
               selectedOptions={props.selectedRecipientGroupOptions}
               onChange={props.setSelectedRecipientGroupOptions}
-              onCreateOption={onCreateEmailOption}
+              onCreateOption={(searchValue, flattenedOptions) =>
+                onComboBoxCreateOption(
+                  searchValue,
+                  flattenedOptions,
+                  recipientGroupOptions,
+                  setRecipientGroupOptions,
+                  props.selectedRecipientGroupOptions,
+                  props.setSelectedRecipientGroupOptions
+                )
+              }
               customOptionText={'Add {searchValue} as a default recipient'}
               isClearable={true}
               isInvalid={context.inputErrors.recipients.length > 0}

@@ -89,7 +89,7 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
     <EuiOverlayMask>
       <EuiModal onClose={props.onClose} style={{ width: 750 }}>
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Create sender</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>Create SMTP sender</EuiModalHeaderTitle>
         </EuiModalHeader>
 
         <EuiModalBody>
@@ -141,7 +141,7 @@ export function CreateSenderModal(props: CreateSenderModalProps) {
                   props.onClose();
                 })
                 .catch((error) => {
-                  coreContext.notifications.toasts.addError(error, {
+                  coreContext.notifications.toasts.addError(error?.body || error, {
                     title: 'Failed to create sender.',
                   });
                 });

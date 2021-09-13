@@ -38,14 +38,17 @@ import { ChannelDetails } from '../Channels/components/details/ChannelDetails';
 import { CreateChannel } from '../CreateChannel/CreateChannel';
 import { CreateRecipientGroup } from '../Emails/CreateRecipientGroup';
 import { CreateSender } from '../Emails/CreateSender';
+import { CreateSESSender } from '../Emails/CreateSESSender';
 import { EmailGroups } from '../Emails/EmailGroups';
+import { EmailSenders } from '../Emails/EmailSenders';
 import Notifications from '../Notifications';
 
 enum Navigation {
   Notifications = 'Notifications',
   Dashboard = 'Dashboard',
   Channels = 'Channels',
-  EmailGroups = 'Email groups',
+  EmailSenders = 'Email senders',
+  EmailGroups = 'Email recipient groups',
 }
 
 enum Pathname {
@@ -56,7 +59,8 @@ enum Pathname {
 interface MainProps extends RouteComponentProps {}
 
 export interface MainState {
-  availableFeatures: Partial<typeof CHANNEL_TYPE>;
+  availableChannels: Partial<typeof CHANNEL_TYPE>;
+  availableConfigTypes: string[]; // available backend config types
   tooltipSupport: boolean; // if true, IAM role for SNS is optional and helper text should be available
 }
 
@@ -68,18 +72,38 @@ export default class Main extends Component<MainProps, MainState> {
   constructor(props: MainProps) {
     super(props);
     this.state = {
-      availableFeatures: CHANNEL_TYPE,
+      availableChannels: CHANNEL_TYPE,
+      availableConfigTypes: [],
       tooltipSupport: false,
     };
   }
 
   async componentDidMount() {
     const serverFeatures = await this.context.notificationService.getServerFeatures();
-    if (serverFeatures != null)
+    if (serverFeatures != null) {
       this.setState({
-        availableFeatures: serverFeatures.availableFeatures,
+        availableChannels: serverFeatures.availableChannels,
+        availableConfigTypes: serverFeatures.availableConfigTypes,
         tooltipSupport: serverFeatures.tooltipSupport,
       });
+    } else {
+      // Feature API call failed, allow all configs to avoid UI breaking.
+      // User requests will still be validated by backend.
+      this.setState({
+        availableChannels: CHANNEL_TYPE,
+        availableConfigTypes: [
+          'slack',
+          'chime',
+          'webhook',
+          'email',
+          'sns',
+          'smtp_account',
+          'ses_account',
+          'email_group',
+        ],
+        tooltipSupport: serverFeatures.tooltipSupport,
+      });
+    }
   }
 
   render() {
@@ -106,8 +130,14 @@ export default class Main extends Component<MainProps, MainState> {
             isSelected: pathname === Pathname.Channels,
           },
           {
-            name: Navigation.EmailGroups,
+            name: Navigation.EmailSenders,
             id: 3,
+            href: `#${ROUTES.EMAIL_SENDERS}`,
+            isSelected: pathname === ROUTES.EMAIL_SENDERS,
+          },
+          {
+            name: Navigation.EmailGroups,
+            id: 4,
             href: `#${ROUTES.EMAIL_GROUPS}`,
             isSelected: pathname === ROUTES.EMAIL_GROUPS,
           },
@@ -125,17 +155,18 @@ export default class Main extends Component<MainProps, MainState> {
                     <ModalProvider>
                       <ModalRoot services={services} />
                       <EuiPage>
-                        {/*Hide side navigation bar when creating or editing rollup job*/}
                         {pathname !== ROUTES.CREATE_CHANNEL &&
                           !pathname.startsWith(ROUTES.EDIT_CHANNEL) &&
                           !pathname.startsWith(ROUTES.CHANNEL_DETAILS) &&
                           pathname !== ROUTES.CREATE_SENDER &&
                           !pathname.startsWith(ROUTES.EDIT_SENDER) &&
+                          pathname !== ROUTES.CREATE_SES_SENDER &&
+                          !pathname.startsWith(ROUTES.EDIT_SES_SENDER) &&
                           pathname !== ROUTES.CREATE_RECIPIENT_GROUP &&
                           !pathname.startsWith(ROUTES.EDIT_RECIPIENT_GROUP) && (
-                            <EuiPageSideBar style={{ minWidth: 150 }}>
+                            <EuiPageSideBar style={{ minWidth: 155 }}>
                               <EuiSideNav
-                                style={{ width: 150 }}
+                                style={{ width: 155 }}
                                 items={sideNav}
                               />
                             </EuiPageSideBar>
@@ -182,6 +213,12 @@ export default class Main extends Component<MainProps, MainState> {
                               )}
                             />
                             <Route
+                              path={ROUTES.EMAIL_SENDERS}
+                              render={(props: RouteComponentProps) => (
+                                <EmailSenders {...props} />
+                              )}
+                            />
+                            <Route
                               path={ROUTES.EMAIL_GROUPS}
                               render={(props: RouteComponentProps) => (
                                 <EmailGroups {...props} />
@@ -197,6 +234,18 @@ export default class Main extends Component<MainProps, MainState> {
                               path={`${ROUTES.EDIT_SENDER}/:id`}
                               render={(props: RouteComponentProps) => (
                                 <CreateSender {...props} edit={true} />
+                              )}
+                            />
+                            <Route
+                              path={ROUTES.CREATE_SES_SENDER}
+                              render={(props: RouteComponentProps) => (
+                                <CreateSESSender {...props} />
+                              )}
+                            />
+                            <Route
+                              path={`${ROUTES.EDIT_SES_SENDER}/:id`}
+                              render={(props: RouteComponentProps) => (
+                                <CreateSESSender {...props} edit={true} />
                               )}
                             />
                             <Route

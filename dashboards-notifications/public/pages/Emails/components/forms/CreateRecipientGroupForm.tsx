@@ -34,6 +34,7 @@ import {
   EuiTextArea,
 } from '@elastic/eui';
 import React from 'react';
+import { onComboBoxCreateOption } from '../../utils/helper';
 import {
   validateRecipientGroupEmails,
   validateRecipientGroupName,
@@ -48,31 +49,13 @@ interface CreateRecipientGroupFormProps {
   setSelectedEmailOptions: (
     options: Array<EuiComboBoxOptionOption<string>>
   ) => void;
-  emailOptions: Array<{ label: string }>;
-  setEmailOptions: (options: Array<{ label: string }>) => void;
+  emailOptions: Array<EuiComboBoxOptionOption<string>>;
+  setEmailOptions: (options: Array<EuiComboBoxOptionOption<string>>) => void;
   inputErrors: { [key: string]: string[] };
   setInputErrors: (errors: { [key: string]: string[] }) => void;
 }
 
 export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
-  const onCreateEmailOption = (
-    searchValue: string,
-    flattenedOptions: Array<EuiComboBoxOptionOption<string>> = []
-  ) => {
-    const normalizedSearchValue = searchValue.trim().toLowerCase();
-    if (!normalizedSearchValue) return;
-
-    const newOption = { label: searchValue };
-    if (
-      flattenedOptions.findIndex(
-        (option) => option.label.trim().toLowerCase() === normalizedSearchValue
-      ) === -1
-    ) {
-      props.setEmailOptions([...props.emailOptions, newOption]);
-    }
-    props.setSelectedEmailOptions([...props.selectedEmailOptions, newOption]);
-  };
-
   return (
     <>
       <EuiFormRow
@@ -140,7 +123,16 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
             options={props.emailOptions}
             selectedOptions={props.selectedEmailOptions}
             onChange={props.setSelectedEmailOptions}
-            onCreateOption={onCreateEmailOption}
+            onCreateOption={(searchValue, flattenedOptions) =>
+              onComboBoxCreateOption(
+                searchValue,
+                flattenedOptions,
+                props.emailOptions,
+                props.setEmailOptions,
+                props.selectedEmailOptions,
+                props.setSelectedEmailOptions
+              )
+            }
             customOptionText={'Add {searchValue} as an email address'}
             isClearable={true}
             isInvalid={props.inputErrors.emailOptions.length > 0}

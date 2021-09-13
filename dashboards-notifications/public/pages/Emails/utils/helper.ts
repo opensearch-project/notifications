@@ -33,6 +33,25 @@ export const createSenderConfigObject = (
   };
 };
 
+export const createSesSenderConfigObject = (
+  senderName: string,
+  email: string,
+  awsRegion: string,
+  roleArn?: string
+) => {
+  return {
+    name: senderName,
+    config_type: 'ses_account',
+    feature_list: Object.keys(NOTIFICATION_SOURCE),
+    is_enabled: true,
+    ses_account: {
+      from_address: email,
+      region: awsRegion,
+      ...(roleArn && { role_arn: roleArn }),
+    },
+  };
+};
+
 export const createRecipientGroupConfigObject = (
   name: string,
   description: string,
@@ -48,4 +67,26 @@ export const createRecipientGroupConfigObject = (
       recipient_list: selectedEmailOptions.map((email) => email.label),
     },
   };
+};
+
+export const onComboBoxCreateOption = (
+  searchValue: string,
+  flattenedOptions: Array<EuiComboBoxOptionOption<string>> = [],
+  options: Array<EuiComboBoxOptionOption<string>>,
+  setOptions: (options: Array<EuiComboBoxOptionOption<string>>) => void,
+  selectedOptions: Array<EuiComboBoxOptionOption<string>>,
+  setSelectedOptions: (options: Array<EuiComboBoxOptionOption<string>>) => void
+) => {
+  const normalizedSearchValue = searchValue.trim().toLowerCase();
+  if (!normalizedSearchValue) return;
+
+  const newOption = { label: searchValue };
+  if (
+    flattenedOptions.findIndex(
+      (option) => option.label.trim().toLowerCase() === normalizedSearchValue
+    ) === -1
+  ) {
+    setOptions([...options, newOption]);
+  }
+  setSelectedOptions([...selectedOptions, newOption]);
 };

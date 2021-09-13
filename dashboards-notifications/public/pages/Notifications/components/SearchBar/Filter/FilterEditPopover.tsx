@@ -138,7 +138,7 @@ export function FilterEditPopover(props: FilterEditPopoverProps) {
           selectedOperatorOptions[0].label as FilterOperatorType,
           filterValue,
           setFilterValue,
-          mainStateContext.availableFeatures
+          mainStateContext.availableChannels
         )}
       <EuiSpacer size="m" />
       <EuiFlexGroup gutterSize="s" justifyContent="flexEnd">

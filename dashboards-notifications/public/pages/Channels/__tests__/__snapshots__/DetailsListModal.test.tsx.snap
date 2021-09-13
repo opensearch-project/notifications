@@ -35,6 +35,8 @@ exports[`<DetailsListModal /> spec renders the component 1`] = `
         "getEmailConfigDetails": [Function],
         "getRecipientGroup": [Function],
         "getRecipientGroups": [Function],
+        "getSESSender": [Function],
+        "getSESSenders": [Function],
         "getSender": [Function],
         "getSenders": [Function],
         "getServerFeatures": [Function],

@@ -30,7 +30,6 @@ import { RouteComponentProps } from 'react-router-dom';
 import { CoreServicesContext } from '../../components/coreServices';
 import { BREADCRUMBS } from '../../utils/constants';
 import { RecipientGroupsTable } from './components/tables/RecipientGroupsTable';
-import { SendersTable } from './components/tables/SendersTable';
 
 interface EmailGroupsProps extends RouteComponentProps {}
 
@@ -47,11 +46,8 @@ export function EmailGroups(props: EmailGroupsProps) {
   return (
     <>
       <EuiTitle size="l">
-        <h1>Email senders and recipient groups</h1>
+        <h1>Email recipient groups</h1>
       </EuiTitle>
-
-      <EuiSpacer />
-      <SendersTable coreContext={coreContext} />
 
       <EuiSpacer />
       <RecipientGroupsTable coreContext={coreContext} />

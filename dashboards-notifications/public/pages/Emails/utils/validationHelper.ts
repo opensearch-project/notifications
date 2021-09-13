@@ -54,6 +54,18 @@ export const validatePort = (port: string) => {
   return errors;
 };
 
+export const validateRoleArn = (roleArn: string) => {
+  const errors = [];
+  if (roleArn.length === 0) errors.push('IAM role ARN cannot be empty.');
+  return errors;
+};
+
+export const validateAwsRegion = (region: string) => {
+  const errors = [];
+  if (region.length === 0) errors.push('AWS region cannot be empty.');
+  return errors;
+};
+
 export const validateRecipientGroupName = (name: string) => {
   const errors = [];
   if (_.trim(name).length === 0)

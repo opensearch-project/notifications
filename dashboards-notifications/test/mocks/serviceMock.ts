@@ -54,7 +54,17 @@ const notificationServiceMock = {
 };
 
 const mainStateMock: MainState = {
-  availableFeatures: CHANNEL_TYPE,
+  availableChannels: CHANNEL_TYPE,
+  availableConfigTypes: [
+    'slack',
+    'chime',
+    'webhook',
+    'email',
+    'sns',
+    'smtp_account',
+    'ses_account',
+    'email_group',
+  ],
   tooltipSupport: true,
 };
 
