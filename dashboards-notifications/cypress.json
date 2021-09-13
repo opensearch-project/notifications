@@ -14,7 +14,7 @@
   "env": {
     "opensearch": "localhost:9200",
     "opensearchDashboards": "localhost:5601",
-    "security_enabled": false
+    "security_enabled": true
   },
   "testFiles": [
     "email_groups.spec.js",

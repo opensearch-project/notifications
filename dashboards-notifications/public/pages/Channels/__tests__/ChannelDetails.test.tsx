@@ -82,6 +82,33 @@ describe('<ChannelDetails/> spec', () => {
     });
   });
 
+  it('handles a non-existing channel', async () => {
+    const props = { match: { params: { id: 'test' } } };
+    const notificationServiceMock = jest.fn() as any;
+    notificationServiceMock.notificationService = {
+      getChannel: async (id: string) => {
+        throw "non existing channel"
+      },
+    };
+    let container = document.createElement('div');
+
+    act(() => {
+      ReactDOM.render(
+        <ServicesContext.Provider value={notificationServiceMock}>
+          <CoreServicesContext.Provider value={coreServicesMock}>
+            <ChannelDetails
+              {...(props as RouteComponentProps<{ id: string }>)}
+            />
+          </CoreServicesContext.Provider>
+        </ServicesContext.Provider>,
+        container
+      );
+    });
+    await waitFor(() => {
+      expect(container).toMatchSnapshot();
+    });
+  });
+
   it('clicks mute button with channel', async () => {
     const props = { match: { params: { id: 'test' } } };
     const notificationServiceMock = jest.fn() as any;

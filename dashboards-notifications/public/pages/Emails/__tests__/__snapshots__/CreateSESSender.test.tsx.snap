@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<CreateSESSender/> spec handles failed requests 1`] = `
+<h1
+  class="euiTitle euiTitle--large"
+>
+  Edit SES sender
+</h1>
+`;
+
+exports[`<CreateSESSender/> spec handles failed requests 2`] = `
+<h1
+  class="euiTitle euiTitle--large"
+>
+  Edit SES sender
+</h1>
+`;
+
+exports[`<CreateSESSender/> spec renders the component 1`] = `
+<h1
+  class="euiTitle euiTitle--large"
+>
+  Create SES sender
+</h1>
+`;
+
+exports[`<CreateSESSender/> spec renders the component for editing 1`] = `
+<h1
+  class="euiTitle euiTitle--large"
+>
+  Edit SES sender
+</h1>
+`;
+
+exports[`<CreateSESSender/> spec renders the component for editing 2`] = `
+<h1
+  class="euiTitle euiTitle--large"
+>
+  Edit SES sender
+</h1>
+`;
