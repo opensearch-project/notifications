@@ -82,19 +82,19 @@ export function Filters(props: FiltersProps) {
           icon: <EuiIcon type="invert" size="m" />,
           panel: 1,
         },
-        {
-          name: `${filter.inverted ? 'Include' : 'Exclude'} results`,
-          icon: (
-            <EuiIcon
-              type={filter.inverted ? 'plusInCircle' : 'minusInCircle'}
-              size="m"
-            />
-          ),
-          onClick: () => {
-            filter.inverted = !filter.inverted;
-            setFilter(filter, index);
-          },
-        },
+        // {
+        //   name: `${filter.inverted ? 'Include' : 'Exclude'} results`,
+        //   icon: (
+        //     <EuiIcon
+        //       type={filter.inverted ? 'plusInCircle' : 'minusInCircle'}
+        //       size="m"
+        //     />
+        //   ),
+        //   onClick: () => {
+        //     filter.inverted = !filter.inverted;
+        //     setFilter(filter, index);
+        //   },
+        // },
         {
           name: filter.disabled ? 'Re-enable' : 'Temporarily disable',
           icon: (
