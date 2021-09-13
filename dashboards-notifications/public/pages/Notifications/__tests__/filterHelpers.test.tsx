@@ -49,14 +49,17 @@ describe('test filter helper functions', () => {
 
   it('returns filter operator options', () => {
     const channelOperators = getFilterOperatorOptions('Channel');
-    expect(channelOperators).toEqual([{ label: 'is' }, { label: 'is not' }]);
+    expect(channelOperators).toEqual([
+      { label: 'is' },
+      // { label: 'is not' },
+    ]);
 
     const sourceOperators = getFilterOperatorOptions('Source');
     expect(sourceOperators).toEqual([
       { label: 'is' },
-      { label: 'is not' },
+      // { label: 'is not' },
       { label: 'is one of' },
-      { label: 'is not one of' },
+      // { label: 'is not one of' },
     ]);
   });
 

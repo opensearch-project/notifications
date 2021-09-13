@@ -52,8 +52,8 @@ describe('<Filters /> spec', () => {
 
     utils.getByText('Channel: test').click();
     utils.getByText('Re-enable').click();
-    utils.getByText('Channel: test').click();
-    utils.getByText('Exclude results').click();
+    // utils.getByText('Channel: test').click();
+    // utils.getByText('Exclude results').click();
     utils.getByText('Channel: test').click();
     utils.getByText('Delete').click();
   });
