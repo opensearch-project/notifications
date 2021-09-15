@@ -34,8 +34,8 @@ internal class SnsDestinationTransport : DestinationTransport<SnsDestination> {
     }
 
     @OpenForTesting
-    constructor(destinationSmtpClient: DestinationSnsClient) {
-        this.destinationSNSClient = destinationSmtpClient
+    constructor(destinationSnsClient: DestinationSnsClient) {
+        this.destinationSNSClient = destinationSnsClient
     }
 
     override fun sendMessage(
