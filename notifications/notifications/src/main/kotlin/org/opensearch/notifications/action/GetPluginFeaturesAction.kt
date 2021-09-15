@@ -38,7 +38,7 @@ import org.opensearch.commons.notifications.action.GetPluginFeaturesRequest
 import org.opensearch.commons.notifications.action.GetPluginFeaturesResponse
 import org.opensearch.commons.notifications.action.NotificationsActions
 import org.opensearch.commons.utils.recreateObject
-import org.opensearch.notifications.spi.NotificationSpi
+import org.opensearch.notifications.CoreProvider
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 
@@ -79,8 +79,8 @@ internal class GetPluginFeaturesAction @Inject constructor(
         request: GetPluginFeaturesRequest,
         user: User?
     ): GetPluginFeaturesResponse {
-        val allowedConfigTypes = NotificationSpi.getAllowedConfigTypes()
-        val pluginFeatures = NotificationSpi.getPluginFeatures()
+        val allowedConfigTypes = CoreProvider.core.getAllowedConfigTypes()
+        val pluginFeatures = CoreProvider.core.getPluginFeatures()
         return GetPluginFeaturesResponse(
             allowedConfigTypes,
             pluginFeatures

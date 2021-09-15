@@ -26,7 +26,9 @@
  */
 
 rootProject.name = 'opensearch-notifications'
-include "spi"
-include "notifications"
+include ":core"
+include ":notifications"
+include ":core:spi"
 
-project(":spi").name = rootProject.name + "-spi"
+project(":core").name = rootProject.name + "-core"
+project(":core:spi").name = rootProject.name + "-core" + "-spi"
