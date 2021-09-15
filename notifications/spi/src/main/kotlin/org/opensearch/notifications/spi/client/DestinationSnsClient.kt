@@ -29,6 +29,7 @@ import com.amazonaws.services.sns.model.KMSOptInRequiredException
 import com.amazonaws.services.sns.model.KMSThrottlingException
 import com.amazonaws.services.sns.model.NotFoundException
 import com.amazonaws.services.sns.model.PlatformApplicationDisabledException
+import com.amazonaws.services.sns.model.PublishResult
 import org.opensearch.notifications.spi.NotificationSpiPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.spi.credentials.SnsClientFactory
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
@@ -49,7 +50,7 @@ class DestinationSnsClient(private val snsClientFactory: SnsClientFactory) {
     fun execute(destination: SnsDestination, message: MessageContent, referenceId: String): DestinationMessageResponse {
         val amazonSNS: AmazonSNS = snsClientFactory.createSnsClient(destination.region, destination.roleArn)
         return try {
-            val result = amazonSNS.publish(destination.topicArn, message.textDescription, message.title)
+            val result = sendMessage(amazonSNS, destination, message)
             DestinationMessageResponse(RestStatus.OK.status, "Success, message id: ${result.messageId}")
         } catch (exception: InvalidParameterException) {
             DestinationMessageResponse(RestStatus.BAD_REQUEST.status, getSnsExceptionText(exception))
@@ -116,5 +117,13 @@ class DestinationSnsClient(private val snsClientFactory: SnsClientFactory) {
     private fun getSdkExceptionText(exception: SdkBaseException): String {
         log.info("$LOG_PREFIX:SdkException $exception")
         return "SNS sdk Error, SDK status:${exception.message}"
+    }
+
+    /*
+     * This method is useful for mocking the client
+     */
+    @Throws(Exception::class)
+    fun sendMessage(amazonSNS: AmazonSNS, destination: SnsDestination, message: MessageContent): PublishResult {
+        return amazonSNS.publish(destination.topicArn, message.textDescription, message.title)
     }
 }
