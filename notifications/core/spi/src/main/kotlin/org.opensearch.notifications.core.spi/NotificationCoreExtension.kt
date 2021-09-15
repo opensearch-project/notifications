@@ -11,7 +11,12 @@
 
 package org.opensearch.notifications.core.spi
 
+/**
+ * SPI of Notification Core
+ */
 interface NotificationCoreExtension {
-
+    /**
+     * @param core Set notification core
+     */
     fun setNotificationCore(core: NotificationCore)
 }
