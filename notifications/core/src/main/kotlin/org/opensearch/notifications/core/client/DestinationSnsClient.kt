@@ -33,9 +33,9 @@ import com.amazonaws.services.sns.model.PublishResult
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.core.credentials.SnsClientFactory
 import org.opensearch.notifications.core.utils.logger
-import org.opensearch.notifications.corespi.model.DestinationMessageResponse
-import org.opensearch.notifications.corespi.model.MessageContent
-import org.opensearch.notifications.corespi.model.destination.SnsDestination
+import org.opensearch.notifications.spi.model.DestinationMessageResponse
+import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.destination.SnsDestination
 import org.opensearch.rest.RestStatus
 
 /**

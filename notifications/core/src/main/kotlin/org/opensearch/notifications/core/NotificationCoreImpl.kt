@@ -29,10 +29,10 @@ package org.opensearch.notifications.core
 
 import org.opensearch.notifications.core.setting.PluginSettings
 import org.opensearch.notifications.core.transport.DestinationTransportProvider
-import org.opensearch.notifications.corespi.NotificationCore
-import org.opensearch.notifications.corespi.model.DestinationMessageResponse
-import org.opensearch.notifications.corespi.model.MessageContent
-import org.opensearch.notifications.corespi.model.destination.BaseDestination
+import org.opensearch.notifications.spi.NotificationCore
+import org.opensearch.notifications.spi.model.DestinationMessageResponse
+import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.destination.BaseDestination
 import java.security.AccessController
 import java.security.PrivilegedAction
 

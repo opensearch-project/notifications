@@ -9,8 +9,10 @@
  *  GitHub history for details.
  */
 
-package org.opensearch.notifications.corespi.model
-
-import org.opensearch.common.settings.SecureString
-
-data class SecureDestinationSettings(val emailUsername: SecureString, val emailPassword: SecureString)
+package org.opensearch.notifications.spi.model.destination
+/**
+ * Supported notification destinations
+ */
+enum class DestinationType {
+    CHIME, SLACK, CUSTOM_WEBHOOK, SMTP, SES, SNS
+}

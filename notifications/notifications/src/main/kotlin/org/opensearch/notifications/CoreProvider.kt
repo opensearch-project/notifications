@@ -11,7 +11,7 @@
 
 package org.opensearch.notifications
 
-import org.opensearch.notifications.corespi.NotificationCore
+import org.opensearch.notifications.spi.NotificationCore
 
 internal object CoreProvider {
     lateinit var core: NotificationCore

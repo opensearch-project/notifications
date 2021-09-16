@@ -8,7 +8,7 @@
  *  Modifications Copyright OpenSearch Contributors. See
  *  GitHub history for details.
  */
-package org.opensearch.notifications.corespi.model.destination
+package org.opensearch.notifications.spi.model.destination
 
 /**
  * This class holds the contents of SNS destination

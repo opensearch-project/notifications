@@ -25,27 +25,11 @@
  *
  */
 
-package org.opensearch.notifications.corespi.model.destination
-
-import org.opensearch.common.Strings
-import org.opensearch.notifications.corespi.utils.validateEmail
+package org.opensearch.notifications.spi.model.destination
 
 /**
- * This class holds the contents of smtp destination
+ * This class holds the contents of a Chime destination
  */
-class SmtpDestination(
-    val accountName: String,
-    val host: String,
-    val port: Int,
-    val method: String,
-    val fromAddress: String,
-    val recipient: String
-) : BaseDestination(DestinationType.SMTP) {
-
-    init {
-        require(!Strings.isNullOrEmpty(host)) { "Host name should be provided" }
-        require(port > 0) { "Port should be positive value" }
-        validateEmail(fromAddress)
-        validateEmail(recipient)
-    }
-}
+class ChimeDestination(
+    url: String,
+) : WebhookDestination(url, DestinationType.CHIME)

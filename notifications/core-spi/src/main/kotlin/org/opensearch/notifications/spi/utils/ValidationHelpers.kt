@@ -25,7 +25,7 @@
  *
  */
 
-package org.opensearch.notifications.corespi.utils
+package org.opensearch.notifications.spi.utils
 
 import inet.ipaddr.IPAddressString
 import org.apache.http.client.methods.HttpPatch

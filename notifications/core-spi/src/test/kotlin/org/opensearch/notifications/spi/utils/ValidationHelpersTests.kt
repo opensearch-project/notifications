@@ -9,7 +9,7 @@
  *  GitHub history for details.
  */
 
-package org.opensearch.notifications.corespi.utils
+package org.opensearch.notifications.spi.utils
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

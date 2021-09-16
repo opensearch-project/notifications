@@ -1,8 +1,8 @@
-package org.opensearch.notifications.corespi
+package org.opensearch.notifications.spi
 
-import org.opensearch.notifications.corespi.model.DestinationMessageResponse
-import org.opensearch.notifications.corespi.model.MessageContent
-import org.opensearch.notifications.corespi.model.destination.BaseDestination
+import org.opensearch.notifications.spi.model.DestinationMessageResponse
+import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.destination.BaseDestination
 
 interface NotificationCore {
     /**

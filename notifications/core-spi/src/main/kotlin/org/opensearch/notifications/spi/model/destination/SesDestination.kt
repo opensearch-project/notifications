@@ -9,11 +9,11 @@
  *  GitHub history for details.
  */
 
-package org.opensearch.notifications.corespi.model.destination
+package org.opensearch.notifications.spi.model.destination
 
 import com.amazonaws.regions.Regions
 import org.opensearch.common.Strings
-import org.opensearch.notifications.corespi.utils.validateEmail
+import org.opensearch.notifications.spi.utils.validateEmail
 
 /**
  * This class holds the contents of ses destination

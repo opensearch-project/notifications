@@ -9,7 +9,7 @@
  * GitHub history for details.
  */
 
-package org.opensearch.notifications.corespi
+package org.opensearch.notifications.spi
 
 /**
  * SPI of Notification Core

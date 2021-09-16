@@ -15,9 +15,9 @@ import org.opensearch.notifications.core.client.DestinationClientPool
 import org.opensearch.notifications.core.client.DestinationSesClient
 import org.opensearch.notifications.core.utils.OpenForTesting
 import org.opensearch.notifications.core.utils.logger
-import org.opensearch.notifications.corespi.model.DestinationMessageResponse
-import org.opensearch.notifications.corespi.model.MessageContent
-import org.opensearch.notifications.corespi.model.destination.SesDestination
+import org.opensearch.notifications.spi.model.DestinationMessageResponse
+import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.destination.SesDestination
 import org.opensearch.rest.RestStatus
 import java.io.IOException
 import javax.mail.MessagingException

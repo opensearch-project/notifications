@@ -48,11 +48,11 @@ import org.opensearch.notifications.core.setting.PluginSettings
 import org.opensearch.notifications.core.utils.OpenForTesting
 import org.opensearch.notifications.core.utils.logger
 import org.opensearch.notifications.core.utils.string
-import org.opensearch.notifications.corespi.model.MessageContent
-import org.opensearch.notifications.corespi.model.destination.ChimeDestination
-import org.opensearch.notifications.corespi.model.destination.CustomWebhookDestination
-import org.opensearch.notifications.corespi.model.destination.SlackDestination
-import org.opensearch.notifications.corespi.model.destination.WebhookDestination
+import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.destination.ChimeDestination
+import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
+import org.opensearch.notifications.spi.model.destination.SlackDestination
+import org.opensearch.notifications.spi.model.destination.WebhookDestination
 import org.opensearch.rest.RestStatus
 import java.io.IOException
 import java.nio.charset.StandardCharsets

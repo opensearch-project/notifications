@@ -11,9 +11,9 @@
 
 package org.opensearch.notifications.core.transport
 
-import org.opensearch.notifications.corespi.model.DestinationMessageResponse
-import org.opensearch.notifications.corespi.model.MessageContent
-import org.opensearch.notifications.corespi.model.destination.BaseDestination
+import org.opensearch.notifications.spi.model.DestinationMessageResponse
+import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.destination.BaseDestination
 
 /**
  * Interface which enables to plug in multiple notification Channel Factories.

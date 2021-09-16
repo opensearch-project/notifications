@@ -25,10 +25,10 @@ import org.opensearch.notifications.core.client.DestinationSnsClient
 import org.opensearch.notifications.core.credentials.SnsClientFactory
 import org.opensearch.notifications.core.transport.DestinationTransportProvider
 import org.opensearch.notifications.core.transport.SnsDestinationTransport
-import org.opensearch.notifications.corespi.model.DestinationMessageResponse
-import org.opensearch.notifications.corespi.model.MessageContent
-import org.opensearch.notifications.corespi.model.destination.DestinationType
-import org.opensearch.notifications.corespi.model.destination.SnsDestination
+import org.opensearch.notifications.spi.model.DestinationMessageResponse
+import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.destination.DestinationType
+import org.opensearch.notifications.spi.model.destination.SnsDestination
 import org.opensearch.rest.RestStatus
 
 internal class SnsDestinationTests {

@@ -9,9 +9,9 @@
  *  GitHub history for details.
  */
 
-package org.opensearch.notifications.corespi.model.destination
+package org.opensearch.notifications.spi.model.destination
 
-import org.opensearch.notifications.corespi.utils.validateUrl
+import org.opensearch.notifications.spi.utils.validateUrl
 
 /**
  * This class holds the contents of generic webbook destination

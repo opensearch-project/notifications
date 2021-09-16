@@ -43,11 +43,11 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.opensearch.notifications.core.client.DestinationHttpClient
 import org.opensearch.notifications.core.transport.DestinationTransportProvider
 import org.opensearch.notifications.core.transport.WebhookDestinationTransport
-import org.opensearch.notifications.corespi.model.DestinationMessageResponse
-import org.opensearch.notifications.corespi.model.MessageContent
-import org.opensearch.notifications.corespi.model.destination.ChimeDestination
-import org.opensearch.notifications.corespi.model.destination.DestinationType
-import org.opensearch.notifications.corespi.model.destination.SlackDestination
+import org.opensearch.notifications.spi.model.DestinationMessageResponse
+import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.destination.ChimeDestination
+import org.opensearch.notifications.spi.model.destination.DestinationType
+import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.rest.RestStatus
 import java.net.MalformedURLException
 import java.util.stream.Stream

@@ -10,7 +10,7 @@
  */
 
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -25,30 +25,12 @@
  *
  */
 
-package org.opensearch.notifications.corespi.model
-
-import org.opensearch.common.Strings
+package org.opensearch.notifications.spi.model
 
 /**
- *  class for storing message.
+ * Data class for storing destination message response per recipient.
  */
-@SuppressWarnings("LongParameterList")
-class MessageContent(
-    val title: String,
-    val textDescription: String,
-    val htmlDescription: String? = null,
-    val fileName: String? = null,
-    val fileEncoding: String? = null,
-    val fileData: String? = null,
-    val fileContentType: String? = null
-) {
-
-    init {
-        require(!Strings.isNullOrEmpty(title)) { "title is null or empty" }
-        require(!Strings.isNullOrEmpty(textDescription)) { "text message part is null or empty" }
-    }
-
-    fun buildMessageWithTitle(): String {
-        return "$title\n\n$textDescription"
-    }
-}
+class DestinationMessageResponse(
+    val statusCode: Int,
+    val statusText: String
+)

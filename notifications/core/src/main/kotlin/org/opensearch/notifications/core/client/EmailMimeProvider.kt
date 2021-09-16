@@ -27,7 +27,7 @@
 
 package org.opensearch.notifications.core.client
 
-import org.opensearch.notifications.corespi.model.MessageContent
+import org.opensearch.notifications.spi.model.MessageContent
 import java.util.Base64
 import javax.activation.DataHandler
 import javax.mail.Message

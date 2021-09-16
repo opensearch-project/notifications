@@ -12,8 +12,8 @@
 package org.opensearch.notifications.core.transport
 
 import org.opensearch.notifications.core.utils.OpenForTesting
-import org.opensearch.notifications.corespi.model.destination.BaseDestination
-import org.opensearch.notifications.corespi.model.destination.DestinationType
+import org.opensearch.notifications.spi.model.destination.BaseDestination
+import org.opensearch.notifications.spi.model.destination.DestinationType
 
 /**
  * This class helps in fetching the right destination transport based on type

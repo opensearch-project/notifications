@@ -25,7 +25,7 @@
  *
  */
 
-package org.opensearch.notifications.corespi.model.destination
+package org.opensearch.notifications.spi.model.destination
 
 /**
  * This class holds the generic parameters required for a BaseDestination.
