@@ -20,13 +20,13 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
 import org.opensearch.common.settings.SecureString
 import org.opensearch.notifications.core.client.DestinationSmtpClient
-import org.opensearch.notifications.core.spi.model.DestinationMessageResponse
-import org.opensearch.notifications.core.spi.model.MessageContent
-import org.opensearch.notifications.core.spi.model.SecureDestinationSettings
-import org.opensearch.notifications.core.spi.model.destination.DestinationType
-import org.opensearch.notifications.core.spi.model.destination.SmtpDestination
 import org.opensearch.notifications.core.transport.DestinationTransportProvider
 import org.opensearch.notifications.core.transport.SmtpDestinationTransport
+import org.opensearch.notifications.corespi.model.DestinationMessageResponse
+import org.opensearch.notifications.corespi.model.MessageContent
+import org.opensearch.notifications.corespi.model.SecureDestinationSettings
+import org.opensearch.notifications.corespi.model.destination.DestinationType
+import org.opensearch.notifications.corespi.model.destination.SmtpDestination
 import org.opensearch.rest.RestStatus
 import javax.mail.MessagingException
 

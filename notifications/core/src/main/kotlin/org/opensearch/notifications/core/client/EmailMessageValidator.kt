@@ -12,8 +12,8 @@
 package org.opensearch.notifications.core.client
 
 import org.opensearch.notifications.core.setting.PluginSettings
-import org.opensearch.notifications.core.spi.model.MessageContent
 import org.opensearch.notifications.core.utils.logger
+import org.opensearch.notifications.corespi.model.MessageContent
 
 /**
  * This class handles the connections to the given Destination.

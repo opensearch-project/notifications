@@ -13,8 +13,8 @@ package org.opensearch.notifications.core.integTest
 
 import org.junit.After
 import org.opensearch.notifications.core.NotificationCoreImpl
-import org.opensearch.notifications.core.spi.model.MessageContent
-import org.opensearch.notifications.core.spi.model.destination.SmtpDestination
+import org.opensearch.notifications.corespi.model.MessageContent
+import org.opensearch.notifications.corespi.model.destination.SmtpDestination
 import org.opensearch.rest.RestStatus
 import org.opensearch.test.rest.OpenSearchRestTestCase
 import org.springframework.integration.test.mail.TestMailServer

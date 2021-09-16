@@ -24,11 +24,11 @@ import com.amazonaws.services.simpleemail.model.SendRawEmailRequest
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.core.credentials.SesClientFactory
 import org.opensearch.notifications.core.setting.PluginSettings
-import org.opensearch.notifications.core.spi.model.DestinationMessageResponse
-import org.opensearch.notifications.core.spi.model.MessageContent
-import org.opensearch.notifications.core.spi.model.destination.SesDestination
 import org.opensearch.notifications.core.utils.SecurityAccess
 import org.opensearch.notifications.core.utils.logger
+import org.opensearch.notifications.corespi.model.DestinationMessageResponse
+import org.opensearch.notifications.corespi.model.MessageContent
+import org.opensearch.notifications.corespi.model.destination.SesDestination
 import org.opensearch.rest.RestStatus
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer

@@ -110,7 +110,7 @@ dependencies {
     testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
     compile group: 'com.github.wnameless', name: 'json-flattener', version: '0.1.0'
-    compileOnly project(path: ":${rootProject.name}-core:${rootProject.name}-core-spi", configuration: 'shadow')
+    compileOnly project(path: ":${rootProject.name}-core-spi", configuration: 'shadow')
 }
 
 // turn off javadoc as it barfs on Kotlin code

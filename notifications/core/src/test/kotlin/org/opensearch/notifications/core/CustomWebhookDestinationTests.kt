@@ -44,12 +44,12 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.opensearch.notifications.core.client.DestinationHttpClient
-import org.opensearch.notifications.core.spi.model.DestinationMessageResponse
-import org.opensearch.notifications.core.spi.model.MessageContent
-import org.opensearch.notifications.core.spi.model.destination.CustomWebhookDestination
-import org.opensearch.notifications.core.spi.model.destination.DestinationType
 import org.opensearch.notifications.core.transport.DestinationTransportProvider
 import org.opensearch.notifications.core.transport.WebhookDestinationTransport
+import org.opensearch.notifications.corespi.model.DestinationMessageResponse
+import org.opensearch.notifications.corespi.model.MessageContent
+import org.opensearch.notifications.corespi.model.destination.CustomWebhookDestination
+import org.opensearch.notifications.corespi.model.destination.DestinationType
 import org.opensearch.rest.RestStatus
 import java.net.MalformedURLException
 import java.util.stream.Stream

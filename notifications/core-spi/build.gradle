@@ -1,0 +1,153 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ *
+ * Modifications Copyright OpenSearch Contributors. See
+ * GitHub history for details.
+ */
+
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
+
+plugins {
+    id 'com.github.johnrengelman.shadow'
+    id 'jacoco'
+    id 'maven'
+    id 'maven-publish'
+    id 'signing'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+apply plugin: 'opensearch.java'
+apply plugin: 'opensearch.testclusters'
+apply plugin: 'opensearch.java-rest-test'
+apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
+
+ext {
+    projectSubstitutions = [:]
+    licenseFile = rootProject.file('LICENSE')
+    noticeFile = rootProject.file('NOTICE')
+}
+
+task sourcesJar(type: Jar) {
+    archiveClassifier.set 'sources'
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar) {
+    archiveClassifier.set 'javadoc'
+    from javadoc.destinationDir
+    dependsOn javadoc
+}
+
+dependencies {
+    compileOnly "org.opensearch:opensearch:${opensearch_version}"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
+    compile "com.amazonaws:aws-java-sdk-ses:${aws_version}"
+    implementation "com.github.seancfoley:ipaddress:5.3.3"
+
+    testImplementation(
+            'org.junit.jupiter:junit-jupiter-api:5.6.2',
+            "org.junit.jupiter:junit-jupiter-params:5.6.2",
+            'org.mockito:mockito-junit-jupiter:3.10.0',
+    )
+    testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.2')
+    testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
+    testCompile "org.opensearch.test:framework:${opensearch_version}"
+}
+
+configurations.all {
+    if (it.state != Configuration.State.UNRESOLVED) return
+    resolutionStrategy {
+        force "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+        force "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
+        force "commons-logging:commons-logging:1.2" // resolve for amazonaws
+        force "commons-codec:commons-codec:1.13" // resolve for amazonaws
+        force "org.apache.httpcomponents:httpclient:4.5.10" // resolve for amazonaws
+        force "org.apache.httpcomponents:httpcore:4.4.13" // resolve for amazonaws
+        force "joda-time:joda-time:2.8.1" // Resolve for amazonaws
+        force "com.fasterxml.jackson.core:jackson-core:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.core:jackson-annotations:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.core:jackson-databind:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.3" // resolve for amazonaws
+        force "junit:junit:4.12" // resolve for amazonaws
+    }
+}
+
+publishing {
+    publications {
+        shadow(MavenPublication) {
+            project.shadow.component(it)
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom {
+                name = "OpenSearch Notifications SPI"
+                packaging = "jar"
+                url = "https://github.com/opensearch-project/notifications"
+                description = "OpenSearch Notifications SPI"
+                scm {
+                    connection = "scm:git@github.com:opensearch-project/notifications.git"
+                    developerConnection = "scm:git@github.com:opensearch-project/notifications.git"
+                    url = "git@github.com:opensearch-project/notifications.git"
+                }
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "amazonwebservices"
+                        organization = "Amazon Web Services"
+                        organizationUrl = "https://aws.amazon.com"
+                    }
+                }
+            }
+        }
+    }
+
+    gradle.startParameter.setShowStacktrace(ShowStacktrace.ALWAYS)
+    gradle.startParameter.setLogLevel(LogLevel.DEBUG)
+
+    signing {
+        required { gradle.taskGraph.hasTask("publishShadowPublicationToSonatype-stagingRepository") }
+        sign publishing.publications.shadow
+    }
+}
+
+test {
+    useJUnitPlatform()
+    doFirst {
+        // reverse operation of https://github.com/elastic/elasticsearch/blob/7.6/buildSrc/src/main/groovy/org/elasticsearch/gradle/BuildPlugin.groovy#L736-L743
+        // to fix the classpath for unit tests
+        test.classpath -= project.files(project.tasks.named('shadowJar'))
+        test.classpath -= project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
+        test.classpath += project.extensions.getByType(SourceSetContainer).getByName(SourceSet.MAIN_SOURCE_SET_NAME).runtimeClasspath
+    }
+    // add "-Dtests.security.manager=false" to VM options if you want to run integ tests in IntelliJ
+    systemProperty 'tests.security.manager', 'false'
+}
+
+shadowJar {
+    // fix jarhell by relocating packages
+    relocate 'org.joda.time', 'org.opensearch.notifications.core.repackage.org.joda.time'
+    relocate 'com.fasterxml.jackson', 'org.opensearch.notifications.core.repackage.com.fasterxml.jackson'
+    relocate 'org.apache.http', 'org.opensearch.notifications.core.repackage.org.apache.http'
+    relocate 'org.apache.commons.logging', 'org.opensearch.notifications.core.repackage.org.apache.commons.logging'
+    relocate 'org.apache.commons.codec', 'org.opensearch.notifications.core.repackage.org.apache.commons.codec'
+    relocate 'com.amazonaws', 'org.opensearch.notifications.core.repackage.com.amazonaws'
+    relocate 'software.amazon.ion', 'org.opensearch.notifications.core.repackage.software.amazon.ion'
+    classifier = null
+}

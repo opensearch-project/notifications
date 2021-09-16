@@ -21,8 +21,8 @@ import org.opensearch.common.settings.Setting.Property.NodeScope
 import org.opensearch.common.settings.Settings
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.PLUGIN_NAME
-import org.opensearch.notifications.core.spi.model.SecureDestinationSettings
 import org.opensearch.notifications.core.utils.logger
+import org.opensearch.notifications.corespi.model.SecureDestinationSettings
 import java.io.IOException
 import java.nio.file.Path
 

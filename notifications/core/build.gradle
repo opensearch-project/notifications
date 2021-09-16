@@ -132,7 +132,7 @@ dependencies {
     testCompile "org.mockito:mockito-core:3.10.0"
     testCompile "org.opensearch.test:framework:${opensearch_version}"
     testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
-    compile project(path: ":${rootProject.name}-core:${rootProject.name}-core-spi", configuration: 'shadow')
+    compile project(path: ":${rootProject.name}-core-spi", configuration: 'shadow')
 }
 
 configurations {

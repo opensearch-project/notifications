@@ -54,8 +54,8 @@ import org.opensearch.notifications.action.PublishNotificationAction
 import org.opensearch.notifications.action.SendNotificationAction
 import org.opensearch.notifications.action.SendTestNotificationAction
 import org.opensearch.notifications.action.UpdateNotificationConfigAction
-import org.opensearch.notifications.core.spi.NotificationCore
-import org.opensearch.notifications.core.spi.NotificationCoreExtension
+import org.opensearch.notifications.corespi.NotificationCore
+import org.opensearch.notifications.corespi.NotificationCoreExtension
 import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.notifications.index.EventIndexingActions
 import org.opensearch.notifications.index.NotificationConfigIndex

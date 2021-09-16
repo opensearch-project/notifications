@@ -14,12 +14,12 @@ package org.opensearch.notifications.core.client
 import com.sun.mail.util.MailConnectException
 import org.opensearch.common.settings.SecureString
 import org.opensearch.notifications.core.setting.PluginSettings
-import org.opensearch.notifications.core.spi.model.DestinationMessageResponse
-import org.opensearch.notifications.core.spi.model.MessageContent
-import org.opensearch.notifications.core.spi.model.SecureDestinationSettings
-import org.opensearch.notifications.core.spi.model.destination.SmtpDestination
 import org.opensearch.notifications.core.utils.SecurityAccess
 import org.opensearch.notifications.core.utils.logger
+import org.opensearch.notifications.corespi.model.DestinationMessageResponse
+import org.opensearch.notifications.corespi.model.MessageContent
+import org.opensearch.notifications.corespi.model.SecureDestinationSettings
+import org.opensearch.notifications.corespi.model.destination.SmtpDestination
 import org.opensearch.rest.RestStatus
 import java.util.Properties
 import javax.mail.Authenticator

@@ -22,8 +22,8 @@ import org.opensearch.env.Environment
 import org.opensearch.env.NodeEnvironment
 import org.opensearch.notifications.core.setting.PluginSettings
 import org.opensearch.notifications.core.setting.PluginSettings.loadDestinationSettings
-import org.opensearch.notifications.core.spi.NotificationCoreExtension
 import org.opensearch.notifications.core.utils.logger
+import org.opensearch.notifications.corespi.NotificationCoreExtension
 import org.opensearch.plugins.ExtensiblePlugin
 import org.opensearch.plugins.ExtensiblePlugin.ExtensionLoader
 import org.opensearch.plugins.Plugin
