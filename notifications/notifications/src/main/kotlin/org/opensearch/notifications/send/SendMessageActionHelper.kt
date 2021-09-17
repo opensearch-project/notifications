@@ -101,7 +101,6 @@ object SendMessageActionHelper {
         val docMetadata = DocMetadata(
             updatedTime,
             createdTime,
-            userAccess.getUserTenant(user),
             userAccess.getAllAccessInfo(user)
         )
         val event = NotificationEvent(eventSource, eventStatusList)

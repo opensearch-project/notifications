@@ -31,11 +31,9 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
-import org.opensearch.commons.notifications.NotificationConstants.TENANT_TAG
 import org.opensearch.commons.notifications.NotificationConstants.UPDATED_TIME_TAG
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.stringList
-import org.opensearch.notifications.security.UserAccessManager.DEFAULT_TENANT
 import java.time.Instant
 
 /**
@@ -44,8 +42,7 @@ import java.time.Instant
 data class DocMetadata(
     val lastUpdateTime: Instant,
     val createdTime: Instant,
-    val tenant: String,
-    val access: List<String> // "User:user", "Role:sample_role", "BERole:sample_backend_role"
+    val access: List<String>
 ) : ToXContent {
     companion object {
         private val log by logger(DocMetadata::class.java)
@@ -61,7 +58,6 @@ data class DocMetadata(
         fun parse(parser: XContentParser): DocMetadata {
             var lastUpdateTime: Instant? = null
             var createdTime: Instant? = null
-            var tenant: String? = null
             var access: List<String> = listOf()
             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser)
             while (XContentParser.Token.END_OBJECT != parser.nextToken()) {
@@ -70,7 +66,6 @@ data class DocMetadata(
                 when (fieldName) {
                     UPDATED_TIME_TAG -> lastUpdateTime = Instant.ofEpochMilli(parser.longValue())
                     CREATED_TIME_TAG -> createdTime = Instant.ofEpochMilli(parser.longValue())
-                    TENANT_TAG -> tenant = parser.text()
                     ACCESS_LIST_TAG -> access = parser.stringList()
                     else -> {
                         parser.skipChildren()
@@ -80,11 +75,9 @@ data class DocMetadata(
             }
             lastUpdateTime ?: throw IllegalArgumentException("$UPDATED_TIME_TAG field absent")
             createdTime ?: throw IllegalArgumentException("$CREATED_TIME_TAG field absent")
-            tenant = tenant ?: DEFAULT_TENANT
             return DocMetadata(
                 lastUpdateTime,
                 createdTime,
-                tenant,
                 access
             )
         }
@@ -97,7 +90,6 @@ data class DocMetadata(
         return builder!!.startObject()
             .field(UPDATED_TIME_TAG, lastUpdateTime.toEpochMilli())
             .field(CREATED_TIME_TAG, createdTime.toEpochMilli())
-            .field(TENANT_TAG, tenant)
             .field(ACCESS_LIST_TAG, access)
             .endObject()
     }

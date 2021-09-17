@@ -61,13 +61,11 @@ interface EventOperations {
 
     /**
      * Query index for NotificationEventDocs for given access details
-     * @param tenant the tenant of the user
      * @param access the list of access details to search NotificationEventDocs for.
      * @param request [GetNotificationEventRequest] object
      * @return search result of NotificationEventDocs
      */
     fun getAllNotificationEvents(
-        tenant: String,
         access: List<String>,
         request: GetNotificationEventRequest
     ): NotificationEventSearchResult

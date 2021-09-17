@@ -133,7 +133,6 @@ fun verifySingleConfigEquals(
     Assert.assertEquals(1, items.size())
     val getResponseItem = items[0].asJsonObject
     Assert.assertEquals(configId, getResponseItem.get("config_id").asString)
-    Assert.assertEquals("", getResponseItem.get("tenant").asString)
     verifyEquals(config, getResponseItem.get("config").asJsonObject)
 }
 
@@ -163,7 +162,6 @@ fun verifyMultiConfigEquals(
         Assert.assertNotNull(configId)
         val config = objectMap[configId]
         Assert.assertNotNull(config)
-        Assert.assertEquals("", item.get("tenant").asString)
         verifyEquals(config!!, item.get("config").asJsonObject)
     }
 }

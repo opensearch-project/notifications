@@ -29,74 +29,23 @@ package org.opensearch.notifications.security
 
 import org.opensearch.OpenSearchStatusException
 import org.opensearch.commons.authuser.User
-import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.rest.RestStatus
-import java.util.stream.Collectors
 
 /**
  * Class for checking/filtering user access.
  */
 internal object UserAccessManager : UserAccess {
-    private const val USER_TAG = "User:"
-    private const val ROLE_TAG = "Role:"
-    private const val BACKEND_ROLE_TAG = "BERole:"
-    private const val ALL_ACCESS_ROLE = "all_access"
-    private const val PRIVATE_TENANT = "__user__"
-    const val DEFAULT_TENANT = ""
+    private const val USE_RBAC = false
 
     /**
      * {@inheritDoc}
      */
     override fun validateUser(user: User?) {
-        if (isUserPrivateTenant(user) && user?.name == null) {
+        if (USE_RBAC && user?.backendRoles.isNullOrEmpty()) {
             throw OpenSearchStatusException(
-                "User name not provided for private tenant access",
+                "User doesn't have backend roles configured. Contact administrator.",
                 RestStatus.FORBIDDEN
             )
-        }
-        when (PluginSettings.filterBy) {
-            PluginSettings.FilterBy.NoFilter -> { // No validation
-            }
-            PluginSettings.FilterBy.User -> { // User name must be present
-                user?.name
-                    ?: run {
-                        throw OpenSearchStatusException(
-                            "Filter-by enabled with security disabled",
-                            RestStatus.FORBIDDEN
-                        )
-                    }
-            }
-            PluginSettings.FilterBy.Roles -> { // backend roles must be present
-                if (user == null || user.roles.isNullOrEmpty()) {
-                    throw OpenSearchStatusException(
-                        "User doesn't have roles configured. Contact administrator.",
-                        RestStatus.FORBIDDEN
-                    )
-                } else if (user.roles.stream().filter { !PluginSettings.ignoredRoles.contains(it) }.count() == 0L) {
-                    throw OpenSearchStatusException(
-                        "No distinguishing roles configured. Contact administrator.",
-                        RestStatus.FORBIDDEN
-                    )
-                }
-            }
-            PluginSettings.FilterBy.BackendRoles -> { // backend roles must be present
-                if (user?.backendRoles.isNullOrEmpty()) {
-                    throw OpenSearchStatusException(
-                        "User doesn't have backend roles configured. Contact administrator.",
-                        RestStatus.FORBIDDEN
-                    )
-                }
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun getUserTenant(user: User?): String {
-        return when (val requestedTenant = user?.requestedTenant) {
-            null -> DEFAULT_TENANT
-            else -> requestedTenant
         }
     }
 
@@ -104,85 +53,29 @@ internal object UserAccessManager : UserAccess {
      * {@inheritDoc}
      */
     override fun getAllAccessInfo(user: User?): List<String> {
-        if (user == null) { // Security is disabled
+        if (user == null) { // Filtering is disabled
             return listOf()
         }
-        val retList: MutableList<String> = mutableListOf()
-        if (user.name != null) {
-            retList.add("$USER_TAG${user.name}")
-        }
-        user.roles.forEach { retList.add("$ROLE_TAG$it") }
-        user.backendRoles.forEach { retList.add("$BACKEND_ROLE_TAG$it") }
-        return retList
+        return user.backendRoles
     }
 
     /**
      * {@inheritDoc}
      */
     override fun getSearchAccessInfo(user: User?): List<String> {
-        if (user == null) { // Security is disabled
+        if (user == null || !USE_RBAC) { // Filtering is disabled
             return listOf()
         }
-        if (isUserPrivateTenant(user)) {
-            return listOf("$USER_TAG${user.name}") // No sharing allowed in private tenant.
-        }
-        if (canAdminViewAllItems(user)) {
-            return listOf()
-        }
-        return when (PluginSettings.filterBy) {
-            PluginSettings.FilterBy.NoFilter -> listOf()
-            PluginSettings.FilterBy.User -> listOf("$USER_TAG${user.name}")
-            PluginSettings.FilterBy.Roles -> user.roles.stream()
-                .filter { !PluginSettings.ignoredRoles.contains(it) }
-                .map { "$ROLE_TAG$it" }
-                .collect(Collectors.toList())
-            PluginSettings.FilterBy.BackendRoles -> user.backendRoles.map { "$BACKEND_ROLE_TAG$it" }
-        }
+        return user.backendRoles
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun doesUserHasAccess(user: User?, tenant: String, access: List<String>): Boolean {
-        if (user == null) { // Security is disabled
+    override fun doesUserHasAccess(user: User?, access: List<String>): Boolean {
+        if (user == null || !USE_RBAC) { // Filtering is disabled
             return true
         }
-        if (getUserTenant(user) != tenant) {
-            return false
-        }
-        if (canAdminViewAllItems(user)) {
-            return true
-        }
-        return when (PluginSettings.filterBy) {
-            PluginSettings.FilterBy.NoFilter -> true
-            PluginSettings.FilterBy.User -> access.contains("$USER_TAG${user.name}")
-            PluginSettings.FilterBy.Roles -> user.roles.stream()
-                .filter { !PluginSettings.ignoredRoles.contains(it) }
-                .map { "$ROLE_TAG$it" }
-                .anyMatch { it in access }
-            PluginSettings.FilterBy.BackendRoles -> user.backendRoles.map { "$BACKEND_ROLE_TAG$it" }.any { it in access }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun hasAllInfoAccess(user: User?): Boolean {
-        if (user == null) { // Security is disabled
-            return true
-        }
-        return isAdminUser(user)
-    }
-
-    private fun canAdminViewAllItems(user: User): Boolean {
-        return PluginSettings.adminAccess == PluginSettings.AdminAccess.All && isAdminUser(user)
-    }
-
-    private fun isAdminUser(user: User): Boolean {
-        return user.roles.contains(ALL_ACCESS_ROLE)
-    }
-
-    private fun isUserPrivateTenant(user: User?): Boolean {
-        return getUserTenant(user) == PRIVATE_TENANT
+        return user.backendRoles.any { it in access }
     }
 }

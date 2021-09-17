@@ -92,7 +92,6 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         Assert.assertEquals(1, items.size())
         val getResponseItem = items[0].asJsonObject
         Assert.assertEquals(eventId, getResponseItem.get("event_id").asString)
-        Assert.assertEquals("", getResponseItem.get("tenant").asString)
         Assert.assertNotNull(getResponseItem.get("event").asJsonObject)
         Thread.sleep(100)
     }
@@ -153,7 +152,6 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         Assert.assertEquals(1, items.size())
         val getResponseItem = items[0].asJsonObject
         Assert.assertEquals(eventId, getResponseItem.get("event_id").asString)
-        Assert.assertEquals("", getResponseItem.get("tenant").asString)
         Assert.assertNotNull(getResponseItem.get("event").asJsonObject)
         Thread.sleep(100)
     }
@@ -217,7 +215,6 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         Assert.assertEquals(1, items.size())
         val getResponseItem = items[0].asJsonObject
         Assert.assertEquals(eventId, getResponseItem.get("event_id").asString)
-        Assert.assertEquals("", getResponseItem.get("tenant").asString)
         Assert.assertNotNull(getResponseItem.get("event").asJsonObject)
         Thread.sleep(100)
     }
@@ -320,7 +317,6 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         Assert.assertEquals(1, items.size())
         val getResponseItem = items[0].asJsonObject
         Assert.assertEquals(eventId, getResponseItem.get("event_id").asString)
-        Assert.assertEquals("", getResponseItem.get("tenant").asString)
         Assert.assertNotNull(getResponseItem.get("event").asJsonObject)
         Thread.sleep(100)
     }
