@@ -43,6 +43,7 @@ import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.notifications.model.Sns
 import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.commons.utils.logger
+import org.opensearch.notifications.CoreProvider
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.index.ConfigOperations
 import org.opensearch.notifications.index.EventOperations
@@ -51,7 +52,6 @@ import org.opensearch.notifications.model.DocMetadata
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.model.NotificationEventDoc
 import org.opensearch.notifications.security.UserAccess
-import org.opensearch.notifications.spi.NotificationSpi
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
@@ -257,7 +257,7 @@ object SendMessageActionHelper {
      * Currently this simply converts the legacy base message to the equivalent destination classes that exist
      * for the notification channels and utilizes the [sendMessageThroughSpi] method. If we get to the point
      * where this method seems to be holding back notification channels from adding new functionality we can
-     * refactor this to have it's own internal private spi call to completely decouple them instead.
+     * refactor this to have it's own internal private core call to completely decouple them instead.
      *
      * @param baseMessage legacy base message
      * @return notification delivery status for the legacy destination
@@ -499,7 +499,7 @@ object SendMessageActionHelper {
         referenceId: String
     ): DestinationMessageResponse {
         return try {
-            val status = NotificationSpi.sendMessage(destination, message, referenceId)
+            val status = CoreProvider.core.sendMessage(destination, message, referenceId)
             log.info("$LOG_PREFIX:sendMessage:statusCode=${status.statusCode}, statusText=${status.statusText}")
             status
         } catch (exception: Exception) {

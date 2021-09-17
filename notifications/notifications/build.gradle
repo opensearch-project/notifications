@@ -27,6 +27,8 @@
 
 import org.opensearch.gradle.test.RestIntegTestTask
 
+import java.util.concurrent.Callable
+
 plugins {
     id 'nebula.ospackage' version "8.5.4"
     id "com.dorongold.task-tree" version "1.5"
@@ -39,16 +41,18 @@ apply plugin: 'opensearch.opensearchplugin'
 apply plugin: 'opensearch.testclusters'
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
+apply plugin: 'nebula.ospackage'
 
 def usingRemoteCluster = System.properties.containsKey('tests.rest.cluster') || System.properties.containsKey('tests.cluster')
 def usingMultiNode = project.properties.containsKey('numNodes')
 
-//check.dependsOn jacocoTestReport
+check.dependsOn jacocoTestReport
 
 opensearchplugin {
     name 'opensearch-notifications'
     description 'OpenSearch Notifications Plugin'
     classname 'org.opensearch.notifications.NotificationPlugin'
+    extendedPlugins = ['opensearch-notifications-core']
 }
 
 allOpen {
@@ -75,9 +79,11 @@ configurations.all {
 
 dependencies {
     compileOnly "${group}:opensearch:${opensearch_version}"
-    compile "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
     compile "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3" // ${kotlin_version} does not work for coroutines
+    compile ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3") {
+        exclude group: 'org.jetbrains', module: 'annotations' // resolve jarhell
+    } // ${kotlin_version} does not work for coroutines
     compile "${group}:common-utils:${common_utils_version}"
     compile "org.json:json:20180813"
 
@@ -103,7 +109,7 @@ dependencies {
     testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
     compile group: 'com.github.wnameless', name: 'json-flattener', version: '0.1.0'
-    compile project(path: ":${rootProject.name}-spi", configuration: 'shadow')
+    compileOnly project(path: ":${rootProject.name}-core-spi", configuration: 'shadow')
 }
 
 // turn off javadoc as it barfs on Kotlin code
@@ -122,6 +128,11 @@ loggerUsageCheck.enabled = false
 def es_tmp_dir = rootProject.file('build/private/es_tmp').absoluteFile
 es_tmp_dir.mkdirs()
 
+// As of ES 7.7 the sample-extension-plugin is being added to the list of plugins for the testCluster during build before
+// the notification-core plugin is causing build failures.
+// The notification-core zip is added explicitly above but the sample-extension-plugin is added implicitly at some time during evaluation.
+// Will need to do a deep dive to find out exactly what task adds the sample-extension-plugin and add notification-core there but a temporary hack is to
+// reorder the plugins list after evaluation but prior to task execution when the plugins are installed.
 afterEvaluate {
     testClusters.integTest.nodes.each { node ->
         def plugins = node.plugins
@@ -139,6 +150,9 @@ test {
     }
     systemProperty 'tests.security.manager', 'false'
     useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
 
 File repo = file("$buildDir/testclusters/repo")
@@ -191,6 +205,18 @@ integTest.getClusters().forEach{c -> c.plugin(project.getObjects().fileProperty(
 
 testClusters.integTest {
     testDistribution = 'INTEG_TEST'
+    // need to install notification-core first, need to assemble notification-core first
+    plugin(provider(new Callable<RegularFile>(){
+        @Override
+        RegularFile call() throws Exception {
+            return new RegularFile() {
+                @Override
+                File getAsFile() {
+                    return fileTree("src/test/resources/notifications-core").getSingleFile()
+                }
+            }
+        }
+    }))
     // Cluster shrink exception thrown if we try to set numberOfNodes to 1, so only apply if > 1
     if (_numNodes > 1) numberOfNodes = _numNodes
     // When running integration tests it doesn't forward the --debug-jvm to the cluster anymore
@@ -224,4 +250,47 @@ if (!usingRemoteCluster && !usingMultiNode) {
     apply from: '../build-tools/plugin-coverage.gradle'
 }
 
-apply from: '../build-tools/pkgbuild.gradle'
+// This is afterEvaluate because the bundlePlugin ZIP task is updated afterEvaluate and changes the ZIP name to match the plugin name
+afterEvaluate {
+    ospackage {
+        packageName = "${name}"
+        release = isSnapshot ? "0.1" : '1'
+        version = "${project.version}" - "-SNAPSHOT"
+
+        into '/usr/share/opensearch/plugins'
+        from(zipTree(bundlePlugin.archivePath)) {
+            into opensearchplugin.name
+        }
+
+        user 'root'
+        permissionGroup 'root'
+        fileMode 0644
+        dirMode 0755
+
+        requires('opensearch-oss', versions.opensearch, EQUAL)
+        packager = 'Amazon'
+        vendor = 'Amazon'
+        os = 'LINUX'
+        prefix '/usr'
+
+        license 'ASL-2.0'
+        maintainer 'OpenSearch Team <opensearch@amazon.com>'
+        url 'https://opensearch.org/'
+        summary '''
+         OpenSearch Notifications.
+         Reference documentation can be found at https://opendistro.github.io/for-elasticsearch-docs/. // TODO:MIGRATE
+    '''.stripIndent().replace('\n', ' ').trim()
+    }
+
+    buildRpm {
+        arch = 'NOARCH'
+        archiveName "${packageName}-${version}.rpm"
+        dependsOn 'assemble'
+    }
+
+    buildDeb {
+        arch = 'amd64'
+        archiveName "${packageName}-${version}.deb"
+        dependsOn 'assemble'
+    }
+}

@@ -49,7 +49,6 @@ import org.opensearch.commons.notifications.model.NotificationEventSearchResult
 import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.notifications.index.EventIndexingActions
 import org.opensearch.notifications.send.SendMessageActionHelper
-import org.opensearch.notifications.spi.NotificationSpi
 import org.opensearch.rest.RestStatus
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
@@ -161,11 +160,6 @@ internal class PluginActionTests {
         val pluginFeatures = mapOf(Pair("FeatureKey1", "Feature1"))
         val request = mock(GetPluginFeaturesRequest::class.java)
         val response = GetPluginFeaturesResponse(allowedConfigTypes, pluginFeatures)
-
-        // Mock singleton's method by mockk framework
-        mockkObject(NotificationSpi)
-        every { NotificationSpi.getAllowedConfigTypes() } returns allowedConfigTypes
-        every { NotificationSpi.getPluginFeatures() } returns pluginFeatures
 
         val getPluginFeaturesAction = GetPluginFeaturesAction(
             transportService, client, actionFilters, xContentRegistry

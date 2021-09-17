@@ -81,11 +81,18 @@ jobs:
 
       - name: Create Artifact Path
         run: |
-          mkdir -p notifications-build
-          cp -r ./notifications/notifications/build/distributions/*.zip notifications-build/
+          mkdir -p notifications-build/{notifications,notifications-core}
+          cp -r ./notifications/notifications/build/distributions/*.zip notifications-build/notifications/
+          cp -r ./notifications/core/build/distributions/*.zip notifications-build/notifications-core/
 
-      - name: Upload Artifacts
+      - name: Upload Artifacts for notifications plugin
         uses: actions/upload-artifact@v1
         with:
-          name: notifications
-          path: notifications-build
+          name: notifications-plugin
+          path: notifications-build/notifications
+
+      - name: Upload Artifacts for notifications-core plugin
+        uses: actions/upload-artifact@v1
+        with:
+          name: notifications-core-plugin
+          path: notifications-build/notifications-core

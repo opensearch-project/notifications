@@ -67,6 +67,8 @@ import org.opensearch.notifications.resthandler.SendTestMessageRestHandler
 import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.notifications.settings.PluginSettings
+import org.opensearch.notifications.spi.NotificationCore
+import org.opensearch.notifications.spi.NotificationCoreExtension
 import org.opensearch.plugins.ActionPlugin
 import org.opensearch.plugins.Plugin
 import org.opensearch.repositories.RepositoriesService
@@ -81,7 +83,7 @@ import java.util.function.Supplier
  * Entry point of the OpenSearch Notifications plugin
  * This class initializes the rest handlers.
  */
-internal class NotificationPlugin : ActionPlugin, Plugin() {
+class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension {
 
     lateinit var clusterService: ClusterService // initialized in createComponents()
 
@@ -195,5 +197,10 @@ internal class NotificationPlugin : ActionPlugin, Plugin() {
             SendTestMessageRestHandler(),
             NotificationStatsRestHandler()
         )
+    }
+
+    override fun setNotificationCore(core: NotificationCore) {
+        log.debug("$LOG_PREFIX:setNotificationCore")
+        CoreProvider.initialize(core)
     }
 }

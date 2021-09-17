@@ -1,0 +1,187 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ *
+ * Modifications Copyright OpenSearch Contributors. See
+ * GitHub history for details.
+ */
+
+import org.opensearch.gradle.test.RestIntegTestTask
+
+plugins {
+    id 'jacoco'
+    id 'maven'
+    id 'maven-publish'
+    id 'signing'
+    id 'nebula.ospackage' version "8.5.4"
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+apply plugin: 'opensearch.opensearchplugin'
+apply plugin: 'opensearch.java'
+apply plugin: 'opensearch.testclusters'
+apply plugin: 'opensearch.java-rest-test'
+apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
+
+ext {
+    projectSubstitutions = [:]
+    licenseFile = rootProject.file('LICENSE')
+    noticeFile = rootProject.file('NOTICE')
+}
+
+opensearchplugin {
+    name 'opensearch-notifications-core'
+    description 'OpenSearch Notifications Core Plugin'
+    classname 'org.opensearch.notifications.core.NotificationCorePlugin'
+}
+
+task integTest(type: RestIntegTestTask) {
+    description = "Run tests against a cluster that has security enabled"
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    systemProperty 'tests.security.manager', 'false'
+}
+
+tasks.named("check").configure { dependsOn(integTest) }
+check.dependsOn jacocoTestReport
+
+// turn off javadoc as it barfs on Kotlin code
+javadoc.enabled = false
+licenseHeaders.enabled = true
+// no need to validate pom, as we do not upload to maven/sonatype
+validateNebulaPom.enabled = false
+dependencyLicenses.enabled = false
+thirdPartyAudit.enabled = false
+// Allow @Test to be used in test classes not inherited from LuceneTestCase.
+forbiddenApis.ignoreFailures = true
+// Allow test cases to be named Tests without having to be inherited from LuceneTestCase.
+testingConventions.enabled = false
+loggerUsageCheck.enabled = false
+
+allOpen {
+    annotation("org.opensearch.notifications.core.util.OpenForTesting")
+}
+
+test {
+    useJUnitPlatform()
+    // add "-Dtests.security.manager=false" to VM options if you want to run integ tests in IntelliJ
+    systemProperty 'tests.security.manager', 'false'
+}
+
+//TODO: see if this can be only set at top level and apply to subprojects, or we remove from top project if possible
+configurations.all {
+    if (it.state != Configuration.State.UNRESOLVED) return
+    resolutionStrategy {
+        force "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+        force "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
+        force "commons-logging:commons-logging:1.2" // resolve for amazonaws
+        force "commons-codec:commons-codec:1.13" // resolve for amazonaws
+        force "org.apache.httpcomponents:httpclient:4.5.10" // resolve for amazonaws
+        force "org.apache.httpcomponents:httpcore:4.4.13" // resolve for amazonaws
+        force "joda-time:joda-time:2.8.1" // Resolve for amazonaws
+        force "com.fasterxml.jackson.core:jackson-core:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.core:jackson-annotations:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.core:jackson-databind:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.3" // resolve for amazonaws
+        force "junit:junit:4.12" // resolve for amazonaws
+    }
+}
+
+compileKotlin { kotlinOptions.freeCompilerArgs = ['-Xjsr305=strict'] }
+
+dependencies {
+    compileOnly "org.opensearch:opensearch:${opensearch_version}"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
+    compile "org.apache.httpcomponents:httpcore:4.4.5"
+    compile "org.apache.httpcomponents:httpclient:4.5.10"
+    compile "com.amazonaws:aws-java-sdk-sns:${aws_version}"
+    compile "com.amazonaws:aws-java-sdk-sts:${aws_version}"
+    compile "com.amazonaws:aws-java-sdk-ses:${aws_version}"
+    compile "com.sun.mail:javax.mail:1.6.2"
+    testImplementation(
+            'org.assertj:assertj-core:3.16.1',
+            'org.junit.jupiter:junit-jupiter-api:5.6.2',
+            "org.junit.jupiter:junit-jupiter-params:5.6.2",
+            "org.easymock:easymock:4.0.1",
+            "org.apache.logging.log4j:log4j-core:${versions.log4j}",
+            'org.mockito:mockito-junit-jupiter:3.10.0',
+            'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0',
+            'io.mockk:mockk:1.11.0',
+            'io.mockk:mockk-common:1.11.0',
+            'io.mockk:mockk-dsl:1.11.0',
+            'io.mockk:mockk-dsl-jvm:1.11.0',
+            'io.mockk:mockk-agent-api:1.11.0',
+            'io.mockk:mockk-agent-common:1.11.0',
+            'io.mockk:mockk-agent-jvm:1.11.0',
+    )
+    testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
+    testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
+    testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.2')
+    testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
+    testCompile "org.mockito:mockito-core:3.10.0"
+    testCompile "org.opensearch.test:framework:${opensearch_version}"
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
+    compile project(path: ":${rootProject.name}-core-spi", configuration: 'shadow')
+}
+
+configurations {
+    testCompile {
+        exclude group: 'org.elasticsearch', module: 'securemock' // resolve jarhell with mockito
+    }
+}
+
+// This is afterEvaluate because the bundlePlugin ZIP task is updated afterEvaluate and changes the ZIP name to match the plugin name
+afterEvaluate {
+    ospackage {
+        packageName = "${name}"
+        release = isSnapshot ? "0.1" : '1'
+        version = "${project.version}" - "-SNAPSHOT"
+
+        into '/usr/share/opensearch/plugins'
+        from(zipTree(bundlePlugin.archivePath)) {
+            into opensearchplugin.name
+        }
+
+        user 'root'
+        permissionGroup 'root'
+        fileMode 0644
+        dirMode 0755
+
+        requires('opensearch-oss', versions.opensearch, EQUAL)
+        packager = 'Amazon'
+        vendor = 'Amazon'
+        os = 'LINUX'
+        prefix '/usr'
+
+        license 'ASL-2.0'
+        maintainer 'OpenSearch Team <opensearch@amazon.com>'
+        url 'https://opensearch.org/'
+        summary '''
+         OpenSearch Notifications Core.
+         Reference documentation can be found at https://opendistro.github.io/for-elasticsearch-docs/. // TODO:MIGRATE
+    '''.stripIndent().replace('\n', ' ').trim()
+    }
+
+    buildRpm {
+        arch = 'NOARCH'
+        archiveName "${packageName}-${version}.rpm"
+        dependsOn 'assemble'
+    }
+
+    buildDeb {
+        arch = 'amd64'
+        archiveName "${packageName}-${version}.deb"
+        dependsOn 'assemble'
+    }
+}
