@@ -122,4 +122,4 @@ check.dependsOn ktlint
 
 evaluationDependsOnChildren()
 
-check.dependsOn project("opensearch-notifications-core").check
+check.dependsOn subprojects*.check
