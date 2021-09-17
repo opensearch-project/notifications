@@ -31,15 +31,3 @@ opensearch.notifications:
   general:
     operationTimeoutMs: 60000 # 60 seconds, Minimum 100ms
     defaultItemsQueryCount: 100 # default number of items to query
-  access:
-    adminAccess: "All"
-    # adminAccess values:
-    ## Standard -> Admin user access follows standard user
-    ## All -> Admin user with "all_access" role can see all data of all users.
-    filterBy: "NoFilter" # Applied when tenant != __user__
-    # filterBy values:
-    ## NoFilter -> everyone see each other's configurations
-    ## User -> configurations are visible to only themselves
-    ## Roles -> configurations are visible to users having any one of the role of creator
-    ## BackendRoles -> configurations are visible to users having any one of the backend role of creator
-    ignoreRoles: ["own_index", "kibana_user", "notifications_full_access", "notifications_read_access"]

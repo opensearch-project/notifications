@@ -31,21 +31,9 @@ import org.opensearch.commons.authuser.User
 interface UserAccess {
     /**
      * Validate User if eligible to do operation
-     * If filterBy == NoFilter
-     *  -> No validation
-     * If filterBy == User
-     *  -> User name should be present
-     * If filterBy == Roles
-     *  -> roles should be present
-     * If filterBy == BackendRoles
-     *  -> backend roles should be present
+     * If filter by BackendRoles is enabled then backend roles should be present
      */
     fun validateUser(user: User?)
-
-    /**
-     * Get tenant info from user object.
-     */
-    fun getUserTenant(user: User?): String
 
     /**
      * Get all user access info from user object.
@@ -60,10 +48,5 @@ interface UserAccess {
     /**
      * validate if user has access based on given access list
      */
-    fun doesUserHasAccess(user: User?, tenant: String, access: List<String>): Boolean
-
-    /**
-     * Check if user has all info access.
-     */
-    fun hasAllInfoAccess(user: User?): Boolean
+    fun doesUserHasAccess(user: User?, access: List<String>): Boolean
 }

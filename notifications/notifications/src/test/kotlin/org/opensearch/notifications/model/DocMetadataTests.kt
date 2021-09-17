@@ -43,31 +43,9 @@ internal class DocMetadataTests {
         val metadata = DocMetadata(
             lastUpdatedTimeMs,
             createdTimeMs,
-            "tenant",
-            listOf("User:user", "Role:sample_role", "BERole:sample_backend_role")
+            listOf("br1", "br2", "br3")
         )
         val jsonString = getJsonString(metadata)
-        val recreatedObject = createObjectFromJsonString(jsonString) { DocMetadata.parse(it) }
-        assertEquals(metadata, recreatedObject)
-    }
-
-    @Test
-    fun `DocMetadata should take default tenant when field is absent in json object`() {
-        val lastUpdatedTimeMs = Instant.ofEpochMilli(Instant.now().toEpochMilli())
-        val createdTimeMs = lastUpdatedTimeMs.minusSeconds(1000)
-        val metadata = DocMetadata(
-            lastUpdatedTimeMs,
-            createdTimeMs,
-            "", // Default tenant
-            listOf("User:user", "Role:sample_role", "BERole:sample_backend_role")
-        )
-        val jsonString = """
-        {
-            "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
-            "created_time_ms":"${createdTimeMs.toEpochMilli()}",
-            "access":["User:user", "Role:sample_role", "BERole:sample_backend_role"]
-        }
-        """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { DocMetadata.parse(it) }
         assertEquals(metadata, recreatedObject)
     }
@@ -79,14 +57,12 @@ internal class DocMetadataTests {
         val metadata = DocMetadata(
             lastUpdatedTimeMs,
             createdTimeMs,
-            "selectedTenant",
             listOf()
         )
         val jsonString = """
         {
             "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
-            "created_time_ms":"${createdTimeMs.toEpochMilli()}",
-            "tenant":"selectedTenant"
+            "created_time_ms":"${createdTimeMs.toEpochMilli()}"
         }
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { DocMetadata.parse(it) }
@@ -100,15 +76,13 @@ internal class DocMetadataTests {
         val metadata = DocMetadata(
             lastUpdatedTimeMs,
             createdTimeMs,
-            "selectedTenant",
-            listOf("User:user", "Role:sample_role", "BERole:sample_backend_role")
+            listOf("br1", "br2", "br3")
         )
         val jsonString = """
         {
             "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
             "created_time_ms":"${createdTimeMs.toEpochMilli()}",
-            "tenant":"selectedTenant",
-            "access":["User:user", "Role:sample_role", "BERole:sample_backend_role"],
+            "access":["br1", "br2", "br3"],
             "extra_field_1":["extra", "value"],
             "extra_field_2":{"extra":"value"},
             "extra_field_3":"extra value 3"
@@ -125,8 +99,7 @@ internal class DocMetadataTests {
         val jsonString = """
         {
             "created_time_ms":"${createdTimeMs.toEpochMilli()}",
-            "tenant":"selectedTenant",
-            "access":["User:user", "Role:sample_role", "BERole:sample_backend_role"]
+            "access":["br1", "br2", "br3"]
         }
         """.trimIndent()
         Assertions.assertThrows(IllegalArgumentException::class.java) {
@@ -140,8 +113,7 @@ internal class DocMetadataTests {
         val jsonString = """
         {
             "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
-            "tenant":"selectedTenant",
-            "access":["User:user", "Role:sample_role", "BERole:sample_backend_role"]
+            "access":["br1", "br2", "br3"]
         }
         """.trimIndent()
         Assertions.assertThrows(IllegalArgumentException::class.java) {

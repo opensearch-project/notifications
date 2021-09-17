@@ -61,13 +61,11 @@ interface ConfigOperations {
 
     /**
      * Query index for NotificationConfigDocs for given access details
-     * @param tenant the tenant of the user
      * @param access the list of access details to search NotificationConfigDocs for.
      * @param request [GetNotificationConfigRequest] object
      * @return search result of NotificationConfigDocs
      */
     fun getAllNotificationConfigs(
-        tenant: String,
         access: List<String>,
         request: GetNotificationConfigRequest
     ): NotificationConfigSearchResult

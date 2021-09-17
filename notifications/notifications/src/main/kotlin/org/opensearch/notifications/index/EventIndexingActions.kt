@@ -84,7 +84,7 @@ object EventIndexingActions {
                 throw OpenSearchStatusException("NotificationEvent $eventId not found", RestStatus.NOT_FOUND)
             }
         val metadata = eventDoc.eventDoc.metadata
-        if (!userAccess.doesUserHasAccess(user, metadata.tenant, metadata.access)) {
+        if (!userAccess.doesUserHasAccess(user, metadata.access)) {
             Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
             throw OpenSearchStatusException("Permission denied for NotificationEvent $eventId", RestStatus.FORBIDDEN)
         }
@@ -92,7 +92,6 @@ object EventIndexingActions {
             eventId,
             metadata.lastUpdateTime,
             metadata.createdTime,
-            metadata.tenant,
             eventDoc.eventDoc.event
         )
         return GetNotificationEventResponse(NotificationEventSearchResult(eventInfo))
@@ -118,7 +117,7 @@ object EventIndexingActions {
         }
         eventDocs.forEach {
             val currentMetadata = it.eventDoc.metadata
-            if (!userAccess.doesUserHasAccess(user, currentMetadata.tenant, currentMetadata.access)) {
+            if (!userAccess.doesUserHasAccess(user, currentMetadata.access)) {
                 Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
                 throw OpenSearchStatusException(
                     "Permission denied for NotificationEvent ${it.docInfo.id}",
@@ -131,7 +130,6 @@ object EventIndexingActions {
                 it.docInfo.id!!,
                 it.eventDoc.metadata.lastUpdateTime,
                 it.eventDoc.metadata.createdTime,
-                it.eventDoc.metadata.tenant,
                 it.eventDoc.event
             )
         }
@@ -147,7 +145,6 @@ object EventIndexingActions {
     private fun getAll(request: GetNotificationEventRequest, user: User?): GetNotificationEventResponse {
         log.info("$LOG_PREFIX:NotificationEvent-getAll")
         val searchResult = operations.getAllNotificationEvents(
-            userAccess.getUserTenant(user),
             userAccess.getSearchAccessInfo(user),
             request
         )

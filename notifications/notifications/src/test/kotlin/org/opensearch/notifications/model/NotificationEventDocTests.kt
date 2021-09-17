@@ -49,8 +49,7 @@ internal class NotificationEventDocTests {
         val metadata = DocMetadata(
             lastUpdatedTimeMs,
             createdTimeMs,
-            "tenant",
-            listOf("User:user", "Role:sample_role", "BERole:sample_backend_role")
+            listOf("br1", "br2", "br3")
         )
         val sampleEventSource = EventSource(
             "title",
@@ -79,8 +78,7 @@ internal class NotificationEventDocTests {
         val metadata = DocMetadata(
             lastUpdatedTimeMs,
             createdTimeMs,
-            "selectedTenant",
-            listOf("User:user", "Role:sample_role", "BERole:sample_backend_role")
+            listOf("br1", "br2", "br3")
         )
         val eventSource = EventSource(
             "title",
@@ -102,8 +100,7 @@ internal class NotificationEventDocTests {
             "metadata":{
                 "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
                 "created_time_ms":"${createdTimeMs.toEpochMilli()}",
-                "tenant":"selectedTenant",
-                "access":["User:user", "Role:sample_role", "BERole:sample_backend_role"]
+                "access":["br1", "br2", "br3"]
             },
             "event":{
                 "event_source":{
@@ -176,8 +173,7 @@ internal class NotificationEventDocTests {
             "metadata":{
                 "last_updated_time_ms":"${lastUpdatedTimeMs.toEpochMilli()}",
                 "created_time_ms":"${createdTimeMs.toEpochMilli()}",
-                "tenant":"selectedTenant",
-                "access":["User:user", "Role:sample_role", "BERole:sample_backend_role"]
+                "access":["br1", "br2", "br3"]
             }
         }
         """.trimIndent()

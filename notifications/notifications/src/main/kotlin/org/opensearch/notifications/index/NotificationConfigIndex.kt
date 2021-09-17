@@ -43,7 +43,6 @@ import org.opensearch.common.unit.TimeValue
 import org.opensearch.common.xcontent.LoggingDeprecationHandler
 import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.common.xcontent.XContentType
-import org.opensearch.commons.notifications.NotificationConstants.TENANT_TAG
 import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
 import org.opensearch.commons.notifications.model.NotificationConfigInfo
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
@@ -92,7 +91,6 @@ internal object NotificationConfigIndex : ConfigOperations {
                 searchHit.id,
                 doc.metadata.lastUpdateTime,
                 doc.metadata.createdTime,
-                doc.metadata.tenant,
                 doc.config
             )
         }
@@ -213,7 +211,6 @@ internal object NotificationConfigIndex : ConfigOperations {
      * {@inheritDoc}
      */
     override fun getAllNotificationConfigs(
-        tenant: String,
         access: List<String>,
         request: GetNotificationConfigRequest
     ): NotificationConfigSearchResult {
@@ -224,7 +221,6 @@ internal object NotificationConfigIndex : ConfigOperations {
             .size(request.maxItems)
             .from(request.fromIndex)
         val query = QueryBuilders.boolQuery()
-        query.filter(QueryBuilders.termsQuery("$METADATA_TAG.$TENANT_TAG", tenant))
         if (access.isNotEmpty()) {
             query.filter(QueryBuilders.termsQuery("$METADATA_TAG.$ACCESS_LIST_TAG", access))
         }

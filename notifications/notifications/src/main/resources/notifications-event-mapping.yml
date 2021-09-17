@@ -39,9 +39,7 @@ properties:
       created_time_ms:
         type: date
         format: epoch_millis
-      tenant:
-        type: keyword
-      access: # Array of access details like user,role,backend_role etc
+      access: # Array of backend_role who has access to this document
         type: keyword
   event: # dynamic structure to store notifications event
     type: object
