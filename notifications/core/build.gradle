@@ -87,12 +87,12 @@ configurations.all {
         force "org.apache.httpcomponents:httpclient:4.5.10" // resolve for amazonaws
         force "org.apache.httpcomponents:httpcore:4.4.13" // resolve for amazonaws
         force "joda-time:joda-time:2.8.1" // Resolve for amazonaws
-        force "com.fasterxml.jackson.core:jackson-core:2.12.3" // resolve for amazonaws
-        force "com.fasterxml.jackson.core:jackson-annotations:2.12.3" // resolve for amazonaws
-        force "com.fasterxml.jackson.core:jackson-databind:2.12.3" // resolve for amazonaws
-        force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.12.3" // resolve for amazonaws
-        force "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.12.3" // resolve for amazonaws
-        force "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.3" // resolve for amazonaws
+        force "com.fasterxml.jackson.core:jackson-core:2.11.4" // resolve for amazonaws
+        force "com.fasterxml.jackson.core:jackson-annotations:2.11.4" // resolve for amazonaws
+        force "com.fasterxml.jackson.core:jackson-databind:2.11.4" // resolve for amazonaws
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.11.4" // resolve for amazonaws
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.11.4" // resolve for amazonaws
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.4" // resolve for amazonaws
         force "junit:junit:4.12" // resolve for amazonaws
     }
 }
