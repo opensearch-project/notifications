@@ -29,19 +29,18 @@ package org.opensearch.notifications.security
 
 import org.opensearch.OpenSearchStatusException
 import org.opensearch.commons.authuser.User
+import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.rest.RestStatus
 
 /**
  * Class for checking/filtering user access.
  */
 internal object UserAccessManager : UserAccess {
-    private const val USE_RBAC = false
-
     /**
      * {@inheritDoc}
      */
     override fun validateUser(user: User?) {
-        if (USE_RBAC && user?.backendRoles.isNullOrEmpty()) {
+        if (PluginSettings.useRbac && user?.backendRoles.isNullOrEmpty()) {
             throw OpenSearchStatusException(
                 "User doesn't have backend roles configured. Contact administrator.",
                 RestStatus.FORBIDDEN
@@ -63,7 +62,7 @@ internal object UserAccessManager : UserAccess {
      * {@inheritDoc}
      */
     override fun getSearchAccessInfo(user: User?): List<String> {
-        if (user == null || !USE_RBAC) { // Filtering is disabled
+        if (user == null || !PluginSettings.useRbac) { // Filtering is disabled
             return listOf()
         }
         return user.backendRoles
@@ -73,7 +72,7 @@ internal object UserAccessManager : UserAccess {
      * {@inheritDoc}
      */
     override fun doesUserHasAccess(user: User?, access: List<String>): Boolean {
-        if (user == null || !USE_RBAC) { // Filtering is disabled
+        if (user == null || !PluginSettings.useRbac) { // Filtering is disabled
             return true
         }
         return user.backendRoles.any { it in access }
