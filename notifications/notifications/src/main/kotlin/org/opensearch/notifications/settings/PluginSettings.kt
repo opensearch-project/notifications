@@ -45,6 +45,8 @@ import java.nio.file.Path
  */
 internal object PluginSettings {
 
+    private lateinit var clusterService: ClusterService
+
     /**
      * Settings Key-prefix for this plugin.
      */
@@ -107,12 +109,6 @@ internal object PluginSettings {
     @Volatile
     var defaultItemsQueryCount: Int
 
-    /**
-     * alerting plugin filter_by_backend_roles setting for enabling RBAC.
-     */
-    @Volatile
-    var useRbac: Boolean = false
-
     private const val DECIMAL_RADIX: Int = 10
 
     private val log by logger(javaClass)
@@ -165,6 +161,14 @@ internal object PluginSettings {
         NodeScope, Dynamic
     )
 
+    fun isRbacEnabled(): Boolean {
+        return if (clusterService.clusterSettings.get(FILTER_BY_BACKEND_ROLES_KEY) != null) {
+            return clusterService.clusterSettings.get(FILTER_BY_BACKEND_ROLES) ?: false
+        } else {
+            false
+        }
+    }
+
     /**
      * Returns list of additional settings available specific to this plugin.
      *
@@ -173,8 +177,7 @@ internal object PluginSettings {
     fun getAllSettings(): List<Setting<*>> {
         return listOf(
             OPERATION_TIMEOUT_MS,
-            DEFAULT_ITEMS_QUERY_COUNT,
-            FILTER_BY_BACKEND_ROLES
+            DEFAULT_ITEMS_QUERY_COUNT
         )
     }
 
@@ -185,7 +188,6 @@ internal object PluginSettings {
     private fun updateSettingValuesFromLocal(clusterService: ClusterService) {
         operationTimeoutMs = OPERATION_TIMEOUT_MS.get(clusterService.settings)
         defaultItemsQueryCount = DEFAULT_ITEMS_QUERY_COUNT.get(clusterService.settings)
-        useRbac = FILTER_BY_BACKEND_ROLES.get(clusterService.settings)
     }
 
     /**
@@ -204,11 +206,6 @@ internal object PluginSettings {
             log.debug("$LOG_PREFIX:$DEFAULT_ITEMS_QUERY_COUNT_KEY -autoUpdatedTo-> $clusterDefaultItemsQueryCount")
             defaultItemsQueryCount = clusterDefaultItemsQueryCount
         }
-        val clusterUseRbac = clusterService.clusterSettings.get(FILTER_BY_BACKEND_ROLES)
-        if (clusterUseRbac != null) {
-            log.debug("$LOG_PREFIX:$FILTER_BY_BACKEND_ROLES_KEY -autoUpdatedTo-> $clusterUseRbac")
-            useRbac = clusterUseRbac
-        }
     }
 
     /**
@@ -216,6 +213,7 @@ internal object PluginSettings {
      * @param clusterService cluster service instance
      */
     fun addSettingsUpdateConsumer(clusterService: ClusterService) {
+        this.clusterService = clusterService
         updateSettingValuesFromLocal(clusterService)
         // Update the variables to cluster setting values
         // If the cluster is not yet started then we get default values again
@@ -228,10 +226,6 @@ internal object PluginSettings {
         clusterService.clusterSettings.addSettingsUpdateConsumer(DEFAULT_ITEMS_QUERY_COUNT) {
             defaultItemsQueryCount = it
             log.info("$LOG_PREFIX:$DEFAULT_ITEMS_QUERY_COUNT_KEY -updatedTo-> $it")
-        }
-        clusterService.clusterSettings.addSettingsUpdateConsumer(FILTER_BY_BACKEND_ROLES) {
-            useRbac = it
-            log.info("$LOG_PREFIX:$FILTER_BY_BACKEND_ROLES_KEY -updatedTo-> $it")
         }
     }
 }

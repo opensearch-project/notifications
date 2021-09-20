@@ -40,7 +40,7 @@ internal object UserAccessManager : UserAccess {
      * {@inheritDoc}
      */
     override fun validateUser(user: User?) {
-        if (PluginSettings.useRbac && user?.backendRoles.isNullOrEmpty()) {
+        if (PluginSettings.isRbacEnabled() && user?.backendRoles.isNullOrEmpty()) {
             throw OpenSearchStatusException(
                 "User doesn't have backend roles configured. Contact administrator.",
                 RestStatus.FORBIDDEN
@@ -62,7 +62,7 @@ internal object UserAccessManager : UserAccess {
      * {@inheritDoc}
      */
     override fun getSearchAccessInfo(user: User?): List<String> {
-        if (user == null || !PluginSettings.useRbac) { // Filtering is disabled
+        if (user == null || !PluginSettings.isRbacEnabled()) { // Filtering is disabled
             return listOf()
         }
         return user.backendRoles
@@ -72,7 +72,7 @@ internal object UserAccessManager : UserAccess {
      * {@inheritDoc}
      */
     override fun doesUserHasAccess(user: User?, access: List<String>): Boolean {
-        if (user == null || !PluginSettings.useRbac) { // Filtering is disabled
+        if (user == null || !PluginSettings.isRbacEnabled()) { // Filtering is disabled
             return true
         }
         return user.backendRoles.any { it in access }
