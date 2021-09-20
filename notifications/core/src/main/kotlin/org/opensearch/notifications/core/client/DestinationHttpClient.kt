@@ -48,6 +48,7 @@ import org.opensearch.notifications.core.setting.PluginSettings
 import org.opensearch.notifications.core.utils.OpenForTesting
 import org.opensearch.notifications.core.utils.logger
 import org.opensearch.notifications.core.utils.string
+import org.opensearch.notifications.core.utils.validateUrlHost
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
@@ -113,6 +114,8 @@ class DestinationHttpClient {
     fun execute(destination: WebhookDestination, message: MessageContent, referenceId: String): String {
         var response: CloseableHttpResponse? = null
         return try {
+            // validate webhook url against host_deny_list in plugin settings
+            validateUrlHost(destination.url, PluginSettings.hostDenyList)
             response = getHttpResponse(destination, message)
             validateResponseStatus(response)
             val responseString = getResponseString(response)

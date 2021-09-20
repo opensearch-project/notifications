@@ -22,8 +22,7 @@ abstract class WebhookDestination(
 ) : BaseDestination(destinationType) {
 
     init {
-        // TODO tmp change for dev purpose, need to load from plugin settings
-        validateUrl(url, listOf("fake"))
+        validateUrl(url)
     }
 
     override fun toString(): String {

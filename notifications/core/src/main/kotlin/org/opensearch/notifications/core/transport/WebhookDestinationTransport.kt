@@ -47,10 +47,18 @@ internal class WebhookDestinationTransport : DestinationTransport<WebhookDestina
             val response = destinationHttpClient.execute(destination, message, referenceId)
             DestinationMessageResponse(RestStatus.OK.status, response)
         } catch (exception: IOException) {
-            log.error("Exception sending message $referenceId: $message", exception)
+            log.error("Exception sending webhook message $referenceId: $message", exception)
             DestinationMessageResponse(
                 RestStatus.INTERNAL_SERVER_ERROR.status,
-                "Failed to send message ${exception.message}"
+                "Failed to send webhook message ${exception.message}"
+            )
+        } catch (illegalArgumentException: IllegalArgumentException) {
+            log.error(
+                "Exception sending webhook message: message creation failed with status:${illegalArgumentException.message}"
+            )
+            DestinationMessageResponse(
+                RestStatus.BAD_REQUEST.status,
+                "Webhook message creation failed with status:${illegalArgumentException.message}"
             )
         }
     }
