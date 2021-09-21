@@ -73,7 +73,6 @@ internal class NotificationEventIndexTests {
         val metadata = DocMetadata(
             lastUpdatedTimeMs,
             createdTimeMs,
-            "tenant",
             listOf("User:user", "Role:sample_role", "BERole:sample_backend_role")
         )
         val sampleEventSource = EventSource(
