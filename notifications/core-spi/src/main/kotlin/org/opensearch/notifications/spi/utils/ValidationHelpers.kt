@@ -34,12 +34,9 @@ import org.apache.http.client.methods.HttpPut
 import org.opensearch.common.Strings
 import java.net.URL
 
-fun validateUrl(urlString: String, hostDenyList: List<String>) {
+fun validateUrl(urlString: String) {
     require(!Strings.isNullOrEmpty(urlString)) { "url is null or empty" }
     require(isValidUrl(urlString)) { "Invalid URL or unsupported" }
-    require(!isHostInDenylist(urlString, hostDenyList)) {
-        "Host of url is denied, based on plugin setting [notification.core.email.host_deny_list]"
-    }
 }
 
 fun validateEmail(email: String) {

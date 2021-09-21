@@ -44,8 +44,8 @@ class NotificationCorePlugin : ReloadablePlugin, Plugin(), ExtensiblePlugin {
     internal companion object {
         private val log by logger(NotificationCorePlugin::class.java)
 
-        const val PLUGIN_NAME = "opensearch-notifications"
-        const val LOG_PREFIX = "notifications"
+        const val PLUGIN_NAME = "opensearch-notifications-core"
+        const val LOG_PREFIX = "notifications-core"
     }
     /**
      * {@inheritDoc}

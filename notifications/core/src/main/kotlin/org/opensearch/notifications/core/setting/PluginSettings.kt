@@ -225,7 +225,7 @@ internal object PluginSettings {
         var settings: Settings? = null
         val configDirName = BootstrapInfo.getSystemProperties()?.get("opensearch.path.conf")?.toString()
         if (configDirName != null) {
-            val defaultSettingYmlFile = Path.of(configDirName, PLUGIN_NAME, "notifications.yml")
+            val defaultSettingYmlFile = Path.of(configDirName, PLUGIN_NAME, "notifications-core.yml")
             try {
                 settings = Settings.builder().loadFromPath(defaultSettingYmlFile).build()
             } catch (e: IOException) {
@@ -361,6 +361,7 @@ internal object PluginSettings {
         socketTimeout = SOCKET_TIMEOUT_MILLISECONDS.get(clusterService.settings)
         tooltipSupport = TOOLTIP_SUPPORT.get(clusterService.settings)
         hostDenyList = HOST_DENY_LIST.get(clusterService.settings)
+        destinationSettings = loadDestinationSettings(clusterService.settings)
     }
 
     /**
@@ -469,7 +470,7 @@ internal object PluginSettings {
         // If this logic needs to be expanded to support other Destinations, different groups can be retrieved similar
         // to emailAccountNames based on the setting namespace and SecureDestinationSettings should be expanded to support
         // these new settings.
-        val emailAccountNames: Set<String> = settings.getGroups(EMAIL_DESTINATION_SETTING_PREFIX).keys
+        val emailAccountNames: Set<String> = settings.getGroups(EMAIL_DESTINATION_SETTING_PREFIX, true).keys
         val emailAccounts: MutableMap<String, SecureDestinationSettings> = mutableMapOf()
         for (emailAccountName in emailAccountNames) {
             // Only adding the settings if they exist
