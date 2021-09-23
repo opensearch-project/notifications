@@ -20,6 +20,11 @@ interface NotificationCore {
     fun getAllowedConfigTypes(): List<String>
 
     /**
+     * Get list of allowed config features
+     */
+    fun getAllowedConfigFeatures(): List<String>
+
+    /**
      * Get map of plugin features
      */
     fun getPluginFeatures(): Map<String, String>

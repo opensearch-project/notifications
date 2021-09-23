@@ -80,9 +80,11 @@ internal class GetPluginFeaturesAction @Inject constructor(
         user: User?
     ): GetPluginFeaturesResponse {
         val allowedConfigTypes = CoreProvider.core.getAllowedConfigTypes()
+        val allowedConfigFeatures = CoreProvider.core.getAllowedConfigFeatures()
         val pluginFeatures = CoreProvider.core.getPluginFeatures()
         return GetPluginFeaturesResponse(
             allowedConfigTypes,
+            allowedConfigFeatures,
             pluginFeatures
         )
     }

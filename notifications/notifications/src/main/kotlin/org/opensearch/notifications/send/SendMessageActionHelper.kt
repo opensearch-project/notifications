@@ -91,6 +91,13 @@ object SendMessageActionHelper {
         val channelMessage = request.channelMessage
         val channelIds = request.channelIds.toSet()
         val user: User? = User.parse(request.threadContext)
+        if (!CoreProvider.core.getAllowedConfigFeatures().contains(request.eventSource.feature)) {
+            Metrics.NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_FEATURE_NOT_FOUND.counter.increment()
+            throw OpenSearchStatusException(
+                "Source ${request.eventSource.feature} Feature not enabled",
+                RestStatus.BAD_REQUEST
+            )
+        }
         val createdTime = Instant.now()
         userAccess.validateUser(user)
         val channels = getConfigs(channelIds)

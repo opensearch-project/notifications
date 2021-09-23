@@ -74,12 +74,25 @@ object NotificationCoreImpl : NotificationCore {
     }
 
     /**
+     * Get list of allowed config features
+     */
+    override fun getAllowedConfigFeatures(): List<String> {
+        return AccessController.doPrivileged(
+            PrivilegedAction {
+                PluginSettings.allowedConfigFeatures
+            } as PrivilegedAction<List<String>>?
+        )
+    }
+
+    /**
      * Get map of plugin features
      */
     override fun getPluginFeatures(): Map<String, String> {
         return AccessController.doPrivileged(
             PrivilegedAction {
-                PluginSettings.defaultSettings
+                mapOf(
+                    Pair("tooltip_support", "${PluginSettings.tooltipSupport}")
+                )
             } as PrivilegedAction<Map<String, String>>?
         )
     }

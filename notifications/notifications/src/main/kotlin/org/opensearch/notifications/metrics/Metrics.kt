@@ -199,6 +199,9 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
     NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND(
         "notifications.send_message.user_error.not_found", RollingCounter()
     ),
+    NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_FEATURE_NOT_FOUND(
+        "notifications.send_message.user_error.feature_not_found", RollingCounter()
+    ),
     NOTIFICATIONS_SEND_MESSAGE_SYSTEM_ERROR(
         "notifications.send_message.system_error",
         RollingCounter()
