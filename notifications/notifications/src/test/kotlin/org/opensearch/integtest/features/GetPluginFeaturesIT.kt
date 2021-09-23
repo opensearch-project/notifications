@@ -27,7 +27,8 @@ class GetPluginFeaturesIT : PluginRestTestCase() {
             "",
             RestStatus.OK.status
         )
-        Assert.assertFalse(getResponse.get("config_type_list").asJsonArray.isEmpty)
+        Assert.assertFalse(getResponse.get("allowed_config_type_list").asJsonArray.isEmpty)
+        Assert.assertFalse(getResponse.get("allowed_config_feature_list").asJsonArray.isEmpty)
         val pluginFeatures = getResponse.get("plugin_features").asJsonObject
         Assert.assertFalse(pluginFeatures.keySet().isEmpty())
     }
@@ -39,7 +40,7 @@ class GetPluginFeaturesIT : PluginRestTestCase() {
             "",
             RestStatus.OK.status
         )
-        val configTypes = getResponse.get("config_type_list").asJsonArray.map { it.asString }
+        val configTypes = getResponse.get("allowed_config_type_list").asJsonArray.map { it.asString }
         if (configTypes.contains(ConfigType.EMAIL.tag)) {
             Assert.assertTrue(configTypes.contains(ConfigType.EMAIL_GROUP.tag))
             Assert.assertTrue(configTypes.contains(ConfigType.SMTP_ACCOUNT.tag) || configTypes.contains(ConfigType.SES_ACCOUNT.tag))

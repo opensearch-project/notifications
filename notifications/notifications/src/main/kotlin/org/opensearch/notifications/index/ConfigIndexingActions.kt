@@ -54,6 +54,7 @@ import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.notifications.model.Sns
 import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.commons.utils.logger
+import org.opensearch.notifications.CoreProvider
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.DocMetadata
@@ -189,6 +190,14 @@ object ConfigIndexingActions {
     }
 
     private fun validateConfig(config: NotificationConfig, user: User?) {
+        config.features.forEach {
+            if (!CoreProvider.core.getAllowedConfigFeatures().contains(it)) {
+                throw OpenSearchStatusException(
+                    "NotificationConfig with type feature $it is not acceptable",
+                    RestStatus.NOT_ACCEPTABLE
+                )
+            }
+        }
         when (config.configType) {
             ConfigType.NONE -> throw OpenSearchStatusException(
                 "NotificationConfig with type NONE is not acceptable",

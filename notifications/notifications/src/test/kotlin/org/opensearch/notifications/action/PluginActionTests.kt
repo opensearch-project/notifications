@@ -157,9 +157,10 @@ internal class PluginActionTests {
     @Test
     fun `Get plugin features action should call back action listener`() {
         val allowedConfigTypes = listOf("type1")
+        val allowedConfigFeatures = listOf("feature1")
         val pluginFeatures = mapOf(Pair("FeatureKey1", "Feature1"))
         val request = mock(GetPluginFeaturesRequest::class.java)
-        val response = GetPluginFeaturesResponse(allowedConfigTypes, pluginFeatures)
+        val response = GetPluginFeaturesResponse(allowedConfigTypes, allowedConfigFeatures, pluginFeatures)
 
         val getPluginFeaturesAction = GetPluginFeaturesAction(
             transportService, client, actionFilters, xContentRegistry
