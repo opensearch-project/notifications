@@ -113,7 +113,7 @@ export default class NotificationService {
   getEmailConfigDetails = async (
     channel: ChannelItemType
   ): Promise<ChannelItemType> => {
-    if (!channel.email) return  channel;
+    if (!channel.email) return channel;
 
     const idMap: { [id: string]: string } = {};
     const ids = [
@@ -230,7 +230,7 @@ export default class NotificationService {
       const response = await this.httpClient.get(
         NODE_API.GET_AVAILABLE_FEATURES
       );
-      const config_type_list = response.config_type_list as Array<
+      const config_type_list = response.allowed_config_type_list as Array<
         keyof typeof CHANNEL_TYPE
       >;
       const channelTypes: Partial<typeof CHANNEL_TYPE> = {};
@@ -243,10 +243,7 @@ export default class NotificationService {
         availableChannels: channelTypes,
         availableConfigTypes: config_type_list as string[],
         tooltipSupport:
-          _.get(response, [
-            'plugin_features',
-            'opensearch.notifications.spi.tooltip_support',
-          ]) === 'true',
+          _.get(response, ['plugin_features', 'tooltip_support']) === 'true',
       };
     } catch (error) {
       console.error('error fetching available features', error);
