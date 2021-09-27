@@ -164,7 +164,7 @@ internal object PluginSettings {
     /**
      * Default disable tooltip support
      */
-    private const val DEFAULT_TOOLTIP_SUPPORT = false
+    private const val DEFAULT_TOOLTIP_SUPPORT = true
 
     /**
      * Default destination settings
@@ -265,7 +265,7 @@ internal object PluginSettings {
         socketTimeout = (settings?.get(SOCKET_TIMEOUT_MILLISECONDS_KEY)?.toInt()) ?: DEFAULT_SOCKET_TIMEOUT_MILLISECONDS
         allowedConfigTypes = settings?.getAsList(ALLOWED_CONFIG_TYPE_KEY, null) ?: DEFAULT_ALLOWED_CONFIG_TYPES
         allowedConfigFeatures = settings?.getAsList(ALLOWED_CONFIG_FEATURE_KEY, null) ?: DEFAULT_ALLOWED_CONFIG_FEATURES
-        tooltipSupport = settings?.getAsBoolean(TOOLTIP_SUPPORT_KEY, false) ?: DEFAULT_TOOLTIP_SUPPORT
+        tooltipSupport = settings?.getAsBoolean(TOOLTIP_SUPPORT_KEY, true) ?: DEFAULT_TOOLTIP_SUPPORT
         hostDenyList = settings?.getAsList(HOST_DENY_LIST_KEY, null) ?: DEFAULT_HOST_DENY_LIST
         destinationSettings = if (settings != null) loadDestinationSettings(settings) else DEFAULT_DESTINATION_SETTINGS
 
