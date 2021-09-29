@@ -172,7 +172,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
                 ],
                 "is_enabled":true,
                 "webhook":{
-                    "url":"https://xxx.com/my-webhook@dev",
+                    "url":"https://szhongna.api.stdlib.com/my-webhook@dev/",
                     "header_params": {
                        "Content-type": "text/plain"
                     }

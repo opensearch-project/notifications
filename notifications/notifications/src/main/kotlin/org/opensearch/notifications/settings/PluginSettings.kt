@@ -60,12 +60,12 @@ internal object PluginSettings {
     /**
      * Operation timeout for network operations.
      */
-    private const val OPERATION_TIMEOUT_MS_KEY = "$GENERAL_KEY_PREFIX.operationTimeoutMs"
+    const val OPERATION_TIMEOUT_MS_KEY = "$GENERAL_KEY_PREFIX.operationTimeoutMs"
 
     /**
      * Setting to choose default number of items to query.
      */
-    private const val DEFAULT_ITEMS_QUERY_COUNT_KEY = "$GENERAL_KEY_PREFIX.defaultItemsQueryCount"
+    const val DEFAULT_ITEMS_QUERY_COUNT_KEY = "$GENERAL_KEY_PREFIX.defaultItemsQueryCount"
 
     /**
      * Legacy alerting plugin filter_by_backend_roles setting.
@@ -80,7 +80,7 @@ internal object PluginSettings {
     /**
      * Default operation timeout for network operations.
      */
-    private const val DEFAULT_OPERATION_TIMEOUT_MS = 60000L
+    const val DEFAULT_OPERATION_TIMEOUT_MS = 60000L
 
     /**
      * Minimum operation timeout for network operations.
@@ -90,7 +90,7 @@ internal object PluginSettings {
     /**
      * Default number of items to query.
      */
-    private const val DEFAULT_ITEMS_QUERY_COUNT_VALUE = 100
+    const val DEFAULT_ITEMS_QUERY_COUNT_VALUE = 100
 
     /**
      * Minimum number of items to query.
@@ -112,7 +112,7 @@ internal object PluginSettings {
     private const val DECIMAL_RADIX: Int = 10
 
     private val log by logger(javaClass)
-    private val defaultSettings: Map<String, String>
+    private var defaultSettings: Map<String, String>
 
     init {
         var settings: Settings? = null
@@ -135,14 +135,14 @@ internal object PluginSettings {
         )
     }
 
-    private val OPERATION_TIMEOUT_MS: Setting<Long> = Setting.longSetting(
+    val OPERATION_TIMEOUT_MS: Setting<Long> = Setting.longSetting(
         OPERATION_TIMEOUT_MS_KEY,
         defaultSettings[OPERATION_TIMEOUT_MS_KEY]!!.toLong(),
         MINIMUM_OPERATION_TIMEOUT_MS,
         NodeScope, Dynamic
     )
 
-    private val DEFAULT_ITEMS_QUERY_COUNT: Setting<Int> = Setting.intSetting(
+    val DEFAULT_ITEMS_QUERY_COUNT: Setting<Int> = Setting.intSetting(
         DEFAULT_ITEMS_QUERY_COUNT_KEY,
         defaultSettings[DEFAULT_ITEMS_QUERY_COUNT_KEY]!!.toInt(),
         MINIMUM_ITEMS_QUERY_COUNT,
@@ -227,5 +227,15 @@ internal object PluginSettings {
             defaultItemsQueryCount = it
             log.info("$LOG_PREFIX:$DEFAULT_ITEMS_QUERY_COUNT_KEY -updatedTo-> $it")
         }
+    }
+
+    // reset the settings values to default values for testing purpose
+    fun reset() {
+        operationTimeoutMs = DEFAULT_OPERATION_TIMEOUT_MS
+        defaultItemsQueryCount = DEFAULT_ITEMS_QUERY_COUNT_VALUE
+        defaultSettings = mapOf(
+            OPERATION_TIMEOUT_MS_KEY to operationTimeoutMs.toString(DECIMAL_RADIX),
+            DEFAULT_ITEMS_QUERY_COUNT_KEY to defaultItemsQueryCount.toString(DECIMAL_RADIX)
+        )
     }
 }

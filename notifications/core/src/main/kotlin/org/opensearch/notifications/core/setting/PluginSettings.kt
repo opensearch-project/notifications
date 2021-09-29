@@ -21,7 +21,6 @@ import org.opensearch.common.settings.Setting.Property.NodeScope
 import org.opensearch.common.settings.Settings
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.PLUGIN_NAME
-import org.opensearch.notifications.core.setting.PluginSettings.KEY_PREFIX
 import org.opensearch.notifications.core.utils.logger
 import org.opensearch.notifications.spi.model.SecureDestinationSettings
 import java.io.IOException
@@ -51,57 +50,57 @@ internal object PluginSettings {
     /**
      * Email size limit.
      */
-    private const val EMAIL_SIZE_LIMIT_KEY = "$EMAIL_KEY_PREFIX.sizeLimit"
+    const val EMAIL_SIZE_LIMIT_KEY = "$EMAIL_KEY_PREFIX.sizeLimit"
 
     /**
      * Email minimum header length.
      */
-    private const val EMAIL_MINIMUM_HEADER_LENGTH_KEY = "$EMAIL_KEY_PREFIX.minimumHeaderLength"
+    const val EMAIL_MINIMUM_HEADER_LENGTH_KEY = "$EMAIL_KEY_PREFIX.minimumHeaderLength"
 
     /**
      * Settings Key prefix for http connection.
      */
-    private const val MAX_CONNECTIONS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.maxConnections"
+    const val MAX_CONNECTIONS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.maxConnections"
 
     /**
      * Settings Key prefix for max http connection per route.
      */
-    private const val MAX_CONNECTIONS_PER_ROUTE_KEY = "$HTTP_CONNECTION_KEY_PREFIX.maxConnectionPerRoute"
+    const val MAX_CONNECTIONS_PER_ROUTE_KEY = "$HTTP_CONNECTION_KEY_PREFIX.maxConnectionPerRoute"
 
     /**
      * Settings Key prefix for connection timeout in milliseconds
      */
-    private const val CONNECTION_TIMEOUT_MILLISECONDS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.connectionTimeout"
+    const val CONNECTION_TIMEOUT_MILLISECONDS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.connectionTimeout"
 
     /**
      * Settings Key prefix for socket timeout in milliseconds
      */
-    private const val SOCKET_TIMEOUT_MILLISECONDS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.socketTimeout"
+    const val SOCKET_TIMEOUT_MILLISECONDS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.socketTimeout"
 
     /**
      * Setting for list of host deny list
      */
-    private const val HOST_DENY_LIST_KEY = "$HTTP_CONNECTION_KEY_PREFIX.hostDenyList"
+    const val HOST_DENY_LIST_KEY = "$HTTP_CONNECTION_KEY_PREFIX.hostDenyList"
 
     /**
      * Setting to choose allowed config types.
      */
-    private const val ALLOWED_CONFIG_TYPE_KEY = "$KEY_PREFIX.allowedConfigTypes"
+    const val ALLOWED_CONFIG_TYPE_KEY = "$KEY_PREFIX.allowedConfigTypes"
 
     /**
      * Setting to choose allowed config features.
      */
-    private const val ALLOWED_CONFIG_FEATURE_KEY = "$KEY_PREFIX.allowedConfigFeatures"
+    const val ALLOWED_CONFIG_FEATURE_KEY = "$KEY_PREFIX.allowedConfigFeatures"
 
     /**
      * Setting to enable tooltip in UI
      */
-    private const val TOOLTIP_SUPPORT_KEY = "$KEY_PREFIX.tooltipSupport"
+    const val TOOLTIP_SUPPORT_KEY = "$KEY_PREFIX.tooltipSupport"
 
     /**
      * Default email size limit as 10MB.
      */
-    private const val DEFAULT_EMAIL_SIZE_LIMIT = 10000000
+    const val DEFAULT_EMAIL_SIZE_LIMIT = 10000000
 
     /**
      * Minimum email size limit as 10KB.
@@ -111,32 +110,32 @@ internal object PluginSettings {
     /**
      * Default value  for http connection.
      */
-    private const val DEFAULT_MAX_CONNECTIONS = 60
+    const val DEFAULT_MAX_CONNECTIONS = 60
 
     /**
      * Default value for max http connection per route.
      */
-    private const val DEFAULT_MAX_CONNECTIONS_PER_ROUTE = 20
+    const val DEFAULT_MAX_CONNECTIONS_PER_ROUTE = 20
 
     /**
      * Default value for connection timeout in milliseconds
      */
-    private const val DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS = 5000
+    const val DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS = 5000
 
     /**
      * Default value for socket timeout in milliseconds
      */
-    private const val DEFAULT_SOCKET_TIMEOUT_MILLISECONDS = 50000
+    const val DEFAULT_SOCKET_TIMEOUT_MILLISECONDS = 50000
 
     /**
      * Default email header length. minimum value from 100 reference emails
      */
-    private const val DEFAULT_MINIMUM_EMAIL_HEADER_LENGTH = 160
+    const val DEFAULT_MINIMUM_EMAIL_HEADER_LENGTH = 160
 
     /**
      * Default config type list
      */
-    private val DEFAULT_ALLOWED_CONFIG_TYPES = listOf(
+    val DEFAULT_ALLOWED_CONFIG_TYPES = listOf(
         "slack",
         "chime",
         "webhook",
@@ -150,7 +149,7 @@ internal object PluginSettings {
     /**
      * Default config feature list
      */
-    private val DEFAULT_ALLOWED_CONFIG_FEATURES = listOf(
+    val DEFAULT_ALLOWED_CONFIG_FEATURES = listOf(
         "alerting",
         "index_management",
         "reports"
@@ -159,12 +158,12 @@ internal object PluginSettings {
     /**
      * Default email host deny list
      */
-    private val DEFAULT_HOST_DENY_LIST = emptyList<String>()
+    val DEFAULT_HOST_DENY_LIST = emptyList<String>()
 
     /**
      * Default disable tooltip support
      */
-    private const val DEFAULT_TOOLTIP_SUPPORT = true
+    const val DEFAULT_TOOLTIP_SUPPORT = true
 
     /**
      * Default destination settings
@@ -240,7 +239,7 @@ internal object PluginSettings {
     private const val DECIMAL_RADIX: Int = 10
 
     private val log by logger(javaClass)
-    private val defaultSettings: Map<String, String>
+    private var defaultSettings: Map<String, String>
 
     init {
         var settings: Settings? = null
@@ -280,64 +279,64 @@ internal object PluginSettings {
         )
     }
 
-    private val EMAIL_SIZE_LIMIT: Setting<Int> = Setting.intSetting(
+    val EMAIL_SIZE_LIMIT: Setting<Int> = Setting.intSetting(
         EMAIL_SIZE_LIMIT_KEY,
         defaultSettings[EMAIL_SIZE_LIMIT_KEY]!!.toInt(),
         MINIMUM_EMAIL_SIZE_LIMIT,
         NodeScope, Dynamic
     )
 
-    private val EMAIL_MINIMUM_HEADER_LENGTH: Setting<Int> = Setting.intSetting(
+    val EMAIL_MINIMUM_HEADER_LENGTH: Setting<Int> = Setting.intSetting(
         EMAIL_MINIMUM_HEADER_LENGTH_KEY,
         defaultSettings[EMAIL_MINIMUM_HEADER_LENGTH_KEY]!!.toInt(),
         NodeScope, Dynamic
     )
 
-    private val MAX_CONNECTIONS: Setting<Int> = Setting.intSetting(
+    val MAX_CONNECTIONS: Setting<Int> = Setting.intSetting(
         MAX_CONNECTIONS_KEY,
         defaultSettings[MAX_CONNECTIONS_KEY]!!.toInt(),
         NodeScope, Dynamic
     )
 
-    private val MAX_CONNECTIONS_PER_ROUTE: Setting<Int> = Setting.intSetting(
+    val MAX_CONNECTIONS_PER_ROUTE: Setting<Int> = Setting.intSetting(
         MAX_CONNECTIONS_PER_ROUTE_KEY,
         defaultSettings[MAX_CONNECTIONS_PER_ROUTE_KEY]!!.toInt(),
         NodeScope, Dynamic
     )
 
-    private val CONNECTION_TIMEOUT_MILLISECONDS: Setting<Int> = Setting.intSetting(
+    val CONNECTION_TIMEOUT_MILLISECONDS: Setting<Int> = Setting.intSetting(
         CONNECTION_TIMEOUT_MILLISECONDS_KEY,
         defaultSettings[CONNECTION_TIMEOUT_MILLISECONDS_KEY]!!.toInt(),
         NodeScope, Dynamic
     )
 
-    private val SOCKET_TIMEOUT_MILLISECONDS: Setting<Int> = Setting.intSetting(
+    val SOCKET_TIMEOUT_MILLISECONDS: Setting<Int> = Setting.intSetting(
         SOCKET_TIMEOUT_MILLISECONDS_KEY,
         defaultSettings[SOCKET_TIMEOUT_MILLISECONDS_KEY]!!.toInt(),
         NodeScope, Dynamic
     )
 
-    private val ALLOWED_CONFIG_TYPES: Setting<List<String>> = Setting.listSetting(
+    val ALLOWED_CONFIG_TYPES: Setting<List<String>> = Setting.listSetting(
         ALLOWED_CONFIG_TYPE_KEY,
         DEFAULT_ALLOWED_CONFIG_TYPES,
         { it },
         NodeScope, Dynamic
     )
 
-    private val ALLOWED_CONFIG_FEATURES: Setting<List<String>> = Setting.listSetting(
+    val ALLOWED_CONFIG_FEATURES: Setting<List<String>> = Setting.listSetting(
         ALLOWED_CONFIG_FEATURE_KEY,
         DEFAULT_ALLOWED_CONFIG_FEATURES,
         { it },
         NodeScope, Dynamic
     )
 
-    private val TOOLTIP_SUPPORT: Setting<Boolean> = Setting.boolSetting(
+    val TOOLTIP_SUPPORT: Setting<Boolean> = Setting.boolSetting(
         TOOLTIP_SUPPORT_KEY,
         defaultSettings[TOOLTIP_SUPPORT_KEY]!!.toBoolean(),
         NodeScope, Dynamic
     )
 
-    private val HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
+    val HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
         HOST_DENY_LIST_KEY,
         DEFAULT_HOST_DENY_LIST,
         { it },
@@ -536,5 +535,28 @@ internal object PluginSettings {
     private fun <T> getEmailSettingValue(settings: Settings, emailAccountName: String, emailSetting: Setting.AffixSetting<T>): T? {
         val concreteSetting = emailSetting.getConcreteSettingForNamespace(emailAccountName)
         return concreteSetting.get(settings)
+    }
+
+    // reset the settings values to default values for testing purpose
+    fun reset() {
+        emailSizeLimit = DEFAULT_EMAIL_SIZE_LIMIT
+        emailMinimumHeaderLength = DEFAULT_MINIMUM_EMAIL_HEADER_LENGTH
+        maxConnections = DEFAULT_MAX_CONNECTIONS
+        maxConnectionsPerRoute = DEFAULT_MAX_CONNECTIONS_PER_ROUTE
+        connectionTimeout = DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS
+        socketTimeout = DEFAULT_SOCKET_TIMEOUT_MILLISECONDS
+        allowedConfigTypes = DEFAULT_ALLOWED_CONFIG_TYPES
+        allowedConfigFeatures = DEFAULT_ALLOWED_CONFIG_FEATURES
+        tooltipSupport = DEFAULT_TOOLTIP_SUPPORT
+        hostDenyList = DEFAULT_HOST_DENY_LIST
+        defaultSettings = mapOf(
+            EMAIL_SIZE_LIMIT_KEY to emailSizeLimit.toString(DECIMAL_RADIX),
+            EMAIL_MINIMUM_HEADER_LENGTH_KEY to emailMinimumHeaderLength.toString(DECIMAL_RADIX),
+            MAX_CONNECTIONS_KEY to maxConnections.toString(DECIMAL_RADIX),
+            MAX_CONNECTIONS_PER_ROUTE_KEY to maxConnectionsPerRoute.toString(DECIMAL_RADIX),
+            CONNECTION_TIMEOUT_MILLISECONDS_KEY to connectionTimeout.toString(DECIMAL_RADIX),
+            SOCKET_TIMEOUT_MILLISECONDS_KEY to socketTimeout.toString(DECIMAL_RADIX),
+            TOOLTIP_SUPPORT_KEY to tooltipSupport.toString()
+        )
     }
 }
