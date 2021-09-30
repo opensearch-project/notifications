@@ -14,7 +14,7 @@ package org.opensearch.notifications.settings
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
@@ -22,18 +22,19 @@ import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.settings.ClusterSettings
 import org.opensearch.common.settings.Settings
 import org.opensearch.notifications.NotificationPlugin
-import org.opensearch.notifications.settings.PluginSettings.DEFAULT_ITEMS_QUERY_COUNT_KEY
-import org.opensearch.notifications.settings.PluginSettings.DEFAULT_ITEMS_QUERY_COUNT_VALUE
-import org.opensearch.notifications.settings.PluginSettings.DEFAULT_OPERATION_TIMEOUT_MS
-import org.opensearch.notifications.settings.PluginSettings.OPERATION_TIMEOUT_MS_KEY
 
 internal class PluginSettingsTests {
     private lateinit var plugin: NotificationPlugin
     private lateinit var clusterService: ClusterService
 
+    private val keyPrefix = "opensearch.notifications"
+    private val generalKeyPrefix = "$keyPrefix.general"
+    private val operationTimeoutKey = "$generalKeyPrefix.operationTimeoutMs"
+    private val defaultItemQueryCountKey = "$generalKeyPrefix.defaultItemsQueryCount"
+
     private val defaultSettings = Settings.builder()
-        .put(OPERATION_TIMEOUT_MS_KEY, DEFAULT_OPERATION_TIMEOUT_MS)
-        .put(DEFAULT_ITEMS_QUERY_COUNT_KEY, DEFAULT_ITEMS_QUERY_COUNT_VALUE)
+        .put(operationTimeoutKey, 60000L)
+        .put(defaultItemQueryCountKey, 100L)
         .build()
 
     @BeforeEach
@@ -59,16 +60,17 @@ internal class PluginSettingsTests {
                 )
             )
         )
-        assertEquals(defaultSettings[OPERATION_TIMEOUT_MS_KEY], PluginSettings.operationTimeoutMs.toString())
-        assertEquals(defaultSettings[DEFAULT_ITEMS_QUERY_COUNT_KEY], PluginSettings.defaultItemsQueryCount.toString())
+        Assertions.assertEquals(defaultSettings[operationTimeoutKey], PluginSettings.operationTimeoutMs.toString())
+        Assertions.assertEquals(defaultSettings[defaultItemQueryCountKey], PluginSettings.defaultItemsQueryCount.toString())
     }
 
     @Test
     fun `test update settings should take cluster settings if available`() {
         val clusterSettings = Settings.builder()
-            .put(OPERATION_TIMEOUT_MS_KEY, 50000L)
-            .put(DEFAULT_ITEMS_QUERY_COUNT_KEY, 200)
+            .put(operationTimeoutKey, 50000L)
+            .put(defaultItemQueryCountKey, 200)
             .build()
+
         whenever(clusterService.settings).thenReturn(defaultSettings)
         whenever(clusterService.clusterSettings).thenReturn(
             ClusterSettings(
@@ -77,8 +79,14 @@ internal class PluginSettingsTests {
             )
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
-        assertEquals(50000L, clusterService.clusterSettings.get(PluginSettings.OPERATION_TIMEOUT_MS))
-        assertEquals(200, clusterService.clusterSettings.get(PluginSettings.DEFAULT_ITEMS_QUERY_COUNT))
+        Assertions.assertEquals(
+            50000L,
+            clusterService.clusterSettings.get(PluginSettings.OPERATION_TIMEOUT_MS)
+        )
+        Assertions.assertEquals(
+            200,
+            clusterService.clusterSettings.get(PluginSettings.DEFAULT_ITEMS_QUERY_COUNT)
+        )
     }
 
     @Test
@@ -92,7 +100,13 @@ internal class PluginSettingsTests {
             )
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
-        assertEquals(DEFAULT_OPERATION_TIMEOUT_MS, clusterService.clusterSettings.get(PluginSettings.OPERATION_TIMEOUT_MS))
-        assertEquals(DEFAULT_ITEMS_QUERY_COUNT_VALUE, clusterService.clusterSettings.get(PluginSettings.DEFAULT_ITEMS_QUERY_COUNT))
+        Assertions.assertEquals(
+            defaultSettings[operationTimeoutKey],
+            clusterService.clusterSettings.get(PluginSettings.OPERATION_TIMEOUT_MS).toString()
+        )
+        Assertions.assertEquals(
+            defaultSettings[defaultItemQueryCountKey],
+            clusterService.clusterSettings.get(PluginSettings.DEFAULT_ITEMS_QUERY_COUNT).toString()
+        )
     }
 }

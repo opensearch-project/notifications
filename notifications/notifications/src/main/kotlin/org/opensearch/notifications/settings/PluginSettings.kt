@@ -34,6 +34,7 @@ import org.opensearch.common.settings.Setting.Property.Deprecated
 import org.opensearch.common.settings.Setting.Property.Dynamic
 import org.opensearch.common.settings.Setting.Property.NodeScope
 import org.opensearch.common.settings.Settings
+import org.opensearch.commons.utils.OpenForTesting
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
@@ -60,12 +61,12 @@ internal object PluginSettings {
     /**
      * Operation timeout for network operations.
      */
-    const val OPERATION_TIMEOUT_MS_KEY = "$GENERAL_KEY_PREFIX.operationTimeoutMs"
+    private const val OPERATION_TIMEOUT_MS_KEY = "$GENERAL_KEY_PREFIX.operationTimeoutMs"
 
     /**
      * Setting to choose default number of items to query.
      */
-    const val DEFAULT_ITEMS_QUERY_COUNT_KEY = "$GENERAL_KEY_PREFIX.defaultItemsQueryCount"
+    private const val DEFAULT_ITEMS_QUERY_COUNT_KEY = "$GENERAL_KEY_PREFIX.defaultItemsQueryCount"
 
     /**
      * Legacy alerting plugin filter_by_backend_roles setting.
@@ -80,7 +81,7 @@ internal object PluginSettings {
     /**
      * Default operation timeout for network operations.
      */
-    const val DEFAULT_OPERATION_TIMEOUT_MS = 60000L
+    private const val DEFAULT_OPERATION_TIMEOUT_MS = 60000L
 
     /**
      * Minimum operation timeout for network operations.
@@ -90,7 +91,7 @@ internal object PluginSettings {
     /**
      * Default number of items to query.
      */
-    const val DEFAULT_ITEMS_QUERY_COUNT_VALUE = 100
+    private const val DEFAULT_ITEMS_QUERY_COUNT_VALUE = 100
 
     /**
      * Minimum number of items to query.
@@ -112,7 +113,7 @@ internal object PluginSettings {
     private const val DECIMAL_RADIX: Int = 10
 
     private val log by logger(javaClass)
-    private var defaultSettings: Map<String, String>
+    private val defaultSettings: Map<String, String>
 
     init {
         var settings: Settings? = null
@@ -230,12 +231,9 @@ internal object PluginSettings {
     }
 
     // reset the settings values to default values for testing purpose
+    @OpenForTesting
     fun reset() {
         operationTimeoutMs = DEFAULT_OPERATION_TIMEOUT_MS
         defaultItemsQueryCount = DEFAULT_ITEMS_QUERY_COUNT_VALUE
-        defaultSettings = mapOf(
-            OPERATION_TIMEOUT_MS_KEY to operationTimeoutMs.toString(DECIMAL_RADIX),
-            DEFAULT_ITEMS_QUERY_COUNT_KEY to defaultItemsQueryCount.toString(DECIMAL_RADIX)
-        )
     }
 }

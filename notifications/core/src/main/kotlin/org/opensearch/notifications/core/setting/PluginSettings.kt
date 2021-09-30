@@ -21,6 +21,7 @@ import org.opensearch.common.settings.Setting.Property.NodeScope
 import org.opensearch.common.settings.Settings
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.PLUGIN_NAME
+import org.opensearch.notifications.core.utils.OpenForTesting
 import org.opensearch.notifications.core.utils.logger
 import org.opensearch.notifications.spi.model.SecureDestinationSettings
 import java.io.IOException
@@ -50,57 +51,57 @@ internal object PluginSettings {
     /**
      * Email size limit.
      */
-    const val EMAIL_SIZE_LIMIT_KEY = "$EMAIL_KEY_PREFIX.sizeLimit"
+    private const val EMAIL_SIZE_LIMIT_KEY = "$EMAIL_KEY_PREFIX.sizeLimit"
 
     /**
      * Email minimum header length.
      */
-    const val EMAIL_MINIMUM_HEADER_LENGTH_KEY = "$EMAIL_KEY_PREFIX.minimumHeaderLength"
+    private const val EMAIL_MINIMUM_HEADER_LENGTH_KEY = "$EMAIL_KEY_PREFIX.minimumHeaderLength"
 
     /**
      * Settings Key prefix for http connection.
      */
-    const val MAX_CONNECTIONS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.maxConnections"
+    private const val MAX_CONNECTIONS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.maxConnections"
 
     /**
      * Settings Key prefix for max http connection per route.
      */
-    const val MAX_CONNECTIONS_PER_ROUTE_KEY = "$HTTP_CONNECTION_KEY_PREFIX.maxConnectionPerRoute"
+    private const val MAX_CONNECTIONS_PER_ROUTE_KEY = "$HTTP_CONNECTION_KEY_PREFIX.maxConnectionPerRoute"
 
     /**
      * Settings Key prefix for connection timeout in milliseconds
      */
-    const val CONNECTION_TIMEOUT_MILLISECONDS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.connectionTimeout"
+    private const val CONNECTION_TIMEOUT_MILLISECONDS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.connectionTimeout"
 
     /**
      * Settings Key prefix for socket timeout in milliseconds
      */
-    const val SOCKET_TIMEOUT_MILLISECONDS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.socketTimeout"
+    private const val SOCKET_TIMEOUT_MILLISECONDS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.socketTimeout"
 
     /**
      * Setting for list of host deny list
      */
-    const val HOST_DENY_LIST_KEY = "$HTTP_CONNECTION_KEY_PREFIX.hostDenyList"
+    private const val HOST_DENY_LIST_KEY = "$HTTP_CONNECTION_KEY_PREFIX.hostDenyList"
 
     /**
      * Setting to choose allowed config types.
      */
-    const val ALLOWED_CONFIG_TYPE_KEY = "$KEY_PREFIX.allowedConfigTypes"
+    private const val ALLOWED_CONFIG_TYPE_KEY = "$KEY_PREFIX.allowedConfigTypes"
 
     /**
      * Setting to choose allowed config features.
      */
-    const val ALLOWED_CONFIG_FEATURE_KEY = "$KEY_PREFIX.allowedConfigFeatures"
+    private const val ALLOWED_CONFIG_FEATURE_KEY = "$KEY_PREFIX.allowedConfigFeatures"
 
     /**
      * Setting to enable tooltip in UI
      */
-    const val TOOLTIP_SUPPORT_KEY = "$KEY_PREFIX.tooltipSupport"
+    private const val TOOLTIP_SUPPORT_KEY = "$KEY_PREFIX.tooltipSupport"
 
     /**
      * Default email size limit as 10MB.
      */
-    const val DEFAULT_EMAIL_SIZE_LIMIT = 10000000
+    private const val DEFAULT_EMAIL_SIZE_LIMIT = 10000000
 
     /**
      * Minimum email size limit as 10KB.
@@ -110,32 +111,32 @@ internal object PluginSettings {
     /**
      * Default value  for http connection.
      */
-    const val DEFAULT_MAX_CONNECTIONS = 60
+    private const val DEFAULT_MAX_CONNECTIONS = 60
 
     /**
      * Default value for max http connection per route.
      */
-    const val DEFAULT_MAX_CONNECTIONS_PER_ROUTE = 20
+    private const val DEFAULT_MAX_CONNECTIONS_PER_ROUTE = 20
 
     /**
      * Default value for connection timeout in milliseconds
      */
-    const val DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS = 5000
+    private const val DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS = 5000
 
     /**
      * Default value for socket timeout in milliseconds
      */
-    const val DEFAULT_SOCKET_TIMEOUT_MILLISECONDS = 50000
+    private const val DEFAULT_SOCKET_TIMEOUT_MILLISECONDS = 50000
 
     /**
      * Default email header length. minimum value from 100 reference emails
      */
-    const val DEFAULT_MINIMUM_EMAIL_HEADER_LENGTH = 160
+    private const val DEFAULT_MINIMUM_EMAIL_HEADER_LENGTH = 160
 
     /**
      * Default config type list
      */
-    val DEFAULT_ALLOWED_CONFIG_TYPES = listOf(
+    private val DEFAULT_ALLOWED_CONFIG_TYPES = listOf(
         "slack",
         "chime",
         "webhook",
@@ -149,7 +150,7 @@ internal object PluginSettings {
     /**
      * Default config feature list
      */
-    val DEFAULT_ALLOWED_CONFIG_FEATURES = listOf(
+    private val DEFAULT_ALLOWED_CONFIG_FEATURES = listOf(
         "alerting",
         "index_management",
         "reports"
@@ -158,12 +159,12 @@ internal object PluginSettings {
     /**
      * Default email host deny list
      */
-    val DEFAULT_HOST_DENY_LIST = emptyList<String>()
+    private val DEFAULT_HOST_DENY_LIST = emptyList<String>()
 
     /**
      * Default disable tooltip support
      */
-    const val DEFAULT_TOOLTIP_SUPPORT = true
+    private const val DEFAULT_TOOLTIP_SUPPORT = true
 
     /**
      * Default destination settings
@@ -239,7 +240,7 @@ internal object PluginSettings {
     private const val DECIMAL_RADIX: Int = 10
 
     private val log by logger(javaClass)
-    private var defaultSettings: Map<String, String>
+    private val defaultSettings: Map<String, String>
 
     init {
         var settings: Settings? = null
@@ -538,6 +539,7 @@ internal object PluginSettings {
     }
 
     // reset the settings values to default values for testing purpose
+    @OpenForTesting
     fun reset() {
         emailSizeLimit = DEFAULT_EMAIL_SIZE_LIMIT
         emailMinimumHeaderLength = DEFAULT_MINIMUM_EMAIL_HEADER_LENGTH
@@ -549,14 +551,5 @@ internal object PluginSettings {
         allowedConfigFeatures = DEFAULT_ALLOWED_CONFIG_FEATURES
         tooltipSupport = DEFAULT_TOOLTIP_SUPPORT
         hostDenyList = DEFAULT_HOST_DENY_LIST
-        defaultSettings = mapOf(
-            EMAIL_SIZE_LIMIT_KEY to emailSizeLimit.toString(DECIMAL_RADIX),
-            EMAIL_MINIMUM_HEADER_LENGTH_KEY to emailMinimumHeaderLength.toString(DECIMAL_RADIX),
-            MAX_CONNECTIONS_KEY to maxConnections.toString(DECIMAL_RADIX),
-            MAX_CONNECTIONS_PER_ROUTE_KEY to maxConnectionsPerRoute.toString(DECIMAL_RADIX),
-            CONNECTION_TIMEOUT_MILLISECONDS_KEY to connectionTimeout.toString(DECIMAL_RADIX),
-            SOCKET_TIMEOUT_MILLISECONDS_KEY to socketTimeout.toString(DECIMAL_RADIX),
-            TOOLTIP_SUPPORT_KEY to tooltipSupport.toString()
-        )
     }
 }

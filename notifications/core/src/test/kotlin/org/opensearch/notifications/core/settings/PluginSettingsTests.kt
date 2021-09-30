@@ -23,42 +23,55 @@ import org.opensearch.common.settings.ClusterSettings
 import org.opensearch.common.settings.Settings
 import org.opensearch.notifications.core.NotificationCorePlugin
 import org.opensearch.notifications.core.setting.PluginSettings
-import org.opensearch.notifications.core.setting.PluginSettings.ALLOWED_CONFIG_FEATURE_KEY
-import org.opensearch.notifications.core.setting.PluginSettings.ALLOWED_CONFIG_TYPE_KEY
-import org.opensearch.notifications.core.setting.PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS_KEY
-import org.opensearch.notifications.core.setting.PluginSettings.DEFAULT_ALLOWED_CONFIG_FEATURES
-import org.opensearch.notifications.core.setting.PluginSettings.DEFAULT_ALLOWED_CONFIG_TYPES
-import org.opensearch.notifications.core.setting.PluginSettings.DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS
-import org.opensearch.notifications.core.setting.PluginSettings.DEFAULT_EMAIL_SIZE_LIMIT
-import org.opensearch.notifications.core.setting.PluginSettings.DEFAULT_HOST_DENY_LIST
-import org.opensearch.notifications.core.setting.PluginSettings.DEFAULT_MAX_CONNECTIONS
-import org.opensearch.notifications.core.setting.PluginSettings.DEFAULT_MAX_CONNECTIONS_PER_ROUTE
-import org.opensearch.notifications.core.setting.PluginSettings.DEFAULT_MINIMUM_EMAIL_HEADER_LENGTH
-import org.opensearch.notifications.core.setting.PluginSettings.DEFAULT_SOCKET_TIMEOUT_MILLISECONDS
-import org.opensearch.notifications.core.setting.PluginSettings.DEFAULT_TOOLTIP_SUPPORT
-import org.opensearch.notifications.core.setting.PluginSettings.EMAIL_MINIMUM_HEADER_LENGTH_KEY
-import org.opensearch.notifications.core.setting.PluginSettings.EMAIL_SIZE_LIMIT_KEY
-import org.opensearch.notifications.core.setting.PluginSettings.HOST_DENY_LIST_KEY
-import org.opensearch.notifications.core.setting.PluginSettings.MAX_CONNECTIONS_KEY
-import org.opensearch.notifications.core.setting.PluginSettings.MAX_CONNECTIONS_PER_ROUTE_KEY
-import org.opensearch.notifications.core.setting.PluginSettings.SOCKET_TIMEOUT_MILLISECONDS_KEY
-import org.opensearch.notifications.core.setting.PluginSettings.TOOLTIP_SUPPORT_KEY
 
 internal class PluginSettingsTests {
     private lateinit var plugin: NotificationCorePlugin
     private lateinit var clusterService: ClusterService
 
+    private val keyPrefix = "opensearch.notifications.core"
+    private val emailKeyPrefix = "$keyPrefix.email"
+    private val httpKeyPrefix = "$keyPrefix.http"
+    private val emailSizeLimitKey = "$emailKeyPrefix.sizeLimit"
+    private val emailMinHeaderLengthKey = "$emailKeyPrefix.minimumHeaderLength"
+    private val httpMaxConnectionKey = "$httpKeyPrefix.maxConnections"
+    private val httpMaxConnectionPerRouteKey = "$httpKeyPrefix.maxConnectionPerRoute"
+    private val httpConnectionTimeoutKey = "$httpKeyPrefix.connectionTimeout"
+    private val httpSocketTimeoutKey = "$httpKeyPrefix.socketTimeout"
+    private val httpHostDenyListKey = "$httpKeyPrefix.hostDenyList"
+    private val allowedConfigTypeKey = "$keyPrefix.allowedConfigTypes"
+    private val allowedConfigFeatureKey = "$keyPrefix.allowedConfigFeatures"
+    private val tooltipSupportKey = "$keyPrefix.tooltipSupport"
+
     private val defaultSettings = Settings.builder()
-        .put(EMAIL_SIZE_LIMIT_KEY, DEFAULT_EMAIL_SIZE_LIMIT)
-        .put(EMAIL_MINIMUM_HEADER_LENGTH_KEY, DEFAULT_MINIMUM_EMAIL_HEADER_LENGTH)
-        .put(MAX_CONNECTIONS_KEY, DEFAULT_MAX_CONNECTIONS)
-        .put(MAX_CONNECTIONS_PER_ROUTE_KEY, DEFAULT_MAX_CONNECTIONS_PER_ROUTE)
-        .put(CONNECTION_TIMEOUT_MILLISECONDS_KEY, DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS)
-        .put(SOCKET_TIMEOUT_MILLISECONDS_KEY, DEFAULT_SOCKET_TIMEOUT_MILLISECONDS)
-        .putList(HOST_DENY_LIST_KEY, DEFAULT_HOST_DENY_LIST)
-        .putList(ALLOWED_CONFIG_TYPE_KEY, DEFAULT_ALLOWED_CONFIG_TYPES)
-        .putList(ALLOWED_CONFIG_FEATURE_KEY, DEFAULT_ALLOWED_CONFIG_FEATURES)
-        .put(TOOLTIP_SUPPORT_KEY, DEFAULT_TOOLTIP_SUPPORT)
+        .put(emailSizeLimitKey, 10000000)
+        .put(emailMinHeaderLengthKey, 160)
+        .put(httpMaxConnectionKey, 60)
+        .put(httpMaxConnectionPerRouteKey, 20)
+        .put(httpConnectionTimeoutKey, 5000)
+        .put(httpSocketTimeoutKey, 50000)
+        .putList(httpHostDenyListKey, emptyList<String>())
+        .putList(
+            allowedConfigTypeKey,
+            listOf(
+                "slack",
+                "chime",
+                "webhook",
+                "email",
+                "sns",
+                "ses_account",
+                "smtp_account",
+                "email_group"
+            )
+        )
+        .putList(
+            allowedConfigFeatureKey,
+            listOf(
+                "alerting",
+                "index_management",
+                "reports"
+            )
+        )
+        .put(tooltipSupportKey, true)
         .build()
 
     @BeforeEach
@@ -94,43 +107,39 @@ internal class PluginSettingsTests {
         )
 
         Assertions.assertEquals(
-            defaultSettings[EMAIL_SIZE_LIMIT_KEY],
+            defaultSettings[emailSizeLimitKey],
             PluginSettings.emailSizeLimit.toString()
         )
         Assertions.assertEquals(
-            defaultSettings[EMAIL_MINIMUM_HEADER_LENGTH_KEY],
+            defaultSettings[emailMinHeaderLengthKey],
             PluginSettings.emailMinimumHeaderLength.toString()
         )
         Assertions.assertEquals(
-            defaultSettings[MAX_CONNECTIONS_KEY],
+            defaultSettings[httpMaxConnectionKey],
             PluginSettings.maxConnections.toString()
         )
         Assertions.assertEquals(
-            defaultSettings[MAX_CONNECTIONS_PER_ROUTE_KEY],
+            defaultSettings[httpMaxConnectionPerRouteKey],
             PluginSettings.maxConnectionsPerRoute.toString()
         )
         Assertions.assertEquals(
-            defaultSettings[SOCKET_TIMEOUT_MILLISECONDS_KEY],
+            defaultSettings[httpSocketTimeoutKey],
             PluginSettings.socketTimeout.toString()
         )
         Assertions.assertEquals(
-            defaultSettings[ALLOWED_CONFIG_TYPE_KEY],
+            defaultSettings[allowedConfigTypeKey],
             PluginSettings.allowedConfigTypes.toString()
         )
         Assertions.assertEquals(
-            defaultSettings[ALLOWED_CONFIG_TYPE_KEY],
-            PluginSettings.allowedConfigTypes.toString()
+            defaultSettings[allowedConfigFeatureKey],
+            PluginSettings.allowedConfigFeatures.toString()
         )
         Assertions.assertEquals(
-            defaultSettings[ALLOWED_CONFIG_TYPE_KEY],
-            PluginSettings.allowedConfigTypes.toString()
-        )
-        Assertions.assertEquals(
-            defaultSettings[TOOLTIP_SUPPORT_KEY],
+            defaultSettings[tooltipSupportKey],
             PluginSettings.tooltipSupport.toString()
         )
         Assertions.assertEquals(
-            defaultSettings[HOST_DENY_LIST_KEY],
+            defaultSettings[httpHostDenyListKey],
             PluginSettings.hostDenyList.toString()
         )
     }
@@ -138,16 +147,16 @@ internal class PluginSettingsTests {
     @Test
     fun `test update settings should take cluster settings if available`() {
         val clusterSettings = Settings.builder()
-            .put(EMAIL_SIZE_LIMIT_KEY, 20000)
-            .put(EMAIL_MINIMUM_HEADER_LENGTH_KEY, 100)
-            .put(MAX_CONNECTIONS_KEY, 100)
-            .put(MAX_CONNECTIONS_PER_ROUTE_KEY, 100)
-            .put(CONNECTION_TIMEOUT_MILLISECONDS_KEY, 100)
-            .put(SOCKET_TIMEOUT_MILLISECONDS_KEY, 100)
-            .putList(HOST_DENY_LIST_KEY, listOf("sample"))
-            .putList(ALLOWED_CONFIG_TYPE_KEY, listOf("slack"))
-            .putList(ALLOWED_CONFIG_FEATURE_KEY, listOf("alerting"))
-            .put(TOOLTIP_SUPPORT_KEY, false)
+            .put(emailSizeLimitKey, 20000)
+            .put(emailMinHeaderLengthKey, 100)
+            .put(httpMaxConnectionKey, 100)
+            .put(httpMaxConnectionPerRouteKey, 100)
+            .put(httpConnectionTimeoutKey, 100)
+            .put(httpSocketTimeoutKey, 100)
+            .putList(httpHostDenyListKey, listOf("sample"))
+            .putList(allowedConfigTypeKey, listOf("slack"))
+            .putList(allowedConfigFeatureKey, listOf("alerting"))
+            .put(tooltipSupportKey, false)
             .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
@@ -230,40 +239,40 @@ internal class PluginSettingsTests {
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         Assertions.assertEquals(
-            DEFAULT_EMAIL_SIZE_LIMIT,
-            clusterService.clusterSettings.get(PluginSettings.EMAIL_SIZE_LIMIT)
+            defaultSettings[emailSizeLimitKey],
+            clusterService.clusterSettings.get(PluginSettings.EMAIL_SIZE_LIMIT).toString()
         )
         Assertions.assertEquals(
-            DEFAULT_MINIMUM_EMAIL_HEADER_LENGTH,
-            clusterService.clusterSettings.get(PluginSettings.EMAIL_MINIMUM_HEADER_LENGTH)
+            defaultSettings[emailMinHeaderLengthKey],
+            clusterService.clusterSettings.get(PluginSettings.EMAIL_MINIMUM_HEADER_LENGTH).toString()
         )
         Assertions.assertEquals(
-            DEFAULT_MAX_CONNECTIONS,
-            clusterService.clusterSettings.get(PluginSettings.MAX_CONNECTIONS)
+            defaultSettings[httpMaxConnectionKey],
+            clusterService.clusterSettings.get(PluginSettings.MAX_CONNECTIONS).toString()
         )
         Assertions.assertEquals(
-            DEFAULT_MAX_CONNECTIONS_PER_ROUTE,
-            clusterService.clusterSettings.get(PluginSettings.MAX_CONNECTIONS_PER_ROUTE)
+            defaultSettings[httpMaxConnectionPerRouteKey],
+            clusterService.clusterSettings.get(PluginSettings.MAX_CONNECTIONS_PER_ROUTE).toString()
         )
         Assertions.assertEquals(
-            DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS,
-            clusterService.clusterSettings.get(PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS)
+            defaultSettings[httpConnectionTimeoutKey],
+            clusterService.clusterSettings.get(PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS).toString()
         )
         Assertions.assertEquals(
-            DEFAULT_HOST_DENY_LIST,
-            clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST)
+            defaultSettings[httpHostDenyListKey],
+            clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST).toString()
         )
         Assertions.assertEquals(
-            DEFAULT_ALLOWED_CONFIG_TYPES,
-            clusterService.clusterSettings.get(PluginSettings.ALLOWED_CONFIG_TYPES)
+            defaultSettings[allowedConfigTypeKey],
+            clusterService.clusterSettings.get(PluginSettings.ALLOWED_CONFIG_TYPES).toString()
         )
         Assertions.assertEquals(
-            DEFAULT_ALLOWED_CONFIG_FEATURES,
-            clusterService.clusterSettings.get(PluginSettings.ALLOWED_CONFIG_FEATURES)
+            defaultSettings[allowedConfigFeatureKey],
+            clusterService.clusterSettings.get(PluginSettings.ALLOWED_CONFIG_FEATURES).toString()
         )
         Assertions.assertEquals(
-            DEFAULT_TOOLTIP_SUPPORT,
-            clusterService.clusterSettings.get(PluginSettings.TOOLTIP_SUPPORT)
+            defaultSettings[tooltipSupportKey],
+            clusterService.clusterSettings.get(PluginSettings.TOOLTIP_SUPPORT).toString()
         )
     }
 }

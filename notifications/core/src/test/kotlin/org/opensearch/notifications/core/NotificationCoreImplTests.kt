@@ -12,21 +12,35 @@
 package org.opensearch.notifications.core
 
 import org.junit.jupiter.api.Test
-import org.opensearch.notifications.core.setting.PluginSettings.DEFAULT_ALLOWED_CONFIG_FEATURES
-import org.opensearch.notifications.core.setting.PluginSettings.DEFAULT_ALLOWED_CONFIG_TYPES
-import org.opensearch.notifications.core.setting.PluginSettings.DEFAULT_TOOLTIP_SUPPORT
 import kotlin.test.assertEquals
 
 class NotificationCoreImplTests {
 
+    private val defaultTooltipSupport = true
+    private val defaultConfigTypes = listOf(
+        "slack",
+        "chime",
+        "webhook",
+        "email",
+        "sns",
+        "ses_account",
+        "smtp_account",
+        "email_group"
+    )
+    private val defaultConfigFeatures = listOf(
+        "alerting",
+        "index_management",
+        "reports"
+    )
+
     private val defaultPluginFeatures = mapOf(
-        "tooltip_support" to DEFAULT_TOOLTIP_SUPPORT.toString()
+        "tooltip_support" to defaultTooltipSupport.toString()
     )
 
     @Test
     fun `test all get configs APIs return the default value`() {
-        assertEquals(DEFAULT_ALLOWED_CONFIG_FEATURES, NotificationCoreImpl.getAllowedConfigFeatures())
-        assertEquals(DEFAULT_ALLOWED_CONFIG_TYPES, NotificationCoreImpl.getAllowedConfigTypes())
+        assertEquals(defaultConfigTypes, NotificationCoreImpl.getAllowedConfigFeatures())
+        assertEquals(defaultConfigFeatures, NotificationCoreImpl.getAllowedConfigTypes())
         assertEquals(defaultPluginFeatures, NotificationCoreImpl.getPluginFeatures())
     }
 }
