@@ -34,6 +34,7 @@ import org.opensearch.common.settings.Setting.Property.Deprecated
 import org.opensearch.common.settings.Setting.Property.Dynamic
 import org.opensearch.common.settings.Setting.Property.NodeScope
 import org.opensearch.common.settings.Settings
+import org.opensearch.commons.utils.OpenForTesting
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
@@ -135,14 +136,14 @@ internal object PluginSettings {
         )
     }
 
-    private val OPERATION_TIMEOUT_MS: Setting<Long> = Setting.longSetting(
+    val OPERATION_TIMEOUT_MS: Setting<Long> = Setting.longSetting(
         OPERATION_TIMEOUT_MS_KEY,
         defaultSettings[OPERATION_TIMEOUT_MS_KEY]!!.toLong(),
         MINIMUM_OPERATION_TIMEOUT_MS,
         NodeScope, Dynamic
     )
 
-    private val DEFAULT_ITEMS_QUERY_COUNT: Setting<Int> = Setting.intSetting(
+    val DEFAULT_ITEMS_QUERY_COUNT: Setting<Int> = Setting.intSetting(
         DEFAULT_ITEMS_QUERY_COUNT_KEY,
         defaultSettings[DEFAULT_ITEMS_QUERY_COUNT_KEY]!!.toInt(),
         MINIMUM_ITEMS_QUERY_COUNT,
@@ -227,5 +228,12 @@ internal object PluginSettings {
             defaultItemsQueryCount = it
             log.info("$LOG_PREFIX:$DEFAULT_ITEMS_QUERY_COUNT_KEY -updatedTo-> $it")
         }
+    }
+
+    // reset the settings values to default values for testing purpose
+    @OpenForTesting
+    fun reset() {
+        operationTimeoutMs = DEFAULT_OPERATION_TIMEOUT_MS
+        defaultItemsQueryCount = DEFAULT_ITEMS_QUERY_COUNT_VALUE
     }
 }
