@@ -271,7 +271,6 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
           total={this.state.total}
         >
           <ChannelControls
-            search={this.state.search}
             onSearchChange={this.onSearchChange}
             filters={this.state.filters}
             onFiltersChange={this.onFiltersChange}

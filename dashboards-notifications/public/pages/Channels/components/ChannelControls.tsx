@@ -43,7 +43,6 @@ import { MainContext } from '../../Main/Main';
 import { ChannelFiltersType } from '../types';
 
 interface ChannelControlsProps {
-  search: string;
   onSearchChange: (search: string) => void;
   filters: ChannelFiltersType;
   onFiltersChange: (filters: ChannelFiltersType) => void;
@@ -136,7 +135,7 @@ export const ChannelControls = (props: ChannelControlsProps) => {
         <EuiFieldSearch
           fullWidth={true}
           placeholder="Search"
-          onSearch={(search) => props.onSearchChange(search)}
+          onSearch={props.onSearchChange}
         />
       </EuiFlexItem>
 

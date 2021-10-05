@@ -37,7 +37,6 @@ describe('<ChannelControls /> spec', () => {
     const { container } = render(
       <MainContext.Provider value={mainStateMock}>
         <ChannelControls
-          search=""
           onSearchChange={onSearchChange}
           filters={{}}
           onFiltersChange={onFiltersChange}
@@ -53,7 +52,6 @@ describe('<ChannelControls /> spec', () => {
     const utils = render(
       <MainContext.Provider value={mainStateMock}>
         <ChannelControls
-          search=""
           onSearchChange={onSearchChange}
           filters={{}}
           onFiltersChange={onFiltersChange}
@@ -72,7 +70,6 @@ describe('<ChannelControls /> spec', () => {
     const utils = render(
       <MainContext.Provider value={mainStateMock}>
         <ChannelControls
-          search=""
           onSearchChange={onSearchChange}
           filters={{}}
           onFiltersChange={onFiltersChange}
