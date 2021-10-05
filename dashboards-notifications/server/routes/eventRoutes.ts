@@ -74,7 +74,7 @@ export function eventRoutes(router: IRouter) {
           max_items: request.query.max_items,
           sort_field: request.query.sort_field,
           sort_order: request.query.sort_order,
-          ...(query && { query }),
+          ...(query && { text_query: query }),
           ...(last_updated_time_ms && { last_updated_time_ms }),
           ...(config_name && { 'status_list.config_name': config_name }),
           ...(config_type && { 'status_list.config_type': config_type }),

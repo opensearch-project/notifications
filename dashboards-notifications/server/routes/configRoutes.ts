@@ -62,7 +62,7 @@ export function configRoutes(router: IRouter) {
             sort_order: request.query.sort_order,
             config_type,
             ...(feature_list && { feature_list }),
-            ...(query && { query }),
+            ...(query && { text_query: query }), // text_query will exclude keyword fields
             ...(config_id_list && { config_id_list }),
           }
         );
