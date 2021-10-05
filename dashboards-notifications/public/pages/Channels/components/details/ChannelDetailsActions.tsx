@@ -92,7 +92,9 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
     {
       label: 'Send test message',
       disabled:
-        props.channel.feature_list.length === 0 || !props.channel.config_id,
+        props.channel.feature_list.length === 0 ||
+        !props.channel.config_id ||
+        !props.channel.is_enabled,
       action: sendTestMessage,
     },
     {
