@@ -75,7 +75,8 @@ export const onComboBoxCreateOption = (
   options: Array<EuiComboBoxOptionOption<string>>,
   setOptions: (options: Array<EuiComboBoxOptionOption<string>>) => void,
   selectedOptions: Array<EuiComboBoxOptionOption<string>>,
-  setSelectedOptions: (options: Array<EuiComboBoxOptionOption<string>>) => void
+  setSelectedOptions: (options: Array<EuiComboBoxOptionOption<string>>) => void,
+  setInputError: (newOptions: Array<EuiComboBoxOptionOption<string>>) => void
 ) => {
   const normalizedSearchValue = searchValue.trim().toLowerCase();
   if (!normalizedSearchValue) return;
@@ -88,5 +89,7 @@ export const onComboBoxCreateOption = (
   ) {
     setOptions([...options, newOption]);
   }
-  setSelectedOptions([...selectedOptions, newOption]);
+  const newOptions = [...selectedOptions, newOption];
+  setSelectedOptions(newOptions);
+  setInputError(newOptions);
 };

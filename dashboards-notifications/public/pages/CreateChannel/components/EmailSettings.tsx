@@ -320,7 +320,12 @@ export function EmailSettings(props: EmailSettingsProps) {
                   recipientGroupOptions,
                   setRecipientGroupOptions,
                   props.selectedRecipientGroupOptions,
-                  props.setSelectedRecipientGroupOptions
+                  props.setSelectedRecipientGroupOptions,
+                  (options) =>
+                    context.setInputErrors({
+                      ...context.inputErrors,
+                      recipients: validateRecipients(options),
+                    })
                 )
               }
               customOptionText={'Add {searchValue} as a default recipient'}

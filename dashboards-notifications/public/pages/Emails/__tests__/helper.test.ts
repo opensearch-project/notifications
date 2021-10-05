@@ -77,13 +77,15 @@ describe('handles combo box create option', () => {
     const selectedOptions = [options[0]];
     const setOptions = jest.fn();
     const setSelectedOptions = jest.fn();
+    const setInputError = jest.fn();
     onComboBoxCreateOption(
       'new-option',
       options,
       options,
       setOptions,
       selectedOptions,
-      setSelectedOptions
+      setSelectedOptions,
+      setInputError
     );
     expect(setOptions).toBeCalledWith([...options, { label: 'new-option' }]);
     expect(setSelectedOptions).toBeCalledWith([...selectedOptions, { label: 'new-option' }]);
@@ -94,13 +96,15 @@ describe('handles combo box create option', () => {
     const selectedOptions = [options[0]];
     const setOptions = jest.fn();
     const setSelectedOptions = jest.fn();
+    const setInputError = jest.fn();
     onComboBoxCreateOption(
       'existing-option',
       options,
       options,
       setOptions,
       selectedOptions,
-      setSelectedOptions
+      setSelectedOptions,
+      setInputError
     );
     expect(setOptions).not.toBeCalled();
     expect(setSelectedOptions).toBeCalledWith([...selectedOptions, { label: 'existing-option' }]);
