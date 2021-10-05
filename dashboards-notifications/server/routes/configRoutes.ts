@@ -39,6 +39,9 @@ export function configRoutes(router: IRouter) {
           config_id_list: schema.maybe(
             schema.oneOf([schema.arrayOf(schema.string()), schema.string()])
           ),
+          'smtp_account.method': schema.maybe(
+            schema.oneOf([schema.arrayOf(schema.string()), schema.string()])
+          ),
         }),
       },
     },
@@ -46,6 +49,9 @@ export function configRoutes(router: IRouter) {
       const config_type = joinRequestParams(request.query.config_type);
       const feature_list = joinRequestParams(request.query.feature_list);
       const config_id_list = joinRequestParams(request.query.config_id_list);
+      const encryption_method = joinRequestParams(
+        request.query['smtp_account.method']
+      );
       const query = request.query.query;
       // @ts-ignore
       const client: ILegacyScopedClusterClient = context.notificationsContext.notificationsClient.asScoped(
@@ -64,6 +70,9 @@ export function configRoutes(router: IRouter) {
             ...(feature_list && { feature_list }),
             ...(query && { query }),
             ...(config_id_list && { config_id_list }),
+            ...(encryption_method && {
+              'smtp_account.method': encryption_method,
+            }),
           }
         );
         return response.ok({ body: resp });
