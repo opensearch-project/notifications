@@ -59,7 +59,10 @@ properties:
           severity:
             type: keyword
           tags:
-            type: keyword
+            type: text
+            fields:
+              keyword:
+                type: keyword
       status_list:
         type: nested
         properties:
@@ -76,7 +79,10 @@ properties:
             type: object # flattened instead of nested to reduce complexity
             properties:
               recipient:
-                type: keyword
+                type: text
+                fields:
+                  keyword:
+                    type: keyword
               delivery_status: # Individual status for each email recipient
                 type: object
                 properties:

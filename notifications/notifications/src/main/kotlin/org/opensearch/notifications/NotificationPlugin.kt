@@ -90,9 +90,13 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension {
     internal companion object {
         private val log by logger(NotificationPlugin::class.java)
 
+        // Plugin main global constants
         const val PLUGIN_NAME = "opensearch-notifications"
         const val LOG_PREFIX = "notifications"
         const val PLUGIN_BASE_URI = "/_plugins/_notifications"
+
+        // Other global constants
+        const val TEXT_QUERY_TAG = "text_query"
     }
 
     /**

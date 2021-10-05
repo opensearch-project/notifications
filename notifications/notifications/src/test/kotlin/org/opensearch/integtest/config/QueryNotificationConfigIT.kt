@@ -789,6 +789,16 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         val domainIds = setOf(slackId, chimeId, webhookId, smtpAccountId)
         Thread.sleep(1000)
 
+        // Get notification configs using query=slack
+        val getSlackResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?query=slack",
+            "",
+            RestStatus.OK.status
+        )
+        verifySingleConfigIdEquals(slackId, getSlackResponse)
+        Thread.sleep(100)
+
         // Get notification configs using query=sample
         val getAllResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -813,6 +823,58 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         val getDomainResponse = executeRequest(
             RestRequest.Method.GET.name,
             "$PLUGIN_BASE_URI/configs?query=*.domain.*",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(domainIds, getDomainResponse, domainIds.size)
+        Thread.sleep(100)
+    }
+
+    fun `test Get filtered notification config using text_query`() {
+        val slackId = createConfig(configType = ConfigType.SLACK)
+        val chimeId = createConfig(configType = ConfigType.CHIME)
+        val webhookId = createConfig(configType = ConfigType.WEBHOOK)
+        val emailGroupId = createConfig(configType = ConfigType.EMAIL_GROUP)
+        val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
+        val allIds = setOf(slackId, chimeId, webhookId, emailGroupId, smtpAccountId)
+        val urlIds = setOf(slackId, chimeId, webhookId)
+        val domainIds = setOf(slackId, chimeId, webhookId, smtpAccountId)
+        Thread.sleep(1000)
+
+        // Get notification configs using text_query=slack should not return any item
+        val getSlackResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?text_query=slack",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(setOf(), getSlackResponse, 0)
+        Thread.sleep(100)
+
+        // Get notification configs using text_query=sample
+        val getAllResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?text_query=sample",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(allIds, getAllResponse, allIds.size)
+        Thread.sleep(100)
+
+        // Get notification configs using text_query=sample_*
+        val getUrlResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?text_query=sample_*",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(urlIds, getUrlResponse, urlIds.size)
+        Thread.sleep(100)
+
+        // Get notification configs using text_query=*.domain.*
+        val getDomainResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?text_query=*.domain.*",
             "",
             RestStatus.OK.status
         )

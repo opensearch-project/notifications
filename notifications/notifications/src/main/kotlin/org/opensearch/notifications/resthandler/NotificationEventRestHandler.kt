@@ -86,28 +86,28 @@ internal class NotificationEventRestHandler : PluginBaseHandler() {
              * Get list of notification events
              * Request URL: GET [REQUEST_URL?event_id=id] or [REQUEST_URL?<query_params>]
              * <query_params> ->
-             *     event_id_list=id1,id2,id3
+             *     event_id_list=id1,id2,id3 (Other query_params ignored if this is not empty)
              *     from_index=20
              *     max_items=10
              *     sort_order=asc
              *     sort_field=event_source.feature
-             *     last_updated_time_ms=from_time..to_time
-             *     created_time_ms=from_time..to_time
-             *     event_source.reference_id=abc,xyz
-             *     event_source.feature=alerting,reports
-             *     event_source.severity=info,high
-             *     event_source.tags=test,tags
-             *     event_source.title=sample title
-             *     event_source.severity=abc,xyz
-             *     status_list.config_id=abc,xyz
-             *     status_list.config_type=slack,chime
-             *     status_list.config_name=sample
-             *     status_list.delivery_status.status_code=400,503
-             *     status_list.delivery_status.status_text=bad,request
-             *     status_list.email_recipient_status.recipient=abc,xyz
-             *     status_list.email_recipient_status.delivery_status.status_code=400,503
-             *     status_list.email_recipient_status.delivery_status.status_text=bad,request
-             *     query=search all above fields
+             *     last_updated_time_ms=from_time..to_time (Range filter field)
+             *     created_time_ms=from_time..to_time (Range filter field)
+             *     event_source.reference_id=abc,xyz (Keyword filter field)
+             *     event_source.feature=alerting,reports (Keyword filter field)
+             *     event_source.severity=info,high (Keyword filter field)
+             *     event_source.tags=test,tags (Text filter field)
+             *     event_source.title=sample title (Text filter field)
+             *     status_list.config_id=abc,xyz (Keyword filter field)
+             *     status_list.config_type=slack,chime (Keyword filter field)
+             *     status_list.config_name=sample (Text filter field)
+             *     status_list.delivery_status.status_code=400,503 (Keyword filter field)
+             *     status_list.delivery_status.status_text=bad,request (Text filter field)
+             *     status_list.email_recipient_status.recipient=abc,xyz (Text filter field)
+             *     status_list.email_recipient_status.delivery_status.status_code=400,503 (Keyword filter field)
+             *     status_list.email_recipient_status.delivery_status.status_text=bad,request (Text filter field)
+             *     query=search all above keyword and text filter fields
+             *     text_query=search text filter fields from above list
              * Request body: Ref [org.opensearch.commons.notifications.action.GetNotificationEventRequest]
              * Response body: [org.opensearch.commons.notifications.action.GetNotificationEventResponse]
              */
