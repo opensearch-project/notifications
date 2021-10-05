@@ -50,6 +50,7 @@ import org.opensearch.commons.notifications.NotificationConstants.UPDATED_TIME_T
 import org.opensearch.index.query.BoolQueryBuilder
 import org.opensearch.index.query.QueryBuilder
 import org.opensearch.index.query.QueryBuilders
+import org.opensearch.notifications.NotificationPlugin.Companion.TEXT_QUERY_TAG
 import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
 import org.opensearch.rest.RestStatus
 
@@ -67,21 +68,21 @@ object EventQueryHelper {
     private val KEYWORD_FIELDS = setOf(
         "$EVENT_SOURCE_TAG.$REFERENCE_ID_TAG",
         "$EVENT_SOURCE_TAG.$FEATURE_TAG",
-        "$EVENT_SOURCE_TAG.$SEVERITY_TAG",
-        "$EVENT_SOURCE_TAG.$TAGS_TAG"
+        "$EVENT_SOURCE_TAG.$SEVERITY_TAG"
     )
     private val TEXT_FIELDS = setOf(
+        "$EVENT_SOURCE_TAG.$TAGS_TAG",
         "$EVENT_SOURCE_TAG.$TITLE_TAG"
     )
     private val NESTED_KEYWORD_FIELDS = setOf(
         "$STATUS_LIST_TAG.$CONFIG_ID_TAG",
         "$STATUS_LIST_TAG.$CONFIG_TYPE_TAG",
-        "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$RECIPIENT_TAG",
         "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$DELIVERY_STATUS_TAG.$STATUS_CODE_TAG",
         "$STATUS_LIST_TAG.$DELIVERY_STATUS_TAG.$STATUS_CODE_TAG"
     )
     private val NESTED_TEXT_FIELDS = setOf(
         "$STATUS_LIST_TAG.$CONFIG_NAME_TAG",
+        "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$RECIPIENT_TAG",
         "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$DELIVERY_STATUS_TAG.$STATUS_TEXT_TAG",
         "$STATUS_LIST_TAG.$DELIVERY_STATUS_TAG.$STATUS_TEXT_TAG"
     )
@@ -91,7 +92,7 @@ object EventQueryHelper {
     private val NESTED_FIELDS = NESTED_KEYWORD_FIELDS.union(NESTED_TEXT_FIELDS)
     private val ALL_FIELDS = METADATA_FIELDS.union(EVENT_FIELDS).union(NESTED_FIELDS)
 
-    val FILTER_PARAMS = ALL_FIELDS.union(setOf(QUERY_TAG))
+    val FILTER_PARAMS = ALL_FIELDS.union(setOf(QUERY_TAG, TEXT_QUERY_TAG))
 
     fun getSortField(sortField: String?): String {
         return if (sortField == null) {
@@ -111,6 +112,7 @@ object EventQueryHelper {
         filterParams.forEach {
             when {
                 QUERY_TAG == it.key -> query.filter(getQueryAllBuilder(it.value))
+                TEXT_QUERY_TAG == it.key -> query.filter(getTextQueryAllBuilder(it.value))
                 METADATA_RANGE_FIELDS.contains(it.key) -> query.filter(getRangeQueryBuilder(it.key, it.value))
                 KEYWORD_FIELDS.contains(it.key) -> query.filter(getTermsQueryBuilder(it.key, it.value))
                 TEXT_FIELDS.contains(it.key) -> query.filter(getMatchQueryBuilder(it.key, it.value))
@@ -133,6 +135,23 @@ object EventQueryHelper {
             allQuery.field("$KEY_PREFIX.$it")
         }
         NESTED_FIELDS.forEach {
+            allNestedQuery.field("$KEY_PREFIX.$it")
+        }
+        val nestedFieldQuery = QueryBuilders.nestedQuery(NESTED_PATH, allNestedQuery, ScoreMode.None)
+        boolQuery.should(allQuery)
+        boolQuery.should(nestedFieldQuery)
+        return boolQuery
+    }
+
+    private fun getTextQueryAllBuilder(queryValue: String): QueryBuilder {
+        val boolQuery = QueryBuilders.boolQuery()
+        val allQuery = QueryBuilders.queryStringQuery(queryValue)
+        val allNestedQuery = QueryBuilders.queryStringQuery(queryValue)
+        // Searching on metadata field is not supported. skip adding METADATA_FIELDS
+        TEXT_FIELDS.forEach {
+            allQuery.field("$KEY_PREFIX.$it")
+        }
+        NESTED_TEXT_FIELDS.forEach {
             allNestedQuery.field("$KEY_PREFIX.$it")
         }
         val nestedFieldQuery = QueryBuilders.nestedQuery(NESTED_PATH, allNestedQuery, ScoreMode.None)

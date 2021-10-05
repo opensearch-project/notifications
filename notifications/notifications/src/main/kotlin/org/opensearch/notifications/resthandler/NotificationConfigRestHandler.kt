@@ -121,35 +121,36 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
              * Get list of notification configs
              * Request URL: GET [REQUEST_URL?config_id=id] or [REQUEST_URL?<query_params>]
              * <query_params> ->
-             *     config_id_list=id1,id2,id3
+             *     config_id_list=id1,id2,id3 (Other query_params ignored if this is not empty)
              *     from_index=20
              *     max_items=10
              *     sort_order=asc
              *     sort_field=config_type
-             *     last_updated_time_ms=from_time..to_time
-             *     created_time_ms=from_time..to_time
-             *     is_enabled=true
-             *     config_type=slack,chime
-             *     feature_list=alerting,reports
-             *     name=test
-             *     description=sample
-             *     email.email_account_id=abc,xyz
-             *     email.email_group_id_list=abc,xyz
-             *     smtp_account.method=ssl
-             *     slack.url=domain
-             *     chime.url=domain
-             *     webhook.url=domain
-             *     email.recipient_list=abc,xyz
-             *     email_group.recipient_list=abc,xyz
-             *     smtp_account.host=domain
-             *     smtp_account.from_address=abc,xyz
-             *     smtp_account.recipient_list=abc,xyz
-             *     sns.topic_arn=abc,xyz
-             *     sns.role_arn=abc,xyz
-             *     ses_account.region=abc,xyz
-             *     ses_account.role_arn=abc,xyz
-             *     ses_account.from_address=abc,xyz
-             *     query=search all above fields
+             *     last_updated_time_ms=from_time..to_time (Range filter field)
+             *     created_time_ms=from_time..to_time (Range filter field)
+             *     is_enabled=true (Boolean filter field)
+             *     config_type=slack,chime (Keyword filter field)
+             *     feature_list=alerting,reports (Keyword filter field)
+             *     name=test (Text filter field)
+             *     description=sample (Text filter field)
+             *     email.email_account_id=abc,xyz (Keyword filter field)
+             *     email.email_group_id_list=abc,xyz (Keyword filter field)
+             *     email.recipient_list=abc,xyz (Text filter field)
+             *     email_group.recipient_list=abc,xyz (Text filter field)
+             *     slack.url=domain (Text filter field)
+             *     chime.url=domain (Text filter field)
+             *     webhook.url=domain (Text filter field)
+             *     smtp_account.host=domain (Text filter field)
+             *     smtp_account.from_address=abc,xyz (Text filter field)
+             *     smtp_account.recipient_list=abc,xyz (Text filter field)
+             *     smtp_account.method=ssl (Keyword filter field)
+             *     sns.topic_arn=abc,xyz (Text filter field)
+             *     sns.role_arn=abc,xyz (Text filter field)
+             *     ses_account.region=abc,xyz (Text filter field)
+             *     ses_account.role_arn=abc,xyz (Text filter field)
+             *     ses_account.from_address=abc,xyz (Text filter field)
+             *     query=search all above keyword and text filter fields
+             *     text_query=search text filter fields from above list
              * Request body: Ref [org.opensearch.commons.notifications.action.GetNotificationConfigRequest]
              * Response body: [org.opensearch.commons.notifications.action.GetNotificationConfigResponse]
              */

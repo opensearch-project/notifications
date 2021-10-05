@@ -57,6 +57,7 @@ import org.opensearch.commons.notifications.model.ConfigType.WEBHOOK
 import org.opensearch.index.query.BoolQueryBuilder
 import org.opensearch.index.query.QueryBuilder
 import org.opensearch.index.query.QueryBuilders
+import org.opensearch.notifications.NotificationPlugin.Companion.TEXT_QUERY_TAG
 import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
 import org.opensearch.rest.RestStatus
 
@@ -101,7 +102,7 @@ object ConfigQueryHelper {
     private val CONFIG_FIELDS = KEYWORD_FIELDS.union(TEXT_FIELDS)
     private val ALL_FIELDS = METADATA_FIELDS.union(CONFIG_FIELDS).union(BOOLEAN_FIELDS)
 
-    val FILTER_PARAMS = ALL_FIELDS.union(setOf(QUERY_TAG))
+    val FILTER_PARAMS = ALL_FIELDS.union(setOf(QUERY_TAG, TEXT_QUERY_TAG))
 
     fun getSortField(sortField: String?): String {
         return if (sortField == null) {
@@ -121,6 +122,7 @@ object ConfigQueryHelper {
         filterParams.forEach {
             when {
                 QUERY_TAG == it.key -> query.filter(getQueryAllBuilder(it.value))
+                TEXT_QUERY_TAG == it.key -> query.filter(getTextQueryAllBuilder(it.value))
                 METADATA_RANGE_FIELDS.contains(it.key) -> query.filter(getRangeQueryBuilder(it.key, it.value))
                 BOOLEAN_FIELDS.contains(it.key) -> query.filter(getTermQueryBuilder(it.key, it.value))
                 KEYWORD_FIELDS.contains(it.key) -> query.filter(getTermsQueryBuilder(it.key, it.value))
@@ -134,6 +136,15 @@ object ConfigQueryHelper {
         val allQuery = QueryBuilders.queryStringQuery(queryValue)
         // Searching on metadata field is not supported. skip adding METADATA_FIELDS
         CONFIG_FIELDS.forEach {
+            allQuery.field("$KEY_PREFIX.$it")
+        }
+        return allQuery
+    }
+
+    private fun getTextQueryAllBuilder(queryValue: String): QueryBuilder {
+        val allQuery = QueryBuilders.queryStringQuery(queryValue)
+        // Searching on metadata field is not supported. skip adding METADATA_FIELDS
+        TEXT_FIELDS.forEach {
             allQuery.field("$KEY_PREFIX.$it")
         }
         return allQuery
