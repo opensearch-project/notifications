@@ -130,7 +130,12 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
                 props.emailOptions,
                 props.setEmailOptions,
                 props.selectedEmailOptions,
-                props.setSelectedEmailOptions
+                props.setSelectedEmailOptions,
+                (options) =>
+                  props.setInputErrors({
+                    ...props.inputErrors,
+                    emailOptions: validateRecipientGroupEmails(options),
+                  })
               )
             }
             customOptionText={'Add {searchValue} as an email address'}
