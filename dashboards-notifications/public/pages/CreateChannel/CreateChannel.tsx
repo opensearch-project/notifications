@@ -531,7 +531,7 @@ export function CreateChannel(props: CreateChannelsProps) {
                   })
                   .catch((error) => {
                     setLoading(false);
-                    coreContext.notifications.toasts.addError(error.body, {
+                    coreContext.notifications.toasts.addError(error?.body || error, {
                       title: `Failed to ${
                         props.edit ? 'update' : 'create'
                       } channel.`,
