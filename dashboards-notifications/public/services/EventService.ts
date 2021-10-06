@@ -78,6 +78,20 @@ export default class EventService {
         },
       }
     );
+    if (response.event_id != null) {
+      await this.getNotification(response.event_id).then((response) => {
+        if (!response.success) {
+          const error = new Error('Failed to send the test message.');
+          error.stack = JSON.stringify(response.status_list, null, 2);
+          throw error;
+        }
+      });
+    } else {
+      console.error(response);
+      const error = new Error('Failed to send the test message.');
+      error.stack = JSON.stringify(response, null, 2);
+      throw error;
+    }
     return response;
   };
 }

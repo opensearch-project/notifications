@@ -106,9 +106,9 @@ export function CreateChannel(props: CreateChannelsProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
-  const channelTypeOptions: Array<EuiSuperSelectOption<
-    keyof typeof CHANNEL_TYPE
-  >> = Object.entries(mainStateContext.availableChannels).map(
+  const channelTypeOptions: Array<
+    EuiSuperSelectOption<keyof typeof CHANNEL_TYPE>
+  > = Object.entries(mainStateContext.availableChannels).map(
     ([key, value]) => ({
       value: key as keyof typeof CHANNEL_TYPE,
       inputDisplay: value,
@@ -127,14 +127,11 @@ export function CreateChannel(props: CreateChannelsProps) {
     Array<EuiComboBoxOptionOption<string>>
   >([]);
   // "value" field is the config_id of recipient groups, if it doesn't exist means it's a custom email address
-  const [
-    selectedRecipientGroupOptions,
-    setSelectedRecipientGroupOptions,
-  ] = useState<Array<EuiComboBoxOptionOption<string>>>([]);
+  const [selectedRecipientGroupOptions, setSelectedRecipientGroupOptions] =
+    useState<Array<EuiComboBoxOptionOption<string>>>([]);
 
-  const [webhookTypeIdSelected, setWebhookTypeIdSelected] = useState<
-    keyof typeof CUSTOM_WEBHOOK_ENDPOINT_TYPE
-  >('WEBHOOK_URL');
+  const [webhookTypeIdSelected, setWebhookTypeIdSelected] =
+    useState<keyof typeof CUSTOM_WEBHOOK_ENDPOINT_TYPE>('WEBHOOK_URL');
   const [webhookURL, setWebhookURL] = useState('');
   const [customURLHost, setCustomURLHost] = useState('');
   const [customURLPort, setCustomURLPort] = useState('');
@@ -146,12 +143,10 @@ export function CreateChannel(props: CreateChannelsProps) {
   const [topicArn, setTopicArn] = useState(''); // SNS topic ARN
   const [roleArn, setRoleArn] = useState(''); // IAM role ARN (optional for ODFE)
 
-  const [
-    sourceCheckboxIdToSelectedMap,
-    setSourceCheckboxIdToSelectedMap,
-  ] = useState<{
-    [x: string]: boolean;
-  }>({});
+  const [sourceCheckboxIdToSelectedMap, setSourceCheckboxIdToSelectedMap] =
+    useState<{
+      [x: string]: boolean;
+    }>({});
 
   const [inputErrors, setInputErrors] = useState<InputErrorsType>({
     name: [],
@@ -189,9 +184,10 @@ export function CreateChannel(props: CreateChannelsProps) {
         .getChannel(id)
         .then(async (response) => {
           if (response.config_type === 'email') {
-            const channel = await servicesContext.notificationService.getEmailConfigDetails(
-              response
-            );
+            const channel =
+              await servicesContext.notificationService.getEmailConfigDetails(
+                response
+              );
             if (channel.email?.invalid_ids?.length) {
               coreContext.notifications.toasts.addDanger(
                 'The sender and/or some recipient groups might have been deleted.'
@@ -356,22 +352,10 @@ export function CreateChannel(props: CreateChannelsProps) {
           throw error;
         });
 
-      const eventId = await servicesContext.eventService
-        .sendTestMessage(
-          tempChannelId,
-          config.feature_list[0] // for test message any source works
-        )
-        .then((response) => response.event_id);
-
-      await servicesContext.eventService
-        .getNotification(eventId)
-        .then((response) => {
-          if (!response.success) {
-            const error = new Error('Failed to send the test message.');
-            error.stack = JSON.stringify(response.status_list, null, 2);
-            throw error;
-          }
-        });
+      await servicesContext.eventService.sendTestMessage(
+        tempChannelId,
+        config.feature_list[0] // for test message any source works
+      );
       coreContext.notifications.toasts.addSuccess(
         'Successfully sent a test message.'
       );
@@ -547,7 +531,7 @@ export function CreateChannel(props: CreateChannelsProps) {
                   })
                   .catch((error) => {
                     setLoading(false);
-                    coreContext.notifications.toasts.addError(error?.body || error, {
+                    coreContext.notifications.toasts.addError(error.body, {
                       title: `Failed to ${
                         props.edit ? 'update' : 'create'
                       } channel.`,
