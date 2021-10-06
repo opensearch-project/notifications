@@ -28,7 +28,6 @@ import {
   EuiBasicTable,
   EuiButton,
   EuiEmptyPrompt,
-  EuiFieldSearch,
   EuiHorizontalRule,
   EuiTableFieldDataColumnType,
   EuiTableSortingType,
@@ -50,12 +49,18 @@ import { ENCRYPTION_TYPE, ROUTES } from '../../../../utils/constants';
 import { getErrorMessage } from '../../../../utils/helpers';
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '../../../Notifications/utils/constants';
 import { DeleteSenderModal } from '../modals/DeleteSenderModal';
+import {
+  SendersTableControls,
+  SendersTableControlsFilterType,
+} from './SendersTableControls';
 
 interface SendersTableProps {
   coreContext: CoreStart;
 }
 
-interface SendersTableState extends TableState<SenderItemType> {}
+interface SendersTableState extends TableState<SenderItemType> {
+  filters: SendersTableControlsFilterType;
+}
 
 export class SendersTable extends Component<
   SendersTableProps,
@@ -77,6 +82,9 @@ export class SendersTable extends Component<
       items: [],
       selectedItems: [],
       loading: true,
+      filters: {
+        encryptionMethod: [],
+      },
     };
 
     this.columns = [
@@ -136,7 +144,7 @@ export class SendersTable extends Component<
   }
 
   static getQueryObjectFromState(state: SendersTableState) {
-    return {
+    const queryObject: any = {
       from_index: state.from,
       max_items: state.size,
       query: state.search,
@@ -144,6 +152,10 @@ export class SendersTable extends Component<
       sort_field: state.sortField,
       sort_order: state.sortDirection,
     };
+    if (state.filters.encryptionMethod.length > 0) {
+      queryObject['smtp_account.method'] = state.filters.encryptionMethod;
+    }
+    return queryObject;
   }
 
   async refresh() {
@@ -256,11 +268,10 @@ export class SendersTable extends Component<
         titleSize="m"
         total={this.state.total}
       >
-        <EuiFieldSearch
-          data-test-subj="senders-table-search-input"
-          fullWidth={true}
-          placeholder="Search"
-          onSearch={this.onSearchChange}
+        <SendersTableControls
+          onSearchChange={this.onSearchChange}
+          filters={this.state.filters}
+          onFiltersChange={(filters) => this.setState({ filters })}
         />
         <EuiHorizontalRule margin="s" />
 

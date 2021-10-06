@@ -28,17 +28,17 @@ import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
 import { mainStateMock } from '../../../../test/mocks/serviceMock';
 import { MainContext } from '../../Main/Main';
-import { ChannelControls } from '../components/ChannelControls';
+import { SendersTableControls } from '../components/tables/SendersTableControls';
 
-describe('<ChannelControls /> spec', () => {
+describe('<SendersTableControls /> spec', () => {
   it('renders the component', () => {
     const onSearchChange = jest.fn();
     const onFiltersChange = jest.fn();
     const { container } = render(
       <MainContext.Provider value={mainStateMock}>
-        <ChannelControls
+        <SendersTableControls
           onSearchChange={onSearchChange}
-          filters={{}}
+          filters={{encryptionMethod: []}}
           onFiltersChange={onFiltersChange}
         />
       </MainContext.Provider>
@@ -51,9 +51,9 @@ describe('<ChannelControls /> spec', () => {
     const onFiltersChange = jest.fn();
     const utils = render(
       <MainContext.Provider value={mainStateMock}>
-        <ChannelControls
+        <SendersTableControls
           onSearchChange={onSearchChange}
-          filters={{}}
+          filters={{encryptionMethod: ["start_tls"]}}
           onFiltersChange={onFiltersChange}
         />
       </MainContext.Provider>
@@ -69,27 +69,16 @@ describe('<ChannelControls /> spec', () => {
     const onFiltersChange = jest.fn();
     const utils = render(
       <MainContext.Provider value={mainStateMock}>
-        <ChannelControls
+        <SendersTableControls
           onSearchChange={onSearchChange}
-          filters={{}}
+          filters={{encryptionMethod: []}}
           onFiltersChange={onFiltersChange}
         />
       </MainContext.Provider>
     );
-    fireEvent.click(utils.getByText('Status'));
-    fireEvent.click(utils.getByText('Active'));
-    expect(onFiltersChange).toBeCalledWith({ state: 'true' });
-
-    fireEvent.click(utils.getByText('Type'));
-    fireEvent.click(utils.getByText('Email'));
-    fireEvent.click(utils.getByText('Chime'));
-    expect(onFiltersChange).toBeCalledWith({ type: ['email', 'chime'] });
-
-    fireEvent.click(utils.getByText('Source'));
-    fireEvent.click(utils.getByText('Alerting'));
-    fireEvent.click(utils.getByText('Reporting'));
-    expect(onFiltersChange).toBeCalledWith({ source: ['alerting', 'reports'] });
-
-    expect(onFiltersChange).toBeCalledTimes(5);
+    fireEvent.click(utils.getByText('Encryption method'));
+    fireEvent.click(utils.getByText('TLS'));
+    fireEvent.click(utils.getByText('None'));
+    expect(onFiltersChange).toBeCalledWith({ encryptionMethod: ["start_tls", "none"] });
   });
 });
