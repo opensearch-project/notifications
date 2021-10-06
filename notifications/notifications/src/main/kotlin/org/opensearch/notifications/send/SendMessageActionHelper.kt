@@ -419,7 +419,7 @@ object SendMessageActionHelper {
             val status = it.deliveryStatus
             log.info("$LOG_PREFIX:${email.emailAccountID}:statusCode=${status.statusCode}, statusText=${status.statusText}")
             if (overallStatus != status.statusCode) {
-                overallStatus = RestStatus.MULTI_STATUS.name
+                overallStatus = RestStatus.MULTI_STATUS.status.toString()
                 overallStatusText = "Errors"
             }
         }
