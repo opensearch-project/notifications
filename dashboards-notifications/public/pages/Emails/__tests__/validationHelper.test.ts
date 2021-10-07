@@ -20,10 +20,16 @@ import {
 
 describe('test sender and recipient group input validations', () => {
   it('validates sender name', () => {
-    const pass = validateSenderName('test name');
+    const pass = validateSenderName('test-name');
     const fail = validateSenderName('');
+    const failWithInvalidCharacters = validateSenderName('invalid name');
+    const failWithUpperCaseCharacters = validateSenderName('INVALID_NAME');
+    const failWithMultipleErrors = validateSenderName(new Array(52).join('@'))
     expect(pass).toEqual([]);
     expect(fail).toHaveLength(1);
+    expect(failWithInvalidCharacters).toEqual(['Sender name contains invalid characters.'])
+    expect(failWithUpperCaseCharacters).toEqual(['Sender name contains invalid characters.'])
+    expect(failWithMultipleErrors).toHaveLength(2)
   });
 
   it('validates email', () => {
@@ -52,8 +58,10 @@ describe('test sender and recipient group input validations', () => {
   it('validates recipient group name', () => {
     const pass = validateRecipientGroupName('test.com');
     const fail = validateRecipientGroupName('');
+    const failWithTooManyCharacters = validateRecipientGroupName(new Array(52).join('a'))
     expect(pass).toEqual([]);
     expect(fail).toHaveLength(1);
+    expect(failWithTooManyCharacters).toHaveLength(1);
   });
 
   it('validates recipient group emails', () => {

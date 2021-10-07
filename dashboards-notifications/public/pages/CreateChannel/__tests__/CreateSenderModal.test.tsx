@@ -76,7 +76,7 @@ describe('<CreateSenderModal/> spec', () => {
     );
 
     const nameInput = utils.getByTestId('create-sender-form-name-input');
-    fireEvent.change(nameInput, { target: { value: 'test name' } });
+    fireEvent.change(nameInput, { target: { value: 'test-name' } });
     const emailInput = utils.getByTestId('create-sender-form-email-input');
     fireEvent.change(emailInput, { target: { value: 'test@email.com' } });
     const hostInput = utils.getByTestId('create-sender-form-host-input');
@@ -107,7 +107,7 @@ describe('<CreateSenderModal/> spec', () => {
     );
 
     const nameInput = utils.getByTestId('create-sender-form-name-input');
-    fireEvent.change(nameInput, { target: { value: 'test name' } });
+    fireEvent.change(nameInput, { target: { value: 'test-name' } });
     const emailInput = utils.getByTestId('create-sender-form-email-input');
     fireEvent.change(emailInput, { target: { value: 'test@email.com' } });
     const hostInput = utils.getByTestId('create-sender-form-host-input');

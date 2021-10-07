@@ -69,7 +69,7 @@ describe('<CreateSESSenderModal/> spec', () => {
     );
 
     const nameInput = utils.getByTestId('create-ses-sender-form-name-input');
-    fireEvent.change(nameInput, { target: { value: 'test name' } });
+    fireEvent.change(nameInput, { target: { value: 'test-name' } });
     const emailInput = utils.getByTestId('create-ses-sender-form-email-input');
     fireEvent.change(emailInput, { target: { value: 'test@email.com' } });
     const roleArnInput = utils.getByTestId(
@@ -106,7 +106,7 @@ describe('<CreateSESSenderModal/> spec', () => {
     );
 
     const nameInput = utils.getByTestId('create-ses-sender-form-name-input');
-    fireEvent.change(nameInput, { target: { value: 'test name' } });
+    fireEvent.change(nameInput, { target: { value: 'test-name' } });
     const emailInput = utils.getByTestId('create-ses-sender-form-email-input');
     fireEvent.change(emailInput, { target: { value: 'test@email.com' } });
     const roleArnInput = utils.getByTestId(

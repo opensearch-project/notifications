@@ -29,7 +29,14 @@ import _ from 'lodash';
 
 export const validateSenderName = (name: string) => {
   const errors = [];
-  if (_.trim(name).length === 0) errors.push('Sender name cannot be empty.');
+  if (_.trim(name).length === 0) {
+    errors.push('Sender name cannot be empty.');
+    return errors;
+  }
+  if (name.length > 50 || name.length < 2)
+    errors.push('Sender name must contain 2 to 50 characters.');
+  if (!/^[a-z0-9-]+$/.test(name))
+    errors.push('Sender name contains invalid characters.');
   return errors;
 };
 
@@ -68,8 +75,12 @@ export const validateAwsRegion = (region: string) => {
 
 export const validateRecipientGroupName = (name: string) => {
   const errors = [];
-  if (_.trim(name).length === 0)
+  if (_.trim(name).length === 0) {
     errors.push('Recipient group name cannot be empty.');
+    return errors;
+  }
+  if (name.length > 50 || name.length < 2)
+    errors.push('Recipient group name must contain 2 to 50 characters.');
   return errors;
 };
 
