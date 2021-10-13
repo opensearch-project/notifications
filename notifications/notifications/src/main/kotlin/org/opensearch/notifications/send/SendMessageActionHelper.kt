@@ -101,9 +101,19 @@ object SendMessageActionHelper {
         val createdTime = Instant.now()
         userAccess.validateUser(user)
         val channels = getConfigs(channelIds)
+        val invalidChannelIds = channelIds.filterNot { id -> channels.map { it.docInfo.id }.contains(id) }
         val childConfigs = getConfigs(getChildConfigIds(channels))
         val message = createMessageContent(eventSource, channelMessage)
-        val eventStatusList = sendMessagesInParallel(eventSource, channels, childConfigs, message)
+        val eventStatusList =
+            sendMessagesInParallel(eventSource, channels, childConfigs, message) + invalidChannelIds.map {
+                EventStatus(
+                    it,
+                    "invalid-channel",
+                    ConfigType.NONE,
+                    listOf(),
+                    DeliveryStatus(RestStatus.NOT_FOUND.status.toString(), "Channel $it not found")
+                )
+            }
         val updatedTime = Instant.now()
         val docMetadata = DocMetadata(
             updatedTime,
@@ -380,11 +390,16 @@ object SendMessageActionHelper {
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_EMAIL.counter.increment()
         val accountDocInfo = childConfigs.find { it.docInfo.id == email.emailAccountID }
+            ?: throw OpenSearchStatusException(
+                "Sender ${email.emailAccountID} not found",
+                RestStatus.NOT_FOUND
+            )
         val groups = childConfigs.filter { email.emailGroupIds.contains(it.docInfo.id) }
+        val invalidGroupIds = email.emailGroupIds.filterNot { id -> childConfigs.map { it.docInfo.id }.contains(id) }
         val groupRecipients = groups.map { (it.configDoc.config.configData as EmailGroup).recipients }.flatten()
         val recipients = email.recipients.union(groupRecipients)
         val emailRecipientStatus: List<EmailRecipientStatus>
-        val accountConfig = accountDocInfo?.configDoc!!.config
+        val accountConfig = accountDocInfo.configDoc.config
         runBlocking {
             val statusDeferredList = recipients.map {
                 async(Dispatchers.IO) {
@@ -410,7 +425,12 @@ object SendMessageActionHelper {
                     }
                 }
             }
-            emailRecipientStatus = statusDeferredList.awaitAll()
+            emailRecipientStatus = statusDeferredList.awaitAll() + invalidGroupIds.map {
+                EmailRecipientStatus(
+                    "placeholder@amazon.com",
+                    DeliveryStatus(RestStatus.NOT_FOUND.status.toString(), "Recipient $it not found")
+                )
+            }
         }
         val firstStatus = emailRecipientStatus.first()
         var overallStatus = firstStatus.deliveryStatus.statusCode
@@ -558,10 +578,7 @@ object SendMessageActionHelper {
         if (configDocs.size != configIds.size) {
             val mutableSet = configIds.toMutableSet()
             configDocs.forEach { mutableSet.remove(it.docInfo.id) }
-            throw OpenSearchStatusException(
-                "getConfigs $mutableSet not found",
-                RestStatus.NOT_FOUND
-            )
+            log.error("$LOG_PREFIX:getAllConfigs $mutableSet not found")
         }
         return configDocs
     }
