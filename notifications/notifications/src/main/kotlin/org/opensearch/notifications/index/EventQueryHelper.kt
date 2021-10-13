@@ -60,6 +60,7 @@ import org.opensearch.rest.RestStatus
 object EventQueryHelper {
     private const val KEY_PREFIX = EVENT_TAG
     private const val NESTED_PATH = "$KEY_PREFIX.$STATUS_LIST_TAG"
+    private const val KEYWORD_SUFFIX = "keyword"
 
     private val METADATA_RANGE_FIELDS = setOf(
         UPDATED_TIME_TAG,
@@ -68,7 +69,10 @@ object EventQueryHelper {
     private val KEYWORD_FIELDS = setOf(
         "$EVENT_SOURCE_TAG.$REFERENCE_ID_TAG",
         "$EVENT_SOURCE_TAG.$FEATURE_TAG",
-        "$EVENT_SOURCE_TAG.$SEVERITY_TAG"
+        "$EVENT_SOURCE_TAG.$SEVERITY_TAG",
+        // Text fields with keyword
+        "$EVENT_SOURCE_TAG.$TAGS_TAG.$KEYWORD_SUFFIX",
+        "$EVENT_SOURCE_TAG.$TITLE_TAG.$KEYWORD_SUFFIX"
     )
     private val TEXT_FIELDS = setOf(
         "$EVENT_SOURCE_TAG.$TAGS_TAG",
@@ -78,7 +82,12 @@ object EventQueryHelper {
         "$STATUS_LIST_TAG.$CONFIG_ID_TAG",
         "$STATUS_LIST_TAG.$CONFIG_TYPE_TAG",
         "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$DELIVERY_STATUS_TAG.$STATUS_CODE_TAG",
-        "$STATUS_LIST_TAG.$DELIVERY_STATUS_TAG.$STATUS_CODE_TAG"
+        "$STATUS_LIST_TAG.$DELIVERY_STATUS_TAG.$STATUS_CODE_TAG",
+        // Text fields with keyword
+        "$STATUS_LIST_TAG.$CONFIG_NAME_TAG.$KEYWORD_SUFFIX",
+        "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$RECIPIENT_TAG.$KEYWORD_SUFFIX",
+        "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$DELIVERY_STATUS_TAG.$STATUS_TEXT_TAG.$KEYWORD_SUFFIX",
+        "$STATUS_LIST_TAG.$DELIVERY_STATUS_TAG.$STATUS_TEXT_TAG.$KEYWORD_SUFFIX"
     )
     private val NESTED_TEXT_FIELDS = setOf(
         "$STATUS_LIST_TAG.$CONFIG_NAME_TAG",

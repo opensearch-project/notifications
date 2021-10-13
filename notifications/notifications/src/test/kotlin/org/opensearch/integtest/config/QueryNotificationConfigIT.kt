@@ -80,8 +80,8 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             ConfigType.EMAIL_GROUP -> """
                 "email_group":{
                     "recipient_list":[
-                        "$randomString+recipient1@from.com",
-                        "$randomString+recipient2@from.com"
+                        {"recipient":"$randomString+recipient1@from.com"},
+                        {"recipient":"$randomString+recipient2@from.com"}
                     ]
                 }
             """.trimIndent()
@@ -757,17 +757,17 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         verifySingleConfigIdEquals(webhookId, getWebhookResponse, 1)
         Thread.sleep(100)
 
-        // Get notification configs using email_group.recipient_list
+        // Get notification configs using email_group.recipient_list.recipient
         val getEmailGroupResponse = executeRequest(
             RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs?email_group.recipient_list=$emailGroupId",
+            "$PLUGIN_BASE_URI/configs?email_group.recipient_list.recipient=$emailGroupId",
             "",
             RestStatus.OK.status
         )
         verifySingleConfigIdEquals(emailGroupId, getEmailGroupResponse, 1)
         Thread.sleep(100)
 
-        // Get notification configs using email_group.recipient_list
+        // Get notification configs using smtp_account.from_address
         val getSmtpAccountResponse = executeRequest(
             RestRequest.Method.GET.name,
             "$PLUGIN_BASE_URI/configs?smtp_account.from_address=$smtpAccountId",
@@ -786,6 +786,8 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
         val allIds = setOf(slackId, chimeId, webhookId, emailGroupId, smtpAccountId)
         val urlIds = setOf(slackId, chimeId, webhookId)
+        val recipientIds = setOf(emailGroupId)
+        val fromIds = setOf(emailGroupId, smtpAccountId)
         val domainIds = setOf(slackId, chimeId, webhookId, smtpAccountId)
         Thread.sleep(1000)
 
@@ -819,6 +821,26 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         verifyMultiConfigIdEquals(urlIds, getUrlResponse, urlIds.size)
         Thread.sleep(100)
 
+        // Get notification configs using query=recipient1
+        val getRecipientResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?query=recipient1",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(recipientIds, getRecipientResponse, recipientIds.size)
+        Thread.sleep(100)
+
+        // Get notification configs using query=from.com
+        val getFromResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?query=from.com",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(fromIds, getFromResponse, fromIds.size)
+        Thread.sleep(100)
+
         // Get notification configs using query=*.domain.*
         val getDomainResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -838,6 +860,8 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
         val allIds = setOf(slackId, chimeId, webhookId, emailGroupId, smtpAccountId)
         val urlIds = setOf(slackId, chimeId, webhookId)
+        val recipientIds = setOf(emailGroupId)
+        val fromIds = setOf(emailGroupId, smtpAccountId)
         val domainIds = setOf(slackId, chimeId, webhookId, smtpAccountId)
         Thread.sleep(1000)
 
@@ -869,6 +893,26 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(urlIds, getUrlResponse, urlIds.size)
+        Thread.sleep(100)
+
+        // Get notification configs using text_query=recipient1
+        val getRecipientResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?text_query=recipient1",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(recipientIds, getRecipientResponse, recipientIds.size)
+        Thread.sleep(100)
+
+        // Get notification configs using text_query=from.com
+        val getFromResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?text_query=from.com",
+            "",
+            RestStatus.OK.status
+        )
+        verifyMultiConfigIdEquals(fromIds, getFromResponse, fromIds.size)
         Thread.sleep(100)
 
         // Get notification configs using text_query=*.domain.*

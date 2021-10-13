@@ -33,6 +33,7 @@ import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORT
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Email
 import org.opensearch.commons.notifications.model.EmailGroup
+import org.opensearch.commons.notifications.model.EmailRecipient
 import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.SesAccount
@@ -96,7 +97,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Create sample email group config request reference
-        val sampleEmailGroup = EmailGroup(listOf("email1@email.com", "email2@email.com"))
+        val sampleEmailGroup = EmailGroup(listOf(EmailRecipient("email1@email.com"), EmailRecipient("email2@email.com")))
         val emailGroupConfig = NotificationConfig(
             "this is a sample email group config name",
             "this is a sample email group config description",
@@ -119,8 +120,8 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "is_enabled":${emailGroupConfig.isEnabled},
                 "email_group":{
                     "recipient_list":[
-                        "${sampleEmailGroup.recipients[0]}",
-                        "${sampleEmailGroup.recipients[1]}"
+                        {"recipient":"${sampleEmailGroup.recipients[0].recipient}"},
+                        {"recipient":"${sampleEmailGroup.recipients[1].recipient}"}
                     ]
                 }
             }
@@ -139,7 +140,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create sample email config request reference
         val sampleEmail = Email(
             smtpAccountConfigId,
-            listOf("default-email1@email.com", "default-email2@email.com"),
+            listOf(EmailRecipient("default-email1@email.com"), EmailRecipient("default-email2@email.com")),
             listOf(emailGroupConfigId)
         )
         val emailConfig = NotificationConfig(
@@ -165,8 +166,8 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "email":{
                     "email_account_id":"${sampleEmail.emailAccountID}",
                     "recipient_list":[
-                        "${sampleEmail.recipients[0]}",
-                        "${sampleEmail.recipients[1]}"
+                        {"recipient":"${sampleEmail.recipients[0].recipient}"},
+                        {"recipient":"${sampleEmail.recipients[1].recipient}"}
                     ],
                     "email_group_id_list":[
                         "${sampleEmail.emailGroupIds[0]}"
@@ -373,7 +374,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Create sample email group config request reference
-        val sampleEmailGroup = EmailGroup(listOf("email1@email.com", "email2@email.com"))
+        val sampleEmailGroup = EmailGroup(listOf(EmailRecipient("email1@email.com"), EmailRecipient("email2@email.com")))
         val emailGroupConfig = NotificationConfig(
             "this is a sample email group config name",
             "this is a sample email group config description",
@@ -396,8 +397,8 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "is_enabled":${emailGroupConfig.isEnabled},
                 "email_group":{
                     "recipient_list":[
-                        "${sampleEmailGroup.recipients[0]}",
-                        "${sampleEmailGroup.recipients[1]}"
+                        {"recipient":"${sampleEmailGroup.recipients[0].recipient}"},
+                        {"recipient":"${sampleEmailGroup.recipients[1].recipient}"}
                     ]
                 }
             }
@@ -416,7 +417,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create sample email config request reference
         val sampleEmail = Email(
             sesAccountConfigId,
-            listOf("default-email1@email.com", "default-email2@email.com"),
+            listOf(EmailRecipient("default-email1@email.com"), EmailRecipient("default-email2@email.com")),
             listOf(emailGroupConfigId)
         )
         val emailConfig = NotificationConfig(
@@ -442,8 +443,8 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "email":{
                     "email_account_id":"${sampleEmail.emailAccountID}",
                     "recipient_list":[
-                        "${sampleEmail.recipients[0]}",
-                        "${sampleEmail.recipients[1]}"
+                        {"recipient":"${sampleEmail.recipients[0].recipient}"},
+                        {"recipient":"${sampleEmail.recipients[1].recipient}"}
                     ],
                     "email_group_id_list":[
                         "${sampleEmail.emailGroupIds[0]}"
@@ -636,7 +637,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create sample email config request reference
         val sampleEmail = Email(
             smtpAccountConfigId,
-            listOf("default-email1@email.com", "default-email2@email.com"),
+            listOf(EmailRecipient("default-email1@email.com"), EmailRecipient("default-email2@email.com")),
             listOf()
         )
         val emailConfig = NotificationConfig(
@@ -662,8 +663,8 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "email":{
                     "email_account_id":"${sampleEmail.emailAccountID}",
                     "recipient_list":[
-                        "${sampleEmail.recipients[0]}",
-                        "${sampleEmail.recipients[1]}"
+                        {"recipient":"${sampleEmail.recipients[0].recipient}"},
+                        {"recipient":"${sampleEmail.recipients[1].recipient}"}
                     ],
                     "email_group_id_list":[]
                 }
@@ -694,7 +695,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create sample email config request reference
         val sampleEmail = Email(
             "InvalidSmtpAccountConfigId",
-            listOf("default-email1@email.com", "default-email2@email.com"),
+            listOf(EmailRecipient("default-email1@email.com"), EmailRecipient("default-email2@email.com")),
             listOf()
         )
         val emailConfig = NotificationConfig(
@@ -720,8 +721,8 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "email":{
                     "email_account_id":"${sampleEmail.emailAccountID}",
                     "recipient_list":[
-                        "${sampleEmail.recipients[0]}",
-                        "${sampleEmail.recipients[1]}"
+                        {"recipient":"${sampleEmail.recipients[0].recipient}"},
+                        {"recipient":"${sampleEmail.recipients[1].recipient}"}
                     ],
                     "email_group_id_list":[]
                 }
@@ -797,7 +798,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create sample email config request reference
         val sampleEmail = Email(
             smtpAccountConfigId,
-            listOf("default-email1@email.com", "default-email2@email.com"),
+            listOf(EmailRecipient("default-email1@email.com"), EmailRecipient("default-email2@email.com")),
             listOf("InvalidEmailGroupConfigId")
         )
         val emailConfig = NotificationConfig(
@@ -823,8 +824,8 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "email":{
                     "email_account_id":"${sampleEmail.emailAccountID}",
                     "recipient_list":[
-                        "${sampleEmail.recipients[0]}",
-                        "${sampleEmail.recipients[1]}"
+                        {"recipient":"${sampleEmail.recipients[0].recipient}"},
+                        {"recipient":"${sampleEmail.recipients[1].recipient}"}
                     ],
                     "email_group_id_list":[
                         "${sampleEmail.emailGroupIds[0]}"
@@ -887,7 +888,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create sample email config request reference with reports and index_management
         val sampleEmail = Email(
             smtpAccountConfigId,
-            listOf("default-email1@email.com", "default-email2@email.com"),
+            listOf(EmailRecipient("default-email1@email.com"), EmailRecipient("default-email2@email.com")),
             listOf()
         )
         val emailConfig = NotificationConfig(
@@ -914,8 +915,8 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "email":{
                     "email_account_id":"${sampleEmail.emailAccountID}",
                     "recipient_list":[
-                        "${sampleEmail.recipients[0]}",
-                        "${sampleEmail.recipients[1]}"
+                        {"recipient":"${sampleEmail.recipients[0].recipient}"},
+                        {"recipient":"${sampleEmail.recipients[1].recipient}"}
                     ],
                     "email_group_id_list":[]
                 }
@@ -953,7 +954,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "feature_list":["reports"],
                 "is_enabled":true,
                 "email_group":{
-                    "recipient_list":[ "email1@email.com", "email2@email.com"]
+                    "recipient_list":[ {"recipient":"email1@email.com"}, {"recipient":"email2@email.com"}]
                 }
             }
         }
@@ -1195,7 +1196,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         // Create sample email config request reference
         val sampleEmail = Email(
             "dummy",
-            listOf("default-email1@email.com", "default-email2@email.com"),
+            listOf(EmailRecipient("default-email1@email.com"), EmailRecipient("default-email2@email.com")),
             listOf("dummy")
         )
         val emailConfig = NotificationConfig(
@@ -1222,8 +1223,8 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "email":{
                     "email_account_id":"${sampleEmail.emailAccountID}",
                     "default_recipients":[
-                        "${sampleEmail.recipients[0]}",
-                        "${sampleEmail.recipients[1]}"
+                        "{"recipient":${sampleEmail.recipients[0].recipient}}",
+                        "{"recipient":${sampleEmail.recipients[1].recipient}}"
                     ],
                     "default_email_group_ids":[
                         "${sampleEmail.emailGroupIds[0]}"

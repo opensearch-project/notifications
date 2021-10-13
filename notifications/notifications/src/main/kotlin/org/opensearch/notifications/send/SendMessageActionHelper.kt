@@ -392,19 +392,19 @@ object SendMessageActionHelper {
                         ConfigType.SMTP_ACCOUNT -> sendEmailFromSmtpAccount(
                             accountConfig.name,
                             accountConfig.configData as SmtpAccount,
-                            it,
+                            it.recipient,
                             message,
                             referenceId
                         )
                         ConfigType.SES_ACCOUNT -> sendEmailFromSesAccount(
                             accountConfig.name,
                             accountConfig.configData as SesAccount,
-                            it,
+                            it.recipient,
                             message,
                             referenceId
                         )
                         else -> EmailRecipientStatus(
-                            it,
+                            it.recipient,
                             DeliveryStatus(RestStatus.NOT_ACCEPTABLE.name, "email account type not enabled")
                         )
                     }
