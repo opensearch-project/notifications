@@ -53,7 +53,7 @@ import {
   ROUTES,
 } from '../../utils/constants';
 import { getErrorMessage } from '../../utils/helpers';
-import { HeaderItemType } from '../Channels/types';
+import { HeaderItemType, MethodType } from '../Channels/types';
 import { MainContext } from '../Main/Main';
 import { ChannelAvailabilityPanel } from './components/ChannelAvailabilityPanel';
 import { ChannelNamePanel } from './components/ChannelNamePanel';
@@ -106,9 +106,9 @@ export function CreateChannel(props: CreateChannelsProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
-  const channelTypeOptions: Array<
-    EuiSuperSelectOption<keyof typeof CHANNEL_TYPE>
-  > = Object.entries(mainStateContext.availableChannels).map(
+  const channelTypeOptions: Array<EuiSuperSelectOption<
+    keyof typeof CHANNEL_TYPE
+  >> = Object.entries(mainStateContext.availableChannels).map(
     ([key, value]) => ({
       value: key as keyof typeof CHANNEL_TYPE,
       inputDisplay: value,
@@ -127,26 +127,32 @@ export function CreateChannel(props: CreateChannelsProps) {
     Array<EuiComboBoxOptionOption<string>>
   >([]);
   // "value" field is the config_id of recipient groups, if it doesn't exist means it's a custom email address
-  const [selectedRecipientGroupOptions, setSelectedRecipientGroupOptions] =
-    useState<Array<EuiComboBoxOptionOption<string>>>([]);
+  const [
+    selectedRecipientGroupOptions,
+    setSelectedRecipientGroupOptions,
+  ] = useState<Array<EuiComboBoxOptionOption<string>>>([]);
 
-  const [webhookTypeIdSelected, setWebhookTypeIdSelected] =
-    useState<keyof typeof CUSTOM_WEBHOOK_ENDPOINT_TYPE>('WEBHOOK_URL');
+  const [webhookTypeIdSelected, setWebhookTypeIdSelected] = useState<
+    keyof typeof CUSTOM_WEBHOOK_ENDPOINT_TYPE
+  >('WEBHOOK_URL');
   const [webhookURL, setWebhookURL] = useState('');
   const [customURLHost, setCustomURLHost] = useState('');
   const [customURLPort, setCustomURLPort] = useState('');
   const [customURLPath, setCustomURLPath] = useState('');
+  const [webhookMethod, setWebhookMethod] = useState<MethodType>('POST');
   const [webhookParams, setWebhookParams] = useState<HeaderItemType[]>([]);
   const [webhookHeaders, setWebhookHeaders] = useState<HeaderItemType[]>([
     { key: 'Content-Type', value: 'application/json' },
   ]);
   const [topicArn, setTopicArn] = useState(''); // SNS topic ARN
-  const [roleArn, setRoleArn] = useState(''); // IAM role ARN (optional for ODFE)
+  const [roleArn, setRoleArn] = useState(''); // IAM role ARN (optional for open source distribution)
 
-  const [sourceCheckboxIdToSelectedMap, setSourceCheckboxIdToSelectedMap] =
-    useState<{
-      [x: string]: boolean;
-    }>({});
+  const [
+    sourceCheckboxIdToSelectedMap,
+    setSourceCheckboxIdToSelectedMap,
+  ] = useState<{
+    [x: string]: boolean;
+  }>({});
 
   const [inputErrors, setInputErrors] = useState<InputErrorsType>({
     name: [],
@@ -184,10 +190,9 @@ export function CreateChannel(props: CreateChannelsProps) {
         .getChannel(id)
         .then(async (response) => {
           if (response.config_type === 'email') {
-            const channel =
-              await servicesContext.notificationService.getEmailConfigDetails(
-                response
-              );
+            const channel = await servicesContext.notificationService.getEmailConfigDetails(
+              response
+            );
             if (channel.email?.invalid_ids?.length) {
               coreContext.notifications.toasts.addDanger(
                 'The sender and/or some recipient groups might have been deleted.'
@@ -229,6 +234,7 @@ export function CreateChannel(props: CreateChannelsProps) {
         setCustomURLHost(webhookObject.customURLHost);
         setCustomURLPort(webhookObject.customURLPort);
         setCustomURLPath(webhookObject.customURLPath);
+        setWebhookMethod(webhookObject.webhookMethod);
         setWebhookParams(webhookObject.webhookParams);
         setWebhookHeaders(webhookObject.webhookHeaders);
       } else if (type === BACKEND_CHANNEL_TYPE.SNS) {
@@ -307,6 +313,7 @@ export function CreateChannel(props: CreateChannelsProps) {
         customURLHost,
         customURLPort,
         customURLPath,
+        webhookMethod,
         webhookParams,
         webhookHeaders
       );
@@ -359,7 +366,7 @@ export function CreateChannel(props: CreateChannelsProps) {
       coreContext.notifications.toasts.addSuccess(
         'Successfully sent a test message.'
       );
-    } catch (error) {
+    } catch (error: any) {
       coreContext.notifications.toasts.addError(error?.body || error, {
         title: 'Failed to send the test message.',
         toastMessage: 'View error details and adjust the channel settings.',
@@ -455,6 +462,8 @@ export function CreateChannel(props: CreateChannelsProps) {
               setCustomURLPort={setCustomURLPort}
               customURLPath={customURLPath}
               setCustomURLPath={setCustomURLPath}
+              webhookMethod={webhookMethod}
+              setWebhookMethod={setWebhookMethod}
               webhookParams={webhookParams}
               setWebhookParams={setWebhookParams}
               webhookHeaders={webhookHeaders}
@@ -531,11 +540,14 @@ export function CreateChannel(props: CreateChannelsProps) {
                   })
                   .catch((error) => {
                     setLoading(false);
-                    coreContext.notifications.toasts.addError(error?.body || error, {
-                      title: `Failed to ${
-                        props.edit ? 'update' : 'create'
-                      } channel.`,
-                    });
+                    coreContext.notifications.toasts.addError(
+                      error?.body || error,
+                      {
+                        title: `Failed to ${
+                          props.edit ? 'update' : 'create'
+                        } channel.`,
+                      }
+                    );
                   });
               }}
             >

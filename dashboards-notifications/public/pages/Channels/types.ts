@@ -34,6 +34,8 @@ export interface HeaderItemType {
   value: string;
 }
 
+export type MethodType = 'POST' | 'PUT' | 'PATCH';
+
 export interface ChannelFiltersType {
   state?: string;
   type?: string[];

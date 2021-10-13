@@ -13,7 +13,7 @@ import { EuiComboBoxOptionOption } from '@elastic/eui';
 import _ from 'lodash';
 import { ChannelItemType, SenderType } from '../../../../models/interfaces';
 import { CUSTOM_WEBHOOK_ENDPOINT_TYPE } from '../../../utils/constants';
-import { HeaderItemType } from '../../Channels/types';
+import { HeaderItemType, MethodType } from '../../Channels/types';
 
 export const constructWebhookObject = (
   webhookTypeIdSelected: keyof typeof CUSTOM_WEBHOOK_ENDPOINT_TYPE,
@@ -21,6 +21,7 @@ export const constructWebhookObject = (
   customURLHost: string,
   customURLPort: string,
   customURLPath: string,
+  webhookMethod: MethodType,
   webhookParams: HeaderItemType[],
   webhookHeaders: HeaderItemType[]
 ) => {
@@ -43,7 +44,7 @@ export const constructWebhookObject = (
   const header_params = webhookHeaders
     .filter(({ key, value }) => key)
     .reduce((prev, curr) => ({ ...prev, [curr.key]: curr.value }), {});
-  return { url, header_params };
+  return { url, header_params, method: webhookMethod };
 };
 
 export const deconstructWebhookObject = (
@@ -53,6 +54,7 @@ export const deconstructWebhookObject = (
   customURLHost: string;
   customURLPort: string;
   customURLPath: string;
+  webhookMethod: MethodType;
   webhookParams: HeaderItemType[];
   webhookHeaders: HeaderItemType[];
 } => {
@@ -73,6 +75,7 @@ export const deconstructWebhookObject = (
       customURLHost,
       customURLPort,
       customURLPath,
+      webhookMethod: webhook.method as MethodType,
       webhookParams,
       webhookHeaders,
     };
@@ -83,6 +86,7 @@ export const deconstructWebhookObject = (
       customURLHost: '',
       customURLPort: '',
       customURLPath: '',
+      webhookMethod: 'POST',
       webhookParams: [],
       webhookHeaders: [],
     };

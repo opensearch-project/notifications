@@ -31,10 +31,11 @@ import {
   EuiRadioGroup,
   EuiRadioGroupOption,
   EuiSpacer,
+  EuiSuperSelect,
 } from '@elastic/eui';
 import React, { useContext } from 'react';
 import { CUSTOM_WEBHOOK_ENDPOINT_TYPE } from '../../../utils/constants';
-import { HeaderItemType } from '../../Channels/types';
+import { HeaderItemType, MethodType } from '../../Channels/types';
 import { CreateChannelContext } from '../CreateChannel';
 import {
   validateCustomURLHost,
@@ -56,6 +57,8 @@ interface CustomWebhookSettingsProps {
   setCustomURLPort: (customURLPort: string) => void;
   customURLPath: string;
   setCustomURLPath: (customURLPath: string) => void;
+  webhookMethod: MethodType;
+  setWebhookMethod: (webhookMethod: MethodType) => void;
   webhookParams: HeaderItemType[];
   setWebhookParams: (webhookParams: HeaderItemType[]) => void;
   webhookHeaders: HeaderItemType[];
@@ -167,6 +170,27 @@ export function CustomWebhookSettings(props: CustomWebhookSettingsProps) {
 
   return (
     <>
+      <EuiFormRow label="Method" style={{ maxWidth: '700px' }}>
+        <EuiSuperSelect
+          options={[
+            {
+              value: 'POST',
+              inputDisplay: 'POST',
+            },
+            {
+              value: 'PUT',
+              inputDisplay: 'PUT',
+            },
+            {
+              value: 'PATCH',
+              inputDisplay: 'PATCH',
+            },
+          ]}
+          valueOfSelected={props.webhookMethod}
+          onChange={props.setWebhookMethod}
+        />
+      </EuiFormRow>
+
       <EuiFormRow label="Define endpoints by" style={{ maxWidth: '700px' }}>
         <EuiRadioGroup
           options={webhookTypeOptions}
