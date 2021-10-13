@@ -79,7 +79,8 @@ export const configListToRecipientGroups = (
 
 export const isStatusCodeSuccess = (statusCode: string) => {
   if (!statusCode) return true;
-  return /^2\d\d/.test(statusCode);
+  // 207 is multistatus, count as error
+  return statusCode !== "207" && /^2\d\d/.test(statusCode);
 };
 
 export const eventToNotification = (event: any): NotificationItem => {

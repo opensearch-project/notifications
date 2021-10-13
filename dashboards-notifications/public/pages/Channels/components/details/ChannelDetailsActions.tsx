@@ -60,19 +60,10 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
 
   const sendTestMessage = async () => {
     try {
-      const eventId = await servicesContext.eventService
-        .sendTestMessage(props.channel.config_id, props.channel.feature_list[0])
-        .then((response) => response.event_id);
-
-      await servicesContext.eventService
-        .getNotification(eventId)
-        .then((response) => {
-          if (!response.success) {
-            const error = new Error('Failed to send the test message.');
-            error.stack = JSON.stringify(response.status_list, null, 2);
-            throw error;
-          }
-        });
+      await servicesContext.eventService.sendTestMessage(
+        props.channel.config_id,
+        props.channel.feature_list[0]
+      );
       coreContext.notifications.toasts.addSuccess(
         'Successfully sent a test message.'
       );
