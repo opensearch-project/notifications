@@ -34,6 +34,7 @@ import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Email
 import org.opensearch.commons.notifications.model.EmailGroup
+import org.opensearch.commons.notifications.model.EmailRecipient
 import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.SesAccount
@@ -60,7 +61,10 @@ fun verifyEquals(email: Email, jsonObject: JsonObject) {
     Assert.assertEquals(email.emailAccountID, jsonObject.get("email_account_id").asString)
     val defaultRecipients = jsonObject.get("recipient_list").asJsonArray
     Assert.assertEquals(email.recipients.size, defaultRecipients.size())
-    defaultRecipients.forEach { email.recipients.contains(it.asString) }
+    defaultRecipients.forEach {
+        val recipient = it.asJsonObject.get("recipient").asString
+        email.recipients.contains(EmailRecipient(recipient))
+    }
     val defaultEmailGroupIds = jsonObject.get("email_group_id_list").asJsonArray
     Assert.assertEquals(email.emailGroupIds.size, defaultEmailGroupIds.size())
     defaultEmailGroupIds.forEach { email.emailGroupIds.contains(it.asString) }
@@ -69,7 +73,10 @@ fun verifyEquals(email: Email, jsonObject: JsonObject) {
 fun verifyEquals(emailGroup: EmailGroup, jsonObject: JsonObject) {
     val recipients = jsonObject.get("recipient_list").asJsonArray
     Assert.assertEquals(emailGroup.recipients.size, recipients.size())
-    recipients.forEach { emailGroup.recipients.contains(it.asString) }
+    recipients.forEach {
+        val recipient = it.asJsonObject.get("recipient").asString
+        emailGroup.recipients.contains(EmailRecipient(recipient))
+    }
 }
 
 fun verifyEquals(smtpAccount: SmtpAccount, jsonObject: JsonObject) {

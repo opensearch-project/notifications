@@ -60,15 +60,15 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
             ConfigType.EMAIL_GROUP -> """
                 "email_group":{
                     "recipient_list":[
-                        "$randomString+recipient1@from.com",
-                        "$randomString+recipient2@from.com"
+                        {"recipient":"$randomString+recipient1@from.com"},
+                        {"recipient":"$randomString+recipient2@from.com"}
                     ]
                 }
             """.trimIndent()
             ConfigType.EMAIL -> """
                 "email":{
                     "email_account_id":"$smtpAccountId",
-                    "recipient_list":["$randomString@from.com"],
+                    "recipient_list":[{"recipient":"$randomString@from.com"}],
                     "email_group_id_list":[${emailGroupId.joinToString { "\"$it\"" }}]
                 }
             """.trimIndent()

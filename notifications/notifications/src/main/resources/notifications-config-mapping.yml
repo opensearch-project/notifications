@@ -92,10 +92,13 @@ properties:
           email_account_id:
             type: keyword
           recipient_list:
-            type: text
-            fields:
-              keyword:
-                type: keyword
+            type: nested
+            properties:
+              recipient:
+                type: text
+                fields:
+                  keyword:
+                    type: keyword
           email_group_id_list:
             type: keyword
       sns: # sns configuration
@@ -147,7 +150,10 @@ properties:
         type: object
         properties:
           recipient_list:
-            type: text
-            fields:
-              keyword:
-                type: keyword
+            type: nested
+            properties:
+              recipient:
+                type: text
+                fields:
+                  keyword:
+                    type: keyword

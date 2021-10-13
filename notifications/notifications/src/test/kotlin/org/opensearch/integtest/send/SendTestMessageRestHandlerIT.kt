@@ -274,7 +274,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
                 "email":{
                     "email_account_id":"$smtpAccountConfigId",
                     "recipient_list":[
-                        "chloe@example.com"
+                        {"recipient":"chloe@example.com"}
                     ],
                     "email_group_id_list":[]
                 }
