@@ -61,7 +61,7 @@ export function CreateRecipientGroupForm(props: CreateRecipientGroupFormProps) {
       <EuiFormRow
         label="Name"
         style={{ maxWidth: '650px' }}
-        helpText="The name must contain 2 to 50 characters. Valid characters are lowercase A-Z, a-z, 0-9, (_) underscore, (-) hyphen and unicode characters."
+        helpText="The name must contain 2 to 50 characters. Valid characters are A-Z, a-z, 0-9, (_) underscore, (-) hyphen and unicode characters."
         error={props.inputErrors.name.join(' ')}
         isInvalid={props.inputErrors.name.length > 0}
       >

@@ -48,7 +48,7 @@ exports[`<CreateRecipientGroupForm/> spec render errors 1`] = `
       class="euiFormHelpText euiFormRow__text"
       id="random_html_id-help"
     >
-      The name must contain 2 to 50 characters. Valid characters are lowercase A-Z, a-z, 0-9, (_) underscore, (-) hyphen and unicode characters.
+      The name must contain 2 to 50 characters. Valid characters are A-Z, a-z, 0-9, (_) underscore, (-) hyphen and unicode characters.
     </div>
   </div>
 </div>
@@ -95,7 +95,7 @@ exports[`<CreateRecipientGroupForm/> spec renders the component 1`] = `
       class="euiFormHelpText euiFormRow__text"
       id="random_html_id-help"
     >
-      The name must contain 2 to 50 characters. Valid characters are lowercase A-Z, a-z, 0-9, (_) underscore, (-) hyphen and unicode characters.
+      The name must contain 2 to 50 characters. Valid characters are A-Z, a-z, 0-9, (_) underscore, (-) hyphen and unicode characters.
     </div>
   </div>
 </div>

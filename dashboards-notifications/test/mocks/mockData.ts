@@ -151,7 +151,7 @@ const mockSNS: ChannelItemType = {
 };
 
 const mockSender: SenderItemType = {
-  name: 'Test sender',
+  name: 'test-sender',
   description: 'test description',
   config_id: '72UysHkBqFjWrmvLFXkB',
   created_time_ms: 1622158742784,
@@ -165,7 +165,7 @@ const mockSender: SenderItemType = {
 };
 
 const mockSESSender: SESSenderItemType = {
-  name: 'Test SES sender',
+  name: 'test-ses-sender',
   description: 'test description',
   config_id: '72HlfUxOdSwJeziYSKxO',
   created_time_ms: 1622158742784,
@@ -178,7 +178,7 @@ const mockSESSender: SESSenderItemType = {
 };
 
 const mockRecipientGroup: RecipientGroupItemType = {
-  name: 'Test sender',
+  name: 'Test recipient group',
   description: 'test description',
   config_id: '72UysHkBqVjWrmvLFXkB',
   created_time_ms: 1622158742784,
