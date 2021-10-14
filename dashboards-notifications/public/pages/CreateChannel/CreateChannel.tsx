@@ -53,7 +53,7 @@ import {
   ROUTES,
 } from '../../utils/constants';
 import { getErrorMessage } from '../../utils/helpers';
-import { HeaderItemType, MethodType } from '../Channels/types';
+import { HeaderItemType, WebhookHttpType, WebhookMethodType } from '../Channels/types';
 import { MainContext } from '../Main/Main';
 import { ChannelAvailabilityPanel } from './components/ChannelAvailabilityPanel';
 import { ChannelNamePanel } from './components/ChannelNamePanel';
@@ -136,10 +136,11 @@ export function CreateChannel(props: CreateChannelsProps) {
     keyof typeof CUSTOM_WEBHOOK_ENDPOINT_TYPE
   >('WEBHOOK_URL');
   const [webhookURL, setWebhookURL] = useState('');
+  const [customURLType, setCustomURLType] = useState<WebhookHttpType>('HTTPS');
   const [customURLHost, setCustomURLHost] = useState('');
   const [customURLPort, setCustomURLPort] = useState('');
   const [customURLPath, setCustomURLPath] = useState('');
-  const [webhookMethod, setWebhookMethod] = useState<MethodType>('POST');
+  const [webhookMethod, setWebhookMethod] = useState<WebhookMethodType>('POST');
   const [webhookParams, setWebhookParams] = useState<HeaderItemType[]>([]);
   const [webhookHeaders, setWebhookHeaders] = useState<HeaderItemType[]>([
     { key: 'Content-Type', value: 'application/json' },
@@ -310,6 +311,7 @@ export function CreateChannel(props: CreateChannelsProps) {
       config.webhook = constructWebhookObject(
         webhookTypeIdSelected,
         webhookURL,
+        customURLType,
         customURLHost,
         customURLPort,
         customURLPath,
@@ -456,6 +458,8 @@ export function CreateChannel(props: CreateChannelsProps) {
               setWebhookTypeIdSelected={setWebhookTypeIdSelected}
               webhookURL={webhookURL}
               setWebhookURL={setWebhookURL}
+              customURLType={customURLType}
+              setCustomURLType={setCustomURLType}
               customURLHost={customURLHost}
               setCustomURLHost={setCustomURLHost}
               customURLPort={customURLPort}

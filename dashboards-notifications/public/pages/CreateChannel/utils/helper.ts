@@ -13,15 +13,20 @@ import { EuiComboBoxOptionOption } from '@elastic/eui';
 import _ from 'lodash';
 import { ChannelItemType, SenderType } from '../../../../models/interfaces';
 import { CUSTOM_WEBHOOK_ENDPOINT_TYPE } from '../../../utils/constants';
-import { HeaderItemType, MethodType } from '../../Channels/types';
+import {
+  HeaderItemType,
+  WebhookHttpType,
+  WebhookMethodType,
+} from '../../Channels/types';
 
 export const constructWebhookObject = (
   webhookTypeIdSelected: keyof typeof CUSTOM_WEBHOOK_ENDPOINT_TYPE,
   webhookURL: string,
+  customURLType: WebhookHttpType,
   customURLHost: string,
   customURLPort: string,
   customURLPath: string,
-  webhookMethod: MethodType,
+  webhookMethod: WebhookMethodType,
   webhookParams: HeaderItemType[],
   webhookHeaders: HeaderItemType[]
 ) => {
@@ -29,7 +34,10 @@ export const constructWebhookObject = (
   if (webhookTypeIdSelected === 'WEBHOOK_URL') {
     url = webhookURL;
   } else {
-    url = `https://${customURLHost.replace(/^https:\/\//, '')}`;
+    url = `${customURLType.toLowerCase()}://${customURLHost.replace(
+      /^https?:\/\//,
+      ''
+    )}`;
     if (customURLPort) url += `:${customURLPort}`;
     if (customURLPath) url += `/${customURLPath.replace(/^\//, '')}`;
     if (webhookParams.length > 0) {
@@ -51,15 +59,19 @@ export const deconstructWebhookObject = (
   webhook: NonNullable<ChannelItemType['webhook']>
 ): {
   webhookURL: string;
+  customURLType: WebhookHttpType;
   customURLHost: string;
   customURLPort: string;
   customURLPath: string;
-  webhookMethod: MethodType;
+  webhookMethod: WebhookMethodType;
   webhookParams: HeaderItemType[];
   webhookHeaders: HeaderItemType[];
 } => {
   try {
     const url = new URL(webhook.url);
+    const customURLType = url.protocol
+      .replace(':', '')
+      .toUpperCase() as WebhookHttpType;
     const customURLHost = url.hostname;
     const customURLPort = url.port;
     const customURLPath = url.pathname.replace(/^\//, '');
@@ -72,10 +84,11 @@ export const deconstructWebhookObject = (
     ).map(([key, value]) => ({ key, value }));
     return {
       webhookURL: webhook.url,
+      customURLType,
       customURLHost,
       customURLPort,
       customURLPath,
-      webhookMethod: webhook.method as MethodType,
+      webhookMethod: webhook.method as WebhookMethodType,
       webhookParams,
       webhookHeaders,
     };
@@ -83,6 +96,7 @@ export const deconstructWebhookObject = (
     console.error('Error parsing url:', error);
     return {
       webhookURL: webhook.url,
+      customURLType: 'HTTPS',
       customURLHost: '',
       customURLPort: '',
       customURLPath: '',

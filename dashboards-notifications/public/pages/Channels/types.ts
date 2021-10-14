@@ -34,7 +34,9 @@ export interface HeaderItemType {
   value: string;
 }
 
-export type MethodType = 'POST' | 'PUT' | 'PATCH';
+export type WebhookMethodType = 'POST' | 'PUT' | 'PATCH';
+
+export type WebhookHttpType = 'HTTP' | 'HTTPS';
 
 export interface ChannelFiltersType {
   state?: string;
