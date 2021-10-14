@@ -20,6 +20,7 @@ import {
 describe('constructs and deconstructs webhook objects', () => {
   const args = [
     'https://test-webhook.com:1234/subdirectory?param1=value1&param2=&param3=value3',
+    'HTTPS',
     'test-webhook.com',
     '1234',
     'subdirectory',
@@ -60,6 +61,7 @@ describe('constructs and deconstructs webhook objects', () => {
     const resultFromCustomURL = constructWebhookObject(
       'CUSTOM_URL',
       '',
+      'HTTPS',
       'test-webhook.com',
       '',
       '',
@@ -77,6 +79,7 @@ describe('constructs and deconstructs webhook objects', () => {
   it('deconstructs webhook objects', () => {
     const {
       webhookURL,
+      customURLType,
       customURLHost,
       customURLPort,
       customURLPath,
@@ -84,9 +87,10 @@ describe('constructs and deconstructs webhook objects', () => {
       webhookHeaders,
     } = deconstructWebhookObject(webhookItem);
     expect(webhookURL).toEqual(args[0]);
-    expect(customURLHost).toEqual(args[1]);
-    expect(customURLPort).toEqual(args[2]);
-    expect(customURLPath).toEqual(args[3]);
+    expect(customURLType).toEqual(args[1]);
+    expect(customURLHost).toEqual(args[2]);
+    expect(customURLPort).toEqual(args[3]);
+    expect(customURLPath).toEqual(args[4]);
     expect(webhookParams).toEqual([
       { key: 'param1', value: 'value1' },
       { key: 'param2', value: '' },
