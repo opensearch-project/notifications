@@ -17,7 +17,6 @@ import io.mockk.mockkObject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.anyLong
 import org.mockito.Mockito.mock
@@ -49,22 +48,16 @@ import java.time.Instant
 
 internal class NotificationEventIndexTests {
 
-    private lateinit var client: Client
+    private val client: Client = mock(Client::class.java, "client")
 
     private val indexName = ".opensearch-notifications-event"
 
-    private lateinit var clusterService: ClusterService
-
-    @BeforeEach
-    fun setUp() {
-        client = mock(Client::class.java, "client")
-        clusterService = mock(ClusterService::class.java, "clusterService")
-        NotificationEventIndex.initialize(client, clusterService)
-    }
+    private val clusterService: ClusterService = mock(ClusterService::class.java, "clusterService")
 
     @Suppress("UNCHECKED_CAST")
     @Test
     fun `index operation to get single event`() {
+        NotificationEventIndex.initialize(client, clusterService)
         // creating expected value
         val id = "index-1"
         val docInfo = DocInfo("index-1", 1, 1, 1)
@@ -130,6 +123,7 @@ internal class NotificationEventIndexTests {
     @Suppress("UNCHECKED_CAST")
     @Test
     fun `NotificationEventIndex should safely return null if response source is null`() {
+        NotificationEventIndex.initialize(client, clusterService)
         val id = "index-1"
         // mocking the dependencies for isIndexExists function
         mockIsIndexExists()
@@ -159,6 +153,7 @@ internal class NotificationEventIndexTests {
     @Suppress("UNCHECKED_CAST")
     @Test
     fun `NotificationEventIndex should throw exception if response isn't acknowledged`() {
+        NotificationEventIndex.initialize(client, clusterService)
         val id = "index-1"
         // mocking the dependencies for isIndexExists function
         mockIsIndexExists()
@@ -174,6 +169,7 @@ internal class NotificationEventIndexTests {
     @Suppress("UNCHECKED_CAST")
     @Test
     fun `NotificationEventIndex should throw exception if index couldn't be created`() {
+        NotificationEventIndex.initialize(client, clusterService)
         val id = "index-1"
         // mocking the dependencies for isIndexExists function
         mockIsIndexExists()

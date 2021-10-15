@@ -69,6 +69,11 @@ internal object PluginSettings {
     private const val DEFAULT_ITEMS_QUERY_COUNT_KEY = "$GENERAL_KEY_PREFIX.defaultItemsQueryCount"
 
     /**
+     * Setting to choose filter send by backend role.
+     */
+    private const val FILTER_SEND_BY_BACKEND_ROLES_KEY = "$GENERAL_KEY_PREFIX.filterSendByBackendRoles"
+
+    /**
      * Legacy alerting plugin filter_by_backend_roles setting.
      */
     private const val LEGACY_FILTER_BY_BACKEND_ROLES_KEY = "opendistro.alerting.filter_by_backend_roles"
@@ -110,6 +115,12 @@ internal object PluginSettings {
     @Volatile
     var defaultItemsQueryCount: Int
 
+    /**
+     * Filter send by backend role.
+     */
+    @Volatile
+    var filterSendByBackendRoles: Boolean
+
     private const val DECIMAL_RADIX: Int = 10
 
     private val log by logger(javaClass)
@@ -130,9 +141,12 @@ internal object PluginSettings {
         operationTimeoutMs = (settings?.get(OPERATION_TIMEOUT_MS_KEY)?.toLong()) ?: DEFAULT_OPERATION_TIMEOUT_MS
         defaultItemsQueryCount = (settings?.get(DEFAULT_ITEMS_QUERY_COUNT_KEY)?.toInt())
             ?: DEFAULT_ITEMS_QUERY_COUNT_VALUE
+        filterSendByBackendRoles = (settings?.get(FILTER_SEND_BY_BACKEND_ROLES_KEY)?.toBoolean())
+            ?: false
         defaultSettings = mapOf(
             OPERATION_TIMEOUT_MS_KEY to operationTimeoutMs.toString(DECIMAL_RADIX),
-            DEFAULT_ITEMS_QUERY_COUNT_KEY to defaultItemsQueryCount.toString(DECIMAL_RADIX)
+            DEFAULT_ITEMS_QUERY_COUNT_KEY to defaultItemsQueryCount.toString(DECIMAL_RADIX),
+            FILTER_SEND_BY_BACKEND_ROLES_KEY to filterSendByBackendRoles.toString()
         )
     }
 
@@ -147,6 +161,12 @@ internal object PluginSettings {
         DEFAULT_ITEMS_QUERY_COUNT_KEY,
         defaultSettings[DEFAULT_ITEMS_QUERY_COUNT_KEY]!!.toInt(),
         MINIMUM_ITEMS_QUERY_COUNT,
+        NodeScope, Dynamic
+    )
+
+    val FILTER_SEND_BY_BACKEND_ROLES: Setting<Boolean> = Setting.boolSetting(
+        FILTER_SEND_BY_BACKEND_ROLES_KEY,
+        defaultSettings[FILTER_SEND_BY_BACKEND_ROLES_KEY]!!.toBoolean(),
         NodeScope, Dynamic
     )
 
@@ -178,7 +198,8 @@ internal object PluginSettings {
     fun getAllSettings(): List<Setting<*>> {
         return listOf(
             OPERATION_TIMEOUT_MS,
-            DEFAULT_ITEMS_QUERY_COUNT
+            DEFAULT_ITEMS_QUERY_COUNT,
+            FILTER_SEND_BY_BACKEND_ROLES
         )
     }
 
@@ -189,6 +210,7 @@ internal object PluginSettings {
     private fun updateSettingValuesFromLocal(clusterService: ClusterService) {
         operationTimeoutMs = OPERATION_TIMEOUT_MS.get(clusterService.settings)
         defaultItemsQueryCount = DEFAULT_ITEMS_QUERY_COUNT.get(clusterService.settings)
+        filterSendByBackendRoles = FILTER_SEND_BY_BACKEND_ROLES.get(clusterService.settings)
     }
 
     /**
@@ -206,6 +228,11 @@ internal object PluginSettings {
         if (clusterDefaultItemsQueryCount != null) {
             log.debug("$LOG_PREFIX:$DEFAULT_ITEMS_QUERY_COUNT_KEY -autoUpdatedTo-> $clusterDefaultItemsQueryCount")
             defaultItemsQueryCount = clusterDefaultItemsQueryCount
+        }
+        val clusterFilterSendByBackendRole = clusterService.clusterSettings.get(FILTER_SEND_BY_BACKEND_ROLES)
+        if (clusterFilterSendByBackendRole != null) {
+            log.debug("$LOG_PREFIX:$FILTER_SEND_BY_BACKEND_ROLES_KEY -autoUpdatedTo-> $clusterFilterSendByBackendRole")
+            filterSendByBackendRoles = clusterFilterSendByBackendRole
         }
     }
 
@@ -228,6 +255,10 @@ internal object PluginSettings {
             defaultItemsQueryCount = it
             log.info("$LOG_PREFIX:$DEFAULT_ITEMS_QUERY_COUNT_KEY -updatedTo-> $it")
         }
+        clusterService.clusterSettings.addSettingsUpdateConsumer(FILTER_SEND_BY_BACKEND_ROLES) {
+            filterSendByBackendRoles = it
+            log.info("$LOG_PREFIX:$FILTER_SEND_BY_BACKEND_ROLES_KEY -updatedTo-> $it")
+        }
     }
 
     // reset the settings values to default values for testing purpose
@@ -235,5 +266,6 @@ internal object PluginSettings {
     fun reset() {
         operationTimeoutMs = DEFAULT_OPERATION_TIMEOUT_MS
         defaultItemsQueryCount = DEFAULT_ITEMS_QUERY_COUNT_VALUE
+        filterSendByBackendRoles = false
     }
 }

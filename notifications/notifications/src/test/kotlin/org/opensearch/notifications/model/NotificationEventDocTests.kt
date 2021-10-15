@@ -45,7 +45,7 @@ internal class NotificationEventDocTests {
     @Test
     fun `Event doc serialize and deserialize using json config object should be equal`() {
         val lastUpdatedTimeMs = Instant.ofEpochMilli(Instant.now().toEpochMilli())
-        val createdTimeMs = lastUpdatedTimeMs.minusSeconds(1000)
+        val createdTimeMs = Instant.ofEpochMilli(Instant.now().minusSeconds(2000).toEpochMilli())
         val metadata = DocMetadata(
             lastUpdatedTimeMs,
             createdTimeMs,
@@ -74,7 +74,7 @@ internal class NotificationEventDocTests {
     @Test
     fun `Event doc should safely ignore extra field in json object`() {
         val lastUpdatedTimeMs = Instant.ofEpochMilli(Instant.now().toEpochMilli())
-        val createdTimeMs = lastUpdatedTimeMs.minusSeconds(1000)
+        val createdTimeMs = Instant.ofEpochMilli(Instant.now().minusSeconds(2000).toEpochMilli())
         val metadata = DocMetadata(
             lastUpdatedTimeMs,
             createdTimeMs,
@@ -167,7 +167,7 @@ internal class NotificationEventDocTests {
     @Test
     fun `Event doc should throw exception if event is absent in json`() {
         val lastUpdatedTimeMs = Instant.ofEpochMilli(Instant.now().toEpochMilli())
-        val createdTimeMs = lastUpdatedTimeMs.minusSeconds(1000)
+        val createdTimeMs = Instant.ofEpochMilli(Instant.now().minusSeconds(2000).toEpochMilli())
         val jsonString = """
         {
             "metadata":{

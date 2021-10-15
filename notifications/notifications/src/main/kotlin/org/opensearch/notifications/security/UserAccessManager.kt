@@ -77,4 +77,11 @@ internal object UserAccessManager : UserAccess {
         }
         return user.backendRoles.any { it in access }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun doesUserHasSendAccess(user: User?, access: List<String>): Boolean {
+        return !PluginSettings.filterSendByBackendRoles || doesUserHasAccess(user, access)
+    }
 }

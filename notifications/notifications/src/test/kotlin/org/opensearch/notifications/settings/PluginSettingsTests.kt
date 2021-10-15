@@ -31,10 +31,12 @@ internal class PluginSettingsTests {
     private val generalKeyPrefix = "$keyPrefix.general"
     private val operationTimeoutKey = "$generalKeyPrefix.operationTimeoutMs"
     private val defaultItemQueryCountKey = "$generalKeyPrefix.defaultItemsQueryCount"
+    private val filterSendByBackendRolesKey = "$generalKeyPrefix.filterSendByBackendRoles"
 
     private val defaultSettings = Settings.builder()
         .put(operationTimeoutKey, 60000L)
         .put(defaultItemQueryCountKey, 100L)
+        .put(filterSendByBackendRolesKey, false)
         .build()
 
     @BeforeEach
@@ -54,14 +56,22 @@ internal class PluginSettingsTests {
 
         Assert.assertTrue(
             settings.containsAll(
-                listOf<Any> (
+                listOf<Any>(
                     PluginSettings.OPERATION_TIMEOUT_MS,
-                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT
+                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
+                    PluginSettings.FILTER_SEND_BY_BACKEND_ROLES
                 )
             )
         )
         Assertions.assertEquals(defaultSettings[operationTimeoutKey], PluginSettings.operationTimeoutMs.toString())
-        Assertions.assertEquals(defaultSettings[defaultItemQueryCountKey], PluginSettings.defaultItemsQueryCount.toString())
+        Assertions.assertEquals(
+            defaultSettings[defaultItemQueryCountKey],
+            PluginSettings.defaultItemsQueryCount.toString()
+        )
+        Assertions.assertEquals(
+            defaultSettings[filterSendByBackendRolesKey],
+            PluginSettings.filterSendByBackendRoles.toString()
+        )
     }
 
     @Test
@@ -69,13 +79,18 @@ internal class PluginSettingsTests {
         val clusterSettings = Settings.builder()
             .put(operationTimeoutKey, 50000L)
             .put(defaultItemQueryCountKey, 200)
+            .put(filterSendByBackendRolesKey, true)
             .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
         whenever(clusterService.clusterSettings).thenReturn(
             ClusterSettings(
                 clusterSettings,
-                setOf(PluginSettings.OPERATION_TIMEOUT_MS, PluginSettings.DEFAULT_ITEMS_QUERY_COUNT)
+                setOf(
+                    PluginSettings.OPERATION_TIMEOUT_MS,
+                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
+                    PluginSettings.FILTER_SEND_BY_BACKEND_ROLES
+                )
             )
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
@@ -87,6 +102,10 @@ internal class PluginSettingsTests {
             200,
             clusterService.clusterSettings.get(PluginSettings.DEFAULT_ITEMS_QUERY_COUNT)
         )
+        Assertions.assertEquals(
+            true,
+            clusterService.clusterSettings.get(PluginSettings.FILTER_SEND_BY_BACKEND_ROLES)
+        )
     }
 
     @Test
@@ -96,7 +115,11 @@ internal class PluginSettingsTests {
         whenever(clusterService.clusterSettings).thenReturn(
             ClusterSettings(
                 clusterSettings,
-                setOf(PluginSettings.OPERATION_TIMEOUT_MS, PluginSettings.DEFAULT_ITEMS_QUERY_COUNT)
+                setOf(
+                    PluginSettings.OPERATION_TIMEOUT_MS,
+                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
+                    PluginSettings.FILTER_SEND_BY_BACKEND_ROLES
+                )
             )
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
@@ -107,6 +130,10 @@ internal class PluginSettingsTests {
         Assertions.assertEquals(
             defaultSettings[defaultItemQueryCountKey],
             clusterService.clusterSettings.get(PluginSettings.DEFAULT_ITEMS_QUERY_COUNT).toString()
+        )
+        Assertions.assertEquals(
+            defaultSettings[filterSendByBackendRolesKey],
+            clusterService.clusterSettings.get(PluginSettings.FILTER_SEND_BY_BACKEND_ROLES).toString()
         )
     }
 }

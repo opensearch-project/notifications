@@ -31,3 +31,4 @@ opensearch.notifications:
   general:
     operationTimeoutMs: 60000 # 60 seconds, Minimum 100ms
     defaultItemsQueryCount: 100 # default number of items to query
+    filterSendByBackendRoles: false # Does sendNotification needs to validate user's backend roles
