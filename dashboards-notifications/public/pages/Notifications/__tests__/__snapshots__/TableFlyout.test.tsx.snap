@@ -378,6 +378,16 @@ exports[`<TableFlyout /> spec renders the component 1`] = `
                       >
                         failed
                       </div>
+                      <div
+                        class="euiText euiText--small"
+                      >
+                        <li>
+                          test@email.com: failed
+                           (
+                          500
+                          )
+                        </li>
+                      </div>
                     </dd>
                   </dl>
                 </div>
