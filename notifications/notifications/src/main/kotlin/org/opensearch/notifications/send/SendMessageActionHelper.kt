@@ -100,10 +100,10 @@ object SendMessageActionHelper {
         }
         val createdTime = Instant.now()
         userAccess.validateUser(user)
-        val channels = getConfigs(channelIds)
-        val childConfigs = getConfigs(getChildConfigIds(channels))
+        val channelMap = getConfigs(channelIds)
+        val childConfigMap = getConfigs(getChildConfigIds(channelMap.values.filterNotNull().toList()))
         val message = createMessageContent(eventSource, channelMessage)
-        val eventStatusList = sendMessagesInParallel(eventSource, channels, childConfigs, message)
+        val eventStatusList = sendMessagesInParallel(user, eventSource, channelMap, childConfigMap, message)
         val updatedTime = Instant.now()
         val docMetadata = DocMetadata(
             updatedTime,
@@ -169,22 +169,23 @@ object SendMessageActionHelper {
     /**
      * Send message to multiple channels in parallel
      * @param eventSource event source information
-     * @param channels list of channel info
-     * @param childConfigs configuration info of child for compound channels like email
+     * @param channelMap map of channel id to channel info
+     * @param childConfigMap map of config id to configuration info of child for compound channels like email
      * @param message the message to send
      * @return notification delivery status for each channel
      */
     private fun sendMessagesInParallel(
+        user: User?,
         eventSource: EventSource,
-        channels: List<NotificationConfigDocInfo>,
-        childConfigs: List<NotificationConfigDocInfo>,
+        channelMap: Map<String, NotificationConfigDocInfo?>,
+        childConfigMap: Map<String, NotificationConfigDocInfo?>,
         message: MessageContent
     ): List<EventStatus> {
         val statusList: List<EventStatus>
         // Fire all the message sending in parallel
         runBlocking {
-            val statusDeferredList = channels.map {
-                async(Dispatchers.IO) { sendMessageToChannel(eventSource, it, childConfigs, message) }
+            val statusDeferredList = channelMap.map {
+                async(Dispatchers.IO) { sendMessageToChannel(user, eventSource, it, childConfigMap, message) }
             }
             statusList = statusDeferredList.awaitAll()
         }
@@ -194,25 +195,51 @@ object SendMessageActionHelper {
     /**
      * Send message to a channel
      * @param eventSource event source information
-     * @param channel channel info
-     * @param childConfigs configuration info of child for compound channels like email
+     * @param channelEntry channel info
+     * @param childConfigMap configuration info of child for compound channels like email
      * @param message the message to send
      * @return notification delivery status for the channel
      */
     private fun sendMessageToChannel(
+        user: User?,
         eventSource: EventSource,
-        channel: NotificationConfigDocInfo,
-        childConfigs: List<NotificationConfigDocInfo>,
+        channelEntry: Map.Entry<String, NotificationConfigDocInfo?>,
+        childConfigMap: Map<String, NotificationConfigDocInfo?>,
         message: MessageContent
     ): EventStatus {
         Metrics.NOTIFICATIONS_SEND_MESSAGE_TOTAL.counter.increment()
         Metrics.NOTIFICATIONS_SEND_MESSAGE_INTERVAL_COUNT.counter.increment()
+        if (channelEntry.value == null) {
+            Metrics.NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND.counter.increment()
+            return EventStatus(
+                channelEntry.key,
+                "invalid-config",
+                ConfigType.NONE,
+                listOf(),
+                DeliveryStatus(RestStatus.NOT_FOUND.status.toString(), "Channel ${channelEntry.key} not found")
+            )
+        } else if (!userAccess.doesUserHasAccess(user, channelEntry.value!!.configDoc.metadata.access)) {
+            Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
+            return EventStatus(
+                channelEntry.key,
+                "invalid-access",
+                ConfigType.NONE,
+                listOf(),
+                DeliveryStatus(RestStatus.FORBIDDEN.status.toString(), "Access denied for channel ${channelEntry.key}")
+            )
+        }
+        val channel = channelEntry.value!!
         val configType = channel.configDoc.config.configType
         val configData = channel.configDoc.config.configData
         var emailRecipientStatus = listOf<EmailRecipientStatus>()
         if (configType == ConfigType.EMAIL) {
             emailRecipientStatus =
-                listOf(EmailRecipientStatus("placeholder@amazon.com", DeliveryStatus("Scheduled", "Pending execution")))
+                listOf(
+                    EmailRecipientStatus(
+                        "placeholder@example.com",
+                        DeliveryStatus("Scheduled", "Pending execution")
+                    )
+                )
         }
         val eventStatus = EventStatus(
             channel.docInfo.id!!, // ID from query so not expected to be null
@@ -237,8 +264,9 @@ object SendMessageActionHelper {
                 eventSource.referenceId
             )
             ConfigType.EMAIL -> sendEmailMessage(
+                user,
                 configData as Email,
-                childConfigs,
+                childConfigMap,
                 message,
                 eventStatus,
                 eventSource.referenceId
@@ -372,19 +400,44 @@ object SendMessageActionHelper {
      * send message to email destination
      */
     private fun sendEmailMessage(
+        user: User?,
         email: Email,
-        childConfigs: List<NotificationConfigDocInfo>,
+        childConfigMap: Map<String, NotificationConfigDocInfo?>,
         message: MessageContent,
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_EMAIL.counter.increment()
-        val accountDocInfo = childConfigs.find { it.docInfo.id == email.emailAccountID }
-        val groups = childConfigs.filter { email.emailGroupIds.contains(it.docInfo.id) }
+        val accountDocInfo = childConfigMap[email.emailAccountID]
+        if (accountDocInfo == null) {
+            Metrics.NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND.counter.increment()
+            return eventStatus.copy(
+                emailRecipientStatus = listOf(),
+                deliveryStatus = DeliveryStatus(
+                    RestStatus.NOT_FOUND.status.toString(),
+                    "Sender ${email.emailAccountID} not found"
+                )
+            )
+        } else if (!userAccess.doesUserHasAccess(user, accountDocInfo.configDoc.metadata.access)) {
+            Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
+            return eventStatus.copy(
+                emailRecipientStatus = listOf(),
+                deliveryStatus = DeliveryStatus(
+                    RestStatus.FORBIDDEN.status.toString(),
+                    "Access denied for sender ${accountDocInfo.docInfo.id}"
+                )
+            )
+        }
+        val accessDeniedGroupIds = childConfigMap.filterValues {
+            it != null && !userAccess.doesUserHasAccess(user, it.configDoc.metadata.access)
+        }.keys
+        val invalidGroupIds = childConfigMap.filterValues { it == null }.keys
+        val groups = childConfigMap.values.filterNotNull()
+            .filter { email.emailGroupIds.contains(it.docInfo.id) && !accessDeniedGroupIds.contains(it.docInfo.id) }
         val groupRecipients = groups.map { (it.configDoc.config.configData as EmailGroup).recipients }.flatten()
         val recipients = email.recipients.union(groupRecipients)
         val emailRecipientStatus: List<EmailRecipientStatus>
-        val accountConfig = accountDocInfo?.configDoc!!.config
+        val accountConfig = accountDocInfo.configDoc.config
         runBlocking {
             val statusDeferredList = recipients.map {
                 async(Dispatchers.IO) {
@@ -410,7 +463,17 @@ object SendMessageActionHelper {
                     }
                 }
             }
-            emailRecipientStatus = statusDeferredList.awaitAll()
+            emailRecipientStatus = statusDeferredList.awaitAll() + invalidGroupIds.map {
+                EmailRecipientStatus(
+                    "unknown-recipient@example.com",
+                    DeliveryStatus(RestStatus.NOT_FOUND.status.toString(), "Recipient $it not found")
+                )
+            } + accessDeniedGroupIds.map {
+                EmailRecipientStatus(
+                    "invalid-access@example.com",
+                    DeliveryStatus(RestStatus.FORBIDDEN.status.toString(), "Access denied for recipient $it")
+                )
+            }
         }
         val firstStatus = emailRecipientStatus.first()
         var overallStatus = firstStatus.deliveryStatus.statusCode
@@ -537,11 +600,11 @@ object SendMessageActionHelper {
     /**
      * Get NotificationConfig info
      * @param configIds config id set
-     * @return list of [NotificationConfigDocInfo]
+     * @return map of config id to [NotificationConfigDocInfo]
      */
-    private fun getConfigs(configIds: Set<String>): List<NotificationConfigDocInfo> {
+    private fun getConfigs(configIds: Set<String>): Map<String, NotificationConfigDocInfo?> {
         return when (configIds.size) {
-            0 -> listOf()
+            0 -> emptyMap()
             1 -> getSingleConfig(configIds.first())
             else -> getAllConfigs(configIds)
         }
@@ -550,32 +613,30 @@ object SendMessageActionHelper {
     /**
      * Get NotificationConfig info
      * @param configIds config id set
-     * @return list of [NotificationConfigDocInfo]
+     * @return map of config id to [NotificationConfigDocInfo]
      */
-    private fun getAllConfigs(configIds: Set<String>): List<NotificationConfigDocInfo> {
+    private fun getAllConfigs(configIds: Set<String>): Map<String, NotificationConfigDocInfo?> {
         log.info("$LOG_PREFIX:getAllConfigs-get $configIds")
         val configDocs = configOperations.getNotificationConfigs(configIds)
+        val configMap = mutableMapOf<String, NotificationConfigDocInfo?>()
+        configIds.forEach { configMap[it] = null }
+        configDocs.forEach { configMap[it.docInfo.id!!] = it }
         if (configDocs.size != configIds.size) {
-            val mutableSet = configIds.toMutableSet()
-            configDocs.forEach { mutableSet.remove(it.docInfo.id) }
-            throw OpenSearchStatusException(
-                "getConfigs $mutableSet not found",
-                RestStatus.NOT_FOUND
-            )
+            val invalidConfigIds = configMap.filterValues { it == null }.keys
+            log.error("$LOG_PREFIX:getAllConfigs $invalidConfigIds not found")
         }
-        return configDocs
+        return configMap
     }
 
     /**
      * Get NotificationConfig info
      * @param configId config id
-     * @return list of [NotificationConfigDocInfo]
+     * @return map of config id to [NotificationConfigDocInfo]
      */
-    private fun getSingleConfig(configId: String): List<NotificationConfigDocInfo> {
+    private fun getSingleConfig(configId: String): Map<String, NotificationConfigDocInfo?> {
         log.info("$LOG_PREFIX:getSingleConfig-get $configId")
         val configDoc = configOperations.getNotificationConfig(configId)
-            ?: throw OpenSearchStatusException("getConfigs $configId not found", RestStatus.NOT_FOUND)
-        return listOf(configDoc)
+        return mapOf(configId to configDoc)
     }
 
     /**
