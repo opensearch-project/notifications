@@ -57,7 +57,7 @@ data class NotificationEventDoc(
         @Throws(IOException::class)
         fun parse(parser: XContentParser): NotificationEventDoc {
             var metadata: DocMetadata? = null
-            var config: NotificationEvent? = null
+            var event: NotificationEvent? = null
 
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
@@ -69,7 +69,7 @@ data class NotificationEventDoc(
                 parser.nextToken()
                 when (fieldName) {
                     METADATA_TAG -> metadata = DocMetadata.parse(parser)
-                    EVENT_TAG -> config = NotificationEvent.parse(parser)
+                    EVENT_TAG -> event = NotificationEvent.parse(parser)
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing event doc")
@@ -77,10 +77,10 @@ data class NotificationEventDoc(
                 }
             }
             metadata ?: throw IllegalArgumentException("$METADATA_TAG field absent")
-            config ?: throw IllegalArgumentException("$EVENT_TAG field absent")
+            event ?: throw IllegalArgumentException("$EVENT_TAG field absent")
             return NotificationEventDoc(
                 metadata,
-                config
+                event
             )
         }
     }

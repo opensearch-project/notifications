@@ -31,6 +31,7 @@ import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
+import org.opensearch.commons.notifications.NotificationConstants.CREATED_TIME_TAG
 import org.opensearch.commons.notifications.NotificationConstants.UPDATED_TIME_TAG
 import org.opensearch.commons.utils.logger
 import org.opensearch.commons.utils.stringList
@@ -47,7 +48,6 @@ data class DocMetadata(
     companion object {
         private val log by logger(DocMetadata::class.java)
         const val METADATA_TAG = "metadata"
-        const val CREATED_TIME_TAG = "created_time_ms"
         const val ACCESS_LIST_TAG = "access"
 
         /**

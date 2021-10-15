@@ -38,7 +38,7 @@ import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
 import java.io.IOException
 
 /**
- * Data class representing Notification config.
+ * Data class representing Notification config with metadata.
  */
 data class NotificationConfigDoc(
     val metadata: DocMetadata,
