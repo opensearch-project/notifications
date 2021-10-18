@@ -180,7 +180,9 @@ export default class Notifications extends Component<
       sort_order: state.sortDirection,
       last_updated_time_ms: `${dateMath
         .parse(state.startTime)
-        ?.valueOf()}..${dateMath.parse(state.endTime)?.valueOf()}`,
+        ?.valueOf()}..${dateMath
+        .parse(state.endTime, { roundUp: true })
+        ?.valueOf()}`,
       ...filterParams,
     };
   }
