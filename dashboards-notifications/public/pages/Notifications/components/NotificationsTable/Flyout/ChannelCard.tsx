@@ -82,7 +82,11 @@ export function ChannelCard(props: ChannelCardProps) {
           let statusText = `${status.recipient}: `;
           if (status.delivery_status.status_text.startsWith('Success'))
             statusText += 'Success';
-          else if (status.delivery_status.status_code === '404')
+          else if (
+            status.delivery_status.status_code === '403' ||
+            status.delivery_status.status_code === '404'
+          )
+            // do not display recipient email if not found or no access
             statusText = status.delivery_status.status_text;
           else statusText += status.delivery_status.status_text;
           return (
