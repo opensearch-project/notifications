@@ -48,12 +48,12 @@ import org.opensearch.notifications.core.setting.PluginSettings
 import org.opensearch.notifications.core.utils.OpenForTesting
 import org.opensearch.notifications.core.utils.logger
 import org.opensearch.notifications.core.utils.string
-import org.opensearch.notifications.core.utils.validateUrlHost
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.WebhookDestination
+import org.opensearch.notifications.spi.utils.isHostInDenylist
 import org.opensearch.rest.RestStatus
 import java.io.IOException
 import java.nio.charset.StandardCharsets
@@ -115,7 +115,9 @@ class DestinationHttpClient {
         var response: CloseableHttpResponse? = null
         return try {
             // validate webhook url against host_deny_list in plugin settings
-            validateUrlHost(destination.url, PluginSettings.hostDenyList)
+            require(!isHostInDenylist(destination.url, PluginSettings.hostDenyList)) {
+                "Host of url is denied, based on plugin setting [notification.core.email.host_deny_list]"
+            }
             response = getHttpResponse(destination, message)
             validateResponseStatus(response)
             val responseString = getResponseString(response)

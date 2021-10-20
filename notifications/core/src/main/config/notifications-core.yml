@@ -29,14 +29,14 @@
 # configuration file for the notifications-core plugin
 opensearch.notifications.core:
   email:
-    sizeLimit: 10000
-    minimumHeaderLength: 100
+    sizeLimit: 10000000
+    minimumHeaderLength: 160
   http:
     maxConnections: 60
     maxConnectionPerRoute: 20
     connectionTimeout: 5000 # in milliseconds
     socketTimeout: 50000
-    hostDenyList: []
+    hostDenyList: ["127.0.0.1", "localhost"]
   allowedConfigTypes: ["slack","chime","webhook","email","sns","ses_account","smtp_account","email_group"]
   allowedConfigFeatures: ["alerting", "index_management", "reports"]
   tooltipSupport: true

@@ -49,7 +49,7 @@ internal class PluginSettingsTests {
         .put(httpMaxConnectionPerRouteKey, 20)
         .put(httpConnectionTimeoutKey, 5000)
         .put(httpSocketTimeoutKey, 50000)
-        .putList(httpHostDenyListKey, emptyList<String>())
+        .putList(httpHostDenyListKey, listOf("localhost", "127.0.0.1"))
         .putList(
             allowedConfigTypeKey,
             listOf(

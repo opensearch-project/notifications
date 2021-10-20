@@ -71,7 +71,7 @@ configurations.all {
         force "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
         force "commons-logging:commons-logging:1.2" // resolve for amazonaws
         force "commons-codec:commons-codec:1.13" // resolve for amazonaws
-        force "org.apache.httpcomponents:httpclient:4.5.10" // resolve for amazonaws
+        force "org.apache.httpcomponents:httpclient:4.5.13" // resolve for amazonaws
         force "org.apache.httpcomponents:httpcore:4.4.13" // resolve for amazonaws
         force "joda-time:joda-time:2.8.1" // Resolve for amazonaws
         force "com.fasterxml.jackson.core:jackson-core:2.11.4" // resolve for amazonaws

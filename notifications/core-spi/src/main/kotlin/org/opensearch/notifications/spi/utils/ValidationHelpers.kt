@@ -55,7 +55,7 @@ fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
         val ipStr = IPAddressString(url.host)
         for (network in hostDenyList) {
             val netStr = IPAddressString(network)
-            if (netStr.contains(ipStr)) {
+            if (netStr == ipStr || netStr.contains(ipStr)) {
                 return true
             }
         }
