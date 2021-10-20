@@ -25,6 +25,7 @@
  */
 
 import { Direction } from '@elastic/eui';
+import { WebhookMethodType } from '../public/pages/Channels/types';
 import {
   CHANNEL_TYPE,
   ENCRYPTION_TYPE,
@@ -79,6 +80,7 @@ export interface ChannelItemType extends ConfigType {
   webhook?: {
     url: string;
     header_params: object;
+    method: WebhookMethodType;
   };
   email?: {
     email_account_id: string;

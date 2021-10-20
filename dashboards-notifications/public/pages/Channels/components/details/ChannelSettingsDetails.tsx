@@ -168,6 +168,14 @@ export function ChannelSettingsDetails(props: ChannelSettingsDetailsProps) {
           description: CHANNEL_TYPE.webhook,
         },
         {
+          title: 'Method',
+          description: webhookObject.webhookMethod || '-',
+        },
+        {
+          title: 'Type',
+          description: webhookObject.customURLType || '-',
+        },
+        {
           title: 'Host',
           description: webhookObject.customURLHost || '-',
         },

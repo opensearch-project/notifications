@@ -113,7 +113,7 @@ export const SEVERITY_TYPE = Object.freeze({
 
 export const CUSTOM_WEBHOOK_ENDPOINT_TYPE = Object.freeze({
   WEBHOOK_URL: 'Webhook URL',
-  CUSTOM_URL: 'Custom attributes URL with HTTPS',
+  CUSTOM_URL: 'Custom attributes URL',
 });
 
 export const HISTOGRAM_TYPE = Object.freeze({

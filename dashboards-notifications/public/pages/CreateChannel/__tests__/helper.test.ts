@@ -9,6 +9,7 @@
  * GitHub history for details.
  */
 
+import { ChannelItemType } from '../../../../models/interfaces';
 import {
   constructEmailObject,
   constructWebhookObject,
@@ -19,9 +20,11 @@ import {
 describe('constructs and deconstructs webhook objects', () => {
   const args = [
     'https://test-webhook.com:1234/subdirectory?param1=value1&param2=&param3=value3',
+    'HTTPS',
     'test-webhook.com',
     '1234',
     'subdirectory',
+    'POST',
     [
       { key: 'param1', value: 'value1' },
       { key: 'param2', value: '' },
@@ -37,10 +40,11 @@ describe('constructs and deconstructs webhook objects', () => {
       { key: 'header3', value: 'value3' },
     ],
   ];
-  const webhookItem = {
+  const webhookItem: ChannelItemType['webhook'] = {
     url:
       'https://test-webhook.com:1234/subdirectory?param1=value1&param2=&param3=value3',
     header_params: { header1: 'value1', header2: '', header3: 'value3' },
+    method: 'POST',
   };
 
   it('constructs webhook objects', () => {
@@ -57,21 +61,25 @@ describe('constructs and deconstructs webhook objects', () => {
     const resultFromCustomURL = constructWebhookObject(
       'CUSTOM_URL',
       '',
+      'HTTPS',
       'test-webhook.com',
       '',
       '',
+      'POST',
       [],
       []
     );
     expect(resultFromCustomURL).toEqual({
       url: 'https://test-webhook.com',
       header_params: {},
+      method: 'POST',
     });
   });
 
   it('deconstructs webhook objects', () => {
     const {
       webhookURL,
+      customURLType,
       customURLHost,
       customURLPort,
       customURLPath,
@@ -79,9 +87,10 @@ describe('constructs and deconstructs webhook objects', () => {
       webhookHeaders,
     } = deconstructWebhookObject(webhookItem);
     expect(webhookURL).toEqual(args[0]);
-    expect(customURLHost).toEqual(args[1]);
-    expect(customURLPort).toEqual(args[2]);
-    expect(customURLPath).toEqual(args[3]);
+    expect(customURLType).toEqual(args[1]);
+    expect(customURLHost).toEqual(args[2]);
+    expect(customURLPort).toEqual(args[3]);
+    expect(customURLPath).toEqual(args[4]);
     expect(webhookParams).toEqual([
       { key: 'param1', value: 'value1' },
       { key: 'param2', value: '' },
@@ -104,7 +113,11 @@ describe('constructs and deconstructs webhook objects', () => {
       customURLPath,
       webhookParams,
       webhookHeaders,
-    } = deconstructWebhookObject({ url: 'invalid url', header_params: {} });
+    } = deconstructWebhookObject({
+      url: 'invalid url',
+      header_params: {},
+      method: 'POST',
+    });
     expect(webhookURL).toEqual('invalid url');
     expect(customURLHost).toEqual('');
     expect(customURLPort).toEqual('');

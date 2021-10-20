@@ -233,12 +233,12 @@ exports[`<ChannelSettingsDetails /> spec renders Webhook channel 1`] = `
         <dt
           class="euiDescriptionList__title"
         >
-          Host
+          Method
         </dt>
         <dd
           class="euiDescriptionList__description"
         >
-          host
+          POST
         </dd>
       </dl>
     </div>
@@ -252,12 +252,12 @@ exports[`<ChannelSettingsDetails /> spec renders Webhook channel 1`] = `
         <dt
           class="euiDescriptionList__title"
         >
-          Port
+          Type
         </dt>
         <dd
           class="euiDescriptionList__description"
         >
-          23
+          HTTPS
         </dd>
       </dl>
     </div>

@@ -105,7 +105,7 @@ const mockEmailWithSES: ChannelItemType = {
       'qQ_8gUxOPmIl9Il-5fv0': 'name5',
       '52KTe3xOdSwJeziY43zi': 'name6',
     },
-    invalid_ids: ["52KTe3xOdSwJeziY43zi"],
+    invalid_ids: ['52KTe3xOdSwJeziY43zi'],
     sender_type: 'ses_account',
   },
   config_id: 'QZT3mKxOCn6LSkzIsAzz',
@@ -129,6 +129,7 @@ const mockWebhook: ChannelItemType = {
       key5: 'value5',
       key6: 'value6',
     },
+    method: 'POST',
   },
   config_id: '7mUjsHkBqFjWrmvLc3nl',
   created_time_ms: 1622157784037,
@@ -242,7 +243,14 @@ const mockNotification: NotificationItem = {
 
 export const MOCK_DATA = {
   channels: {
-    items: [mockChime, mockSlack, mockEmail, mockEmailWithSES, mockWebhook, mockSNS],
+    items: [
+      mockChime,
+      mockSlack,
+      mockEmail,
+      mockEmailWithSES,
+      mockWebhook,
+      mockSNS,
+    ],
     total: 6,
   },
   chime: mockChime,
