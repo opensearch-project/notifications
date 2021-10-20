@@ -74,6 +74,31 @@ export function ChannelCard(props: ChannelCardProps) {
     );
   };
 
+  const renderEmailRecipientStatus = () => {
+    if (!props.channel.email_recipient_status?.length) return null;
+    return (
+      <EuiText size="s">
+        {props.channel.email_recipient_status.map((status, i) => {
+          let statusText = `${status.recipient}: `;
+          if (status.delivery_status.status_text.startsWith('Success'))
+            statusText += 'Success';
+          else if (
+            status.delivery_status.status_code === '403' ||
+            status.delivery_status.status_code === '404'
+          )
+            // do not display recipient email if not found or no access
+            statusText = status.delivery_status.status_text;
+          else statusText += status.delivery_status.status_text;
+          return (
+            <li key={`${status.recipient}-${i}`}>
+              {statusText} ({status.delivery_status.status_code})
+            </li>
+          );
+        })}
+      </EuiText>
+    );
+  };
+
   return (
     <>
       <EuiCard
@@ -110,9 +135,12 @@ export function ChannelCard(props: ChannelCardProps) {
         {!isStatusCodeSuccess(props.channel.delivery_status.status_code) &&
           renderList(
             'Error details',
-            <EuiText style={{ lineBreak: 'anywhere' }} size="s">
-              {props.channel.delivery_status.status_text}
-            </EuiText>
+            <>
+              <EuiText style={{ lineBreak: 'anywhere' }} size="s">
+                {props.channel.delivery_status.status_text}
+              </EuiText>
+              {renderEmailRecipientStatus()}
+            </>
           )}
       </EuiCard>
     </>
