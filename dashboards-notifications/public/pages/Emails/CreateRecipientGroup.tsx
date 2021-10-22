@@ -105,12 +105,15 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
     if (typeof id !== 'string') return;
 
     try {
-      const response =
-        await servicesContext.notificationService.getRecipientGroup(id);
+      const response = await servicesContext.notificationService.getRecipientGroup(
+        id
+      );
       setName(response.name);
       setDescription(response.description || '');
       setSelectedEmailOptions(
-        response.email_group.recipient_list.map((email) => ({ label: email }))
+        response.email_group.recipient_list.map((recipient) => ({
+          label: recipient.recipient,
+        }))
       );
     } catch (error) {
       coreContext.notifications.toasts.addDanger(
@@ -183,17 +186,20 @@ export function CreateRecipientGroup(props: CreateRecipientGroupProps) {
                     }.`
                   );
                   setTimeout(
-                    () => location.hash = `#${ROUTES.EMAIL_GROUPS}`,
+                    () => (location.hash = `#${ROUTES.EMAIL_GROUPS}`),
                     SERVER_DELAY
                   );
                 })
                 .catch((error) => {
                   setLoading(false);
-                  coreContext.notifications.toasts.addError(error?.body || error, {
-                    title: `Failed to ${
-                      props.edit ? 'update' : 'create'
-                    } sender.`,
-                  });
+                  coreContext.notifications.toasts.addError(
+                    error?.body || error,
+                    {
+                      title: `Failed to ${
+                        props.edit ? 'update' : 'create'
+                      } recipient group.`,
+                    }
+                  );
                 });
             }}
           >

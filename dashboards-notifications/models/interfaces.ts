@@ -127,7 +127,7 @@ export interface SESSenderItemType extends ConfigType {
 
 export interface RecipientGroupItemType extends ConfigType {
   email_group: {
-    recipient_list: string[];
+    recipient_list: { [recipient: string]: string }[];
   };
 }
 

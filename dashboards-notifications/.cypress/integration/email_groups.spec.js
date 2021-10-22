@@ -28,7 +28,7 @@ describe('Test create email senders', () => {
       .contains('Create SMTP sender')
       .click({ force: true });
     cy.get('[data-test-subj="create-sender-form-name-input"]').type(
-      'Test ssl sender'
+      'test-ssl-sender'
     );
     cy.get('.euiButton__text').contains('Create').click({ force: true });
     cy.contains('Some fields are invalid.').should('exist');
@@ -42,7 +42,7 @@ describe('Test create email senders', () => {
     cy.get('[data-test-subj="create-sender-form-port-input"]').type('123');
     cy.get('.euiButton__text').contains('Create').click({ force: true });
     cy.contains('successfully created.').should('exist');
-    cy.contains('Test ssl sender').should('exist');
+    cy.contains('test-ssl-sender').should('exist');
   });
 
   it('creates tls sender', () => {
@@ -50,7 +50,7 @@ describe('Test create email senders', () => {
       .contains('Create SMTP sender')
       .click({ force: true });
     cy.get('[data-test-subj="create-sender-form-name-input"]').type(
-      'Test tls sender'
+      'test-tls-sender'
     );
     cy.get('[data-test-subj="create-sender-form-email-input"]').type(
       'test@email.com'
@@ -68,7 +68,7 @@ describe('Test create email senders', () => {
 
     cy.get('.euiButton__text').contains('Create').click({ force: true });
     cy.contains('successfully created.').should('exist');
-    cy.contains('Test ssl sender').should('exist');
+    cy.contains('test-ssl-sender').should('exist');
   });
 
   it('creates SES sender', () => {
@@ -76,7 +76,7 @@ describe('Test create email senders', () => {
       .contains('Create SES sender')
       .click({ force: true });
     cy.get('[data-test-subj="create-ses-sender-form-name-input"]').type(
-      'Test ses sender'
+      'test-ses-sender'
     );
     cy.get('[data-test-subj="create-ses-sender-form-email-input"]').type(
       'test@email.com'
@@ -90,7 +90,7 @@ describe('Test create email senders', () => {
 
     cy.get('.euiButton__text').contains('Create').click({ force: true });
     cy.contains('successfully created.').should('exist');
-    cy.contains('Test ses sender').should('exist');
+    cy.contains('test-ses-sender').should('exist');
   });
 });
 

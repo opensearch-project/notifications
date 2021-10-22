@@ -99,7 +99,10 @@ export class RecipientGroupsTable extends Component<
         sortable: true,
         truncateText: true,
         width: '450px',
-        render: (emails: string[]) => {
+        render: (
+          recipient_list: RecipientGroupItemType['email_group']['recipient_list']
+        ) => {
+          const emails = recipient_list.map((recipient) => recipient.recipient);
           return (
             <div>
               {emails.slice(0, 5).join(', ')}
