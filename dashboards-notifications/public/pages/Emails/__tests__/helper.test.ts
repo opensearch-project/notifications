@@ -62,9 +62,9 @@ describe('creates sender and recipient groups as config object', () => {
       is_enabled: true,
       email_group: {
         recipient_list: [
-          'email1@test.com',
-          'email2@test.com',
-          'email3@test.com',
+          { recipient: 'email1@test.com' },
+          { recipient: 'email2@test.com' },
+          { recipient: 'email3@test.com' },
         ],
       },
     });
@@ -73,7 +73,10 @@ describe('creates sender and recipient groups as config object', () => {
 
 describe('handles combo box create option', () => {
   it('adds new option to combo box options', () => {
-    const options = [{label: 'selected-option'}, { label: 'existing-option' }];
+    const options = [
+      { label: 'selected-option' },
+      { label: 'existing-option' },
+    ];
     const selectedOptions = [options[0]];
     const setOptions = jest.fn();
     const setSelectedOptions = jest.fn();
@@ -88,11 +91,17 @@ describe('handles combo box create option', () => {
       setInputError
     );
     expect(setOptions).toBeCalledWith([...options, { label: 'new-option' }]);
-    expect(setSelectedOptions).toBeCalledWith([...selectedOptions, { label: 'new-option' }]);
+    expect(setSelectedOptions).toBeCalledWith([
+      ...selectedOptions,
+      { label: 'new-option' },
+    ]);
   });
-  
+
   it('selects existing option', () => {
-    const options = [{label: 'selected-option'}, { label: 'existing-option' }];
+    const options = [
+      { label: 'selected-option' },
+      { label: 'existing-option' },
+    ];
     const selectedOptions = [options[0]];
     const setOptions = jest.fn();
     const setSelectedOptions = jest.fn();
@@ -107,6 +116,9 @@ describe('handles combo box create option', () => {
       setInputError
     );
     expect(setOptions).not.toBeCalled();
-    expect(setSelectedOptions).toBeCalledWith([...selectedOptions, { label: 'existing-option' }]);
+    expect(setSelectedOptions).toBeCalledWith([
+      ...selectedOptions,
+      { label: 'existing-option' },
+    ]);
   });
 });

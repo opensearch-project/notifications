@@ -64,7 +64,9 @@ export const createRecipientGroupConfigObject = (
     feature_list: Object.keys(NOTIFICATION_SOURCE),
     is_enabled: true,
     email_group: {
-      recipient_list: selectedEmailOptions.map((email) => email.label),
+      recipient_list: selectedEmailOptions.map((email) => ({
+        recipient: email.label,
+      })),
     },
   };
 };

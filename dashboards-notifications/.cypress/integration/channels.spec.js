@@ -79,7 +79,7 @@ describe('Test create channels', () => {
 
     // custom data-test-subj does not work on combo box
     cy.get('[data-test-subj="comboBoxInput"]').eq(0).click({ force: true });
-    cy.contains('Test tls sender').click();
+    cy.contains('test-tls-sender').click();
 
     cy.get('.euiButton__text')
       .contains('Create recipient group')
@@ -121,7 +121,7 @@ describe('Test create channels', () => {
       .contains('Create SES sender')
       .click({ force: true });
     cy.get('[data-test-subj="create-ses-sender-form-name-input"]').type(
-      'Test ses sender'
+      'test-ses-sender'
     );
     cy.get('[data-test-subj="create-ses-sender-form-email-input"]').type(
       'test@email.com'
@@ -166,7 +166,7 @@ describe('Test create channels', () => {
   });
 
   it('creates a sns channel', () => {
-    cy.get('[placeholder="Enter channel name"]').type('Test sns channel');
+    cy.get('[placeholder="Enter channel name"]').type('test-sns-channel');
     cy.get('.euiCheckbox__input[id="reports"]').click({ force: true });
 
     cy.get('.euiSuperSelectControl').contains('Slack').click({ force: true });
