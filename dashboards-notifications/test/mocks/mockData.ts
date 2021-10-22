@@ -186,12 +186,12 @@ const mockRecipientGroup: RecipientGroupItemType = {
   last_updated_time_ms: 1622158742784,
   email_group: {
     recipient_list: [
-      'test1@email.com',
-      'test2@email.com',
-      'test3@email.com',
-      'test4@email.com',
-      'test5@email.com',
-      'test6@email.com',
+      { recipient: 'test1@email.com' },
+      { recipient: 'test2@email.com' },
+      { recipient: 'test3@email.com' },
+      { recipient: 'test4@email.com' },
+      { recipient: 'test5@email.com' },
+      { recipient: 'test6@email.com' },
     ],
   },
 };
