@@ -26,8 +26,8 @@ name: Test and Build Notifications
 on: [push, pull_request]
 
 env:
-  OPENSEARCH_VERSION: '1.1.0-SNAPSHOT'
-  OPENSEARCH_BRANCH: '1.1'
+  OPENSEARCH_VERSION: '1.2.0-SNAPSHOT'
+  OPENSEARCH_BRANCH: '1.x'
   COMMON_UTILS_BRANCH: 'main'
 
 jobs:

@@ -129,7 +129,7 @@ dependencies {
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
     testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.2')
     testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
-    testCompile "org.mockito:mockito-core:3.10.0"
+    testCompile "org.mockito:mockito-core:3.12.4"
     testCompile "org.opensearch.test:framework:${opensearch_version}"
     testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
     compile project(path: ":${rootProject.name}-core-spi", configuration: 'shadow')
