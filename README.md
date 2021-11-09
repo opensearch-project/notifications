@@ -122,3 +122,7 @@ This project is licensed under the Apache-2.0 License. See [LICENSE](LICENSE) fo
 ## Notice
 
 See [NOTICE](NOTICE) for more information.
+
+## Copyright
+
+Copyright OpenSearch Contributors. See [NOTICE](NOTICE) for details.
