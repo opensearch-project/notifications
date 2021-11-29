@@ -159,7 +159,10 @@ internal object PluginSettings {
     /**
      * Default email host deny list
      */
-    private val DEFAULT_HOST_DENY_LIST = emptyList<String>()
+    private val DEFAULT_HOST_DENY_LIST = listOf(
+        "localhost",
+        "127.0.0.1"
+    )
 
     /**
      * Default disable tooltip support
