@@ -19,7 +19,6 @@ buildscript {
         // For local publish dependency
         mavenLocal()
         mavenCentral()
-        jcenter()
     }
 
     dependencies {
@@ -49,7 +48,6 @@ allprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        jcenter()
     }
     group = "org.opensearch"
     plugins.withId('java') {
