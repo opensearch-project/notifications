@@ -11,6 +11,7 @@ module.exports = {
   testMatch: ['**/*.test.js', '**/*.test.jsx', '**/*.test.ts', '**/*.test.tsx'],
   clearMocks: true,
   modulePathIgnorePatterns: ['<rootDir>/offline-module-cache/'],
+  testEnvironment: 'jest-environment-jsdom',
   testPathIgnorePatterns: ['<rootDir>/build/', '<rootDir>/node_modules/'],
   snapshotSerializers: ['enzyme-to-json/serializer'],
   coveragePathIgnorePatterns: [

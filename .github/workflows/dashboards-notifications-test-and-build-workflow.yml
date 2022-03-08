@@ -60,7 +60,7 @@ jobs:
         with:
           timeout_minutes: 30
           max_attempts: 1
-          command: cd OpenSearch-Dashboards/plugins/dashboards-notifications; yarn test --coverage
+          command: cd OpenSearch-Dashboards/plugins/dashboards-notifications; yarn test:jest --coverage
 
       - name: Upload coverage
         uses: codecov/codecov-action@v1
