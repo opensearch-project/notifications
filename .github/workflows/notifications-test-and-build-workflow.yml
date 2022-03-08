@@ -9,8 +9,6 @@ on: [push, pull_request]
 
 env:
   OPENSEARCH_VERSION: '2.0.0-SNAPSHOT'
-  OPENSEARCH_BRANCH: 'main'
-  COMMON_UTILS_BRANCH: 'main'
 
 jobs:
   build:
@@ -21,28 +19,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.14
-
-       # dependencies: OpenSearch
-      - name: Checkout OpenSearch
-        uses: actions/checkout@v2
-        with:
-          repository: 'opensearch-project/OpenSearch'
-          path: OpenSearch
-          ref: ${{ env.OPENSEARCH_BRANCH }}
-      - name: Build OpenSearch
-        working-directory: ./OpenSearch
-        run: ./gradlew publishToMavenLocal
-
-      # dependencies: common-utils
-      - name: Checkout common-utils
-        uses: actions/checkout@v2
-        with:
-          repository: 'opensearch-project/common-utils'
-          ref: ${{ env.COMMON_UTILS_BRANCH }}
-          path: common-utils
-      - name: Build common-utils
-        working-directory: ./common-utils
-        run: ./gradlew publishToMavenLocal -Dopensearch.version=${{ env.OPENSEARCH_VERSION }}
 
       # notifications
       - name: Checkout Notifications
