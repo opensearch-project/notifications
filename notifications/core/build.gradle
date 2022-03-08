@@ -7,7 +7,6 @@ import org.opensearch.gradle.test.RestIntegTestTask
 
 plugins {
     id 'jacoco'
-    id 'maven'
     id 'maven-publish'
     id 'signing'
     id 'nebula.ospackage' version "8.5.4"
@@ -16,6 +15,8 @@ plugins {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven { url "https://plugins.gradle.org/m2/" }
+    maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
 }
 
 apply plugin: 'opensearch.opensearchplugin'
@@ -123,7 +124,7 @@ dependencies {
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
     testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.2')
     testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
-    testCompile "org.mockito:mockito-core:3.10.0"
+    testCompile "org.mockito:mockito-core:4.3.1"
     testCompile "org.opensearch.test:framework:${opensearch_version}"
     testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
     compile project(path: ":${rootProject.name}-core-spi", configuration: 'shadow')
