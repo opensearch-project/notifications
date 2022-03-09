@@ -20,18 +20,15 @@ import { CreateSender } from '../Emails/CreateSender';
 import { CreateSESSender } from '../Emails/CreateSESSender';
 import { EmailGroups } from '../Emails/EmailGroups';
 import { EmailSenders } from '../Emails/EmailSenders';
-import Notifications from '../Notifications';
 
 enum Navigation {
   Notifications = 'Notifications',
-  Dashboard = 'Dashboard',
   Channels = 'Channels',
   EmailSenders = 'Email senders',
   EmailGroups = 'Email recipient groups',
 }
 
 enum Pathname {
-  Notifications = '/notifications',
   Channels = '/channels',
 }
 
@@ -94,14 +91,8 @@ export default class Main extends Component<MainProps, MainState> {
       {
         name: Navigation.Notifications,
         id: 0,
-        href: `#${Pathname.Notifications}`,
+        href: `#${Pathname.Channels}`,
         items: [
-          {
-            name: Navigation.Dashboard,
-            id: 1,
-            href: `#${Pathname.Notifications}`,
-            isSelected: pathname === Pathname.Notifications,
-          },
           {
             name: Navigation.Channels,
             id: 2,
@@ -182,16 +173,6 @@ export default class Main extends Component<MainProps, MainState> {
                               )}
                             />
                             <Route
-                              path={ROUTES.NOTIFICATIONS}
-                              render={(props: RouteComponentProps) => (
-                                <Notifications
-                                  {...props}
-                                  services={services}
-                                  mainProps={this.state}
-                                />
-                              )}
-                            />
-                            <Route
                               path={ROUTES.EMAIL_SENDERS}
                               render={(props: RouteComponentProps) => (
                                 <EmailSenders {...props} />
@@ -239,7 +220,7 @@ export default class Main extends Component<MainProps, MainState> {
                                 <CreateRecipientGroup {...props} edit={true} />
                               )}
                             />
-                            <Redirect from="/" to={ROUTES.NOTIFICATIONS} />
+                            <Redirect from="/" to={ROUTES.CHANNELS} />
                           </Switch>
                         </EuiPageBody>
                       </EuiPage>
