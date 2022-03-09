@@ -14,7 +14,6 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import { Toast } from '@elastic/eui/src/components/toast/global_toast_list';
-import _ from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { ChannelItemType } from '../../../../../models/interfaces';
@@ -24,7 +23,6 @@ import { ModalConsumer } from '../../../../components/Modal';
 import { ServicesContext } from '../../../../services';
 import {
   BREADCRUMBS,
-  NOTIFICATION_SOURCE,
   ROUTES,
 } from '../../../../utils/constants';
 import { renderTime } from '../../../../utils/helpers';
@@ -127,16 +125,6 @@ export function ChannelDetails(props: ChannelDetailsProps) {
     },
   ];
 
-  const sources: Array<ListItemType> = [
-    {
-      title: 'Notification sources',
-      description:
-        channel?.feature_list
-          .map((source) => _.get(NOTIFICATION_SOURCE, source, '-'))
-          .join(', ') || '-',
-    },
-  ];
-
   return (
     <>
       <EuiGlobalToastList
@@ -227,17 +215,6 @@ export function ChannelDetails(props: ChannelDetailsProps) {
         panelStyles={{ maxWidth: 1300 }}
       >
         <ChannelSettingsDetails channel={channel} />
-      </ContentPanel>
-
-      <EuiSpacer />
-
-      <ContentPanel
-        bodyStyles={{ padding: 'initial' }}
-        title="Availability"
-        titleSize="s"
-        panelStyles={{ maxWidth: 1300 }}
-      >
-        <ChannelDetailItems listItems={sources} />
       </ContentPanel>
     </>
   );
