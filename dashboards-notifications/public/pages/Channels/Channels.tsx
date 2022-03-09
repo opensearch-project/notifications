@@ -29,7 +29,6 @@ import { NotificationService } from '../../services';
 import {
   BREADCRUMBS,
   CHANNEL_TYPE,
-  NOTIFICATION_SOURCE,
   ROUTES,
 } from '../../utils/constants';
 import { getErrorMessage } from '../../utils/helpers';
@@ -96,16 +95,6 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
         render: (type: string) => _.get(CHANNEL_TYPE, type, '-'),
       },
       {
-        field: 'feature_list',
-        name: 'Notification source',
-        sortable: true,
-        truncateText: true,
-        render: (features: string[]) =>
-          features
-            .map((feature) => _.get(NOTIFICATION_SOURCE, feature, '-'))
-            .join(', ') || '-',
-      },
-      {
         field: 'description',
         name: 'Description',
         sortable: true,
@@ -148,8 +137,6 @@ export class Channels extends Component<ChannelsProps, ChannelsState> {
     };
     if (state.filters.state != undefined)
       queryObject.is_enabled = state.filters.state;
-    if (!_.isEmpty(state.filters.source))
-      queryObject.feature_list = state.filters.source;
     return queryObject;
   }
 

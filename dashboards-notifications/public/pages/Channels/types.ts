@@ -20,5 +20,4 @@ export type WebhookHttpType = 'HTTP' | 'HTTPS';
 export interface ChannelFiltersType {
   state?: string;
   type?: string[];
-  source?: string[];
 }
