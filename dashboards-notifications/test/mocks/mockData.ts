@@ -222,8 +222,4 @@ export const MOCK_DATA = {
     items: [mockRecipientGroup],
     total: 1,
   },
-  notifications: {
-    items: [mockNotification],
-    total: 1,
-  },
 };
