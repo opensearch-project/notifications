@@ -325,7 +325,7 @@ export function CreateChannel(props: CreateChannelsProps) {
           throw error;
         });
 
-      await servicesContext.eventService.sendTestMessage(
+      await servicesContext.notificationService.sendTestMessage(
         tempChannelId,
         config.feature_list[0] // for test message any source works
       );

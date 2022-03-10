@@ -39,7 +39,7 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
 
   const sendTestMessage = async () => {
     try {
-      await servicesContext.eventService.sendTestMessage(
+      await servicesContext.notificationService.sendTestMessage(
         props.channel.config_id,
         props.channel.feature_list[0]
       );

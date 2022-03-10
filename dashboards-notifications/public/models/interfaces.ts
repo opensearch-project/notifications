@@ -4,9 +4,7 @@
  */
 
 import { NotificationService } from '../services';
-import EventService from '../services/EventService';
 
 export interface BrowserServices {
   notificationService: NotificationService;
-  eventService: EventService;
 }
