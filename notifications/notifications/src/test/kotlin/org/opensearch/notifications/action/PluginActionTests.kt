@@ -4,8 +4,6 @@
  */
 package org.opensearch.notifications.action
 
-import io.mockk.every
-import io.mockk.mockkObject
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.fail
@@ -40,9 +38,6 @@ import org.opensearch.commons.notifications.action.UpdateNotificationConfigRespo
 import org.opensearch.commons.notifications.model.ChannelList
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
 import org.opensearch.commons.notifications.model.NotificationEventSearchResult
-import org.opensearch.notifications.index.ConfigIndexingActions
-import org.opensearch.notifications.index.EventIndexingActions
-import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.rest.RestStatus
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
@@ -71,10 +66,6 @@ internal class PluginActionTests {
         val request = mock(CreateNotificationConfigRequest::class.java)
         val response = CreateNotificationConfigResponse(notificationId)
 
-        // Mock singleton's method by mockk framework
-        mockkObject(ConfigIndexingActions)
-        every { ConfigIndexingActions.create(request, any()) } returns response
-
         val createNotificationConfigAction = CreateNotificationConfigAction(
             transportService, client, actionFilters, xContentRegistry
         )
@@ -86,10 +77,6 @@ internal class PluginActionTests {
         val notificationId = "notification-1"
         val request = mock(UpdateNotificationConfigRequest::class.java)
         val response = UpdateNotificationConfigResponse(notificationId)
-
-        // Mock singleton's method by mockk framework
-        mockkObject(ConfigIndexingActions)
-        every { ConfigIndexingActions.update(request, any()) } returns response
 
         val updateNotificationConfigAction = UpdateNotificationConfigAction(
             transportService, client, actionFilters, xContentRegistry
@@ -104,10 +91,6 @@ internal class PluginActionTests {
             mapOf(Pair("sample_config_id", RestStatus.OK))
         )
 
-        // Mock singleton's method by mockk framework
-        mockkObject(ConfigIndexingActions)
-        every { ConfigIndexingActions.delete(request, any()) } returns response
-
         val deleteNotificationConfigAction = DeleteNotificationConfigAction(
             transportService, client, actionFilters, xContentRegistry
         )
@@ -121,10 +104,6 @@ internal class PluginActionTests {
             mock(NotificationConfigSearchResult::class.java)
         )
 
-        // Mock singleton's method by mockk framework
-        mockkObject(ConfigIndexingActions)
-        every { ConfigIndexingActions.get(request, any()) } returns response
-
         val getNotificationConfigAction = GetNotificationConfigAction(
             transportService, client, actionFilters, xContentRegistry
         )
@@ -137,10 +116,6 @@ internal class PluginActionTests {
         val response = GetNotificationEventResponse(
             mock(NotificationEventSearchResult::class.java)
         )
-
-        // Mock singleton's method by mockk framework
-        mockkObject(EventIndexingActions)
-        every { EventIndexingActions.get(request, any()) } returns response
 
         val getNotificationEventAction = GetNotificationEventAction(
             transportService, client, actionFilters, xContentRegistry
@@ -166,10 +141,6 @@ internal class PluginActionTests {
         val request = mock(GetChannelListRequest::class.java)
         val response = GetChannelListResponse(mock(ChannelList::class.java))
 
-        // Mock singleton's method by mockk framework
-        mockkObject(ConfigIndexingActions)
-        every { ConfigIndexingActions.getChannelList(request, any()) } returns response
-
         val getChannelListAction = GetChannelListAction(
             transportService, client, actionFilters, xContentRegistry
         )
@@ -181,10 +152,6 @@ internal class PluginActionTests {
         val notificationId = "notification-1"
         val request = mock(SendNotificationRequest::class.java)
         val response = SendNotificationResponse(notificationId)
-
-        // Mock singleton's method by mockk framework
-        mockkObject(SendMessageActionHelper)
-        every { SendMessageActionHelper.executeRequest(request) } returns response
 
         val sendNotificationAction = SendNotificationAction(
             transportService, client, actionFilters, xContentRegistry
@@ -198,10 +165,6 @@ internal class PluginActionTests {
         val response = LegacyPublishNotificationResponse(
             LegacyDestinationResponse.Builder().withStatusCode(200).withResponseContent("Hello world").build()
         )
-
-        // Mock singleton's method by mockk framework
-        mockkObject(SendMessageActionHelper)
-        every { SendMessageActionHelper.executeLegacyRequest(request) } returns response
 
         val publishNotificationAction = PublishNotificationAction(
             transportService, client, actionFilters, xContentRegistry

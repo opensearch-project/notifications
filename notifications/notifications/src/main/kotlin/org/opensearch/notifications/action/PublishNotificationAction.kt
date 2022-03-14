@@ -59,8 +59,19 @@ internal class PublishNotificationAction @Inject constructor(
      */
     override fun executeRequest(
         request: LegacyPublishNotificationRequest,
-        user: User?
-    ): LegacyPublishNotificationResponse {
-        return SendMessageActionHelper.executeLegacyRequest(request)
+        user: User?,
+        actionListener: ActionListener<LegacyPublishNotificationResponse>
+    ) {
+        SendMessageActionHelper.executeLegacyRequest(
+            request,
+            object : ActionListener<LegacyPublishNotificationResponse> {
+                override fun onResponse(response: LegacyPublishNotificationResponse) {
+                    actionListener.onResponse(response)
+                }
+                override fun onFailure(exception: Exception?) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 }

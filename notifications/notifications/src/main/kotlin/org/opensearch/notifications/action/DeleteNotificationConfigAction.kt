@@ -19,6 +19,7 @@ import org.opensearch.commons.utils.recreateObject
 import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
+import java.lang.Exception
 
 /**
  * Delete NotificationConfig transport action
@@ -55,8 +56,19 @@ internal class DeleteNotificationConfigAction @Inject constructor(
      */
     override fun executeRequest(
         request: DeleteNotificationConfigRequest,
-        user: User?
-    ): DeleteNotificationConfigResponse {
-        return ConfigIndexingActions.delete(request, user)
+        user: User?,
+        actionListener: ActionListener<DeleteNotificationConfigResponse>
+    ) {
+        ConfigIndexingActions.delete(
+            request, user,
+            object : ActionListener<DeleteNotificationConfigResponse> {
+                override fun onResponse(response: DeleteNotificationConfigResponse) {
+                    actionListener.onResponse(response)
+                }
+                override fun onFailure(exception: Exception?) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 }

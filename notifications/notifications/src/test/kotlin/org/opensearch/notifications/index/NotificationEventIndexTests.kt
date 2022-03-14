@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.anyLong
 import org.mockito.Mockito.mock
 import org.opensearch.action.ActionFuture
+import org.opensearch.action.ActionListener
 import org.opensearch.action.admin.indices.create.CreateIndexResponse
 import org.opensearch.action.get.GetRequest
 import org.opensearch.action.get.GetResponse
@@ -108,8 +109,17 @@ internal class NotificationEventIndexTests {
         mockkObject(NotificationEventDoc)
         every { NotificationEventDoc.parse(any()) } returns eventDoc
 
-        val actualEventDocInfo = NotificationEventIndex.getNotificationEvent(id)
-        assertEquals(expectedEventDocInfo, actualEventDocInfo)
+        NotificationEventIndex.getNotificationEvent(
+            id,
+            object : ActionListener<NotificationEventDocInfo> {
+                override fun onResponse(eventDoc: NotificationEventDocInfo?) {
+                    assertEquals(expectedEventDocInfo, eventDoc)
+                }
+                override fun onFailure(exception: Exception) {
+                    TODO("Not yet implemented")
+                }
+            }
+        )
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -138,8 +148,17 @@ internal class NotificationEventIndexTests {
         val mockGetResponse = mock(GetResponse::class.java)
         whenever(mockActionFuture.actionGet(anyLong())).thenReturn(mockGetResponse)
 
-        val actualEventDocInfo = NotificationEventIndex.getNotificationEvent(id)
-        assertNull(actualEventDocInfo)
+        NotificationEventIndex.getNotificationEvent(
+            id,
+            object : ActionListener<NotificationEventDocInfo> {
+                override fun onResponse(actualEventDocInfo: NotificationEventDocInfo?) {
+                    assertNull(actualEventDocInfo)
+                }
+                override fun onFailure(exception: Exception) {
+                    TODO("Not yet implemented")
+                }
+            }
+        )
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -154,7 +173,18 @@ internal class NotificationEventIndexTests {
         val mockActionGet = mock(CreateIndexResponse::class.java)
         mockCreateIndex(mockActionGet)
         Assertions.assertThrows(IllegalStateException::class.java) {
-            NotificationEventIndex.getNotificationEvent(id)
+            NotificationEventIndex.getNotificationEvent(
+                id,
+                object : ActionListener<NotificationEventDocInfo> {
+                    override fun onResponse(eventDoc: NotificationEventDocInfo?) {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun onFailure(exception: Exception) {
+                        throw exception
+                    }
+                }
+            )
         }
     }
 
@@ -166,7 +196,18 @@ internal class NotificationEventIndexTests {
         // mocking the dependencies for isIndexExists function
         mockIsIndexExists()
         Assertions.assertThrows(Exception::class.java) {
-            NotificationEventIndex.getNotificationEvent(id)
+            NotificationEventIndex.getNotificationEvent(
+                id,
+                object : ActionListener<NotificationEventDocInfo> {
+                    override fun onResponse(eventDoc: NotificationEventDocInfo?) {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun onFailure(exception: Exception) {
+                        throw exception
+                    }
+                }
+            )
         }
     }
 

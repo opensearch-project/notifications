@@ -55,10 +55,16 @@ internal class GetPluginFeaturesAction @Inject constructor(
      */
     override fun executeRequest(
         request: GetPluginFeaturesRequest,
-        user: User?
-    ): GetPluginFeaturesResponse {
+        user: User?,
+        actionListener: ActionListener<GetPluginFeaturesResponse>
+    ) {
         val allowedConfigTypes = CoreProvider.core.getAllowedConfigTypes()
         val pluginFeatures = CoreProvider.core.getPluginFeatures()
-        return GetPluginFeaturesResponse(allowedConfigTypes, pluginFeatures)
+        actionListener.onResponse(
+            GetPluginFeaturesResponse(
+                allowedConfigTypes,
+                pluginFeatures
+            )
+        )
     }
 }

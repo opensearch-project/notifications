@@ -55,8 +55,19 @@ internal class SendNotificationAction @Inject constructor(
      */
     override fun executeRequest(
         request: SendNotificationRequest,
-        user: User?
-    ): SendNotificationResponse {
-        return SendMessageActionHelper.executeRequest(request)
+        user: User?,
+        actionListener: ActionListener<SendNotificationResponse>
+    ) {
+        SendMessageActionHelper.executeRequest(
+            request,
+            object : ActionListener<SendNotificationResponse> {
+                override fun onResponse(response: SendNotificationResponse) {
+                    actionListener.onResponse(response)
+                }
+                override fun onFailure(exception: Exception?) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 }

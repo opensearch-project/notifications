@@ -55,8 +55,20 @@ internal class CreateNotificationConfigAction @Inject constructor(
      */
     override fun executeRequest(
         request: CreateNotificationConfigRequest,
-        user: User?
-    ): CreateNotificationConfigResponse {
-        return ConfigIndexingActions.create(request, user)
+        user: User?,
+        actionListener: ActionListener<CreateNotificationConfigResponse>
+    ) {
+        ConfigIndexingActions.create(
+            request, user,
+            object : ActionListener<CreateNotificationConfigResponse> {
+                override fun onResponse(response: CreateNotificationConfigResponse) {
+                    actionListener.onResponse(response)
+                }
+
+                override fun onFailure(exception: Exception?) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 }

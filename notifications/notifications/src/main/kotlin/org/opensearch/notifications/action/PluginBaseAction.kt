@@ -57,52 +57,62 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
         val user: User? = User.parse(userStr)
         val storedThreadContext = client.threadPool().threadContext.newStoredContext(false)
         scope.launch {
-            try {
-                client.threadPool().threadContext.stashContext().use {
-                    storedThreadContext.restore()
-                    listener.onResponse(executeRequest(request as Request, user))
-                }
-            } catch (exception: OpenSearchStatusException) {
-                Metrics.NOTIFICATIONS_EXCEPTIONS_OS_STATUS_EXCEPTION.counter.increment()
-                log.warn("$LOG_PREFIX:OpenSearchStatusException:", exception)
-                listener.onFailure(exception)
-            } catch (exception: OpenSearchSecurityException) {
-                Metrics.NOTIFICATIONS_EXCEPTIONS_OS_SECURITY_EXCEPTION.counter.increment()
-                log.warn("$LOG_PREFIX:OpenSearchSecurityException:", exception)
-                listener.onFailure(
-                    OpenSearchStatusException(
-                        "Permissions denied: ${exception.message} - Contact administrator",
-                        RestStatus.FORBIDDEN
-                    )
+            client.threadPool().threadContext.stashContext().use {
+                storedThreadContext.restore()
+                executeRequest(
+                    request as Request, user,
+                    object : ActionListener<Response> {
+                        override fun onResponse(response: Response) {
+                            listener.onResponse(response)
+                        }
+                        override fun onFailure(exception: Exception?) {
+                            try {
+                                throw exception!!
+                            } catch (exception: OpenSearchStatusException) {
+                                Metrics.NOTIFICATIONS_EXCEPTIONS_OS_STATUS_EXCEPTION.counter.increment()
+                                log.warn("$LOG_PREFIX:OpenSearchStatusException:", exception)
+                                listener.onFailure(exception)
+                            } catch (exception: OpenSearchSecurityException) {
+                                Metrics.NOTIFICATIONS_EXCEPTIONS_OS_SECURITY_EXCEPTION.counter.increment()
+                                log.warn("$LOG_PREFIX:OpenSearchSecurityException:", exception)
+                                listener.onFailure(
+                                    OpenSearchStatusException(
+                                        "Permissions denied: ${exception.message} - Contact administrator",
+                                        RestStatus.FORBIDDEN
+                                    )
+                                )
+                            } catch (exception: VersionConflictEngineException) {
+                                Metrics.NOTIFICATIONS_EXCEPTIONS_VERSION_CONFLICT_ENGINE_EXCEPTION.counter.increment()
+                                log.warn("$LOG_PREFIX:VersionConflictEngineException:", exception)
+                                listener.onFailure(OpenSearchStatusException(exception.message, RestStatus.CONFLICT))
+                            } catch (exception: IndexNotFoundException) {
+                                Metrics.NOTIFICATIONS_EXCEPTIONS_INDEX_NOT_FOUND_EXCEPTION.counter.increment()
+                                log.warn("$LOG_PREFIX:IndexNotFoundException:", exception)
+                                listener.onFailure(OpenSearchStatusException(exception.message, RestStatus.NOT_FOUND))
+                            } catch (exception: InvalidIndexNameException) {
+                                Metrics.NOTIFICATIONS_EXCEPTIONS_INVALID_INDEX_NAME_EXCEPTION.counter.increment()
+                                log.warn("$LOG_PREFIX:InvalidIndexNameException:", exception)
+                                listener.onFailure(OpenSearchStatusException(exception.message, RestStatus.BAD_REQUEST))
+                            } catch (exception: IllegalArgumentException) {
+                                Metrics.NOTIFICATIONS_EXCEPTIONS_ILLEGAL_ARGUMENT_EXCEPTION.counter.increment()
+                                log.warn("$LOG_PREFIX:IllegalArgumentException:", exception)
+                                listener.onFailure(OpenSearchStatusException(exception.message, RestStatus.BAD_REQUEST))
+                            } catch (exception: IllegalStateException) {
+                                Metrics.NOTIFICATIONS_EXCEPTIONS_ILLEGAL_STATE_EXCEPTION.counter.increment()
+                                log.warn("$LOG_PREFIX:IllegalStateException:", exception)
+                                listener.onFailure(OpenSearchStatusException(exception.message, RestStatus.SERVICE_UNAVAILABLE))
+                            } catch (exception: IOException) {
+                                Metrics.NOTIFICATIONS_EXCEPTIONS_IO_EXCEPTION.counter.increment()
+                                log.error("$LOG_PREFIX:Uncaught IOException:", exception)
+                                listener.onFailure(OpenSearchStatusException(exception.message, RestStatus.FAILED_DEPENDENCY))
+                            } catch (exception: Exception) {
+                                Metrics.NOTIFICATIONS_EXCEPTIONS_INTERNAL_SERVER_ERROR.counter.increment()
+                                log.error("$LOG_PREFIX:Uncaught Exception:", exception)
+                                listener.onFailure(OpenSearchStatusException(exception.message, RestStatus.INTERNAL_SERVER_ERROR))
+                            }
+                        }
+                    }
                 )
-            } catch (exception: VersionConflictEngineException) {
-                Metrics.NOTIFICATIONS_EXCEPTIONS_VERSION_CONFLICT_ENGINE_EXCEPTION.counter.increment()
-                log.warn("$LOG_PREFIX:VersionConflictEngineException:", exception)
-                listener.onFailure(OpenSearchStatusException(exception.message, RestStatus.CONFLICT))
-            } catch (exception: IndexNotFoundException) {
-                Metrics.NOTIFICATIONS_EXCEPTIONS_INDEX_NOT_FOUND_EXCEPTION.counter.increment()
-                log.warn("$LOG_PREFIX:IndexNotFoundException:", exception)
-                listener.onFailure(OpenSearchStatusException(exception.message, RestStatus.NOT_FOUND))
-            } catch (exception: InvalidIndexNameException) {
-                Metrics.NOTIFICATIONS_EXCEPTIONS_INVALID_INDEX_NAME_EXCEPTION.counter.increment()
-                log.warn("$LOG_PREFIX:InvalidIndexNameException:", exception)
-                listener.onFailure(OpenSearchStatusException(exception.message, RestStatus.BAD_REQUEST))
-            } catch (exception: IllegalArgumentException) {
-                Metrics.NOTIFICATIONS_EXCEPTIONS_ILLEGAL_ARGUMENT_EXCEPTION.counter.increment()
-                log.warn("$LOG_PREFIX:IllegalArgumentException:", exception)
-                listener.onFailure(OpenSearchStatusException(exception.message, RestStatus.BAD_REQUEST))
-            } catch (exception: IllegalStateException) {
-                Metrics.NOTIFICATIONS_EXCEPTIONS_ILLEGAL_STATE_EXCEPTION.counter.increment()
-                log.warn("$LOG_PREFIX:IllegalStateException:", exception)
-                listener.onFailure(OpenSearchStatusException(exception.message, RestStatus.SERVICE_UNAVAILABLE))
-            } catch (exception: IOException) {
-                Metrics.NOTIFICATIONS_EXCEPTIONS_IO_EXCEPTION.counter.increment()
-                log.error("$LOG_PREFIX:Uncaught IOException:", exception)
-                listener.onFailure(OpenSearchStatusException(exception.message, RestStatus.FAILED_DEPENDENCY))
-            } catch (exception: Exception) {
-                Metrics.NOTIFICATIONS_EXCEPTIONS_INTERNAL_SERVER_ERROR.counter.increment()
-                log.error("$LOG_PREFIX:Uncaught Exception:", exception)
-                listener.onFailure(OpenSearchStatusException(exception.message, RestStatus.INTERNAL_SERVER_ERROR))
             }
         }
     }
@@ -111,9 +121,10 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
      * Execute the transport request
      * @param request the request to execute
      * @param user the user context given by security plugin
+     * @param actionListener the listener which listens for response
      * @return the response to return.
      */
-    abstract fun executeRequest(request: Request, user: User?): Response
+    abstract fun executeRequest(request: Request, user: User?, actionListener: ActionListener<Response>)
 
     /**
      * Executes the given [block] function on this resource and then closes it down correctly whether an exception

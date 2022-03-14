@@ -9,6 +9,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.opensearch.OpenSearchStatusException
+import org.opensearch.action.ActionListener
 import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.commons.authuser.User
@@ -79,59 +80,106 @@ object SendMessageActionHelper {
      * Send notification message and keep audit.
      * @param request request object
      */
-    fun executeRequest(request: SendNotificationRequest): SendNotificationResponse {
+    fun executeRequest(
+        request: SendNotificationRequest,
+        actionListener: ActionListener<SendNotificationResponse>
+    ) {
+
         val eventSource = request.eventSource
         val channelMessage = request.channelMessage
         val channelIds = request.channelIds.toSet()
         val user: User? = User.parse(request.threadContext)
+
         val createdTime = Instant.now()
         userAccess.validateUser(user)
-        val channelMap = getConfigs(channelIds)
-        val childConfigMap = getConfigs(getChildConfigIds(channelMap.values.filterNotNull().toList()))
-        val message = createMessageContent(eventSource, channelMessage)
-        val eventStatusList = sendMessagesInParallel(user, eventSource, channelMap, childConfigMap, message)
-        val updatedTime = Instant.now()
-        val docMetadata = DocMetadata(
-            updatedTime,
-            createdTime,
-            userAccess.getAllAccessInfo(user)
-        )
-        val event = NotificationEvent(eventSource, eventStatusList)
-        val eventDoc = NotificationEventDoc(docMetadata, event)
-        val docId = eventOperations.createNotificationEvent(eventDoc)
-            ?: run {
-                Metrics.NOTIFICATIONS_SEND_MESSAGE_SYSTEM_ERROR.counter.increment()
-                throw OpenSearchStatusException("Indexing not Acknowledged", RestStatus.INSUFFICIENT_STORAGE)
-            }
-        // traverse status to determine HTTP status code
-        var overallStatusCode = eventStatusList.first().deliveryStatus?.statusCode
-        eventStatusList.forEach { eventStatus ->
-            if (eventStatus.deliveryStatus?.statusCode != overallStatusCode) {
-                overallStatusCode = RestStatus.MULTI_STATUS.status.toString()
-            }
-        }
-        val eventStatusListString = eventStatusList.joinToString(",", "[", "]") { getJsonString(it) }
-        if (overallStatusCode != RestStatus.OK.status.toString()) {
-            val errorMessage = "{\"notification_id\": \"$docId\",\"event_status_list\": $eventStatusListString}"
-            throw OpenSearchStatusException(
-                errorMessage, RestStatus.fromCode(overallStatusCode!!.toInt())
-            )
-        }
 
-        return SendNotificationResponse(docId)
+        getConfigs(
+            channelIds,
+            object : ActionListener<Map<String, NotificationConfigDocInfo?>> {
+
+                override fun onResponse(channelMap: Map<String, NotificationConfigDocInfo?>) {
+                    getConfigs(
+                        getChildConfigIds(channelMap.values.filterNotNull().toList()),
+                        object : ActionListener<Map<String, NotificationConfigDocInfo?>> {
+                            override fun onResponse(childConfigMap: Map<String, NotificationConfigDocInfo?>) {
+                                val message = createMessageContent(eventSource, channelMessage)
+                                val eventStatusList = sendMessagesInParallel(user, eventSource, channelMap, childConfigMap, message)
+                                val updatedTime = Instant.now()
+                                val docMetadata = DocMetadata(
+                                    updatedTime,
+                                    createdTime,
+                                    userAccess.getAllAccessInfo(user)
+                                )
+                                val event = NotificationEvent(eventSource, eventStatusList)
+                                val eventDoc = NotificationEventDoc(docMetadata, event)
+                                eventOperations.createNotificationEvent(
+                                    eventDoc, null,
+                                    object : ActionListener<String> {
+                                        override fun onResponse(docId: String) {
+                                            docId ?: run {
+                                                Metrics.NOTIFICATIONS_SEND_MESSAGE_SYSTEM_ERROR.counter.increment()
+                                                throw OpenSearchStatusException("Indexing not Acknowledged", RestStatus.INSUFFICIENT_STORAGE)
+                                            }
+                                            // traverse status to determine HTTP status code
+                                            var overallStatusCode = eventStatusList.first().deliveryStatus?.statusCode
+                                            eventStatusList.forEach { eventStatus ->
+                                                if (eventStatus.deliveryStatus?.statusCode != overallStatusCode) {
+                                                    overallStatusCode = RestStatus.MULTI_STATUS.status.toString()
+                                                }
+                                            }
+                                            val eventStatusListString = eventStatusList.joinToString(",", "[", "]") { getJsonString(it) }
+                                            if (overallStatusCode != RestStatus.OK.status.toString()) {
+                                                val errorMessage = "{\"notification_id\": \"$docId\",\"event_status_list\": $eventStatusListString}"
+                                                throw OpenSearchStatusException(
+                                                    errorMessage, RestStatus.fromCode(overallStatusCode!!.toInt())
+                                                )
+                                            }
+                                            actionListener.onResponse(SendNotificationResponse(docId))
+                                        }
+
+                                        override fun onFailure(exception: Exception) {
+                                            actionListener.onFailure(exception)
+                                        }
+                                    }
+                                )
+                            }
+
+                            override fun onFailure(exception: Exception) {
+                                actionListener.onFailure(exception)
+                            }
+                        }
+                    )
+                }
+
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 
     /**
      * Send legacy notification message intended only for Index Management plugin.
      * @param request request object
      */
-    fun executeLegacyRequest(request: LegacyPublishNotificationRequest): LegacyPublishNotificationResponse {
+    fun executeLegacyRequest(
+        request: LegacyPublishNotificationRequest,
+        actionListener: ActionListener<LegacyPublishNotificationResponse>
+    ) {
         val baseMessage = request.baseMessage
-        val response: LegacyDestinationResponse
-        runBlocking {
-            response = sendMessageToLegacyDestination(baseMessage)
-        }
-        return LegacyPublishNotificationResponse(response)
+
+        sendMessageToLegacyDestination(
+            baseMessage,
+            object : ActionListener<LegacyDestinationResponse> {
+                override fun onResponse(response: LegacyDestinationResponse) {
+                    actionListener.onResponse(LegacyPublishNotificationResponse(response))
+                }
+
+                override fun onFailure(exception: java.lang.Exception?) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 
     /**
@@ -282,43 +330,49 @@ object SendMessageActionHelper {
      * @param baseMessage legacy base message
      * @return notification delivery status for the legacy destination
      */
-    private fun sendMessageToLegacyDestination(baseMessage: LegacyBaseMessage): LegacyDestinationResponse {
+    private fun sendMessageToLegacyDestination(
+        baseMessage: LegacyBaseMessage,
+        actionListener: ActionListener<LegacyDestinationResponse>
+    ) {
         val message =
-            MessageContent(title = "Legacy Notification", textDescription = baseMessage.messageContent)
-        // These legacy destination calls do not have reference Ids, just passing 'legacy' constant
-        return when (baseMessage.channelType) {
-            LegacyDestinationType.LEGACY_SLACK -> {
-                val destination = SlackDestination(baseMessage.url)
-                val status = sendMessageThroughSpi(destination, message, "legacy")
-                LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
-                    .withResponseContent(status.statusText).build()
+            MessageContent(title = "Index Management Notification", textDescription = baseMessage.messageContent)
+        // These legacy destination calls do not have reference Ids, just passing index management feature constant
+        actionListener.onResponse(
+            when (baseMessage.channelType) {
+                LegacyDestinationType.LEGACY_SLACK -> {
+                    val destination = SlackDestination(baseMessage.url)
+                    val status = sendMessageThroughSpi(destination, message, "legacy")
+                    LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
+                        .withResponseContent(status.statusText).build()
+                }
+                LegacyDestinationType.LEGACY_CHIME -> {
+                    val destination = ChimeDestination(baseMessage.url)
+                    val status = sendMessageThroughSpi(destination, message, "legacy")
+                    LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
+                        .withResponseContent(status.statusText).build()
+                }
+                LegacyDestinationType.LEGACY_CUSTOM_WEBHOOK -> {
+                    val destination = CustomWebhookDestination(
+                        (baseMessage as LegacyCustomWebhookMessage).uri.toString(),
+                        baseMessage.headerParams,
+                        baseMessage.method
+                    )
+                    val status = sendMessageThroughSpi(destination, message, "legacy")
+                    LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
+                        .withResponseContent(status.statusText).build()
+                }
+                null -> {
+                    log.warn("No channel type given (null) for publishing to legacy destination")
+                    LegacyDestinationResponse.Builder().withStatusCode(400)
+                        .withResponseContent("No channel type given (null) for publishing to legacy destination").build()
+                }
             }
-            LegacyDestinationType.LEGACY_CHIME -> {
-                val destination = ChimeDestination(baseMessage.url)
-                val status = sendMessageThroughSpi(destination, message, "legacy")
-                LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
-                    .withResponseContent(status.statusText).build()
-            }
-            LegacyDestinationType.LEGACY_CUSTOM_WEBHOOK -> {
-                val destination = CustomWebhookDestination(
-                    (baseMessage as LegacyCustomWebhookMessage).uri.toString(),
-                    baseMessage.headerParams,
-                    baseMessage.method
-                )
-                val status = sendMessageThroughSpi(destination, message, "legacy")
-                LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
-                    .withResponseContent(status.statusText).build()
-            }
-            null -> {
-                log.warn("No channel type given (null) for publishing to legacy destination")
-                LegacyDestinationResponse.Builder().withStatusCode(400)
-                    .withResponseContent("No channel type given (null) for publishing to legacy destination").build()
-            }
-        }
+        )
     }
 
     /**
      * Check if channel is eligible to send message, return error status if not
+     * @param eventSource event source information
      * @param channel channel info
      * @return null if channel is eligible to send message. error delivery status if not
      */
@@ -583,11 +637,14 @@ object SendMessageActionHelper {
      * @param configIds config id set
      * @return map of config id to [NotificationConfigDocInfo]
      */
-    private fun getConfigs(configIds: Set<String>): Map<String, NotificationConfigDocInfo?> {
-        return when (configIds.size) {
-            0 -> emptyMap()
-            1 -> getSingleConfig(configIds.first())
-            else -> getAllConfigs(configIds)
+    private fun getConfigs(
+        configIds: Set<String>,
+        actionListener: ActionListener<Map<String, NotificationConfigDocInfo?>>
+    ) {
+        when (configIds.size) {
+            0 -> getEmptyConfig(actionListener)
+            1 -> getSingleConfig(configIds.first(), actionListener)
+            else -> getAllConfigs(configIds, actionListener)
         }
     }
 
@@ -596,17 +653,32 @@ object SendMessageActionHelper {
      * @param configIds config id set
      * @return map of config id to [NotificationConfigDocInfo]
      */
-    private fun getAllConfigs(configIds: Set<String>): Map<String, NotificationConfigDocInfo?> {
+    private fun getAllConfigs(
+        configIds: Set<String>,
+        actionListener: ActionListener<Map<String, NotificationConfigDocInfo?>>
+    ) {
         log.info("$LOG_PREFIX:getAllConfigs-get $configIds")
-        val configDocs = configOperations.getNotificationConfigs(configIds)
-        val configMap = mutableMapOf<String, NotificationConfigDocInfo?>()
-        configIds.forEach { configMap[it] = null }
-        configDocs.forEach { configMap[it.docInfo.id!!] = it }
-        if (configDocs.size != configIds.size) {
-            val invalidConfigIds = configMap.filterValues { it == null }.keys
-            log.error("$LOG_PREFIX:getAllConfigs $invalidConfigIds not found")
-        }
-        return configMap
+
+        configOperations.getNotificationConfigs(
+            configIds,
+            object : ActionListener<List<NotificationConfigDocInfo>> {
+
+                override fun onResponse(configDocs: List<NotificationConfigDocInfo>) {
+                    val configMap = mutableMapOf<String, NotificationConfigDocInfo?>()
+                    configIds.forEach { configMap[it] = null }
+                    configDocs.forEach { configMap[it.docInfo.id!!] = it }
+                    if (configDocs.size != configIds.size) {
+                        val invalidConfigIds = configMap.filterValues { it == null }.keys
+                        log.error("$LOG_PREFIX:getAllConfigs $invalidConfigIds not found")
+                    }
+                    actionListener.onResponse(configMap)
+                }
+
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 
     /**
@@ -614,10 +686,26 @@ object SendMessageActionHelper {
      * @param configId config id
      * @return map of config id to [NotificationConfigDocInfo]
      */
-    private fun getSingleConfig(configId: String): Map<String, NotificationConfigDocInfo?> {
+    private fun getSingleConfig(
+        configId: String,
+        actionListener: ActionListener<Map<String, NotificationConfigDocInfo?>>
+    ) {
         log.info("$LOG_PREFIX:getSingleConfig-get $configId")
-        val configDoc = configOperations.getNotificationConfig(configId)
-        return mapOf(configId to configDoc)
+        configOperations.getNotificationConfig(
+            configId,
+            object : ActionListener<NotificationConfigDocInfo> {
+                override fun onResponse(configDoc: NotificationConfigDocInfo) {
+                    actionListener.onResponse(mapOf(configId to configDoc))
+                }
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
+    }
+
+    private fun getEmptyConfig(actionListener: ActionListener<Map<String, NotificationConfigDocInfo?>>) {
+        actionListener.onResponse(emptyMap())
     }
 
     /**

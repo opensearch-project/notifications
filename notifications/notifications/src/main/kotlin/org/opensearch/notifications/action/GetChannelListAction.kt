@@ -19,6 +19,7 @@ import org.opensearch.commons.utils.recreateObject
 import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
+import java.lang.Exception
 
 /**
  * Get channel list transport action
@@ -55,8 +56,19 @@ internal class GetChannelListAction @Inject constructor(
      */
     override fun executeRequest(
         request: GetChannelListRequest,
-        user: User?
-    ): GetChannelListResponse {
-        return ConfigIndexingActions.getChannelList(request, user)
+        user: User?,
+        actionListener: ActionListener<GetChannelListResponse>
+    ) {
+        ConfigIndexingActions.getChannelList(
+            request, user,
+            object : ActionListener<GetChannelListResponse> {
+                override fun onResponse(response: GetChannelListResponse) {
+                    actionListener.onResponse(response)
+                }
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 }

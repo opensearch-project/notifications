@@ -19,6 +19,7 @@ import org.opensearch.commons.utils.recreateObject
 import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
+import java.lang.Exception
 
 /**
  * Update NotificationConfig transport action
@@ -55,8 +56,19 @@ internal class UpdateNotificationConfigAction @Inject constructor(
      */
     override fun executeRequest(
         request: UpdateNotificationConfigRequest,
-        user: User?
-    ): UpdateNotificationConfigResponse {
-        return ConfigIndexingActions.update(request, user)
+        user: User?,
+        actionListener: ActionListener<UpdateNotificationConfigResponse>
+    ) {
+        ConfigIndexingActions.update(
+            request, user,
+            object : ActionListener<UpdateNotificationConfigResponse> {
+                override fun onResponse(response: UpdateNotificationConfigResponse) {
+                    actionListener.onResponse(response)
+                }
+                override fun onFailure(exception: Exception?) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 }

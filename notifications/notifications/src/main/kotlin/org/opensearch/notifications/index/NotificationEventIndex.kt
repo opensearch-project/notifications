@@ -6,16 +6,23 @@
 package org.opensearch.notifications.index
 
 import org.opensearch.ResourceAlreadyExistsException
+import org.opensearch.action.ActionListener
 import org.opensearch.action.DocWriteResponse
 import org.opensearch.action.admin.indices.create.CreateIndexRequest
 import org.opensearch.action.bulk.BulkRequest
+import org.opensearch.action.bulk.BulkResponse
 import org.opensearch.action.delete.DeleteRequest
+import org.opensearch.action.delete.DeleteResponse
 import org.opensearch.action.get.GetRequest
 import org.opensearch.action.get.GetResponse
 import org.opensearch.action.get.MultiGetRequest
+import org.opensearch.action.get.MultiGetResponse
 import org.opensearch.action.index.IndexRequest
+import org.opensearch.action.index.IndexResponse
 import org.opensearch.action.search.SearchRequest
+import org.opensearch.action.search.SearchResponse
 import org.opensearch.action.update.UpdateRequest
+import org.opensearch.action.update.UpdateResponse
 import org.opensearch.client.Client
 import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.unit.TimeValue
@@ -123,7 +130,11 @@ internal object NotificationEventIndex : EventOperations {
     /**
      * {@inheritDoc}
      */
-    override fun createNotificationEvent(eventDoc: NotificationEventDoc, id: String?): String? {
+    override fun createNotificationEvent(
+        eventDoc: NotificationEventDoc,
+        id: String?,
+        actionListener: ActionListener<String>
+    ) {
         createIndex()
         val indexRequest = IndexRequest(INDEX_NAME)
             .source(eventDoc.toXContent())
@@ -131,37 +142,71 @@ internal object NotificationEventIndex : EventOperations {
         if (id != null) {
             indexRequest.id(id)
         }
-        val actionFuture = client.index(indexRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        return if (response.result != DocWriteResponse.Result.CREATED) {
-            log.warn("$LOG_PREFIX:createNotificationEvent - response:$response")
-            null
-        } else {
-            response.id
-        }
+        client.index(
+            indexRequest,
+            object : ActionListener<IndexResponse> {
+                override fun onResponse(response: IndexResponse) {
+                    if (response.result != DocWriteResponse.Result.CREATED) {
+                        log.warn("$LOG_PREFIX:createNotificationEvent - response:$response")
+                        actionListener.onResponse(null)
+                    } else {
+                        actionListener.onResponse(response.id)
+                    }
+                }
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun getNotificationEvents(ids: Set<String>): List<NotificationEventDocInfo> {
+    override fun getNotificationEvents(
+        ids: Set<String>,
+        actionListener: ActionListener<List<NotificationEventDocInfo>>
+    ) {
         createIndex()
         val getRequest = MultiGetRequest()
         ids.forEach { getRequest.add(INDEX_NAME, it) }
-        val actionFuture = client.multiGet(getRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        return response.responses.mapNotNull { parseNotificationEventDoc(it.id, it.response) }
+        client.multiGet(
+            getRequest,
+            object : ActionListener<MultiGetResponse> {
+                override fun onResponse(response: MultiGetResponse) {
+                    actionListener.onResponse(
+                        response.responses.mapNotNull {
+                            parseNotificationEventDoc(it.id, it.response)
+                        }
+                    )
+                }
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun getNotificationEvent(id: String): NotificationEventDocInfo? {
+    override fun getNotificationEvent(
+        id: String,
+        actionListener: ActionListener<NotificationEventDocInfo>
+    ) {
         createIndex()
         val getRequest = GetRequest(INDEX_NAME).id(id)
-        val actionFuture = client.get(getRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        return parseNotificationEventDoc(id, response)
+        client.get(
+            getRequest,
+            object : ActionListener<GetResponse> {
+                override fun onResponse(response: GetResponse) {
+                    actionListener.onResponse(parseNotificationEventDoc(id, response))
+                }
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 
     private fun parseNotificationEventDoc(id: String, response: GetResponse): NotificationEventDocInfo? {
@@ -191,8 +236,9 @@ internal object NotificationEventIndex : EventOperations {
      */
     override fun getAllNotificationEvents(
         access: List<String>,
-        request: GetNotificationEventRequest
-    ): NotificationEventSearchResult {
+        request: GetNotificationEventRequest,
+        actionListener: ActionListener<NotificationEventSearchResult>
+    ) {
         createIndex()
         val sourceBuilder = SearchSourceBuilder()
             .timeout(TimeValue(PluginSettings.operationTimeoutMs, TimeUnit.MILLISECONDS))
@@ -208,55 +254,92 @@ internal object NotificationEventIndex : EventOperations {
         val searchRequest = SearchRequest()
             .indices(INDEX_NAME)
             .source(sourceBuilder)
-        val actionFuture = client.search(searchRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        val result = NotificationEventSearchResult(request.fromIndex.toLong(), response, searchHitParser)
-        log.info(
-            "$LOG_PREFIX:getAllNotificationEvents from:${request.fromIndex}, maxItems:${request.maxItems}," +
-                " sortField:${request.sortField}, sortOrder=${request.sortOrder}, filters=${request.filterParams}" +
-                " retCount:${result.objectList.size}, totalCount:${result.totalHits}"
+
+        client.search(
+            searchRequest,
+            object : ActionListener<SearchResponse> {
+                override fun onResponse(response: SearchResponse) {
+                    val result = NotificationEventSearchResult(request.fromIndex.toLong(), response, searchHitParser)
+                    log.info(
+                        "$LOG_PREFIX:getAllNotificationEvents from:${request.fromIndex}, maxItems:${request.maxItems}," +
+                            " sortField:${request.sortField}, sortOrder=${request.sortOrder}, filters=${request.filterParams}" +
+                            " retCount:${result.objectList.size}, totalCount:${result.totalHits}"
+                    )
+                    actionListener.onResponse(result)
+                }
+
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
+            }
         )
-        return result
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun updateNotificationEvent(id: String, notificationEventDoc: NotificationEventDoc): Boolean {
+    override fun updateNotificationEvent(
+        id: String,
+        notificationEventDoc: NotificationEventDoc,
+        actionListener: ActionListener<Boolean>
+    ) {
         createIndex()
         val updateRequest = UpdateRequest()
             .index(INDEX_NAME)
             .id(id)
             .doc(notificationEventDoc.toXContent())
             .fetchSource(true)
-        val actionFuture = client.update(updateRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        if (response.result != DocWriteResponse.Result.UPDATED) {
-            log.warn("$LOG_PREFIX:updateNotificationEvent failed for $id; response:$response")
-        }
-        return response.result == DocWriteResponse.Result.UPDATED
+        client.update(
+            updateRequest,
+            object : ActionListener<UpdateResponse> {
+                override fun onResponse(response: UpdateResponse) {
+                    if (response.result != DocWriteResponse.Result.UPDATED) {
+                        log.warn("$LOG_PREFIX:updateNotificationEvent failed for $id; response:$response")
+                    }
+                    actionListener.onResponse(response.result == DocWriteResponse.Result.UPDATED)
+                }
+
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun deleteNotificationEvent(id: String): Boolean {
+    override fun deleteNotificationEvent(id: String, actionListener: ActionListener<Boolean>) {
         createIndex()
         val deleteRequest = DeleteRequest()
             .index(INDEX_NAME)
             .id(id)
-        val actionFuture = client.delete(deleteRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        if (response.result != DocWriteResponse.Result.DELETED) {
-            log.warn("$LOG_PREFIX:deleteNotificationEvent failed for $id; response:$response")
-        }
-        return response.result == DocWriteResponse.Result.DELETED
+        client.delete(
+            deleteRequest,
+            object : ActionListener<DeleteResponse> {
+                override fun onResponse(response: DeleteResponse) {
+                    if (response.result != DocWriteResponse.Result.DELETED) {
+                        log.warn("$LOG_PREFIX:deleteNotificationEvent failed for $id; response:$response")
+                        actionListener.onResponse(null)
+                    } else {
+                        actionListener.onResponse(response.result == DocWriteResponse.Result.DELETED)
+                    }
+                }
+
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun deleteNotificationEvents(ids: Set<String>): Map<String, RestStatus> {
+    override fun deleteNotificationEvents(
+        ids: Set<String>,
+        actionListener: ActionListener<Map<String, RestStatus>>
+    ) {
         createIndex()
         val bulkRequest = BulkRequest()
         ids.forEach {
@@ -265,15 +348,24 @@ internal object NotificationEventIndex : EventOperations {
                 .id(it)
             bulkRequest.add(deleteRequest)
         }
-        val actionFuture = client.bulk(bulkRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        val mutableMap = mutableMapOf<String, RestStatus>()
-        response.forEach {
-            mutableMap[it.id] = it.status()
-            if (it.isFailed) {
-                log.warn("$LOG_PREFIX:deleteNotificationEvent failed for ${it.id}; response:${it.failureMessage}")
+        client.bulk(
+            bulkRequest,
+            object : ActionListener<BulkResponse> {
+                override fun onResponse(response: BulkResponse) {
+                    val mutableMap = mutableMapOf<String, RestStatus>()
+                    response.forEach {
+                        mutableMap[it.id] = it.status()
+                        if (it.isFailed) {
+                            log.warn("$LOG_PREFIX:deleteNotificationEvent failed for ${it.id}; response:${it.failureMessage}")
+                        }
+                    }
+                    actionListener.onResponse(mutableMap)
+                }
+
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
             }
-        }
-        return mutableMap
+        )
     }
 }

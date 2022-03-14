@@ -6,15 +6,21 @@
 package org.opensearch.notifications.index
 
 import org.opensearch.ResourceAlreadyExistsException
+import org.opensearch.action.ActionListener
 import org.opensearch.action.DocWriteResponse
 import org.opensearch.action.admin.indices.create.CreateIndexRequest
 import org.opensearch.action.bulk.BulkRequest
+import org.opensearch.action.bulk.BulkResponse
 import org.opensearch.action.delete.DeleteRequest
+import org.opensearch.action.delete.DeleteResponse
 import org.opensearch.action.get.GetRequest
 import org.opensearch.action.get.GetResponse
 import org.opensearch.action.get.MultiGetRequest
+import org.opensearch.action.get.MultiGetResponse
 import org.opensearch.action.index.IndexRequest
+import org.opensearch.action.index.IndexResponse
 import org.opensearch.action.search.SearchRequest
+import org.opensearch.action.search.SearchResponse
 import org.opensearch.client.Client
 import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.unit.TimeValue
@@ -123,7 +129,11 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    override fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String?): String? {
+    override fun createNotificationConfig(
+        configDoc: NotificationConfigDoc,
+        id: String?,
+        actionListener: ActionListener<String>
+    ) {
         createIndex()
         val indexRequest = IndexRequest(INDEX_NAME)
             .source(configDoc.toXContent())
@@ -131,37 +141,69 @@ internal object NotificationConfigIndex : ConfigOperations {
         if (id != null) {
             indexRequest.id(id)
         }
-        val actionFuture = client.index(indexRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        return if (response.result != DocWriteResponse.Result.CREATED) {
-            log.warn("$LOG_PREFIX:createNotificationConfig - response:$response")
-            null
-        } else {
-            response.id
-        }
+        client.index(
+            indexRequest,
+            object : ActionListener<IndexResponse> {
+                override fun onResponse(response: IndexResponse) {
+                    if (response.result != DocWriteResponse.Result.CREATED) {
+                        log.warn("$LOG_PREFIX:createNotificationConfig - response:$response")
+                        actionListener.onResponse(null)
+                    } else {
+                        actionListener.onResponse(response.id)
+                    }
+                }
+                override fun onFailure(exception: Exception) {
+                    log.error("$LOG_PREFIX: Error in createNotificationConfig - response:${exception.message}")
+                    actionListener.onResponse(null)
+                }
+            }
+        )
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun getNotificationConfigs(ids: Set<String>): List<NotificationConfigDocInfo> {
+    override fun getNotificationConfigs(
+        ids: Set<String>,
+        actionListener: ActionListener<List<NotificationConfigDocInfo>>
+    ) {
         createIndex()
         val getRequest = MultiGetRequest()
         ids.forEach { getRequest.add(INDEX_NAME, it) }
-        val actionFuture = client.multiGet(getRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        return response.responses.mapNotNull { parseNotificationConfigDoc(it.id, it.response) }
+        client.multiGet(
+            getRequest,
+            object : ActionListener<MultiGetResponse> {
+                override fun onResponse(response: MultiGetResponse) {
+                    actionListener.onResponse(
+                        response.responses.mapNotNull {
+                            parseNotificationConfigDoc(it.id, it.response)
+                        }
+                    )
+                }
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun getNotificationConfig(id: String): NotificationConfigDocInfo? {
+    override fun getNotificationConfig(id: String, actionListener: ActionListener<NotificationConfigDocInfo>) {
         createIndex()
         val getRequest = GetRequest(INDEX_NAME).id(id)
-        val actionFuture = client.get(getRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        return parseNotificationConfigDoc(id, response)
+        client.get(
+            getRequest,
+            object : ActionListener<GetResponse> {
+                override fun onResponse(response: GetResponse) {
+                    actionListener.onResponse(parseNotificationConfigDoc(id, response))
+                }
+                override fun onFailure(ex: Exception) {
+                    actionListener.onFailure(ex)
+                }
+            }
+        )
     }
 
     private fun parseNotificationConfigDoc(id: String, response: GetResponse): NotificationConfigDocInfo? {
@@ -191,8 +233,9 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     override fun getAllNotificationConfigs(
         access: List<String>,
-        request: GetNotificationConfigRequest
-    ): NotificationConfigSearchResult {
+        request: GetNotificationConfigRequest,
+        actionListener: ActionListener<NotificationConfigSearchResult>
+    ) {
         createIndex()
         val sourceBuilder = SearchSourceBuilder()
             .timeout(TimeValue(PluginSettings.operationTimeoutMs, TimeUnit.MILLISECONDS))
@@ -208,54 +251,83 @@ internal object NotificationConfigIndex : ConfigOperations {
         val searchRequest = SearchRequest()
             .indices(INDEX_NAME)
             .source(sourceBuilder)
-        val actionFuture = client.search(searchRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        val result = NotificationConfigSearchResult(request.fromIndex.toLong(), response, searchHitParser)
-        log.info(
-            "$LOG_PREFIX:getAllNotificationConfigs from:${request.fromIndex}, maxItems:${request.maxItems}," +
-                " sortField:${request.sortField}, sortOrder=${request.sortOrder}, filters=${request.filterParams}" +
-                " retCount:${result.objectList.size}, totalCount:${result.totalHits}"
+
+        client.search(
+            searchRequest,
+            object : ActionListener<SearchResponse> {
+                override fun onResponse(response: SearchResponse) {
+                    val result = NotificationConfigSearchResult(request.fromIndex.toLong(), response, searchHitParser)
+                    log.info(
+                        "$LOG_PREFIX:getAllNotificationConfigs from:${request.fromIndex}, maxItems:${request.maxItems}," +
+                            " sortField:${request.sortField}, sortOrder=${request.sortOrder}, filters=${request.filterParams}" +
+                            " retCount:${result.objectList.size}, totalCount:${result.totalHits}"
+                    )
+                    actionListener.onResponse(result)
+                }
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
+            }
         )
-        return result
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun updateNotificationConfig(id: String, notificationConfigDoc: NotificationConfigDoc): Boolean {
+    override fun updateNotificationConfig(
+        id: String,
+        notificationConfigDoc: NotificationConfigDoc,
+        actionListener: ActionListener<Boolean>
+    ) {
         createIndex()
         val indexRequest = IndexRequest(INDEX_NAME)
             .source(notificationConfigDoc.toXContent())
             .create(false)
             .id(id)
-        val actionFuture = client.index(indexRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        if (response.result != DocWriteResponse.Result.UPDATED) {
-            log.warn("$LOG_PREFIX:updateNotificationConfig failed for $id; response:$response")
-        }
-        return response.result == DocWriteResponse.Result.UPDATED
+        client.index(
+            indexRequest,
+            object : ActionListener<IndexResponse> {
+                override fun onResponse(response: IndexResponse) {
+                    if (response.result != DocWriteResponse.Result.UPDATED) {
+                        log.warn("$LOG_PREFIX:updateNotificationConfig failed for $id; response:$response")
+                    }
+                    actionListener.onResponse(response.result == DocWriteResponse.Result.UPDATED)
+                }
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun deleteNotificationConfig(id: String): Boolean {
+    override fun deleteNotificationConfig(id: String, actionListener: ActionListener<Boolean>) {
         createIndex()
         val deleteRequest = DeleteRequest()
             .index(INDEX_NAME)
             .id(id)
-        val actionFuture = client.delete(deleteRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        if (response.result != DocWriteResponse.Result.DELETED) {
-            log.warn("$LOG_PREFIX:deleteNotificationConfig failed for $id; response:$response")
-        }
-        return response.result == DocWriteResponse.Result.DELETED
+        client.delete(
+            deleteRequest,
+            object : ActionListener<DeleteResponse> {
+                override fun onResponse(response: DeleteResponse) {
+                    if (response.result != DocWriteResponse.Result.DELETED) {
+                        log.warn("$LOG_PREFIX:deleteNotificationConfig failed for $id; response:$response")
+                    }
+                    actionListener.onResponse(response.result == DocWriteResponse.Result.DELETED)
+                }
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun deleteNotificationConfigs(ids: Set<String>): Map<String, RestStatus> {
+    override fun deleteNotificationConfigs(ids: Set<String>, actionListener: ActionListener<Map<String, RestStatus>>) {
         createIndex()
         val bulkRequest = BulkRequest()
         ids.forEach {
@@ -264,15 +336,23 @@ internal object NotificationConfigIndex : ConfigOperations {
                 .id(it)
             bulkRequest.add(deleteRequest)
         }
-        val actionFuture = client.bulk(bulkRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        val mutableMap = mutableMapOf<String, RestStatus>()
-        response.forEach {
-            mutableMap[it.id] = it.status()
-            if (it.isFailed) {
-                log.warn("$LOG_PREFIX:deleteNotificationConfig failed for ${it.id}; response:${it.failureMessage}")
+        client.bulk(
+            bulkRequest,
+            object : ActionListener<BulkResponse> {
+                override fun onResponse(response: BulkResponse) {
+                    val mutableMap = mutableMapOf<String, RestStatus>()
+                    response.forEach {
+                        mutableMap[it.id] = it.status()
+                        if (it.isFailed) {
+                            log.warn("$LOG_PREFIX:deleteNotificationConfig failed for ${it.id}; response:${it.failureMessage}")
+                        }
+                    }
+                    actionListener.onResponse(mutableMap)
+                }
+                override fun onFailure(exception: Exception) {
+                    actionListener.onFailure(exception)
+                }
             }
-        }
-        return mutableMap
+        )
     }
 }

@@ -55,8 +55,19 @@ internal class GetNotificationEventAction @Inject constructor(
      */
     override fun executeRequest(
         request: GetNotificationEventRequest,
-        user: User?
-    ): GetNotificationEventResponse {
-        return EventIndexingActions.get(request, user)
+        user: User?,
+        actionListener: ActionListener<GetNotificationEventResponse>
+    ) {
+        EventIndexingActions.get(
+            request, user,
+            object : ActionListener<GetNotificationEventResponse> {
+                override fun onResponse(response: GetNotificationEventResponse) {
+                    actionListener.onResponse(response)
+                }
+                override fun onFailure(exception: Exception?) {
+                    actionListener.onFailure(exception)
+                }
+            }
+        )
     }
 }

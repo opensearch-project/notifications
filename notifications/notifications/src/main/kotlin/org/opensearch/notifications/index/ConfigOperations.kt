@@ -4,6 +4,7 @@
  */
 package org.opensearch.notifications.index
 
+import org.opensearch.action.ActionListener
 import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
 import org.opensearch.notifications.model.NotificationConfigDoc
@@ -21,21 +22,31 @@ interface ConfigOperations {
      * @return Notification Config id if successful, null otherwise
      * @throws java.util.concurrent.ExecutionException with a cause
      */
-    fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String? = null): String?
+    fun createNotificationConfig(
+        configDoc: NotificationConfigDoc,
+        id: String? = null,
+        actionListener: ActionListener<String>
+    )
 
     /**
      * Query index for Notification Config with ID
      * @param ids set of the document ids to get info
      * @return list of NotificationConfigDocInfo on success, null otherwise
      */
-    fun getNotificationConfigs(ids: Set<String>): List<NotificationConfigDocInfo>
+    fun getNotificationConfigs(
+        ids: Set<String>,
+        actionListener: ActionListener<List<NotificationConfigDocInfo>>
+    )
 
     /**
      * Query index for Notification Config with ID
      * @param id the id for the document
      * @return NotificationConfigDocInfo on success, null otherwise
      */
-    fun getNotificationConfig(id: String): NotificationConfigDocInfo?
+    fun getNotificationConfig(
+        id: String,
+        actionListener: ActionListener<NotificationConfigDocInfo>
+    )
 
     /**
      * Query index for NotificationConfigDocs for given access details
@@ -45,8 +56,9 @@ interface ConfigOperations {
      */
     fun getAllNotificationConfigs(
         access: List<String>,
-        request: GetNotificationConfigRequest
-    ): NotificationConfigSearchResult
+        request: GetNotificationConfigRequest,
+        actionListener: ActionListener<NotificationConfigSearchResult>
+    )
 
     /**
      * update NotificationConfigDoc for given id
@@ -54,19 +66,23 @@ interface ConfigOperations {
      * @param notificationConfigDoc the NotificationConfigDoc data
      * @return true if successful, false otherwise
      */
-    fun updateNotificationConfig(id: String, notificationConfigDoc: NotificationConfigDoc): Boolean
+    fun updateNotificationConfig(
+        id: String,
+        notificationConfigDoc: NotificationConfigDoc,
+        actionListener: ActionListener<Boolean>
+    )
 
     /**
      * delete NotificationConfigDoc for given id
      * @param id the id for the document
      * @return true if successful, false otherwise
      */
-    fun deleteNotificationConfig(id: String): Boolean
+    fun deleteNotificationConfig(id: String, actionListener: ActionListener<Boolean>)
 
     /**
      * delete NotificationConfigDoc for given ids
      * @param ids set of the document ids to delete
      * @return map of id to status
      */
-    fun deleteNotificationConfigs(ids: Set<String>): Map<String, RestStatus>
+    fun deleteNotificationConfigs(ids: Set<String>, actionListener: ActionListener<Map<String, RestStatus>>)
 }
