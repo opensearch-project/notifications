@@ -130,7 +130,7 @@ object ConfigIndexingActions {
             }
             // Validate that the user has access to underlying configurations as well.
             val currentMetadata = it.configDoc.metadata
-            if (!userAccess.doesUserHasAccess(user, currentMetadata.access)) {
+            if (!userAccess.doesUserHaveAccess(user, currentMetadata.access)) {
                 Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
                 throw OpenSearchStatusException(
                     "Permission denied for NotificationConfig ${it.docInfo.id}",
@@ -241,7 +241,7 @@ object ConfigIndexingActions {
             }
 
         val currentMetadata = currentConfigDoc.configDoc.metadata
-        if (!userAccess.doesUserHasAccess(user, currentMetadata.access)) {
+        if (!userAccess.doesUserHaveAccess(user, currentMetadata.access)) {
             Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
             throw OpenSearchStatusException(
                 "Permission denied for NotificationConfig ${request.configId}",
@@ -292,7 +292,7 @@ object ConfigIndexingActions {
                 throw OpenSearchStatusException("NotificationConfig $configId not found", RestStatus.NOT_FOUND)
             }
         val metadata = configDoc.configDoc.metadata
-        if (!userAccess.doesUserHasAccess(user, metadata.access)) {
+        if (!userAccess.doesUserHaveAccess(user, metadata.access)) {
             Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
             throw OpenSearchStatusException("Permission denied for NotificationConfig $configId", RestStatus.FORBIDDEN)
         }
@@ -325,7 +325,7 @@ object ConfigIndexingActions {
         }
         configDocs.forEach {
             val currentMetadata = it.configDoc.metadata
-            if (!userAccess.doesUserHasAccess(user, currentMetadata.access)) {
+            if (!userAccess.doesUserHaveAccess(user, currentMetadata.access)) {
                 Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
                 throw OpenSearchStatusException(
                     "Permission denied for NotificationConfig ${it.docInfo.id}",
@@ -417,7 +417,7 @@ object ConfigIndexingActions {
             }
 
         val currentMetadata = currentConfigDoc.configDoc.metadata
-        if (!userAccess.doesUserHasAccess(user, currentMetadata.access)) {
+        if (!userAccess.doesUserHaveAccess(user, currentMetadata.access)) {
             Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
             throw OpenSearchStatusException(
                 "Permission denied for NotificationConfig $configId",
@@ -455,7 +455,7 @@ object ConfigIndexingActions {
         }
         configDocs.forEach {
             val currentMetadata = it.configDoc.metadata
-            if (!userAccess.doesUserHasAccess(user, currentMetadata.access)) {
+            if (!userAccess.doesUserHaveAccess(user, currentMetadata.access)) {
                 Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
                 throw OpenSearchStatusException(
                     "Permission denied for NotificationConfig ${it.docInfo.id}",

@@ -49,7 +49,7 @@ internal object UserAccessManager : UserAccess {
     /**
      * {@inheritDoc}
      */
-    override fun doesUserHasAccess(user: User?, access: List<String>): Boolean {
+    override fun doesUserHaveAccess(user: User?, access: List<String>): Boolean {
         if (user == null || !PluginSettings.isRbacEnabled()) { // Filtering is disabled
             return true
         }
@@ -59,7 +59,7 @@ internal object UserAccessManager : UserAccess {
     /**
      * {@inheritDoc}
      */
-    override fun doesUserHasSendAccess(user: User?, access: List<String>): Boolean {
-        return !PluginSettings.filterSendByBackendRoles || doesUserHasAccess(user, access)
+    override fun doesUserHaveSendAccess(user: User?, access: List<String>): Boolean {
+        return !PluginSettings.filterSendByBackendRoles || doesUserHaveAccess(user, access)
     }
 }
