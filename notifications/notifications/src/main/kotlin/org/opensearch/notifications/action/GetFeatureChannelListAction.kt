@@ -9,7 +9,6 @@ import org.opensearch.action.ActionListener
 import org.opensearch.action.ActionRequest
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.client.Client
-import org.opensearch.common.Strings
 import org.opensearch.common.inject.Inject
 import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.commons.authuser.User
@@ -18,7 +17,6 @@ import org.opensearch.commons.notifications.action.GetFeatureChannelListResponse
 import org.opensearch.commons.notifications.action.NotificationsActions
 import org.opensearch.commons.utils.recreateObject
 import org.opensearch.notifications.index.ConfigIndexingActions
-import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 
@@ -59,10 +57,6 @@ internal class GetFeatureChannelListAction @Inject constructor(
         request: GetFeatureChannelListRequest,
         user: User?
     ): GetFeatureChannelListResponse {
-        require(!Strings.isNullOrEmpty(request.feature)) {
-            Metrics.NOTIFICATIONS_FEATURE_CHANNELS_INFO_USER_ERROR_INVALID_FEATURE_TAG.counter.increment()
-            "Not a valid feature"
-        } // TODO: Validate against allowed features
         return ConfigIndexingActions.getFeatureChannelList(request, user)
     }
 }

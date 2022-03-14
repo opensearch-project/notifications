@@ -6,9 +6,6 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_ALERTING
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Webhook
@@ -30,7 +27,6 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.WEBHOOK,
-            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS, FEATURE_ALERTING),
             isEnabled = true,
             configData = sampleWebhook
         )
@@ -42,11 +38,6 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"webhook",
-                "feature_list":[
-                    "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}",
-                    "${referenceObject.features.elementAt(2)}"
-                ],
                 "is_enabled":${referenceObject.isEnabled},
                 "webhook":{
                     "url":"${(referenceObject.configData as Webhook).url}",
@@ -98,7 +89,6 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a updated config name",
             "this is a updated config description",
             ConfigType.WEBHOOK,
-            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
             isEnabled = true,
             configData = updatedWebhook
         )
@@ -110,10 +100,6 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${updatedObject.name}",
                 "description":"${updatedObject.description}",
                 "config_type":"webhook",
-                "feature_list":[
-                    "${updatedObject.features.elementAt(0)}",
-                    "${updatedObject.features.elementAt(1)}"
-                ],
                 "is_enabled":${updatedObject.isEnabled},
                 "webhook":{
                     "url":"${(updatedObject.configData as Webhook).url}",
@@ -172,7 +158,6 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.WEBHOOK,
-            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS, FEATURE_ALERTING),
             isEnabled = true,
             configData = sampleWebhook
         )
@@ -184,11 +169,6 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"webhook",
-                "features":[
-                    "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}",
-                    "${referenceObject.features.elementAt(2)}"
-                ],
                 "is_enabled":${referenceObject.isEnabled},
                 "slack":{"url":"https://dummy.com"}
                 "webhook":{"url":"${(referenceObject.configData as Webhook).url}"}

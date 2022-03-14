@@ -32,8 +32,6 @@ properties:
                 type: keyword
           reference_id:
             type: keyword
-          feature:
-            type: keyword
           severity:
             type: keyword
           tags:

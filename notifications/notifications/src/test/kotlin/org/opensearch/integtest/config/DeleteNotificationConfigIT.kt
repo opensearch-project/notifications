@@ -29,10 +29,6 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
                 "name":"this is a sample config name $randomString",
                 "description":"this is a sample config description $randomString",
                 "config_type":"slack",
-                "feature_list":[
-                    "index_management",
-                    "reports"
-                ],
                 "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#$randomString"}
             }

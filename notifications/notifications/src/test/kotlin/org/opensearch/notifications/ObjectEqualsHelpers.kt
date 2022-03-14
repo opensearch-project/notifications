@@ -80,9 +80,6 @@ fun verifyEquals(config: NotificationConfig, jsonObject: JsonObject) {
     Assert.assertEquals(config.description, jsonObject.get("description").asString)
     Assert.assertEquals(config.configType.tag, jsonObject.get("config_type").asString)
     Assert.assertEquals(config.isEnabled, jsonObject.get("is_enabled").asBoolean)
-    val features = jsonObject.get("feature_list").asJsonArray
-    Assert.assertEquals(config.features.size, features.size())
-    features.forEach { config.features.contains(it.asString) }
     when (config.configType) {
         ConfigType.SLACK -> verifyEquals((config.configData as Slack), jsonObject.get("slack").asJsonObject)
         ConfigType.CHIME -> verifyEquals((config.configData as Chime), jsonObject.get("chime").asJsonObject)

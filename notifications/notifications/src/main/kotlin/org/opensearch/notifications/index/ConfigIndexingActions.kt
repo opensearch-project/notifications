@@ -32,7 +32,6 @@ import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.notifications.model.Sns
 import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.commons.utils.logger
-import org.opensearch.notifications.CoreProvider
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.DocMetadata
@@ -76,7 +75,7 @@ object ConfigIndexingActions {
         // TODO: URL validation with rules
     }
 
-    private fun validateEmailConfig(email: Email, features: Set<String>, user: User?) {
+    private fun validateEmailConfig(email: Email, user: User?) {
         if (email.emailGroupIds.contains(email.emailAccountID)) {
             throw OpenSearchStatusException(
                 "Config IDs ${email.emailAccountID} is in both emailAccountID and emailGroupIds",
@@ -137,18 +136,6 @@ object ConfigIndexingActions {
                     RestStatus.FORBIDDEN
                 )
             }
-
-            // Validate the features enabled are included in all underlying configurations as well.
-            if (!it.configDoc.config.features.containsAll(features)) {
-                val missingFeatures = features.filterNot { item ->
-                    it.configDoc.config.features.contains(item)
-                }
-                Metrics.NOTIFICATIONS_SECURITY_USER_ERROR.counter.increment()
-                throw OpenSearchStatusException(
-                    "Some Features not available in NotificationConfig ${it.docInfo.id}:$missingFeatures",
-                    RestStatus.FORBIDDEN
-                )
-            }
         }
     }
 
@@ -168,14 +155,6 @@ object ConfigIndexingActions {
     }
 
     private fun validateConfig(config: NotificationConfig, user: User?) {
-        config.features.forEach {
-            if (!CoreProvider.core.getAllowedConfigFeatures().contains(it)) {
-                throw OpenSearchStatusException(
-                    "NotificationConfig with type feature $it is not acceptable",
-                    RestStatus.NOT_ACCEPTABLE
-                )
-            }
-        }
         when (config.configType) {
             ConfigType.NONE -> throw OpenSearchStatusException(
                 "NotificationConfig with type NONE is not acceptable",
@@ -184,7 +163,7 @@ object ConfigIndexingActions {
             ConfigType.SLACK -> validateSlackConfig(config.configData as Slack, user)
             ConfigType.CHIME -> validateChimeConfig(config.configData as Chime, user)
             ConfigType.WEBHOOK -> validateWebhookConfig(config.configData as Webhook, user)
-            ConfigType.EMAIL -> validateEmailConfig(config.configData as Email, config.features, user)
+            ConfigType.EMAIL -> validateEmailConfig(config.configData as Email, user)
             ConfigType.SMTP_ACCOUNT -> validateSmtpAccountConfig(config.configData as SmtpAccount, user)
             ConfigType.SES_ACCOUNT -> validateSesAccountConfig(config.configData as SesAccount, user)
             ConfigType.EMAIL_GROUP -> validateEmailGroupConfig(config.configData as EmailGroup, user)
@@ -370,7 +349,6 @@ object ConfigIndexingActions {
         userAccess.validateUser(user)
         val supportedChannelListString = getSupportedChannelList().joinToString(",")
         val filterParams = mapOf(
-            Pair("feature_list", request.feature),
             Pair("config_type", supportedChannelListString)
         )
         val getAllRequest = GetNotificationConfigRequest(filterParams = filterParams)

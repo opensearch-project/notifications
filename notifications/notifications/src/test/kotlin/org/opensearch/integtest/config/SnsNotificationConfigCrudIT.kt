@@ -6,8 +6,6 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Sns
@@ -26,7 +24,6 @@ class SnsNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.SNS,
-            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSns
         )
@@ -38,10 +35,6 @@ class SnsNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"sns",
-                "feature_list":[
-                    "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}"
-                ],
                 "is_enabled":${referenceObject.isEnabled},
                 "sns":{"topic_arn":"${(referenceObject.configData as Sns).topicArn}","role_arn":"${(referenceObject.configData as Sns).roleArn}"}
             }
@@ -85,7 +78,6 @@ class SnsNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a updated config name",
             "this is a updated config description",
             ConfigType.SNS,
-            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
             isEnabled = true,
             configData = updatedSns
         )
@@ -97,10 +89,6 @@ class SnsNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${updatedObject.name}",
                 "description":"${updatedObject.description}",
                 "config_type":"sns",
-                "feature_list":[
-                    "${updatedObject.features.elementAt(0)}",
-                    "${updatedObject.features.elementAt(1)}"
-                ],
                 "is_enabled":${updatedObject.isEnabled},
                 "sns":{"topic_arn":"${(updatedObject.configData as Sns).topicArn}","role_arn":"${(updatedObject.configData as Sns).roleArn}"}
             }
@@ -154,7 +142,6 @@ class SnsNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.SNS,
-            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSns
         )
@@ -166,10 +153,6 @@ class SnsNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"sns",
-                "features":[
-                    "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}"
-                ],
                 "is_enabled":${referenceObject.isEnabled},
                 "chime":{"url":"https://dummy.com"}
                 "sns":{"topic_arn":"${(referenceObject.configData as Sns).topicArn}","role_arn":"${(referenceObject.configData as Sns).roleArn}"}

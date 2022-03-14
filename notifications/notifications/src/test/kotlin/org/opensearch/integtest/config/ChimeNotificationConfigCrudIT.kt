@@ -5,9 +5,6 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_ALERTING
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.NotificationConfig
@@ -26,7 +23,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.CHIME,
-            setOf(FEATURE_ALERTING, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleChime
         )
@@ -38,10 +34,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"chime",
-                "feature_list":[
-                    "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}"
-                ],
                 "is_enabled":${referenceObject.isEnabled},
                 "chime":{"url":"${(referenceObject.configData as Chime).url}"}
             }
@@ -85,7 +77,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a updated config name",
             "this is a updated config description",
             ConfigType.CHIME,
-            setOf(FEATURE_INDEX_MANAGEMENT),
             isEnabled = true,
             configData = updatedChime
         )
@@ -97,9 +88,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${updatedObject.name}",
                 "description":"${updatedObject.description}",
                 "config_type":"chime",
-                "feature_list":[
-                    "${updatedObject.features.elementAt(0)}"
-                ],
                 "is_enabled":${updatedObject.isEnabled},
                 "chime":{"url":"${(updatedObject.configData as Chime).url}"}
             }
@@ -153,7 +141,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.CHIME,
-            setOf(FEATURE_ALERTING, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleChime
         )
@@ -165,10 +152,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"chime",
-                "features":[
-                    "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}"
-                ],
                 "is_enabled":${referenceObject.isEnabled},
                 "slack":{"url":"https://dummy.com"}
                 "chime":{"url":"${(referenceObject.configData as Chime).url}"}
@@ -190,7 +173,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.CHIME,
-            setOf(FEATURE_ALERTING, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleChime
         )
@@ -202,10 +184,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"chime",
-                "feature_list":[
-                    "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}"
-                ],
                 "is_enabled":${referenceObject.isEnabled},
                 "chime":{"url":"${(referenceObject.configData as Chime).url}"}
             }
@@ -228,9 +206,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"this is a updated config name",
                 "description":"this is a updated config description",
                 "config_type":"slack",
-                "feature_list":[
-                    "$FEATURE_INDEX_MANAGEMENT"
-                ],
                 "is_enabled":"true",
                 "slack":{"url":"https://updated.domain.com/updated_slack_url#0987654321"}
             }
@@ -251,7 +226,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.CHIME,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleChimeConfigData
         )
@@ -263,9 +237,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"chime",
-                "feature_list":[
-                    "${referenceObject.features.elementAt(0)}"                
-                ],
                 "is_enabled":${referenceObject.isEnabled},
                 "chime":{"url":"http"}
             }
@@ -296,7 +267,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.CHIME,
-            setOf(FEATURE_ALERTING, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleChime
         )
@@ -308,10 +278,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"chime",
-                "feature_list":[
-                    "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}"
-                ],
                 "is_enabled":${referenceObject.isEnabled},
                 "chime":{"url":"${(referenceObject.configData as Chime).url}"}
             }
@@ -334,9 +300,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"this is a updated config name",
                 "description":"this is a updated config description",
                 "config_type":"chime",
-                "feature_list":[
-                    "$FEATURE_INDEX_MANAGEMENT"
-                ],
                 "is_enabled":"true",
                 "chime":{"url":"https://updated.domain.com/updated_chime_url#0987654321"}
             }
@@ -355,9 +318,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"this is a updated config name",
                 "description":"this is a updated config description",
                 "config_type":"chime",
-                "feature_list":[
-                    "$FEATURE_INDEX_MANAGEMENT"
-                ],
                 "is_enabled":"true",
                 "chime":{"url":"http"}
             }

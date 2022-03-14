@@ -34,8 +34,6 @@ properties:
             type: keyword
       config_type:
         type: keyword
-      feature_list:
-        type: keyword
       is_enabled:
         type: boolean
       slack: # slack configuration

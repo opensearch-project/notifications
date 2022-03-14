@@ -14,7 +14,6 @@ import org.opensearch.commons.notifications.NotificationConstants.DELIVERY_STATU
 import org.opensearch.commons.notifications.NotificationConstants.EMAIL_RECIPIENT_STATUS_TAG
 import org.opensearch.commons.notifications.NotificationConstants.EVENT_SOURCE_TAG
 import org.opensearch.commons.notifications.NotificationConstants.EVENT_TAG
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_TAG
 import org.opensearch.commons.notifications.NotificationConstants.QUERY_TAG
 import org.opensearch.commons.notifications.NotificationConstants.RECIPIENT_TAG
 import org.opensearch.commons.notifications.NotificationConstants.REFERENCE_ID_TAG
@@ -46,7 +45,6 @@ object EventQueryHelper {
     )
     private val KEYWORD_FIELDS = setOf(
         "$EVENT_SOURCE_TAG.$REFERENCE_ID_TAG",
-        "$EVENT_SOURCE_TAG.$FEATURE_TAG",
         "$EVENT_SOURCE_TAG.$SEVERITY_TAG",
         // Text fields with keyword
         "$EVENT_SOURCE_TAG.$TAGS_TAG.$KEYWORD_SUFFIX",

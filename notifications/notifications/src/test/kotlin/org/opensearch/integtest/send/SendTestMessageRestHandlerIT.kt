@@ -24,11 +24,6 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
                 "name":"this is a sample config name",
                 "description":"this is a sample config description",
                 "config_type":"chime",
-                "feature_list":[
-                    "index_management",
-                    "reports",
-                    "alerting"
-                ],
                 "is_enabled":true,
                 "chime":{
                     "url":"https://hooks.chime.aws/incomingwebhooks/xxxx"
@@ -49,7 +44,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         // send test message
         val sendResponse = executeRequest(
             RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/feature/test/$configId?feature=alerting",
+            "$PLUGIN_BASE_URI/feature/test/$configId",
             "",
             RestStatus.INTERNAL_SERVER_ERROR.status
         )
@@ -83,11 +78,6 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
                 "name":"this is a sample config name",
                 "description":"this is a sample config description",
                 "config_type":"slack",
-                "feature_list":[
-                    "index_management",
-                    "reports",
-                    "alerting"
-                ],
                 "is_enabled":true,
                 "slack":{
                     "url":"https://hooks.slack.com/services/xxx/xxx"
@@ -108,7 +98,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         // send test message
         val sendResponse = executeRequest(
             RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/feature/test/$configId?feature=alerting",
+            "$PLUGIN_BASE_URI/feature/test/$configId",
             "",
             RestStatus.INTERNAL_SERVER_ERROR.status
         )
@@ -143,11 +133,6 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
                 "name":"this is a sample config name",
                 "description":"this is a sample config description",
                 "config_type":"webhook",
-                "feature_list":[
-                    "index_management",
-                    "reports",
-                    "alerting"
-                ],
                 "is_enabled":true,
                 "webhook":{
                     "url":"https://szhongna.api.stdlib.com/my-webhook@dev/",
@@ -171,7 +156,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         // send test message
         val sendResponse = executeRequest(
             RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/feature/test/$configId?feature=alerting",
+            "$PLUGIN_BASE_URI/feature/test/$configId",
             "",
             RestStatus.INTERNAL_SERVER_ERROR.status
         )
@@ -212,11 +197,6 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
                 "name":"this is a sample smtp",
                 "description":"this is a sample smtp description",
                 "config_type":"smtp_account",
-                "feature_list":[
-                    "index_management",
-                    "reports",
-                    "alerting"
-                ],
                 "is_enabled":true,
                 "smtp_account":{
                     "host":"${sampleSmtpAccount.host}",
@@ -243,11 +223,6 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
                 "name":"email config name",
                 "description":"email description",
                 "config_type":"email",
-                "feature_list":[
-                    "index_management",
-                    "reports",
-                    "alerting"
-                ],
                 "is_enabled":true,
                 "email":{
                     "email_account_id":"$smtpAccountConfigId",
@@ -273,7 +248,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         // send test message
         val sendResponse = executeRequest(
             RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/feature/test/$emailConfigId?feature=alerting",
+            "$PLUGIN_BASE_URI/feature/test/$emailConfigId",
             "",
             RestStatus.SERVICE_UNAVAILABLE.status
         )

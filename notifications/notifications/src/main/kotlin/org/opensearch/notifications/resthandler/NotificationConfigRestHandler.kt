@@ -108,7 +108,6 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
              *     created_time_ms=from_time..to_time (Range filter field)
              *     is_enabled=true (Boolean filter field)
              *     config_type=slack,chime (Keyword filter field)
-             *     feature_list=alerting,reports (Keyword filter field)
              *     name=test (Text filter field)
              *     description=sample (Text filter field)
              *     email.email_account_id=abc,xyz (Keyword filter field)

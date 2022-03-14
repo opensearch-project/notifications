@@ -68,11 +68,10 @@ internal class NotificationEventRestHandler : PluginBaseHandler() {
              *     from_index=20
              *     max_items=10
              *     sort_order=asc
-             *     sort_field=event_source.feature
+             *     sort_field=event_source.severity
              *     last_updated_time_ms=from_time..to_time (Range filter field)
              *     created_time_ms=from_time..to_time (Range filter field)
              *     event_source.reference_id=abc,xyz (Keyword filter field)
-             *     event_source.feature=alerting,reports (Keyword filter field)
              *     event_source.severity=info,high (Keyword filter field)
              *     event_source.tags=test,tags (Text filter field)
              *     event_source.title=sample title (Text filter field)

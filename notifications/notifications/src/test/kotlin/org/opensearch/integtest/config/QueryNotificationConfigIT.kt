@@ -6,9 +6,6 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_ALERTING
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.NotificationConfig
@@ -29,14 +26,12 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
     private fun getCreateRequestJsonString(
         nameSubstring: String,
         configType: ConfigType,
-        isEnabled: Boolean,
-        features: Set<String>
+        isEnabled: Boolean
     ): String {
         val randomString = (1..20)
             .map { Random.nextInt(0, charPool.size) }
             .map(charPool::get)
             .joinToString("")
-        val featuresString = features.joinToString { "\"$it\"" }
         val configObjectString = when (configType) {
             ConfigType.SLACK -> """
                 "slack":{"url":"https://slack.domain.com/sample_slack_url#$randomString"}
@@ -72,7 +67,6 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
                 "name":"$nameSubstring:this is a sample config name $randomString",
                 "description":"this is a sample config description $randomString",
                 "config_type":"$configType",
-                "feature_list":[$featuresString],
                 "is_enabled":$isEnabled,
                 $configObjectString
             }
@@ -83,10 +77,9 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
     private fun createConfig(
         nameSubstring: String = "",
         configType: ConfigType = ConfigType.SLACK,
-        isEnabled: Boolean = true,
-        features: Set<String> = setOf(FEATURE_ALERTING, FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS)
+        isEnabled: Boolean = true
     ): String {
-        val createRequestJsonString = getCreateRequestJsonString(nameSubstring, configType, isEnabled, features)
+        val createRequestJsonString = getCreateRequestJsonString(nameSubstring, configType, isEnabled)
         val createResponse = executeRequest(
             RestRequest.Method.POST.name,
             "$PLUGIN_BASE_URI/configs",
@@ -376,49 +369,6 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         Thread.sleep(100)
     }
 
-    fun `test Get sorted notification config using multi keyword sort_field(features)`() {
-        val iId = createConfig(features = setOf(FEATURE_INDEX_MANAGEMENT))
-        val aId = createConfig(features = setOf(FEATURE_ALERTING))
-        val rId = createConfig(features = setOf(FEATURE_REPORTS))
-        val iaId = createConfig(features = setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_ALERTING))
-        val raId = createConfig(features = setOf(FEATURE_REPORTS, FEATURE_ALERTING))
-        val riId = createConfig(features = setOf(FEATURE_REPORTS, FEATURE_INDEX_MANAGEMENT))
-        val iarId = createConfig(features = setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_ALERTING, FEATURE_REPORTS))
-        Thread.sleep(1000)
-
-        val sortedConfigIds = listOf(aId, iaId, raId, iarId, iId, riId, rId)
-        val reverseOrderIds = listOf(rId, raId, riId, iarId, iId, iaId, aId)
-        // Get all notification configs with default sort_order(asc)
-        val getDefaultOrderConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs?sort_field=feature_list",
-            "",
-            RestStatus.OK.status
-        )
-        verifyOrderedConfigList(sortedConfigIds, getDefaultOrderConfigResponse, sortedConfigIds.size)
-        Thread.sleep(100)
-
-        // Get all notification configs with sort_order=asc
-        val getAscConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs?sort_field=feature_list&sort_order=asc",
-            "",
-            RestStatus.OK.status
-        )
-        verifyOrderedConfigList(sortedConfigIds, getAscConfigResponse, sortedConfigIds.size)
-        Thread.sleep(100)
-
-        // Get all notification configs with sort_order=desc
-        val getDescConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs?sort_field=feature_list&sort_order=desc",
-            "",
-            RestStatus.OK.status
-        )
-        verifyOrderedConfigList(reverseOrderIds, getDescConfigResponse, sortedConfigIds.size)
-        Thread.sleep(100)
-    }
-
     fun `test Get sorted notification config using text sort_field(slack_url)`() {
         val configIds: Set<String> = (1..10).map { createConfig(configType = ConfigType.SLACK) }.toSet()
         Thread.sleep(1000)
@@ -548,39 +498,6 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(disabledConfigIds, getDisabledResponse, disabledConfigIds.size)
-        Thread.sleep(100)
-    }
-
-    fun `test Get filtered notification config using keyword filter_param_list(features)`() {
-        val iId = createConfig(features = setOf(FEATURE_INDEX_MANAGEMENT))
-        val aId = createConfig(features = setOf(FEATURE_ALERTING))
-        val rId = createConfig(features = setOf(FEATURE_REPORTS))
-        val iaId = createConfig(features = setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_ALERTING))
-        val raId = createConfig(features = setOf(FEATURE_REPORTS, FEATURE_ALERTING))
-        val riId = createConfig(features = setOf(FEATURE_REPORTS, FEATURE_INDEX_MANAGEMENT))
-        val iarId = createConfig(features = setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_ALERTING, FEATURE_REPORTS))
-        Thread.sleep(1000)
-
-        val reportIds = setOf(rId, raId, riId, iarId)
-        // Get notification configs with features=Reports
-        val getEnabledResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs?feature_list=reports",
-            "",
-            RestStatus.OK.status
-        )
-        verifyMultiConfigIdEquals(reportIds, getEnabledResponse, reportIds.size)
-        Thread.sleep(100)
-
-        val imAndAlertsIds = setOf(iId, aId, iaId, raId, riId, iarId)
-        // Get notification configs with features=IndexManagement,Alerting
-        val getDisabledResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs?feature_list=index_management,alerting",
-            "",
-            RestStatus.OK.status
-        )
-        verifyMultiConfigIdEquals(imAndAlertsIds, getDisabledResponse, imAndAlertsIds.size)
         Thread.sleep(100)
     }
 
@@ -923,7 +840,6 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.CHIME,
-            setOf(FEATURE_ALERTING, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleChime
         )
@@ -936,10 +852,6 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"chime",
-                "feature_list":[
-                    "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}"
-                ],
                 "is_enabled":${referenceObject.isEnabled},
                 "chime":{"url":"${(referenceObject.configData as Chime).url}"}
             }

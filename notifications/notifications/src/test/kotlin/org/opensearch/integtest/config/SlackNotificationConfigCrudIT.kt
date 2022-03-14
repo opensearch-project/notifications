@@ -6,8 +6,6 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
@@ -26,7 +24,6 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.SLACK,
-            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSlack
         )
@@ -38,10 +35,6 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"slack",
-                "feature_list":[
-                    "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}"
-                ],
                 "is_enabled":${referenceObject.isEnabled},
                 "slack":{"url":"${(referenceObject.configData as Slack).url}"}
             }
@@ -85,7 +78,6 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a updated config name",
             "this is a updated config description",
             ConfigType.SLACK,
-            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
             isEnabled = true,
             configData = updatedSlack
         )
@@ -97,10 +89,6 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${updatedObject.name}",
                 "description":"${updatedObject.description}",
                 "config_type":"slack",
-                "feature_list":[
-                    "${updatedObject.features.elementAt(0)}",
-                    "${updatedObject.features.elementAt(1)}"
-                ],
                 "is_enabled":${updatedObject.isEnabled},
                 "slack":{"url":"${(updatedObject.configData as Slack).url}"}
             }
@@ -154,7 +142,6 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.SLACK,
-            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSlack
         )
@@ -166,10 +153,6 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"slack",
-                "features":[
-                    "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}"
-                ],
                 "is_enabled":${referenceObject.isEnabled},
                 "chime":{"url":"https://dummy.com"}
                 "slack":{"url":"${(referenceObject.configData as Slack).url}"}

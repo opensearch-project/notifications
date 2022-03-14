@@ -7,7 +7,6 @@ package org.opensearch.notifications.resthandler
 
 import org.opensearch.client.node.NodeClient
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_TAG
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.action.SendTestNotificationAction
 import org.opensearch.notifications.metrics.Metrics
@@ -56,7 +55,7 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
      * {@inheritDoc}
      */
     override fun responseParams(): Set<String> {
-        return setOf(CONFIG_ID_TAG, FEATURE_TAG)
+        return setOf(CONFIG_ID_TAG)
     }
 
     /**
@@ -77,9 +76,8 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
     ) = RestChannelConsumer {
         Metrics.NOTIFICATIONS_SEND_TEST_MESSAGE_TOTAL.counter.increment()
         Metrics.NOTIFICATIONS_SEND_TEST_MESSAGE_INTERVAL_COUNT.counter.increment()
-        val feature = request.param(FEATURE_TAG)
         val configId = request.param(CONFIG_ID_TAG)
-        val sendTestNotificationRequest = SendTestNotificationRequest(feature, configId)
+        val sendTestNotificationRequest = SendTestNotificationRequest(configId)
         client.execute(
             SendTestNotificationAction.ACTION_TYPE,
             sendTestNotificationRequest,

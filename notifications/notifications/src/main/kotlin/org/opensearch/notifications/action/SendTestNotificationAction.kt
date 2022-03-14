@@ -50,8 +50,8 @@ internal class SendTestNotificationAction @Inject constructor(
         request: SendTestNotificationRequest,
         listener: ActionListener<SendNotificationResponse>
     ) {
-        val source = SendTestNotificationActionHelper.generateEventSource(request.feature, request.configId)
-        val message = SendTestNotificationActionHelper.generateMessage(request.feature, request.configId)
+        val source = SendTestNotificationActionHelper.generateEventSource(request.configId)
+        val message = SendTestNotificationActionHelper.generateMessage(request.configId)
         val channelIds = listOf(request.configId)
         NotificationsPluginInterface.sendNotification(
             client as NodeClient,

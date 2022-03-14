@@ -12,7 +12,6 @@ import org.opensearch.commons.notifications.NotificationConstants.CREATED_TIME_T
 import org.opensearch.commons.notifications.NotificationConstants.DESCRIPTION_TAG
 import org.opensearch.commons.notifications.NotificationConstants.EMAIL_ACCOUNT_ID_TAG
 import org.opensearch.commons.notifications.NotificationConstants.EMAIL_GROUP_ID_LIST_TAG
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_LIST_TAG
 import org.opensearch.commons.notifications.NotificationConstants.FROM_ADDRESS_TAG
 import org.opensearch.commons.notifications.NotificationConstants.HOST_TAG
 import org.opensearch.commons.notifications.NotificationConstants.IS_ENABLED_TAG
@@ -61,7 +60,6 @@ object ConfigQueryHelper {
     )
     private val KEYWORD_FIELDS = setOf(
         CONFIG_TYPE_TAG,
-        FEATURE_LIST_TAG,
         "${EMAIL.tag}.$EMAIL_ACCOUNT_ID_TAG",
         "${EMAIL.tag}.$EMAIL_GROUP_ID_LIST_TAG",
         "${SMTP_ACCOUNT.tag}.$METHOD_TAG",

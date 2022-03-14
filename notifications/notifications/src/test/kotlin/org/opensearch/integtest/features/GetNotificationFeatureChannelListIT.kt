@@ -7,9 +7,6 @@ package org.opensearch.integtest.features
 
 import com.google.gson.JsonObject
 import org.junit.Assert
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_ALERTING
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
@@ -24,7 +21,6 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
         nameSubstring: String,
         configType: ConfigType,
         isEnabled: Boolean,
-        features: Set<String>,
         smtpAccountId: String = "",
         emailGroupId: Set<String> = setOf()
     ): String {
@@ -32,7 +28,6 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
             .map { Random.nextInt(0, charPool.size) }
             .map(charPool::get)
             .joinToString("")
-        val featuresString = features.joinToString { "\"$it\"" }
         val configObjectString = when (configType) {
             ConfigType.SLACK -> """
                 "slack":{"url":"https://slack.domain.com/sample_slack_url#$randomString"}
@@ -75,7 +70,6 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
                 "name":"$nameSubstring:this is a sample config name $randomString",
                 "description":"this is a sample config description $randomString",
                 "config_type":"$configType",
-                "feature_list":[$featuresString],
                 "is_enabled":$isEnabled,
                 $configObjectString
             }
@@ -87,7 +81,6 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
         nameSubstring: String = "",
         configType: ConfigType = ConfigType.SLACK,
         isEnabled: Boolean = true,
-        features: Set<String> = setOf(FEATURE_ALERTING, FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
         smtpAccountId: String = "",
         emailGroupId: Set<String> = setOf()
     ): String {
@@ -95,7 +88,6 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
             nameSubstring,
             configType,
             isEnabled,
-            features,
             smtpAccountId,
             emailGroupId
         )
@@ -125,19 +117,10 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
         }
     }
 
-    fun `test Get feature channel list should error for empty feature`() {
-        executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/feature/channels/",
-            "",
-            RestStatus.BAD_REQUEST.status
-        )
-    }
-
     fun `test POST feature channel list should result in error`() {
         executeRequest(
             RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/feature/channels/reports",
+            "$PLUGIN_BASE_URI/feature/channels",
             "{\"feature\":\"reports\"}",
             RestStatus.METHOD_NOT_ALLOWED.status
         )
@@ -146,7 +129,7 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
     fun `test PUT feature channel list should result in error`() {
         executeRequest(
             RestRequest.Method.PUT.name,
-            "$PLUGIN_BASE_URI/feature/channels/alerting",
+            "$PLUGIN_BASE_URI/feature/channels",
             "{\"feature\":\"reports\"}",
             RestStatus.METHOD_NOT_ALLOWED.status
         )
@@ -168,47 +151,12 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
         val channelIds = setOf(slackId, chimeId, webhookId, emailId)
         val response = executeRequest(
             RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/feature/channels/alerting",
+            "$PLUGIN_BASE_URI/feature/channels",
             "",
             RestStatus.OK.status
         )
         Thread.sleep(100)
         verifyChannelIdEquals(channelIds, response, channelIds.size)
-        Thread.sleep(100)
-    }
-
-    fun `test getFeatureChannelList should return only channels corresponding to feature`() {
-        val alertingOnlyIds: Set<String> = (1..5).map { createConfig(features = setOf(FEATURE_ALERTING)) }.toSet()
-        val reportsOnlyIds: Set<String> = (1..5).map { createConfig(features = setOf(FEATURE_REPORTS)) }.toSet()
-        val ismAndAlertingIds: Set<String> = (1..5).map {
-            createConfig(features = setOf(FEATURE_ALERTING, FEATURE_INDEX_MANAGEMENT))
-        }.toSet()
-        Thread.sleep(1000)
-        val alertingIds = alertingOnlyIds.union(ismAndAlertingIds)
-        val alertingResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/feature/channels/alerting",
-            "",
-            RestStatus.OK.status
-        )
-        Thread.sleep(100)
-        verifyChannelIdEquals(alertingIds, alertingResponse, alertingIds.size)
-        val reportsResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/feature/channels/reports",
-            "",
-            RestStatus.OK.status
-        )
-        Thread.sleep(100)
-        verifyChannelIdEquals(reportsOnlyIds, reportsResponse, reportsOnlyIds.size)
-        val ismResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/feature/channels/index_management",
-            "",
-            RestStatus.OK.status
-        )
-        Thread.sleep(100)
-        verifyChannelIdEquals(ismAndAlertingIds, ismResponse, ismAndAlertingIds.size)
         Thread.sleep(100)
     }
 }

@@ -7,7 +7,6 @@ package org.opensearch.notifications.model
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
@@ -31,7 +30,6 @@ internal class NotificationConfigDocTests {
             "name",
             "description",
             ConfigType.SLACK,
-            setOf(FEATURE_REPORTS),
             configData = sampleSlack
         )
         val configDoc = NotificationConfigDoc(metadata, config)
@@ -54,7 +52,6 @@ internal class NotificationConfigDocTests {
             "name",
             "description",
             ConfigType.SLACK,
-            setOf(FEATURE_REPORTS),
             configData = sampleSlack
         )
         val configDoc = NotificationConfigDoc(metadata, config)
@@ -69,7 +66,6 @@ internal class NotificationConfigDocTests {
                 "name":"name",
                 "description":"description",
                 "config_type":"slack",
-                "feature_list":["reports"],
                 "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_url#1234567890"}
             },
@@ -90,7 +86,6 @@ internal class NotificationConfigDocTests {
                 "name":"name",
                 "description":"description",
                 "config_type":"slack",
-                "feature_list":["index_management"],
                 "is_enabled":true,
                 "slack":{"url":"https://domain.com/sample_slack_url#1234567890"}
             }

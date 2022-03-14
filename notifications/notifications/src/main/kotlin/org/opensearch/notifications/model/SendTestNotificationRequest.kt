@@ -17,7 +17,6 @@ import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_TAG
 import org.opensearch.commons.utils.logger
 import java.io.IOException
 
@@ -25,7 +24,6 @@ import java.io.IOException
  * Action Request to send test notification.
  */
 class SendTestNotificationRequest : ActionRequest, ToXContentObject {
-    val feature: String
     val configId: String
 
     companion object {
@@ -43,7 +41,6 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
         @JvmStatic
         @Throws(IOException::class)
         fun parse(parser: XContentParser): SendTestNotificationRequest {
-            var feature: String? = null
             var configId: String? = null
 
             XContentParserUtils.ensureExpectedToken(
@@ -55,7 +52,6 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    FEATURE_TAG -> feature = parser.text()
                     CONFIG_ID_TAG -> configId = parser.text()
                     else -> {
                         parser.skipChildren()
@@ -63,22 +59,18 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
                     }
                 }
             }
-            feature ?: throw IllegalArgumentException("$FEATURE_TAG field absent")
             configId ?: throw IllegalArgumentException("$CONFIG_ID_TAG field absent")
-            return SendTestNotificationRequest(feature, configId)
+            return SendTestNotificationRequest(configId)
         }
     }
 
     /**
      * constructor for creating the class
-     * @param feature the notification info
      * @param configId the id of the notification configuration channel
      */
     constructor(
-        feature: String,
         configId: String,
     ) {
-        this.feature = feature
         this.configId = configId
     }
 
@@ -87,7 +79,6 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
      */
     @Throws(IOException::class)
     constructor(input: StreamInput) : super(input) {
-        feature = input.readString()
         configId = input.readString()
     }
 
@@ -97,7 +88,6 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
     @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
         super.writeTo(output)
-        output.writeString(feature)
         output.writeString(configId)
     }
 
@@ -107,7 +97,6 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(FEATURE_TAG, feature)
             .field(CONFIG_ID_TAG, configId)
             .endObject()
     }

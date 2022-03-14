@@ -16,7 +16,6 @@ import org.opensearch.commons.destination.message.LegacyBaseMessage
 import org.opensearch.commons.destination.message.LegacyCustomWebhookMessage
 import org.opensearch.commons.destination.message.LegacyDestinationType
 import org.opensearch.commons.destination.response.LegacyDestinationResponse
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
 import org.opensearch.commons.notifications.action.LegacyPublishNotificationRequest
 import org.opensearch.commons.notifications.action.LegacyPublishNotificationResponse
 import org.opensearch.commons.notifications.action.SendNotificationRequest
@@ -85,13 +84,6 @@ object SendMessageActionHelper {
         val channelMessage = request.channelMessage
         val channelIds = request.channelIds.toSet()
         val user: User? = User.parse(request.threadContext)
-        if (!CoreProvider.core.getAllowedConfigFeatures().contains(request.eventSource.feature)) {
-            Metrics.NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_FEATURE_NOT_FOUND.counter.increment()
-            throw OpenSearchStatusException(
-                "Source ${request.eventSource.feature} Feature not enabled",
-                RestStatus.BAD_REQUEST
-            )
-        }
         val createdTime = Instant.now()
         userAccess.validateUser(user)
         val channelMap = getConfigs(channelIds)
@@ -242,7 +234,7 @@ object SendMessageActionHelper {
             emailRecipientStatus,
             DeliveryStatus("Scheduled", "Pending execution")
         )
-        val invalidStatus: DeliveryStatus? = getStatusIfChannelIsNotEligibleToSendMessage(eventSource, channel)
+        val invalidStatus: DeliveryStatus? = getStatusIfChannelIsNotEligibleToSendMessage(channel)
         if (invalidStatus != null) {
             return eventStatus.copy(deliveryStatus = invalidStatus)
         }
@@ -280,12 +272,12 @@ object SendMessageActionHelper {
     }
 
     /**
-     * Send message to a legacy destination intended only for Index Management
+     * Send message to a legacy destination intended only for Alerting and Index Management
      *
      * Currently this simply converts the legacy base message to the equivalent destination classes that exist
      * for the notification channels and utilizes the [sendMessageThroughSpi] method. If we get to the point
      * where this method seems to be holding back notification channels from adding new functionality we can
-     * refactor this to have it's own internal private core call to completely decouple them instead.
+     * refactor this to have its own internal private core call to completely decouple them instead.
      *
      * @param baseMessage legacy base message
      * @return notification delivery status for the legacy destination
@@ -297,13 +289,13 @@ object SendMessageActionHelper {
         return when (baseMessage.channelType) {
             LegacyDestinationType.LEGACY_SLACK -> {
                 val destination = SlackDestination(baseMessage.url)
-                val status = sendMessageThroughSpi(destination, message, FEATURE_INDEX_MANAGEMENT)
+                val status = sendMessageThroughSpi(destination, message, "legacy")
                 LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
                     .withResponseContent(status.statusText).build()
             }
             LegacyDestinationType.LEGACY_CHIME -> {
                 val destination = ChimeDestination(baseMessage.url)
-                val status = sendMessageThroughSpi(destination, message, FEATURE_INDEX_MANAGEMENT)
+                val status = sendMessageThroughSpi(destination, message, "legacy")
                 LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
                     .withResponseContent(status.statusText).build()
             }
@@ -313,7 +305,7 @@ object SendMessageActionHelper {
                     baseMessage.headerParams,
                     baseMessage.method
                 )
-                val status = sendMessageThroughSpi(destination, message, FEATURE_INDEX_MANAGEMENT)
+                val status = sendMessageThroughSpi(destination, message, "legacy")
                 LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
                     .withResponseContent(status.statusText).build()
             }
@@ -327,19 +319,14 @@ object SendMessageActionHelper {
 
     /**
      * Check if channel is eligible to send message, return error status if not
-     * @param eventSource event source information
      * @param channel channel info
      * @return null if channel is eligible to send message. error delivery status if not
      */
     private fun getStatusIfChannelIsNotEligibleToSendMessage(
-        eventSource: EventSource,
         channel: NotificationConfigDocInfo
     ): DeliveryStatus? {
         return if (!channel.configDoc.config.isEnabled) {
             DeliveryStatus(RestStatus.LOCKED.name, "The channel is muted")
-        } else if (!channel.configDoc.config.features.contains(eventSource.feature)) {
-            Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
-            DeliveryStatus(RestStatus.FORBIDDEN.name, "Feature is not enabled for channel")
         } else {
             null
         }
