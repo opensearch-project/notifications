@@ -43,7 +43,7 @@ ext {
     noticeFile = rootProject.file('NOTICE')
 }
 
-configurations.testCompile {
+configurations.testImplementation {
     exclude module: "securemock"
 }
 
@@ -58,12 +58,12 @@ configurations.all {
 dependencies {
     compileOnly "${group}:opensearch:${opensearch_version}"
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
-    compile ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3") {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3") {
         exclude group: 'org.jetbrains', module: 'annotations' // resolve jarhell
     } // ${kotlin_version} does not work for coroutines
-    compile "${group}:common-utils:${common_utils_version}"
-    compile "org.json:json:20180813"
+    implementation "${group}:common-utils:${common_utils_version}"
+    implementation "org.json:json:20180813"
 
     testImplementation(
             'org.assertj:assertj-core:3.19.0',
@@ -79,14 +79,14 @@ dependencies {
             "org.junit.jupiter:junit-jupiter-api:${junit_version}"
     )
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit_version}")
-    testCompile "org.opensearch.test:framework:${opensearch_version}"
-    testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
-    testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
-    testCompile "org.mockito:mockito-core:4.3.1"
-    testCompile 'com.google.code.gson:gson:2.8.7'
+    testImplementation "org.opensearch.test:framework:${opensearch_version}"
+    testImplementation "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
+    testImplementation "org.mockito:mockito-core:4.3.1"
+    testImplementation 'com.google.code.gson:gson:2.8.7'
     testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
-    compile group: 'com.github.wnameless', name: 'json-flattener', version: '0.1.0'
+    implementation group: 'com.github.wnameless', name: 'json-flattener', version: '0.1.0'
     compileOnly project(path: ":${rootProject.name}-core-spi", configuration: 'shadow')
 }
 

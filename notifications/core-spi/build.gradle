@@ -46,7 +46,10 @@ dependencies {
     compileOnly "org.opensearch:opensearch:${opensearch_version}"
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
-    compile "com.amazonaws:aws-java-sdk-ses:${aws_version}"
+    implementation "com.amazonaws:aws-java-sdk-core:${aws_version}"
+    implementation "com.amazonaws:aws-java-sdk-ses:${aws_version}"
+    implementation "org.apache.httpcomponents:httpcore:4.4.13"
+    implementation "org.apache.httpcomponents:httpclient:4.5.10"
     implementation "com.github.seancfoley:ipaddress:5.3.3"
 
     testImplementation(
@@ -54,9 +57,9 @@ dependencies {
             "org.junit.jupiter:junit-jupiter-params:5.6.2",
             'org.mockito:mockito-junit-jupiter:3.10.0',
     )
-    testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.2')
-    testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
-    testCompile "org.opensearch.test:framework:${opensearch_version}"
+    testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.6.2')
+    testImplementation "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
+    testImplementation "org.opensearch.test:framework:${opensearch_version}"
 }
 
 configurations.all {
