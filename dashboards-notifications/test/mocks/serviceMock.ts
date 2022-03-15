@@ -5,7 +5,7 @@
 
 import { CoreStart } from 'opensearch-dashboards/public';
 import { MainState } from '../../public/pages/Main/Main';
-import { EventService, NotificationService } from '../../public/services';
+import { NotificationService } from '../../public/services';
 import { CHANNEL_TYPE } from '../../public/utils/constants';
 import httpClientMock from './httpClientMock';
 
@@ -26,10 +26,8 @@ const coreServicesMock = ({
 } as unknown) as CoreStart;
 
 const browserServicesMock = new NotificationService(httpClientMock);
-const eventServiceMock = new EventService(httpClientMock);
 const notificationServiceMock = {
   notificationService: browserServicesMock,
-  eventService: eventServiceMock,
 };
 
 const mainStateMock: MainState = {

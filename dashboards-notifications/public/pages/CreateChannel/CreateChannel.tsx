@@ -34,7 +34,6 @@ import {
 import { getErrorMessage } from '../../utils/helpers';
 import { HeaderItemType, WebhookHttpType, WebhookMethodType } from '../Channels/types';
 import { MainContext } from '../Main/Main';
-import { ChannelAvailabilityPanel } from './components/ChannelAvailabilityPanel';
 import { ChannelNamePanel } from './components/ChannelNamePanel';
 import { ChimeSettings } from './components/ChimeSettings';
 import { CustomWebhookSettings } from './components/CustomWebhookSettings';
@@ -127,13 +126,6 @@ export function CreateChannel(props: CreateChannelsProps) {
   const [topicArn, setTopicArn] = useState(''); // SNS topic ARN
   const [roleArn, setRoleArn] = useState(''); // IAM role ARN (optional for open source distribution)
 
-  const [
-    sourceCheckboxIdToSelectedMap,
-    setSourceCheckboxIdToSelectedMap,
-  ] = useState<{
-    [x: string]: boolean;
-  }>({});
-
   const [inputErrors, setInputErrors] = useState<InputErrorsType>({
     name: [],
     slackWebhook: [],
@@ -187,11 +179,6 @@ export function CreateChannel(props: CreateChannelsProps) {
       setName(response.name);
       setDescription(response.description || '');
       setChannelType(type);
-      setSourceCheckboxIdToSelectedMap(
-        Object.fromEntries(
-          response.feature_list.map((feature) => [feature, true])
-        )
-      );
 
       if (type === BACKEND_CHANNEL_TYPE.SLACK) {
         setSlackWebhook(response.slack?.url || '');
@@ -277,9 +264,7 @@ export function CreateChannel(props: CreateChannelsProps) {
       name,
       description,
       config_type: channelType,
-      feature_list: Object.entries(sourceCheckboxIdToSelectedMap)
-        .filter(([key, value]) => value)
-        .map(([key, value]) => key),
+      feature_list: ['alerting'], // TODO: Remove this from config when the backend no longer requires it
       is_enabled: isEnabled,
     };
     if (channelType === BACKEND_CHANNEL_TYPE.SLACK) {
@@ -340,7 +325,7 @@ export function CreateChannel(props: CreateChannelsProps) {
           throw error;
         });
 
-      await servicesContext.eventService.sendTestMessage(
+      await servicesContext.notificationService.sendTestMessage(
         tempChannelId,
         config.feature_list[0] // for test message any source works
       );
@@ -463,12 +448,6 @@ export function CreateChannel(props: CreateChannelsProps) {
         </ContentPanel>
 
         <EuiSpacer />
-        <ChannelAvailabilityPanel
-          sourceCheckboxIdToSelectedMap={sourceCheckboxIdToSelectedMap}
-          setSourceCheckboxIdToSelectedMap={setSourceCheckboxIdToSelectedMap}
-        />
-
-        <EuiSpacer />
         <EuiFlexGroup gutterSize="m" justifyContent="flexEnd">
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty href={prevURL}>Cancel</EuiButtonEmpty>
@@ -476,9 +455,6 @@ export function CreateChannel(props: CreateChannelsProps) {
           <EuiFlexItem grow={false}>
             <EuiButton
               data-test-subj="create-channel-send-test-message-button"
-              disabled={Object.values(sourceCheckboxIdToSelectedMap).every(
-                (enabled) => !enabled
-              )}
               onClick={() => {
                 if (!isInputValid()) {
                   coreContext.notifications.toasts.addDanger(

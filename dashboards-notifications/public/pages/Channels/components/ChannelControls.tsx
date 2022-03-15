@@ -16,7 +16,6 @@ import _ from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
 import {
   CHANNEL_TYPE,
-  NOTIFICATION_SOURCE,
 } from '../../../../public/utils/constants';
 import { MainContext } from '../../Main/Main';
 import { ChannelFiltersType } from '../types';
@@ -37,14 +36,6 @@ export const ChannelControls = (props: ChannelControlsProps) => {
   const [isTypePopoverOpen, setIsTypePopoverOpen] = useState(false);
   const [typeItems, setTypeItems] = useState(
     Object.entries(mainStateContext.availableChannels).map(([key, value]) => ({
-      field: key,
-      display: value,
-      checked: 'off',
-    }))
-  );
-  const [isSourcePopoverOpen, setIsSourcePopoverOpen] = useState(false);
-  const [sourceItems, setSourceItems] = useState(
-    Object.entries(NOTIFICATION_SOURCE).map(([key, value]) => ({
       field: key,
       display: value,
       checked: 'off',
@@ -85,10 +76,6 @@ export const ChannelControls = (props: ChannelControlsProps) => {
       case 'state':
         setStateItems(newItems);
         newFilters.state = checkedItems[0];
-        break;
-      case 'source':
-        setSourceItems(newItems);
-        newFilters.source = checkedItems;
         break;
       case 'type':
         setTypeItems(newItems);
@@ -169,32 +156,6 @@ export const ChannelControls = (props: ChannelControlsProps) => {
                   key={`channel-type-filter-${index}`}
                   checked={item.checked === 'on' ? 'on' : undefined}
                   onClick={() => updateItem(typeItems, index, 'type')}
-                >
-                  {item.display}
-                </EuiFilterSelectItem>
-              );
-            })}
-          </EuiPopover>
-          <EuiPopover
-            button={
-              <EuiFilterButton
-                iconType="arrowDown"
-                grow={false}
-                onClick={() => setIsSourcePopoverOpen(!isSourcePopoverOpen)}
-              >
-                {isItemSelected(sourceItems) ? <b>Source</b> : 'Source'}
-              </EuiFilterButton>
-            }
-            isOpen={isSourcePopoverOpen}
-            closePopover={() => setIsSourcePopoverOpen(false)}
-            panelPaddingSize="none"
-          >
-            {sourceItems.map((item, index) => {
-              return (
-                <EuiFilterSelectItem
-                  key={`channel-source-filter-${index}`}
-                  checked={item.checked === 'on' ? 'on' : undefined}
-                  onClick={() => updateItem(sourceItems, index, 'source')}
                 >
                   {item.display}
                 </EuiFilterSelectItem>

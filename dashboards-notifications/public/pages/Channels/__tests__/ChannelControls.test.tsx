@@ -64,11 +64,6 @@ describe('<ChannelControls /> spec', () => {
     fireEvent.click(utils.getByText('Chime'));
     expect(onFiltersChange).toBeCalledWith({ type: ['email', 'chime'] });
 
-    fireEvent.click(utils.getByText('Source'));
-    fireEvent.click(utils.getByText('Alerting'));
-    fireEvent.click(utils.getByText('Reporting'));
-    expect(onFiltersChange).toBeCalledWith({ source: ['alerting', 'reports'] });
-
-    expect(onFiltersChange).toBeCalledTimes(5);
+    expect(onFiltersChange).toBeCalledTimes(3);
   });
 });

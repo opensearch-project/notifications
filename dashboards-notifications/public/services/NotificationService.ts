@@ -14,7 +14,7 @@ import {
   SenderType,
   SESSenderItemType,
 } from '../../models/interfaces';
-import { CHANNEL_TYPE } from '../utils/constants';
+import {CHANNEL_TYPE, NOTIFICATION_SOURCE} from '../utils/constants';
 import {
   configListToChannels,
   configListToRecipientGroups,
@@ -24,11 +24,17 @@ import {
   configToRecipientGroup,
   configToSender,
   configToSESSender,
+  eventToNotification,
 } from './utils/helper';
 
 interface ConfigsResponse {
   total_hits: number;
   config_list: any[];
+}
+
+interface EventsResponse {
+  total_hits: number;
+  event_list: any[];
 }
 
 export default class NotificationService {
@@ -228,5 +234,41 @@ export default class NotificationService {
       console.error('error fetching available features', error);
       return null;
     }
+  };
+
+  getNotification = async (id: string) => {
+    const response = await this.httpClient.get<EventsResponse>(
+        `${NODE_API.GET_EVENT}/${id}`
+    );
+    return eventToNotification(response.event_list[0]);
+  };
+
+  sendTestMessage = async (
+      configId: string,
+      feature: keyof typeof NOTIFICATION_SOURCE
+  ) => {
+    const response = await this.httpClient.get(
+        `${NODE_API.SEND_TEST_MESSAGE}/${configId}`,
+        {
+          query: {
+            feature,
+          },
+        }
+    );
+    if (response.event_id != null) {
+      await this.getNotification(response.event_id).then((response) => {
+        if (!response.success) {
+          const error = new Error('Failed to send the test message.');
+          error.stack = JSON.stringify(response.status_list, null, 2);
+          throw error;
+        }
+      });
+    } else {
+      console.error(response);
+      const error = new Error('Failed to send the test message.');
+      error.stack = JSON.stringify(response, null, 2);
+      throw error;
+    }
+    return response;
   };
 }

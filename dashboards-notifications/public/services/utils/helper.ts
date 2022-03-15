@@ -5,7 +5,6 @@
 
 import {
   ChannelItemType,
-  NotificationItem,
   RecipientGroupItemType,
   SenderItemType,
   SESSenderItemType,
@@ -77,20 +76,15 @@ export const isStatusCodeSuccess = (statusCode: string) => {
   return statusCode !== "207" && /^2\d\d/.test(statusCode);
 };
 
-export const eventToNotification = (event: any): NotificationItem => {
+export const eventToNotification = (event: any) => {
   const success = event.event.status_list.every(
     (status: any) => isStatusCodeSuccess(status.delivery_status.status_code)
   );
   return {
-    event_source: event.event.event_source,
     status_list: event.event.status_list,
     event_id: event.event_id,
     created_time_ms: event.created_time_ms,
     last_updated_time_ms: event.last_updated_time_ms,
     success,
   };
-};
-
-export const eventListToNotifications = (events: any[]): NotificationItem[] => {
-  return events?.map((event) => eventToNotification(event)) || [];
 };

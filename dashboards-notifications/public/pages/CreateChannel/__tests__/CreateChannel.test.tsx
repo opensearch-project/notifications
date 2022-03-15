@@ -38,7 +38,6 @@ describe('<CreateChannel/> spec', () => {
       </MainContext.Provider>
     );
     utils.getByTestId('create-channel-create-button').click();
-    utils.getByText('Alerting').click();
     utils.getByTestId('create-channel-send-test-message-button').click();
     expect(utils.container.firstChild).toMatchSnapshot();
   });

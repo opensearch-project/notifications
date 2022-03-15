@@ -16,7 +16,6 @@ export const NODE_API = Object.freeze({
   CREATE_CONFIG: `${NODE_API_BASE_PATH}/create_config`,
   DELETE_CONFIGS: `${NODE_API_BASE_PATH}/delete_configs`,
   UPDATE_CONFIG: `${NODE_API_BASE_PATH}/update_config`,
-  GET_EVENTS: `${NODE_API_BASE_PATH}/get_events`,
   GET_EVENT: `${NODE_API_BASE_PATH}/get_event`,
   GET_AVAILABLE_FEATURES: `${NODE_API_BASE_PATH}/features`,
   SEND_TEST_MESSAGE: `${NODE_API_BASE_PATH}/test_message`,

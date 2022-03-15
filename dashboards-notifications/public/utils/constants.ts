@@ -25,7 +25,6 @@ export const ROUTES = Object.freeze({
 
 export const BREADCRUMBS = Object.freeze({
   NOTIFICATIONS: { text: 'Notifications', href: '#/' },
-  DASHBOARD: { text: 'Dashboard', href: `#${ROUTES.NOTIFICATIONS}` },
   CHANNELS: { text: 'Channels', href: `#${ROUTES.CHANNELS}` },
   CHANNEL_DETAILS: { text: 'Channels', href: `#${ROUTES.CHANNEL_DETAILS}` },
   CREATE_CHANNEL: { text: 'Create channel', href: `#${ROUTES.CREATE_CHANNEL}` },
@@ -93,12 +92,4 @@ export const SEVERITY_TYPE = Object.freeze({
 export const CUSTOM_WEBHOOK_ENDPOINT_TYPE = Object.freeze({
   WEBHOOK_URL: 'Webhook URL',
   CUSTOM_URL: 'Custom attributes URL',
-});
-
-export const HISTOGRAM_TYPE = Object.freeze({
-  CHANNEL_TYPE: 'Channel type',
-  SOURCE: 'Notification source',
-  STATUS: 'Notification status',
-  SEVERITY: 'Severity',
-  TOP_10_CHANNELS: 'Top 10 channels',
 });

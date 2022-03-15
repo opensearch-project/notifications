@@ -5,7 +5,6 @@
 
 import {
   ChannelItemType,
-  NotificationItem,
   RecipientGroupItemType,
   SenderItemType,
   SESSenderItemType,
@@ -190,51 +189,6 @@ const mockRecipientGroup: RecipientGroupItemType = {
   },
 };
 
-const mockNotification: NotificationItem = {
-  event_id: 'qcuW53kBSU9z3nsaFegV',
-  last_updated_time_ms: 1623084806565,
-  created_time_ms: 1623084806565,
-  tenant: '',
-  event_source: {
-    title: 'test notification',
-    reference_id: 'reference_id',
-    feature: 'reports',
-    severity: 'info',
-    tags: ['tag1', 'tag2'],
-  },
-  success: false,
-  status_list: [
-    {
-      config_id: '8KUO2HkBtN9Xw674azJS',
-      config_type: 'slack',
-      config_name: 'slack test',
-      email_recipient_status: [],
-      delivery_status: {
-        status_code: '200',
-        status_text: 'success',
-      },
-    },
-    {
-      config_id: 'oMvr2HkBSU9z3nsaFujT',
-      config_type: 'email',
-      config_name: 'emailtest',
-      email_recipient_status: [
-        {
-          recipient: 'test@email.com',
-          delivery_status: {
-            status_code: '500',
-            status_text: 'failed',
-          },
-        },
-      ],
-      delivery_status: {
-        status_code: '500',
-        status_text: 'failed',
-      },
-    },
-  ],
-};
-
 export const MOCK_DATA = {
   channels: {
     items: [
@@ -266,10 +220,6 @@ export const MOCK_DATA = {
   recipientGroup: mockRecipientGroup,
   recipientGroups: {
     items: [mockRecipientGroup],
-    total: 1,
-  },
-  notifications: {
-    items: [mockNotification],
     total: 1,
   },
 };

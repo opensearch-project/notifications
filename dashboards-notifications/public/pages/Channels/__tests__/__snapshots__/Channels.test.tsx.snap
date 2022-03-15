@@ -221,44 +221,6 @@ exports[`<Channels/> spec renders the empty component 1`] = `
               </button>
             </div>
           </div>
-          <div
-            class="euiPopover euiPopover--anchorDownCenter"
-          >
-            <div
-              class="euiPopover__anchor"
-            >
-              <button
-                class="euiButtonEmpty euiButtonEmpty--text euiFilterButton euiFilterButton--hasIcon euiFilterButton--noGrow"
-                type="button"
-              >
-                <span
-                  class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
-                >
-                  <svg
-                    aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
-                    focusable="false"
-                    height="16"
-                    role="img"
-                    viewBox="0 0 16 16"
-                    width="16"
-                    xmlns="http://www.w3.org/2000/svg"
-                  />
-                  <span
-                    class="euiButtonEmpty__text"
-                  >
-                    <span
-                      class="euiFilterButton__textShift"
-                      data-text="Source"
-                      title="Source"
-                    >
-                      Source
-                    </span>
-                  </span>
-                </span>
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -480,37 +442,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                 aria-live="polite"
                 aria-sort="none"
                 class="euiTableHeaderCell"
-                data-test-subj="tableHeaderCell_feature_list_3"
-                role="columnheader"
-                scope="col"
-              >
-                <button
-                  class="euiTableHeaderButton"
-                  data-test-subj="tableHeaderSortButton"
-                  type="button"
-                >
-                  <span
-                    class="euiTableCellContent"
-                  >
-                    <span
-                      class="euiTableCellContent__text"
-                      title="Notification source"
-                    >
-                      Notification source
-                    </span>
-                    <span
-                      class="euiScreenReaderOnly"
-                    >
-                      Click to sort in ascending order
-                    </span>
-                  </span>
-                </button>
-              </th>
-              <th
-                aria-live="polite"
-                aria-sort="none"
-                class="euiTableHeaderCell"
-                data-test-subj="tableHeaderCell_description_4"
+                data-test-subj="tableHeaderCell_description_3"
                 role="columnheader"
                 scope="col"
               >
@@ -544,7 +476,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
             >
               <td
                 class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                colspan="6"
+                colspan="5"
               >
                 <div
                   class="euiTableCellContent euiTableCellContent--alignCenter"
