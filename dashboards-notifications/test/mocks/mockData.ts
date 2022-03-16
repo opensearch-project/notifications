@@ -14,7 +14,6 @@ const mockChime: ChannelItemType = {
   name: 'Chime test channel',
   description: 'test description',
   config_type: 'chime',
-  feature_list: ['reports'],
   is_enabled: true,
   chime: {
     url: 'https://chimehook',
@@ -28,7 +27,6 @@ const mockSlack: ChannelItemType = {
   name: 'Slack test channel',
   description: 'test description',
   config_type: 'slack',
-  feature_list: ['reports'],
   is_enabled: false,
   slack: {
     url: 'https://chimehook',
@@ -42,7 +40,6 @@ const mockEmail: ChannelItemType = {
   name: 'Email test channel',
   description: 'test description',
   config_type: 'email',
-  feature_list: ['alerting'],
   is_enabled: true,
   email: {
     email_account_id: 'dj8etXkBCzVy9Vy-nsiL',
@@ -76,7 +73,6 @@ const mockEmailWithSES: ChannelItemType = {
   name: 'Email test channel',
   description: 'test description',
   config_type: 'email',
-  feature_list: ['alerting'],
   is_enabled: true,
   email: {
     email_account_id: 'dj8etXkBCzVy9Vy-nsiL',
@@ -110,7 +106,6 @@ const mockWebhook: ChannelItemType = {
   name: 'Webhook test channel',
   description: 'test description',
   config_type: 'webhook',
-  feature_list: ['alerting'],
   is_enabled: true,
   webhook: {
     url: 'https://host:23/path?key1=%23%404&key2=&key3=value3',
@@ -133,7 +128,6 @@ const mockSNS: ChannelItemType = {
   name: 'SNS test channel',
   description: 'test description',
   config_type: 'sns',
-  feature_list: ['alerting'],
   is_enabled: true,
   sns: {
     topic_arn: 'arn:aws:sns:us-west-2:012345678912:notifications-test',

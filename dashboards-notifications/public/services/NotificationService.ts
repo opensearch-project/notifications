@@ -14,7 +14,7 @@ import {
   SenderType,
   SESSenderItemType,
 } from '../../models/interfaces';
-import {CHANNEL_TYPE, NOTIFICATION_SOURCE} from '../utils/constants';
+import { CHANNEL_TYPE } from '../utils/constants';
 import {
   configListToChannels,
   configListToRecipientGroups,
@@ -244,16 +244,10 @@ export default class NotificationService {
   };
 
   sendTestMessage = async (
-      configId: string,
-      feature: keyof typeof NOTIFICATION_SOURCE
+      configId: string
   ) => {
     const response = await this.httpClient.get(
-        `${NODE_API.SEND_TEST_MESSAGE}/${configId}`,
-        {
-          query: {
-            feature,
-          },
-        }
+        `${NODE_API.SEND_TEST_MESSAGE}/${configId}`
     );
     if (response.event_id != null) {
       await this.getNotification(response.event_id).then((response) => {

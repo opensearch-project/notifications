@@ -41,7 +41,6 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
     try {
       await servicesContext.notificationService.sendTestMessage(
         props.channel.config_id,
-        props.channel.feature_list[0]
       );
       coreContext.notifications.toasts.addSuccess(
         'Successfully sent a test message.'
@@ -62,7 +61,6 @@ export function ChannelDetailsActions(props: ChannelDetailsActionsProps) {
     {
       label: 'Send test message',
       disabled:
-        props.channel.feature_list.length === 0 ||
         !props.channel.config_id ||
         !props.channel.is_enabled,
       action: sendTestMessage,

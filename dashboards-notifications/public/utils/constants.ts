@@ -48,12 +48,6 @@ export const BREADCRUMBS = Object.freeze({
   EDIT_RECIPIENT_GROUP: { text: 'Edit recipient group' },
 });
 
-export const NOTIFICATION_SOURCE = Object.freeze({
-  alerting: 'Alerting',
-  index_management: 'ISM',
-  reports: 'Reporting',
-});
-
 export const BACKEND_CHANNEL_TYPE = Object.freeze({
   SLACK: 'slack',
   EMAIL: 'email',

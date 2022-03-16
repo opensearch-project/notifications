@@ -24,9 +24,6 @@ export function configRoutes(router: IRouter) {
             schema.arrayOf(schema.string()),
             schema.string(),
           ]),
-          feature_list: schema.maybe(
-            schema.oneOf([schema.arrayOf(schema.string()), schema.string()])
-          ),
           is_enabled: schema.maybe(schema.boolean()),
           sort_field: schema.string(),
           sort_order: schema.string(),
@@ -41,7 +38,6 @@ export function configRoutes(router: IRouter) {
     },
     async (context, request, response) => {
       const config_type = joinRequestParams(request.query.config_type);
-      const feature_list = joinRequestParams(request.query.feature_list);
       const config_id_list = joinRequestParams(request.query.config_id_list);
       const encryption_method = joinRequestParams(
         request.query['smtp_account.method']
@@ -61,7 +57,6 @@ export function configRoutes(router: IRouter) {
             sort_field: request.query.sort_field,
             sort_order: request.query.sort_order,
             config_type,
-            ...(feature_list && { feature_list }),
             ...(query && { text_query: query }), // text_query will exclude keyword fields
             ...(config_id_list && { config_id_list }),
             ...(encryption_method && {
