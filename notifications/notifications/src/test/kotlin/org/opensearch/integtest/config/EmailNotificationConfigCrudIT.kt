@@ -6,8 +6,6 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Email
 import org.opensearch.commons.notifications.model.EmailGroup
@@ -39,7 +37,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample smtp account config name",
             "this is a sample smtp account config description",
             ConfigType.SMTP_ACCOUNT,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSmtpAccount
         )
@@ -51,9 +48,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${smtpAccountConfig.name}",
                 "description":"${smtpAccountConfig.description}",
                 "config_type":"smtp_account",
-                "feature_list":[
-                    "${smtpAccountConfig.features.elementAt(0)}"
-                ],
                 "is_enabled":${smtpAccountConfig.isEnabled},
                 "smtp_account":{
                     "host":"${sampleSmtpAccount.host}",
@@ -80,7 +74,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample email group config name",
             "this is a sample email group config description",
             ConfigType.EMAIL_GROUP,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleEmailGroup
         )
@@ -92,9 +85,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${emailGroupConfig.name}",
                 "description":"${emailGroupConfig.description}",
                 "config_type":"email_group",
-                "feature_list":[
-                    "${emailGroupConfig.features.elementAt(0)}"
-                ],
                 "is_enabled":${emailGroupConfig.isEnabled},
                 "email_group":{
                     "recipient_list":[
@@ -125,7 +115,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.EMAIL,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleEmail
         )
@@ -137,9 +126,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${emailConfig.name}",
                 "description":"${emailConfig.description}",
                 "config_type":"email",
-                "feature_list":[
-                    "${emailConfig.features.elementAt(0)}"
-                ],
                 "is_enabled":${emailConfig.isEnabled},
                 "email":{
                     "email_account_id":"${sampleEmail.emailAccountID}",
@@ -221,7 +207,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a updated smtp account config name",
             "this is a updated smtp account config description",
             ConfigType.SMTP_ACCOUNT,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = updatedSmtpAccount
         )
@@ -233,9 +218,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${updatedSmtpAccountConfig.name}",
                 "description":"${updatedSmtpAccountConfig.description}",
                 "config_type":"smtp_account",
-                "feature_list":[
-                    "${updatedSmtpAccountConfig.features.elementAt(0)}"
-                ],
                 "is_enabled":${updatedSmtpAccountConfig.isEnabled},
                 "smtp_account":{
                     "host":"${updatedSmtpAccount.host}",
@@ -317,7 +299,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample ses account config name",
             "this is a sample ses account config description",
             ConfigType.SES_ACCOUNT,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSesAccount
         )
@@ -329,9 +310,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${sesAccountConfig.name}",
                 "description":"${sesAccountConfig.description}",
                 "config_type":"ses_account",
-                "feature_list":[
-                    "${sesAccountConfig.features.elementAt(0)}"
-                ],
                 "is_enabled":${sesAccountConfig.isEnabled},
                 "ses_account":{
                     "region":"${sampleSesAccount.awsRegion}",
@@ -357,7 +335,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample email group config name",
             "this is a sample email group config description",
             ConfigType.EMAIL_GROUP,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleEmailGroup
         )
@@ -369,9 +346,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${emailGroupConfig.name}",
                 "description":"${emailGroupConfig.description}",
                 "config_type":"email_group",
-                "feature_list":[
-                    "${emailGroupConfig.features.elementAt(0)}"
-                ],
                 "is_enabled":${emailGroupConfig.isEnabled},
                 "email_group":{
                     "recipient_list":[
@@ -402,7 +376,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.EMAIL,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleEmail
         )
@@ -414,9 +387,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${emailConfig.name}",
                 "description":"${emailConfig.description}",
                 "config_type":"email",
-                "feature_list":[
-                    "${emailConfig.features.elementAt(0)}"
-                ],
                 "is_enabled":${emailConfig.isEnabled},
                 "email":{
                     "email_account_id":"${sampleEmail.emailAccountID}",
@@ -497,7 +467,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a updated ses account config name",
             "this is a updated ses account config description",
             ConfigType.SES_ACCOUNT,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = updatedSesAccount
         )
@@ -509,9 +478,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${updatedSesAccountConfig.name}",
                 "description":"${updatedSesAccountConfig.description}",
                 "config_type":"ses_account",
-                "feature_list":[
-                    "${updatedSesAccountConfig.features.elementAt(0)}"
-                ],
                 "is_enabled":${updatedSesAccountConfig.isEnabled},
                 "ses_account":{
                     "region":"${updatedSesAccount.awsRegion}",
@@ -589,9 +555,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"sample smtp account config name",
                 "description":"sample smtp account config description",
                 "config_type":"smtp_account",
-                "feature_list":[
-                    "reports"
-                ],
                 "is_enabled":true,
                 "smtp_account":{
                     "host":"smtp.domain.com",
@@ -622,7 +585,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.EMAIL,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleEmail
         )
@@ -634,9 +596,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${emailConfig.name}",
                 "description":"${emailConfig.description}",
                 "config_type":"email",
-                "feature_list":[
-                    "${emailConfig.features.elementAt(0)}"
-                ],
                 "is_enabled":${emailConfig.isEnabled},
                 "email":{
                     "email_account_id":"${sampleEmail.emailAccountID}",
@@ -680,7 +639,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.EMAIL,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleEmail
         )
@@ -692,9 +650,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${emailConfig.name}",
                 "description":"${emailConfig.description}",
                 "config_type":"email",
-                "feature_list":[
-                    "${emailConfig.features.elementAt(0)}"
-                ],
                 "is_enabled":${emailConfig.isEnabled},
                 "email":{
                     "email_account_id":"${sampleEmail.emailAccountID}",
@@ -738,7 +693,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample smtp account config name",
             "this is a sample smtp account config description",
             ConfigType.SMTP_ACCOUNT,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSmtpAccount
         )
@@ -750,9 +704,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${smtpAccountConfig.name}",
                 "description":"${smtpAccountConfig.description}",
                 "config_type":"smtp_account",
-                "feature_list":[
-                    "${smtpAccountConfig.features.elementAt(0)}"
-                ],
                 "is_enabled":${smtpAccountConfig.isEnabled},
                 "smtp_account":{
                     "host":"${sampleSmtpAccount.host}",
@@ -783,7 +734,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.EMAIL,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleEmail
         )
@@ -795,9 +745,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${emailConfig.name}",
                 "description":"${emailConfig.description}",
                 "config_type":"email",
-                "feature_list":[
-                    "${emailConfig.features.elementAt(0)}"
-                ],
                 "is_enabled":${emailConfig.isEnabled},
                 "email":{
                     "email_account_id":"${sampleEmail.emailAccountID}",
@@ -831,95 +778,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
     }
 
-    fun `test Create email notification config using email account id with unavailable feature should fail`() {
-        // Create smtp account notification config with reporting and alerting feature
-        val createSmtpAccountRequestJsonString = """
-        {
-            "config":{
-                "name":"sample smtp account config name",
-                "description":"sample smtp account config description",
-                "config_type":"smtp_account",
-                "feature_list":[
-                    "reports",
-                    "alerting"
-                ],
-                "is_enabled":true,
-                "smtp_account":{
-                    "host":"smtp.domain.com",
-                    "port":"1234",
-                    "method":"start_tls",
-                    "from_address":"from@domain.com"
-                }
-            }
-        }
-        """.trimIndent()
-        val createSmtpAccountResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createSmtpAccountRequestJsonString,
-            RestStatus.OK.status
-        )
-        val smtpAccountConfigId = createSmtpAccountResponse.get("config_id").asString
-        Assert.assertNotNull(smtpAccountConfigId)
-        Thread.sleep(100)
-
-        // Create sample email config request reference with reports and index_management
-        val sampleEmail = Email(
-            smtpAccountConfigId,
-            listOf(EmailRecipient("default-email1@email.com"), EmailRecipient("default-email2@email.com")),
-            listOf()
-        )
-        val emailConfig = NotificationConfig(
-            "this is a sample config name",
-            "this is a sample config description",
-            ConfigType.EMAIL,
-            setOf(FEATURE_REPORTS, FEATURE_INDEX_MANAGEMENT),
-            isEnabled = true,
-            configData = sampleEmail
-        )
-
-        // Create email notification config
-        val createEmailRequestJsonString = """
-        {
-            "config":{
-                "name":"${emailConfig.name}",
-                "description":"${emailConfig.description}",
-                "config_type":"email",
-                "feature_list":[
-                    "${emailConfig.features.elementAt(0)}",
-                    "${emailConfig.features.elementAt(1)}"
-                ],
-                "is_enabled":${emailConfig.isEnabled},
-                "email":{
-                    "email_account_id":"${sampleEmail.emailAccountID}",
-                    "recipient_list":[
-                        {"recipient":"${sampleEmail.recipients[0].recipient}"},
-                        {"recipient":"${sampleEmail.recipients[1].recipient}"}
-                    ],
-                    "email_group_id_list":[]
-                }
-            }
-        }
-        """.trimIndent()
-        executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createEmailRequestJsonString,
-            RestStatus.FORBIDDEN.status
-        )
-        Thread.sleep(1000)
-
-        // Get all notification config should give only email group
-        val getAllConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs",
-            "",
-            RestStatus.OK.status
-        )
-        verifySingleConfigIdEquals(smtpAccountConfigId, getAllConfigResponse)
-        Thread.sleep(100)
-    }
-
     fun `test Create email notification config wit email_group IDs put as email account id should fail`() {
 
         // Create email group notification config
@@ -929,7 +787,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"sample email group name",
                 "description":"sample email group description",
                 "config_type":"email_group",
-                "feature_list":["reports"],
                 "is_enabled":true,
                 "email_group":{
                     "recipient_list":[ {"recipient":"email1@email.com"}, {"recipient":"email2@email.com"}]
@@ -954,7 +811,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"this is a sample config name",
                 "description":"this is a sample config description",
                 "config_type":"email",
-                "feature_list":["reports"],
                 "is_enabled":true,
                 "email":{
                     "email_account_id":"$emailGroupConfigId",
@@ -991,9 +847,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"sample smtp account config name",
                 "description":"sample smtp account config description",
                 "config_type":"smtp_account",
-                "feature_list":[
-                    "reports"
-                ],
                 "is_enabled":true,
                 "smtp_account":{
                     "host":"smtp.domain.com",
@@ -1019,7 +872,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"this is a sample config name",
                 "description":"this is a sample config description",
                 "config_type":"email",
-                "feature_list":["reports"],
                 "is_enabled":true,
                 "email":{
                     "email_account_id":"$smtpAccountConfigId",
@@ -1056,9 +908,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"sample smtp account config name",
                 "description":"sample smtp account config description",
                 "config_type":"smtp_account",
-                "feature_list":[
-                    "reports"
-                ],
                 "is_enabled":true,
                 "smtp_account":{
                     "host":"smtp.domain.com",
@@ -1095,7 +944,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"this is a sample config name",
                 "description":"this is a sample config description",
                 "config_type":"email",
-                "feature_list":["reports"],
                 "is_enabled":true,
                 "email":{
                     "email_account_id":"$smtpAccountConfigId",
@@ -1136,7 +984,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample smtp account config name",
             "this is a sample smtp account config description",
             ConfigType.SMTP_ACCOUNT,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSmtpAccount
         )
@@ -1148,9 +995,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${smtpAccountConfig.name}",
                 "description":"${smtpAccountConfig.description}",
                 "config_type":"smtp_account",
-                "features":[
-                    "${smtpAccountConfig.features.elementAt(0)}"
-                ],
                 "is_enabled":${smtpAccountConfig.isEnabled},
                 "slack": {"url": "https://dummy.com"},
                 "smtp_account":{
@@ -1181,7 +1025,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.EMAIL,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleEmail
         )
@@ -1193,9 +1036,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "name":"${emailConfig.name}",
                 "description":"${emailConfig.description}",
                 "config_type":"email",
-                "features":[
-                    "${emailConfig.features.elementAt(0)}"
-                ],
                 "is_enabled":${emailConfig.isEnabled},
                 "slack":{"url": "https://dummy.com"},
                 "email":{

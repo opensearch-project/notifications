@@ -8,7 +8,6 @@ import { WebhookMethodType } from '../public/pages/Channels/types';
 import {
   CHANNEL_TYPE,
   ENCRYPTION_TYPE,
-  NOTIFICATION_SOURCE,
 } from '../public/utils/constants';
 
 export interface ChannelStatus {
@@ -31,7 +30,6 @@ export type SenderType = 'smtp_account' | 'ses_account';
 
 export interface ChannelItemType extends ConfigType {
   config_type: keyof typeof CHANNEL_TYPE;
-  feature_list: Array<keyof typeof NOTIFICATION_SOURCE>;
   is_enabled: boolean; // active or muted
   slack?: {
     url: string;

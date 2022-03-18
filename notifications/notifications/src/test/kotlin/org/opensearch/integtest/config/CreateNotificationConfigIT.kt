@@ -6,9 +6,6 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_ALERTING
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_INDEX_MANAGEMENT
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_REPORTS
 import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.MethodType
@@ -31,7 +28,6 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.SLACK,
-            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSlack
         )
@@ -43,10 +39,6 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"slack",
-                "feature_list":[
-                    "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}"
-                ],
                 "is_enabled":${referenceObject.isEnabled},
                 "slack":{"url":"${(referenceObject.configData as Slack).url}"}
             }
@@ -81,7 +73,6 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.CHIME,
-            setOf(FEATURE_ALERTING, FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleChime
         )
@@ -94,10 +85,6 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"chime",
-                "feature_list":[
-                    "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}"
-                ],
                 "is_enabled":${referenceObject.isEnabled},
                 "chime":{"url":"${(referenceObject.configData as Chime).url}"}
             }
@@ -130,7 +117,6 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             "this is a sample config name",
             "this is a sample config description",
             ConfigType.WEBHOOK,
-            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS, FEATURE_ALERTING),
             isEnabled = true,
             configData = sampleWebhook
         )
@@ -142,11 +128,6 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
                 "config_type":"webhook",
-                "feature_list":[
-                    "${referenceObject.features.elementAt(0)}",
-                    "${referenceObject.features.elementAt(1)}",
-                    "${referenceObject.features.elementAt(2)}"
-                ],
                 "is_enabled":${referenceObject.isEnabled},
                 "webhook":{"url":"${(referenceObject.configData as Webhook).url}"}
             }
@@ -179,7 +160,6 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             "this is another config name",
             "this is another config description",
             ConfigType.WEBHOOK,
-            setOf(FEATURE_INDEX_MANAGEMENT, FEATURE_REPORTS),
             isEnabled = true,
             configData = anotherWebhook
         )
@@ -192,10 +172,6 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
                 "name":"${anotherObject.name}",
                 "description":"${anotherObject.description}",
                 "config_type":"webhook",
-                "feature_list":[
-                    "${anotherObject.features.elementAt(0)}",
-                    "${anotherObject.features.elementAt(1)}"
-                ],
                 "is_enabled":${anotherObject.isEnabled},
                 "webhook":{"url":"${(anotherObject.configData as Webhook).url}"}
             }
@@ -223,7 +199,6 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             "this is a sample smtp account config name",
             "this is a sample smtp account config description",
             ConfigType.SMTP_ACCOUNT,
-            setOf(FEATURE_REPORTS),
             isEnabled = true,
             configData = sampleSmtpAccount
         )
@@ -236,9 +211,6 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
                 "name":"${smtpAccountConfig.name}",
                 "description":"${smtpAccountConfig.description}",
                 "config_type":"smtp_account",
-                "feature_list":[
-                    "${smtpAccountConfig.features.elementAt(0)}"
-                ],
                 "is_enabled":${smtpAccountConfig.isEnabled},
                 "smtp_account":{
                     "host":"${sampleSmtpAccount.host}",

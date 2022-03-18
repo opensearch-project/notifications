@@ -26,7 +26,6 @@ import org.opensearch.cluster.routing.RoutingTable
 import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.util.concurrent.ThreadContext
 import org.opensearch.common.util.concurrent.ThreadContext.StoredContext
-import org.opensearch.commons.notifications.NotificationConstants.FEATURE_ALERTING
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.DeliveryStatus
 import org.opensearch.commons.notifications.model.EventSource
@@ -65,7 +64,6 @@ internal class NotificationEventIndexTests {
         val sampleEventSource = EventSource(
             "title",
             "reference_id",
-            FEATURE_ALERTING,
             tags = listOf("tag1", "tag2"),
             severity = SeverityType.INFO
         )

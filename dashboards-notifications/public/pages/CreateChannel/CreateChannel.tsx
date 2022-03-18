@@ -264,7 +264,6 @@ export function CreateChannel(props: CreateChannelsProps) {
       name,
       description,
       config_type: channelType,
-      feature_list: ['alerting'], // TODO: Remove this from config when the backend no longer requires it
       is_enabled: isEnabled,
     };
     if (channelType === BACKEND_CHANNEL_TYPE.SLACK) {
@@ -327,7 +326,6 @@ export function CreateChannel(props: CreateChannelsProps) {
 
       await servicesContext.notificationService.sendTestMessage(
         tempChannelId,
-        config.feature_list[0] // for test message any source works
       );
       coreContext.notifications.toasts.addSuccess(
         'Successfully sent a test message.'

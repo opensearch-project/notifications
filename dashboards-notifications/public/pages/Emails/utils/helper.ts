@@ -4,7 +4,7 @@
  */
 
 import { EuiComboBoxOptionOption } from '@elastic/eui';
-import { ENCRYPTION_TYPE, NOTIFICATION_SOURCE } from '../../../utils/constants';
+import { ENCRYPTION_TYPE } from '../../../utils/constants';
 
 export const createSenderConfigObject = (
   senderName: string,
@@ -16,7 +16,6 @@ export const createSenderConfigObject = (
   return {
     name: senderName,
     config_type: 'smtp_account',
-    feature_list: Object.keys(NOTIFICATION_SOURCE),
     is_enabled: true,
     smtp_account: {
       host,
@@ -36,7 +35,6 @@ export const createSesSenderConfigObject = (
   return {
     name: senderName,
     config_type: 'ses_account',
-    feature_list: Object.keys(NOTIFICATION_SOURCE),
     is_enabled: true,
     ses_account: {
       from_address: email,
@@ -55,7 +53,6 @@ export const createRecipientGroupConfigObject = (
     name,
     description,
     config_type: 'email_group',
-    feature_list: Object.keys(NOTIFICATION_SOURCE),
     is_enabled: true,
     email_group: {
       recipient_list: selectedEmailOptions.map((email) => ({

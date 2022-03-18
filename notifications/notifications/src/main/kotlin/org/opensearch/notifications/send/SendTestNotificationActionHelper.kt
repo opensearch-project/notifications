@@ -13,37 +13,36 @@ import org.opensearch.commons.notifications.model.SeverityType
  * Helper function for send transport action.
  */
 object SendTestNotificationActionHelper {
-    fun generateMessage(feature: String, configId: String): ChannelMessage {
+    fun generateMessage(configId: String): ChannelMessage {
         return ChannelMessage(
-            getMessageTextDescription(feature, configId),
-            getMessageHtmlDescription(feature, configId),
+            getMessageTextDescription(configId),
+            getMessageHtmlDescription(configId),
             null
         )
     }
 
-    fun generateEventSource(feature: String, configId: String): EventSource {
+    fun generateEventSource(configId: String): EventSource {
         return EventSource(
-            getMessageTitle(feature, configId),
+            getMessageTitle(configId),
             configId,
-            feature,
             SeverityType.INFO
         )
     }
 
-    private fun getMessageTitle(feature: String, configId: String): String {
-        return "[$feature] Test Message Title-$configId" // TODO: change as spec
+    private fun getMessageTitle(configId: String): String {
+        return "Test Message Title-$configId" // TODO: change as spec
     }
 
-    private fun getMessageTextDescription(feature: String, configId: String): String {
-        return "Test message content body for config id $configId\nfrom feature $feature" // TODO: change as spec
+    private fun getMessageTextDescription(configId: String): String {
+        return "Test message content body for config id $configId" // TODO: change as spec
     }
 
-    private fun getMessageHtmlDescription(feature: String, configId: String): String {
+    private fun getMessageHtmlDescription(configId: String): String {
         return """
             <html>
             <header><title>Test Message</title></header>
             <body>
-            <p>Test Message for config id $configId from feature $feature</p>
+            <p>Test Message for config id $configId</p>
             </body>
             </html>
         """.trimIndent() // TODO: change as spec

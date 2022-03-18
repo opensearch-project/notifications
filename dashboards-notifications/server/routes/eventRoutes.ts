@@ -47,9 +47,6 @@ export function eventRoutes(router: IRouter) {
         params: schema.object({
           configId: schema.string(),
         }),
-        query: schema.object({
-          feature: schema.string(),
-        }),
       },
     },
     async (context, request, response) => {
@@ -62,7 +59,6 @@ export function eventRoutes(router: IRouter) {
           'notifications.sendTestMessage',
           {
             configId: request.params.configId,
-            feature: request.query.feature,
           }
         );
         return response.ok({ body: resp });

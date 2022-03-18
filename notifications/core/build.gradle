@@ -96,14 +96,16 @@ compileKotlin { kotlinOptions.freeCompilerArgs = ['-Xjsr305=strict'] }
 
 dependencies {
     compileOnly "org.opensearch:opensearch:${opensearch_version}"
-    compile "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
-    compile "org.apache.httpcomponents:httpcore:4.4.5"
-    compile "org.apache.httpcomponents:httpclient:4.5.10"
-    compile "com.amazonaws:aws-java-sdk-sns:${aws_version}"
-    compile "com.amazonaws:aws-java-sdk-sts:${aws_version}"
-    compile "com.amazonaws:aws-java-sdk-ses:${aws_version}"
-    compile "com.sun.mail:javax.mail:1.6.2"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
+    implementation "org.apache.httpcomponents:httpcore:4.4.5"
+    implementation "org.apache.httpcomponents:httpclient:4.5.10"
+    implementation "com.amazonaws:aws-java-sdk-core:${aws_version}"
+    implementation "com.amazonaws:aws-java-sdk-sns:${aws_version}"
+    implementation "com.amazonaws:aws-java-sdk-sts:${aws_version}"
+    implementation "com.amazonaws:aws-java-sdk-ses:${aws_version}"
+    implementation "com.sun.mail:javax.mail:1.6.2"
+    implementation "javax.activation:activation:1.1"
     testImplementation(
             'org.assertj:assertj-core:3.16.1',
             'org.junit.jupiter:junit-jupiter-api:5.6.2',
@@ -122,16 +124,17 @@ dependencies {
     )
     testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
-    testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.2')
-    testCompile "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
-    testCompile "org.mockito:mockito-core:4.3.1"
-    testCompile "org.opensearch.test:framework:${opensearch_version}"
-    testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
-    compile project(path: ":${rootProject.name}-core-spi", configuration: 'shadow')
+    testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.6.2')
+    testImplementation "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
+    testImplementation "net.bytebuddy:byte-buddy-agent:1.12.7"
+    testImplementation "org.mockito:mockito-core:4.3.1"
+    testImplementation "org.opensearch.test:framework:${opensearch_version}"
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
+    implementation project(path: ":${rootProject.name}-core-spi", configuration: 'shadow')
 }
 
 configurations {
-    testCompile {
+    testImplementation {
         exclude group: 'org.elasticsearch', module: 'securemock' // resolve jarhell with mockito
     }
 }
