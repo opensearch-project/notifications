@@ -26,7 +26,7 @@ internal class NotificationChannelListRestHandler : PluginBaseHandler() {
         /**
          * Base URL for this handler
          */
-        private const val REQUEST_URL = "$PLUGIN_BASE_URI/feature/channels"
+        private const val REQUEST_URL = "$PLUGIN_BASE_URI/channels"
     }
 
     /**
@@ -42,7 +42,7 @@ internal class NotificationChannelListRestHandler : PluginBaseHandler() {
     override fun routes(): List<Route> {
         return listOf(
             /**
-             * Get a notification event
+             * Get notification channels
              * Request URL: GET [REQUEST_URL]
              * Request body: Ref [org.opensearch.commons.notifications.action.GetChannelListRequest]
              * Response body: [org.opensearch.commons.notifications.action.GetChannelListResponse]

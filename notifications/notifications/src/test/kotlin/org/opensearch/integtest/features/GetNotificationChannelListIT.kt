@@ -120,7 +120,7 @@ class GetNotificationChannelListIT : PluginRestTestCase() {
     fun `test POST channel list should result in error`() {
         executeRequest(
             RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/feature/channels",
+            "$PLUGIN_BASE_URI/channels",
             "{\"feature\":\"reports\"}",
             RestStatus.METHOD_NOT_ALLOWED.status
         )
@@ -129,7 +129,7 @@ class GetNotificationChannelListIT : PluginRestTestCase() {
     fun `test PUT channel list should result in error`() {
         executeRequest(
             RestRequest.Method.PUT.name,
-            "$PLUGIN_BASE_URI/feature/channels",
+            "$PLUGIN_BASE_URI/channels",
             "{\"feature\":\"reports\"}",
             RestStatus.METHOD_NOT_ALLOWED.status
         )
@@ -151,7 +151,7 @@ class GetNotificationChannelListIT : PluginRestTestCase() {
         val channelIds = setOf(slackId, chimeId, webhookId, emailId)
         val response = executeRequest(
             RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/feature/channels",
+            "$PLUGIN_BASE_URI/channels",
             "",
             RestStatus.OK.status
         )
