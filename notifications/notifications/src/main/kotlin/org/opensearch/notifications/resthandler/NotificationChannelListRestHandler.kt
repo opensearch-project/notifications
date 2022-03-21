@@ -7,7 +7,7 @@ package org.opensearch.notifications.resthandler
 
 import org.opensearch.client.node.NodeClient
 import org.opensearch.commons.notifications.NotificationsPluginInterface
-import org.opensearch.commons.notifications.action.GetFeatureChannelListRequest
+import org.opensearch.commons.notifications.action.GetChannelListRequest
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
@@ -21,7 +21,7 @@ import org.opensearch.rest.action.RestToXContentListener
 /**
  * Rest handler for getting notification channels.
  */
-internal class NotificationFeatureChannelListRestHandler : PluginBaseHandler() {
+internal class NotificationChannelListRestHandler : PluginBaseHandler() {
     companion object {
         /**
          * Base URL for this handler
@@ -33,7 +33,7 @@ internal class NotificationFeatureChannelListRestHandler : PluginBaseHandler() {
      * {@inheritDoc}
      */
     override fun getName(): String {
-        return "notifications_feature_channel_list"
+        return "notifications_channel_list"
     }
 
     /**
@@ -44,8 +44,8 @@ internal class NotificationFeatureChannelListRestHandler : PluginBaseHandler() {
             /**
              * Get a notification event
              * Request URL: GET [REQUEST_URL]
-             * Request body: Ref [org.opensearch.commons.notifications.action.GetFeatureChannelListRequest]
-             * Response body: [org.opensearch.commons.notifications.action.GetFeatureChannelListResponse]
+             * Request body: Ref [org.opensearch.commons.notifications.action.GetChannelListRequest]
+             * Response body: [org.opensearch.commons.notifications.action.GetChannelListResponse]
              */
             Route(GET, REQUEST_URL)
         )
@@ -64,12 +64,12 @@ internal class NotificationFeatureChannelListRestHandler : PluginBaseHandler() {
     override fun executeRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
         return when (request.method()) {
             GET -> {
-                Metrics.NOTIFICATIONS_FEATURE_CHANNELS_INFO_TOTAL.counter.increment()
-                Metrics.NOTIFICATIONS_FEATURE_CHANNELS_INFO_INTERVAL_COUNT.counter.increment()
+                Metrics.NOTIFICATIONS_CHANNELS_INFO_TOTAL.counter.increment()
+                Metrics.NOTIFICATIONS_CHANNELS_INFO_INTERVAL_COUNT.counter.increment()
                 RestChannelConsumer {
-                    NotificationsPluginInterface.getFeatureChannelList(
+                    NotificationsPluginInterface.getChannelList(
                         client,
-                        GetFeatureChannelListRequest(),
+                        GetChannelListRequest(),
                         RestToXContentListener(it)
                     )
                 }

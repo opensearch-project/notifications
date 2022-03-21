@@ -152,19 +152,16 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
         "notifications_events.info.system_error", RollingCounter()
     ),
     // Feature Channels Endpoints
-    // GET _plugins/_notifications/feature/channels/{featureTag}
-    NOTIFICATIONS_FEATURE_CHANNELS_INFO_TOTAL(
-        "notifications_feature_channels.info.total",
+    // GET _plugins/_notifications/channels
+    NOTIFICATIONS_CHANNELS_INFO_TOTAL(
+        "notifications_channels.info.total",
         BasicCounter()
     ),
-    NOTIFICATIONS_FEATURE_CHANNELS_INFO_INTERVAL_COUNT(
-        "notifications_feature_channels.info.count", RollingCounter()
+    NOTIFICATIONS_CHANNELS_INFO_INTERVAL_COUNT(
+        "notifications_channels.info.count", RollingCounter()
     ),
-    NOTIFICATIONS_FEATURE_CHANNELS_INFO_USER_ERROR_INVALID_FEATURE_TAG(
-        "notifications_feature_channels.info.user_error.invalid_feature_tag", RollingCounter()
-    ),
-    NOTIFICATIONS_FEATURE_CHANNELS_INFO_SYSTEM_ERROR(
-        "notifications_feature_channels.info.system_error", RollingCounter()
+    NOTIFICATIONS_CHANNELS_INFO_SYSTEM_ERROR(
+        "notifications_channels.info.system_error", RollingCounter()
     ),
     // Features Endpoints
     // GET _plugins/_notifications/features
@@ -192,9 +189,6 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
     ), // user errors for send message?
     NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND(
         "notifications.send_message.user_error.not_found", RollingCounter()
-    ),
-    NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_FEATURE_NOT_FOUND(
-        "notifications.send_message.user_error.feature_not_found", RollingCounter()
     ),
     NOTIFICATIONS_SEND_MESSAGE_SYSTEM_ERROR(
         "notifications.send_message.system_error",

@@ -24,7 +24,7 @@ import org.opensearch.env.Environment
 import org.opensearch.env.NodeEnvironment
 import org.opensearch.notifications.action.CreateNotificationConfigAction
 import org.opensearch.notifications.action.DeleteNotificationConfigAction
-import org.opensearch.notifications.action.GetFeatureChannelListAction
+import org.opensearch.notifications.action.GetChannelListAction
 import org.opensearch.notifications.action.GetNotificationConfigAction
 import org.opensearch.notifications.action.GetNotificationEventAction
 import org.opensearch.notifications.action.GetPluginFeaturesAction
@@ -36,9 +36,9 @@ import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.notifications.index.EventIndexingActions
 import org.opensearch.notifications.index.NotificationConfigIndex
 import org.opensearch.notifications.index.NotificationEventIndex
+import org.opensearch.notifications.resthandler.NotificationChannelListRestHandler
 import org.opensearch.notifications.resthandler.NotificationConfigRestHandler
 import org.opensearch.notifications.resthandler.NotificationEventRestHandler
-import org.opensearch.notifications.resthandler.NotificationFeatureChannelListRestHandler
 import org.opensearch.notifications.resthandler.NotificationFeaturesRestHandler
 import org.opensearch.notifications.resthandler.NotificationStatsRestHandler
 import org.opensearch.notifications.resthandler.SendTestMessageRestHandler
@@ -140,8 +140,8 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension {
                 GetNotificationEventAction::class.java
             ),
             ActionPlugin.ActionHandler(
-                NotificationsActions.GET_FEATURE_CHANNEL_LIST_ACTION_TYPE,
-                GetFeatureChannelListAction::class.java
+                NotificationsActions.GET_CHANNEL_LIST_ACTION_TYPE,
+                GetChannelListAction::class.java
             ),
             ActionPlugin.ActionHandler(
                 NotificationsActions.GET_PLUGIN_FEATURES_ACTION_TYPE,
@@ -175,7 +175,7 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension {
             NotificationConfigRestHandler(),
             NotificationEventRestHandler(),
             NotificationFeaturesRestHandler(),
-            NotificationFeatureChannelListRestHandler(),
+            NotificationChannelListRestHandler(),
             SendTestMessageRestHandler(),
             NotificationStatsRestHandler()
         )

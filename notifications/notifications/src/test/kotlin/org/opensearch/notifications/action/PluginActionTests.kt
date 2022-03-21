@@ -23,8 +23,8 @@ import org.opensearch.commons.notifications.action.CreateNotificationConfigReque
 import org.opensearch.commons.notifications.action.CreateNotificationConfigResponse
 import org.opensearch.commons.notifications.action.DeleteNotificationConfigRequest
 import org.opensearch.commons.notifications.action.DeleteNotificationConfigResponse
-import org.opensearch.commons.notifications.action.GetFeatureChannelListRequest
-import org.opensearch.commons.notifications.action.GetFeatureChannelListResponse
+import org.opensearch.commons.notifications.action.GetChannelListRequest
+import org.opensearch.commons.notifications.action.GetChannelListResponse
 import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
 import org.opensearch.commons.notifications.action.GetNotificationConfigResponse
 import org.opensearch.commons.notifications.action.GetNotificationEventRequest
@@ -37,7 +37,7 @@ import org.opensearch.commons.notifications.action.SendNotificationRequest
 import org.opensearch.commons.notifications.action.SendNotificationResponse
 import org.opensearch.commons.notifications.action.UpdateNotificationConfigRequest
 import org.opensearch.commons.notifications.action.UpdateNotificationConfigResponse
-import org.opensearch.commons.notifications.model.FeatureChannelList
+import org.opensearch.commons.notifications.model.ChannelList
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
 import org.opensearch.commons.notifications.model.NotificationEventSearchResult
 import org.opensearch.notifications.index.ConfigIndexingActions
@@ -163,18 +163,18 @@ internal class PluginActionTests {
     }
 
     @Test
-    fun `Get feature channel list action should call back action listener`() {
-        val request = mock(GetFeatureChannelListRequest::class.java)
-        val response = GetFeatureChannelListResponse(mock(FeatureChannelList::class.java))
+    fun `Get channel list action should call back action listener`() {
+        val request = mock(GetChannelListRequest::class.java)
+        val response = GetChannelListResponse(mock(ChannelList::class.java))
 
         // Mock singleton's method by mockk framework
         mockkObject(ConfigIndexingActions)
-        every { ConfigIndexingActions.getFeatureChannelList(request, any()) } returns response
+        every { ConfigIndexingActions.getChannelList(request, any()) } returns response
 
-        val getFeatureChannelListAction = GetFeatureChannelListAction(
+        val getChannelListAction = GetChannelListAction(
             transportService, client, actionFilters, xContentRegistry
         )
-        getFeatureChannelListAction.execute(task, request, AssertionListener(response))
+        getChannelListAction.execute(task, request, AssertionListener(response))
     }
 
     @Test
