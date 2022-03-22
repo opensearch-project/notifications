@@ -12,8 +12,8 @@ import org.opensearch.client.Client
 import org.opensearch.common.inject.Inject
 import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.commons.authuser.User
-import org.opensearch.commons.notifications.action.GetFeatureChannelListRequest
-import org.opensearch.commons.notifications.action.GetFeatureChannelListResponse
+import org.opensearch.commons.notifications.action.GetChannelListRequest
+import org.opensearch.commons.notifications.action.GetChannelListResponse
 import org.opensearch.commons.notifications.action.NotificationsActions
 import org.opensearch.commons.utils.recreateObject
 import org.opensearch.notifications.index.ConfigIndexingActions
@@ -21,19 +21,19 @@ import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 
 /**
- * Get feature channel list transport action
+ * Get channel list transport action
  */
-internal class GetFeatureChannelListAction @Inject constructor(
+internal class GetChannelListAction @Inject constructor(
     transportService: TransportService,
     client: Client,
     actionFilters: ActionFilters,
     val xContentRegistry: NamedXContentRegistry
-) : PluginBaseAction<GetFeatureChannelListRequest, GetFeatureChannelListResponse>(
-    NotificationsActions.GET_FEATURE_CHANNEL_LIST_NAME,
+) : PluginBaseAction<GetChannelListRequest, GetChannelListResponse>(
+    NotificationsActions.GET_CHANNEL_LIST_NAME,
     transportService,
     client,
     actionFilters,
-    ::GetFeatureChannelListRequest
+    ::GetChannelListRequest
 ) {
 
     /**
@@ -43,10 +43,10 @@ internal class GetFeatureChannelListAction @Inject constructor(
     override fun doExecute(
         task: Task?,
         request: ActionRequest,
-        listener: ActionListener<GetFeatureChannelListResponse>
+        listener: ActionListener<GetChannelListResponse>
     ) {
-        val transformedRequest = request as? GetFeatureChannelListRequest
-            ?: recreateObject(request) { GetFeatureChannelListRequest(it) }
+        val transformedRequest = request as? GetChannelListRequest
+            ?: recreateObject(request) { GetChannelListRequest(it) }
         super.doExecute(task, transformedRequest, listener)
     }
 
@@ -54,9 +54,9 @@ internal class GetFeatureChannelListAction @Inject constructor(
      * {@inheritDoc}
      */
     override fun executeRequest(
-        request: GetFeatureChannelListRequest,
+        request: GetChannelListRequest,
         user: User?
-    ): GetFeatureChannelListResponse {
-        return ConfigIndexingActions.getFeatureChannelList(request, user)
+    ): GetChannelListResponse {
+        return ConfigIndexingActions.getChannelList(request, user)
     }
 }

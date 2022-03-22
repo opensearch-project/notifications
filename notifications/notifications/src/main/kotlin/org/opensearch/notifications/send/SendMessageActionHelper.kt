@@ -284,8 +284,8 @@ object SendMessageActionHelper {
      */
     private fun sendMessageToLegacyDestination(baseMessage: LegacyBaseMessage): LegacyDestinationResponse {
         val message =
-            MessageContent(title = "Index Management Notification", textDescription = baseMessage.messageContent)
-        // These legacy destination calls do not have reference Ids, just passing index management feature constant
+            MessageContent(title = "Legacy Notification", textDescription = baseMessage.messageContent)
+        // These legacy destination calls do not have reference Ids, just passing 'legacy' constant
         return when (baseMessage.channelType) {
             LegacyDestinationType.LEGACY_SLACK -> {
                 val destination = SlackDestination(baseMessage.url)

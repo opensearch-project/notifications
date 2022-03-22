@@ -14,7 +14,7 @@ import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
 import kotlin.random.Random
 
-class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
+class GetNotificationChannelListIT : PluginRestTestCase() {
     private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
 
     private fun getCreateRequestJsonString(
@@ -107,7 +107,7 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
         if (totalHits >= 0) {
             Assert.assertEquals(totalHits, jsonObject.get("total_hits").asInt)
         }
-        val items = jsonObject.get("feature_channel_list").asJsonArray
+        val items = jsonObject.get("channel_list").asJsonArray
         Assert.assertEquals(idSet.size, items.size())
         items.forEach {
             val item = it.asJsonObject
@@ -117,25 +117,25 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
         }
     }
 
-    fun `test POST feature channel list should result in error`() {
+    fun `test POST channel list should result in error`() {
         executeRequest(
             RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/feature/channels",
+            "$PLUGIN_BASE_URI/channels",
             "{\"feature\":\"reports\"}",
             RestStatus.METHOD_NOT_ALLOWED.status
         )
     }
 
-    fun `test PUT feature channel list should result in error`() {
+    fun `test PUT channel list should result in error`() {
         executeRequest(
             RestRequest.Method.PUT.name,
-            "$PLUGIN_BASE_URI/feature/channels",
+            "$PLUGIN_BASE_URI/channels",
             "{\"feature\":\"reports\"}",
             RestStatus.METHOD_NOT_ALLOWED.status
         )
     }
 
-    fun `test getFeatureChannelList should return only channels`() {
+    fun `test getChannelList should return only channels`() {
         val slackId = createConfig(configType = ConfigType.SLACK)
         val chimeId = createConfig(configType = ConfigType.CHIME)
         val webhookId = createConfig(configType = ConfigType.WEBHOOK)
@@ -151,7 +151,7 @@ class GetNotificationFeatureChannelListIT : PluginRestTestCase() {
         val channelIds = setOf(slackId, chimeId, webhookId, emailId)
         val response = executeRequest(
             RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/feature/channels",
+            "$PLUGIN_BASE_URI/channels",
             "",
             RestStatus.OK.status
         )

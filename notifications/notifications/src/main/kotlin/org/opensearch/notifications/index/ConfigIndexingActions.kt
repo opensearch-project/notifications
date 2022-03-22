@@ -11,18 +11,18 @@ import org.opensearch.commons.notifications.action.CreateNotificationConfigReque
 import org.opensearch.commons.notifications.action.CreateNotificationConfigResponse
 import org.opensearch.commons.notifications.action.DeleteNotificationConfigRequest
 import org.opensearch.commons.notifications.action.DeleteNotificationConfigResponse
-import org.opensearch.commons.notifications.action.GetFeatureChannelListRequest
-import org.opensearch.commons.notifications.action.GetFeatureChannelListResponse
+import org.opensearch.commons.notifications.action.GetChannelListRequest
+import org.opensearch.commons.notifications.action.GetChannelListResponse
 import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
 import org.opensearch.commons.notifications.action.GetNotificationConfigResponse
 import org.opensearch.commons.notifications.action.UpdateNotificationConfigRequest
 import org.opensearch.commons.notifications.action.UpdateNotificationConfigResponse
+import org.opensearch.commons.notifications.model.Channel
+import org.opensearch.commons.notifications.model.ChannelList
 import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Email
 import org.opensearch.commons.notifications.model.EmailGroup
-import org.opensearch.commons.notifications.model.FeatureChannel
-import org.opensearch.commons.notifications.model.FeatureChannelList
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.NotificationConfigInfo
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
@@ -340,12 +340,12 @@ object ConfigIndexingActions {
 
     /**
      * Get NotificationConfig info
-     * @param request [GetFeatureChannelListRequest] object
+     * @param request [GetChannelListRequest] object
      * @param user the user info object
-     * @return [GetFeatureChannelListResponse]
+     * @return [GetChannelListResponse]
      */
-    fun getFeatureChannelList(request: GetFeatureChannelListRequest, user: User?): GetFeatureChannelListResponse {
-        log.info("$LOG_PREFIX:getFeatureChannelList $request")
+    fun getChannelList(request: GetChannelListRequest, user: User?): GetChannelListResponse {
+        log.info("$LOG_PREFIX:getChannelList $request")
         userAccess.validateUser(user)
         val supportedChannelListString = getSupportedChannelList().joinToString(",")
         val filterParams = mapOf(
@@ -359,10 +359,10 @@ object ConfigIndexingActions {
         val searchResult = getAllResult.objectList.map {
             val configId = it.configId
             val config = it.notificationConfig
-            FeatureChannel(configId, config.name, config.description, config.configType, config.isEnabled)
+            Channel(configId, config.name, config.description, config.configType, config.isEnabled)
         }
-        val featureChannelList = FeatureChannelList(searchResult)
-        return GetFeatureChannelListResponse(featureChannelList)
+        val ChannelList = ChannelList(searchResult)
+        return GetChannelListResponse(ChannelList)
     }
 
     private fun getSupportedChannelList(): List<String> {
