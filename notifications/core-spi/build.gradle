@@ -27,8 +27,8 @@ apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
 
 ext {
     projectSubstitutions = [:]
-    licenseFile = rootProject.file('LICENSE')
-    noticeFile = rootProject.file('NOTICE')
+    licenseFile = rootProject.file('LICENSE.txt')
+    noticeFile = rootProject.file('NOTICE.txt')
 }
 
 task sourcesJar(type: Jar) {
