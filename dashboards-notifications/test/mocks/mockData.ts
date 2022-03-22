@@ -43,7 +43,11 @@ const mockEmail: ChannelItemType = {
   is_enabled: true,
   email: {
     email_account_id: 'dj8etXkBCzVy9Vy-nsiL',
-    recipient_list: ['custom@email.com', 'email@test.com', 'test@email.com'],
+    recipient_list: [
+      { recipient: 'custom@email.com' },
+      { recipient: 'email@test.com' },
+      { recipient: 'test@email.com' },
+    ],
     email_group_id_list: [
       '1l8hq3kB0XwiBlEbanSo',
       'dz8etXkBCzVy9Vy-0sgh',
@@ -76,7 +80,11 @@ const mockEmailWithSES: ChannelItemType = {
   is_enabled: true,
   email: {
     email_account_id: 'dj8etXkBCzVy9Vy-nsiL',
-    recipient_list: ['custom@email.com', 'email@test.com', 'test@email.com'],
+    recipient_list: [
+      { recipient: 'custom@email.com' },
+      { recipient: 'email@test.com' },
+      { recipient: 'test@email.com' },
+    ],
     email_group_id_list: [
       '1y8ud3xO0KjvOyRonaFb',
       'qm8rgKxOPmIl9Il-0ftu',
