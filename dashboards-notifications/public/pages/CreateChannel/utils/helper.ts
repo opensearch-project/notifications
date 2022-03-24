@@ -112,7 +112,7 @@ export const constructEmailObject = (
     if (group.value) {
       recipientGroupIds.push(group.value);
     } else {
-      customEmailsList.push(group.label);
+      customEmailsList.push({ recipient: group.label });
     }
   }
   return {
@@ -142,7 +142,7 @@ export const deconstructEmailObject = (
       label: _.get(email.email_group_id_map, groupId, '-'),
       value: groupId,
     })),
-    ...email.recipient_list.map((address) => ({ label: address })),
+    ...email.recipient_list.map((recipient) => ({ label: recipient.recipient })),
   ];
   return {
     senderType: email.sender_type!,

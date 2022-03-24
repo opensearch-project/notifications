@@ -44,7 +44,7 @@ export interface ChannelItemType extends ConfigType {
   };
   email?: {
     email_account_id: string;
-    recipient_list: string[]; // custom email addresses
+    recipient_list: { [recipient: string]: string }[]; // custom email addresses
     email_group_id_list: string[];
     // optional fields for displaying or editing email channel, needs more requests
     sender_type?: SenderType;

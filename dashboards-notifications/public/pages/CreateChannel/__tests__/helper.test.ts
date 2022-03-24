@@ -154,7 +154,10 @@ describe('constructs and deconstructs email objects', () => {
       'recipient-group-id-2',
       'recipient-group-id-3',
     ],
-    recipient_list: ['custom.address1@email.com', 'custom.address2@email.com'],
+    recipient_list: [
+      { recipient: 'custom.address1@email.com' },
+      { recipient: 'custom.address2@email.com' },
+    ],
   };
 
   it('constructs email objects', () => {
