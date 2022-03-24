@@ -34,7 +34,6 @@ class NotificationCoreImplTests {
     @Test
     fun `test all get configs APIs return the default value`() {
         assertEquals(defaultConfigTypes, NotificationCoreImpl.getAllowedConfigTypes())
-        assertEquals(defaultConfigFeatures, NotificationCoreImpl.getAllowedConfigFeatures())
         assertEquals(defaultPluginFeatures, NotificationCoreImpl.getPluginFeatures())
     }
 }

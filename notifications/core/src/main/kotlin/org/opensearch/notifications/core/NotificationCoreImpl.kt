@@ -52,17 +52,6 @@ object NotificationCoreImpl : NotificationCore {
     }
 
     /**
-     * Get list of allowed config features
-     */
-    override fun getAllowedConfigFeatures(): List<String> {
-        return AccessController.doPrivileged(
-            PrivilegedAction {
-                PluginSettings.allowedConfigFeatures
-            } as PrivilegedAction<List<String>>?
-        )
-    }
-
-    /**
      * Get map of plugin features
      */
     override fun getPluginFeatures(): Map<String, String> {
