@@ -16,5 +16,4 @@ opensearch.notifications.core:
     socketTimeout: 50000
     hostDenyList: []
   allowedConfigTypes: ["slack","chime","webhook","email","sns","ses_account","smtp_account","email_group"]
-  allowedConfigFeatures: ["alerting", "index_management", "reports"]
   tooltipSupport: true
