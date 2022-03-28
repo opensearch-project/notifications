@@ -22,7 +22,6 @@ class GetPluginFeaturesIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         Assert.assertFalse(getResponse.get("allowed_config_type_list").asJsonArray.isEmpty)
-        Assert.assertFalse(getResponse.get("allowed_config_feature_list").asJsonArray.isEmpty)
         val pluginFeatures = getResponse.get("plugin_features").asJsonObject
         Assert.assertFalse(pluginFeatures.keySet().isEmpty())
     }

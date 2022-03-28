@@ -33,7 +33,6 @@ internal class PluginSettingsTests {
     private val httpSocketTimeoutKey = "$httpKeyPrefix.socketTimeout"
     private val httpHostDenyListKey = "$httpKeyPrefix.hostDenyList"
     private val allowedConfigTypeKey = "$keyPrefix.allowedConfigTypes"
-    private val allowedConfigFeatureKey = "$keyPrefix.allowedConfigFeatures"
     private val tooltipSupportKey = "$keyPrefix.tooltipSupport"
 
     private val defaultSettings = Settings.builder()
@@ -55,14 +54,6 @@ internal class PluginSettingsTests {
                 "ses_account",
                 "smtp_account",
                 "email_group"
-            )
-        )
-        .putList(
-            allowedConfigFeatureKey,
-            listOf(
-                "alerting",
-                "index_management",
-                "reports"
             )
         )
         .put(tooltipSupportKey, true)
@@ -93,7 +84,6 @@ internal class PluginSettingsTests {
                     PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
-                    PluginSettings.ALLOWED_CONFIG_FEATURES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.HOST_DENY_LIST
                 )
@@ -125,10 +115,6 @@ internal class PluginSettingsTests {
             PluginSettings.allowedConfigTypes.toString()
         )
         Assertions.assertEquals(
-            defaultSettings[allowedConfigFeatureKey],
-            PluginSettings.allowedConfigFeatures.toString()
-        )
-        Assertions.assertEquals(
             defaultSettings[tooltipSupportKey],
             PluginSettings.tooltipSupport.toString()
         )
@@ -149,7 +135,6 @@ internal class PluginSettingsTests {
             .put(httpSocketTimeoutKey, 100)
             .putList(httpHostDenyListKey, listOf("sample"))
             .putList(allowedConfigTypeKey, listOf("slack"))
-            .putList(allowedConfigFeatureKey, listOf("alerting"))
             .put(tooltipSupportKey, false)
             .build()
 
@@ -165,7 +150,6 @@ internal class PluginSettingsTests {
                     PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
-                    PluginSettings.ALLOWED_CONFIG_FEATURES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.HOST_DENY_LIST
                 )
@@ -201,10 +185,6 @@ internal class PluginSettingsTests {
             clusterService.clusterSettings.get(PluginSettings.ALLOWED_CONFIG_TYPES)
         )
         Assertions.assertEquals(
-            listOf("alerting"),
-            clusterService.clusterSettings.get(PluginSettings.ALLOWED_CONFIG_FEATURES)
-        )
-        Assertions.assertEquals(
             false,
             clusterService.clusterSettings.get(PluginSettings.TOOLTIP_SUPPORT)
         )
@@ -225,7 +205,6 @@ internal class PluginSettingsTests {
                     PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
-                    PluginSettings.ALLOWED_CONFIG_FEATURES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.HOST_DENY_LIST
                 )
@@ -259,10 +238,6 @@ internal class PluginSettingsTests {
         Assertions.assertEquals(
             defaultSettings[allowedConfigTypeKey],
             clusterService.clusterSettings.get(PluginSettings.ALLOWED_CONFIG_TYPES).toString()
-        )
-        Assertions.assertEquals(
-            defaultSettings[allowedConfigFeatureKey],
-            clusterService.clusterSettings.get(PluginSettings.ALLOWED_CONFIG_FEATURES).toString()
         )
         Assertions.assertEquals(
             defaultSettings[tooltipSupportKey],

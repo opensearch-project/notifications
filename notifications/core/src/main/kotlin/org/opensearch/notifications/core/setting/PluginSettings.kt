@@ -83,11 +83,6 @@ internal object PluginSettings {
     private const val ALLOWED_CONFIG_TYPE_KEY = "$KEY_PREFIX.allowedConfigTypes"
 
     /**
-     * Setting to choose allowed config features.
-     */
-    private const val ALLOWED_CONFIG_FEATURE_KEY = "$KEY_PREFIX.allowedConfigFeatures"
-
-    /**
      * Setting to enable tooltip in UI
      */
     private const val TOOLTIP_SUPPORT_KEY = "$KEY_PREFIX.tooltipSupport"
@@ -142,15 +137,6 @@ internal object PluginSettings {
     )
 
     /**
-     * Default config feature list
-     */
-    private val DEFAULT_ALLOWED_CONFIG_FEATURES = listOf(
-        "alerting",
-        "index_management",
-        "reports"
-    )
-
-    /**
      * Default email host deny list
      */
     private val DEFAULT_HOST_DENY_LIST = emptyList<String>()
@@ -170,12 +156,6 @@ internal object PluginSettings {
      */
     @Volatile
     var allowedConfigTypes: List<String>
-
-    /**
-     * list of allowed config features.
-     */
-    @Volatile
-    var allowedConfigFeatures: List<String>
 
     /**
      * Email size limit setting
@@ -258,7 +238,6 @@ internal object PluginSettings {
             ?: DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS
         socketTimeout = (settings?.get(SOCKET_TIMEOUT_MILLISECONDS_KEY)?.toInt()) ?: DEFAULT_SOCKET_TIMEOUT_MILLISECONDS
         allowedConfigTypes = settings?.getAsList(ALLOWED_CONFIG_TYPE_KEY, null) ?: DEFAULT_ALLOWED_CONFIG_TYPES
-        allowedConfigFeatures = settings?.getAsList(ALLOWED_CONFIG_FEATURE_KEY, null) ?: DEFAULT_ALLOWED_CONFIG_FEATURES
         tooltipSupport = settings?.getAsBoolean(TOOLTIP_SUPPORT_KEY, true) ?: DEFAULT_TOOLTIP_SUPPORT
         hostDenyList = settings?.getAsList(HOST_DENY_LIST_KEY, null) ?: DEFAULT_HOST_DENY_LIST
         destinationSettings = if (settings != null) loadDestinationSettings(settings) else DEFAULT_DESTINATION_SETTINGS
@@ -318,13 +297,6 @@ internal object PluginSettings {
         NodeScope, Dynamic
     )
 
-    val ALLOWED_CONFIG_FEATURES: Setting<List<String>> = Setting.listSetting(
-        ALLOWED_CONFIG_FEATURE_KEY,
-        DEFAULT_ALLOWED_CONFIG_FEATURES,
-        { it },
-        NodeScope, Dynamic
-    )
-
     val TOOLTIP_SUPPORT: Setting<Boolean> = Setting.boolSetting(
         TOOLTIP_SUPPORT_KEY,
         defaultSettings[TOOLTIP_SUPPORT_KEY]!!.toBoolean(),
@@ -364,7 +336,6 @@ internal object PluginSettings {
             CONNECTION_TIMEOUT_MILLISECONDS,
             SOCKET_TIMEOUT_MILLISECONDS,
             ALLOWED_CONFIG_TYPES,
-            ALLOWED_CONFIG_FEATURES,
             TOOLTIP_SUPPORT,
             HOST_DENY_LIST,
             EMAIL_USERNAME,
@@ -377,7 +348,6 @@ internal object PluginSettings {
      */
     private fun updateSettingValuesFromLocal(clusterService: ClusterService) {
         allowedConfigTypes = ALLOWED_CONFIG_TYPES.get(clusterService.settings)
-        allowedConfigFeatures = ALLOWED_CONFIG_FEATURES.get(clusterService.settings)
         emailSizeLimit = EMAIL_SIZE_LIMIT.get(clusterService.settings)
         emailMinimumHeaderLength = EMAIL_MINIMUM_HEADER_LENGTH.get(clusterService.settings)
         maxConnections = MAX_CONNECTIONS.get(clusterService.settings)
@@ -430,11 +400,6 @@ internal object PluginSettings {
             log.debug("$LOG_PREFIX:$ALLOWED_CONFIG_TYPE_KEY -autoUpdatedTo-> $clusterAllowedConfigTypes")
             allowedConfigTypes = clusterAllowedConfigTypes
         }
-        val clusterAllowedConfigFeatures = clusterService.clusterSettings.get(ALLOWED_CONFIG_FEATURES)
-        if (clusterAllowedConfigFeatures != null) {
-            log.debug("$LOG_PREFIX:$ALLOWED_CONFIG_FEATURE_KEY -autoUpdatedTo-> $clusterAllowedConfigFeatures")
-            allowedConfigFeatures = clusterAllowedConfigFeatures
-        }
         val clusterTooltipSupport = clusterService.clusterSettings.get(TOOLTIP_SUPPORT)
         if (clusterTooltipSupport != null) {
             log.debug("$LOG_PREFIX:$TOOLTIP_SUPPORT_KEY -autoUpdatedTo-> $clusterTooltipSupport")
@@ -460,10 +425,6 @@ internal object PluginSettings {
         clusterService.clusterSettings.addSettingsUpdateConsumer(ALLOWED_CONFIG_TYPES) {
             allowedConfigTypes = it
             log.info("$LOG_PREFIX:$ALLOWED_CONFIG_TYPE_KEY -updatedTo-> $it")
-        }
-        clusterService.clusterSettings.addSettingsUpdateConsumer(ALLOWED_CONFIG_FEATURES) {
-            allowedConfigFeatures = it
-            log.info("$LOG_PREFIX:$ALLOWED_CONFIG_FEATURE_KEY -updatedTo-> $it")
         }
         clusterService.clusterSettings.addSettingsUpdateConsumer(EMAIL_SIZE_LIMIT) {
             emailSizeLimit = it
@@ -542,7 +503,6 @@ internal object PluginSettings {
         connectionTimeout = DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS
         socketTimeout = DEFAULT_SOCKET_TIMEOUT_MILLISECONDS
         allowedConfigTypes = DEFAULT_ALLOWED_CONFIG_TYPES
-        allowedConfigFeatures = DEFAULT_ALLOWED_CONFIG_FEATURES
         tooltipSupport = DEFAULT_TOOLTIP_SUPPORT
         hostDenyList = DEFAULT_HOST_DENY_LIST
     }
