@@ -62,4 +62,4 @@ This code is licensed under the Apache 2.0 License.
 
 ## Copyright
 
-Copyright OpenSearch Contributors. See [NOTICE](../NOTICE) for details.
+Copyright OpenSearch Contributors. See [NOTICE](../NOTICE.txt) for details.
