@@ -1,5 +1,3 @@
-# Notifications Maintainers
-
 ## Maintainers
 | Maintainer             | GitHub ID                                         | Affiliation |
 |------------------------|---------------------------------------------------|-------------|
