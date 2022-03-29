@@ -21,6 +21,7 @@ import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.unit.TimeValue
 import org.opensearch.common.xcontent.LoggingDeprecationHandler
 import org.opensearch.common.xcontent.NamedXContentRegistry
+import org.opensearch.common.xcontent.XContentHelper
 import org.opensearch.common.xcontent.XContentType
 import org.opensearch.commons.notifications.action.GetNotificationEventRequest
 import org.opensearch.commons.notifications.model.NotificationEventInfo
@@ -51,7 +52,6 @@ internal object NotificationEventIndex : EventOperations {
     private const val INDEX_NAME = ".opensearch-notifications-event"
     private const val MAPPING_FILE_NAME = "notifications-event-mapping.yml"
     private const val SETTINGS_FILE_NAME = "notifications-event-settings.yml"
-    private const val MAPPING_TYPE = "_doc"
 
     private lateinit var client: Client
     private lateinit var clusterService: ClusterService
@@ -90,9 +90,10 @@ internal object NotificationEventIndex : EventOperations {
         if (!isIndexExists()) {
             val classLoader = NotificationEventIndex::class.java.classLoader
             val indexMappingSource = classLoader.getResource(MAPPING_FILE_NAME)?.readText()!!
+            val indexMappingAsMap = XContentHelper.convertToMap(XContentType.YAML.xContent(), indexMappingSource, false)
             val indexSettingsSource = classLoader.getResource(SETTINGS_FILE_NAME)?.readText()!!
             val request = CreateIndexRequest(INDEX_NAME)
-                .mapping(MAPPING_TYPE, indexMappingSource, XContentType.YAML)
+                .mapping(indexMappingAsMap)
                 .settings(indexSettingsSource, XContentType.YAML)
             try {
                 val actionFuture = client.admin().indices().create(request)
