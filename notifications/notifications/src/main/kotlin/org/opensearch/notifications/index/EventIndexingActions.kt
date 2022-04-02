@@ -5,6 +5,7 @@
 
 package org.opensearch.notifications.index
 
+/*
 import org.opensearch.OpenSearchStatusException
 import org.opensearch.commons.authuser.User
 import org.opensearch.commons.notifications.action.GetNotificationEventRequest
@@ -129,3 +130,4 @@ object EventIndexingActions {
         return GetNotificationEventResponse(searchResult)
     }
 }
+ */

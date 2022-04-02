@@ -26,19 +26,15 @@ import org.opensearch.notifications.action.CreateNotificationConfigAction
 import org.opensearch.notifications.action.DeleteNotificationConfigAction
 import org.opensearch.notifications.action.GetChannelListAction
 import org.opensearch.notifications.action.GetNotificationConfigAction
-import org.opensearch.notifications.action.GetNotificationEventAction
 import org.opensearch.notifications.action.GetPluginFeaturesAction
 import org.opensearch.notifications.action.PublishNotificationAction
 import org.opensearch.notifications.action.SendNotificationAction
 import org.opensearch.notifications.action.SendTestNotificationAction
 import org.opensearch.notifications.action.UpdateNotificationConfigAction
 import org.opensearch.notifications.index.ConfigIndexingActions
-import org.opensearch.notifications.index.EventIndexingActions
 import org.opensearch.notifications.index.NotificationConfigIndex
-import org.opensearch.notifications.index.NotificationEventIndex
 import org.opensearch.notifications.resthandler.NotificationChannelListRestHandler
 import org.opensearch.notifications.resthandler.NotificationConfigRestHandler
-import org.opensearch.notifications.resthandler.NotificationEventRestHandler
 import org.opensearch.notifications.resthandler.NotificationFeaturesRestHandler
 import org.opensearch.notifications.resthandler.NotificationStatsRestHandler
 import org.opensearch.notifications.resthandler.SendTestMessageRestHandler
@@ -105,10 +101,11 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension {
         this.clusterService = clusterService
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         NotificationConfigIndex.initialize(client, clusterService)
-        NotificationEventIndex.initialize(client, clusterService)
+//        NotificationEventIndex.initialize(client, clusterService)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
-        SendMessageActionHelper.initialize(NotificationConfigIndex, NotificationEventIndex, UserAccessManager)
-        EventIndexingActions.initialize(NotificationEventIndex, UserAccessManager)
+//        SendMessageActionHelper.initialize(NotificationConfigIndex, NotificationEventIndex, UserAccessManager)
+        SendMessageActionHelper.initialize(NotificationConfigIndex, UserAccessManager)
+//        EventIndexingActions.initialize(NotificationEventIndex, UserAccessManager)
         return listOf()
     }
 
@@ -134,10 +131,6 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension {
             ActionPlugin.ActionHandler(
                 NotificationsActions.GET_NOTIFICATION_CONFIG_ACTION_TYPE,
                 GetNotificationConfigAction::class.java
-            ),
-            ActionPlugin.ActionHandler(
-                NotificationsActions.GET_NOTIFICATION_EVENT_ACTION_TYPE,
-                GetNotificationEventAction::class.java
             ),
             ActionPlugin.ActionHandler(
                 NotificationsActions.GET_CHANNEL_LIST_ACTION_TYPE,
@@ -173,7 +166,6 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension {
         log.debug("$LOG_PREFIX:getRestHandlers")
         return listOf(
             NotificationConfigRestHandler(),
-            NotificationEventRestHandler(),
             NotificationFeaturesRestHandler(),
             NotificationChannelListRestHandler(),
             SendTestMessageRestHandler(),

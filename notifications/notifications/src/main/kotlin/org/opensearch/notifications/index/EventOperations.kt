@@ -4,6 +4,7 @@
  */
 package org.opensearch.notifications.index
 
+/*
 import org.opensearch.commons.notifications.action.GetNotificationEventRequest
 import org.opensearch.commons.notifications.model.NotificationEventSearchResult
 import org.opensearch.notifications.model.NotificationEventDoc
@@ -70,3 +71,5 @@ interface EventOperations {
      */
     fun deleteNotificationEvents(ids: Set<String>): Map<String, RestStatus>
 }
+
+ */

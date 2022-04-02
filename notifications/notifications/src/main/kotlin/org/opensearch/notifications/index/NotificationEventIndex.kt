@@ -5,6 +5,7 @@
 
 package org.opensearch.notifications.index
 
+/*
 import org.opensearch.ResourceAlreadyExistsException
 import org.opensearch.action.DocWriteResponse
 import org.opensearch.action.admin.indices.create.CreateIndexRequest
@@ -277,3 +278,5 @@ internal object NotificationEventIndex : EventOperations {
         return mutableMap
     }
 }
+
+ */

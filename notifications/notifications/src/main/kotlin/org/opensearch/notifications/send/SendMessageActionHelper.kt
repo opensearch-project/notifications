@@ -39,7 +39,6 @@ import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.CoreProvider
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.index.ConfigOperations
-import org.opensearch.notifications.index.EventOperations
 import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.DocMetadata
 import org.opensearch.notifications.model.NotificationConfigDocInfo
@@ -66,12 +65,10 @@ object SendMessageActionHelper {
     private val log by logger(SendMessageActionHelper::class.java)
 
     private lateinit var configOperations: ConfigOperations
-    private lateinit var eventOperations: EventOperations
     private lateinit var userAccess: UserAccess
 
-    fun initialize(configOperations: ConfigOperations, eventOperations: EventOperations, userAccess: UserAccess) {
+    fun initialize(configOperations: ConfigOperations, userAccess: UserAccess) {
         this.configOperations = configOperations
-        this.eventOperations = eventOperations
         this.userAccess = userAccess
     }
 
@@ -98,11 +95,13 @@ object SendMessageActionHelper {
         )
         val event = NotificationEvent(eventSource, eventStatusList)
         val eventDoc = NotificationEventDoc(docMetadata, event)
-        val docId = eventOperations.createNotificationEvent(eventDoc)
-            ?: run {
-                Metrics.NOTIFICATIONS_SEND_MESSAGE_SYSTEM_ERROR.counter.increment()
-                throw OpenSearchStatusException("Indexing not Acknowledged", RestStatus.INSUFFICIENT_STORAGE)
-            }
+        val docId = "test_doc"
+        // TODO: Add eventDoc in the response of NotificationResponse
+//        val docId = eventOperations.createNotificationEvent(eventDoc)
+//            ?: run {
+//                Metrics.NOTIFICATIONS_SEND_MESSAGE_SYSTEM_ERROR.counter.increment()
+//                throw OpenSearchStatusException("Indexing not Acknowledged", RestStatus.INSUFFICIENT_STORAGE)
+//            }
         // traverse status to determine HTTP status code
         var overallStatusCode = eventStatusList.first().deliveryStatus?.statusCode
         eventStatusList.forEach { eventStatus ->

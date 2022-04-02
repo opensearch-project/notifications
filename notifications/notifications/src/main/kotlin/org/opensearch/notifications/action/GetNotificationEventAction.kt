@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/*
 package org.opensearch.notifications.action
 
 import org.opensearch.action.ActionListener
@@ -60,3 +61,5 @@ internal class GetNotificationEventAction @Inject constructor(
         return EventIndexingActions.get(request, user)
     }
 }
+
+ */

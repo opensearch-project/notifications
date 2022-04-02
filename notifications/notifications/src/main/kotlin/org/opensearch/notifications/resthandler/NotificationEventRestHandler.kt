@@ -4,6 +4,7 @@
  */
 package org.opensearch.notifications.resthandler
 
+/*
 import org.opensearch.client.node.NodeClient
 import org.opensearch.commons.notifications.NotificationConstants.DEFAULT_MAX_ITEMS
 import org.opensearch.commons.notifications.NotificationConstants.EVENT_ID_LIST_TAG
@@ -171,3 +172,5 @@ internal class NotificationEventRestHandler : PluginBaseHandler() {
         return retIds
     }
 }
+
+ */
