@@ -5,6 +5,7 @@
 
 package org.opensearch.integtest.event
 
+/*
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.rest.RestRequest
@@ -22,3 +23,5 @@ class QueryNotificationEventIT : PluginRestTestCase() {
         )
     }
 }
+
+ */
