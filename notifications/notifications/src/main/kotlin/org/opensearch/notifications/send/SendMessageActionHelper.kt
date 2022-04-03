@@ -94,7 +94,7 @@ object SendMessageActionHelper {
             userAccess.getAllAccessInfo(user)
         )
         val event = NotificationEvent(eventSource, eventStatusList)
-        val eventDoc = NotificationEventDoc(docMetadata, event)
+        val eventDoc = NotificationEventDoc(event)
         val docId = "test_doc"
         // TODO: Add eventDoc in the response of NotificationResponse
 //        val docId = eventOperations.createNotificationEvent(eventDoc)

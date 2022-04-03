@@ -12,14 +12,12 @@ import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.EVENT_TAG
 import org.opensearch.commons.notifications.model.NotificationEvent
 import org.opensearch.commons.utils.logger
-import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
 import java.io.IOException
 
 /**
- * Data class representing Notification event with metadata.
+ * Data class representing Notification event
  */
 data class NotificationEventDoc(
-    val metadata: DocMetadata,
     val event: NotificationEvent
 ) : ToXContent {
 
@@ -34,7 +32,6 @@ data class NotificationEventDoc(
         @JvmStatic
         @Throws(IOException::class)
         fun parse(parser: XContentParser): NotificationEventDoc {
-            var metadata: DocMetadata? = null
             var event: NotificationEvent? = null
 
             XContentParserUtils.ensureExpectedToken(
@@ -46,7 +43,6 @@ data class NotificationEventDoc(
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    METADATA_TAG -> metadata = DocMetadata.parse(parser)
                     EVENT_TAG -> event = NotificationEvent.parse(parser)
                     else -> {
                         parser.skipChildren()
@@ -54,10 +50,8 @@ data class NotificationEventDoc(
                     }
                 }
             }
-            metadata ?: throw IllegalArgumentException("$METADATA_TAG field absent")
             event ?: throw IllegalArgumentException("$EVENT_TAG field absent")
             return NotificationEventDoc(
-                metadata,
                 event
             )
         }
@@ -78,7 +72,6 @@ data class NotificationEventDoc(
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
         return builder.startObject()
-            .field(METADATA_TAG, metadata)
             .field(EVENT_TAG, event)
             .endObject()
     }

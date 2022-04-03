@@ -21,13 +21,6 @@ internal class NotificationEventDocTests {
 
     @Test
     fun `Event doc serialize and deserialize using json config object should be equal`() {
-        val lastUpdatedTimeMs = Instant.ofEpochMilli(Instant.now().toEpochMilli())
-        val createdTimeMs = Instant.ofEpochMilli(Instant.now().minusSeconds(2000).toEpochMilli())
-        val metadata = DocMetadata(
-            lastUpdatedTimeMs,
-            createdTimeMs,
-            listOf("br1", "br2", "br3")
-        )
         val sampleEventSource = EventSource(
             "title",
             "reference_id",
@@ -41,7 +34,7 @@ internal class NotificationEventDocTests {
             deliveryStatus = DeliveryStatus("200", "success")
         )
         val sampleEvent = NotificationEvent(sampleEventSource, listOf(status))
-        val eventDoc = NotificationEventDoc(metadata, sampleEvent)
+        val eventDoc = NotificationEventDoc(sampleEvent)
         val jsonString = getJsonString(eventDoc)
         val recreatedObject = createObjectFromJsonString(jsonString) { NotificationEventDoc.parse(it) }
         assertEquals(eventDoc, recreatedObject)
@@ -51,11 +44,6 @@ internal class NotificationEventDocTests {
     fun `Event doc should safely ignore extra field in json object`() {
         val lastUpdatedTimeMs = Instant.ofEpochMilli(Instant.now().toEpochMilli())
         val createdTimeMs = Instant.ofEpochMilli(Instant.now().minusSeconds(2000).toEpochMilli())
-        val metadata = DocMetadata(
-            lastUpdatedTimeMs,
-            createdTimeMs,
-            listOf("br1", "br2", "br3")
-        )
         val eventSource = EventSource(
             "title",
             "reference_id",
@@ -69,7 +57,7 @@ internal class NotificationEventDocTests {
             deliveryStatus = DeliveryStatus("200", "success")
         )
         val sampleEvent = NotificationEvent(eventSource, listOf(eventStatus))
-        val eventDoc = NotificationEventDoc(metadata, sampleEvent)
+        val eventDoc = NotificationEventDoc(sampleEvent)
         val jsonString = """
         {
             "metadata":{
@@ -104,37 +92,6 @@ internal class NotificationEventDocTests {
         """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { NotificationEventDoc.parse(it) }
         assertEquals(eventDoc, recreatedObject)
-    }
-
-    @Test
-    fun `Event doc should throw exception if metadata is absent in json`() {
-        val jsonString = """
-        {
-            "event":{
-                "event_source":{
-                    "title":"title",
-                    "reference_id":"reference_id",
-                    "severity":"info",
-                    "tags":["tag1", "tag2"]
-                },
-                "status_list":[
-                    {
-                       "config_id":"config_id",
-                       "config_type":"chime",
-                       "config_name":"name",
-                       "delivery_status":
-                       {
-                            "status_code":"200",
-                            "status_text":"success"
-                       }
-                    }
-                ]
-            }
-        }
-        """.trimIndent()
-        Assertions.assertThrows(IllegalArgumentException::class.java) {
-            createObjectFromJsonString(jsonString) { NotificationEventDoc.parse(it) }
-        }
     }
 
     @Test

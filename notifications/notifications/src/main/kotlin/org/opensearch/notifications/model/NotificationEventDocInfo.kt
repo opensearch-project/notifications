@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/*
 package org.opensearch.notifications.model
 
 /**
@@ -12,3 +13,4 @@ data class NotificationEventDocInfo(
     val docInfo: DocInfo,
     val eventDoc: NotificationEventDoc
 )
+ */
