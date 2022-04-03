@@ -27,8 +27,6 @@ import org.opensearch.commons.notifications.action.GetChannelListRequest
 import org.opensearch.commons.notifications.action.GetChannelListResponse
 import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
 import org.opensearch.commons.notifications.action.GetNotificationConfigResponse
-import org.opensearch.commons.notifications.action.GetNotificationEventRequest
-import org.opensearch.commons.notifications.action.GetNotificationEventResponse
 import org.opensearch.commons.notifications.action.GetPluginFeaturesRequest
 import org.opensearch.commons.notifications.action.GetPluginFeaturesResponse
 import org.opensearch.commons.notifications.action.LegacyPublishNotificationRequest
@@ -39,9 +37,7 @@ import org.opensearch.commons.notifications.action.UpdateNotificationConfigReque
 import org.opensearch.commons.notifications.action.UpdateNotificationConfigResponse
 import org.opensearch.commons.notifications.model.ChannelList
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
-import org.opensearch.commons.notifications.model.NotificationEventSearchResult
 import org.opensearch.notifications.index.ConfigIndexingActions
-import org.opensearch.notifications.index.EventIndexingActions
 import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.rest.RestStatus
 import org.opensearch.tasks.Task
@@ -131,6 +127,7 @@ internal class PluginActionTests {
         getNotificationConfigAction.execute(task, request, AssertionListener(response))
     }
 
+/*
     @Test
     fun `Get notification event action should call back action listener`() {
         val request = mock(GetNotificationEventRequest::class.java)
@@ -147,6 +144,7 @@ internal class PluginActionTests {
         )
         getNotificationEventAction.execute(task, request, AssertionListener(response))
     }
+ */
 
     @Test
     fun `Get plugin features action should call back action listener`() {

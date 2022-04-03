@@ -4,6 +4,7 @@
  */
 package org.opensearch.notifications.index
 
+/*
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
 import io.mockk.every
@@ -204,3 +205,5 @@ internal class NotificationEventIndexTests {
         whenever(client.get(any())).thenReturn(mockActionFuture)
     }
 }
+
+ */
