@@ -15,7 +15,7 @@ import org.opensearch.commons.utils.logger
 import java.io.IOException
 
 /**
- * Data class representing Notification event
+ * Data class representing Notification event.
  */
 data class NotificationEventDoc(
     val event: NotificationEvent
@@ -55,15 +55,6 @@ data class NotificationEventDoc(
                 event
             )
         }
-    }
-
-    /**
-     * create XContentBuilder from this object using [XContentFactory.jsonBuilder()]
-     * @param params XContent parameters
-     * @return created XContentBuilder object
-     */
-    fun toXContent(params: ToXContent.Params = ToXContent.EMPTY_PARAMS): XContentBuilder {
-        return toXContent(XContentFactory.jsonBuilder(), params)
     }
 
     /**

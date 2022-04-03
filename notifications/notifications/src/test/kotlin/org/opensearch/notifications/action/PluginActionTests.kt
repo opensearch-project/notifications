@@ -127,25 +127,6 @@ internal class PluginActionTests {
         getNotificationConfigAction.execute(task, request, AssertionListener(response))
     }
 
-/*
-    @Test
-    fun `Get notification event action should call back action listener`() {
-        val request = mock(GetNotificationEventRequest::class.java)
-        val response = GetNotificationEventResponse(
-            mock(NotificationEventSearchResult::class.java)
-        )
-
-        // Mock singleton's method by mockk framework
-        mockkObject(EventIndexingActions)
-        every { EventIndexingActions.get(request, any()) } returns response
-
-        val getNotificationEventAction = GetNotificationEventAction(
-            transportService, client, actionFilters, xContentRegistry
-        )
-        getNotificationEventAction.execute(task, request, AssertionListener(response))
-    }
- */
-
     @Test
     fun `Get plugin features action should call back action listener`() {
         val allowedConfigTypes = listOf("type1")

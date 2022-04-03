@@ -101,11 +101,8 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension {
         this.clusterService = clusterService
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         NotificationConfigIndex.initialize(client, clusterService)
-//        NotificationEventIndex.initialize(client, clusterService)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
-//        SendMessageActionHelper.initialize(NotificationConfigIndex, NotificationEventIndex, UserAccessManager)
         SendMessageActionHelper.initialize(NotificationConfigIndex, UserAccessManager)
-//        EventIndexingActions.initialize(NotificationEventIndex, UserAccessManager)
         return listOf()
     }
 

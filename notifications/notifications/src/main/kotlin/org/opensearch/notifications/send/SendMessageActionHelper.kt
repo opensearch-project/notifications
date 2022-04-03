@@ -97,11 +97,7 @@ object SendMessageActionHelper {
         val eventDoc = NotificationEventDoc(event)
         val docId = "test_doc"
         // TODO: Add eventDoc in the response of NotificationResponse
-//        val docId = eventOperations.createNotificationEvent(eventDoc)
-//            ?: run {
-//                Metrics.NOTIFICATIONS_SEND_MESSAGE_SYSTEM_ERROR.counter.increment()
-//                throw OpenSearchStatusException("Indexing not Acknowledged", RestStatus.INSUFFICIENT_STORAGE)
-//            }
+
         // traverse status to determine HTTP status code
         var overallStatusCode = eventStatusList.first().deliveryStatus?.statusCode
         eventStatusList.forEach { eventStatus ->
