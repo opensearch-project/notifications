@@ -40,9 +40,7 @@ import org.opensearch.notifications.CoreProvider
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.index.ConfigOperations
 import org.opensearch.notifications.metrics.Metrics
-import org.opensearch.notifications.model.DocMetadata
 import org.opensearch.notifications.model.NotificationConfigDocInfo
-import org.opensearch.notifications.model.NotificationEventDoc
 import org.opensearch.notifications.security.UserAccess
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
@@ -55,7 +53,6 @@ import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import org.opensearch.notifications.spi.model.destination.SnsDestination
 import org.opensearch.rest.RestStatus
 import java.io.ByteArrayOutputStream
-import java.time.Instant
 
 /**
  * Helper function for send transport action.
@@ -81,22 +78,12 @@ object SendMessageActionHelper {
         val channelMessage = request.channelMessage
         val channelIds = request.channelIds.toSet()
         val user: User? = User.parse(request.threadContext)
-        val createdTime = Instant.now()
         userAccess.validateUser(user)
         val channelMap = getConfigs(channelIds)
         val childConfigMap = getConfigs(getChildConfigIds(channelMap.values.filterNotNull().toList()))
         val message = createMessageContent(eventSource, channelMessage)
         val eventStatusList = sendMessagesInParallel(user, eventSource, channelMap, childConfigMap, message)
-        val updatedTime = Instant.now()
-        val docMetadata = DocMetadata(
-            updatedTime,
-            createdTime,
-            userAccess.getAllAccessInfo(user)
-        )
         val event = NotificationEvent(eventSource, eventStatusList)
-        val eventDoc = NotificationEventDoc(event)
-        val docId = "test_doc"
-        // TODO: Add eventDoc in the response of NotificationResponse
 
         // traverse status to determine HTTP status code
         var overallStatusCode = eventStatusList.first().deliveryStatus?.statusCode
@@ -107,13 +94,13 @@ object SendMessageActionHelper {
         }
         val eventStatusListString = eventStatusList.joinToString(",", "[", "]") { getJsonString(it) }
         if (overallStatusCode != RestStatus.OK.status.toString()) {
-            val errorMessage = "{\"notification_id\": \"$docId\",\"event_status_list\": $eventStatusListString}"
+            val errorMessage = "{\"event_status_list\": $eventStatusListString}"
             throw OpenSearchStatusException(
                 errorMessage, RestStatus.fromCode(overallStatusCode!!.toInt())
             )
         }
 
-        return SendNotificationResponse(docId)
+        return SendNotificationResponse(event)
     }
 
     /**

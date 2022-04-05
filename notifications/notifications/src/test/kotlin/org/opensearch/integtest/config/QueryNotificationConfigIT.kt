@@ -164,7 +164,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
 
     fun `test Get all notification config`() {
         val configIds: Set<String> = (1..20).map { createConfig() }.toSet()
-        Thread.sleep(1000)
+        refreshAllIndices()
 
         // Get all notification configs
         val getAllConfigResponse = executeRequest(

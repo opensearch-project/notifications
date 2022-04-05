@@ -36,7 +36,13 @@ import org.opensearch.commons.notifications.action.SendNotificationResponse
 import org.opensearch.commons.notifications.action.UpdateNotificationConfigRequest
 import org.opensearch.commons.notifications.action.UpdateNotificationConfigResponse
 import org.opensearch.commons.notifications.model.ChannelList
+import org.opensearch.commons.notifications.model.ConfigType
+import org.opensearch.commons.notifications.model.DeliveryStatus
+import org.opensearch.commons.notifications.model.EventSource
+import org.opensearch.commons.notifications.model.EventStatus
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
+import org.opensearch.commons.notifications.model.NotificationEvent
+import org.opensearch.commons.notifications.model.SeverityType
 import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.rest.RestStatus
@@ -159,7 +165,22 @@ internal class PluginActionTests {
     fun `Send notification action should call back action listener`() {
         val notificationId = "notification-1"
         val request = mock(SendNotificationRequest::class.java)
-        val response = SendNotificationResponse(notificationId)
+
+        val sampleEventSource = EventSource(
+            "title",
+            "reference_id",
+            severity = SeverityType.INFO
+        )
+        val sampleStatus = EventStatus(
+            "config_id",
+            "name",
+            ConfigType.SLACK,
+            deliveryStatus = DeliveryStatus("404", "invalid recipient")
+        )
+
+        val sampleEvent = NotificationEvent(sampleEventSource, listOf(sampleStatus))
+
+        val response = SendNotificationResponse(sampleEvent)
 
         // Mock singleton's method by mockk framework
         mockkObject(SendMessageActionHelper)
