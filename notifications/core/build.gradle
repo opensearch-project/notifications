@@ -77,7 +77,7 @@ configurations.all {
     resolutionStrategy {
         force "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
         force "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
-        force "commons-logging:commons-logging:1.2" // resolve for amazonaws
+        force "commons-logging:commons-logging:${versions.commonslogging}" // resolve for amazonaws
         force "commons-codec:commons-codec:1.13" // resolve for amazonaws
         force "org.apache.httpcomponents:httpclient:4.5.10" // resolve for amazonaws
         force "org.apache.httpcomponents:httpcore:4.4.13" // resolve for amazonaws
@@ -96,6 +96,7 @@ compileKotlin { kotlinOptions.freeCompilerArgs = ['-Xjsr305=strict'] }
 
 dependencies {
     compileOnly "org.opensearch:opensearch:${opensearch_version}"
+    implementation "commons-logging:commons-logging:${versions.commonslogging}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
     implementation "org.apache.httpcomponents:httpcore:4.4.5"
