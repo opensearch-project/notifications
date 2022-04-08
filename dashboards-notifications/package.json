@@ -20,12 +20,12 @@
     "plugin_helpers": "node ../../scripts/plugin_helpers"
   },
   "dependencies": {
-    "cypress": "^5.0.0"
+    "cypress": "^6.0.0"
   },
   "devDependencies": {
     "@types/enzyme-adapter-react-16": "^1.0.6",
     "@types/showdown": "^1.9.3",
-    "enzyme-adapter-react-16": "^1.15.2",
+    "enzyme-adapter-react-16": "^1.15.5",
     "jest": "^27.5.1",
     "jest-dom": "^4.0.0"
   }
