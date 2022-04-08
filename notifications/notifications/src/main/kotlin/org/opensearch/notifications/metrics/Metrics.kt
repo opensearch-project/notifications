@@ -131,26 +131,6 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
     NOTIFICATIONS_CONFIG_INFO_USER_ERROR_SET_NOT_FOUND(
         "notifications_config.info.user_error.set_not_found", RollingCounter()
     ),
-    NOTIFICATIONS_CONFIG_INFO_SYSTEM_ERROR(
-        "notifications_config.info.system_error",
-        RollingCounter()
-    ),
-    // Event Endpoints
-    // GET _plugins/_notifications/events/{configId}
-    NOTIFICATIONS_EVENTS_INFO_TOTAL(
-        "notifications_events.info.total",
-        BasicCounter()
-    ),
-    NOTIFICATIONS_EVENTS_INFO_INTERVAL_COUNT(
-        "notifications_events.info.count",
-        RollingCounter()
-    ),
-    NOTIFICATIONS_EVENTS_INFO_USER_ERROR_INVALID_CONFIG_ID(
-        "notifications_events.info.user_error.invalid_config_id", RollingCounter()
-    ),
-    NOTIFICATIONS_EVENTS_INFO_SYSTEM_ERROR(
-        "notifications_events.info.system_error", RollingCounter()
-    ),
     // Feature Channels Endpoints
     // GET _plugins/_notifications/channels
     NOTIFICATIONS_CHANNELS_INFO_TOTAL(
@@ -160,9 +140,6 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
     NOTIFICATIONS_CHANNELS_INFO_INTERVAL_COUNT(
         "notifications_channels.info.count", RollingCounter()
     ),
-    NOTIFICATIONS_CHANNELS_INFO_SYSTEM_ERROR(
-        "notifications_channels.info.system_error", RollingCounter()
-    ),
     // Features Endpoints
     // GET _plugins/_notifications/features
     NOTIFICATIONS_FEATURES_INFO_TOTAL(
@@ -171,10 +148,6 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
     ),
     NOTIFICATIONS_FEATURES_INFO_INTERVAL_COUNT(
         "notifications_features.info.count",
-        RollingCounter()
-    ),
-    NOTIFICATIONS_FEATURES_INFO_SYSTEM_ERROR(
-        "notifications_features.info.system_error",
         RollingCounter()
     ),
     // Send Message Endpoints
@@ -190,10 +163,6 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
     NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND(
         "notifications.send_message.user_error.not_found", RollingCounter()
     ),
-    NOTIFICATIONS_SEND_MESSAGE_SYSTEM_ERROR(
-        "notifications.send_message.system_error",
-        RollingCounter()
-    ), // Track message destinations
     NOTIFICATIONS_MESSAGE_DESTINATION_SLACK(
         "notifications.message_destination.slack",
         BasicCounter()

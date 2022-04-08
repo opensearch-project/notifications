@@ -27,8 +27,6 @@ import org.opensearch.commons.notifications.action.GetChannelListRequest
 import org.opensearch.commons.notifications.action.GetChannelListResponse
 import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
 import org.opensearch.commons.notifications.action.GetNotificationConfigResponse
-import org.opensearch.commons.notifications.action.GetNotificationEventRequest
-import org.opensearch.commons.notifications.action.GetNotificationEventResponse
 import org.opensearch.commons.notifications.action.GetPluginFeaturesRequest
 import org.opensearch.commons.notifications.action.GetPluginFeaturesResponse
 import org.opensearch.commons.notifications.action.LegacyPublishNotificationRequest
@@ -38,10 +36,14 @@ import org.opensearch.commons.notifications.action.SendNotificationResponse
 import org.opensearch.commons.notifications.action.UpdateNotificationConfigRequest
 import org.opensearch.commons.notifications.action.UpdateNotificationConfigResponse
 import org.opensearch.commons.notifications.model.ChannelList
+import org.opensearch.commons.notifications.model.ConfigType
+import org.opensearch.commons.notifications.model.DeliveryStatus
+import org.opensearch.commons.notifications.model.EventSource
+import org.opensearch.commons.notifications.model.EventStatus
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
-import org.opensearch.commons.notifications.model.NotificationEventSearchResult
+import org.opensearch.commons.notifications.model.NotificationEvent
+import org.opensearch.commons.notifications.model.SeverityType
 import org.opensearch.notifications.index.ConfigIndexingActions
-import org.opensearch.notifications.index.EventIndexingActions
 import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.rest.RestStatus
 import org.opensearch.tasks.Task
@@ -132,23 +134,6 @@ internal class PluginActionTests {
     }
 
     @Test
-    fun `Get notification event action should call back action listener`() {
-        val request = mock(GetNotificationEventRequest::class.java)
-        val response = GetNotificationEventResponse(
-            mock(NotificationEventSearchResult::class.java)
-        )
-
-        // Mock singleton's method by mockk framework
-        mockkObject(EventIndexingActions)
-        every { EventIndexingActions.get(request, any()) } returns response
-
-        val getNotificationEventAction = GetNotificationEventAction(
-            transportService, client, actionFilters, xContentRegistry
-        )
-        getNotificationEventAction.execute(task, request, AssertionListener(response))
-    }
-
-    @Test
     fun `Get plugin features action should call back action listener`() {
         val allowedConfigTypes = listOf("type1")
         val pluginFeatures = mapOf(Pair("FeatureKey1", "Feature1"))
@@ -180,7 +165,22 @@ internal class PluginActionTests {
     fun `Send notification action should call back action listener`() {
         val notificationId = "notification-1"
         val request = mock(SendNotificationRequest::class.java)
-        val response = SendNotificationResponse(notificationId)
+
+        val sampleEventSource = EventSource(
+            "title",
+            "reference_id",
+            severity = SeverityType.INFO
+        )
+        val sampleStatus = EventStatus(
+            "config_id",
+            "name",
+            ConfigType.SLACK,
+            deliveryStatus = DeliveryStatus("404", "invalid recipient")
+        )
+
+        val sampleEvent = NotificationEvent(sampleEventSource, listOf(sampleStatus))
+
+        val response = SendNotificationResponse(sampleEvent)
 
         // Mock singleton's method by mockk framework
         mockkObject(SendMessageActionHelper)

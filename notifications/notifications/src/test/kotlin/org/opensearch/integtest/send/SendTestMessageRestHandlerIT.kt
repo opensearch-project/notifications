@@ -5,7 +5,6 @@
 
 package org.opensearch.integtest.send
 
-import com.google.gson.JsonParser
 import org.junit.Assert
 import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.SmtpAccount
@@ -52,21 +51,6 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         // verify failure response is with message
         val error = sendResponse.get("error").asJsonObject
         Assert.assertNotNull(error.get("reason").asString)
-
-        // verify event is created correctly with status
-        val eventId = JsonParser.parseString(error.get("reason").asString).asJsonObject.get("notification_id").asString
-        val getEventResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/events/$eventId",
-            "",
-            RestStatus.OK.status
-        )
-        val items = getEventResponse.get("event_list").asJsonArray
-        Assert.assertEquals(1, items.size())
-        val getResponseItem = items[0].asJsonObject
-        Assert.assertEquals(eventId, getResponseItem.get("event_id").asString)
-        Assert.assertNotNull(getResponseItem.get("event").asJsonObject)
-        Thread.sleep(100)
     }
 
     @Suppress("EmptyFunctionBlock")
@@ -106,22 +90,6 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         // verify failure response is with message
         val error = sendResponse.get("error").asJsonObject
         Assert.assertNotNull(error.get("reason").asString)
-
-        // verify event is created correctly with status
-        val eventId = JsonParser.parseString(error.get("reason").asString).asJsonObject.get("notification_id").asString
-
-        val getEventResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/events/$eventId",
-            "",
-            RestStatus.OK.status
-        )
-        val items = getEventResponse.get("event_list").asJsonArray
-        Assert.assertEquals(1, items.size())
-        val getResponseItem = items[0].asJsonObject
-        Assert.assertEquals(eventId, getResponseItem.get("event_id").asString)
-        Assert.assertNotNull(getResponseItem.get("event").asJsonObject)
-        Thread.sleep(100)
     }
 
     @Suppress("EmptyFunctionBlock")
@@ -164,22 +132,6 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         // verify failure response is with message
         val error = sendResponse.get("error").asJsonObject
         Assert.assertNotNull(error.get("reason").asString)
-
-        // verify event is created correctly with status
-        val eventId = JsonParser.parseString(error.get("reason").asString).asJsonObject.get("notification_id").asString
-
-        val getEventResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/events/$eventId",
-            "",
-            RestStatus.OK.status
-        )
-        val items = getEventResponse.get("event_list").asJsonArray
-        Assert.assertEquals(1, items.size())
-        val getResponseItem = items[0].asJsonObject
-        Assert.assertEquals(eventId, getResponseItem.get("event_id").asString)
-        Assert.assertNotNull(getResponseItem.get("event").asJsonObject)
-        Thread.sleep(100)
     }
 
     @Suppress("EmptyFunctionBlock")
@@ -256,21 +208,5 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         // verify failure response is with message
         val error = sendResponse.get("error").asJsonObject
         Assert.assertNotNull(error.get("reason").asString)
-
-        // verify event is created correctly with status
-        val eventId = JsonParser.parseString(error.get("reason").asString).asJsonObject.get("notification_id").asString
-
-        val getEventResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/events/$eventId",
-            "",
-            RestStatus.OK.status
-        )
-        val items = getEventResponse.get("event_list").asJsonArray
-        Assert.assertEquals(1, items.size())
-        val getResponseItem = items[0].asJsonObject
-        Assert.assertEquals(eventId, getResponseItem.get("event_id").asString)
-        Assert.assertNotNull(getResponseItem.get("event").asJsonObject)
-        Thread.sleep(100)
     }
 }

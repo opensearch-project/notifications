@@ -60,7 +60,7 @@ internal class SendTestNotificationAction @Inject constructor(
             channelIds,
             object : ActionListener<SendNotificationResponse> {
                 override fun onResponse(sendNotificationResponse: SendNotificationResponse) {
-                    log.info("$LOG_PREFIX:SendTestNotificationAction-send:${sendNotificationResponse.notificationId}")
+                    log.info("$LOG_PREFIX:SendTestNotificationAction-send:${sendNotificationResponse.notificationEvent}")
                     listener.onResponse(sendNotificationResponse)
                 }
 
