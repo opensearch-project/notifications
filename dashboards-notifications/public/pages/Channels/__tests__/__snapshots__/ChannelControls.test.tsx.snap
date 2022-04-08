@@ -14,7 +14,7 @@ exports[`<ChannelControls /> spec renders the component 1`] = `
         class="euiFormControlLayout__childrenWrapper"
       >
         <input
-          class="euiFieldSearch euiFieldSearch--fullWidth euiFieldSearch-isClearable"
+          class="euiFieldSearch euiFieldSearch--fullWidth"
           placeholder="Search"
           type="search"
         />
@@ -60,7 +60,7 @@ exports[`<ChannelControls /> spec renders the component 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                 focusable="false"
                 height="16"
                 role="img"
@@ -98,7 +98,7 @@ exports[`<ChannelControls /> spec renders the component 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                 focusable="false"
                 height="16"
                 role="img"

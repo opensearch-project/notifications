@@ -2,7 +2,7 @@
 
 exports[`<Channels/> spec renders the empty component 1`] = `
 <div
-  class="euiPanel euiPanel--paddingMedium"
+  class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
 >
   <div
     class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
@@ -53,7 +53,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                     >
                       <svg
                         aria-hidden="true"
-                        class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                        class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                         focusable="false"
                         height="16"
                         role="img"
@@ -114,7 +114,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
             class="euiFormControlLayout__childrenWrapper"
           >
             <input
-              class="euiFieldSearch euiFieldSearch--fullWidth euiFieldSearch-isClearable"
+              class="euiFieldSearch euiFieldSearch--fullWidth"
               placeholder="Search"
               type="search"
             />
@@ -160,7 +160,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                 >
                   <svg
                     aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                    class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                     focusable="false"
                     height="16"
                     role="img"
@@ -198,7 +198,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                 >
                   <svg
                     aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                    class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                     focusable="false"
                     height="16"
                     role="img"
@@ -282,7 +282,7 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                       >
                         <svg
                           aria-hidden="true"
-                          class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                          class="euiIcon euiIcon--small euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                           focusable="false"
                           height="16"
                           role="img"
@@ -355,13 +355,12 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                   >
                     <span
                       class="euiTableCellContent__text"
-                      title="Name; Sorted in ascending order"
+                      title="Name"
                     >
                       Name
                     </span>
                     <svg
                       aria-hidden="true"
-                      aria-label="Sorted in ascending order"
                       class="euiIcon euiIcon--medium euiIcon-isLoading euiTableSortIcon"
                       focusable="false"
                       height="16"
@@ -370,11 +369,6 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                       width="16"
                       xmlns="http://www.w3.org/2000/svg"
                     />
-                    <span
-                      class="euiScreenReaderOnly"
-                    >
-                      Click to sort in descending order
-                    </span>
                   </span>
                 </button>
               </th>
@@ -399,11 +393,6 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                       title="Notification status"
                     >
                       Notification status
-                    </span>
-                    <span
-                      class="euiScreenReaderOnly"
-                    >
-                      Click to sort in ascending order
                     </span>
                   </span>
                 </button>
@@ -430,11 +419,6 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                     >
                       Type
                     </span>
-                    <span
-                      class="euiScreenReaderOnly"
-                    >
-                      Click to sort in ascending order
-                    </span>
                   </span>
                 </button>
               </th>
@@ -460,11 +444,6 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                     >
                       Description
                     </span>
-                    <span
-                      class="euiScreenReaderOnly"
-                    >
-                      Click to sort in ascending order
-                    </span>
                   </span>
                 </button>
               </th>
@@ -487,14 +466,14 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                     <div
                       class="euiEmptyPrompt"
                     >
+                      <h2
+                        class="euiTitle euiTitle--medium"
+                      >
+                        No channels to display
+                      </h2>
                       <span
                         class="euiTextColor euiTextColor--subdued"
                       >
-                        <h2
-                          class="euiTitle euiTitle--medium"
-                        >
-                          No channels to display
-                        </h2>
                         <div
                           class="euiSpacer euiSpacer--m"
                         />
@@ -506,9 +485,6 @@ exports[`<Channels/> spec renders the empty component 1`] = `
                       </span>
                       <div
                         class="euiSpacer euiSpacer--l"
-                      />
-                      <div
-                        class="euiSpacer euiSpacer--s"
                       />
                       <a
                         class="euiButton euiButton--primary"

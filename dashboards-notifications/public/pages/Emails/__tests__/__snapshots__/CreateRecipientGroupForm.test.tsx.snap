@@ -27,7 +27,7 @@ exports[`<CreateRecipientGroupForm/> spec render errors 1`] = `
         class="euiFormControlLayout__childrenWrapper"
       >
         <input
-          aria-describedby="random_html_id-help random_html_id-error-0"
+          aria-describedby="random_html_id-help-0 random_html_id-error-0"
           class="euiFieldText euiFieldText--fullWidth"
           data-test-subj="create-recipient-group-form-name-input"
           id="random_html_id"
@@ -46,7 +46,7 @@ exports[`<CreateRecipientGroupForm/> spec render errors 1`] = `
     </div>
     <div
       class="euiFormHelpText euiFormRow__text"
-      id="random_html_id-help"
+      id="random_html_id-help-0"
     >
       The name must contain 2 to 50 characters. Valid characters are A-Z, a-z, 0-9, (_) underscore, (-) hyphen and unicode characters.
     </div>
@@ -81,7 +81,7 @@ exports[`<CreateRecipientGroupForm/> spec renders the component 1`] = `
         class="euiFormControlLayout__childrenWrapper"
       >
         <input
-          aria-describedby="random_html_id-help"
+          aria-describedby="random_html_id-help-0"
           class="euiFieldText euiFieldText--fullWidth"
           data-test-subj="create-recipient-group-form-name-input"
           id="random_html_id"
@@ -93,7 +93,7 @@ exports[`<CreateRecipientGroupForm/> spec renders the component 1`] = `
     </div>
     <div
       class="euiFormHelpText euiFormRow__text"
-      id="random_html_id-help"
+      id="random_html_id-help-0"
     >
       The name must contain 2 to 50 characters. Valid characters are A-Z, a-z, 0-9, (_) underscore, (-) hyphen and unicode characters.
     </div>

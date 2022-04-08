@@ -2,7 +2,7 @@
 
 exports[`<RecipientGroupsTable /> spec renders empty state 1`] = `
 <div
-  class="euiPanel euiPanel--paddingMedium"
+  class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
 >
   <div
     class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
@@ -111,7 +111,7 @@ exports[`<RecipientGroupsTable /> spec renders empty state 1`] = `
         class="euiFormControlLayout__childrenWrapper"
       >
         <input
-          class="euiFieldSearch euiFieldSearch--fullWidth euiFieldSearch-isClearable"
+          class="euiFieldSearch euiFieldSearch--fullWidth"
           data-test-subj="recipient-groups-table-search-input"
           placeholder="Search"
           type="search"
@@ -194,7 +194,7 @@ exports[`<RecipientGroupsTable /> spec renders empty state 1`] = `
                       >
                         <svg
                           aria-hidden="true"
-                          class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                          class="euiIcon euiIcon--small euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                           focusable="false"
                           height="16"
                           role="img"
@@ -268,13 +268,12 @@ exports[`<RecipientGroupsTable /> spec renders empty state 1`] = `
                   >
                     <span
                       class="euiTableCellContent__text"
-                      title="Name; Sorted in ascending order"
+                      title="Name"
                     >
                       Name
                     </span>
                     <svg
                       aria-hidden="true"
-                      aria-label="Sorted in ascending order"
                       class="euiIcon euiIcon--medium euiIcon-isLoading euiTableSortIcon"
                       focusable="false"
                       height="16"
@@ -283,11 +282,6 @@ exports[`<RecipientGroupsTable /> spec renders empty state 1`] = `
                       width="16"
                       xmlns="http://www.w3.org/2000/svg"
                     />
-                    <span
-                      class="euiScreenReaderOnly"
-                    >
-                      Click to sort in descending order
-                    </span>
                   </span>
                 </button>
               </th>
@@ -313,11 +307,6 @@ exports[`<RecipientGroupsTable /> spec renders empty state 1`] = `
                       title="Email addresses"
                     >
                       Email addresses
-                    </span>
-                    <span
-                      class="euiScreenReaderOnly"
-                    >
-                      Click to sort in ascending order
                     </span>
                   </span>
                 </button>
@@ -345,11 +334,6 @@ exports[`<RecipientGroupsTable /> spec renders empty state 1`] = `
                     >
                       Description
                     </span>
-                    <span
-                      class="euiScreenReaderOnly"
-                    >
-                      Click to sort in ascending order
-                    </span>
                   </span>
                 </button>
               </th>
@@ -372,14 +356,14 @@ exports[`<RecipientGroupsTable /> spec renders empty state 1`] = `
                     <div
                       class="euiEmptyPrompt"
                     >
+                      <h2
+                        class="euiTitle euiTitle--medium"
+                      >
+                        No recipient groups to display
+                      </h2>
                       <span
                         class="euiTextColor euiTextColor--subdued"
                       >
-                        <h2
-                          class="euiTitle euiTitle--medium"
-                        >
-                          No recipient groups to display
-                        </h2>
                         <div
                           class="euiSpacer euiSpacer--m"
                         />
@@ -391,9 +375,6 @@ exports[`<RecipientGroupsTable /> spec renders empty state 1`] = `
                       </span>
                       <div
                         class="euiSpacer euiSpacer--l"
-                      />
-                      <div
-                        class="euiSpacer euiSpacer--s"
                       />
                       <a
                         class="euiButton euiButton--primary"

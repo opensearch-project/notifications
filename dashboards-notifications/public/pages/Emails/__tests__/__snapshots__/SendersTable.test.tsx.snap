@@ -2,7 +2,7 @@
 
 exports[`<SendersTable /> spec renders empty state 1`] = `
 <div
-  class="euiPanel euiPanel--paddingMedium"
+  class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
 >
   <div
     class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
@@ -117,7 +117,7 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
             class="euiFormControlLayout__childrenWrapper"
           >
             <input
-              class="euiFieldSearch euiFieldSearch--fullWidth euiFieldSearch-isClearable"
+              class="euiFieldSearch euiFieldSearch--fullWidth"
               data-test-subj="senders-table-search-input"
               placeholder="Search"
               type="search"
@@ -164,7 +164,7 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
                 >
                   <svg
                     aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                    class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                     focusable="false"
                     height="16"
                     role="img"
@@ -248,7 +248,7 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
                       >
                         <svg
                           aria-hidden="true"
-                          class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                          class="euiIcon euiIcon--small euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                           focusable="false"
                           height="16"
                           role="img"
@@ -322,13 +322,12 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
                   >
                     <span
                       class="euiTableCellContent__text"
-                      title="Name; Sorted in ascending order"
+                      title="Name"
                     >
                       Name
                     </span>
                     <svg
                       aria-hidden="true"
-                      aria-label="Sorted in ascending order"
                       class="euiIcon euiIcon--medium euiIcon-isLoading euiTableSortIcon"
                       focusable="false"
                       height="16"
@@ -337,11 +336,6 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
                       width="16"
                       xmlns="http://www.w3.org/2000/svg"
                     />
-                    <span
-                      class="euiScreenReaderOnly"
-                    >
-                      Click to sort in descending order
-                    </span>
                   </span>
                 </button>
               </th>
@@ -367,11 +361,6 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
                       title="Outbound email address"
                     >
                       Outbound email address
-                    </span>
-                    <span
-                      class="euiScreenReaderOnly"
-                    >
-                      Click to sort in ascending order
                     </span>
                   </span>
                 </button>
@@ -399,11 +388,6 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
                     >
                       Host
                     </span>
-                    <span
-                      class="euiScreenReaderOnly"
-                    >
-                      Click to sort in ascending order
-                    </span>
                   </span>
                 </button>
               </th>
@@ -414,7 +398,7 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
                 scope="col"
                 style="width: 200px;"
               >
-                <div
+                <span
                   class="euiTableCellContent"
                 >
                   <span
@@ -423,7 +407,7 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
                   >
                     Port
                   </span>
-                </div>
+                </span>
               </th>
               <th
                 aria-live="polite"
@@ -448,11 +432,6 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
                     >
                       Encryption method
                     </span>
-                    <span
-                      class="euiScreenReaderOnly"
-                    >
-                      Click to sort in ascending order
-                    </span>
                   </span>
                 </button>
               </th>
@@ -475,14 +454,14 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
                     <div
                       class="euiEmptyPrompt"
                     >
+                      <h2
+                        class="euiTitle euiTitle--medium"
+                      >
+                        No SMTP senders to display
+                      </h2>
                       <span
                         class="euiTextColor euiTextColor--subdued"
                       >
-                        <h2
-                          class="euiTitle euiTitle--medium"
-                        >
-                          No SMTP senders to display
-                        </h2>
                         <div
                           class="euiSpacer euiSpacer--m"
                         />
@@ -494,9 +473,6 @@ exports[`<SendersTable /> spec renders empty state 1`] = `
                       </span>
                       <div
                         class="euiSpacer euiSpacer--l"
-                      />
-                      <div
-                        class="euiSpacer euiSpacer--s"
                       />
                       <a
                         class="euiButton euiButton--primary"
