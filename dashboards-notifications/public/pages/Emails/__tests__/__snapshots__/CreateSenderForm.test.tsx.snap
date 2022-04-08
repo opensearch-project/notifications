@@ -27,7 +27,7 @@ exports[`<CreateSenderForm/> spec renders errors 1`] = `
         class="euiFormControlLayout__childrenWrapper"
       >
         <input
-          aria-describedby="random_html_id-help random_html_id-error-0"
+          aria-describedby="random_html_id-help-0 random_html_id-error-0"
           class="euiFieldText euiFieldText--fullWidth"
           data-test-subj="create-sender-form-name-input"
           id="random_html_id"
@@ -46,7 +46,7 @@ exports[`<CreateSenderForm/> spec renders errors 1`] = `
     </div>
     <div
       class="euiFormHelpText euiFormRow__text"
-      id="random_html_id-help"
+      id="random_html_id-help-0"
     >
       Use a unique, descriptive name. The sender name must contain from 2 to 50 characters. Valid characters are lowercase a-z, 0-9, and - (hyphen).
     </div>
@@ -81,7 +81,7 @@ exports[`<CreateSenderForm/> spec renders the component 1`] = `
         class="euiFormControlLayout__childrenWrapper"
       >
         <input
-          aria-describedby="random_html_id-help"
+          aria-describedby="random_html_id-help-0"
           class="euiFieldText euiFieldText--fullWidth"
           data-test-subj="create-sender-form-name-input"
           id="random_html_id"
@@ -93,7 +93,7 @@ exports[`<CreateSenderForm/> spec renders the component 1`] = `
     </div>
     <div
       class="euiFormHelpText euiFormRow__text"
-      id="random_html_id-help"
+      id="random_html_id-help-0"
     >
       Use a unique, descriptive name. The sender name must contain from 2 to 50 characters. Valid characters are lowercase a-z, 0-9, and - (hyphen).
     </div>

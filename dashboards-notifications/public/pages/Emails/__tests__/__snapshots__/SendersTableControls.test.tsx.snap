@@ -14,7 +14,7 @@ exports[`<SendersTableControls /> spec renders the component 1`] = `
         class="euiFormControlLayout__childrenWrapper"
       >
         <input
-          class="euiFieldSearch euiFieldSearch--fullWidth euiFieldSearch-isClearable"
+          class="euiFieldSearch euiFieldSearch--fullWidth"
           data-test-subj="senders-table-search-input"
           placeholder="Search"
           type="search"
@@ -61,7 +61,7 @@ exports[`<SendersTableControls /> spec renders the component 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                 focusable="false"
                 height="16"
                 role="img"

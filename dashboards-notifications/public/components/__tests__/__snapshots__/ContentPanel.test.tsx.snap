@@ -2,7 +2,7 @@
 
 exports[`<ContentPanel /> spec renders the component 1`] = `
 <div
-  class="euiPanel euiPanel--paddingMedium"
+  class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
 >
   <div
     class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
@@ -48,7 +48,7 @@ exports[`<ContentPanel /> spec renders the component 1`] = `
 
 exports[`<ContentPanel /> spec renders with empty actions 1`] = `
 <div
-  class="euiPanel euiPanel--paddingMedium"
+  class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
 >
   <div
     class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive"
