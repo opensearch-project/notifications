@@ -15,6 +15,7 @@ import org.opensearch.commons.authuser.User
 import org.opensearch.commons.destination.message.LegacyBaseMessage
 import org.opensearch.commons.destination.message.LegacyCustomWebhookMessage
 import org.opensearch.commons.destination.message.LegacyDestinationType
+import org.opensearch.commons.destination.message.LegacyEmailMessage
 import org.opensearch.commons.destination.response.LegacyDestinationResponse
 import org.opensearch.commons.notifications.action.LegacyPublishNotificationRequest
 import org.opensearch.commons.notifications.action.LegacyPublishNotificationResponse
@@ -265,7 +266,7 @@ object SendMessageActionHelper {
      * @return notification delivery status for the legacy destination
      */
     private fun sendMessageToLegacyDestination(baseMessage: LegacyBaseMessage): LegacyDestinationResponse {
-        val message =
+        var message =
             MessageContent(title = "Legacy Notification", textDescription = baseMessage.messageContent)
         // These legacy destination calls do not have reference Ids, just passing 'legacy' constant
         return when (baseMessage.channelType) {
@@ -290,6 +291,45 @@ object SendMessageActionHelper {
                 val status = sendMessageThroughSpi(destination, message, "legacy")
                 LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
                     .withResponseContent(status.statusText).build()
+            }
+            LegacyDestinationType.LEGACY_EMAIL -> {
+                val recipients = (baseMessage as LegacyEmailMessage).recipients
+                // The naming is a little confusing but need to use the subject from LegacyEmailMessage as the title,
+                // so it appears as the subject of the email
+                message = MessageContent(title = baseMessage.subject, textDescription = baseMessage.messageContent)
+                runBlocking {
+                    val emailRecipientStatus: List<EmailRecipientStatus> = recipients.map {
+                        async(Dispatchers.IO) {
+                            val destination = SmtpDestination(
+                                baseMessage.channelName,
+                                baseMessage.host,
+                                baseMessage.port,
+                                baseMessage.method,
+                                baseMessage.from,
+                                it
+                            )
+                            val status = sendMessageThroughSpi(destination, message, "legacy")
+                            EmailRecipientStatus(
+                                it,
+                                DeliveryStatus(status.statusCode.toString(), status.statusText)
+                            )
+                        }
+                    }.awaitAll()
+
+                    val firstStatus = emailRecipientStatus.first()
+                    var overallStatus = firstStatus.deliveryStatus.statusCode
+                    var overallStatusText = firstStatus.deliveryStatus.statusText
+                    emailRecipientStatus.forEach {
+                        val status = it.deliveryStatus
+                        log.info("$LOG_PREFIX:Legacy email:statusCode=${status.statusCode}, statusText=${status.statusText}")
+                        if (overallStatus != status.statusCode) {
+                            overallStatus = RestStatus.MULTI_STATUS.status.toString()
+                            overallStatusText = "Errors"
+                        }
+                    }
+                    LegacyDestinationResponse.Builder().withStatusCode(overallStatus.toInt())
+                        .withResponseContent(overallStatusText).build()
+                }
             }
             null -> {
                 log.warn("No channel type given (null) for publishing to legacy destination")
