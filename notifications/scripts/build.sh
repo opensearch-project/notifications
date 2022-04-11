@@ -70,19 +70,17 @@ fi
 mkdir -p $OUTPUT/maven
 mkdir -p $OUTPUT/plugins
 
-cd notifications
 ./gradlew publishToMavenLocal -PexcludeTests="**/SesChannelIT*" -Dopensearch.version=$VERSION -Dbuild.snapshot=$SNAPSHOT -Dbuild.version_qualifier=$QUALIFIER
 ./gradlew assemble --no-daemon --refresh-dependencies -DskipTests=true -Dopensearch.version=$VERSION -Dbuild.snapshot=$SNAPSHOT -Dbuild.version_qualifier=$QUALIFIER
-cd ..
 
 mkdir -p $OUTPUT/plugins
 
-notifCoreZipPath=$(find . -path \*core/build/distributions/*.zip)
+notifCoreZipPath=$(find . -path \*core/build/distributions/\*.zip)
 distributions="$(dirname "${notifCoreZipPath}")"
 echo "COPY ${distributions}/*.zip"
 cp ${distributions}/*.zip ./$OUTPUT/plugins
 
-notifZipPath=$(find . -path \*notifications/build/distributions/*.zip)
+notifZipPath=$(find . -path \*notifications/build/distributions/\*.zip)
 distributions="$(dirname "${notifZipPath}")"
 echo "COPY ${distributions}/*.zip"
 cp ${distributions}/*.zip ./$OUTPUT/plugins
