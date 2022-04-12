@@ -70,19 +70,25 @@ fi
 mkdir -p $OUTPUT/maven
 mkdir -p $OUTPUT/plugins
 
-cd notifications
+# Either core or notifications subfolders
+CURR_DIR=`basename $(pwd)`
+
+# Go to the first notifications folder, which holds the core folder and the second notifications folder
+cd ../
 ./gradlew publishToMavenLocal -PexcludeTests="**/SesChannelIT*" -Dopensearch.version=$VERSION -Dbuild.snapshot=$SNAPSHOT -Dbuild.version_qualifier=$QUALIFIER
 ./gradlew assemble --no-daemon --refresh-dependencies -DskipTests=true -Dopensearch.version=$VERSION -Dbuild.snapshot=$SNAPSHOT -Dbuild.version_qualifier=$QUALIFIER
-cd ..
 
 mkdir -p $OUTPUT/plugins
 
-notifCoreZipPath=$(find . -path \*core/build/distributions/*.zip)
-distributions="$(dirname "${notifCoreZipPath}")"
-echo "COPY ${distributions}/*.zip"
-cp ${distributions}/*.zip ./$OUTPUT/plugins
+if [ "$CURR_DIR" = "core" ]; then
+    notifCoreZipPath=$(ls core/build/distributions/ | grep .zip)
+    cp -v core/build/distributions/$notifCoreZipPath ./$OUTPUT/plugins
 
-notifZipPath=$(find . -path \*notifications/build/distributions/*.zip)
-distributions="$(dirname "${notifZipPath}")"
-echo "COPY ${distributions}/*.zip"
-cp ${distributions}/*.zip ./$OUTPUT/plugins
+elif [ "$CURR_DIR" = "notifications" ]; then
+    notifCoreZipPath=$(ls notifications/build/distributions/ | grep .zip)
+    cp -v notifications/build/distributions/$notifCoreZipPath ./$OUTPUT/plugins
+
+else
+    echo "$CURR_DIR not exist!"
+    exit 1
+fi
