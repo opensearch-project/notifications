@@ -13,7 +13,7 @@ function usage() {
     echo ""
     echo "Arguments:"
     echo -e "-v VERSION\t[Required] OpenSearch version."
-    echo -e "-q QUALIFIER\t[Optional] Build qualifier."
+    echo -e "-q QUALIFIER\t[Optional] Version qualifier."
     echo -e "-s SNAPSHOT\t[Optional] Build a snapshot, default is 'false'."
     echo -e "-p PLATFORM\t[Optional] Platform, ignored."
     echo -e "-a ARCHITECTURE\t[Optional] Build architecture, ignored."
@@ -75,14 +75,8 @@ cd notifications
 ./gradlew assemble --no-daemon --refresh-dependencies -DskipTests=true -Dopensearch.version=$VERSION -Dbuild.snapshot=$SNAPSHOT -Dbuild.version_qualifier=$QUALIFIER
 cd ..
 
+zipPath=$(find . -path \*/distributions/*.zip)
+distributions="$(dirname "${zipPath}")"
+echo "COPY ${distributions}/*.zip"
 mkdir -p $OUTPUT/plugins
-
-notifCoreZipPath=$(find . -path \*core/build/distributions/*.zip)
-distributions="$(dirname "${notifCoreZipPath}")"
-echo "COPY ${distributions}/*.zip"
-cp ${distributions}/*.zip ./$OUTPUT/plugins
-
-notifZipPath=$(find . -path \*notifications/build/distributions/*.zip)
-distributions="$(dirname "${notifZipPath}")"
-echo "COPY ${distributions}/*.zip"
 cp ${distributions}/*.zip ./$OUTPUT/plugins
