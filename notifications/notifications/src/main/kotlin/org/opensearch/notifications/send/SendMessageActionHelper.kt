@@ -301,7 +301,7 @@ object SendMessageActionHelper {
                     val emailRecipientStatus: List<EmailRecipientStatus> = recipients.map {
                         async(Dispatchers.IO) {
                             val destination = SmtpDestination(
-                                baseMessage.channelName,
+                                baseMessage.accountName,
                                 baseMessage.host,
                                 baseMessage.port,
                                 baseMessage.method,
