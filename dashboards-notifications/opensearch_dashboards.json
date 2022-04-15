@@ -1,7 +1,7 @@
 {
   "id": "notificationsDashboards",
   "version": "2.0.0.0-rc1",
-  "opensearchDashboardsVersion": "2.0.0",
+  "opensearchDashboardsVersion": "2.0.0-rc1",
   "requiredPlugins": ["navigation", "data"],
   "optionalPlugins": ["share"],
   "server": true,
