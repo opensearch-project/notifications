@@ -33,6 +33,12 @@ internal object PluginSettings {
     private const val EMAIL_KEY_PREFIX = "$KEY_PREFIX.email"
 
     /**
+     * Legacy Email Destination setting prefix used by Alerting.
+     * Defining this here to be used as a fallback for the Notification plugin setting to account for migrated Email Destinations.
+     */
+    private const val LEGACY_EMAIL_DESTINATION_SETTING_PREFIX = "plugins.alerting.destination.email."
+
+    /**
      * Settings Key prefix for Email. Note: Should contain . at the end for secure settings
      */
     private const val EMAIL_DESTINATION_SETTING_PREFIX = "$KEY_PREFIX.email."
@@ -310,16 +316,38 @@ internal object PluginSettings {
         NodeScope, Dynamic
     )
 
+    private val LEGACY_EMAIL_USERNAME: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
+        LEGACY_EMAIL_DESTINATION_SETTING_PREFIX,
+        "username",
+        { key: String -> SecureSetting.secureString(key, null) }
+    )
+
+    private val LEGACY_EMAIL_PASSWORD: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
+        LEGACY_EMAIL_DESTINATION_SETTING_PREFIX,
+        "password",
+        { key: String -> SecureSetting.secureString(key, null) }
+    )
+
     private val EMAIL_USERNAME: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
         EMAIL_DESTINATION_SETTING_PREFIX,
         "username",
-        { key: String -> SecureSetting.secureString(key, null) }
+        { key: String ->
+            SecureSetting.secureString(
+                key,
+                fallback(key, LEGACY_EMAIL_USERNAME, "opensearch\\.notifications\\.core", "plugins.alerting.destination")
+            )
+        }
     )
 
     private val EMAIL_PASSWORD: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
         EMAIL_DESTINATION_SETTING_PREFIX,
         "password",
-        { key: String -> SecureSetting.secureString(key, null) }
+        { key: String ->
+            SecureSetting.secureString(
+                key,
+                fallback(key, LEGACY_EMAIL_PASSWORD, "opensearch\\.notifications\\.core", "plugins.alerting.destination")
+            )
+        }
     )
 
     /**
@@ -465,7 +493,10 @@ internal object PluginSettings {
         // If this logic needs to be expanded to support other Destinations, different groups can be retrieved similar
         // to emailAccountNames based on the setting namespace and SecureDestinationSettings should be expanded to support
         // these new settings.
-        val emailAccountNames: Set<String> = settings.getGroups(EMAIL_DESTINATION_SETTING_PREFIX, true).keys
+        var emailAccountNames: Set<String> = settings.getGroups(EMAIL_DESTINATION_SETTING_PREFIX, true).keys
+        // Retrieve the email account names defined under the legacy Alerting prefix as well, otherwise the fallback setting won't be checked for them
+        val legacyEmailAccountNames: Set<String> = settings.getGroups(LEGACY_EMAIL_DESTINATION_SETTING_PREFIX, true).keys
+        emailAccountNames = emailAccountNames.union(legacyEmailAccountNames)
         val emailAccounts: MutableMap<String, SecureDestinationSettings> = mutableMapOf()
         for (emailAccountName in emailAccountNames) {
             // Only adding the settings if they exist
@@ -491,6 +522,14 @@ internal object PluginSettings {
     private fun <T> getEmailSettingValue(settings: Settings, emailAccountName: String, emailSetting: Setting.AffixSetting<T>): T? {
         val concreteSetting = emailSetting.getConcreteSettingForNamespace(emailAccountName)
         return concreteSetting.get(settings)
+    }
+
+    private fun <T> fallback(key: String, affixSetting: Setting.AffixSetting<T>, regex: String, replacement: String): Setting<T>? {
+        return if ("_na_" == key) {
+            affixSetting.getConcreteSettingForNamespace(key)
+        } else {
+            affixSetting.getConcreteSetting(key.replace(regex.toRegex(), replacement))
+        }
     }
 
     // reset the settings values to default values for testing purpose
