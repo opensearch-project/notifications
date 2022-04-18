@@ -27,6 +27,7 @@ import org.opensearch.commons.notifications.model.NotificationConfigInfo
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
 import org.opensearch.commons.notifications.model.SearchResults
 import org.opensearch.commons.utils.logger
+import org.opensearch.index.query.BoolQueryBuilder
 import org.opensearch.index.query.QueryBuilders
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.index.ConfigQueryHelper.getSortField
@@ -38,6 +39,7 @@ import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.rest.RestStatus
+import org.opensearch.script.Script
 import org.opensearch.search.SearchHit
 import org.opensearch.search.builder.SearchSourceBuilder
 import org.opensearch.search.sort.SortOrder
@@ -201,7 +203,13 @@ internal object NotificationConfigIndex : ConfigOperations {
             .from(request.fromIndex)
         val query = QueryBuilders.boolQuery()
         if (access.isNotEmpty()) {
-            query.filter(QueryBuilders.termsQuery("$METADATA_TAG.$ACCESS_LIST_TAG", access))
+            // We consider empty access documents public, so will fetch them as well
+            val filterQuery = BoolQueryBuilder().should(
+                QueryBuilders.termsQuery("$METADATA_TAG.$ACCESS_LIST_TAG", access)
+            ).should(
+                QueryBuilders.scriptQuery(Script("doc['$METADATA_TAG.$ACCESS_LIST_TAG'] == []"))
+            )
+            query.filter(filterQuery)
         }
         ConfigQueryHelper.addQueryFilters(query, request.filterParams)
         sourceBuilder.query(query)
