@@ -14,6 +14,8 @@ import org.opensearch.rest.RestStatus
  * Class for checking/filtering user access.
  */
 internal object UserAccessManager : UserAccess {
+    const val ADMIN_ROLE = "all_access"
+
     /**
      * {@inheritDoc}
      */
@@ -40,7 +42,7 @@ internal object UserAccessManager : UserAccess {
      * {@inheritDoc}
      */
     override fun getSearchAccessInfo(user: User?): List<String> {
-        if (user == null || !PluginSettings.isRbacEnabled()) { // Filtering is disabled
+        if (user == null || !PluginSettings.isRbacEnabled() || user.roles.contains(ADMIN_ROLE)) { // Filtering is disabled
             return listOf()
         }
         return user.backendRoles
@@ -53,7 +55,9 @@ internal object UserAccessManager : UserAccess {
         if (user == null || !PluginSettings.isRbacEnabled()) { // Filtering is disabled
             return true
         }
-        return user.backendRoles.any { it in access }
+        // User has access to resource if resource is public i.e. no access roles attached, user is an admin user or there is any intersection
+        // between user backend roles and access roles
+        return access.isEmpty() || user.roles.contains(ADMIN_ROLE) || user.backendRoles.any { it in access }
     }
 
     /**
