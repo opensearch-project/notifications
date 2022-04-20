@@ -187,7 +187,7 @@ object SendMessageActionHelper {
                 listOf(),
                 DeliveryStatus(RestStatus.NOT_FOUND.status.toString(), "Channel ${channelEntry.key} not found")
             )
-        } else if (!userAccess.doesUserHaveSendAccess(user, channelEntry.value!!.configDoc.metadata.access)) {
+        } else if (!userAccess.doesUserHaveAccess(user, channelEntry.value!!.configDoc.metadata.access)) {
             Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
             return EventStatus(
                 channelEntry.key,
@@ -421,7 +421,7 @@ object SendMessageActionHelper {
                     "Sender ${email.emailAccountID} not found"
                 )
             )
-        } else if (!userAccess.doesUserHaveSendAccess(user, accountDocInfo.configDoc.metadata.access)) {
+        } else if (!userAccess.doesUserHaveAccess(user, accountDocInfo.configDoc.metadata.access)) {
             Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
             return eventStatus.copy(
                 emailRecipientStatus = listOf(),
@@ -432,7 +432,7 @@ object SendMessageActionHelper {
             )
         }
         val accessDeniedGroupIds = childConfigMap.filterValues {
-            it != null && !userAccess.doesUserHaveSendAccess(user, it.configDoc.metadata.access)
+            it != null && !userAccess.doesUserHaveAccess(user, it.configDoc.metadata.access)
         }.keys
         val invalidGroupIds = childConfigMap.filterValues { it == null }.keys
         val groups = childConfigMap.values.filterNotNull()
