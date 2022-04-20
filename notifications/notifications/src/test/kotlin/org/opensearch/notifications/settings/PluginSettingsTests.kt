@@ -23,9 +23,9 @@ internal class PluginSettingsTests {
 
     private val keyPrefix = "opensearch.notifications"
     private val generalKeyPrefix = "$keyPrefix.general"
-    private val operationTimeoutKey = "$generalKeyPrefix.operationTimeoutMs"
-    private val defaultItemQueryCountKey = "$generalKeyPrefix.defaultItemsQueryCount"
-    private val filterSendByBackendRolesKey = "$generalKeyPrefix.filterSendByBackendRoles"
+    private val operationTimeoutKey = "$generalKeyPrefix.operation_timeout_ms"
+    private val defaultItemQueryCountKey = "$generalKeyPrefix.default_items_query_count"
+    private val filterSendByBackendRolesKey = "$generalKeyPrefix.filter_send_by_backend_roles"
 
     private val defaultSettings = Settings.builder()
         .put(operationTimeoutKey, 60000L)

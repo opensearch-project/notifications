@@ -39,17 +39,17 @@ internal object PluginSettings {
     /**
      * Operation timeout for network operations.
      */
-    private const val OPERATION_TIMEOUT_MS_KEY = "$GENERAL_KEY_PREFIX.operationTimeoutMs"
+    private const val OPERATION_TIMEOUT_MS_KEY = "$GENERAL_KEY_PREFIX.operation_timeout_ms"
 
     /**
      * Setting to choose default number of items to query.
      */
-    private const val DEFAULT_ITEMS_QUERY_COUNT_KEY = "$GENERAL_KEY_PREFIX.defaultItemsQueryCount"
+    private const val DEFAULT_ITEMS_QUERY_COUNT_KEY = "$GENERAL_KEY_PREFIX.default_items_query_count"
 
     /**
      * Setting to choose filter send by backend role.
      */
-    private const val FILTER_SEND_BY_BACKEND_ROLES_KEY = "$GENERAL_KEY_PREFIX.filterSendByBackendRoles"
+    private const val FILTER_SEND_BY_BACKEND_ROLES_KEY = "$GENERAL_KEY_PREFIX.filter_send_by_backend_roles"
 
     /**
      * Legacy alerting plugin filter_by_backend_roles setting.
