@@ -31,6 +31,8 @@ internal class PluginSettingsTests {
     private val httpMaxConnectionPerRouteKey = "$httpKeyPrefix.max_connection_per_route"
     private val httpConnectionTimeoutKey = "$httpKeyPrefix.connection_timeout"
     private val httpSocketTimeoutKey = "$httpKeyPrefix.socket_timeout"
+    private val legacyAlertingHostDenyListKey = "opendistro.destination.host.deny_list"
+    private val alertingHostDenyListKey = "plugins.destination.host.deny_list"
     private val httpHostDenyListKey = "$httpKeyPrefix.host_deny_list"
     private val allowedConfigTypeKey = "$keyPrefix.allowed_config_types"
     private val tooltipSupportKey = "$keyPrefix.tooltip_support"
@@ -242,6 +244,105 @@ internal class PluginSettingsTests {
         Assertions.assertEquals(
             defaultSettings[tooltipSupportKey],
             clusterService.clusterSettings.get(PluginSettings.TOOLTIP_SUPPORT).toString()
+        )
+    }
+
+    @Test
+    fun `test notifications host deny list takes precedence over fallbacks`() {
+        val clusterSettings = Settings.builder()
+            .putList(legacyAlertingHostDenyListKey, emptyList())
+            .putList(alertingHostDenyListKey, emptyList())
+            .putList(httpHostDenyListKey, listOf("sample"))
+            .build()
+
+        whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterSettings).thenReturn(
+            ClusterSettings(
+                clusterSettings,
+                setOf(
+                    PluginSettings.EMAIL_SIZE_LIMIT,
+                    PluginSettings.EMAIL_MINIMUM_HEADER_LENGTH,
+                    PluginSettings.MAX_CONNECTIONS,
+                    PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
+                    PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
+                    PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.ALLOWED_CONFIG_TYPES,
+                    PluginSettings.TOOLTIP_SUPPORT,
+                    PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
+                    PluginSettings.ALERTING_HOST_DENY_LIST,
+                    PluginSettings.HOST_DENY_LIST
+                )
+            )
+        )
+        PluginSettings.addSettingsUpdateConsumer(clusterService)
+        Assertions.assertEquals(
+            listOf("sample"),
+            clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST)
+        )
+    }
+
+    @Test
+    fun `test host deny list falls back to alerting setting if available`() {
+        val clusterSettings = Settings.builder()
+            .putList(legacyAlertingHostDenyListKey, emptyList())
+            .putList(alertingHostDenyListKey, listOf("sample"))
+            .build()
+
+        whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterSettings).thenReturn(
+            ClusterSettings(
+                clusterSettings,
+                setOf(
+                    PluginSettings.EMAIL_SIZE_LIMIT,
+                    PluginSettings.EMAIL_MINIMUM_HEADER_LENGTH,
+                    PluginSettings.MAX_CONNECTIONS,
+                    PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
+                    PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
+                    PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.ALLOWED_CONFIG_TYPES,
+                    PluginSettings.TOOLTIP_SUPPORT,
+                    PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
+                    PluginSettings.ALERTING_HOST_DENY_LIST,
+                    PluginSettings.HOST_DENY_LIST
+                )
+            )
+        )
+        PluginSettings.addSettingsUpdateConsumer(clusterService)
+        Assertions.assertEquals(
+            listOf("sample"),
+            clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST)
+        )
+    }
+
+    @Test
+    fun `test host deny list falls back to legacy alerting setting if newer settings are not set`() {
+        val clusterSettings = Settings.builder()
+            .putList(legacyAlertingHostDenyListKey, listOf("sample"))
+            .build()
+
+        whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterSettings).thenReturn(
+            ClusterSettings(
+                clusterSettings,
+                setOf(
+                    PluginSettings.EMAIL_SIZE_LIMIT,
+                    PluginSettings.EMAIL_MINIMUM_HEADER_LENGTH,
+                    PluginSettings.MAX_CONNECTIONS,
+                    PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
+                    PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
+                    PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.ALLOWED_CONFIG_TYPES,
+                    PluginSettings.TOOLTIP_SUPPORT,
+                    PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
+                    PluginSettings.ALERTING_HOST_DENY_LIST,
+                    PluginSettings.HOST_DENY_LIST
+                )
+            )
+        )
+        PluginSettings.addSettingsUpdateConsumer(clusterService)
+        Assertions.assertEquals(
+            listOf("sample"),
+            clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST)
         )
     }
 }

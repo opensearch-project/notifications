@@ -10,7 +10,9 @@ import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.settings.SecureSetting
 import org.opensearch.common.settings.SecureString
 import org.opensearch.common.settings.Setting
+import org.opensearch.common.settings.Setting.Property.Deprecated
 import org.opensearch.common.settings.Setting.Property.Dynamic
+import org.opensearch.common.settings.Setting.Property.Final
 import org.opensearch.common.settings.Setting.Property.NodeScope
 import org.opensearch.common.settings.Settings
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.LOG_PREFIX
@@ -77,6 +79,16 @@ internal object PluginSettings {
      * Settings Key prefix for socket timeout in milliseconds
      */
     private const val SOCKET_TIMEOUT_MILLISECONDS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.socket_timeout"
+
+    /**
+     * Legacy setting for list of host deny list in Alerting
+     */
+    private const val LEGACY_ALERTING_HOST_DENY_LIST_KEY = "opendistro.destination.host.deny_list"
+
+    /**
+     * Setting for list of host deny list in Alerting
+     */
+    private const val ALERTING_HOST_DENY_LIST_KEY = "plugins.destination.host.deny_list"
 
     /**
      * Setting for list of host deny list
@@ -309,9 +321,23 @@ internal object PluginSettings {
         NodeScope, Dynamic
     )
 
+    val LEGACY_ALERTING_HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
+        LEGACY_ALERTING_HOST_DENY_LIST_KEY,
+        DEFAULT_HOST_DENY_LIST,
+        { it },
+        NodeScope, Final, Deprecated
+    )
+
+    val ALERTING_HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
+        ALERTING_HOST_DENY_LIST_KEY,
+        LEGACY_ALERTING_HOST_DENY_LIST,
+        { it },
+        NodeScope, Final
+    )
+
     val HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
         HOST_DENY_LIST_KEY,
-        DEFAULT_HOST_DENY_LIST,
+        ALERTING_HOST_DENY_LIST,
         { it },
         NodeScope, Dynamic
     )
