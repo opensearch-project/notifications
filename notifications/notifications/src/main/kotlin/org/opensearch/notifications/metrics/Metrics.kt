@@ -213,7 +213,7 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
         /**
          * Converts the enum metric values to JSON string
          */
-        fun collectToJSON(): String {
+        private fun collectToJSON(): String {
             val metricsJSONObject = JSONObject()
             for (metric in values) {
                 metricsJSONObject.put(metric.metricName, metric.counter.getValue())
