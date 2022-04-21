@@ -21,21 +21,21 @@ interface ConfigOperations {
      * @return Notification Config id if successful, null otherwise
      * @throws java.util.concurrent.ExecutionException with a cause
      */
-    fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String? = null): String?
+    suspend fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String? = null): String?
 
     /**
      * Query index for Notification Config with ID
      * @param ids set of the document ids to get info
      * @return list of NotificationConfigDocInfo on success, null otherwise
      */
-    fun getNotificationConfigs(ids: Set<String>): List<NotificationConfigDocInfo>
+    suspend fun getNotificationConfigs(ids: Set<String>): List<NotificationConfigDocInfo>
 
     /**
      * Query index for Notification Config with ID
      * @param id the id for the document
      * @return NotificationConfigDocInfo on success, null otherwise
      */
-    fun getNotificationConfig(id: String): NotificationConfigDocInfo?
+    suspend fun getNotificationConfig(id: String): NotificationConfigDocInfo?
 
     /**
      * Query index for NotificationConfigDocs for given access details
@@ -43,7 +43,7 @@ interface ConfigOperations {
      * @param request [GetNotificationConfigRequest] object
      * @return search result of NotificationConfigDocs
      */
-    fun getAllNotificationConfigs(
+    suspend fun getAllNotificationConfigs(
         access: List<String>,
         request: GetNotificationConfigRequest
     ): NotificationConfigSearchResult
@@ -54,19 +54,19 @@ interface ConfigOperations {
      * @param notificationConfigDoc the NotificationConfigDoc data
      * @return true if successful, false otherwise
      */
-    fun updateNotificationConfig(id: String, notificationConfigDoc: NotificationConfigDoc): Boolean
+    suspend fun updateNotificationConfig(id: String, notificationConfigDoc: NotificationConfigDoc): Boolean
 
     /**
      * delete NotificationConfigDoc for given id
      * @param id the id for the document
      * @return true if successful, false otherwise
      */
-    fun deleteNotificationConfig(id: String): Boolean
+    suspend fun deleteNotificationConfig(id: String): Boolean
 
     /**
      * delete NotificationConfigDoc for given ids
      * @param ids set of the document ids to delete
      * @return map of id to status
      */
-    fun deleteNotificationConfigs(ids: Set<String>): Map<String, RestStatus>
+    suspend fun deleteNotificationConfigs(ids: Set<String>): Map<String, RestStatus>
 }

@@ -53,7 +53,7 @@ internal class GetChannelListAction @Inject constructor(
     /**
      * {@inheritDoc}
      */
-    override fun executeRequest(
+    override suspend fun executeRequest(
         request: GetChannelListRequest,
         user: User?
     ): GetChannelListResponse {

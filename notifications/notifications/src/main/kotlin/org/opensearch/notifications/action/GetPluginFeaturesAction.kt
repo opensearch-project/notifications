@@ -53,7 +53,7 @@ internal class GetPluginFeaturesAction @Inject constructor(
     /**
      * {@inheritDoc}
      */
-    override fun executeRequest(
+    override suspend fun executeRequest(
         request: GetPluginFeaturesRequest,
         user: User?
     ): GetPluginFeaturesResponse {

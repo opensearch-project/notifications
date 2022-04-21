@@ -53,7 +53,7 @@ internal class UpdateNotificationConfigAction @Inject constructor(
     /**
      * {@inheritDoc}
      */
-    override fun executeRequest(
+    override suspend fun executeRequest(
         request: UpdateNotificationConfigRequest,
         user: User?
     ): UpdateNotificationConfigResponse {
