@@ -8,13 +8,19 @@ package org.opensearch.notifications.index
 import org.opensearch.ResourceAlreadyExistsException
 import org.opensearch.action.DocWriteResponse
 import org.opensearch.action.admin.indices.create.CreateIndexRequest
+import org.opensearch.action.admin.indices.create.CreateIndexResponse
 import org.opensearch.action.bulk.BulkRequest
+import org.opensearch.action.bulk.BulkResponse
 import org.opensearch.action.delete.DeleteRequest
+import org.opensearch.action.delete.DeleteResponse
 import org.opensearch.action.get.GetRequest
 import org.opensearch.action.get.GetResponse
 import org.opensearch.action.get.MultiGetRequest
+import org.opensearch.action.get.MultiGetResponse
 import org.opensearch.action.index.IndexRequest
+import org.opensearch.action.index.IndexResponse
 import org.opensearch.action.search.SearchRequest
+import org.opensearch.action.search.SearchResponse
 import org.opensearch.client.Client
 import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.unit.TimeValue
@@ -38,6 +44,7 @@ import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.notifications.util.SecureIndexClient
+import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntilTimeout
 import org.opensearch.rest.RestStatus
 import org.opensearch.script.Script
 import org.opensearch.search.SearchHit
@@ -88,7 +95,7 @@ internal object NotificationConfigIndex : ConfigOperations {
      * Create index using the mapping and settings defined in resource
      */
     @Suppress("TooGenericExceptionCaught")
-    private fun createIndex() {
+    private suspend fun createIndex() {
         if (!isIndexExists()) {
             val classLoader = NotificationConfigIndex::class.java.classLoader
             val indexMappingSource = classLoader.getResource(MAPPING_FILE_NAME)?.readText()!!
@@ -98,8 +105,9 @@ internal object NotificationConfigIndex : ConfigOperations {
                 .mapping(indexMappingAsMap)
                 .settings(indexSettingsSource, XContentType.YAML)
             try {
-                val actionFuture = client.admin().indices().create(request)
-                val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
+                val response: CreateIndexResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+                    admin().indices().create(request, it)
+                }
                 if (response.isAcknowledged) {
                     log.info("$LOG_PREFIX:Index $INDEX_NAME creation Acknowledged")
                 } else {
@@ -125,7 +133,7 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    override fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String?): String? {
+    override suspend fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String?): String? {
         createIndex()
         val indexRequest = IndexRequest(INDEX_NAME)
             .source(configDoc.toXContent())
@@ -133,8 +141,9 @@ internal object NotificationConfigIndex : ConfigOperations {
         if (id != null) {
             indexRequest.id(id)
         }
-        val actionFuture = client.index(indexRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
+        val response: IndexResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+            index(indexRequest, it)
+        }
         return if (response.result != DocWriteResponse.Result.CREATED) {
             log.warn("$LOG_PREFIX:createNotificationConfig - response:$response")
             null
@@ -146,23 +155,25 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    override fun getNotificationConfigs(ids: Set<String>): List<NotificationConfigDocInfo> {
+    override suspend fun getNotificationConfigs(ids: Set<String>): List<NotificationConfigDocInfo> {
         createIndex()
         val getRequest = MultiGetRequest()
         ids.forEach { getRequest.add(INDEX_NAME, it) }
-        val actionFuture = client.multiGet(getRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
+        val response: MultiGetResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+            multiGet(getRequest, it)
+        }
         return response.responses.mapNotNull { parseNotificationConfigDoc(it.id, it.response) }
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun getNotificationConfig(id: String): NotificationConfigDocInfo? {
+    override suspend fun getNotificationConfig(id: String): NotificationConfigDocInfo? {
         createIndex()
         val getRequest = GetRequest(INDEX_NAME).id(id)
-        val actionFuture = client.get(getRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
+        val response: GetResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+            get(getRequest, it)
+        }
         return parseNotificationConfigDoc(id, response)
     }
 
@@ -191,7 +202,7 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    override fun getAllNotificationConfigs(
+    override suspend fun getAllNotificationConfigs(
         access: List<String>,
         request: GetNotificationConfigRequest
     ): NotificationConfigSearchResult {
@@ -216,8 +227,9 @@ internal object NotificationConfigIndex : ConfigOperations {
         val searchRequest = SearchRequest()
             .indices(INDEX_NAME)
             .source(sourceBuilder)
-        val actionFuture = client.search(searchRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
+        val response: SearchResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+            search(searchRequest, it)
+        }
         val result = NotificationConfigSearchResult(request.fromIndex.toLong(), response, searchHitParser)
         log.info(
             "$LOG_PREFIX:getAllNotificationConfigs from:${request.fromIndex}, maxItems:${request.maxItems}," +
@@ -230,14 +242,15 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    override fun updateNotificationConfig(id: String, notificationConfigDoc: NotificationConfigDoc): Boolean {
+    override suspend fun updateNotificationConfig(id: String, notificationConfigDoc: NotificationConfigDoc): Boolean {
         createIndex()
         val indexRequest = IndexRequest(INDEX_NAME)
             .source(notificationConfigDoc.toXContent())
             .create(false)
             .id(id)
-        val actionFuture = client.index(indexRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
+        val response: IndexResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+            index(indexRequest, it)
+        }
         if (response.result != DocWriteResponse.Result.UPDATED) {
             log.warn("$LOG_PREFIX:updateNotificationConfig failed for $id; response:$response")
         }
@@ -247,13 +260,15 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    override fun deleteNotificationConfig(id: String): Boolean {
+    override suspend fun deleteNotificationConfig(id: String): Boolean {
         createIndex()
         val deleteRequest = DeleteRequest()
             .index(INDEX_NAME)
             .id(id)
-        val actionFuture = client.delete(deleteRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
+
+        val response: DeleteResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+            delete(deleteRequest, it)
+        }
         if (response.result != DocWriteResponse.Result.DELETED) {
             log.warn("$LOG_PREFIX:deleteNotificationConfig failed for $id; response:$response")
         }
@@ -263,7 +278,7 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    override fun deleteNotificationConfigs(ids: Set<String>): Map<String, RestStatus> {
+    override suspend fun deleteNotificationConfigs(ids: Set<String>): Map<String, RestStatus> {
         createIndex()
         val bulkRequest = BulkRequest()
         ids.forEach {
@@ -272,8 +287,9 @@ internal object NotificationConfigIndex : ConfigOperations {
                 .id(it)
             bulkRequest.add(deleteRequest)
         }
-        val actionFuture = client.bulk(bulkRequest)
-        val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
+        val response: BulkResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+            bulk(bulkRequest, it)
+        }
         val mutableMap = mutableMapOf<String, RestStatus>()
         response.forEach {
             mutableMap[it.id] = it.status()

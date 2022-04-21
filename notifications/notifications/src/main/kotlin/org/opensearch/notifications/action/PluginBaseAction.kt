@@ -113,7 +113,7 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
      * @param user the user context given by security plugin
      * @return the response to return.
      */
-    abstract fun executeRequest(request: Request, user: User?): Response
+    abstract suspend fun executeRequest(request: Request, user: User?): Response
 
     /**
      * Executes the given [block] function on this resource and then closes it down correctly whether an exception

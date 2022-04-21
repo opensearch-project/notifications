@@ -6,6 +6,7 @@ package org.opensearch.notifications.action
 
 import io.mockk.every
 import io.mockk.mockkObject
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.fail
@@ -75,7 +76,11 @@ internal class PluginActionTests {
 
         // Mock singleton's method by mockk framework
         mockkObject(ConfigIndexingActions)
-        every { ConfigIndexingActions.create(request, any()) } returns response
+        every {
+            runBlocking {
+                ConfigIndexingActions.create(request, any())
+            }
+        } returns response
 
         val createNotificationConfigAction = CreateNotificationConfigAction(
             transportService, client, actionFilters, xContentRegistry
@@ -91,7 +96,11 @@ internal class PluginActionTests {
 
         // Mock singleton's method by mockk framework
         mockkObject(ConfigIndexingActions)
-        every { ConfigIndexingActions.update(request, any()) } returns response
+        every {
+            runBlocking {
+                ConfigIndexingActions.update(request, any())
+            }
+        } returns response
 
         val updateNotificationConfigAction = UpdateNotificationConfigAction(
             transportService, client, actionFilters, xContentRegistry
@@ -108,7 +117,11 @@ internal class PluginActionTests {
 
         // Mock singleton's method by mockk framework
         mockkObject(ConfigIndexingActions)
-        every { ConfigIndexingActions.delete(request, any()) } returns response
+        every {
+            runBlocking {
+                ConfigIndexingActions.delete(request, any())
+            }
+        } returns response
 
         val deleteNotificationConfigAction = DeleteNotificationConfigAction(
             transportService, client, actionFilters, xContentRegistry
@@ -125,7 +138,11 @@ internal class PluginActionTests {
 
         // Mock singleton's method by mockk framework
         mockkObject(ConfigIndexingActions)
-        every { ConfigIndexingActions.get(request, any()) } returns response
+        every {
+            runBlocking {
+                ConfigIndexingActions.get(request, any())
+            }
+        } returns response
 
         val getNotificationConfigAction = GetNotificationConfigAction(
             transportService, client, actionFilters, xContentRegistry
@@ -153,7 +170,11 @@ internal class PluginActionTests {
 
         // Mock singleton's method by mockk framework
         mockkObject(ConfigIndexingActions)
-        every { ConfigIndexingActions.getChannelList(request, any()) } returns response
+        every {
+            runBlocking {
+                ConfigIndexingActions.getChannelList(request, any())
+            }
+        } returns response
 
         val getChannelListAction = GetChannelListAction(
             transportService, client, actionFilters, xContentRegistry
@@ -184,7 +205,11 @@ internal class PluginActionTests {
 
         // Mock singleton's method by mockk framework
         mockkObject(SendMessageActionHelper)
-        every { SendMessageActionHelper.executeRequest(request) } returns response
+        every {
+            runBlocking {
+                SendMessageActionHelper.executeRequest(request)
+            }
+        } returns response
 
         val sendNotificationAction = SendNotificationAction(
             transportService, client, actionFilters, xContentRegistry
