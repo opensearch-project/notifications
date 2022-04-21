@@ -19,7 +19,7 @@ fun validateUrl(urlString: String) {
 
 fun validateUrlHost(urlString: String, hostDenyList: List<String>) {
     require(!org.opensearch.notifications.spi.utils.isHostInDenylist(urlString, hostDenyList)) {
-        "Host of url is denied, based on plugin setting [notification.core.email.host_deny_list]"
+        "Host of url is denied, based on plugin setting [notification.core.http.host_deny_list]"
     }
 }
 

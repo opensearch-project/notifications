@@ -39,27 +39,27 @@ internal object PluginSettings {
     /**
      * Operation timeout for network operations.
      */
-    private const val OPERATION_TIMEOUT_MS_KEY = "$GENERAL_KEY_PREFIX.operationTimeoutMs"
+    private const val OPERATION_TIMEOUT_MS_KEY = "$GENERAL_KEY_PREFIX.operation_timeout_ms"
 
     /**
      * Setting to choose default number of items to query.
      */
-    private const val DEFAULT_ITEMS_QUERY_COUNT_KEY = "$GENERAL_KEY_PREFIX.defaultItemsQueryCount"
-
-    /**
-     * Setting to choose filter send by backend role.
-     */
-    private const val FILTER_SEND_BY_BACKEND_ROLES_KEY = "$GENERAL_KEY_PREFIX.filterSendByBackendRoles"
+    private const val DEFAULT_ITEMS_QUERY_COUNT_KEY = "$GENERAL_KEY_PREFIX.default_items_query_count"
 
     /**
      * Legacy alerting plugin filter_by_backend_roles setting.
      */
-    private const val LEGACY_FILTER_BY_BACKEND_ROLES_KEY = "opendistro.alerting.filter_by_backend_roles"
+    private const val LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES_KEY = "opendistro.alerting.filter_by_backend_roles"
 
     /**
-     * alerting plugin filter_by_backend_roles setting.
+     * Alerting plugin filter_by_backend_roles setting.
      */
-    private const val FILTER_BY_BACKEND_ROLES_KEY = "plugins.alerting.filter_by_backend_roles"
+    private const val ALERTING_FILTER_BY_BACKEND_ROLES_KEY = "plugins.alerting.filter_by_backend_roles"
+
+    /**
+     * Setting to enable filtering by backend roles.
+     */
+    private const val FILTER_BY_BACKEND_ROLES_KEY = "$GENERAL_KEY_PREFIX.filter_by_backend_roles"
 
     /**
      * Default operation timeout for network operations.
@@ -93,12 +93,6 @@ internal object PluginSettings {
     @Volatile
     var defaultItemsQueryCount: Int
 
-    /**
-     * Filter send by backend role.
-     */
-    @Volatile
-    var filterSendByBackendRoles: Boolean
-
     private const val DECIMAL_RADIX: Int = 10
 
     private val log by logger(javaClass)
@@ -119,12 +113,9 @@ internal object PluginSettings {
         operationTimeoutMs = (settings?.get(OPERATION_TIMEOUT_MS_KEY)?.toLong()) ?: DEFAULT_OPERATION_TIMEOUT_MS
         defaultItemsQueryCount = (settings?.get(DEFAULT_ITEMS_QUERY_COUNT_KEY)?.toInt())
             ?: DEFAULT_ITEMS_QUERY_COUNT_VALUE
-        filterSendByBackendRoles = (settings?.get(FILTER_SEND_BY_BACKEND_ROLES_KEY)?.toBoolean())
-            ?: false
         defaultSettings = mapOf(
             OPERATION_TIMEOUT_MS_KEY to operationTimeoutMs.toString(DECIMAL_RADIX),
-            DEFAULT_ITEMS_QUERY_COUNT_KEY to defaultItemsQueryCount.toString(DECIMAL_RADIX),
-            FILTER_SEND_BY_BACKEND_ROLES_KEY to filterSendByBackendRoles.toString()
+            DEFAULT_ITEMS_QUERY_COUNT_KEY to defaultItemsQueryCount.toString(DECIMAL_RADIX)
         )
     }
 
@@ -142,21 +133,21 @@ internal object PluginSettings {
         NodeScope, Dynamic
     )
 
-    val FILTER_SEND_BY_BACKEND_ROLES: Setting<Boolean> = Setting.boolSetting(
-        FILTER_SEND_BY_BACKEND_ROLES_KEY,
-        defaultSettings[FILTER_SEND_BY_BACKEND_ROLES_KEY]!!.toBoolean(),
-        NodeScope, Dynamic
-    )
-
-    private val LEGACY_FILTER_BY_BACKEND_ROLES: Setting<Boolean> = Setting.boolSetting(
-        LEGACY_FILTER_BY_BACKEND_ROLES_KEY,
+    val LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES: Setting<Boolean> = Setting.boolSetting(
+        LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES_KEY,
         false,
         NodeScope, Dynamic, Deprecated,
     )
 
-    private val FILTER_BY_BACKEND_ROLES: Setting<Boolean> = Setting.boolSetting(
+    val ALERTING_FILTER_BY_BACKEND_ROLES: Setting<Boolean> = Setting.boolSetting(
+        ALERTING_FILTER_BY_BACKEND_ROLES_KEY,
+        LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES,
+        NodeScope, Dynamic
+    )
+
+    val FILTER_BY_BACKEND_ROLES: Setting<Boolean> = Setting.boolSetting(
         FILTER_BY_BACKEND_ROLES_KEY,
-        LEGACY_FILTER_BY_BACKEND_ROLES,
+        ALERTING_FILTER_BY_BACKEND_ROLES,
         NodeScope, Dynamic
     )
 
@@ -177,7 +168,7 @@ internal object PluginSettings {
         return listOf(
             OPERATION_TIMEOUT_MS,
             DEFAULT_ITEMS_QUERY_COUNT,
-            FILTER_SEND_BY_BACKEND_ROLES
+            FILTER_BY_BACKEND_ROLES
         )
     }
 
@@ -188,7 +179,6 @@ internal object PluginSettings {
     private fun updateSettingValuesFromLocal(clusterService: ClusterService) {
         operationTimeoutMs = OPERATION_TIMEOUT_MS.get(clusterService.settings)
         defaultItemsQueryCount = DEFAULT_ITEMS_QUERY_COUNT.get(clusterService.settings)
-        filterSendByBackendRoles = FILTER_SEND_BY_BACKEND_ROLES.get(clusterService.settings)
     }
 
     /**
@@ -206,11 +196,6 @@ internal object PluginSettings {
         if (clusterDefaultItemsQueryCount != null) {
             log.debug("$LOG_PREFIX:$DEFAULT_ITEMS_QUERY_COUNT_KEY -autoUpdatedTo-> $clusterDefaultItemsQueryCount")
             defaultItemsQueryCount = clusterDefaultItemsQueryCount
-        }
-        val clusterFilterSendByBackendRole = clusterService.clusterSettings.get(FILTER_SEND_BY_BACKEND_ROLES)
-        if (clusterFilterSendByBackendRole != null) {
-            log.debug("$LOG_PREFIX:$FILTER_SEND_BY_BACKEND_ROLES_KEY -autoUpdatedTo-> $clusterFilterSendByBackendRole")
-            filterSendByBackendRoles = clusterFilterSendByBackendRole
         }
     }
 
@@ -233,10 +218,6 @@ internal object PluginSettings {
             defaultItemsQueryCount = it
             log.info("$LOG_PREFIX:$DEFAULT_ITEMS_QUERY_COUNT_KEY -updatedTo-> $it")
         }
-        clusterService.clusterSettings.addSettingsUpdateConsumer(FILTER_SEND_BY_BACKEND_ROLES) {
-            filterSendByBackendRoles = it
-            log.info("$LOG_PREFIX:$FILTER_SEND_BY_BACKEND_ROLES_KEY -updatedTo-> $it")
-        }
     }
 
     // reset the settings values to default values for testing purpose
@@ -244,6 +225,5 @@ internal object PluginSettings {
     fun reset() {
         operationTimeoutMs = DEFAULT_OPERATION_TIMEOUT_MS
         defaultItemsQueryCount = DEFAULT_ITEMS_QUERY_COUNT_VALUE
-        filterSendByBackendRoles = false
     }
 }
