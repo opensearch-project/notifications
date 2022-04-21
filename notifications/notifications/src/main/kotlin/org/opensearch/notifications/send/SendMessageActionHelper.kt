@@ -74,7 +74,7 @@ object SendMessageActionHelper {
      * Send notification message and keep audit.
      * @param request request object
      */
-    fun executeRequest(request: SendNotificationRequest): SendNotificationResponse {
+    suspend fun executeRequest(request: SendNotificationRequest): SendNotificationResponse {
         val eventSource = request.eventSource
         val channelMessage = request.channelMessage
         val channelIds = request.channelIds.toSet()
@@ -605,7 +605,7 @@ object SendMessageActionHelper {
      * @param configIds config id set
      * @return map of config id to [NotificationConfigDocInfo]
      */
-    private fun getConfigs(configIds: Set<String>): Map<String, NotificationConfigDocInfo?> {
+    private suspend fun getConfigs(configIds: Set<String>): Map<String, NotificationConfigDocInfo?> {
         return when (configIds.size) {
             0 -> emptyMap()
             1 -> getSingleConfig(configIds.first())
@@ -618,7 +618,7 @@ object SendMessageActionHelper {
      * @param configIds config id set
      * @return map of config id to [NotificationConfigDocInfo]
      */
-    private fun getAllConfigs(configIds: Set<String>): Map<String, NotificationConfigDocInfo?> {
+    private suspend fun getAllConfigs(configIds: Set<String>): Map<String, NotificationConfigDocInfo?> {
         log.info("$LOG_PREFIX:getAllConfigs-get $configIds")
         val configDocs = configOperations.getNotificationConfigs(configIds)
         val configMap = mutableMapOf<String, NotificationConfigDocInfo?>()
@@ -636,7 +636,7 @@ object SendMessageActionHelper {
      * @param configId config id
      * @return map of config id to [NotificationConfigDocInfo]
      */
-    private fun getSingleConfig(configId: String): Map<String, NotificationConfigDocInfo?> {
+    private suspend fun getSingleConfig(configId: String): Map<String, NotificationConfigDocInfo?> {
         log.info("$LOG_PREFIX:getSingleConfig-get $configId")
         val configDoc = configOperations.getNotificationConfig(configId)
         return mapOf(configId to configDoc)

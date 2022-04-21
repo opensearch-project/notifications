@@ -53,7 +53,7 @@ internal class DeleteNotificationConfigAction @Inject constructor(
     /**
      * {@inheritDoc}
      */
-    override fun executeRequest(
+    override suspend fun executeRequest(
         request: DeleteNotificationConfigRequest,
         user: User?
     ): DeleteNotificationConfigResponse {

@@ -5,7 +5,11 @@
 
 package org.opensearch.notifications.index
 
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeout
 import org.opensearch.OpenSearchStatusException
+import org.opensearch.action.ActionListener
+import org.opensearch.client.OpenSearchClient
 import org.opensearch.commons.authuser.User
 import org.opensearch.commons.notifications.action.CreateNotificationConfigRequest
 import org.opensearch.commons.notifications.action.CreateNotificationConfigResponse
@@ -39,6 +43,8 @@ import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.security.UserAccess
 import org.opensearch.rest.RestStatus
 import java.time.Instant
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * NotificationConfig indexing operation actions.
@@ -75,7 +81,7 @@ object ConfigIndexingActions {
         // TODO: URL validation with rules
     }
 
-    private fun validateEmailConfig(email: Email, user: User?) {
+    private suspend fun validateEmailConfig(email: Email, user: User?) {
         if (email.emailGroupIds.contains(email.emailAccountID)) {
             throw OpenSearchStatusException(
                 "Config IDs ${email.emailAccountID} is in both emailAccountID and emailGroupIds",
@@ -154,7 +160,7 @@ object ConfigIndexingActions {
         // No extra validation required. All email IDs are validated as part of model validation.
     }
 
-    private fun validateConfig(config: NotificationConfig, user: User?) {
+    private suspend fun validateConfig(config: NotificationConfig, user: User?) {
         when (config.configType) {
             ConfigType.NONE -> throw OpenSearchStatusException(
                 "NotificationConfig with type NONE is not acceptable",
@@ -177,7 +183,7 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [CreateNotificationConfigResponse]
      */
-    fun create(request: CreateNotificationConfigRequest, user: User?): CreateNotificationConfigResponse {
+    suspend fun create(request: CreateNotificationConfigRequest, user: User?): CreateNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-create")
         userAccess.validateUser(user)
         validateConfig(request.notificationConfig, user)
@@ -205,7 +211,7 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [UpdateNotificationConfigResponse]
      */
-    fun update(request: UpdateNotificationConfigRequest, user: User?): UpdateNotificationConfigResponse {
+    suspend fun update(request: UpdateNotificationConfigRequest, user: User?): UpdateNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-update ${request.configId}")
         userAccess.validateUser(user)
         validateConfig(request.notificationConfig, user)
@@ -246,7 +252,7 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [GetNotificationConfigResponse]
      */
-    fun get(request: GetNotificationConfigRequest, user: User?): GetNotificationConfigResponse {
+    suspend fun get(request: GetNotificationConfigRequest, user: User?): GetNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-get $request")
         userAccess.validateUser(user)
         return when (request.configIds.size) {
@@ -262,7 +268,7 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [GetNotificationConfigResponse]
      */
-    private fun info(configId: String, user: User?): GetNotificationConfigResponse {
+    private suspend fun info(configId: String, user: User?): GetNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-info $configId")
         val configDoc = operations.getNotificationConfig(configId)
         configDoc
@@ -290,7 +296,7 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [GetNotificationConfigResponse]
      */
-    private fun info(configIds: Set<String>, user: User?): GetNotificationConfigResponse {
+    private suspend fun info(configIds: Set<String>, user: User?): GetNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-info $configIds")
         val configDocs = operations.getNotificationConfigs(configIds)
         if (configDocs.size != configIds.size) {
@@ -329,7 +335,7 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [GetNotificationConfigResponse]
      */
-    private fun getAll(request: GetNotificationConfigRequest, user: User?): GetNotificationConfigResponse {
+    private suspend fun getAll(request: GetNotificationConfigRequest, user: User?): GetNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-getAll")
         val searchResult = operations.getAllNotificationConfigs(
             userAccess.getSearchAccessInfo(user),
@@ -344,7 +350,7 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [GetChannelListResponse]
      */
-    fun getChannelList(request: GetChannelListRequest, user: User?): GetChannelListResponse {
+    suspend fun getChannelList(request: GetChannelListRequest, user: User?): GetChannelListResponse {
         log.info("$LOG_PREFIX:getChannelList $request")
         userAccess.validateUser(user)
         val supportedChannelListString = getSupportedChannelList().joinToString(",")
@@ -381,7 +387,7 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [DeleteNotificationConfigResponse]
      */
-    private fun delete(configId: String, user: User?): DeleteNotificationConfigResponse {
+    private suspend fun delete(configId: String, user: User?): DeleteNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-delete $configId")
         userAccess.validateUser(user)
         val currentConfigDoc = operations.getNotificationConfig(configId)
@@ -418,7 +424,7 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [DeleteNotificationConfigResponse]
      */
-    private fun delete(configIds: Set<String>, user: User?): DeleteNotificationConfigResponse {
+    private suspend fun delete(configIds: Set<String>, user: User?): DeleteNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-delete $configIds")
         userAccess.validateUser(user)
         val configDocs = operations.getNotificationConfigs(configIds)
@@ -451,12 +457,27 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [DeleteNotificationConfigResponse]
      */
-    fun delete(request: DeleteNotificationConfigRequest, user: User?): DeleteNotificationConfigResponse {
+    suspend fun delete(request: DeleteNotificationConfigRequest, user: User?): DeleteNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-delete ${request.configIds}")
         return if (request.configIds.size == 1) {
             delete(request.configIds.first(), user)
         } else {
             delete(request.configIds, user)
         }
+    }
+    suspend fun <C : OpenSearchClient, T> C.suspendUntil(block: C.(ActionListener<T>) -> Unit): T =
+        suspendCancellableCoroutine { cont ->
+            block(object : ActionListener<T> {
+                override fun onResponse(response: T) = cont.resume(response)
+
+                override fun onFailure(e: Exception) = cont.resumeWithException(e)
+            })
+        }
+    suspend fun <C : OpenSearchClient, T> C.suspendUntilTimeout(timeout: Long, block: C.(ActionListener<T>) -> Unit): T {
+        var finalValue: T
+        withTimeout(timeout) {
+            finalValue = suspendUntil(block)
+        }
+        return finalValue
     }
 }
