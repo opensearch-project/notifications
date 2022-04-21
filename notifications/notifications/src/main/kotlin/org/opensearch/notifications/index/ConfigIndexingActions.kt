@@ -5,11 +5,7 @@
 
 package org.opensearch.notifications.index
 
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withTimeout
 import org.opensearch.OpenSearchStatusException
-import org.opensearch.action.ActionListener
-import org.opensearch.client.OpenSearchClient
 import org.opensearch.commons.authuser.User
 import org.opensearch.commons.notifications.action.CreateNotificationConfigRequest
 import org.opensearch.commons.notifications.action.CreateNotificationConfigResponse
@@ -43,8 +39,6 @@ import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.security.UserAccess
 import org.opensearch.rest.RestStatus
 import java.time.Instant
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 /**
  * NotificationConfig indexing operation actions.
@@ -464,20 +458,5 @@ object ConfigIndexingActions {
         } else {
             delete(request.configIds, user)
         }
-    }
-    suspend fun <C : OpenSearchClient, T> C.suspendUntil(block: C.(ActionListener<T>) -> Unit): T =
-        suspendCancellableCoroutine { cont ->
-            block(object : ActionListener<T> {
-                override fun onResponse(response: T) = cont.resume(response)
-
-                override fun onFailure(e: Exception) = cont.resumeWithException(e)
-            })
-        }
-    suspend fun <C : OpenSearchClient, T> C.suspendUntilTimeout(timeout: Long, block: C.(ActionListener<T>) -> Unit): T {
-        var finalValue: T
-        withTimeout(timeout) {
-            finalValue = suspendUntil(block)
-        }
-        return finalValue
     }
 }
