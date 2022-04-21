@@ -63,7 +63,14 @@ dependencies {
         exclude group: 'org.jetbrains', module: 'annotations' // resolve jarhell
     } // ${kotlin_version} does not work for coroutines
     implementation "${group}:common-utils:${common_utils_version}"
-    implementation "org.json:json:20180813"
+    // TODO: change compile to implementation when the _local/stats API is supported
+    compileOnly "org.json:json:20180813"
+    compileOnly "com.github.wnameless.json:json-flattener:0.13.0"
+    // TODO: uncomment when the _local/stats API is supported
+    // implementation "com.github.wnameless.json:json-base:2.0.0"
+    // implementation "com.fasterxml.jackson.core:jackson-databind:2.10.4"
+    // implementation "com.fasterxml.jackson.core:jackson-annotations:2.10.4"
+
 
     testImplementation(
             'org.assertj:assertj-core:3.19.0',
@@ -87,7 +94,6 @@ dependencies {
     testImplementation 'com.google.code.gson:gson:2.8.7'
     testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
-    implementation group: 'com.github.wnameless', name: 'json-flattener', version: '0.1.0'
     compileOnly project(path: ":${rootProject.name}-core-spi", configuration: 'shadow')
 }
 
