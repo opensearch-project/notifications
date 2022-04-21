@@ -138,7 +138,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
     fun `test send test smtp email message`() {
         val sampleSmtpAccount = SmtpAccount(
             "localhost",
-            25,
+            1000,
             MethodType.NONE,
             "szhongna@testemail.com"
         )
