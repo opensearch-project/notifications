@@ -7,13 +7,13 @@
 # configuration file for the notifications-core plugin
 opensearch.notifications.core:
   email:
-    sizeLimit: 10000
-    minimumHeaderLength: 100
+    size_limit: 10000
+    minimum_header_length: 100
   http:
-    maxConnections: 60
-    maxConnectionPerRoute: 20
-    connectionTimeout: 5000 # in milliseconds
-    socketTimeout: 50000
-    hostDenyList: []
-  allowedConfigTypes: ["slack","chime","webhook","email","sns","ses_account","smtp_account","email_group"]
-  tooltipSupport: true
+    max_connections: 60
+    max_connection_per_route: 20
+    connection_timeout: 5000 # in milliseconds
+    socket_timeout: 50000
+    host_deny_list: []
+  allowed_config_types: ["slack","chime","webhook","email","sns","ses_account","smtp_account","email_group"]
+  tooltip_support: true

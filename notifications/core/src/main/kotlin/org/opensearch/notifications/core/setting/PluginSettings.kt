@@ -10,7 +10,9 @@ import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.settings.SecureSetting
 import org.opensearch.common.settings.SecureString
 import org.opensearch.common.settings.Setting
+import org.opensearch.common.settings.Setting.Property.Deprecated
 import org.opensearch.common.settings.Setting.Property.Dynamic
+import org.opensearch.common.settings.Setting.Property.Final
 import org.opensearch.common.settings.Setting.Property.NodeScope
 import org.opensearch.common.settings.Settings
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.LOG_PREFIX
@@ -51,47 +53,57 @@ internal object PluginSettings {
     /**
      * Email size limit.
      */
-    private const val EMAIL_SIZE_LIMIT_KEY = "$EMAIL_KEY_PREFIX.sizeLimit"
+    private const val EMAIL_SIZE_LIMIT_KEY = "$EMAIL_KEY_PREFIX.size_limit"
 
     /**
      * Email minimum header length.
      */
-    private const val EMAIL_MINIMUM_HEADER_LENGTH_KEY = "$EMAIL_KEY_PREFIX.minimumHeaderLength"
+    private const val EMAIL_MINIMUM_HEADER_LENGTH_KEY = "$EMAIL_KEY_PREFIX.minimum_header_length"
 
     /**
      * Settings Key prefix for http connection.
      */
-    private const val MAX_CONNECTIONS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.maxConnections"
+    private const val MAX_CONNECTIONS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.max_connections"
 
     /**
      * Settings Key prefix for max http connection per route.
      */
-    private const val MAX_CONNECTIONS_PER_ROUTE_KEY = "$HTTP_CONNECTION_KEY_PREFIX.maxConnectionPerRoute"
+    private const val MAX_CONNECTIONS_PER_ROUTE_KEY = "$HTTP_CONNECTION_KEY_PREFIX.max_connection_per_route"
 
     /**
      * Settings Key prefix for connection timeout in milliseconds
      */
-    private const val CONNECTION_TIMEOUT_MILLISECONDS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.connectionTimeout"
+    private const val CONNECTION_TIMEOUT_MILLISECONDS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.connection_timeout"
 
     /**
      * Settings Key prefix for socket timeout in milliseconds
      */
-    private const val SOCKET_TIMEOUT_MILLISECONDS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.socketTimeout"
+    private const val SOCKET_TIMEOUT_MILLISECONDS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.socket_timeout"
+
+    /**
+     * Legacy setting for list of host deny list in Alerting
+     */
+    private const val LEGACY_ALERTING_HOST_DENY_LIST_KEY = "opendistro.destination.host.deny_list"
+
+    /**
+     * Setting for list of host deny list in Alerting
+     */
+    private const val ALERTING_HOST_DENY_LIST_KEY = "plugins.destination.host.deny_list"
 
     /**
      * Setting for list of host deny list
      */
-    private const val HOST_DENY_LIST_KEY = "$HTTP_CONNECTION_KEY_PREFIX.hostDenyList"
+    private const val HOST_DENY_LIST_KEY = "$HTTP_CONNECTION_KEY_PREFIX.host_deny_list"
 
     /**
      * Setting to choose allowed config types.
      */
-    private const val ALLOWED_CONFIG_TYPE_KEY = "$KEY_PREFIX.allowedConfigTypes"
+    private const val ALLOWED_CONFIG_TYPE_KEY = "$KEY_PREFIX.allowed_config_types"
 
     /**
      * Setting to enable tooltip in UI
      */
-    private const val TOOLTIP_SUPPORT_KEY = "$KEY_PREFIX.tooltipSupport"
+    private const val TOOLTIP_SUPPORT_KEY = "$KEY_PREFIX.tooltip_support"
 
     /**
      * Default email size limit as 10MB.
@@ -143,7 +155,7 @@ internal object PluginSettings {
     )
 
     /**
-     * Default email host deny list
+     * Default host deny list
      */
     private val DEFAULT_HOST_DENY_LIST = emptyList<String>()
 
@@ -309,9 +321,23 @@ internal object PluginSettings {
         NodeScope, Dynamic
     )
 
+    val LEGACY_ALERTING_HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
+        LEGACY_ALERTING_HOST_DENY_LIST_KEY,
+        DEFAULT_HOST_DENY_LIST,
+        { it },
+        NodeScope, Final, Deprecated
+    )
+
+    val ALERTING_HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
+        ALERTING_HOST_DENY_LIST_KEY,
+        LEGACY_ALERTING_HOST_DENY_LIST,
+        { it },
+        NodeScope, Final
+    )
+
     val HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
         HOST_DENY_LIST_KEY,
-        DEFAULT_HOST_DENY_LIST,
+        ALERTING_HOST_DENY_LIST,
         { it },
         NodeScope, Dynamic
     )

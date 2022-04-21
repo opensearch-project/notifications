@@ -59,11 +59,4 @@ internal object UserAccessManager : UserAccess {
         // between user backend roles and access roles
         return access.isEmpty() || user.roles.contains(ADMIN_ROLE) || user.backendRoles.any { it in access }
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun doesUserHaveSendAccess(user: User?, access: List<String>): Boolean {
-        return !PluginSettings.filterSendByBackendRoles || doesUserHaveAccess(user, access)
-    }
 }

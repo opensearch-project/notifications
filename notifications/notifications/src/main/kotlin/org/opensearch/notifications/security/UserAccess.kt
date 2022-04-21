@@ -27,9 +27,4 @@ interface UserAccess {
      * validate if user has access based on given access list
      */
     fun doesUserHaveAccess(user: User?, access: List<String>): Boolean
-
-    /**
-     * validate if user has send-notification access based on given access list
-     */
-    fun doesUserHaveSendAccess(user: User?, access: List<String>): Boolean
 }
