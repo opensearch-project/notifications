@@ -106,7 +106,7 @@ You must set up debugger configurations to listen on each port starting from `50
 
 ### Backport
 
-See [link to backport documentation](https://github.com/opensearch-project/opensearch-plugins/blob/main/BACKPORT.md)
+See [link to backport documentation](https://github.com/opensearch-project/opensearch-plugins/blob/main/WORKFLOWS.md#managing-backports)
 
 ## Code of Conduct
 
