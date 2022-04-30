@@ -51,6 +51,7 @@ exports[`<ChannelNamePanel/> spec renders errors 1`] = `
             <input
               aria-describedby="random_html_id-error-0"
               class="euiFieldText"
+              data-test-subj="create-channel-name-input"
               id="random_html_id"
               placeholder="Enter channel name"
               type="text"
@@ -93,6 +94,7 @@ exports[`<ChannelNamePanel/> spec renders errors 1`] = `
       >
         <textarea
           class="euiTextArea euiTextArea--resizeVertical"
+          data-test-subj="create-channel-description-input"
           placeholder="What is the purpose of this channel?"
           rows="6"
           style="height: 4.1rem;"
@@ -155,6 +157,7 @@ exports[`<ChannelNamePanel/> spec renders the component 1`] = `
           >
             <input
               class="euiFieldText"
+              data-test-subj="create-channel-name-input"
               id="random_html_id"
               placeholder="Enter channel name"
               type="text"
@@ -190,6 +193,7 @@ exports[`<ChannelNamePanel/> spec renders the component 1`] = `
       >
         <textarea
           class="euiTextArea euiTextArea--resizeVertical"
+          data-test-subj="create-channel-description-input"
           placeholder="What is the purpose of this channel?"
           rows="6"
           style="height: 4.1rem;"
