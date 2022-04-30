@@ -31,6 +31,7 @@ export function ChannelNamePanel(props: ChannelNamePanelProps) {
           isInvalid={context.inputErrors.name.length > 0}
         >
           <EuiFieldText
+            data-test-subj="create-channel-name-input"
             placeholder="Enter channel name"
             value={props.name}
             onChange={(e) => props.setName(e.target.value)}
@@ -52,6 +53,7 @@ export function ChannelNamePanel(props: ChannelNamePanelProps) {
         >
           <>
             <EuiTextArea
+              data-test-subj="create-channel-description-input"
               placeholder="What is the purpose of this channel?"
               style={{ height: '4.1rem' }}
               value={props.description}

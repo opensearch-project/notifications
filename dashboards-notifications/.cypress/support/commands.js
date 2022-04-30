@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-const { ADMIN_AUTH } = require('./constants');
+const { API, ADMIN_AUTH } = require('./constants');
 
 // ***********************************************
 // This example commands.js shows you how to
@@ -68,4 +68,22 @@ Cypress.Commands.overwrite('request', (originalFn, ...args) => {
   }
 
   return originalFn(Object.assign({}, defaults, options));
+});
+
+Cypress.Commands.add('deleteAllConfigs', () => {
+  cy.request({
+    method: 'GET',
+    url: `${Cypress.env('opensearch')}${API.CONFIGS_BASE}`,
+  }).then((response) => {
+    if (response.status === 200) {
+      for (let i = 0; i < response.body.total_hits; i++) {
+        cy.request(
+          'DELETE',
+          `${Cypress.env('opensearch')}${API.CONFIGS_BASE}/${response.body.config_list[i].config_id}`
+        );
+      }
+    } else {
+      cy.log('Failed to get configs.', response);
+    }
+  });
 });
