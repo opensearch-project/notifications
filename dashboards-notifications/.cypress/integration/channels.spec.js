@@ -22,7 +22,6 @@ describe('Test create channels', () => {
     cy.contains('Some fields are invalid.').should('exist');
 
     cy.get('[placeholder="Enter channel name"]').type('Test slack channel');
-    cy.get('.euiCheckbox__input[id="alerting"]').click({ force: true });
     cy.get('[data-test-subj="create-channel-slack-webhook-input"]').type(
       'https://sample-slack-webhook'
     );
@@ -42,7 +41,6 @@ describe('Test create channels', () => {
 
   it('creates a chime channel', () => {
     cy.get('[placeholder="Enter channel name"]').type('Test chime channel');
-    cy.get('.euiCheckbox__input[id="reports"]').click({ force: true });
 
     cy.get('.euiSuperSelectControl').contains('Slack').click({ force: true });
     cy.wait(delay);
@@ -62,7 +60,6 @@ describe('Test create channels', () => {
 
   it('creates a email channel', () => {
     cy.get('[placeholder="Enter channel name"]').type('Test email channel');
-    cy.get('.euiCheckbox__input[id="reports"]').click({ force: true });
 
     cy.get('.euiSuperSelectControl').contains('Slack').click({ force: true });
     cy.wait(delay);
@@ -99,7 +96,6 @@ describe('Test create channels', () => {
 
   it('creates a email channel with ses sender', () => {
     cy.get('[placeholder="Enter channel name"]').type('Test email channel with ses');
-    cy.get('.euiCheckbox__input[id="reports"]').click({ force: true });
 
     cy.get('.euiSuperSelectControl').contains('Slack').click({ force: true });
     cy.wait(delay);
@@ -142,7 +138,6 @@ describe('Test create channels', () => {
 
   it('creates a webhook channel', () => {
     cy.get('[placeholder="Enter channel name"]').type('Test webhook channel');
-    cy.get('.euiCheckbox__input[id="reports"]').click({ force: true });
 
     cy.get('.euiSuperSelectControl').contains('Slack').click({ force: true });
     cy.wait(delay);
@@ -161,7 +156,6 @@ describe('Test create channels', () => {
 
   it('creates a sns channel', () => {
     cy.get('[placeholder="Enter channel name"]').type('test-sns-channel');
-    cy.get('.euiCheckbox__input[id="reports"]').click({ force: true });
 
     cy.get('.euiSuperSelectControl').contains('Slack').click({ force: true });
     cy.wait(delay);
@@ -267,12 +261,14 @@ describe('Test channel details', () => {
     cy.contains('Edit').click({ force: true });
     cy.contains('Edit channel').should('exist');
     cy.get('.euiText').contains('Custom webhook').should('exist');
-    cy.get('.euiCheckbox__input[id="alerting"]').click({ force: true });
+    cy.get(
+      '[data-test-subj="create-channel-description-input"]'
+    ).type('{selectall}{backspace}Updated custom webhook description');
     cy.wait(delay);
     cy.contains('Save').click({ force: true });
 
     cy.contains('successfully updated.').should('exist');
-    cy.contains('Alerting').should('exist');
+    cy.contains('Updated custom webhook description').should('exist');
   })
 
   it('deletes channels', async () => {
