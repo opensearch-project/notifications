@@ -14,11 +14,10 @@
   "env": {
     "opensearch": "localhost:9200",
     "opensearchDashboards": "localhost:5601",
-    "security_enabled": true
+    "security_enabled": false
   },
   "testFiles": [
-    "email_groups.spec.js",
-    "channels.spec.js",
-    "dashboard.spec.js"
+    "email_senders_and_groups.spec.js",
+    "channels.spec.js"
   ]
 }
