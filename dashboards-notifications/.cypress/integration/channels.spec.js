@@ -6,8 +6,19 @@
 /// <reference types="cypress" />
 
 import { delay } from '../utils/constants';
+import testSlackChannel from '../fixtures/test_slack_channel';
+import testChimeChannel from '../fixtures/test_chime_channel';
+import testWebhookChannel from '../fixtures/test_webhook_channel.json';
+import testTlsSmtpSender from '../fixtures/test_tls_smtp_sender';
 
 describe('Test create channels', () => {
+  before(() => {
+    // Delete all Notification configs
+    cy.deleteAllConfigs();
+
+    cy.createConfig(testTlsSmtpSender);
+  });
+
   beforeEach(() => {
     cy.visit(
       `${Cypress.env(
@@ -58,7 +69,7 @@ describe('Test create channels', () => {
     cy.contains('successfully created.').should('exist');
   });
 
-  it('creates a email channel', () => {
+  it('creates an email channel', () => {
     cy.get('[placeholder="Enter channel name"]').type('Test email channel');
 
     cy.get('.euiSuperSelectControl').contains('Slack').click({ force: true });
@@ -94,7 +105,7 @@ describe('Test create channels', () => {
     cy.contains('successfully created.').should('exist');
   });
 
-  it('creates a email channel with ses sender', () => {
+  it('creates an email channel with ses sender', () => {
     cy.get('[placeholder="Enter channel name"]').type('Test email channel with ses');
 
     cy.get('.euiSuperSelectControl').contains('Slack').click({ force: true });
@@ -154,7 +165,7 @@ describe('Test create channels', () => {
     cy.contains('successfully created.').should('exist');
   });
 
-  it('creates a sns channel', () => {
+  it('creates an sns channel', () => {
     cy.get('[placeholder="Enter channel name"]').type('test-sns-channel');
 
     cy.get('.euiSuperSelectControl').contains('Slack').click({ force: true });
@@ -177,6 +188,17 @@ describe('Test create channels', () => {
 });
 
 describe('Test channels table', () => {
+  before(() => {
+    // Delete all Notification configs
+    cy.deleteAllConfigs();
+
+    // Create test channels
+    cy.createConfig(testSlackChannel);
+    cy.createConfig(testChimeChannel);
+    cy.createConfig(testWebhookChannel);
+    cy.createTestEmailChannel();
+  });
+
   beforeEach(() => {
     cy.visit(
       `${Cypress.env(
@@ -225,6 +247,17 @@ describe('Test channels table', () => {
 });
 
 describe('Test channel details', () => {
+  before(() => {
+    // Delete all Notification configs
+    cy.deleteAllConfigs();
+
+    // Create test channels
+    cy.createConfig(testSlackChannel);
+    cy.createConfig(testChimeChannel);
+    cy.createConfig(testWebhookChannel);
+    cy.createTestEmailChannel();
+  });
+
   beforeEach(() => {
     cy.visit(
       `${Cypress.env(

@@ -1,0 +1,13 @@
+{
+  "config": {
+    "name": "test-ses-sender",
+    "description": "A test SES sender",
+    "config_type": "ses_account",
+    "is_enabled": true,
+    "ses_account": {
+      "region": "us-east-1",
+      "role_arn": "arn:aws:iam::012345678912:role/NotificationsSESRole",
+      "from_address": "test@email.com"
+    }
+  }
+}

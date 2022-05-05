@@ -1,0 +1,11 @@
+{
+  "config": {
+    "name": "Test chime channel",
+    "description": "A test chime channel",
+    "config_type": "chime",
+    "is_enabled": true,
+    "chime": {
+      "url": "https://sample-chime-webhook"
+    }
+  }
+}

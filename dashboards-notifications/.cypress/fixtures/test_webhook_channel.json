@@ -1,0 +1,12 @@
+{
+  "config": {
+    "name": "Test webhook channel",
+    "description": "A test webhook channel",
+    "config_type": "webhook",
+    "is_enabled": true,
+    "webhook": {
+      "url": "https://custom-webhook-test-url.com:8888/test-path?params1=value1&params2=value2&params3=value3&params4=value4&params5=values5&params6=values6&params7=values7"
+    }
+  }
+}
+

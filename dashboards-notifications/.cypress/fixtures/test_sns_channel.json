@@ -1,0 +1,12 @@
+{
+  "config": {
+    "name": "test-sns-channel",
+    "description": "A test SNS channel",
+    "config_type": "sns",
+    "is_enabled": true,
+    "sns": {
+      "topic_arn": "arn:aws:sns:us-west-2:123456789012:notifications-test",
+      "role_arn": "arn:aws:iam::012345678901:role/NotificationsSNSRole"
+    }
+  }
+}
