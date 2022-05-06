@@ -9,12 +9,12 @@ import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import com.amazonaws.auth.BasicSessionCredentials
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
-import com.amazonaws.auth.profile.ProfileCredentialsProvider
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder
 import com.amazonaws.services.securitytoken.model.AssumeRoleRequest
 import org.opensearch.notifications.core.credentials.CredentialsProvider
 
 class CredentialsProviderFactory : CredentialsProvider {
+
     override fun getCredentialsProvider(region: String, roleArn: String?): AWSCredentialsProvider {
         return if (roleArn != null) {
             getCredentialsProviderByIAMRole(region, roleArn)
@@ -25,7 +25,7 @@ class CredentialsProviderFactory : CredentialsProvider {
 
     private fun getCredentialsProviderByIAMRole(region: String, roleArn: String?): AWSCredentialsProvider {
         val stsClient = AWSSecurityTokenServiceClientBuilder.standard()
-            .withCredentials(ProfileCredentialsProvider())
+            .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
             .withRegion(region)
             .build()
         val roleRequest = AssumeRoleRequest()
