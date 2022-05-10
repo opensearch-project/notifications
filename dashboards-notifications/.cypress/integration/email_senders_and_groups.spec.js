@@ -9,6 +9,7 @@ import { delay } from '../utils/constants';
 import testSslSmtpSender from '../fixtures/test_ssl_smtp_sender';
 import testTlsSmtpSender from '../fixtures/test_tls_smtp_sender';
 import testSesSender from '../fixtures/test_ses_sender';
+import testEmailRecipientGroup from '../fixtures/test_email_recipient_group';
 
 describe('Test create email senders', () => {
   before(() => {
@@ -119,7 +120,7 @@ describe('Test edit senders', () => {
     cy.get('.euiCheckbox__input[aria-label="Select this row"]').eq(0).click(); // ssl sender
     cy.get('[data-test-subj="senders-table-edit-button"]').click();
     cy.get('[data-test-subj="create-sender-form-email-input"]').type(
-      '{selectall}{backspace}edited.test@email.com'
+      '{selectall}{backspace}editedtest@email.com'
     );
     cy.wait(delay);
 
@@ -182,6 +183,11 @@ describe('Test delete senders', () => {
 
 describe('Test create, edit and delete recipient group', () => {
   beforeEach(() => {
+    // Delete all Notification configs
+    cy.deleteAllConfigs();
+
+    cy.createConfig(testEmailRecipientGroup);
+
     cy.visit(
       `${Cypress.env(
         'opensearchDashboards'

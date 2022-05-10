@@ -1,0 +1,30 @@
+{
+  "config": {
+    "name": "Test recipient group",
+    "description": "A test email recipient group",
+    "config_type": "email_group",
+    "is_enabled": true,
+    "email_group": {
+      "recipient_list": [
+        {
+          "recipient": "custom.email.1@test.com"
+        },
+        {
+          "recipient": "custom.email.2@test.com"
+        },
+        {
+          "recipient": "custom.email.3@test.com"
+        },
+        {
+          "recipient": "custom.email.4@test.com"
+        },
+        {
+          "recipient": "custom.email.5@test.com"
+        },
+        {
+          "recipient": "custom.email.6@test.com"
+        }
+      ]
+    }
+  }
+}
