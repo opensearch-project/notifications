@@ -184,7 +184,6 @@ internal class PluginActionTests {
 
     @Test
     fun `Send notification action should call back action listener`() {
-        val notificationId = "notification-1"
         val request = mock(SendNotificationRequest::class.java)
 
         val sampleEventSource = EventSource(
