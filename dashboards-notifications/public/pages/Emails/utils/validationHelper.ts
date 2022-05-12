@@ -14,7 +14,7 @@ export const validateSenderName = (name: string) => {
   }
   if (name.length > 50 || name.length < 2)
     errors.push('Sender name must contain 2 to 50 characters.');
-  if (!/^[a-z0-9-]+$/.test(name))
+  if (!/^[a-z0-9-_]+$/.test(name))
     errors.push('Sender name contains invalid characters.');
   return errors;
 };
