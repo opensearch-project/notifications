@@ -20,7 +20,7 @@
     "plugin_helpers": "node ../../scripts/plugin_helpers"
   },
   "dependencies": {
-    "cypress": "^9.5.2"
+    "cypress": "^6.0.0"
   },
   "devDependencies": {
     "@types/enzyme-adapter-react-16": "^1.0.6",
@@ -28,5 +28,9 @@
     "enzyme-adapter-react-16": "^1.15.5",
     "jest": "^27.5.1",
     "jest-dom": "^4.0.0"
+  },
+  "resolutions": {
+    "async": "^3.2.3",
+    "minimist": "^1.2.6"
   }
 }
