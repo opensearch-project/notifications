@@ -1,0 +1,17 @@
+{
+  "config": {
+    "name": "Test email channel",
+    "description": "A test SMTP email channel",
+    "config_type": "email",
+    "is_enabled": true,
+    "email": {
+      "email_account_id": "test_smtp_sender_id",
+      "recipient_list": [
+        {
+          "recipient": "custom.email@test.com"
+        }
+      ],
+      "email_group_id_list": []
+    }
+  }
+}

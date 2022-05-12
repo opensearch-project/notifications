@@ -6,8 +6,17 @@
 /// <reference types="cypress" />
 
 import { delay } from '../utils/constants';
+import testSslSmtpSender from '../fixtures/test_ssl_smtp_sender';
+import testTlsSmtpSender from '../fixtures/test_tls_smtp_sender';
+import testSesSender from '../fixtures/test_ses_sender';
+import testEmailRecipientGroup from '../fixtures/test_email_recipient_group';
 
 describe('Test create email senders', () => {
+  before(() => {
+    // Delete all Notification configs
+    cy.deleteAllConfigs();
+  });
+
   beforeEach(() => {
     cy.visit(
       `${Cypress.env(
@@ -62,7 +71,7 @@ describe('Test create email senders', () => {
 
     cy.get('.euiButton__text').contains('Create').click({ force: true });
     cy.contains('successfully created.').should('exist');
-    cy.contains('test-ssl-sender').should('exist');
+    cy.contains('test-tls-sender').should('exist');
   });
 
   it('creates SES sender', () => {
@@ -89,6 +98,15 @@ describe('Test create email senders', () => {
 });
 
 describe('Test edit senders', () => {
+  before(() => {
+    // Delete all Notification configs
+    cy.deleteAllConfigs();
+
+    cy.createConfig(testSslSmtpSender);
+    cy.createConfig(testTlsSmtpSender);
+    cy.createConfig(testSesSender);
+  });
+
   beforeEach(() => {
     cy.visit(
       `${Cypress.env(
@@ -102,7 +120,7 @@ describe('Test edit senders', () => {
     cy.get('.euiCheckbox__input[aria-label="Select this row"]').eq(0).click(); // ssl sender
     cy.get('[data-test-subj="senders-table-edit-button"]').click();
     cy.get('[data-test-subj="create-sender-form-email-input"]').type(
-      '{selectall}{backspace}edited.test@email.com'
+      '{selectall}{backspace}editedtest@email.com'
     );
     cy.wait(delay);
 
@@ -124,6 +142,15 @@ describe('Test edit senders', () => {
 });
 
 describe('Test delete senders', () => {
+  before(() => {
+    // Delete all Notification configs
+    cy.deleteAllConfigs();
+
+    cy.createConfig(testSslSmtpSender);
+    cy.createConfig(testTlsSmtpSender);
+    cy.createConfig(testSesSender);
+  });
+
   beforeEach(() => {
     cy.visit(
       `${Cypress.env(
@@ -135,7 +162,7 @@ describe('Test delete senders', () => {
 
   it('deletes smtp senders', () => {
     cy.get('.euiCheckbox__input[aria-label="Select this row"]').eq(0).click(); // ssl sender
-    cy.get('[data-test-subj="senders-table-delete-button"]').click();
+    cy.get('[data-test-subj="senders-table-delete-button"]').click({ force: true });
     cy.get('input[placeholder="delete"]').type('delete');
     cy.wait(delay);
     cy.get('[data-test-subj="delete-sender-modal-delete-button"]').click();
@@ -144,7 +171,7 @@ describe('Test delete senders', () => {
 
   it('deletes ses senders', () => {
     cy.get('.euiCheckbox__input[aria-label="Select this row"]').last().click(); // ses sender
-    cy.get('[data-test-subj="ses-senders-table-delete-button"]').click();
+    cy.get('[data-test-subj="ses-senders-table-delete-button"]').click({ force: true });
     cy.get('input[placeholder="delete"]').type('delete');
     cy.wait(delay);
     cy.get('[data-test-subj="delete-sender-modal-delete-button"]').click();
@@ -156,6 +183,11 @@ describe('Test delete senders', () => {
 
 describe('Test create, edit and delete recipient group', () => {
   beforeEach(() => {
+    // Delete all Notification configs
+    cy.deleteAllConfigs();
+
+    cy.createConfig(testEmailRecipientGroup);
+
     cy.visit(
       `${Cypress.env(
         'opensearchDashboards'

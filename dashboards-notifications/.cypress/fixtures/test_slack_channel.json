@@ -1,0 +1,11 @@
+{
+  "config": {
+    "name": "Test slack channel",
+    "description": "A test slack channel",
+    "config_type": "slack",
+    "is_enabled": true,
+    "slack": {
+      "url": "https://sample-slack-webhook"
+    }
+  }
+}

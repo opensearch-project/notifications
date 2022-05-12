@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import testTlsSmtpSender from '../fixtures/test_tls_smtp_sender';
+import testSmtpEmailChannel from '../fixtures/test_smtp_email_channel';
+
 const { API, ADMIN_AUTH } = require('./constants');
 
 // ***********************************************
@@ -68,6 +71,15 @@ Cypress.Commands.overwrite('request', (originalFn, ...args) => {
   }
 
   return originalFn(Object.assign({}, defaults, options));
+});
+
+Cypress.Commands.add('createConfig', (notificationConfigJSON) => {
+  cy.request('POST', `${Cypress.env('opensearch')}${API.CONFIGS_BASE}`, notificationConfigJSON);
+});
+
+Cypress.Commands.add('createTestEmailChannel', () => {
+  cy.createConfig(testTlsSmtpSender);
+  cy.createConfig(testSmtpEmailChannel);
 });
 
 Cypress.Commands.add('deleteAllConfigs', () => {

@@ -1,0 +1,14 @@
+{
+  "config": {
+    "name": "test-ssl-sender",
+    "description": "A test SSL SMTP sender",
+    "config_type": "smtp_account",
+    "is_enabled": true,
+    "smtp_account": {
+      "host": "test-host.com",
+      "port": 123,
+      "method": "ssl",
+      "from_address": "test@email.com"
+    }
+  }
+}
