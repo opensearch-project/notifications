@@ -54,7 +54,7 @@ export function CreateSenderForm(props: CreateSenderFormProps) {
       <EuiFormRow
         label="Sender name"
         style={{ maxWidth: '650px' }}
-        helpText="Use a unique, descriptive name. The sender name must contain from 2 to 50 characters. Valid characters are lowercase a-z, 0-9, and - (hyphen)."
+        helpText="Use a unique, descriptive name. The sender name must contain from 2 to 50 characters. Valid characters are lowercase a-z, 0-9, - (hyphen) and _ (underscore)."
         error={props.inputErrors.senderName.join(' ')}
         isInvalid={props.inputErrors.senderName.length > 0}
       >
