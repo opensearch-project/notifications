@@ -22,9 +22,52 @@ fun validateEmail(email: String) {
     require(isValidEmail(email)) { "Invalid email address" }
 }
 
+fun isFQDN(urlString: String): Boolean {
+    var p: java.lang.Process? = null
+    try {
+        p = java.lang.Runtime.getRuntime()
+            .exec("nslookup " + urlString) // check host is FQDN or not
+        val out = StringBuilder()
+        val br = java.io.BufferedReader(java.io.InputStreamReader(p.getInputStream()))
+        var line: String? = null
+        var previous: String? = null
+        while (br.readLine().also { line = it } != null) {
+            if (line != previous) {
+                previous = line
+                out.append(line).append('\n')
+            }
+        }
+        if (p.waitFor() == 0) {
+            p.destroy()
+        }
+        val tmp: String = out.toString()
+        if (tmp.contains("server can't find")) {
+            println("Not FQDN")
+            return (false) // return false when host is not FQDN
+        } else {
+            println("FQDN")
+            return (true)
+        }
+    } catch (e: java.io.IOException) {
+        println(e.printStackTrace())
+    } catch (e: java.lang.InterruptedException) {
+        println(e.printStackTrace())
+    }
+
+    return false
+}
+
 fun isValidUrl(urlString: String): Boolean {
     val url = URL(urlString) // throws MalformedURLException if URL is invalid
-    return ("https" == url.protocol || "http" == url.protocol) // Support only http/https, other protocols not supported
+    val index: Int = urlString.indexOf("//") + 2
+    val s: String = urlString.substring(index)
+
+    val flag = isFQDN(s)
+    if (s.equals(url.host)) {
+        return (("https" == url.protocol || "http" == url.protocol) && flag) // Support only http/https, other protocols not supported
+    } else {
+        return (("https" == url.protocol || "http" == url.protocol) && !flag)
+    }
 }
 
 fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
