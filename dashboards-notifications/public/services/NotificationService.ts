@@ -249,15 +249,7 @@ export default class NotificationService {
     const response = await this.httpClient.get(
         `${NODE_API.SEND_TEST_MESSAGE}/${configId}`
     );
-    if (response.event_id != null) {
-      await this.getNotification(response.event_id).then((response) => {
-        if (!response.success) {
-          const error = new Error('Failed to send the test message.');
-          error.stack = JSON.stringify(response.status_list, null, 2);
-          throw error;
-        }
-      });
-    } else {
+    if (response.status_list[0].delivery_status.status_code != 200) {
       console.error(response);
       const error = new Error('Failed to send the test message.');
       error.stack = JSON.stringify(response, null, 2);
