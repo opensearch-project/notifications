@@ -37,7 +37,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
     }
 
     protected fun isLocalHost(): Boolean {
-        val host = System.getProperty("tests.cluster")!!.toString()
+        val host = System.getProperty("tests.cluster", "dummyHost")!!.toString()
         return host.startsWith("localhost:")
     }
 
