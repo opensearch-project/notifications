@@ -3,23 +3,25 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.opensearch.notifications.core.integTest
+package org.opensearch.notifications.core.smtp
 
 import org.junit.After
+import org.junit.jupiter.api.Test
 import org.opensearch.notifications.core.NotificationCoreImpl
+import org.opensearch.notifications.core.transport.DestinationTransportProvider
+import org.opensearch.notifications.core.transport.SmtpDestinationTransport
 import org.opensearch.notifications.spi.model.MessageContent
+import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import org.opensearch.rest.RestStatus
-import org.opensearch.test.rest.OpenSearchRestTestCase
 import org.springframework.integration.test.mail.TestMailServer
+import kotlin.test.assertEquals
 
-internal class SmtpEmailIT : OpenSearchRestTestCase() {
+class SmtpEmailTests {
 
-    private val smtpServer: TestMailServer.SmtpServer
-    private val smtpPort = 10255 // use non-standard port > 1024 to avoid permission issue
-
-    init {
-        smtpServer = TestMailServer.smtp(smtpPort)
+    internal companion object {
+        private const val smtpPort = 10255 // use non-standard port > 1024 to avoid permission issue
+        private val smtpServer = TestMailServer.smtp(smtpPort)
     }
 
     @After
@@ -28,6 +30,7 @@ internal class SmtpEmailIT : OpenSearchRestTestCase() {
         smtpServer.resetServer()
     }
 
+    @Test
     fun `test send email to one recipient over smtp server`() {
         val smtpDestination = SmtpDestination(
             "testAccountName",
@@ -46,11 +49,13 @@ internal class SmtpEmailIT : OpenSearchRestTestCase() {
             "VGVzdCBtZXNzYWdlCgo=",
             "application/octet-stream",
         )
+        DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SMTP to SmtpDestinationTransport())
         val response = NotificationCoreImpl.sendMessage(smtpDestination, message, "ref")
         assertEquals("Success", response.statusText)
         assertEquals(RestStatus.OK.status, response.statusCode)
     }
 
+    @Test
     fun `test send email with non-available host`() {
         val smtpDestination = SmtpDestination(
             "testAccountName",
@@ -69,6 +74,7 @@ internal class SmtpEmailIT : OpenSearchRestTestCase() {
             "VGVzdCBtZXNzYWdlCgo=",
             "application/octet-stream",
         )
+        DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SMTP to SmtpDestinationTransport())
         val response = NotificationCoreImpl.sendMessage(smtpDestination, message, "ref")
         assertEquals(
             "sendEmail Error, status:Couldn't connect to host, port: invalidHost, $smtpPort; timeout -1",
