@@ -36,6 +36,11 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         return System.getProperty("https", "false")!!.toBoolean()
     }
 
+    protected fun isLocalHost(): Boolean {
+        val host = System.getProperty("tests.cluster", "dummyHost")!!.toString()
+        return host.startsWith("localhost:")
+    }
+
     override fun getProtocol(): String {
         return if (isHttps()) {
             "https"
