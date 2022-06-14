@@ -26,7 +26,7 @@ fun isFQDN(urlString: String): Boolean {
     var p: java.lang.Process? = null
     try {
         p = java.lang.Runtime.getRuntime()
-                .exec("nslookup " + urlString) // check host is FQDN or not
+            .exec("nslookup " + urlString) // check host is FQDN or not
         val out = StringBuilder()
         val br = java.io.BufferedReader(java.io.InputStreamReader(p.getInputStream()))
         var line: String? = null
