@@ -73,7 +73,6 @@ jobs:
         run: |
           cd OpenSearch-Dashboards/plugins/dashboards-notifications
           yarn build
-          mv ./build/*.zip ./build/${{ env.PLUGIN_NAME }}-${{ env.OPENSEARCH_PLUGIN_VERSION }}.zip
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v1
