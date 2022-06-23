@@ -1,12 +1,12 @@
 {
   "name": "notifications-dashboards",
-  "version": "2.0.0.0",
+  "version": "2.1.0.0",
   "description": "OpenSearch Dashboards Notifications Plugin",
   "license": "Apache-2.0",
   "main": "index.ts",
-  "opensearchDashboards": {
-    "version": "2.0.0",
-    "templateVersion": "1.0.0"
+  "config": {
+    "id": "notificationsDashboards",
+    "zip_name": "notifications-dashboards"
   },
   "scripts": {
     "osd": "node ../../scripts/osd",
@@ -17,7 +17,8 @@
     "test:jest": "TZ=UTC ../../node_modules/.bin/jest --config ./test/jest.config.js",
     "cypress:run": "cypress run",
     "cypress:open": "cypress open",
-    "plugin_helpers": "node ../../scripts/plugin_helpers"
+    "plugin_helpers": "node ../../scripts/plugin_helpers",
+    "postbuild": "echo Renaming build artifact to [$npm_package_config_zip_name-$npm_package_version.zip] && mv build/$npm_package_config_id*.zip build/$npm_package_config_zip_name-$npm_package_version.zip"
   },
   "dependencies": {
     "cypress": "^6.0.0"

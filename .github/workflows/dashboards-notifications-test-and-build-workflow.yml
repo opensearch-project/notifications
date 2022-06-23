@@ -9,8 +9,8 @@ on: [pull_request, push]
 
 env:
   PLUGIN_NAME: notifications-dashboards
-  OPENSEARCH_DASHBOARDS_VERSION: 'main'
-  OPENSEARCH_PLUGIN_VERSION: 2.0.0.0
+  OPENSEARCH_DASHBOARDS_VERSION: '2.x'
+  OPENSEARCH_PLUGIN_VERSION: 2.1.0.0
 
 jobs:
 
@@ -73,7 +73,6 @@ jobs:
         run: |
           cd OpenSearch-Dashboards/plugins/dashboards-notifications
           yarn build
-          mv ./build/*.zip ./build/${{ env.PLUGIN_NAME }}-${{ env.OPENSEARCH_PLUGIN_VERSION }}.zip
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v1
