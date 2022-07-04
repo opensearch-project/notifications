@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class ValidationHelpersTests {
+    private val GOOGLE_URL = "https://www.google.com"
+    private val INVALID_URL = "www.invalid.com"
+    private val VALID_NOT_FQDN_URL = "https://odfe-es-client-service:9200/"
 
     private val hostDentyList = listOf(
         "127.0.0.0/8",
@@ -41,5 +44,20 @@ internal class ValidationHelpersTests {
         for (url in urls) {
             assertEquals(false, isHostInDenylist(url, hostDentyList))
         }
+    }
+
+    @Test
+    fun `validator identifies invalid url as invalid`() {
+        assert(!isValidUrl(INVALID_URL))
+    }
+
+    @Test
+    fun `validator identifies valid google url as valid`() {
+        assert(isValidUrl(GOOGLE_URL))
+    }
+
+    @Test
+    fun `validator identifies non FQDN as valid`() {
+        assert(isValidUrl(VALID_NOT_FQDN_URL))
     }
 }

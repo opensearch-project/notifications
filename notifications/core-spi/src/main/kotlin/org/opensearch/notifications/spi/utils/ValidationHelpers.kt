@@ -10,7 +10,17 @@ import org.apache.http.client.methods.HttpPatch
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.methods.HttpPut
 import org.opensearch.common.Strings
+import org.opensearch.notifications.spi.utils.ValidationHelpers.FQDN_REGEX
+import java.net.MalformedURLException
 import java.net.URL
+
+private object ValidationHelpers {
+    const val FQDN_REGEX =
+        "^(?!.*?_.*?)(?!(?:\\w+?\\.)?-[\\w.\\-]*?)(?!\\w+?-\\.[\\w.\\-]+?)" +
+            "(?=\\w)(?=[\\w.\\-]*?\\.+[\\w.\\-]*?)(?![\\w.\\-]{254})(?!(?" +
+            ":\\.?[\\w\\-.]*?[\\w\\-]{64,}\\.)+?)[\\w.\\-]+?(?<![\\w\\-.]?\\." +
+            "\\d?)(?<=[\\w\\-]{2,})(?<![\\w\\-]{25})\$"
+}
 
 fun validateUrl(urlString: String) {
     require(!Strings.isNullOrEmpty(urlString)) { "url is null or empty" }
@@ -22,43 +32,23 @@ fun validateEmail(email: String) {
     require(isValidEmail(email)) { "Invalid email address" }
 }
 
-fun isFQDN(urlString: String): Boolean {
-    var p: java.lang.Process? = null
-    try {
-        p = java.lang.Runtime.getRuntime()
-            .exec("nslookup " + urlString) // check host is FQDN or not
-        val out = StringBuilder()
-        val br = java.io.BufferedReader(java.io.InputStreamReader(p.getInputStream()))
-        var line: String? = null
-        var previous: String? = null
-        while (br.readLine().also { line = it } != null) {
-            if (line != previous) {
-                previous = line
-                out.append(line).append('\n')
-            }
-        }
-        if (p.waitFor() == 0) {
-            p.destroy()
-        }
-        return !out.toString().contains("server can't find")
-    } catch (e: java.io.IOException) {
-        println(e.printStackTrace())
-    } catch (e: java.lang.InterruptedException) {
-        println(e.printStackTrace())
-    }
-    return false
-}
-
 fun isValidUrl(urlString: String): Boolean {
-    val url = URL(urlString) // throws MalformedURLException if URL is invalid
-    val index: Int = urlString.indexOf("//") + 2
-    val s: String = urlString.substring(index)
+    val url: URL
+    try {
+        url = URL(urlString)
+    } catch (exception: MalformedURLException) {
+        return false
+    }
 
-    val flag = isFQDN(s)
-    if (s.equals(url.host)) {
-        return (("https" == url.protocol || "http" == url.protocol) && flag) // Support only http/https, other protocols not supported
+    val index: Int = urlString.indexOf("//") + 2
+    val subString: String = urlString.substring(index)
+
+    val regex = Regex(FQDN_REGEX)
+    val isFQDN = regex.matches(subString)
+    return if (subString == url.host) {
+        (("https" == url.protocol || "http" == url.protocol) && isFQDN) // Support only http/https, other protocols not supported
     } else {
-        return (("https" == url.protocol || "http" == url.protocol) && !flag)
+        (("https" == url.protocol || "http" == url.protocol) && !isFQDN)
     }
 }
 
