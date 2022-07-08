@@ -6,6 +6,7 @@
 package org.opensearch.notifications.spi.utils
 
 import inet.ipaddr.IPAddressString
+import org.apache.commons.validator.routines.DomainValidator
 import org.apache.http.client.methods.HttpPatch
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.methods.HttpPut
@@ -45,6 +46,7 @@ fun isValidUrl(urlString: String): Boolean {
 
     val regex = Regex(FQDN_REGEX)
     val isFQDN = regex.matches(subString)
+    if (isFQDN && !DomainValidator.getInstance().isValid(subString)) return false
     return if (subString == url.host) {
         (("https" == url.protocol || "http" == url.protocol) && isFQDN) // Support only http/https, other protocols not supported
     } else {

@@ -52,6 +52,7 @@ dependencies {
     implementation "org.apache.httpcomponents:httpclient:4.5.10"
     implementation "com.github.seancfoley:ipaddress:5.3.3"
     implementation "${group}:common-utils:${common_utils_version}"
+    implementation("commons-validator:commons-validator:1.7")
 
     testImplementation(
             'org.junit.jupiter:junit-jupiter-api:5.6.2',
