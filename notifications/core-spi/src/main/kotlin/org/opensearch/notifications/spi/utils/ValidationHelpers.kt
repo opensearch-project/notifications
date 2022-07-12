@@ -95,4 +95,3 @@ fun validateMethod(method: String) {
         method.findAnyOf(validMethods) != null
     ) { "Invalid method supplied. Only POST, PUT and PATCH are allowed" }
 }
-// testing
