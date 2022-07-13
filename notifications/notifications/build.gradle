@@ -64,7 +64,7 @@ dependencies {
     } // ${kotlin_version} does not work for coroutines
     implementation "${group}:common-utils:${common_utils_version}"
     // TODO: change compile to implementation when the _local/stats API is supported
-    compileOnly "org.json:json:20180813"
+    compileOnly "org.json:json:2.1.1813"
     compileOnly "com.github.wnameless.json:json-flattener:0.13.0"
     // TODO: uncomment when the _local/stats API is supported
     // implementation "com.github.wnameless.json:json-base:2.0.0"
