@@ -12,7 +12,6 @@ import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.methods.HttpPut
 import org.opensearch.common.Strings
 import org.opensearch.notifications.spi.utils.ValidationHelpers.FQDN_REGEX
-import java.net.MalformedURLException
 import java.net.URL
 
 private object ValidationHelpers {
@@ -34,12 +33,7 @@ fun validateEmail(email: String) {
 }
 
 fun isValidUrl(urlString: String): Boolean {
-    val url: URL
-    try {
-        url = URL(urlString)
-    } catch (exception: MalformedURLException) {
-        return false
-    }
+    val url = URL(urlString)
 
     val index: Int = urlString.indexOf("//") + 2
     val subString: String = urlString.substring(index)

@@ -7,6 +7,8 @@ package org.opensearch.notifications.spi.utils
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import java.net.MalformedURLException
 
 internal class ValidationHelpersTests {
     private val GOOGLE_URL = "https://www.google.com"
@@ -48,7 +50,7 @@ internal class ValidationHelpersTests {
 
     @Test
     fun `validator identifies invalid url as invalid`() {
-        assert(!isValidUrl(INVALID_URL))
+        assertThrows<MalformedURLException> { isValidUrl(INVALID_URL) }
     }
 
     @Test
