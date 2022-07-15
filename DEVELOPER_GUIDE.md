@@ -46,13 +46,17 @@ This project uses following tools
 ### Building from the command line
 
 1. `./gradlew build` builds and tests project.
-1. `./gradlew run` launches a single node cluster with the `notifications` plugin installed.
-1. `./gradlew run -PnumNodes=3` launches a multi-node cluster (3 nodes) with the `notifications` plugin installed.
-1. `./gradlew integTest` launches a single node cluster with the `notifications` plugin installed and runs all integ tests.
-1. `./gradlew integTest -PnumNodes=3` launches a multi-node cluster with the `notifications` plugin installed and runs all integ tests.
-1. `./gradlew integTest -Dtests.class="*RunnerIT"` runs a single integ test class
-1. `./gradlew integTest -Dtests.method="test execute * with dryrun"` runs a single integ test method
+2. `./gradlew run` launches a single node cluster with the `notifications` plugin installed.
+3. `./gradlew run -PnumNodes=3` launches a multi-node cluster (3 nodes) with the `notifications` plugin installed.
+4. `./gradlew integTest` launches a single node cluster with the `notifications` plugin installed and runs all integ tests.
+5. `./gradlew integTest -PnumNodes=3` launches a multi-node cluster with the `notifications` plugin installed and runs all integ tests.
+6. `./gradlew integTest -Dtests.class="*RunnerIT"` runs a single integ test class
+7. `./gradlew integTest -Dtests.method="test execute * with dryrun"` runs a single integ test method
    (remember to quote the test method name if it contains spaces).
+8. `./gradlew notificationsBwcCluster#mixedClusterTask` launches a cluster with three nodes of bwc version of OpenSearch with notifications and tests backwards compatibility by upgrading one of the nodes with the current version of OpenSearch with notifications, creating a mixed cluster.
+9. `./gradlew notificationsBwcCluster#rollingUpgradeClusterTask` launches a cluster with three nodes of bwc version of OpenSearch with notifications and tests backwards compatibility by performing rolling upgrade of each node with the current version of OpenSearch with notifications.
+10. `./gradlew notificationsBwcCluster#fullRestartClusterTask` launches a cluster with three nodes of bwc version of OpenSearch with notifications and tests backwards compatibility by performing a full restart on the cluster upgrading all the nodes with the current version of OpenSearch with notifications.
+11. `./gradlew bwcTestSuite` runs all the above bwc tests combined.
 
 When launching a cluster using above commands, logs are placed in `notifications/build/testclusters/integTest-0/logs/`.
 
