@@ -53,9 +53,13 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         return true
     }
 
+    open fun preservePluginIndicesAfterTest(): Boolean = false
+
     @Throws(IOException::class)
     @After
     open fun wipeAllPluginIndices() {
+        if (preservePluginIndicesAfterTest()) return
+
         val pluginIndices = listOf(".opensearch-notifications-config")
         val response = client().performRequest(Request("GET", "/_cat/indices?format=json&expand_wildcards=all"))
         val xContentType = XContentType.fromMediaType(response.entity.contentType.value)
