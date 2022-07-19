@@ -24,8 +24,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          # TODO: Parse this from alerting plugin
-          java-version: 14
+          # TODO: Parse this from notifications plugin
+          java-version: 11
 
       - name: Checkout Plugin
         uses: actions/checkout@v1
