@@ -13,7 +13,7 @@ env:
   OPENSEARCH_VERSION: '2.1.0-SNAPSHOT'
 
 jobs:
-  build:
+  tests:
     runs-on: ubuntu-latest
     env:
       # prevents extra Cypress installation progress messages
@@ -95,17 +95,17 @@ jobs:
 
       # Screenshots are only captured on failure, will change this once we do visual regression tests
       - uses: actions/upload-artifact@v1
-      if: failure()
-      with:
-        name: cypress-screenshots
-        path: OpenSearch-Dashboards/plugins/alerting-dashboards-plugin/cypress/screenshots
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: OpenSearch-Dashboards/plugins/alerting-dashboards-plugin/cypress/screenshots
 
       # Test run video was always captured, so this action uses "always()" condition
       - uses: actions/upload-artifact@v1
-      if: always()
-      with:
-        name: cypress-videos
-        path: OpenSearch-Dashboards/plugins/alerting-dashboards-plugin/cypress/videos
+        if: always()
+        with:
+          name: cypress-videos
+          path: OpenSearch-Dashboards/plugins/alerting-dashboards-plugin/cypress/videos
 
       - name: Upload coverage
         uses: codecov/codecov-action@v1
@@ -119,4 +119,3 @@ jobs:
         with:
           name: dashboards-notifications
           path: OpenSearch-Dashboards/plugins/dashboards-notifications/build
-
