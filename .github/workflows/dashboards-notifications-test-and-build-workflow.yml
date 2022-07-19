@@ -10,17 +10,31 @@ on: [pull_request, push]
 env:
   PLUGIN_NAME: notifications-dashboards
   OPENSEARCH_DASHBOARDS_VERSION: '2.x'
-  OPENSEARCH_PLUGIN_VERSION: 2.1.0.0
+  OPENSEARCH_VERSION: '2.1.0-SNAPSHOT'
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
+    env:
+      # prevents extra Cypress installation progress messages
+      CI: 1
+      # avoid warnings like "tput: No value for $TERM and no -T specified"
+      TERM: xterm
     steps:
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          # TODO: Parse this from alerting plugin
+          java-version: 14
+
       - name: Checkout Plugin
         uses: actions/checkout@v1
+
+      - name: Run Opensearch with plugin
+        run: |
+          cd notifications
+          ./gradlew run -Dopensearch.version=${{ env.OPENSEARCH_VERSION }} &
+          timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:9200)" != "200" ]]; do sleep 5; done'
 
       - name: Checkout OpenSearch Dashboards
         uses: actions/checkout@v1
@@ -50,17 +64,48 @@ jobs:
       - name: Move Notifications to Plugins Dir
         run: mv dashboards-notifications OpenSearch-Dashboards/plugins/dashboards-notifications
 
-      - name: OpenSearch Dashboards Pluign Bootstrap
+      - name: OpenSearch Dashboards Plugin Bootstrap
         run: |
           cd OpenSearch-Dashboards/plugins/dashboards-notifications
           yarn osd bootstrap
 
-      - name: Test
+      - name: Build Artifact
+        run: |
+          cd OpenSearch-Dashboards/plugins/dashboards-notifications
+          yarn build
+
+      - name: Run unit tests
         uses: nick-invision/retry@v1
         with:
           timeout_minutes: 30
           max_attempts: 1
           command: cd OpenSearch-Dashboards/plugins/dashboards-notifications; yarn test:jest --coverage
+
+      - name: Run OpenSearch Dashboards server
+        run: |
+          cd OpenSearch-Dashboards
+          yarn start --no-base-path --no-watch &
+          sleep 300
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v2
+        with:
+          working-directory: OpenSearch-Dashboards/plugins/dashboards-notifications
+          command: yarn run cypress run
+
+      # Screenshots are only captured on failure, will change this once we do visual regression tests
+      - uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: cypress-screenshots
+        path: OpenSearch-Dashboards/plugins/alerting-dashboards-plugin/cypress/screenshots
+
+      # Test run video was always captured, so this action uses "always()" condition
+      - uses: actions/upload-artifact@v1
+      if: always()
+      with:
+        name: cypress-videos
+        path: OpenSearch-Dashboards/plugins/alerting-dashboards-plugin/cypress/videos
 
       - name: Upload coverage
         uses: codecov/codecov-action@v1
@@ -68,11 +113,6 @@ jobs:
           flags: dashboards-notifications
           directory: OpenSearch-Dashboards/plugins/
           token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Build Artifact
-        run: |
-          cd OpenSearch-Dashboards/plugins/dashboards-notifications
-          yarn build
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v1
