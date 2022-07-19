@@ -98,14 +98,14 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: OpenSearch-Dashboards/plugins/alerting-dashboards-plugin/cypress/screenshots
+          path: OpenSearch-Dashboards/plugins/dashboards-notifications/.cypress/screenshots
 
       # Test run video was always captured, so this action uses "always()" condition
       - uses: actions/upload-artifact@v1
         if: always()
         with:
           name: cypress-videos
-          path: OpenSearch-Dashboards/plugins/alerting-dashboards-plugin/cypress/videos
+          path: OpenSearch-Dashboards/plugins/dashboards-notifications/.cypress/videos
 
       - name: Upload coverage
         uses: codecov/codecov-action@v1
