@@ -17,6 +17,7 @@ apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'idea'
 apply plugin: 'opensearch.opensearchplugin'
+apply plugin: 'opensearch.pluginzip'
 apply plugin: 'opensearch.testclusters'
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
@@ -32,6 +33,29 @@ opensearchplugin {
     description 'OpenSearch Notifications Plugin'
     classname 'org.opensearch.notifications.NotificationPlugin'
     extendedPlugins = ['opensearch-notifications-core']
+}
+
+publishing {
+    publications {
+        pluginZip(MavenPublication) { publication ->
+            pom {
+                name = "opensearch-notifications"
+                description = "OpenSearch Notifications Plugin"
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                developers {
+                    developer {
+                        name = "OpenSearch"
+                        url = "https://github.com/opensearch-project/notifications"
+                    }
+                }
+            }
+        }
+    }
 }
 
 allOpen {

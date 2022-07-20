@@ -20,6 +20,7 @@ repositories {
 }
 
 apply plugin: 'opensearch.opensearchplugin'
+apply plugin: 'opensearch.pluginzip'
 apply plugin: 'opensearch.java'
 apply plugin: 'opensearch.testclusters'
 apply plugin: 'opensearch.java-rest-test'
@@ -36,6 +37,29 @@ opensearchplugin {
     name 'opensearch-notifications-core'
     description 'OpenSearch Notifications Core Plugin'
     classname 'org.opensearch.notifications.core.NotificationCorePlugin'
+}
+
+publishing {
+    publications {
+        pluginZip(MavenPublication) { publication ->
+            pom {
+                name = "opensearch-notifications-core"
+                description = "OpenSearch Notifications Core Plugin"
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                developers {
+                    developer {
+                        name = "OpenSearch"
+                        url = "https://github.com/opensearch-project/notifications"
+                    }
+                }
+            }
+        }
+    }
 }
 
 task integTest(type: RestIntegTestTask) {
