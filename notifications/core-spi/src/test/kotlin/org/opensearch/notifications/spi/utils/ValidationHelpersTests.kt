@@ -14,6 +14,11 @@ internal class ValidationHelpersTests {
     private val GOOGLE_URL = "https://www.google.com"
     private val INVALID_URL = "www.invalid.com"
     private val VALID_NOT_FQDN_URL = "https://odfe-es-client-service:9200/"
+    private val SAMPLE_URL = "https://sample.url:1234"
+    private val LOCAL_HOST_URL = "https://localhost:6060"
+    private val LOCAL_HOST_EXTENDED = "https://localhost:6060/service"
+    private val WEBHOOK_URL = "https://test-webhook.com:1234/subdirectory?param1=value1&param2=&param3=value3"
+    private val CHIME_URL = "https://domain.com/sample_chime_url#1234567890"
 
     private val hostDentyList = listOf(
         "127.0.0.0/8",
@@ -61,5 +66,30 @@ internal class ValidationHelpersTests {
     @Test
     fun `validator identifies non FQDN as valid`() {
         assert(isValidUrl(VALID_NOT_FQDN_URL))
+    }
+
+    @Test
+    fun `validator identifies sample url as valid`() {
+        assert(isValidUrl(SAMPLE_URL))
+    }
+
+    @Test
+    fun `validator identifies localhost url as valid`() {
+        assert(isValidUrl(LOCAL_HOST_URL))
+    }
+
+    @Test
+    fun `validator identifies localhost extended url as valid`() {
+        assert(isValidUrl(LOCAL_HOST_EXTENDED))
+    }
+
+    @Test
+    fun `validator identifies webhook url as valid`() {
+        assert(isValidUrl(WEBHOOK_URL))
+    }
+
+    @Test
+    fun `validator identifies chime url as valid`() {
+        assert(isValidUrl(CHIME_URL))
     }
 }
