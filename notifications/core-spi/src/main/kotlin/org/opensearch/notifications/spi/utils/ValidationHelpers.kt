@@ -6,11 +6,21 @@
 package org.opensearch.notifications.spi.utils
 
 import inet.ipaddr.IPAddressString
+import org.apache.commons.validator.routines.DomainValidator
 import org.apache.http.client.methods.HttpPatch
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.methods.HttpPut
 import org.opensearch.common.Strings
+import org.opensearch.notifications.spi.utils.ValidationHelpers.FQDN_REGEX
 import java.net.URL
+
+private object ValidationHelpers {
+    const val FQDN_REGEX =
+        "^(?!.*?_.*?)(?!(?:\\w+?\\.)?-[\\w.\\-]*?)(?!\\w+?-\\.[\\w.\\-]+?)" +
+            "(?=\\w)(?=[\\w.\\-]*?\\.+[\\w.\\-]*?)(?![\\w.\\-]{254})(?!(?" +
+            ":\\.?[\\w\\-.]*?[\\w\\-]{64,}\\.)+?)[\\w.\\-]+?(?<![\\w\\-.]?\\." +
+            "\\d?)(?<=[\\w\\-]{2,})(?<![\\w\\-]{25})\$"
+}
 
 fun validateUrl(urlString: String) {
     require(!Strings.isNullOrEmpty(urlString)) { "url is null or empty" }
@@ -23,8 +33,19 @@ fun validateEmail(email: String) {
 }
 
 fun isValidUrl(urlString: String): Boolean {
-    val url = URL(urlString) // throws MalformedURLException if URL is invalid
-    return ("https" == url.protocol || "http" == url.protocol) // Support only http/https, other protocols not supported
+    val url = URL(urlString)
+
+    val index: Int = urlString.indexOf("//") + 2
+    val subString: String = urlString.substring(index)
+
+    val regex = Regex(FQDN_REGEX)
+    val isFQDN = regex.matches(subString)
+    if (isFQDN && !DomainValidator.getInstance().isValid(subString)) return false
+    return if (subString == url.host) {
+        (("https" == url.protocol || "http" == url.protocol) && isFQDN) // Support only http/https, other protocols not supported
+    } else {
+        (("https" == url.protocol || "http" == url.protocol) && !isFQDN)
+    }
 }
 
 fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
