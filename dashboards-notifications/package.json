@@ -1,6 +1,6 @@
 {
   "name": "notifications-dashboards",
-  "version": "2.1.0.0",
+  "version": "2.2.0.0",
   "description": "OpenSearch Dashboards Notifications Plugin",
   "license": "Apache-2.0",
   "main": "index.ts",
