@@ -53,7 +53,7 @@ internal class SlackDestinationTests {
             // Stubbing isHostInDenylist() so it doesn't attempt to resolve hosts that don't exist in the unit tests
             clearAllMocks()
             mockkStatic("org.opensearch.notifications.spi.utils.ValidationHelpersKt")
-            every { isHostInDenylist(any(), any()) } returns false
+            every { org.opensearch.notifications.spi.utils.isHostInDenylist(any(), any()) } returns false
         }
     }
 
