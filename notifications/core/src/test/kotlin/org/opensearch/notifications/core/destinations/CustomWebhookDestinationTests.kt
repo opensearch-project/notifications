@@ -5,7 +5,6 @@
 
 package org.opensearch.notifications.core.destinations
 
-import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockkStatic
 import org.apache.http.client.methods.CloseableHttpResponse
@@ -17,9 +16,9 @@ import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.message.BasicStatusLine
 import org.easymock.EasyMock
+import org.junit.Before
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
@@ -29,7 +28,6 @@ import org.opensearch.notifications.core.NotificationCoreImpl
 import org.opensearch.notifications.core.client.DestinationHttpClient
 import org.opensearch.notifications.core.transport.DestinationTransportProvider
 import org.opensearch.notifications.core.transport.WebhookDestinationTransport
-import org.opensearch.notifications.core.utils.isHostInDenylist
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
@@ -56,14 +54,13 @@ internal class CustomWebhookDestinationTests {
                 Arguments.of("\r", """\r"""),
                 Arguments.of("\"", """\""""),
             )
+    }
 
-        @BeforeAll
-        fun setup() {
-            // Stubbing isHostInDenylist() so it doesn't attempt to resolve hosts that don't exist in the unit tests
-            clearAllMocks()
-            mockkStatic("org.opensearch.notifications.spi.utils.ValidationHelpersKt")
-            every { org.opensearch.notifications.spi.utils.isHostInDenylist(any(), any()) } returns false
-        }
+    @Before
+    fun setup() {
+        // Stubbing isHostInDenylist() so it doesn't attempt to resolve hosts that don't exist in the unit tests
+        mockkStatic("org.opensearch.notifications.spi.utils.ValidationHelpersKt")
+        every { org.opensearch.notifications.spi.utils.isHostInDenylist(any(), any()) } returns false
     }
 
     @ParameterizedTest(name = "method {0} should return corresponding type of Http request object {1}")
