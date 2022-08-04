@@ -500,6 +500,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
         // verify failure response is with message
         val error = sendResponse.get("error").asJsonObject
         Assert.assertNotNull(error.get("reason").asString)
+        Assert.assertTrue(error.get("reason").asString.contains("\"delivery_status\":{\"status_code\":\"500\""))
 
         deleteUserWithCustomRole(user, NOTIFICATION_TEST_SEND_ACCESS)
     }
