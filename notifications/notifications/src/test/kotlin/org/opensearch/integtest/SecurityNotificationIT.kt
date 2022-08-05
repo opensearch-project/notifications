@@ -460,7 +460,6 @@ class SecurityNotificationIT : PluginRestTestCase() {
         deleteUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE)
     }
 
-    @Suppress("EmptyFunctionBlock")
     fun `test send test slack message with send permissions`() {
         createUserWithCustomRole(user, NOTIFICATION_TEST_SEND_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
 

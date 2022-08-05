@@ -273,7 +273,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         emailGroupId: Set<String> = setOf(),
         client: RestClient = client()
     ): String {
-        val createRequestJsonString = getCreateRequestJsonString(
+        val createRequestJsonString = getCreateNotificationRequestJsonString(
             nameSubstring,
             configType,
             isEnabled,

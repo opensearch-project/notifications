@@ -314,7 +314,6 @@ internal object NotificationConfigIndex : ConfigOperations {
  * @param block a function to process this [AutoCloseable] resource.
  * @return the result of [block] function invoked on this resource.
  */
-@Suppress("TooGenericExceptionCaught")
 private inline fun <T : ThreadContext.StoredContext, R> T.use(block: (T) -> R): R {
     var exception: Throwable? = null
     try {
@@ -333,7 +332,6 @@ private inline fun <T : ThreadContext.StoredContext, R> T.use(block: (T) -> R): 
  *
  * The suppressed exception is added to the list of suppressed exceptions of [cause] exception.
  */
-@Suppress("TooGenericExceptionCaught")
 private fun ThreadContext.StoredContext.closeFinally(cause: Throwable?) = when (cause) {
     null -> close()
     else -> try {
