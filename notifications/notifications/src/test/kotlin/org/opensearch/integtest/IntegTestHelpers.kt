@@ -9,11 +9,13 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import org.junit.Assert
 import org.opensearch.client.Response
+import org.opensearch.commons.notifications.model.ConfigType
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.time.Instant
+import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -97,6 +99,68 @@ fun getStatusText(response: JsonObject): String {
         .getAsJsonArray("recipient_list")
         .get(0).asJsonObject
         .get("status_text").asString
+}
+
+private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+
+fun getCreateNotificationRequestJsonString(
+    nameSubstring: String,
+    configType: ConfigType,
+    isEnabled: Boolean,
+    smtpAccountId: String = "",
+    emailGroupId: Set<String> = setOf()
+): String {
+    val randomString = (1..20)
+        .map { Random.nextInt(0, charPool.size) }
+        .map(charPool::get)
+        .joinToString("")
+    val configObjectString = when (configType) {
+        ConfigType.SLACK -> """
+            "slack":{"url":"https://slack.domain.com/sample_slack_url#$randomString"}
+        """.trimIndent()
+        ConfigType.CHIME -> """
+            "chime":{"url":"https://chime.domain.com/sample_chime_url#$randomString"}
+        """.trimIndent()
+        ConfigType.WEBHOOK -> """
+            "webhook":{"url":"https://web.domain.com/sample_web_url#$randomString"}
+        """.trimIndent()
+        ConfigType.SMTP_ACCOUNT -> """
+            "smtp_account":{
+                "host":"smtp.domain.com",
+                "port":"4321",
+                "method":"ssl",
+                "from_address":"$randomString@from.com"
+            }
+        """.trimIndent()
+        ConfigType.EMAIL_GROUP -> """
+            "email_group":{
+                "recipient_list":[
+                    {"recipient":"$randomString+recipient1@from.com"},
+                    {"recipient":"$randomString+recipient2@from.com"}
+                ]
+            }
+        """.trimIndent()
+        ConfigType.EMAIL -> """
+            "email":{
+                "email_account_id":"$smtpAccountId",
+                "recipient_list":[{"recipient":"$randomString@from.com"}],
+                "email_group_id_list":[${emailGroupId.joinToString { "\"$it\"" }}]
+            }
+        """.trimIndent()
+        else -> throw IllegalArgumentException("Unsupported configType=$configType")
+    }
+    return """
+    {
+        "config_id":"$randomString",
+        "config":{
+            "name":"$nameSubstring:this is a sample config name $randomString",
+            "description":"this is a sample config description $randomString",
+            "config_type":"$configType",
+            "is_enabled":$isEnabled,
+            $configObjectString
+        }
+    }
+    """.trimIndent()
 }
 
 /** Util class to build Json entity of request body */

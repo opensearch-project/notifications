@@ -24,6 +24,7 @@ import org.opensearch.action.search.SearchResponse
 import org.opensearch.client.Client
 import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.unit.TimeValue
+import org.opensearch.common.util.concurrent.ThreadContext
 import org.opensearch.common.xcontent.LoggingDeprecationHandler
 import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.common.xcontent.XContentHelper
@@ -104,18 +105,20 @@ internal object NotificationConfigIndex : ConfigOperations {
             val request = CreateIndexRequest(INDEX_NAME)
                 .mapping(indexMappingAsMap)
                 .settings(indexSettingsSource, XContentType.YAML)
-            try {
-                val response: CreateIndexResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-                    admin().indices().create(request, it)
-                }
-                if (response.isAcknowledged) {
-                    log.info("$LOG_PREFIX:Index $INDEX_NAME creation Acknowledged")
-                } else {
-                    throw IllegalStateException("$LOG_PREFIX:Index $INDEX_NAME creation not Acknowledged")
-                }
-            } catch (exception: Exception) {
-                if (exception !is ResourceAlreadyExistsException && exception.cause !is ResourceAlreadyExistsException) {
-                    throw exception
+            client.threadPool().threadContext.stashContext().use {
+                try {
+                    val response: CreateIndexResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+                        admin().indices().create(request, it)
+                    }
+                    if (response.isAcknowledged) {
+                        log.info("$LOG_PREFIX:Index $INDEX_NAME creation Acknowledged")
+                    } else {
+                        throw IllegalStateException("$LOG_PREFIX:Index $INDEX_NAME creation not Acknowledged")
+                    }
+                } catch (exception: Exception) {
+                    if (exception !is ResourceAlreadyExistsException && exception.cause !is ResourceAlreadyExistsException) {
+                        throw exception
+                    }
                 }
             }
         }
@@ -298,5 +301,42 @@ internal object NotificationConfigIndex : ConfigOperations {
             }
         }
         return mutableMap
+    }
+}
+
+/**
+ * Executes the given [block] function on this resource and then closes it down correctly whether an exception
+ * is thrown or not.
+ *
+ * In case if the resource is being closed due to an exception occurred in [block], and the closing also fails with an exception,
+ * the latter is added to the [suppressed][java.lang.Throwable.addSuppressed] exceptions of the former.
+ *
+ * @param block a function to process this [AutoCloseable] resource.
+ * @return the result of [block] function invoked on this resource.
+ */
+private inline fun <T : ThreadContext.StoredContext, R> T.use(block: (T) -> R): R {
+    var exception: Throwable? = null
+    try {
+        return block(this)
+    } catch (e: Throwable) {
+        exception = e
+        throw e
+    } finally {
+        closeFinally(exception)
+    }
+}
+
+/**
+ * Closes this [AutoCloseable], suppressing possible exception or error thrown by [AutoCloseable.close] function when
+ * it's being closed due to some other [cause] exception occurred.
+ *
+ * The suppressed exception is added to the list of suppressed exceptions of [cause] exception.
+ */
+private fun ThreadContext.StoredContext.closeFinally(cause: Throwable?) = when (cause) {
+    null -> close()
+    else -> try {
+        close()
+    } catch (closeException: Throwable) {
+        cause.addSuppressed(closeException)
     }
 }
