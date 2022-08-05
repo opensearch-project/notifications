@@ -1,0 +1,92 @@
+##
+ # Copyright OpenSearch Contributors
+ # SPDX-License-Identifier: Apache-2.0
+##
+ 
+name: Security Test and Build Notifications
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      # This setting says that all jobs should finish, even if one fails
+      fail-fast: false
+      matrix:
+        java: [11, 17]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+
+      # notifications
+      - name: Checkout Notifications
+        uses: actions/checkout@v2
+
+      # Temporarily exclude tests which causing CI to fail. Tracking in #251
+      - name: Build with Gradle
+        # Only assembling since the full build is governed by other workflows
+        run: |
+          cd notifications
+          ./gradlew assemble
+
+      - name: Pull and Run Docker
+        run: |
+          plugin_core=`basename $(ls notifications/core/build/distributions/*.zip)`
+          plugin=`basename $(ls notifications/notifications/build/distributions/*.zip)`
+          list_of_files=`ls`
+          list_of_all_files=`ls notifications/core/build/distributions/`
+          version=`echo $plugin|awk -F- '{print $3}'| cut -d. -f 1-3`
+          plugin_version=`echo $plugin|awk -F- '{print $3}'| cut -d. -f 1-4`
+          qualifier=`echo $plugin|awk -F- '{print $4}'| cut -d. -f 1-1`
+          candidate_version=`echo $plugin|awk -F- '{print $5}'| cut -d. -f 1-1`
+          docker_version=$version
+
+          [[ -z $candidate_version ]] && candidate_version=$qualifier && qualifier=""
+
+          echo plugin version plugin_version qualifier candidate_version docker_version
+          echo "($plugin) ($version) ($plugin_version) ($qualifier) ($candidate_version) ($docker_version)"
+          echo $ls $list_of_all_files
+
+          if docker pull opensearchstaging/opensearch:$docker_version
+          then
+            echo "FROM opensearchstaging/opensearch:$docker_version" >> Dockerfile
+            echo "RUN /usr/share/opensearch/bin/opensearch-plugin remove opensearch-notifications;" >> Dockerfile
+            echo "RUN /usr/share/opensearch/bin/opensearch-plugin remove opensearch-notifications-core;" >> Dockerfile
+            echo "ADD notifications/core/build/distributions/$plugin_core /tmp/" >> Dockerfile
+            echo "RUN /usr/share/opensearch/bin/opensearch-plugin install --batch file:/tmp/$plugin_core" >> Dockerfile
+            echo "ADD notifications/notifications/build/distributions/$plugin /tmp/" >> Dockerfile
+            echo "RUN /usr/share/opensearch/bin/opensearch-plugin install --batch file:/tmp/$plugin" >> Dockerfile
+            docker build -t opensearch-notifications:test .
+            echo "imagePresent=true" >> $GITHUB_ENV
+          else
+            echo "imagePresent=false" >> $GITHUB_ENV
+          fi
+
+      - name: Run Docker Image
+        if: env.imagePresent == 'true'
+        run: |
+          cd ..
+          docker run -p 9200:9200 -d -p 9600:9600 -e "discovery.type=single-node" opensearch-notifications:test
+          sleep 120
+
+      - name: Run Notification Test for security enabled test cases
+        if: env.imagePresent == 'true'
+        run: |
+          cluster_running=`curl -XGET https://localhost:9200/_cat/plugins -u admin:admin --insecure`
+          echo $cluster_running
+          security=`curl -XGET https://localhost:9200/_cat/plugins -u admin:admin --insecure |grep opensearch-security|wc -l`
+          echo $security
+          if [ $security -gt 0 ]
+          then
+            echo "Security plugin is available"
+            cd notifications
+            ./gradlew integTest -Dtests.rest.cluster=localhost:9200 -Dtests.cluster=localhost:9200 -Dtests.clustername=docker-cluster -Dhttps=true -Duser=admin -Dpassword=admin
+          else
+            echo "Security plugin is NOT available skipping this run as tests without security have already been run"
+            exit 1
+          fi
