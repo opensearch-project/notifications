@@ -61,14 +61,6 @@ internal class ValidationHelpersTests {
     }
 
     @Test
-    fun `test url in denylist`() {
-        val urls = listOf("https://www.amazon.com", "https://mytest.com", "https://mytest.com")
-        for (url in urls) {
-            assertEquals(false, isHostInDenylist(url, hostDenyList))
-        }
-    }
-
-    @Test
     fun `validator identifies invalid url as invalid`() {
         assertThrows<MalformedURLException> { isValidUrl(INVALID_URL) }
     }
