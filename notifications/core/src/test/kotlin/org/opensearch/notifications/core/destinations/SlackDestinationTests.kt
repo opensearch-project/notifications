@@ -5,6 +5,8 @@
 
 package org.opensearch.notifications.core.destinations
 
+import io.mockk.every
+import io.mockk.mockkStatic
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.StringEntity
@@ -13,6 +15,7 @@ import org.apache.http.message.BasicStatusLine
 import org.easymock.EasyMock
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
@@ -42,6 +45,13 @@ internal class SlackDestinationTests {
                 Arguments.of("\r", """\r"""),
                 Arguments.of("\"", """\""""),
             )
+    }
+
+    @BeforeEach
+    fun setup() {
+        // Stubbing isHostInDenylist() so it doesn't attempt to resolve hosts that don't exist in the unit tests
+        mockkStatic("org.opensearch.notifications.spi.utils.ValidationHelpersKt")
+        every { org.opensearch.notifications.spi.utils.isHostInDenylist(any(), any()) } returns false
     }
 
     @Test

@@ -10,6 +10,7 @@ import org.apache.http.client.methods.HttpPatch
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.methods.HttpPut
 import org.opensearch.common.Strings
+import java.net.InetAddress
 import java.net.URL
 
 fun validateUrl(urlString: String) {
@@ -30,7 +31,7 @@ fun isValidUrl(urlString: String): Boolean {
 fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
     val url = URL(urlString)
     if (url.host != null) {
-        val ipStr = IPAddressString(url.host)
+        val ipStr = IPAddressString(InetAddress.getByName(url.host).hostAddress)
         for (network in hostDenyList) {
             val netStr = IPAddressString(network)
             if (netStr.contains(ipStr)) {
