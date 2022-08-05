@@ -5,9 +5,12 @@
 
 package org.opensearch.notifications.spi.utils
 
+import io.mockk.every
+import io.mockk.mockkStatic
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.net.InetAddress
 import java.net.MalformedURLException
 
 internal class ValidationHelpersTests {
@@ -20,7 +23,7 @@ internal class ValidationHelpersTests {
     private val WEBHOOK_URL = "https://test-webhook.com:1234/subdirectory?param1=value1&param2=&param3=value3"
     private val CHIME_URL = "https://domain.com/sample_chime_url#1234567890"
 
-    private val hostDentyList = listOf(
+    private val hostDenyList = listOf(
         "127.0.0.0/8",
         "10.0.0.0/8",
         "172.16.0.0/12",
@@ -41,16 +44,20 @@ internal class ValidationHelpersTests {
             "9.9.9.9"
         )
         for (ip in ips) {
-            assertEquals(true, isHostInDenylist("https://$ip", hostDentyList))
+            assertEquals(true, isHostInDenylist("https://$ip", hostDenyList))
         }
     }
 
     @Test
-    fun `test url in denylist`() {
-        val urls = listOf("https://www.amazon.com", "https://mytest.com", "https://mytest.com")
-        for (url in urls) {
-            assertEquals(false, isHostInDenylist(url, hostDentyList))
-        }
+    fun `test hostname gets resolved to ip for denylist`() {
+        val invalidHost = "invalid.com"
+        mockkStatic(InetAddress::class)
+        every { InetAddress.getByName(invalidHost).hostAddress } returns "10.0.0.1" // 10.0.0.0/8
+        assertEquals(true, isHostInDenylist("https://$invalidHost", hostDenyList))
+
+        val validHost = "valid.com"
+        every { InetAddress.getByName(validHost).hostAddress } returns "174.12.0.0"
+        assertEquals(false, isHostInDenylist("https://$validHost", hostDenyList))
     }
 
     @Test
