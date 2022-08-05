@@ -37,7 +37,7 @@ internal class SendTestNotificationAction @Inject constructor(
     ::SendTestNotificationRequest
 ) {
     companion object {
-        private const val NAME = "cluster:admin/opensearch/notifications/test_notification"
+        internal const val NAME = "cluster:admin/opensearch/notifications/test_notification"
         internal val ACTION_TYPE = ActionType(NAME, ::SendNotificationResponse)
         private val log by logger(SendTestNotificationAction::class.java)
     }

@@ -208,6 +208,12 @@ integTest {
         jvmArgs '-agentlib:jdwp=transport=dt_socket,server=n,suspend=y,address=8000'
     }
 
+    if (System.getProperty("https") == null || System.getProperty("https") == "false") {
+        filter {
+            excludeTestsMatching "org.opensearch.*.Security*IT"
+        }
+    }
+
     if (System.getProperty("tests.rest.bwcsuite") == null) {
         filter {
             excludeTestsMatching "org.opensearch.integtest.bwc.*IT"
