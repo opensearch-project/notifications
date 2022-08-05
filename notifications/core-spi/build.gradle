@@ -53,12 +53,21 @@ dependencies {
     implementation "com.github.seancfoley:ipaddress:5.3.3"
 
     testImplementation(
-            'org.junit.jupiter:junit-jupiter-api:5.6.2',
+            "io.mockk:mockk:1.11.0",
+            "io.mockk:mockk-common:1.11.0",
+            "io.mockk:mockk-dsl:1.11.0",
+            "io.mockk:mockk-dsl-jvm:1.11.0",
+            "io.mockk:mockk-agent-api:1.11.0",
+            "io.mockk:mockk-agent-common:1.11.0",
+            "io.mockk:mockk-agent-jvm:1.11.0",
+            "org.junit.jupiter:junit-jupiter-api:5.6.2",
             "org.junit.jupiter:junit-jupiter-params:5.6.2",
-            'org.mockito:mockito-junit-jupiter:3.10.0',
+            "org.mockito:mockito-junit-jupiter:3.10.0",
     )
     testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.6.2')
     testImplementation "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
+    testImplementation "net.bytebuddy:byte-buddy-agent:1.12.7"
     testImplementation "org.opensearch.test:framework:${opensearch_version}"
 }
 
