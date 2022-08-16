@@ -15,7 +15,7 @@ import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
 import org.opensearch.rest.BytesRestResponse
 import org.opensearch.rest.RestHandler.Route
 import org.opensearch.rest.RestRequest
-import org.opensearch.rest.RestRequest.Method.GET
+import org.opensearch.rest.RestRequest.Method.POST
 import org.opensearch.rest.RestStatus
 
 /**
@@ -43,11 +43,11 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
         return listOf(
             /**
              * Get notification features
-             * Request URL: GET [REQUEST_URL/CONFIG_ID_TAG]
+             * Request URL: POST [REQUEST_URL/CONFIG_ID_TAG]
              * Request body: Ref [org.opensearch.commons.notifications.action.SendNotificationRequest]
              * Response body: [org.opensearch.commons.notifications.action.SendNotificationResponse]
              */
-            Route(GET, "$REQUEST_URL/{$CONFIG_ID_TAG}")
+            Route(POST, "$REQUEST_URL/{$CONFIG_ID_TAG}")
         )
     }
 
@@ -63,7 +63,7 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
      */
     override fun executeRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
         return when (request.method()) {
-            GET -> executeSendTestMessage(request, client)
+            POST -> executeSendTestMessage(request, client)
             else -> RestChannelConsumer {
                 it.sendResponse(BytesRestResponse(RestStatus.METHOD_NOT_ALLOWED, "${request.method()} is not allowed"))
             }
