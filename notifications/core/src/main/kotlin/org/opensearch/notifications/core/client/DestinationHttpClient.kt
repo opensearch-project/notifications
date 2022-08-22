@@ -84,6 +84,7 @@ class DestinationHttpClient {
                 .setConnectionManager(connectionManager)
                 .setRetryHandler(DefaultHttpRequestRetryHandler())
                 .useSystemProperties()
+                .disableRedirectHandling()
                 .build()
         }
     }
