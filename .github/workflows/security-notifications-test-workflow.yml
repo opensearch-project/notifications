@@ -55,8 +55,9 @@ jobs:
           if docker pull opensearchstaging/opensearch:$docker_version
           then
             echo "FROM opensearchstaging/opensearch:$docker_version" >> Dockerfile
-            echo "RUN /usr/share/opensearch/bin/opensearch-plugin remove opensearch-notifications;" >> Dockerfile
-            echo "RUN /usr/share/opensearch/bin/opensearch-plugin remove opensearch-notifications-core;" >> Dockerfile
+            # Making the removal of the existing plugins in the docker image conditional in case this workflow is running before the new version of the plugins are published to the Docker image
+            echo "RUN if /usr/share/opensearch/bin/opensearch-plugin list | grep -q 'opensearch-notifications$'; then /usr/share/opensearch/bin/opensearch-plugin remove opensearch-notifications; fi" >> Dockerfile
+            echo "RUN if /usr/share/opensearch/bin/opensearch-plugin list | grep -q 'opensearch-notifications-core$'; then /usr/share/opensearch/bin/opensearch-plugin remove opensearch-notifications-core; fi" >> Dockerfile
             echo "ADD notifications/core/build/distributions/$plugin_core /tmp/" >> Dockerfile
             echo "RUN /usr/share/opensearch/bin/opensearch-plugin install --batch file:/tmp/$plugin_core" >> Dockerfile
             echo "ADD notifications/notifications/build/distributions/$plugin /tmp/" >> Dockerfile
