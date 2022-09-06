@@ -42,6 +42,12 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
      */
     override fun replacedRoutes(): List<ReplacedRoute> {
         return listOf(
+            /**
+             * Send test notification message
+             * Request URL: POST [REQUEST_URL/CONFIG_ID_TAG]
+             * Request body: Ref [org.opensearch.commons.notifications.action.SendNotificationRequest]
+             * Response body: [org.opensearch.commons.notifications.action.SendNotificationResponse]
+             */
             // Using GET with this API has been deprecated, it will be removed in favor of the POST equivalent in the next major version.
             ReplacedRoute(POST, "$REQUEST_URL/{$CONFIG_ID_TAG}", GET, "$REQUEST_URL/{$CONFIG_ID_TAG}")
         )
