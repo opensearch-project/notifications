@@ -40,7 +40,7 @@ export function eventRoutes(router: IRouter) {
     }
   );
 
-  router.get(
+  router.post(
     {
       path: `${NODE_API.SEND_TEST_MESSAGE}/{configId}`,
       validate: {
