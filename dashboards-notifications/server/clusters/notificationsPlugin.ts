@@ -89,7 +89,7 @@ export function NotificationsPlugin(Client: any, config: any, components: any) {
         },
       },
     },
-    method: 'GET',
+    method: 'POST',
   });
 
   notifications.getServerFeatures = clientAction({
