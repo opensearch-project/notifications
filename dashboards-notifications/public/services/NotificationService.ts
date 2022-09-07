@@ -246,7 +246,7 @@ export default class NotificationService {
   sendTestMessage = async (
       configId: string
   ) => {
-    const response = await this.httpClient.get(
+    const response = await this.httpClient.post(
         `${NODE_API.SEND_TEST_MESSAGE}/${configId}`
     );
     if (response.status_list[0].delivery_status.status_code != 200) {
