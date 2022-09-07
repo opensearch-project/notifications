@@ -43,7 +43,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
 
         // send test message
         val sendResponse = executeRequest(
-            RestRequest.Method.GET.name,
+            RestRequest.Method.POST.name,
             "$PLUGIN_BASE_URI/feature/test/$configId",
             "",
             RestStatus.INTERNAL_SERVER_ERROR.status
@@ -82,7 +82,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
 
         // send test message
         val sendResponse = executeRequest(
-            RestRequest.Method.GET.name,
+            RestRequest.Method.POST.name,
             "$PLUGIN_BASE_URI/feature/test/$configId",
             "",
             RestStatus.INTERNAL_SERVER_ERROR.status
@@ -124,7 +124,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
 
         // send test message
         val sendResponse = executeRequest(
-            RestRequest.Method.GET.name,
+            RestRequest.Method.POST.name,
             "$PLUGIN_BASE_URI/feature/test/$configId",
             "",
             RestStatus.INTERNAL_SERVER_ERROR.status
@@ -200,7 +200,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
 
         // send test message
         val sendResponse = executeRequest(
-            RestRequest.Method.GET.name,
+            RestRequest.Method.POST.name,
             "$PLUGIN_BASE_URI/feature/test/$emailConfigId",
             "",
             RestStatus.SERVICE_UNAVAILABLE.status
