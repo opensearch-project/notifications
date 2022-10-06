@@ -255,10 +255,10 @@ String bwcPluginsResourcePath = "src/test/resources/plugins/bwc"
 String bwcNotificationsCoreFilePath = "$bwcPluginsResourcePath/notifications-core/$bwcVersion"
 String bwcNotificationsFilePath = "$bwcPluginsResourcePath/notifications/$bwcVersion"
 String bwcNotificationsCoreDownload = "https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/" +
-        "2.0.0/latest/linux/x64/tar/builds/opensearch/plugins/opensearch-notifications-core-" +
+        "2.3.0/latest/linux/x64/tar/builds/opensearch/plugins/opensearch-notifications-core-" +
         bwcVersion + ".zip"
 String bwcNotificationsDownload = "https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/" +
-        "2.0.0/latest/linux/x64/tar/builds/opensearch/plugins/opensearch-notifications-" +
+        "2.3.0/latest/linux/x64/tar/builds/opensearch/plugins/opensearch-notifications-" +
         bwcVersion + ".zip"
 
 2.times { i ->
