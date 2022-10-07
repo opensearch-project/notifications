@@ -264,7 +264,7 @@ String bwcNotificationsDownload = "https://ci.opensearch.org/ci/dbc/distribution
 2.times { i ->
     testClusters {
         "${baseName}$i" {
-            testDistribution = "INTEG_TEST"
+            testDistribution = "ARCHIVE"
             versions = ["2.4.0", opensearch_version]
             numberOfNodes = 3
             plugin(provider(new Callable<RegularFile>(){
