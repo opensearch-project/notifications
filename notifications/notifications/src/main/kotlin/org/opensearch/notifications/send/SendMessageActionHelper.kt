@@ -333,6 +333,9 @@ object SendMessageActionHelper {
             }
             LegacyDestinationType.LEGACY_SNS -> {
                 log.warn("Channel type given (sns) for publishing to legacy destination currently not supported")
+                LegacyDestinationResponse.Builder().withStatusCode(400)
+                    .withResponseContent("Channel type given (sns) for publishing to legacy destination not supported").build()
+
             }
             null -> {
                 log.warn("No channel type given (null) for publishing to legacy destination")
