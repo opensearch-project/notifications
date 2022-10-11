@@ -16,7 +16,6 @@ import org.opensearch.commons.destination.message.LegacyBaseMessage
 import org.opensearch.commons.destination.message.LegacyCustomWebhookMessage
 import org.opensearch.commons.destination.message.LegacyDestinationType
 import org.opensearch.commons.destination.message.LegacyEmailMessage
-import org.opensearch.commons.destination.message.LegacySNSMessage
 import org.opensearch.commons.destination.response.LegacyDestinationResponse
 import org.opensearch.commons.notifications.action.LegacyPublishNotificationRequest
 import org.opensearch.commons.notifications.action.LegacyPublishNotificationResponse
@@ -333,11 +332,7 @@ object SendMessageActionHelper {
                 }
             }
             LegacyDestinationType.LEGACY_SNS -> {
-                val legacySnsMessage = baseMessage as LegacySNSMessage
-                val destination = SnsDestination(legacySnsMessage.topicArn, legacySnsMessage.roleArn)
-                val status = sendMessageThroughSpi(destination, message, "legacy")
-                LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
-                    .withResponseContent(status.statusText).build()
+                log.warn("Channel type given (sns) for publishing to legacy destination currently not supported")
             }
             null -> {
                 log.warn("No channel type given (null) for publishing to legacy destination")
