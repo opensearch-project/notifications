@@ -45,6 +45,7 @@ publishing {
             pom {
                 name = "opensearch-notifications-core"
                 description = "OpenSearch Notifications Core Plugin"
+                groupId = "org.opensearch.plugin"
                 licenses {
                     license {
                         name = "The Apache License, Version 2.0"
