@@ -10,3 +10,4 @@ include ":core-spi"
 
 project(":core").name = rootProject.name + "-core"
 project(":core-spi").name = rootProject.name + "-core" + "-spi"
+startParameter.excludedTaskNames=["publishPluginZipPublicationToMavenLocal"]
