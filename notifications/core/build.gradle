@@ -104,8 +104,8 @@ configurations.all {
         force "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
         force "commons-logging:commons-logging:${versions.commonslogging}" // resolve for amazonaws
         force "commons-codec:commons-codec:1.13" // resolve for amazonaws
-        force "org.apache.httpcomponents:client5:httpclient5:${versions.httpclient5}" // resolve for amazonaws
-        force "org.apache.httpcomponents:core5:httpcore5:${versions.httpcore5}" // resolve for amazonaws
+        force "org.apache.httpcomponents.client5:httpclient5:${versions.httpclient5}" // resolve for amazonaws
+        force "org.apache.httpcomponents.core5:httpcore5:${versions.httpcore5}" // resolve for amazonaws
         force "joda-time:joda-time:2.8.1" // Resolve for amazonaws
         force "com.fasterxml.jackson.core:jackson-core:${versions.jackson}" // resolve for amazonaws
         force "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}" // resolve for amazonaws
@@ -124,8 +124,8 @@ dependencies {
     implementation "commons-logging:commons-logging:${versions.commonslogging}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
-    implementation "org.apache.httpcomponents:core5:httpcore5:${versions.httpcore5}"
-    implementation "org.apache.httpcomponents:client5:httpclient5:${versions.httpclient5}"
+    implementation "org.apache.httpcomponents.core5:httpcore5:${versions.httpcore5}"
+    implementation "org.apache.httpcomponents.client5:httpclient5:${versions.httpclient5}"
     implementation "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}"
     implementation "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}"
     implementation "com.amazonaws:aws-java-sdk-core:${aws_version}"
@@ -148,7 +148,7 @@ dependencies {
             'io.mockk:mockk-dsl-jvm:1.11.0',
             'io.mockk:mockk-agent-api:1.11.0',
             'io.mockk:mockk-agent-common:1.11.0',
-            'io.mockk:mockk-agent-jvm:1.11.0',
+            'io.mockk:mockk-agent-jvm:1.11.0'
     )
     testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'

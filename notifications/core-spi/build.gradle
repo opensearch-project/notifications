@@ -48,8 +48,8 @@ dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
     implementation "com.amazonaws:aws-java-sdk-core:${aws_version}"
     implementation "com.amazonaws:aws-java-sdk-ses:${aws_version}"
-    implementation "org.apache.httpcomponents:core5:httpcore5:${versions.httpcore5}"
-    implementation "org.apache.httpcomponents:client5:httpclient5:${versions.httpclient5}"
+    implementation "org.apache.httpcomponents.core5:httpcore5:${versions.httpcore5}"
+    implementation "org.apache.httpcomponents.client5:httpclient5:${versions.httpclient5}"
     implementation "com.github.seancfoley:ipaddress:5.3.3"
     implementation "commons-validator:commons-validator:1.7"
 
@@ -79,8 +79,8 @@ configurations.all {
         force "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
         force "commons-logging:commons-logging:${versions.commonslogging}" // resolve for amazonaws
         force "commons-codec:commons-codec:1.13" // resolve for amazonaws
-        force "org.apache.httpcomponents:client5:httpclient5:${versions.httpclient5}" // resolve for amazonaws
-        force "org.apache.httpcomponents:core5:httpcore5:${versions.httpcore5}" // resolve for amazonaws
+        force "org.apache.httpcomponents.client5:httpclient5:${versions.httpclient5}" // resolve for amazonaws
+        force "org.apache.httpcomponents.core5:httpcore5:${versions.httpcore5}" // resolve for amazonaws
         force "joda-time:joda-time:2.8.1" // Resolve for amazonaws
         force "com.fasterxml.jackson.core:jackson-core:2.11.4" // resolve for amazonaws
         force "com.fasterxml.jackson.core:jackson-annotations:2.11.4" // resolve for amazonaws
@@ -153,6 +153,7 @@ shadowJar {
     relocate 'org.joda.time', 'org.opensearch.notifications.core.repackage.org.joda.time'
     relocate 'com.fasterxml.jackson', 'org.opensearch.notifications.core.repackage.com.fasterxml.jackson'
     relocate 'org.apache.http', 'org.opensearch.notifications.core.repackage.org.apache.http'
+    relocate 'org.apache.hc', 'org.opensearch.notifications.core.repackage.org.apache.hc'
     relocate 'org.apache.commons.logging', 'org.opensearch.notifications.core.repackage.org.apache.commons.logging'
     relocate 'org.apache.commons.codec', 'org.opensearch.notifications.core.repackage.org.apache.commons.codec'
     relocate 'com.amazonaws', 'org.opensearch.notifications.core.repackage.com.amazonaws'

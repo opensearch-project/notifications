@@ -5,21 +5,21 @@
 
 package org.opensearch.notifications.core.client
 
-import org.apache.http.HttpEntity
-import org.apache.http.HttpResponse
-import org.apache.http.client.config.RequestConfig
-import org.apache.http.client.methods.CloseableHttpResponse
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
-import org.apache.http.client.methods.HttpPatch
-import org.apache.http.client.methods.HttpPost
-import org.apache.http.client.methods.HttpPut
-import org.apache.http.client.methods.HttpRequestBase
-import org.apache.http.entity.StringEntity
-import org.apache.http.impl.client.CloseableHttpClient
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler
-import org.apache.http.impl.client.HttpClientBuilder
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
-import org.apache.http.util.EntityUtils
+import org.apache.hc.client5.http.classic.methods.HttpPatch
+import org.apache.hc.client5.http.classic.methods.HttpPost
+import org.apache.hc.client5.http.classic.methods.HttpPut
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase
+import org.apache.hc.client5.http.config.RequestConfig
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager
+import org.apache.hc.core5.http.HttpEntity
+import org.apache.hc.core5.http.HttpResponse
+import org.apache.hc.core5.http.io.entity.EntityUtils
+import org.apache.hc.core5.http.io.entity.StringEntity
+import org.apache.hc.core5.util.Timeout
 import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.common.xcontent.XContentType
 import org.opensearch.notifications.core.setting.PluginSettings
@@ -71,9 +71,9 @@ class DestinationHttpClient {
 
         private fun createHttpClient(): CloseableHttpClient {
             val config: RequestConfig = RequestConfig.custom()
-                .setConnectTimeout(PluginSettings.connectionTimeout)
-                .setConnectionRequestTimeout(PluginSettings.connectionTimeout)
-                .setSocketTimeout(PluginSettings.socketTimeout)
+                .setConnectTimeout(Timeout.ofMilliseconds(PluginSettings.connectionTimeout.toLong()))
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(PluginSettings.connectionTimeout.toLong()))
+                .setResponseTimeout(Timeout.ofMilliseconds(PluginSettings.socketTimeout.toLong()))
                 .build()
             val connectionManager = PoolingHttpClientConnectionManager()
             connectionManager.maxTotal = PluginSettings.maxConnections
@@ -82,7 +82,7 @@ class DestinationHttpClient {
             return HttpClientBuilder.create()
                 .setDefaultRequestConfig(config)
                 .setConnectionManager(connectionManager)
-                .setRetryHandler(DefaultHttpRequestRetryHandler())
+                .setRetryStrategy(DefaultHttpRequestRetryStrategy())
                 .useSystemProperties()
                 .disableRedirectHandling()
                 .build()
@@ -109,7 +109,7 @@ class DestinationHttpClient {
 
     @Throws(Exception::class)
     private fun getHttpResponse(destination: WebhookDestination, message: MessageContent): CloseableHttpResponse {
-        var httpRequest: HttpRequestBase = HttpPost(destination.url)
+        var httpRequest: HttpUriRequestBase = HttpPost(destination.url)
 
         if (destination is CustomWebhookDestination) {
             httpRequest = constructHttpRequest(destination.method, destination.url)
@@ -122,12 +122,12 @@ class DestinationHttpClient {
         }
 
         val entity = StringEntity(buildRequestBody(destination, message), StandardCharsets.UTF_8)
-        (httpRequest as HttpEntityEnclosingRequestBase).entity = entity
+        httpRequest.entity = entity
 
         return httpClient.execute(httpRequest)
     }
 
-    private fun constructHttpRequest(method: String, url: String): HttpRequestBase {
+    private fun constructHttpRequest(method: String, url: String): HttpUriRequestBase {
         return when (method) {
             HttpPost.METHOD_NAME -> HttpPost(url)
             HttpPut.METHOD_NAME -> HttpPut(url)
@@ -146,9 +146,9 @@ class DestinationHttpClient {
 
     @Throws(IOException::class)
     private fun validateResponseStatus(response: HttpResponse) {
-        val statusCode: Int = response.statusLine.statusCode
+        val statusCode: Int = response.code
         if (!VALID_RESPONSE_STATUS.contains(statusCode)) {
-            throw IOException("Failed: ${EntityUtils.toString(response.entity)}")
+            throw IOException("Failed: ${response.reasonPhrase}")
         }
     }
 
