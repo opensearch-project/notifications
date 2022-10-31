@@ -222,7 +222,7 @@ integTest {
     }
 }
 
-project.getTasks().getByName("bundlePlugin").dependsOn(findProject(":${rootProject.name}-core").tasks.getByPath(":${rootProject.name}-core:build"))
+project.getTasks().getByName("bundlePlugin").dependsOn(findProject(":${rootProject.name}-core").tasks.getByPath(":${rootProject.name}-core:bundlePlugin"))
 Zip bundle = (Zip) project.getTasks().getByName("bundlePlugin");
 Zip coreBundle = (Zip) findProject(":${rootProject.name}-core").getTasks().getByName("bundlePlugin");
 integTest.dependsOn(bundle)
