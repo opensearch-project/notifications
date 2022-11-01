@@ -129,6 +129,13 @@ jobs:
           yarn start --no-base-path --no-watch &
           sleep 300
 
+      - name: Install Cypress
+        run: |
+          cd OpenSearch-Dashboards/plugins/dashboards-notifications
+          # This will install Cypress in case the binary is missing which can happen on Windows and Mac
+          # If the binary exists, this will exit quickly so it is not an expensive operation
+          yarn cypress install
+
       - name: Get Cypress version
         id: cypress_version
         run: |
@@ -137,7 +144,7 @@ jobs:
 
       - name: Cache Cypress
         id: cache-cypress
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ${{ matrix.cypress_cache_folder }}
           key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
