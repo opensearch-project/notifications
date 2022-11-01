@@ -67,6 +67,7 @@ jobs:
           mkdir -p notifications-build/{notifications,notifications-core}
           cp -r ./notifications/notifications/build/distributions/*.zip notifications-build/notifications/
           cp -r ./notifications/core/build/distributions/*.zip notifications-build/notifications-core/
+        shell: bash
 
       - name: Upload Artifacts for notifications plugin
         uses: actions/upload-artifact@v1
