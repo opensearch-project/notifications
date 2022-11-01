@@ -135,6 +135,7 @@ jobs:
           # This will install Cypress in case the binary is missing which can happen on Windows and Mac
           # If the binary exists, this will exit quickly so it is not an expensive operation
           yarn cypress install
+        shell: bash
 
       - name: Get Cypress version
         id: cypress_version
