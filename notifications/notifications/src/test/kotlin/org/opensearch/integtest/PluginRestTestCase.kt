@@ -66,7 +66,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         if (preservePluginIndicesAfterTest()) return
 
         val pluginIndices = listOf(".opensearch-notifications-config")
-        val response = adminClient().performRequest(Request("GET", "/_cat/indices?format=json&expand_wildcards=all"))
+        val response = client().performRequest(Request("GET", "/_cat/indices?format=json&expand_wildcards=all"))
         val xContentType = XContentType.fromMediaType(response.entity.contentType)
         xContentType.xContent().createParser(
             NamedXContentRegistry.EMPTY, DeprecationHandler.THROW_UNSUPPORTED_OPERATION,
