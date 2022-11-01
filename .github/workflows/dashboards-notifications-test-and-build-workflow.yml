@@ -98,11 +98,13 @@ jobs:
         run: |
           cd OpenSearch-Dashboards/plugins/dashboards-notifications
           yarn osd bootstrap
+        shell: bash
 
       - name: Build Artifact
         run: |
           cd OpenSearch-Dashboards/plugins/dashboards-notifications
           yarn build
+        shell: bash
 
       - name: Run unit tests
         uses: nick-invision/retry@v1
