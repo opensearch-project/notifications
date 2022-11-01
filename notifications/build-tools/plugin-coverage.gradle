@@ -18,6 +18,9 @@
 
 // Get gradle to generate the required jvm agent arg for us using a dummy tasks of type Test. Unfortunately
 // testing tasks don't derive from Test so the jacoco plugin can't do this automatically.
+
+import org.apache.tools.ant.taskdefs.condition.Os
+
 def jacocoDir = "${buildDir}/jacoco"
 
 task dummyTest(type: Test) {
@@ -60,7 +63,12 @@ allprojects{
         jacocoTestReport.dependsOn integTest
 
         testClusters.integTest {
-            jvmArgs " ${dummyIntegTest.jacoco.getAsJvmArg()}".replace('javaagent:','javaagent:/')
+            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                // Replacing build with absolute path to fix the error "error opening zip file or JAR manifest missing : /build/tmp/expandedArchives/..../jacocoagent.jar"
+                jvmArgs " ${dummyIntegTest.jacoco.getAsJvmArg()}".replace('build',"${buildDir}")
+            } else {
+                jvmArgs " ${dummyIntegTest.jacoco.getAsJvmArg()}".replace('javaagent:','javaagent:/')
+            }
             systemProperty 'com.sun.management.jmxremote', "true"
             systemProperty 'com.sun.management.jmxremote.authenticate', "false"
             systemProperty 'com.sun.management.jmxremote.port', "7777"
