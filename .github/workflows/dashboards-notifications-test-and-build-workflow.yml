@@ -31,8 +31,13 @@ jobs:
           - os: windows-latest
             working_directory: X:\
             os_java_options: -Xmx4096M
+            cypress_cache_folder: /AppData/Local/Cypress/Cache
           - os: ubuntu-latest
             jest_test_args: --coverage
+            cypress_cache_folder: ~/.cache/Cypress
+          - os: macos-latest
+            cypress_cache_folder: ~/Library/Caches/Cypress
+
 
     name: Test and Build Dashboards Notifications with JDK ${{ matrix.java }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -123,6 +128,21 @@ jobs:
           cd OpenSearch-Dashboards
           yarn start --no-base-path --no-watch &
           sleep 300
+
+      - name: Get Cypress version
+        id: cypress_version
+        run: |
+          cd OpenSearch-Dashboards/plugins/dashboards-notifications
+          echo "::set-output name=cypress_version::$(cat ./package.json | jq '.dependencies.cypress' | tr -d '"')"
+
+      - name: Cache Cypress
+        id: cache-cypress
+        uses: actions/cache@v1
+        with:
+          path: ${{ matrix.cypress_cache_folder }}
+          key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
+        env:
+          CYPRESS_INSTALL_BINARY: ${{ steps.cypress_version.outputs.cypress_version }}
 
       - name: Run Cypress tests
         uses: cypress-io/github-action@v2
