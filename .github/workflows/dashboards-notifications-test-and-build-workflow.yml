@@ -133,8 +133,8 @@ jobs:
         run: |
           cd OpenSearch-Dashboards/plugins/dashboards-notifications
           # This will install Cypress in case the binary is missing which can happen on Windows and Mac
-          # If the binary exists, this will exit quickly so it is not an expensive operation
-          yarn cypress install
+          # If the binary exists, this will exit quickly so it should not be an expensive operation
+          yarn add cypress
         shell: bash
 
       - name: Get Cypress version
@@ -149,14 +149,14 @@ jobs:
         with:
           path: ${{ matrix.cypress_cache_folder }}
           key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
-        env:
-          CYPRESS_INSTALL_BINARY: ${{ steps.cypress_version.outputs.cypress_version }}
 
       - name: Run Cypress tests
         uses: cypress-io/github-action@v2
         with:
           working-directory: OpenSearch-Dashboards/plugins/dashboards-notifications
           command: yarn run cypress run
+        env:
+          CYPRESS_CACHE_FOLDER: ${{ matrix.cypress_cache_folder }}
 
       # Screenshots are only captured on failure, will change this once we do visual regression tests
       - uses: actions/upload-artifact@v1
