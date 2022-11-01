@@ -91,6 +91,12 @@ jobs:
           echo "Installing yarn ${{ steps.versions_step.outputs.yarn_version }}"
           npm i -g yarn@${{ steps.versions_step.outputs.yarn_version }}
 
+      - name: Set npm to use bash for shell
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          # Sets Windows to use bash for npm shell so the script commands work as intended
+          npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
+
       - name: Move Notifications to Plugins Dir
         run: mv dashboards-notifications OpenSearch-Dashboards/plugins/dashboards-notifications
 
@@ -98,13 +104,11 @@ jobs:
         run: |
           cd OpenSearch-Dashboards/plugins/dashboards-notifications
           yarn osd bootstrap
-        shell: bash
 
       - name: Build Artifact
         run: |
           cd OpenSearch-Dashboards/plugins/dashboards-notifications
           yarn build
-        shell: bash
 
       - name: Run unit tests
         uses: nick-invision/retry@v1
