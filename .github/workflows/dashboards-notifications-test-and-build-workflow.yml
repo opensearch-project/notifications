@@ -55,6 +55,10 @@ jobs:
       - name: Run Opensearch with plugin
         working-directory: ${{ env.WORKING_DIR }}
         run: |
+          # Install coreutils for macOS since timeout doesn't seem to available on that OS even when forcing bash shell
+          if [ "$RUNNER_OS" == "macOS" ]; then
+              brew install coreutils
+          fi
           cd notifications
           ./gradlew run -Dopensearch.version=${{ env.OPENSEARCH_VERSION }} &
           timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:9200)" != "200" ]]; do sleep 5; done'
