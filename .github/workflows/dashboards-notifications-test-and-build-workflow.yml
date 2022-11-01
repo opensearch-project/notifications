@@ -116,7 +116,7 @@ jobs:
           timeout_minutes: 30
           max_attempts: 1
           command: cd OpenSearch-Dashboards/plugins/dashboards-notifications; yarn test:jest ${{ env.JEST_TEST_ARGS }}
-        shell: bash
+          shell: bash
 
       - name: Run OpenSearch Dashboards server
         run: |
