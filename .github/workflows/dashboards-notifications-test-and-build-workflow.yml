@@ -134,7 +134,7 @@ jobs:
           cd OpenSearch-Dashboards/plugins/dashboards-notifications
           # This will install Cypress in case the binary is missing which can happen on Windows and Mac
           # If the binary exists, this will exit quickly so it should not be an expensive operation
-          yarn add cypress
+          npx cypress install
         shell: bash
 
       - name: Get Cypress version
