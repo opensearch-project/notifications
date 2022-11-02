@@ -31,7 +31,7 @@ jobs:
           - os: windows-latest
             working_directory: X:\
             os_java_options: -Xmx4096M
-            cypress_cache_folder: /AppData/Local/Cypress/Cache
+            cypress_cache_folder: ~/AppData/Local/Cypress/Cache
           - os: ubuntu-latest
             jest_test_args: --coverage
             cypress_cache_folder: ~/.cache/Cypress
