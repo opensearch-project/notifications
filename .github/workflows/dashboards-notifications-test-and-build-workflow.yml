@@ -127,7 +127,10 @@ jobs:
         run: |
           cd OpenSearch-Dashboards
           yarn start --no-base-path --no-watch &
-          sleep 300
+          timeout 300 bash -c 'while [[ "$(curl -s http://localhost:5601/api/status | jq -r '.status.overall.state')" != "green" ]]; do echo sleeping 5; sleep 5; done'
+          curl -sk localhost:5601/api/status | jq
+          netstat -anP tcp | grep LISTEN | grep 5601 || netstat -ntlp | grep 5601
+        shell: bash
 
       - name: Install Cypress
         run: |
