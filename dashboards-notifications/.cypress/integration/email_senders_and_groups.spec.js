@@ -23,7 +23,8 @@ describe('Test create email senders', () => {
         'opensearchDashboards'
       )}/app/notifications-dashboards#email-senders`
     );
-    cy.wait(20000);
+    cy.reload(true);
+    cy.wait(delay * 5);
   });
 
   it('creates ssl sender', () => {
@@ -113,7 +114,8 @@ describe('Test edit senders', () => {
         'opensearchDashboards'
       )}/app/notifications-dashboards#email-senders`
     );
-    cy.wait(delay * 3);
+    cy.reload(true);
+    cy.wait(delay * 5);
   });
 
   it('edits sender email address', () => {
@@ -157,7 +159,8 @@ describe('Test delete senders', () => {
         'opensearchDashboards'
       )}/app/notifications-dashboards#email-senders`
     );
-    cy.wait(delay * 3);
+    cy.reload(true);
+    cy.wait(delay * 5);
   });
 
   it('deletes smtp senders', () => {
@@ -193,7 +196,8 @@ describe('Test create, edit and delete recipient group', () => {
         'opensearchDashboards'
       )}/app/notifications-dashboards#email-recipient-groups`
     );
-    cy.wait(delay * 3);
+    cy.reload(true);
+    cy.wait(delay * 5);
   });
 
   it('creates recipient group', () => {
