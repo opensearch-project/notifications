@@ -25,7 +25,6 @@ jobs:
       # This setting says that all jobs should finish, even if one fails
       fail-fast: false
       matrix:
-        java: [ 11, 17 ]
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         include:
           - os: windows-latest
@@ -39,14 +38,14 @@ jobs:
             cypress_cache_folder: ~/Library/Caches/Cypress
 
 
-    name: Test and Build Dashboards Notifications with JDK ${{ matrix.java }} on ${{ matrix.os }}
+    name: Test and Build Dashboards Notifications on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: ${{ matrix.java }}
+          java-version: 11
 
       - name: Checkout Plugin
         uses: actions/checkout@v1
