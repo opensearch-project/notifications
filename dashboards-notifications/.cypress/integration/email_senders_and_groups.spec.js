@@ -18,12 +18,15 @@ describe('Test create email senders', () => {
   });
 
   beforeEach(() => {
+    cy.intercept(`${Cypress.env('opensearchDashboards')}/api/notifications/get_configs`)
+      .as('getConfigs');
     cy.visit(
       `${Cypress.env(
         'opensearchDashboards'
       )}/app/notifications-dashboards#email-senders`
     );
-    cy.wait(delay * 3);
+    cy.wait('@getConfigs') // First wait is for SMTP Senders table
+      .wait('@getConfigs'); // Second wait is for SES Senders table
   });
 
   it('creates ssl sender', () => {
