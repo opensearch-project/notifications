@@ -9,13 +9,26 @@ on: [push, pull_request]
 
 jobs:
   build:
+    env:
+      BUILD_ARGS: ${{ matrix.os_build_args }}
+      WORKING_DIR: ${{ matrix.working_directory }}.
     strategy:
       # This setting says that all jobs should finish, even if one fails
       fail-fast: false
       matrix:
         java: [11, 17]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        include:
+          - os: windows-latest
+            os_build_args: -x integTest -x jacocoTestReport
+            working_directory: X:\
+            os_java_options: -Xmx4096M
+          - os: macos-latest
+            os_build_args: -x integTest -x jacocoTestReport
 
-    runs-on: ubuntu-latest
+    # Job name
+    name: Build Notifications with JDK ${{ matrix.java }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Set up JDK ${{ matrix.java }}
@@ -27,13 +40,22 @@ jobs:
       - name: Checkout Notifications
         uses: actions/checkout@v2
 
-      # Temporarily exclude tests which causing CI to fail. Tracking in #251
+      # This is a hack, but this step creates a link to the X: mounted drive, which makes the path
+      # short enough to work on Windows
+      - name: Shorten Path
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: subst 'X:' .
+
       - name: Build with Gradle
+        working-directory: ${{ env.WORKING_DIR }}
         run: |
           cd notifications
-          ./gradlew build -PexcludeTests="**/SesChannelIT*"
+          ./gradlew build ${{ env.BUILD_ARGS }}
+        env:
+          _JAVA_OPTIONS: ${{ matrix.os_java_options }}
 
       - name: Upload coverage
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         uses: codecov/codecov-action@v1
         with:
           flags: opensearch-notifications
@@ -45,15 +67,16 @@ jobs:
           mkdir -p notifications-build/{notifications,notifications-core}
           cp -r ./notifications/notifications/build/distributions/*.zip notifications-build/notifications/
           cp -r ./notifications/core/build/distributions/*.zip notifications-build/notifications-core/
+        shell: bash
 
       - name: Upload Artifacts for notifications plugin
         uses: actions/upload-artifact@v1
         with:
-          name: notifications-plugin
+          name: notifications-plugin-${{ matrix.os }}
           path: notifications-build/notifications
 
       - name: Upload Artifacts for notifications-core plugin
         uses: actions/upload-artifact@v1
         with:
-          name: notifications-core-plugin
+          name: notifications-core-plugin-${{ matrix.os }}
           path: notifications-build/notifications-core

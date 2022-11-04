@@ -9,32 +9,66 @@ on: [pull_request, push]
 
 env:
   PLUGIN_NAME: notifications-dashboards
-  OPENSEARCH_DASHBOARDS_VERSION: '2.x'
+  OPENSEARCH_DASHBOARDS_VERSION: '2.4'
   OPENSEARCH_VERSION: '2.4.0-SNAPSHOT'
 
 jobs:
   tests:
-    runs-on: ubuntu-latest
     env:
+      JEST_TEST_ARGS: ${{ matrix.jest_test_args }}
       # prevents extra Cypress installation progress messages
       CI: 1
       # avoid warnings like "tput: No value for $TERM and no -T specified"
       TERM: xterm
+      WORKING_DIR: ${{ matrix.working_directory }}.
+    strategy:
+      # This setting says that all jobs should finish, even if one fails
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        include:
+          - os: windows-latest
+            working_directory: X:\
+            os_java_options: -Xmx4096M
+            cypress_cache_folder: ~/AppData/Local/Cypress/Cache
+          - os: ubuntu-latest
+            jest_test_args: --coverage
+            cypress_cache_folder: ~/.cache/Cypress
+          - os: macos-latest
+            cypress_cache_folder: ~/Library/Caches/Cypress
+
+
+    name: Test and Build Dashboards Notifications on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
     steps:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          # TODO: Parse this from notifications plugin
           java-version: 11
 
       - name: Checkout Plugin
         uses: actions/checkout@v1
 
+      # This is a hack, but this step creates a link to the X: mounted drive, which makes the path
+      # short enough to work on Windows
+      - name: Shorten Path
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: subst 'X:' .
+
       - name: Run Opensearch with plugin
+        working-directory: ${{ env.WORKING_DIR }}
         run: |
+          # Install coreutils for macOS since timeout doesn't seem to available on that OS even when forcing bash shell
+          if [ "$RUNNER_OS" == "macOS" ]; then
+              brew install coreutils
+          fi
           cd notifications
           ./gradlew run -Dopensearch.version=${{ env.OPENSEARCH_VERSION }} &
           timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:9200)" != "200" ]]; do sleep 5; done'
+        shell: bash
+        env:
+          _JAVA_OPTIONS: ${{ matrix.os_java_options }}
 
       - name: Checkout OpenSearch Dashboards
         uses: actions/checkout@v1
@@ -61,6 +95,12 @@ jobs:
           echo "Installing yarn ${{ steps.versions_step.outputs.yarn_version }}"
           npm i -g yarn@${{ steps.versions_step.outputs.yarn_version }}
 
+      - name: Set npm to use bash for shell
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          # Sets Windows to use bash for npm shell so the script commands work as intended
+          npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
+
       - name: Move Notifications to Plugins Dir
         run: mv dashboards-notifications OpenSearch-Dashboards/plugins/dashboards-notifications
 
@@ -75,39 +115,74 @@ jobs:
           yarn build
 
       - name: Run unit tests
-        uses: nick-invision/retry@v1
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 30
           max_attempts: 1
-          command: cd OpenSearch-Dashboards/plugins/dashboards-notifications; yarn test:jest --coverage
+          command: cd OpenSearch-Dashboards/plugins/dashboards-notifications; yarn test:jest ${{ env.JEST_TEST_ARGS }}
+          shell: bash
 
       - name: Run OpenSearch Dashboards server
         run: |
           cd OpenSearch-Dashboards
           yarn start --no-base-path --no-watch &
-          sleep 300
+          timeout 400 bash -c 'while [[ "$(curl -s http://localhost:5601/api/status | jq -r '.status.overall.state')" != "green" ]]; do echo sleeping 5; sleep 5; done'
+          curl -sk localhost:5601/api/status | jq
+          netstat -anp tcp | grep LISTEN | grep 5601 || netstat -ntlp | grep 5601
+        shell: bash
+
+      - name: Install Cypress
+        run: |
+          cd OpenSearch-Dashboards/plugins/dashboards-notifications
+          # This will install Cypress in case the binary is missing which can happen on Windows and Mac
+          # If the binary exists, this will exit quickly so it should not be an expensive operation
+          npx cypress install
+        shell: bash
+
+      - name: Get Cypress version
+        id: cypress_version
+        run: |
+          cd OpenSearch-Dashboards/plugins/dashboards-notifications
+          echo "::set-output name=cypress_version::$(cat ./package.json | jq '.dependencies.cypress' | tr -d '"')"
+
+      - name: Cache Cypress
+        id: cache-cypress
+        uses: actions/cache@v2
+        with:
+          path: ${{ matrix.cypress_cache_folder }}
+          key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
+
+      - name: Reset npm's script shell
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          # Resetting npm's script shell for Windows so `yarn run cypress` doesn't have conflicts
+          npm config delete script-shell
 
       - name: Run Cypress tests
         uses: cypress-io/github-action@v2
         with:
           working-directory: OpenSearch-Dashboards/plugins/dashboards-notifications
-          command: yarn run cypress run
+          command: yarn run cypress run --browser chrome
+          wait-on: 'http://localhost:5601'
+        env:
+          CYPRESS_CACHE_FOLDER: ${{ matrix.cypress_cache_folder }}
 
       # Screenshots are only captured on failure, will change this once we do visual regression tests
       - uses: actions/upload-artifact@v1
         if: failure()
         with:
-          name: cypress-screenshots
+          name: cypress-screenshots-${{ matrix.os }}
           path: OpenSearch-Dashboards/plugins/dashboards-notifications/.cypress/screenshots
 
       # Test run video was always captured, so this action uses "always()" condition
       - uses: actions/upload-artifact@v1
         if: always()
         with:
-          name: cypress-videos
+          name: cypress-videos-${{ matrix.os }}
           path: OpenSearch-Dashboards/plugins/dashboards-notifications/.cypress/videos
 
       - name: Upload coverage
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         uses: codecov/codecov-action@v1
         with:
           flags: dashboards-notifications
