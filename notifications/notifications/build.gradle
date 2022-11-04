@@ -10,7 +10,7 @@ import java.util.concurrent.Callable
 
 plugins {
     id 'nebula.ospackage' version "8.5.4"
-    id "com.dorongold.task-tree" version "1.5"
+    id "com.dorongold.task-tree" version "2.0"
 }
 
 apply plugin: 'java'
@@ -222,7 +222,7 @@ integTest {
     }
 }
 
-project.getTasks().getByName("bundlePlugin").dependsOn(findProject(":${rootProject.name}-core").tasks.getByPath(":${rootProject.name}-core:build"))
+project.getTasks().getByName("bundlePlugin").dependsOn(findProject(":${rootProject.name}-core").tasks.getByPath(":${rootProject.name}-core:bundlePlugin"))
 Zip bundle = (Zip) project.getTasks().getByName("bundlePlugin");
 Zip coreBundle = (Zip) findProject(":${rootProject.name}-core").getTasks().getByName("bundlePlugin");
 integTest.dependsOn(bundle)
