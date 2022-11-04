@@ -28,3 +28,9 @@ import './commands'
 if (Cypress.env('security_enabled')) {
   Cypress.env('opensearch', 'https://localhost:9200');
 }
+
+Cypress.on('uncaught:exception', (err, runnable) => {
+  // returning false here prevents Cypress from
+  // failing the test on uncaught exception errors
+  return false
+})
