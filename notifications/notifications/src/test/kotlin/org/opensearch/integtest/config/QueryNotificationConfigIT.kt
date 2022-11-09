@@ -543,7 +543,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         // Get notification configs between initialTime..middleTime
         val getFirstResponse = executeRequest(
             RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs?last_updated_time_ms=${initialTime.toEpochMilli()}..${middleTime.toEpochMilli()}",
+            "$PLUGIN_BASE_URI/configs?last_updated_time_ms=${initialTime.toEpochMilli()}..${middleTime.toEpochMilli() - 1}",
             "",
             RestStatus.OK.status
         )
@@ -553,7 +553,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         // Get notification configs between middleTime..finalTime
         val getSecondResponse = executeRequest(
             RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs?last_updated_time_ms=${middleTime.toEpochMilli()}..${finalTime.toEpochMilli()}",
+            "$PLUGIN_BASE_URI/configs?last_updated_time_ms=${middleTime.toEpochMilli()}..${finalTime.toEpochMilli() - 1}",
             "",
             RestStatus.OK.status
         )
@@ -563,7 +563,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         // Get notification configs between finalTime..endTime
         val getThirdResponse = executeRequest(
             RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs?last_updated_time_ms=${finalTime.toEpochMilli()}..${endTime.toEpochMilli()}",
+            "$PLUGIN_BASE_URI/configs?last_updated_time_ms=${finalTime.toEpochMilli()}..${endTime.toEpochMilli() - 1}",
             "",
             RestStatus.OK.status
         )
@@ -586,7 +586,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         // Get notification configs between initialTime..middleTime
         val getFirstResponse = executeRequest(
             RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs?created_time_ms=${initialTime.toEpochMilli()}..${middleTime.toEpochMilli()}",
+            "$PLUGIN_BASE_URI/configs?created_time_ms=${initialTime.toEpochMilli()}..${middleTime.toEpochMilli() - 1}",
             "",
             RestStatus.OK.status
         )
@@ -596,7 +596,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         // Get notification configs between middleTime..finalTime
         val getSecondResponse = executeRequest(
             RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs?created_time_ms=${middleTime.toEpochMilli()}..${finalTime.toEpochMilli()}",
+            "$PLUGIN_BASE_URI/configs?created_time_ms=${middleTime.toEpochMilli()}..${finalTime.toEpochMilli() - 1}",
             "",
             RestStatus.OK.status
         )
@@ -606,7 +606,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         // Get notification configs between finalTime..endTime
         val getThirdResponse = executeRequest(
             RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs?created_time_ms=${finalTime.toEpochMilli()}..${endTime.toEpochMilli()}",
+            "$PLUGIN_BASE_URI/configs?created_time_ms=${finalTime.toEpochMilli()}..${endTime.toEpochMilli() - 1}",
             "",
             RestStatus.OK.status
         )
