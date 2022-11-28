@@ -9,8 +9,8 @@ on: [pull_request, push]
 
 env:
   PLUGIN_NAME: notifications-dashboards
-  OPENSEARCH_DASHBOARDS_VERSION: '2.4'
-  OPENSEARCH_VERSION: '2.4.0-SNAPSHOT'
+  OPENSEARCH_DASHBOARDS_VERSION: '2.5'
+  OPENSEARCH_VERSION: '2.5.0-SNAPSHOT'
 
 jobs:
   tests:
