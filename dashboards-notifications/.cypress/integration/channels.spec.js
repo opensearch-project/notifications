@@ -28,7 +28,7 @@ describe('Test create channels', () => {
     cy.wait(delay * 3);
   });
 
-  it('creates a slack channel and send test message', { retries: 3 }, () => {
+  it('creates a slack channel and send test message', () => {
     cy.get('[data-test-subj="create-channel-create-button"]').click();
     cy.contains('Some fields are invalid.').should('exist');
 

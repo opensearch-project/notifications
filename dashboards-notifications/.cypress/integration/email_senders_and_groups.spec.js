@@ -27,7 +27,7 @@ describe('Test create email senders', () => {
     cy.wait(delay * 5);
   });
 
-  it('creates ssl sender', { retries: 3 }, () => {
+  it('creates ssl sender', () => {
     cy.get('.euiButton__text')
       .contains('Create SMTP sender')
       .click({ force: true });
