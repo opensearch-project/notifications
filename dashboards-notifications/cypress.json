@@ -12,8 +12,8 @@
   "responseTimeout": 60000,
   "defaultCommandTimeout": 60000,
   "retries": {
-    "runMode": 3,
-    "openMode": 3
+    "runMode": 2,
+    "openMode": 2
   },
   "env": {
     "opensearch": "localhost:9200",
