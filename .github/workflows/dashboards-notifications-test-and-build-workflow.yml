@@ -25,7 +25,8 @@ jobs:
       # This setting says that all jobs should finish, even if one fails
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        # TODO: mac-os-latest was removed due to CI flakiness, we can revisit adding it back later
+        os: [ ubuntu-latest, windows-latest ]
         include:
           - os: windows-latest
             working_directory: X:\
