@@ -25,7 +25,7 @@ jobs:
       # This setting says that all jobs should finish, even if one fails
       fail-fast: false
       matrix:
-        # TODO: mac-os-latest was removed due to CI flakiness, we can revisit adding it back later
+        # TODO: macos-latest was removed due to CI flakiness, we can revisit adding it back later
         os: [ ubuntu-latest, windows-latest ]
         include:
           - os: windows-latest
@@ -35,8 +35,9 @@ jobs:
           - os: ubuntu-latest
             jest_test_args: --coverage
             cypress_cache_folder: ~/.cache/Cypress
-          - os: macos-latest
-            cypress_cache_folder: ~/Library/Caches/Cypress
+            # TODO: Add back when macos-latest is back in the test matrix
+#          - os: macos-latest
+#            cypress_cache_folder: ~/Library/Caches/Cypress
 
 
     name: Test and Build Dashboards Notifications on ${{ matrix.os }}
