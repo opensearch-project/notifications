@@ -249,24 +249,24 @@ testClusters.integTest {
     setting 'path.repo', repo.absolutePath
 }
 
-String bwcVersion = "2.4.0.0"
+String bwcVersion = "2.5.0.0"
 String baseName = "notificationsBwcCluster"
 
 String bwcPluginsResourcePath = "src/test/resources/plugins/bwc"
 String bwcNotificationsCoreFilePath = "$bwcPluginsResourcePath/notifications-core/$bwcVersion"
 String bwcNotificationsFilePath = "$bwcPluginsResourcePath/notifications/$bwcVersion"
 String bwcNotificationsCoreDownload = "https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/" +
-        "2.4.0/latest/linux/x64/tar/builds/opensearch/plugins/opensearch-notifications-core-" +
+        "2.5.0/latest/linux/x64/tar/builds/opensearch/plugins/opensearch-notifications-core-" +
         bwcVersion + ".zip"
 String bwcNotificationsDownload = "https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/" +
-        "2.4.0/latest/linux/x64/tar/builds/opensearch/plugins/opensearch-notifications-" +
+        "2.5.0/latest/linux/x64/tar/builds/opensearch/plugins/opensearch-notifications-" +
         bwcVersion + ".zip"
 
 2.times { i ->
     testClusters {
         "${baseName}$i" {
-            testDistribution = "ARCHIVE"
-            versions = ["2.4.0", opensearch_version]
+            testDistribution = "INTEG_TEST"
+            versions = ["2.5.0-SNAPSHOT", opensearch_version]
             numberOfNodes = 3
             plugin(provider(new Callable<RegularFile>(){
                 @Override
