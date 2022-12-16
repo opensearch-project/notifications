@@ -9,8 +9,8 @@ on: [pull_request, push]
 
 env:
   PLUGIN_NAME: notifications-dashboards
-  OPENSEARCH_DASHBOARDS_VERSION: '2.4.0'
-  OPENSEARCH_VERSION: '2.4.0-SNAPSHOT'
+  OPENSEARCH_DASHBOARDS_VERSION: 'main'
+  OPENSEARCH_VERSION: '3.0.0-SNAPSHOT'
 
 jobs:
   tests:
@@ -45,8 +45,9 @@ jobs:
 
     steps:
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
+          distribution: temurin # Temurin is a distribution of adoptium
           java-version: 11
 
       - name: Checkout Plugin

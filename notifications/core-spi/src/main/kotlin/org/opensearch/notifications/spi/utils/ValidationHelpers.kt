@@ -7,9 +7,9 @@ package org.opensearch.notifications.spi.utils
 
 import inet.ipaddr.IPAddressString
 import org.apache.commons.validator.routines.DomainValidator
-import org.apache.http.client.methods.HttpPatch
-import org.apache.http.client.methods.HttpPost
-import org.apache.http.client.methods.HttpPut
+import org.apache.hc.client5.http.classic.methods.HttpPatch
+import org.apache.hc.client5.http.classic.methods.HttpPost
+import org.apache.hc.client5.http.classic.methods.HttpPut
 import org.opensearch.common.Strings
 import org.opensearch.notifications.spi.utils.ValidationHelpers.FQDN_REGEX
 import java.net.InetAddress
