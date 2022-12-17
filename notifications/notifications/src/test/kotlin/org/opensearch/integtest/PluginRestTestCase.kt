@@ -287,6 +287,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
             RestStatus.OK.status,
             client
         )
+        refreshAllIndices()
         val configId = createResponse.get("config_id").asString
         Assert.assertNotNull(configId)
         Thread.sleep(100)

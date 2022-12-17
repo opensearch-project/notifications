@@ -74,23 +74,24 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         """.trimIndent()
     }
 
-    private fun createConfig(
-        nameSubstring: String = "",
-        configType: ConfigType = ConfigType.SLACK,
-        isEnabled: Boolean = true
-    ): String {
-        val createRequestJsonString = getCreateRequestJsonString(nameSubstring, configType, isEnabled)
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
-        Assert.assertNotNull(configId)
-        Thread.sleep(100)
-        return configId
-    }
+//    private fun createConfig(
+//        nameSubstring: String = "",
+//        configType: ConfigType = ConfigType.SLACK,
+//        isEnabled: Boolean = true
+//    ): String {
+//        val createRequestJsonString = getCreateRequestJsonString(nameSubstring, configType, isEnabled)
+//        val createResponse = executeRequest(
+//            RestRequest.Method.POST.name,
+//            "$PLUGIN_BASE_URI/configs",
+//            createRequestJsonString,
+//            RestStatus.OK.status
+//        )
+//        refreshAllIndices()
+//        val configId = createResponse.get("config_id").asString
+//        Assert.assertNotNull(configId)
+//        Thread.sleep(100)
+//        return configId
+//    }
 
     fun `test Get single notification config as part of path`() {
         val configId = createConfig()

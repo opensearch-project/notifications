@@ -36,19 +36,20 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
         """.trimIndent()
     }
 
-    private fun createConfig(): String {
-        val createRequestJsonString = getCreateRequestJsonString()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
-        Assert.assertNotNull(configId)
-        Thread.sleep(100)
-        return configId
-    }
+//    private fun createConfig(): String {
+//        val createRequestJsonString = getCreateRequestJsonString()
+//        val createResponse = executeRequest(
+//            RestRequest.Method.POST.name,
+//            "$PLUGIN_BASE_URI/configs",
+//            createRequestJsonString,
+//            RestStatus.OK.status
+//        )
+//        refreshAllIndices()
+//        val configId = createResponse.get("config_id").asString
+//        Assert.assertNotNull(configId)
+//        Thread.sleep(100)
+//        return configId
+//    }
 
     fun `test Delete single notification config`() {
         val configId = createConfig()
