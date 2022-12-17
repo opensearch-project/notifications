@@ -18,80 +18,9 @@ import org.opensearch.notifications.verifySingleConfigIdEquals
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
 import java.time.Instant
-import kotlin.random.Random
 
 class QueryNotificationConfigIT : PluginRestTestCase() {
     private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
-
-    private fun getCreateRequestJsonString(
-        nameSubstring: String,
-        configType: ConfigType,
-        isEnabled: Boolean
-    ): String {
-        val randomString = (1..20)
-            .map { Random.nextInt(0, charPool.size) }
-            .map(charPool::get)
-            .joinToString("")
-        val configObjectString = when (configType) {
-            ConfigType.SLACK -> """
-                "slack":{"url":"https://slack.domain.com/sample_slack_url#$randomString"}
-            """.trimIndent()
-            ConfigType.CHIME -> """
-                "chime":{"url":"https://chime.domain.com/sample_chime_url#$randomString"}
-            """.trimIndent()
-            ConfigType.WEBHOOK -> """
-                "webhook":{"url":"https://web.domain.com/sample_web_url#$randomString"}
-            """.trimIndent()
-            ConfigType.SMTP_ACCOUNT -> """
-                "smtp_account":{
-                    "host":"smtp.domain.com",
-                    "port":"4321",
-                    "method":"ssl",
-                    "from_address":"$randomString@from.com"
-                }
-            """.trimIndent()
-            ConfigType.EMAIL_GROUP -> """
-                "email_group":{
-                    "recipient_list":[
-                        {"recipient":"$randomString+recipient1@from.com"},
-                        {"recipient":"$randomString+recipient2@from.com"}
-                    ]
-                }
-            """.trimIndent()
-            else -> throw IllegalArgumentException("Unsupported configType=$configType")
-        }
-        return """
-        {
-            "config_id":"$randomString",
-            "config":{
-                "name":"$nameSubstring:this is a sample config name $randomString",
-                "description":"this is a sample config description $randomString",
-                "config_type":"$configType",
-                "is_enabled":$isEnabled,
-                $configObjectString
-            }
-        }
-        """.trimIndent()
-    }
-
-//    private fun createConfig(
-//        nameSubstring: String = "",
-//        configType: ConfigType = ConfigType.SLACK,
-//        isEnabled: Boolean = true
-//    ): String {
-//        val createRequestJsonString = getCreateRequestJsonString(nameSubstring, configType, isEnabled)
-//        val createResponse = executeRequest(
-//            RestRequest.Method.POST.name,
-//            "$PLUGIN_BASE_URI/configs",
-//            createRequestJsonString,
-//            RestStatus.OK.status
-//        )
-//        refreshAllIndices()
-//        val configId = createResponse.get("config_id").asString
-//        Assert.assertNotNull(configId)
-//        Thread.sleep(100)
-//        return configId
-//    }
 
     fun `test Get single notification config as part of path`() {
         val configId = createConfig()
