@@ -115,12 +115,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Delete slack notification config
-        val deleteResponse = executeRequest(
-            RestRequest.Method.DELETE.name,
-            "$PLUGIN_BASE_URI/configs/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        val deleteResponse = deleteConfig(configId)
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
         Thread.sleep(1000)
 

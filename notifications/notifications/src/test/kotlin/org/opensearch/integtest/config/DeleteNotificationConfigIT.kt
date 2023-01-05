@@ -31,12 +31,7 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Delete notification config
-        val deleteResponse = executeRequest(
-            RestRequest.Method.DELETE.name,
-            "$PLUGIN_BASE_URI/configs/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        val deleteResponse = deleteConfig(configId)
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
         Thread.sleep(100)
 
@@ -88,12 +83,7 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Delete notification config
-        val deleteResponse = executeRequest(
-            RestRequest.Method.DELETE.name,
-            "$PLUGIN_BASE_URI/configs?config_id_list=${configIds.joinToString(separator = ",")}",
-            "",
-            RestStatus.OK.status
-        )
+        val deleteResponse = deleteConfigs(configIds)
         val deletedObject = deleteResponse.get("delete_response_list").asJsonObject
         configIds.forEach {
             Assert.assertEquals("OK", deletedObject.get(it).asString)
@@ -169,12 +159,7 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
         val remainingIds = partitions.second.toSet()
 
         // Delete notification config
-        val deleteResponse = executeRequest(
-            RestRequest.Method.DELETE.name,
-            "$PLUGIN_BASE_URI/configs?config_id_list=${deletedIds.joinToString(separator = ",")}",
-            "",
-            RestStatus.OK.status
-        )
+        val deleteResponse = deleteConfigs(deletedIds)
         val deletedObject = deleteResponse.get("delete_response_list").asJsonObject
         deletedIds.forEach {
             Assert.assertEquals("OK", deletedObject.get(it).asString)

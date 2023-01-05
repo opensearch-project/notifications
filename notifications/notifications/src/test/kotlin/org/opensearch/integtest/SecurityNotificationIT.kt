@@ -351,13 +351,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         // Delete Slack notification config
-        executeRequest(
-            RestRequest.Method.DELETE.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
-            "",
-            RestStatus.OK.status,
-            userClient!!
-        )
+        deleteConfig(configId, userClient!!)
 
         // Should not be able to find config
         executeRequest(

@@ -294,6 +294,36 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         return configId
     }
 
+    fun deleteConfig(
+        configId: String,
+        client: RestClient = client()
+    ): JsonObject {
+        val deleteResponse = executeRequest(
+            RestRequest.Method.DELETE.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.OK.status,
+            client
+        )
+        refreshAllIndices()
+        return deleteResponse
+    }
+
+    fun deleteConfigs(
+        configIds: Set<String>,
+        client: RestClient = client()
+    ): JsonObject {
+        val deleteResponse = executeRequest(
+            RestRequest.Method.DELETE.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs?config_id_list=${configIds.joinToString(separator = ",")}",
+            "",
+            RestStatus.OK.status,
+            client
+        )
+        refreshAllIndices()
+        return deleteResponse
+    }
+
     @After
     open fun wipeAllSettings() {
         wipeAllClusterSettings()

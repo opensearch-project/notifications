@@ -268,12 +268,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Delete email notification config
-        val deleteResponse = executeRequest(
-            RestRequest.Method.DELETE.name,
-            "$PLUGIN_BASE_URI/configs/$emailConfigId",
-            "",
-            RestStatus.OK.status
-        )
+        val deleteResponse = deleteConfig(emailConfigId)
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(emailConfigId).asString)
         Thread.sleep(1000)
 
@@ -527,12 +522,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Delete email notification config
-        val deleteResponse = executeRequest(
-            RestRequest.Method.DELETE.name,
-            "$PLUGIN_BASE_URI/configs/$emailConfigId",
-            "",
-            RestStatus.OK.status
-        )
+        val deleteResponse = deleteConfig(emailConfigId)
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(emailConfigId).asString)
         Thread.sleep(1000)
 
