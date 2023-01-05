@@ -35,17 +35,17 @@ class SecurityNotificationIT : PluginRestTestCase() {
 
     @Before
     fun create() {
-
-        if (userClient == null) {
-            createUser(user, user, arrayOf())
-            userClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), user, user).setSocketTimeout(60000).build()
-        }
+        createUser(user, user, arrayOf())
+        userClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), user, user)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
     }
 
     @After
     fun cleanup() {
-
         userClient?.close()
+        userClient = null
     }
 
     fun `test Create slack notification config with user that has create Notification permission`() {
