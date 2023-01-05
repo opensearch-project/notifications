@@ -44,13 +44,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
@@ -90,13 +84,8 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        Assert.assertEquals(configId, createResponse.get("config_id").asString)
+        val createdConfigId = createConfigWithRequestJsonString(createRequestJsonString)
+        Assert.assertEquals(configId, createdConfigId)
         Thread.sleep(1000)
 
         // Get chime notification config

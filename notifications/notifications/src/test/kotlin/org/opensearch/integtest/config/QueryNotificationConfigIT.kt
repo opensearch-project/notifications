@@ -787,13 +787,8 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        Assert.assertEquals(absentId, createResponse.get("config_id").asString)
+        val createdConfigId = createConfigWithRequestJsonString(createRequestJsonString)
+        Assert.assertEquals(absentId, createdConfigId)
         Thread.sleep(1000)
 
         // Get chime notification config

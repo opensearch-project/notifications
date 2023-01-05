@@ -294,6 +294,22 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         return configId
     }
 
+    fun createConfigWithRequestJsonString(
+        createRequestJsonString: String,
+        client: RestClient = client()
+    ): String {
+        val createResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
+            createRequestJsonString,
+            RestStatus.OK.status,
+            client
+        )
+        refreshAllIndices()
+        Thread.sleep(100)
+        return createResponse.get("config_id").asString
+    }
+
     fun deleteConfig(
         configId: String,
         client: RestClient = client()

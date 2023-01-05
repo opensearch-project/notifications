@@ -74,14 +74,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
         }
         """.trimIndent()
         try {
-            val createResponse = executeRequest(
-                RestRequest.Method.POST.name,
-                "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-                createRequestJsonString,
-                RestStatus.OK.status,
-                userClient!!
-            )
-            val configId = createResponse.get("config_id").asString
+            val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
             Thread.sleep(1000)
 
@@ -159,13 +152,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
@@ -243,13 +230,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
         }
         """.trimIndent()
 
-        executeRequest(
-            RestRequest.Method.POST.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-            createRequestJsonString,
-            RestStatus.FORBIDDEN.status,
-            userClient!!
-        )
+        createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
         deleteUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE)
     }
 
@@ -278,13 +259,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
@@ -340,13 +315,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
@@ -471,13 +440,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
@@ -515,13 +478,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 

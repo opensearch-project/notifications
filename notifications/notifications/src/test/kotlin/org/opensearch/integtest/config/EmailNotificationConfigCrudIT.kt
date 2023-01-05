@@ -58,13 +58,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createSmtpAccountResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createSmtpAccountRequestJsonString,
-            RestStatus.OK.status
-        )
-        val smtpAccountConfigId = createSmtpAccountResponse.get("config_id").asString
+        val smtpAccountConfigId = createConfigWithRequestJsonString(createSmtpAccountRequestJsonString)
         Assert.assertNotNull(smtpAccountConfigId)
         Thread.sleep(100)
 
@@ -95,13 +89,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createEmailGroupResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createEmailGroupRequestJsonString,
-            RestStatus.OK.status
-        )
-        val emailGroupConfigId = createEmailGroupResponse.get("config_id").asString
+        val emailGroupConfigId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString)
         Assert.assertNotNull(emailGroupConfigId)
         Thread.sleep(100)
 
@@ -140,13 +128,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createEmailResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createEmailRequestJsonString,
-            RestStatus.OK.status
-        )
-        val emailConfigId = createEmailResponse.get("config_id").asString
+        val emailConfigId = createConfigWithRequestJsonString(createEmailRequestJsonString)
         Assert.assertNotNull(emailConfigId)
         Thread.sleep(1000)
 
@@ -314,13 +296,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createSesAccountResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createSesAccountRequestJsonString,
-            RestStatus.OK.status
-        )
-        val sesAccountConfigId = createSesAccountResponse.get("config_id").asString
+        val sesAccountConfigId = createConfigWithRequestJsonString(createSesAccountRequestJsonString)
         Assert.assertNotNull(sesAccountConfigId)
         Thread.sleep(100)
 
@@ -351,13 +327,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createEmailGroupResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createEmailGroupRequestJsonString,
-            RestStatus.OK.status
-        )
-        val emailGroupConfigId = createEmailGroupResponse.get("config_id").asString
+        val emailGroupConfigId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString)
         Assert.assertNotNull(emailGroupConfigId)
         Thread.sleep(100)
 
@@ -396,13 +366,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createEmailResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createEmailRequestJsonString,
-            RestStatus.OK.status
-        )
-        val emailConfigId = createEmailResponse.get("config_id").asString
+        val emailConfigId = createConfigWithRequestJsonString(createEmailRequestJsonString)
         Assert.assertNotNull(emailConfigId)
         Thread.sleep(1000)
 
@@ -555,13 +519,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createSmtpAccountResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createSmtpAccountRequestJsonString,
-            RestStatus.OK.status
-        )
-        val smtpAccountConfigId = createSmtpAccountResponse.get("config_id").asString
+        val smtpAccountConfigId = createConfigWithRequestJsonString(createSmtpAccountRequestJsonString)
         Assert.assertNotNull(smtpAccountConfigId)
         Thread.sleep(100)
 
@@ -598,13 +556,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createEmailResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createEmailRequestJsonString,
-            RestStatus.OK.status
-        )
-        val emailConfigId = createEmailResponse.get("config_id").asString
+        val emailConfigId = createConfigWithRequestJsonString(createEmailRequestJsonString)
         Assert.assertNotNull(emailConfigId)
         Thread.sleep(1000)
 
@@ -704,13 +656,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createSmtpAccountResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createSmtpAccountRequestJsonString,
-            RestStatus.OK.status
-        )
-        val smtpAccountConfigId = createSmtpAccountResponse.get("config_id").asString
+        val smtpAccountConfigId = createConfigWithRequestJsonString(createSmtpAccountRequestJsonString)
         Assert.assertNotNull(smtpAccountConfigId)
         Thread.sleep(100)
 
@@ -784,13 +730,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createEmailGroupResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createEmailGroupRequestJsonString,
-            RestStatus.OK.status
-        )
-        val emailGroupConfigId = createEmailGroupResponse.get("config_id").asString
+        val emailGroupConfigId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString)
         Assert.assertNotNull(emailGroupConfigId)
         Thread.sleep(100)
 
@@ -847,13 +787,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createSmtpAccountResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createSmtpAccountRequestJsonString,
-            RestStatus.OK.status
-        )
-        val smtpAccountConfigId = createSmtpAccountResponse.get("config_id").asString
+        val smtpAccountConfigId = createConfigWithRequestJsonString(createSmtpAccountRequestJsonString)
         Assert.assertNotNull(smtpAccountConfigId)
         Thread.sleep(100)
         val createEmailRequestJsonString = """
@@ -908,24 +842,12 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createSmtpAccountResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createSmtpAccountRequestJsonString,
-            RestStatus.OK.status
-        )
-        val smtpAccountConfigId = createSmtpAccountResponse.get("config_id").asString
+        val smtpAccountConfigId = createConfigWithRequestJsonString(createSmtpAccountRequestJsonString)
         Assert.assertNotNull(smtpAccountConfigId)
         Thread.sleep(100)
 
         // Create another smtp account
-        val anotherAccountResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createSmtpAccountRequestJsonString,
-            RestStatus.OK.status
-        )
-        val anotherAccountConfigId = anotherAccountResponse.get("config_id").asString
+        val anotherAccountConfigId = createConfigWithRequestJsonString(createSmtpAccountRequestJsonString)
         Assert.assertNotNull(anotherAccountConfigId)
         Thread.sleep(100)
         val createEmailRequestJsonString = """
