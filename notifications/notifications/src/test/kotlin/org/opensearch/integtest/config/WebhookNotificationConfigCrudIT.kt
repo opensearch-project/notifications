@@ -48,13 +48,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
@@ -131,12 +125,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Delete webhook notification config
-        val deleteResponse = executeRequest(
-            RestRequest.Method.DELETE.name,
-            "$PLUGIN_BASE_URI/configs/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        val deleteResponse = deleteConfig(configId)
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
         Thread.sleep(1000)
 

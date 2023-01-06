@@ -74,14 +74,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
         }
         """.trimIndent()
         try {
-            val createResponse = executeRequest(
-                RestRequest.Method.POST.name,
-                "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-                createRequestJsonString,
-                RestStatus.OK.status,
-                userClient!!
-            )
-            val configId = createResponse.get("config_id").asString
+            val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
             Thread.sleep(1000)
 
@@ -159,13 +152,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
@@ -278,13 +265,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
@@ -340,24 +321,12 @@ class SecurityNotificationIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
         // Delete Slack notification config
-        executeRequest(
-            RestRequest.Method.DELETE.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
-            "",
-            RestStatus.OK.status,
-            userClient!!
-        )
+        deleteConfig(configId, userClient!!)
 
         // Should not be able to find config
         executeRequest(
@@ -477,13 +446,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
@@ -521,13 +484,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
