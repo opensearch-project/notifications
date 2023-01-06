@@ -230,7 +230,13 @@ class SecurityNotificationIT : PluginRestTestCase() {
         }
         """.trimIndent()
 
-        createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
+        executeRequest(
+            RestRequest.Method.POST.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
+            createRequestJsonString,
+            RestStatus.FORBIDDEN.status,
+            userClient!!
+        )
         deleteUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE)
     }
 
