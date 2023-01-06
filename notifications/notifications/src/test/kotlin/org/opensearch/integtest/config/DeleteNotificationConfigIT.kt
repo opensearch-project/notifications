@@ -12,43 +12,9 @@ import org.opensearch.notifications.verifyMultiConfigIdEquals
 import org.opensearch.notifications.verifySingleConfigIdEquals
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
-import kotlin.random.Random
 
 class DeleteNotificationConfigIT : PluginRestTestCase() {
     private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
-
-    private fun getCreateRequestJsonString(): String {
-        val randomString = (1..20)
-            .map { Random.nextInt(0, charPool.size) }
-            .map(charPool::get)
-            .joinToString("")
-        return """
-        {
-            "config_id":"$randomString",
-            "config":{
-                "name":"this is a sample config name $randomString",
-                "description":"this is a sample config description $randomString",
-                "config_type":"slack",
-                "is_enabled":true,
-                "slack":{"url":"https://domain.com/sample_slack_url#$randomString"}
-            }
-        }
-        """.trimIndent()
-    }
-
-    private fun createConfig(): String {
-        val createRequestJsonString = getCreateRequestJsonString()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
-        Assert.assertNotNull(configId)
-        Thread.sleep(100)
-        return configId
-    }
 
     fun `test Delete single notification config`() {
         val configId = createConfig()
@@ -65,12 +31,7 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Delete notification config
-        val deleteResponse = executeRequest(
-            RestRequest.Method.DELETE.name,
-            "$PLUGIN_BASE_URI/configs/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        val deleteResponse = deleteConfig(configId)
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
         Thread.sleep(100)
 
@@ -122,12 +83,7 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Delete notification config
-        val deleteResponse = executeRequest(
-            RestRequest.Method.DELETE.name,
-            "$PLUGIN_BASE_URI/configs?config_id_list=${configIds.joinToString(separator = ",")}",
-            "",
-            RestStatus.OK.status
-        )
+        val deleteResponse = deleteConfigs(configIds)
         val deletedObject = deleteResponse.get("delete_response_list").asJsonObject
         configIds.forEach {
             Assert.assertEquals("OK", deletedObject.get(it).asString)
@@ -203,12 +159,7 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
         val remainingIds = partitions.second.toSet()
 
         // Delete notification config
-        val deleteResponse = executeRequest(
-            RestRequest.Method.DELETE.name,
-            "$PLUGIN_BASE_URI/configs?config_id_list=${deletedIds.joinToString(separator = ",")}",
-            "",
-            RestStatus.OK.status
-        )
+        val deleteResponse = deleteConfigs(deletedIds)
         val deletedObject = deleteResponse.get("delete_response_list").asJsonObject
         deletedIds.forEach {
             Assert.assertEquals("OK", deletedObject.get(it).asString)
