@@ -30,13 +30,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
@@ -69,13 +63,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
@@ -111,13 +99,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            createRequestJsonString,
-            RestStatus.OK.status
-        )
-        val configId = createResponse.get("config_id").asString
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
@@ -159,13 +141,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            smtpAccountCreateRequestJsonString,
-            RestStatus.OK.status
-        )
-        val smtpAccountConfigId = createResponse.get("config_id").asString
+        val smtpAccountConfigId = createConfigWithRequestJsonString(smtpAccountCreateRequestJsonString)
         Assert.assertNotNull(smtpAccountConfigId)
         Thread.sleep(1000)
 
@@ -187,13 +163,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         }
         """.trimIndent()
 
-        val emailCreateResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/configs",
-            emailCreateRequestJsonString,
-            RestStatus.OK.status
-        )
-        val emailConfigId = emailCreateResponse.get("config_id").asString
+        val emailConfigId = createConfigWithRequestJsonString(emailCreateRequestJsonString)
         Assert.assertNotNull(emailConfigId)
         Thread.sleep(1000)
 

@@ -104,13 +104,7 @@ class NotificationsBackwardsCompatibilityIT : PluginRestTestCase() {
             }
         }
         """.trimIndent()
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-            requestJsonString,
-            RestStatus.OK.status
-        )
-        val createdConfigId = createResponse.get("config_id").asString
+        val createdConfigId = createConfigWithRequestJsonString(requestJsonString)
         assertNotNull(createdConfigId)
         Thread.sleep(100)
     }
