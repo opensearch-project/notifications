@@ -94,8 +94,6 @@ dependencies {
     compileOnly "com.github.wnameless.json:json-flattener:0.13.0"
     // TODO: uncomment when the _local/stats API is supported
     // implementation "com.github.wnameless.json:json-base:2.0.0"
-    // implementation "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}"
-    // implementation "com.fasterxml.jackson.core:jackson-annotations:2.10.4"
 
 
     testImplementation(
