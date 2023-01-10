@@ -253,7 +253,7 @@ String bwcVersion = "2.0.0.0"
 Boolean bwcBundleTest = (project.findProperty('customDistributionDownloadType') != null &&
         project.properties['customDistributionDownloadType'] == "bundle");
 String baseName = "notificationsBwcCluster"
-
+String bwcCurrentVersion = opensearch_version.replace("-SNAPSHOT", "")
 String bwcPluginsResourcePath = "src/test/resources/plugins/bwc"
 String bwcNotificationsCoreFilePath = "$bwcPluginsResourcePath/notifications-core/$bwcVersion"
 String bwcNotificationsFilePath = "$bwcPluginsResourcePath/notifications/$bwcVersion"
@@ -270,7 +270,7 @@ String bwcNotificationsDownload = "https://ci.opensearch.org/ci/dbc/distribution
             numberOfNodes = 3
             if (bwcBundleTest) {
                 testDistribution = "ARCHIVE"
-                versions = ["2.0.0", "2.5.0"]
+                versions = ["2.0.0", bwcCurrentVersion]
                 nodes.each { node ->
                     node.extraConfigFile("kirk.pem", file("src/test/resources/security/kirk.pem"))
                     node.extraConfigFile("kirk-key.pem", file("src/test/resources/security/kirk-key.pem"))
