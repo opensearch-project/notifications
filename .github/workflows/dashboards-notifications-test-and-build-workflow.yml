@@ -153,7 +153,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ matrix.cypress_cache_folder }}
-          key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
+          key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('OpenSearch-Dashboards/plugins/dashboards-notifications/package.json') }}
 
       - name: Reset npm's script shell
         if: ${{ matrix.os == 'windows-latest' }}
