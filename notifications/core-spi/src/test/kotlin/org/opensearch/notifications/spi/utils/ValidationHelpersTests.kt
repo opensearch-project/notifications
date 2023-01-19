@@ -22,6 +22,7 @@ internal class ValidationHelpersTests {
     private val LOCAL_HOST_EXTENDED = "https://localhost:6060/service"
     private val WEBHOOK_URL = "https://test-webhook.com:1234/subdirectory?param1=value1&param2=&param3=value3"
     private val CHIME_URL = "https://domain.com/sample_chime_url#1234567890"
+    private val MICROSOFT_TEAMS_WEBHOOK = "https://outlook.office.com/webhook/your_webhook_url"
 
     private val hostDenyList = listOf(
         "127.0.0.0/8",
@@ -93,6 +94,10 @@ internal class ValidationHelpersTests {
     @Test
     fun `validator identifies webhook url as valid`() {
         assert(isValidUrl(WEBHOOK_URL))
+    }
+    @Test
+    fun `validator identifies webhook url as valid`() {
+        assert(isValidUrl(MICROSOFT_TEAMS_WEBHOOK))
     }
 
     @Test
