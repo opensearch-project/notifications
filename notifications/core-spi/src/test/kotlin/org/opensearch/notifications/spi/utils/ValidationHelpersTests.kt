@@ -99,4 +99,11 @@ internal class ValidationHelpersTests {
     fun `validator identifies chime url as valid`() {
         assert(isValidUrl(CHIME_URL))
     }
+    @Test
+    fun `validate Telegram token`() {
+        val validToken = "valid_token"
+        val invalidToken = "invalid_token"
+        assert(validateTelegramToken(validToken))
+        assertEquals(false, validateTelegramToken(invalidToken))
+    }
 }
