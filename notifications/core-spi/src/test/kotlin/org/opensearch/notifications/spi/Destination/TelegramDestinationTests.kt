@@ -11,7 +11,7 @@ class TelegramDestinationTests {
         val url = "https://t.me/notificationPluginBot"
         val destination = TelegramDestination(token, url)
         assert(destination.token == token) { "Token assertion failed" }
-        assert(destination.url == url) { "URL  assertion failed" }
+        assert(destination.url == url) { "URL assertion failed" }
         assert(destination.destinationType == DestinationType.TELEGRAM) { "Destination type assertion failed" }
 
         // Test sendTelegramMessage function
