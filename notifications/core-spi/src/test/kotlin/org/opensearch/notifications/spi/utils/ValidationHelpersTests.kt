@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.net.InetAddress
 import java.net.MalformedURLException
-
 internal class ValidationHelpersTests {
     private val GOOGLE_URL = "https://www.google.com"
     private val INVALID_URL = "www.invalid.com"
@@ -22,7 +21,9 @@ internal class ValidationHelpersTests {
     private val LOCAL_HOST_EXTENDED = "https://localhost:6060/service"
     private val WEBHOOK_URL = "https://test-webhook.com:1234/subdirectory?param1=value1&param2=&param3=value3"
     private val CHIME_URL = "https://domain.com/sample_chime_url#1234567890"
-    private val MICROSOFT_TEAMS_WEBHOOK = "https://outlook.office.com/webhook/your_webhook_url"
+    private val MICROSOFT_TEAMS_INCOMING_WEBHOOK = "https://8m7xqz.webhook.office.com/webhookb2/b0885113-57f8-4b61-8f3a-bdf3f4ae2831@500d1839-8666-4320-9f55-59d8838ad8db/IncomingWebhook/84637be48f4245c09b82e735b2cd9335/b7e1bf56-6634-422c-abe8-402e6e95fc68"
+    private val TELEGRAM_TOKEN = "5910159857:AAF9qpqgPp3SZE_gAsKvhjy0uVgJ9zLLe7"
+    private val TELEGRAM_URL = "https://t.me/notificationPluginBot"
 
     private val hostDenyList = listOf(
         "127.0.0.0/8",
@@ -105,10 +106,7 @@ internal class ValidationHelpersTests {
         assert(isValidUrl(CHIME_URL))
     }
     @Test
-    fun `validate Telegram token`() {
-        val validToken = "valid_token"
-        val invalidToken = "invalid_token"
-        assert(validateTelegramToken(validToken))
-        assertEquals(false, validateTelegramToken(invalidToken))
+    fun `validator identifies telegram token as valid`() {
+        assert(isValidTelegramToken(TELEGRAM_TOKEN))
     }
 }

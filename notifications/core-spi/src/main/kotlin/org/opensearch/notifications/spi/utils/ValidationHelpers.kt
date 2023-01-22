@@ -12,15 +12,15 @@ import org.apache.hc.client5.http.classic.methods.HttpPost
 import org.apache.hc.client5.http.classic.methods.HttpPut
 import org.opensearch.common.Strings
 import org.opensearch.notifications.spi.utils.ValidationHelpers.FQDN_REGEX
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
 import java.net.InetAddress
 import java.net.URL
 
 private object ValidationHelpers {
     const val FQDN_REGEX =
-        "^(?!.*?_.*?)(?!(?:\\w+?\\.)?-[\\w.\\-]*?)(?!\\w+?-\\.[\\w.\\-]+?)" +
-            "(?=\\w)(?=[\\w.\\-]*?\\.+[\\w.\\-]*?)(?![\\w.\\-]{254})(?!(?" +
-            ":\\.?[\\w\\-.]*?[\\w\\-]{64,}\\.)+?)[\\w.\\-]+?(?<![\\w\\-.]?\\." +
-            "\\d?)(?<=[\\w\\-]{2,})(?<![\\w\\-]{25})\$"
+        "^(?!.*?_.*?)(?!(?:\\w+?\\.)?-[\\w.\\-]*?)(?!\\w+?-\\.[\\w.\\-]+?)" + "(?=\\w)(?=[\\w.\\-]*?\\.+[\\w.\\-]*?)(?![\\w.\\-]{254})(?!(?" + ":\\.?[\\w\\-.]*?[\\w\\-]{64,}\\.)+?)[\\w.\\-]+?(?<![\\w\\-.]?\\." + "\\d?)(?<=[\\w\\-]{2,})(?<![\\w\\-]{25})\$"
 }
 
 fun validateUrl(urlString: String) {
@@ -69,24 +69,30 @@ fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
  * Regex was based off of this post: https://stackoverflow.com/a/201378
  */
 fun isValidEmail(email: String): Boolean {
-    val validEmailPattern = Regex(
-        "(?:[a-z0-9!#\$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#\$%&'*+\\/=?^_`{|}~-]+)*" +
-            "|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]" + "" +
-            "|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")" +
-            "@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?" +
-            "|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}" +
-            "(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:" +
-            "(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]" + "" +
-            "|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])",
-        RegexOption.IGNORE_CASE
-    )
+    val validEmailPattern = Regex("(?:[a-z0-9!#\$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#\$%&'*+\\/=?^_`{|}~-]+)*" + "|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]" + "" + "|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")" + "@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?" + "|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}" + "(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:" + "(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]" + "" + "|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])", RegexOption.IGNORE_CASE)
     return validEmailPattern.matches(email)
 }
 
 fun validateMethod(method: String) {
     require(!Strings.isNullOrEmpty(method)) { "Method is null or empty" }
     val validMethods = listOf(HttpPost.METHOD_NAME, HttpPut.METHOD_NAME, HttpPatch.METHOD_NAME)
-    require(
-        method.findAnyOf(validMethods) != null
-    ) { "Invalid method supplied. Only POST, PUT and PATCH are allowed" }
+    require(method.findAnyOf(validMethods) != null) { "Invalid method supplied. Only POST, PUT and PATCH are allowed" }
+}
+private fun validateTelegramToken(token: String) {
+    val url = URL("https://api.telegram.org/bot$token/getMe")
+    val connection = url.openConnection() as HttpURLConnection
+
+    connection.requestMethod = "GET"
+    val response = connection.responseCode
+    if (response != 200) {
+        throw IllegalArgumentException("Invalid Telegram token")
+    }
+    val responseBuilder = StringBuilder()
+    val input = BufferedReader(InputStreamReader(connection.inputStream))
+    var inputLine: String? = input.readLine()
+    while (inputLine != null) {
+        responseBuilder.append(inputLine)
+        inputLine = input.readLine()
+    }
+    input.close()
 }
