@@ -17,7 +17,7 @@ class MicrosoftTeamsDestination(url: String) : WebhookDestination(url, Destinati
 
         val outputStream = connection.outputStream
         val writer = OutputStreamWriter(outputStream)
-        writer.write("{\"text\":\"$message\"}")
+        writer.write("{\"text\":\"$message\"} ")
         writer.flush()
         writer.close()
         outputStream.close()

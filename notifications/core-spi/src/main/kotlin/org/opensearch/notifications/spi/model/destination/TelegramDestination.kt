@@ -47,7 +47,7 @@ class TelegramDestination(val token: String, url: String) : WebhookDestination(u
             inputLine = input.readLine()
         }
         input.close()
-        println("Response Code: $response")
+        println("Response  Code: $response")
         println("Response: $responseBuilder")
     }
 }
