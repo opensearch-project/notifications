@@ -22,7 +22,7 @@ internal class ValidationHelpersTests {
     private val LOCAL_HOST_EXTENDED = "https://localhost:6060/service"
     private val WEBHOOK_URL = "https://test-webhook.com:1234/subdirectory?param1=value1&param2=&param3=value3"
     private val CHIME_URL = "https://domain.com/sample_chime_url#1234567890"
-    private val MICROSOFT_TEAMS_WEBHOOK_URL = "https://8m7xqz.webhook.office.com/webhookb2/b0885113-57f8-4b61-8f3a-bdf3f4ae2831@500d1839-8666-4320-9f55-59d8838ad8db/IncomingWebhook/84637be48f4245c09b82e735b2cd9335/b7e1bf56-6634-422c-abe8-402e6e95fc68"
+    private val MICROSOFT_TEAMS_WEBHOOK_URL = "https://{}.webhook.office.com/webhookb2/{}/IncomingWebhook/{}"
 
     private val hostDenyList = listOf(
         "127.0.0.0/8",
