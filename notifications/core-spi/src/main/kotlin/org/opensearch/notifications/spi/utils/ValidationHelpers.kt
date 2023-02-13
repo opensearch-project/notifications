@@ -90,3 +90,21 @@ fun validateMethod(method: String) {
         method.findAnyOf(validMethods) != null
     ) { "Invalid method supplied. Only POST, PUT and PATCH are allowed" }
 }
+private fun validateTelegramToken(token: String) {
+    val url = URL("https://api.telegram.org/bot$token/getMe")
+    val connection = url.openConnection() as HttpURLConnection
+
+    connection.requestMethod = "GET"
+    val response = connection.responseCode
+    if (response != 200) {
+        throw IllegalArgumentException("Invalid Telegram token")
+    }
+    val responseBuilder = StringBuilder()
+    val input = BufferedReader(InputStreamReader(connection.inputStream))
+    var inputLine: String? = input.readLine()
+    while (inputLine != null) {
+        responseBuilder.append(inputLine)
+        inputLine = input.readLine()
+    }
+    input.close()
+}

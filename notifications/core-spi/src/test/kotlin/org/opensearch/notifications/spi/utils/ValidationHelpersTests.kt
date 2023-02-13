@@ -22,6 +22,7 @@ internal class ValidationHelpersTests {
     private val LOCAL_HOST_EXTENDED = "https://localhost:6060/service"
     private val WEBHOOK_URL = "https://test-webhook.com:1234/subdirectory?param1=value1&param2=&param3=value3"
     private val CHIME_URL = "https://domain.com/sample_chime_url#1234567890"
+    private val TELEGRAM_URL ="https://api.telegram.org/bot{token}/sendMessage?chat_id={chatId}"
 
     private val hostDenyList = listOf(
         "127.0.0.0/8",
@@ -99,4 +100,9 @@ internal class ValidationHelpersTests {
     fun `validator identifies chime url as valid`() {
         assert(isValidUrl(CHIME_URL))
     }
+    @Test
+    fun `validator identifies webhook url as valid`() {
+        assert(isValidUrl(TELEGRAM_URL))
+    }
+
 }

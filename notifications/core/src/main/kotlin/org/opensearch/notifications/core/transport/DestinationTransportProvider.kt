@@ -28,6 +28,7 @@ internal object DestinationTransportProvider {
         DestinationType.SMTP to smtpDestinationTransport,
         DestinationType.SNS to snsDestinationTransport,
         DestinationType.SES to sesDestinationTransport
+        DestinationType.TELEGRAM to webhookDestinationTransport,
     )
 
     /**
