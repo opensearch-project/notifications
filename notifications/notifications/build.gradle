@@ -168,7 +168,7 @@ test {
 
 File repo = file("$buildDir/testclusters/repo")
 def _numNodes = findProperty('numNodes') as Integer ?: 1
-
+def securityEnabled = System.getProperty("security", "false") == "true"
 task integTest(type: RestIntegTestTask) {
     description = "Run tests against a cluster that has security enabled"
     testClassesDirs = sourceSets.test.output.classesDirs
@@ -347,6 +347,9 @@ task "${baseName}#mixedClusterTask"(type: StandaloneRestIntegTestTask) {
     dependsOn "${baseName}#oldVersionClusterTask0"
     doFirst {
         testClusters."${baseName}0".upgradeNodeAndPluginToNextVersion(plugins)
+        getClusters().forEach { cluster ->
+            waitForClusterSetup(cluster, securityEnabled)
+        }
     }
     filter {
         includeTestsMatching "org.opensearch.integtest.bwc.*IT"
@@ -356,6 +359,7 @@ task "${baseName}#mixedClusterTask"(type: StandaloneRestIntegTestTask) {
     systemProperty 'tests.plugin_bwc_version', bwcVersion
     nonInputProperties.systemProperty('tests.rest.cluster', "${-> testClusters."${baseName}0".allHttpSocketURI.join(",")}")
     nonInputProperties.systemProperty('tests.clustername', "${-> testClusters."${baseName}0".getName()}")
+    systemProperty 'tests.security.manager', 'false'
 }
 
 // Upgrade the second node to new OpenSearch version with upgraded plugin version after the first node is upgraded.

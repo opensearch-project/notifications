@@ -113,7 +113,7 @@ configurations.all {
         force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.11.4" // resolve for amazonaws
         force "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.11.4" // resolve for amazonaws
         force "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.4" // resolve for amazonaws
-        force "junit:junit:4.12" // resolve for amazonaws
+        force "junit:junit:4.13.1" // resolve for amazonaws
     }
 }
 
