@@ -113,7 +113,7 @@ configurations.all {
         force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.11.4" // resolve for amazonaws
         force "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.11.4" // resolve for amazonaws
         force "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.4" // resolve for amazonaws
-        force "junit:junit:4.12" // resolve for amazonaws
+        force "junit:junit:4.13.2" // resolve for amazonaws
     }
 }
 
@@ -156,7 +156,7 @@ dependencies {
     testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.6.2')
     testImplementation "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
     testImplementation "net.bytebuddy:byte-buddy-agent:1.12.7"
-    testImplementation "org.mockito:mockito-core:4.7.0"
+    testImplementation "org.mockito:mockito-core:5.1.0"
     testImplementation "org.opensearch.test:framework:${opensearch_version}"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
     implementation project(path: ":${rootProject.name}-core-spi", configuration: 'shadow')
