@@ -154,8 +154,9 @@ internal class SmtpDestinationTests {
         assertEquals("Success", response.statusText)
 
         // Optional: check the sent email message
-        //val sentMessage: MimeMessage = response.details["message"] as MimeMessage
-        //println("Sent message: ${sentMessage.content}")
-    }
 
+        // val sentMessage: MimeMessage = response.details["message"] as MimeMessage
+
+        // println("Sent message: ${sentMessage.content}")
+    }
 }
