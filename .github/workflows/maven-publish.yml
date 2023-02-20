@@ -16,7 +16,7 @@ jobs:
       matrix:
         jdk: [11, 17]
         platform: ["ubuntu-latest", "windows-latest", "macos-latest"]
-    if: github.repository == 'opensearch-project/security'
+    if: github.repository == 'opensearch-project/notifications'
     runs-on: ${{ matrix.platform }}
 
     permissions:
