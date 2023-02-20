@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -57,17 +57,6 @@ publishing {
             }
         }
     }
-
-    repositories {
-        maven {
-            name = "Snapshots"
-            url = "https://aws.oss.sonatype.org/content/repositories/snapshots"
-            credentials {
-                username "$System.env.SONATYPE_USERNAME"
-                password "$System.env.SONATYPE_PASSWORD"
-            }
-        }
-    }
 }
 
 allOpen {
@@ -122,13 +111,14 @@ dependencies {
             'io.mockk:mockk-agent-jvm:1.11.0',
             "org.junit.jupiter:junit-jupiter-api:${junit_version}"
     )
+
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit_version}")
     testImplementation "org.opensearch.test:framework:${opensearch_version}"
     testImplementation "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
     testImplementation "net.bytebuddy:byte-buddy-agent:1.12.7"
     testImplementation "org.mockito:mockito-core:5.1.0"
-    testImplementation 'com.google.code.gson:gson:2.8.9'
+    testImplementation 'com.google.code.gson:gson:2.8.7'
     testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
     compileOnly project(path: ":${rootProject.name}-core-spi", configuration: 'shadow')
@@ -179,6 +169,7 @@ test {
 
 File repo = file("$buildDir/testclusters/repo")
 def _numNodes = findProperty('numNodes') as Integer ?: 1
+
 task integTest(type: RestIntegTestTask) {
     description = "Run tests against a cluster that has security enabled"
     testClassesDirs = sourceSets.test.output.classesDirs
