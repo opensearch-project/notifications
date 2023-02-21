@@ -8,5 +8,8 @@ Compatible with OpenSearch 2.6.0
 ### Infrastructure
 * Publish snapshots to maven via GHA ([#627](https://github.com/opensearch-project/notifications/pull/627))
 
+### Bug Fixes
+* Update dependency com.google.code.gson:gson to v2.8.9 ([#626](https://github.com/opensearch-project/notifications/pull/626))
+
 ### Documentation
 * Add 2.6.0 release notes ([#629](https://github.com/opensearch-project/notifications/pull/629))
