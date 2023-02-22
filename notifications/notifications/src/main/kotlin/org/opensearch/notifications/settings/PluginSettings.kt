@@ -123,32 +123,38 @@ internal object PluginSettings {
         OPERATION_TIMEOUT_MS_KEY,
         defaultSettings[OPERATION_TIMEOUT_MS_KEY]!!.toLong(),
         MINIMUM_OPERATION_TIMEOUT_MS,
-        NodeScope, Dynamic
+        NodeScope,
+        Dynamic
     )
 
     val DEFAULT_ITEMS_QUERY_COUNT: Setting<Int> = Setting.intSetting(
         DEFAULT_ITEMS_QUERY_COUNT_KEY,
         defaultSettings[DEFAULT_ITEMS_QUERY_COUNT_KEY]!!.toInt(),
         MINIMUM_ITEMS_QUERY_COUNT,
-        NodeScope, Dynamic
+        NodeScope,
+        Dynamic
     )
 
     val LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES: Setting<Boolean> = Setting.boolSetting(
         LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES_KEY,
         false,
-        NodeScope, Dynamic, Deprecated,
+        NodeScope,
+        Dynamic,
+        Deprecated
     )
 
     val ALERTING_FILTER_BY_BACKEND_ROLES: Setting<Boolean> = Setting.boolSetting(
         ALERTING_FILTER_BY_BACKEND_ROLES_KEY,
         LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES,
-        NodeScope, Dynamic
+        NodeScope,
+        Dynamic
     )
 
     val FILTER_BY_BACKEND_ROLES: Setting<Boolean> = Setting.boolSetting(
         FILTER_BY_BACKEND_ROLES_KEY,
         ALERTING_FILTER_BY_BACKEND_ROLES,
-        NodeScope, Dynamic
+        NodeScope,
+        Dynamic
     )
 
     fun isRbacEnabled(): Boolean {
