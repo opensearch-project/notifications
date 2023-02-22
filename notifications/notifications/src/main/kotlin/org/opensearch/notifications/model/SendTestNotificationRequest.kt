@@ -11,13 +11,13 @@ import org.opensearch.action.ValidateActions
 import org.opensearch.common.io.stream.StreamInput
 import org.opensearch.common.io.stream.StreamOutput
 import org.opensearch.common.io.stream.Writeable
-import org.opensearch.common.xcontent.ToXContent
-import org.opensearch.common.xcontent.ToXContentObject
-import org.opensearch.common.xcontent.XContentBuilder
-import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.utils.logger
+import org.opensearch.core.xcontent.ToXContent
+import org.opensearch.core.xcontent.ToXContentObject
+import org.opensearch.core.xcontent.XContentBuilder
+import org.opensearch.core.xcontent.XContentParser
 import java.io.IOException
 
 /**
@@ -69,7 +69,7 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
      * @param configId the id of the notification configuration channel
      */
     constructor(
-        configId: String,
+        configId: String
     ) {
         this.configId = configId
     }

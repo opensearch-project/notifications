@@ -24,7 +24,8 @@ class SecurityNotificationIT : PluginRestTestCase() {
 
     companion object {
         @BeforeClass
-        @JvmStatic fun setup() {
+        @JvmStatic
+        fun setup() {
             // things to execute once and keep around for the class
             org.junit.Assume.assumeTrue(System.getProperty("https", "false")!!.toBoolean())
         }

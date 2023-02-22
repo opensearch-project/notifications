@@ -715,7 +715,6 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
     }
 
     fun `test Create email notification config wit email_group IDs put as email account id should fail`() {
-
         // Create email group notification config
         val createEmailGroupRequestJsonString = """
         {
