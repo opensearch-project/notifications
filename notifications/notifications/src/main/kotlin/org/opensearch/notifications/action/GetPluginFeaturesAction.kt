@@ -10,12 +10,12 @@ import org.opensearch.action.ActionRequest
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.client.Client
 import org.opensearch.common.inject.Inject
-import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.commons.authuser.User
 import org.opensearch.commons.notifications.action.GetPluginFeaturesRequest
 import org.opensearch.commons.notifications.action.GetPluginFeaturesResponse
 import org.opensearch.commons.notifications.action.NotificationsActions
 import org.opensearch.commons.utils.recreateObject
+import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.CoreProvider
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
