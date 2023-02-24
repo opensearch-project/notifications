@@ -82,4 +82,29 @@ class SmtpEmailTests {
         )
         assertEquals(RestStatus.SERVICE_UNAVAILABLE.status, response.statusCode)
     }
+    @Test
+    fun `test send HTML email over smtp server`() {
+        val smtpDestination = SmtpDestination(
+            "testAccountName",
+            "localhost",
+            smtpPort,
+            "none",
+            "from@email.com",
+            "test@localhost.com"
+        )
+        val htmlContent = "<html><body><h1>This  is an HTML email test</h1><p>It should display this text in a web browser</p></body></html>"
+        val message = MessageContent(
+            "Test HTML email title",
+            "Description for notification in text",
+            htmlContent,
+            "opensearch.data",
+            "base64",
+            "VGVzdCBtZXNzYWdlCgo=",
+            "application/octet-stream",
+        )
+        DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SMTP to SmtpDestinationTransport())
+        val response = NotificationCoreImpl.sendMessage(smtpDestination, message, "ref")
+        assertEquals("Success", response.statusText)
+        assertEquals(RestStatus.OK.status, response.statusCode)
+    }
 }
