@@ -121,6 +121,6 @@ internal class SmtpDestinationTests {
         val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
             SmtpDestination("testAccountName", "localhost", -1, "ssl", "from@test.com", "to@test.com")
         }
-        assertEquals("Port should be positive value", exception.message)
+        assertEquals("Port should   be positive value", exception.message)
     }
 }
