@@ -151,6 +151,7 @@ internal object PluginSettings {
         "sns",
         "ses_account",
         "smtp_account",
+        "microsoft_teams",
         "email_group"
     )
 

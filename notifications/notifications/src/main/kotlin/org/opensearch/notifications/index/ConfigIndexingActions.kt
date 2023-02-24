@@ -4,7 +4,6 @@
  */
 
 package org.opensearch.notifications.index
-
 import org.opensearch.OpenSearchStatusException
 import org.opensearch.commons.authuser.User
 import org.opensearch.commons.notifications.action.CreateNotificationConfigRequest
@@ -23,6 +22,7 @@ import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Email
 import org.opensearch.commons.notifications.model.EmailGroup
+import org.opensearch.commons.notifications.model.MicrosoftTeams
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.NotificationConfigInfo
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
@@ -39,8 +39,7 @@ import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.security.UserAccess
 import org.opensearch.rest.RestStatus
 import java.time.Instant
-
-/**
+/** Feature support microsoft teams webhooks #585
  * NotificationConfig indexing operation actions.
  */
 @Suppress("TooManyFunctions")
@@ -68,6 +67,10 @@ object ConfigIndexingActions {
     @Suppress("UnusedPrivateMember")
     private fun validateWebhookConfig(webhook: Webhook, user: User?) {
         // TODO: URL validation with rules
+    }
+    @Suppress("UnusedPrivateMember")
+    private fun validateMicrosoftTeamsConfig(microsoftTeams: MicrosoftTeams, user: User?) {
+        // TODO: host validation with rules
     }
 
     @Suppress("UnusedPrivateMember")
@@ -168,6 +171,7 @@ object ConfigIndexingActions {
             ConfigType.SES_ACCOUNT -> validateSesAccountConfig(config.configData as SesAccount, user)
             ConfigType.EMAIL_GROUP -> validateEmailGroupConfig(config.configData as EmailGroup, user)
             ConfigType.SNS -> validateSnsConfig(config.configData as Sns, user)
+            configType.MICROSOFT_TEAMS -> validateMicrosoftTeamsConfig(config.configData as MicrosoftTeams, user)
         }
     }
 
@@ -371,7 +375,8 @@ object ConfigIndexingActions {
             ConfigType.CHIME.tag,
             ConfigType.WEBHOOK.tag,
             ConfigType.EMAIL.tag,
-            ConfigType.SNS.tag
+            ConfigType.SNS.tag,
+            ConfigType.MICROSOFT_TEAMS.tag
         )
     }
 

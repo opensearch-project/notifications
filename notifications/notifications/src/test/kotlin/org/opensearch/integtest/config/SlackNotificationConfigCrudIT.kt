@@ -144,7 +144,8 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
                 "config_type":"slack",
                 "is_enabled":${referenceObject.isEnabled},
                 "chime":{"url":"https://dummy.com"}
-                "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+                "slack":{"url":"${(referenceObject.configData as Slack).url}
+                "microsoft_teams":{"url":"${(referenceObject.configData as Microsoft_teams).url}"}
             }
         }
         """.trimIndent()

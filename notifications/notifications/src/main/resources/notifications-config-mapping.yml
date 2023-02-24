@@ -133,3 +133,11 @@ properties:
                 fields:
                   keyword:
                     type: keyword
+      microsoftTeams: # microsoftTeams configuration
+        type: object
+        properties:
+          url:
+            type: text
+            fields:
+              keyword:
+                type: keyword

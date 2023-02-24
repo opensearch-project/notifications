@@ -15,5 +15,5 @@ opensearch.notifications.core:
     connection_timeout: 5000 # in milliseconds
     socket_timeout: 50000
     host_deny_list: []
-  allowed_config_types: ["slack","chime","webhook","email","sns","ses_account","smtp_account","email_group"]
+  allowed_config_types: ["slack","chime","webhook","email","sns","ses_account","smtp_account","email_group","microsoft_teams"]
   tooltip_support: true

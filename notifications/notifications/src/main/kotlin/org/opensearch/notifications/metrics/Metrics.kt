@@ -180,7 +180,7 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
         BasicCounter()
     ),
     NOTIFICATIONS_MESSAGE_DESTINATION_MICROSOFT_TEAMS(
-        "notifications.message_destination.microsofTeams",
+        "notifications.message_destination.microsoft_teams",
         BasicCounter()
     ),
     NOTIFICATIONS_MESSAGE_DESTINATION_SES_ACCOUNT(

@@ -28,6 +28,7 @@ import org.opensearch.commons.notifications.NotificationConstants.URL_TAG
 import org.opensearch.commons.notifications.model.ConfigType.CHIME
 import org.opensearch.commons.notifications.model.ConfigType.EMAIL
 import org.opensearch.commons.notifications.model.ConfigType.EMAIL_GROUP
+import org.opensearch.commons.notifications.model.ConfigType.MICROSOFT_TEAMS
 import org.opensearch.commons.notifications.model.ConfigType.SES_ACCOUNT
 import org.opensearch.commons.notifications.model.ConfigType.SLACK
 import org.opensearch.commons.notifications.model.ConfigType.SMTP_ACCOUNT
@@ -75,7 +76,9 @@ object ConfigQueryHelper {
         "${SNS.tag}.$TOPIC_ARN_TAG.$KEYWORD_SUFFIX",
         "${SNS.tag}.$ROLE_ARN_TAG.$KEYWORD_SUFFIX",
         "${SES_ACCOUNT.tag}.$ROLE_ARN_TAG.$KEYWORD_SUFFIX",
-        "${SES_ACCOUNT.tag}.$FROM_ADDRESS_TAG.$KEYWORD_SUFFIX"
+        "${SES_ACCOUNT.tag}.$FROM_ADDRESS_TAG.$KEYWORD_SUFFIX",
+        "${MICROSOFT_TEAMS.tag}.$URL_TAG.$KEYWORD_SUFFIX"
+
     )
     private val TEXT_FIELDS = setOf(
         NAME_TAG,
@@ -88,7 +91,9 @@ object ConfigQueryHelper {
         "${SNS.tag}.$TOPIC_ARN_TAG",
         "${SNS.tag}.$ROLE_ARN_TAG",
         "${SES_ACCOUNT.tag}.$ROLE_ARN_TAG",
-        "${SES_ACCOUNT.tag}.$FROM_ADDRESS_TAG"
+        "${SES_ACCOUNT.tag}.$FROM_ADDRESS_TAG",
+        "${MICROSOFT_TEAMS.tag}.$URL_TAG"
+
     )
     private val NESTED_KEYWORD_FIELDS = setOf(
         // Text fields with keyword
