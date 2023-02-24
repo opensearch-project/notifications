@@ -27,8 +27,7 @@ internal object DestinationTransportProvider {
         DestinationType.CUSTOM_WEBHOOK to webhookDestinationTransport,
         DestinationType.SMTP to smtpDestinationTransport,
         DestinationType.SNS to snsDestinationTransport,
-        DestinationType.SES to sesDestinationTransport,
-        DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport
+        DestinationType.SES to sesDestinationTransport
     )
 
     /**

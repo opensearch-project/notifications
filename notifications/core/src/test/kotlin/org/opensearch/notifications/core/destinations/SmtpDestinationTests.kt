@@ -123,40 +123,4 @@ internal class SmtpDestinationTests {
         }
         assertEquals("Port should be positive value", exception.message)
     }
-
-    @Test
-    fun testMissingFromOrRecipientEmailDestination() {
-        val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
-            SmtpDestination("testAccountName", "localhost", 465, "ssl", "", "to@test.com")
-        }
-        assertEquals("FromAddress and recipient should be provided", exception.message)
-    }
-    @Test
-    fun testSendHtmlEmailMessage() {
-        // Create SMTP destination object
-        val smtpDestination = SmtpDestination(
-            "testAccountName", "smtp.gmail.com", 587, "starttls",
-            "sender@gmail.com", "receiver@gmail.com"
-        )
-
-        // Create message object with HTML content
-        val message = MessageContent(
-            "Test HTML Email subject",
-            "<html><body><h1>Hello World!</h1><p>This is an HTML email message</p></body></html>",
-            "text/html"
-        )
-
-        // Send the message
-        val response = smtpDestination.sendMessage(message)
-
-        // Verify that the message was sent successfully
-        assertEquals(RestStatus.OK.status, response.statusCode)
-        assertEquals("Success", response.statusText)
-
-        // Optional: check the sent email message
-
-        // val sentMessage: MimeMessage = response.details["message"] as MimeMessage
-
-        // println("Sent message: ${sentMessage.content}")
-    }
 }

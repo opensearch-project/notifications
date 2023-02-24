@@ -116,39 +116,6 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         Assert.assertNotNull(error.get("reason").asString)
     }
     @Suppress("EmptyFunctionBlock")
-    fun `test send test microsoft Teams message`() {
-        // Create webhook notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"this is a sample config name",
-                "description":"this is a sample config description",
-                "config_type":"webhook",
-                "is_enabled":true,
-                "chime":{
-                    "url":"https://8m7xqz.webhook.office.com/webhookb2/b0885113-57f8-4b61-8f3a-bdf3f4ae2831@500d1839-8666-4320-9f55-59d8838ad8db/IncomingWebhook/84637be48f4245c09b82e735b2cd9335/b7e1bf56-6634-422c-abe8-402e6e95fc68"
-                }
-            }
-        }
-        """.trimIndent()
-        val configId = createConfigWithRequestJsonString(createRequestJsonString)
-        Assert.assertNotNull(configId)
-        Thread.sleep(1000)
-
-        // send test message
-        val sendResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/feature/test/$configId",
-            "",
-            RestStatus.INTERNAL_SERVER_ERROR.status
-        )
-
-        // verify failure response is with message
-        val error = sendResponse.get("error").asJsonObject
-        Assert.assertNotNull(error.get("reason").asString)
-    }
-
-    @Suppress("EmptyFunctionBlock")
     fun `test send test smtp email message`() {
         val sampleSmtpAccount = SmtpAccount(
             "localhost",
@@ -215,55 +182,6 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
     /**
      * TODO: Needs to be able to detect if running against a docker localhost as this test would fail
      */
-    @Suppress("EmptyFunctionBlock")
-    fun `test send test smtp email message with html format`() {
-        val sampleSmtpAccount = SmtpAccount(
-            "localhost",
-            1000,
-            MethodType.NONE,
-            "szhongna@testemail.com"
-        )
-        // Create smtp account notification config
-        val smtpAccountCreateRequestJsonString = """
-        {
-            "config": {
-                "name": "test smtp account",
-                "description": "this is a sample smtp account",
-                "config_type": "smtp_account",
-                "smtp_account": {
-                    "smtp_host": "localhost",
-                    "smtp_port": 1000,
-                    "method": "none",
-                    "smtp_username": "testusername",
-                    "smtp_password": "testpassword",
-                    "from_address": "testfrom@testemail.com",
-                    "recipient_list": [
-                        "testrecipient@testemail.com"
-                    ],
-                    "email_html_body": "<html><body><h1>This is a test email with HTML format!</h1><p>This is some test content</p></body></html>",
-                    "email_subject": "Test email with HTML format"
-                }
-            }
-        }
-        """.trimIndent()
-        val configId = createConfigWithRequestJsonString(smtpAccountCreateRequestJsonString)
-        Assert.assertNotNull(configId)
-        Thread.sleep(1000)
-
-        // send test message
-        val sendResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/feature/test/$configId",
-            "",
-            RestStatus.OK.status
-        )
-
-        // verify success response
-        val success = sendResponse.get("data").asJsonObject
-        Assert.assertEquals("email", success.get("feature").asString)
-        Assert.assertEquals("smtp_account", success.get("config_type").asString)
-        Assert.assertEquals("success", success.get("status").asString)
-    }
 //    @Suppress("EmptyFunctionBlock")
 //    fun `test send test smtp email message for localhost successfully`() {
 //        if (isLocalHost()) {
