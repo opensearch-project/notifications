@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`<DeleteRecipientGroupModal /> spec deletes recipient groups 1`] = `null`;
-
-exports[`<DeleteRecipientGroupModal /> spec handles failures 1`] = `null`;
-
-exports[`<DeleteRecipientGroupModal /> spec renders multiple recipient groups 1`] = `null`;
-
-exports[`<DeleteRecipientGroupModal /> spec renders the component 1`] = `null`;
