@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { render, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { MOCK_DATA } from '../../../../test/mocks/mockData';
@@ -40,6 +40,52 @@ describe('<CreateChannel/> spec', () => {
     utils.getByTestId('create-channel-create-button').click();
     utils.getByTestId('create-channel-send-test-message-button').click();
     expect(utils.container.firstChild).toMatchSnapshot();
+  });
+
+  it('renders the component without SMTP sender type', async () => {
+    const notificationServiceMockEmail = jest.fn() as any;
+    const getEmailChannel = jest.fn(
+        async (queryObject: object) => MOCK_DATA.email
+    );
+    notificationServiceMockEmail.notificationService = {
+      getChannel: getEmailChannel,
+      getSenders: jest.fn(async (query) => MOCK_DATA.senders),
+      getEmailConfigDetails: jest.fn(async (channel) =>
+          Promise.resolve(channel)
+      ),
+      updateConfig: updateConfigSuccess,
+    };
+    const props = {
+      location: { search: '' },
+      match: { params: { id: 'test' } },
+    };
+    const mainState = { ...mainStateMock,
+      availableConfigTypes: [
+        'slack',
+        'chime',
+        'webhook',
+        'email',
+        'sns',
+        'ses_account',
+        'email_group',
+      ],
+    };
+
+    render(
+        <MainContext.Provider value={mainState}>
+          <ServicesContext.Provider value={notificationServiceMockEmail}>
+            <CoreServicesContext.Provider value={coreServicesMock}>
+              <CreateChannel
+                  {...(props as RouteComponentProps<{ id: string }>)}
+                  edit={true}
+              />
+            </CoreServicesContext.Provider>
+          </ServicesContext.Provider>
+        </MainContext.Provider>
+    );
+
+    expect(await screen.queryByText('Sender type')).toBeNull();
+    expect(await screen.queryByText('SMTP sender')).toBeNull();
   });
 
   it('renders the component for editing slack', async () => {
