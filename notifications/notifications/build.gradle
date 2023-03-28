@@ -127,7 +127,7 @@ dependencies {
     testImplementation "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
     testImplementation "net.bytebuddy:byte-buddy-agent:1.12.7"
-    testImplementation "org.mockito:mockito-core:5.1.0"
+    testImplementation "org.mockito:mockito-core:${versions.mockito}"
     testImplementation 'com.google.code.gson:gson:2.8.9'
     testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'

@@ -17,12 +17,12 @@ import org.opensearch.client.RestClient
 import org.opensearch.client.WarningsHandler
 import org.opensearch.common.io.PathUtils
 import org.opensearch.common.settings.Settings
-import org.opensearch.common.xcontent.DeprecationHandler
-import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.common.xcontent.XContentType
 import org.opensearch.commons.ConfigConstants
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.rest.SecureRestClientBuilder
+import org.opensearch.core.xcontent.DeprecationHandler
+import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.NotificationPlugin
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestStatus
@@ -69,7 +69,8 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         val response = client().performRequest(Request("GET", "/_cat/indices?format=json&expand_wildcards=all"))
         val xContentType = XContentType.fromMediaType(response.entity.contentType.value)
         xContentType.xContent().createParser(
-            NamedXContentRegistry.EMPTY, DeprecationHandler.THROW_UNSUPPORTED_OPERATION,
+            NamedXContentRegistry.EMPTY,
+            DeprecationHandler.THROW_UNSUPPORTED_OPERATION,
             response.entity.content
         ).use { parser ->
             for (index in parser.list()) {
