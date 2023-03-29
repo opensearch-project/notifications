@@ -9,6 +9,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.opensearch.OpenSearchStatusException
+import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.commons.authuser.User
 import org.opensearch.commons.destination.message.LegacyBaseMessage
@@ -36,7 +37,6 @@ import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.notifications.model.Sns
 import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.commons.utils.logger
-import org.opensearch.core.xcontent.ToXContent
 import org.opensearch.notifications.CoreProvider
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.index.ConfigOperations
@@ -97,8 +97,7 @@ object SendMessageActionHelper {
         if (overallStatusCode != RestStatus.OK.status.toString()) {
             val errorMessage = "{\"event_status_list\": $eventStatusListString}"
             throw OpenSearchStatusException(
-                errorMessage,
-                RestStatus.fromCode(overallStatusCode!!.toInt())
+                errorMessage, RestStatus.fromCode(overallStatusCode!!.toInt())
             )
         }
 
@@ -132,7 +131,7 @@ object SendMessageActionHelper {
             channelMessage.attachment?.fileName,
             channelMessage.attachment?.fileEncoding,
             channelMessage.attachment?.fileData,
-            channelMessage.attachment?.fileContentType
+            channelMessage.attachment?.fileContentType,
         )
     }
 

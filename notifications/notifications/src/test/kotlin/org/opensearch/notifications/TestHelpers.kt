@@ -5,12 +5,12 @@
 
 package org.opensearch.notifications
 
+import org.opensearch.common.xcontent.DeprecationHandler
+import org.opensearch.common.xcontent.NamedXContentRegistry
+import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentFactory
+import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentType
-import org.opensearch.core.xcontent.DeprecationHandler
-import org.opensearch.core.xcontent.NamedXContentRegistry
-import org.opensearch.core.xcontent.ToXContent
-import org.opensearch.core.xcontent.XContentParser
 import java.io.ByteArrayOutputStream
 
 fun getJsonString(xContent: ToXContent): String {

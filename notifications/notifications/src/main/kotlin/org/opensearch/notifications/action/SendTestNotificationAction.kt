@@ -12,10 +12,10 @@ import org.opensearch.action.support.HandledTransportAction
 import org.opensearch.client.Client
 import org.opensearch.client.node.NodeClient
 import org.opensearch.common.inject.Inject
+import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.commons.notifications.NotificationsPluginInterface
 import org.opensearch.commons.notifications.action.SendNotificationResponse
 import org.opensearch.commons.utils.logger
-import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.model.SendTestNotificationRequest
 import org.opensearch.notifications.send.SendTestNotificationActionHelper
@@ -29,7 +29,7 @@ internal class SendTestNotificationAction @Inject constructor(
     transportService: TransportService,
     val client: Client,
     actionFilters: ActionFilters,
-    val xContentRegistry: NamedXContentRegistry
+    val xContentRegistry: NamedXContentRegistry,
 ) : HandledTransportAction<SendTestNotificationRequest, SendNotificationResponse>(
     NAME,
     transportService,

@@ -93,11 +93,11 @@ object ConfigQueryHelper {
     private val NESTED_KEYWORD_FIELDS = setOf(
         // Text fields with keyword
         "${EMAIL.tag}.$RECIPIENT_LIST_TAG.$RECIPIENT_TAG.$KEYWORD_SUFFIX",
-        "${EMAIL_GROUP.tag}.$RECIPIENT_LIST_TAG.$RECIPIENT_TAG.$KEYWORD_SUFFIX"
+        "${EMAIL_GROUP.tag}.$RECIPIENT_LIST_TAG.$RECIPIENT_TAG.$KEYWORD_SUFFIX",
     )
     private val NESTED_TEXT_FIELDS = setOf(
         "${EMAIL.tag}.$RECIPIENT_LIST_TAG.$RECIPIENT_TAG",
-        "${EMAIL_GROUP.tag}.$RECIPIENT_LIST_TAG.$RECIPIENT_TAG"
+        "${EMAIL_GROUP.tag}.$RECIPIENT_LIST_TAG.$RECIPIENT_TAG",
     )
 
     private val METADATA_FIELDS = METADATA_RANGE_FIELDS

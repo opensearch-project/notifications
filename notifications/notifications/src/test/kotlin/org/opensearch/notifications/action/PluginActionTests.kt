@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.opensearch.action.ActionListener
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.client.Client
+import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.commons.destination.response.LegacyDestinationResponse
 import org.opensearch.commons.notifications.action.BaseResponse
 import org.opensearch.commons.notifications.action.CreateNotificationConfigRequest
@@ -43,7 +44,6 @@ import org.opensearch.commons.notifications.model.EventStatus
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
 import org.opensearch.commons.notifications.model.NotificationEvent
 import org.opensearch.commons.notifications.model.SeverityType
-import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.rest.RestStatus
@@ -83,10 +83,7 @@ internal class PluginActionTests {
         } returns response
 
         val createNotificationConfigAction = CreateNotificationConfigAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
+            transportService, client, actionFilters, xContentRegistry
         )
         createNotificationConfigAction.execute(task, request, AssertionListener(response))
     }
@@ -106,10 +103,7 @@ internal class PluginActionTests {
         } returns response
 
         val updateNotificationConfigAction = UpdateNotificationConfigAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
+            transportService, client, actionFilters, xContentRegistry
         )
         updateNotificationConfigAction.execute(task, request, AssertionListener(response))
     }
@@ -130,10 +124,7 @@ internal class PluginActionTests {
         } returns response
 
         val deleteNotificationConfigAction = DeleteNotificationConfigAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
+            transportService, client, actionFilters, xContentRegistry
         )
         deleteNotificationConfigAction.execute(task, request, AssertionListener(response))
     }
@@ -154,10 +145,7 @@ internal class PluginActionTests {
         } returns response
 
         val getNotificationConfigAction = GetNotificationConfigAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
+            transportService, client, actionFilters, xContentRegistry
         )
         getNotificationConfigAction.execute(task, request, AssertionListener(response))
     }
@@ -170,10 +158,7 @@ internal class PluginActionTests {
         val response = GetPluginFeaturesResponse(allowedConfigTypes, pluginFeatures)
 
         val getPluginFeaturesAction = GetPluginFeaturesAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
+            transportService, client, actionFilters, xContentRegistry
         )
         getPluginFeaturesAction.execute(task, request, AssertionListener(response))
     }
@@ -192,10 +177,7 @@ internal class PluginActionTests {
         } returns response
 
         val getChannelListAction = GetChannelListAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
+            transportService, client, actionFilters, xContentRegistry
         )
         getChannelListAction.execute(task, request, AssertionListener(response))
     }
@@ -230,10 +212,7 @@ internal class PluginActionTests {
         } returns response
 
         val sendNotificationAction = SendNotificationAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
+            transportService, client, actionFilters, xContentRegistry
         )
         sendNotificationAction.execute(task, request, AssertionListener(response))
     }
@@ -250,10 +229,7 @@ internal class PluginActionTests {
         every { SendMessageActionHelper.executeLegacyRequest(request) } returns response
 
         val publishNotificationAction = PublishNotificationAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
+            transportService, client, actionFilters, xContentRegistry
         )
         publishNotificationAction.execute(task, request, AssertionListener(response))
     }

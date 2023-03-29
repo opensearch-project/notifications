@@ -5,8 +5,8 @@
 
 package org.opensearch.notifications.resthandler
 
+import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.commons.notifications.action.BaseResponse
-import org.opensearch.core.xcontent.XContentBuilder
 import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.rest.BytesRestResponse
 import org.opensearch.rest.RestChannel
@@ -35,7 +35,6 @@ internal class RestResponseToXContentListener<Response : BaseResponse>(channel: 
         }
         return BytesRestResponse(getStatus(response), builder)
     }
-
     /**
      * {@inheritDoc}
      */

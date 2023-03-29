@@ -8,7 +8,7 @@ package org.opensearch.notifications.core.utils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.opensearch.common.bytes.BytesReference
-import org.opensearch.core.xcontent.XContentBuilder
+import org.opensearch.common.xcontent.XContentBuilder
 
 fun <T : Any> logger(forClass: Class<T>): Lazy<Logger> {
     return lazy { LogManager.getLogger(forClass) }

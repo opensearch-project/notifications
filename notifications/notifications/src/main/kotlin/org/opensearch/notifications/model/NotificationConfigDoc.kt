@@ -4,14 +4,14 @@
  */
 package org.opensearch.notifications.model
 
+import org.opensearch.common.xcontent.ToXContent
+import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentFactory
+import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_TAG
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.utils.logger
-import org.opensearch.core.xcontent.ToXContent
-import org.opensearch.core.xcontent.XContentBuilder
-import org.opensearch.core.xcontent.XContentParser
 import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
 import java.io.IOException
 
