@@ -73,9 +73,9 @@ jobs:
         if: env.imagePresent == 'true'
         run: |
           cd ..
-          docker run -p 9200:9200 -d -p 9600:9600 -e "discovery.type=single-node" opensearch-notifications:test
+          container_id=`docker run -p 9200:9200 -d -p 9600:9600 -e "discovery.type=single-node" opensearch-notifications:test`
           sleep 120
-
+          echo `docker logs $container_id`
       - name: Run Notification Test for security enabled test cases
         if: env.imagePresent == 'true'
         run: |
