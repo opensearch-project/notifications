@@ -126,8 +126,8 @@ dependencies {
     testImplementation "org.opensearch.test:framework:${opensearch_version}"
     testImplementation "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
-    testImplementation "net.bytebuddy:byte-buddy-agent:1.12.7"
-    testImplementation "org.mockito:mockito-core:5.1.0"
+    testImplementation "net.bytebuddy:byte-buddy-agent:${versions.bytebuddy}"
+    testImplementation "org.mockito:mockito-core:${versions.mockito}"
     testImplementation 'com.google.code.gson:gson:2.8.9'
     testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
@@ -259,61 +259,51 @@ testClusters.integTest {
     setting 'path.repo', repo.absolutePath
 }
 
-String bwcVersion = "2.5.0.0"
+// Always be minimumCompatibilityVersion of current opensearch version(3.0.0)
+def bwcVersionShort = "2.7.0"
+def bwcVersion = bwcVersionShort + ".0"
+def bwcOpenSearchVesion= bwcVersionShort + "-SNAPSHOT"
+def bwcPluginVersion = bwcVersion + "-SNAPSHOT"
 String baseName = "notificationsBwcCluster"
 
-String bwcPluginsResourcePath = "src/test/resources/plugins/bwc"
-String bwcNotificationsCoreFilePath = "$bwcPluginsResourcePath/notifications-core/$bwcVersion"
-String bwcNotificationsFilePath = "$bwcPluginsResourcePath/notifications/$bwcVersion"
-String bwcNotificationsCoreDownload = "https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/" +
-        "2.5.0/latest/linux/x64/tar/builds/opensearch/plugins/opensearch-notifications-core-" +
-        bwcVersion + ".zip"
-String bwcNotificationsDownload = "https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/" +
-        "2.5.0/latest/linux/x64/tar/builds/opensearch/plugins/opensearch-notifications-" +
-        bwcVersion + ".zip"
+configurations {
+    opensearchPlugin
+}
+
+dependencies {
+    opensearchPlugin "org.opensearch.plugin:opensearch-notifications-core:${bwcPluginVersion}@zip"
+    opensearchPlugin "org.opensearch.plugin:notifications:${bwcPluginVersion}@zip"
+}
+
+ext.resolvePluginFile = { pluginId ->
+    return new Callable<RegularFile>() {
+        @Override
+        RegularFile call() throws Exception {
+            return new RegularFile() {
+                @Override
+                File getAsFile() {
+                    return configurations.opensearchPlugin.resolvedConfiguration.resolvedArtifacts
+                            .find { ResolvedArtifact f ->
+                                f.name.startsWith(pluginId)
+                            }
+                            .file
+                }
+            }
+        }
+    }
+}
+
+def notificationsCoreFile = resolvePluginFile("opensearch-notifications-core")
+def notificationsFile = resolvePluginFile("notifications")
 
 2.times { i ->
     testClusters {
         "${baseName}$i" {
             testDistribution = "INTEG_TEST"
-            versions = ["2.5.0-SNAPSHOT", opensearch_version]
+            versions = [bwcOpenSearchVesion, opensearch_version]
             numberOfNodes = 3
-            plugin(provider(new Callable<RegularFile>(){
-                @Override
-                RegularFile call() throws Exception {
-                    return new RegularFile() {
-                        @Override
-                        File getAsFile() {
-                            if (new File("$project.rootDir/$bwcNotificationsCoreFilePath").exists()) {
-                                project.delete(files("$project.rootDir/$bwcNotificationsCoreFilePath"))
-                            }
-                            project.mkdir bwcNotificationsCoreFilePath
-                            ant.get(src: bwcNotificationsCoreDownload,
-                                    dest: bwcNotificationsCoreFilePath,
-                                    httpusecaches: false)
-                            return fileTree(bwcNotificationsCoreFilePath).getSingleFile()
-                        }
-                    }
-                }
-            }))
-            plugin(provider(new Callable<RegularFile>(){
-                @Override
-                RegularFile call() throws Exception {
-                    return new RegularFile() {
-                        @Override
-                        File getAsFile() {
-                            if (new File("$project.rootDir/$bwcNotificationsFilePath").exists()) {
-                                project.delete(files("$project.rootDir/$bwcNotificationsFilePath"))
-                            }
-                            project.mkdir bwcNotificationsFilePath
-                            ant.get(src: bwcNotificationsDownload,
-                                    dest: bwcNotificationsFilePath,
-                                    httpusecaches: false)
-                            return fileTree(bwcNotificationsFilePath).getSingleFile()
-                        }
-                    }
-                }
-            }))
+            plugin(provider(notificationsCoreFile))
+            plugin(provider(notificationsFile))
             setting 'path.repo', "${buildDir}/cluster/shared/repo/${baseName}"
             setting 'http.content_type.required', 'true'
         }
