@@ -260,14 +260,11 @@ testClusters.integTest {
 }
 
 // Always be minimumCompatibilityVersion of current opensearch version(3.0.0)
-def bwcVersion = "2.7.0"
-def bwcPluginVersion= bwcVersion + ".0" + "-SNAPSHOT"
-def bwcVersionSnapshot = bwcVersion + "-SNAPSHOT"
+def bwcVersionShort = "2.7.0"
+def bwcVersion = bwcVersionShort + ".0"
+def bwcOpenSearchVesion= bwcVersionShort + "-SNAPSHOT"
+def bwcPluginVersion = bwcVersion + "-SNAPSHOT"
 String baseName = "notificationsBwcCluster"
-
-String bwcPluginsResourcePath = "src/test/resources/plugins/bwc"
-String bwcNotificationsCoreFilePath = "$bwcPluginsResourcePath/notifications-core/$bwcVersion"
-String bwcNotificationsFilePath = "$bwcPluginsResourcePath/notifications/$bwcVersion"
 
 configurations {
     opensearchPlugin
@@ -303,7 +300,7 @@ def notificationsFile = resolvePluginFile("notifications")
     testClusters {
         "${baseName}$i" {
             testDistribution = "INTEG_TEST"
-            versions = [bwcVersionSnapshot, opensearch_version]
+            versions = [bwcOpenSearchVesion, opensearch_version]
             numberOfNodes = 3
             plugin(provider(notificationsCoreFile))
             plugin(provider(notificationsFile))
