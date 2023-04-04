@@ -90,7 +90,7 @@ internal class SlackDestinationTests {
     @Test
     fun `test Slack message empty entity response`() {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
-        val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "")
+        val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "{}")
 
         val httpResponse = mockk<CloseableHttpResponse>()
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
