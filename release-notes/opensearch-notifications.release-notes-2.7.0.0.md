@@ -13,4 +13,4 @@ Compatible with OpenSearch 2.7.0
 * Convert empty httpEntity to {} to avoid DeliveryStatus initialization exception ([#648](https://github.com/opensearch-project/notifications/pull/648))
 
 ### Documentation
-* Add 2.7.0 release notes
+* Add 2.7.0 release notes ([#652](https://github.com/opensearch-project/notifications/pull/652))
