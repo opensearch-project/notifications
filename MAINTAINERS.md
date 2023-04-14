@@ -9,6 +9,7 @@ This document contains a list of maintainers in this repo. See [opensearch-proje
 | Xuesong Luo            | [xluo-aws](https://github.com/xluo-aws)       | Amazon      |
 | Hailong Cui            | [Hailong-am](https://github.com/Hailong-am)   | Amazon      |
 | Binlong Gao            | [gaobinlong](https://github.com/gaobinlong)   | Amazon      |
+| Zhongnan Su            | [zhongnansu](https://github.com/zhongnansu)   | Amazon      |
 
 ## Emeritus
 
@@ -16,4 +17,3 @@ This document contains a list of maintainers in this repo. See [opensearch-proje
 | ---------------------- | --------------------------------------------- | ----------- |
 | Anantha Krishna Bhatta | [akbhatta](https://github.com/akbhatta)       | Amazon      |
 | Joshua Li              | [joshuali925](https://github.com/joshuali925) | Amazon      |
-| Zhongnan Su            | [zhongnansu](https://github.com/zhongnansu)   | Amazon      |
