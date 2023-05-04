@@ -158,5 +158,5 @@ shadowJar {
     relocate 'org.apache.commons.codec', 'org.opensearch.notifications.core.repackage.org.apache.commons.codec'
     relocate 'com.amazonaws', 'org.opensearch.notifications.core.repackage.com.amazonaws'
     relocate 'software.amazon.ion', 'org.opensearch.notifications.core.repackage.software.amazon.ion'
-    classifier = null
+    archiveClassifier.set('')
 }
