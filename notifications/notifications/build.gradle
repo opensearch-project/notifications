@@ -472,7 +472,8 @@ afterEvaluate {
     buildRpm {
         arch = 'NOARCH'
         dependsOn 'assemble'
-        task renameRpm(type: Copy) {
+        finalizedBy 'renameRpm'
+        task renameRpm {
             from("$buildDir/distributions")
             into("$buildDir/distributions")
             rename "$archiveFileName", "${packageName}-${version}.rpm"
@@ -481,8 +482,9 @@ afterEvaluate {
     }
 
     buildDeb {
-        arch = 'amd64'
+        arch = 'all'
         dependsOn 'assemble'
+        finalizedBy 'renameDeb'
         task renameDeb(type: Copy) {
             from("$buildDir/distributions")
             into("$buildDir/distributions")
