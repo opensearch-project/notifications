@@ -224,7 +224,7 @@ afterEvaluate {
     }
 
     buildDeb {
-        arch = 'amd64'
+        arch = 'all'
         dependsOn 'assemble'
         finalizedBy 'renameDeb'
         task renameDeb(type: Copy) {
