@@ -265,7 +265,7 @@ testClusters.integTest {
 }
 
 // Always be minimumCompatibilityVersion of current opensearch version(3.0.0)
-def bwcVersionShort = "2.7.0"
+def bwcVersionShort = "2.8.0"
 def bwcVersion = bwcVersionShort + ".0"
 def bwcOpenSearchVesion= bwcVersionShort + "-SNAPSHOT"
 def bwcPluginVersion = bwcVersion + "-SNAPSHOT"
@@ -473,7 +473,7 @@ afterEvaluate {
         arch = 'NOARCH'
         dependsOn 'assemble'
         finalizedBy 'renameRpm'
-        task renameRpm {
+        task renameRpm(type: Copy) {
             from("$buildDir/distributions")
             into("$buildDir/distributions")
             rename "$archiveFileName", "${packageName}-${version}.rpm"
