@@ -391,7 +391,7 @@ task prepareBwcTests {
 // Upgrade one node of the old cluster to new OpenSearch version with upgraded plugin version.
 // This results in a mixed cluster with 2 nodes on the old version and 1 upgraded node.
 // This is also used as a one third upgraded cluster for a rolling upgrade.
-task "${baseName}#mixedClusterTask"(type: StandaloneRestIntegTestTask) {
+task "${baseName}#oneThirdsUpgradeClusterTask"(type: StandaloneRestIntegTestTask) {
     useCluster testClusters."${baseName}0"
     dependsOn "${baseName}#oldVersionClusterTask0"
     if (bwcBundleTest){
@@ -417,7 +417,7 @@ task "${baseName}#mixedClusterTask"(type: StandaloneRestIntegTestTask) {
 // This results in a mixed cluster with 1 node on the old version and 2 upgraded nodes.
 // This is used for rolling upgrade.
 task "${baseName}#twoThirdsUpgradedClusterTask"(type: StandaloneRestIntegTestTask) {
-    dependsOn "${baseName}#mixedClusterTask"
+    dependsOn "${baseName}#oneThirdsUpgradeClusterTask"
     useCluster testClusters."${baseName}0"
     if (bwcBundleTest){
         doFirst {
@@ -456,7 +456,6 @@ task "${baseName}#rollingUpgradeClusterTask"(type: StandaloneRestIntegTestTask) 
     filter {
         includeTestsMatching "org.opensearch.integtest.bwc.*IT"
     }
-    mustRunAfter "${baseName}#mixedClusterTask"
     systemProperty 'tests.rest.bwcsuite', 'mixed_cluster'
     systemProperty 'tests.rest.bwcsuite_round', 'third'
     systemProperty 'tests.plugin_bwc_version', bwcVersion
@@ -491,7 +490,7 @@ task "${baseName}#fullRestartClusterTask"(type: StandaloneRestIntegTestTask) {
 task bwcTestSuite(type: StandaloneRestIntegTestTask) {
     exclude '**/*Test*'
     exclude '**/*IT*'
-    dependsOn tasks.named("${baseName}#mixedClusterTask")
+    dependsOn tasks.named("${baseName}#oneThirdsUpgradeClusterTask")
     dependsOn tasks.named("${baseName}#rollingUpgradeClusterTask")
     dependsOn tasks.named("${baseName}#fullRestartClusterTask")
 }

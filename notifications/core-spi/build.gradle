@@ -31,12 +31,12 @@ ext {
     noticeFile = rootProject.file('NOTICE.txt')
 }
 
-task sourcesJar(type: Jar) {
+tasks.register('sourcesJar', Jar) {
     archiveClassifier.set 'sources'
     from sourceSets.main.allJava
 }
 
-task javadocJar(type: Jar) {
+tasks.register('javadocJar', Jar) {
     archiveClassifier.set 'javadoc'
     from javadoc.destinationDir
     dependsOn javadoc
@@ -72,7 +72,7 @@ dependencies {
     testImplementation "org.opensearch.test:framework:${opensearch_version}"
 }
 
-configurations.all {
+configurations.configureEach {
     if (it.state != Configuration.State.UNRESOLVED) return
     resolutionStrategy {
         force "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
@@ -141,8 +141,8 @@ test {
         // reverse operation of https://github.com/elastic/elasticsearch/blob/7.6/buildSrc/src/main/groovy/org/elasticsearch/gradle/BuildPlugin.groovy#L736-L743
         // to fix the classpath for unit tests
         test.classpath -= project.files(project.tasks.named('shadowJar'))
-        test.classpath -= project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
-        test.classpath += project.extensions.getByType(SourceSetContainer).getByName(SourceSet.MAIN_SOURCE_SET_NAME).runtimeClasspath
+        test.classpath -= project.configurations.named(ShadowBasePlugin.CONFIGURATION_NAME)
+        test.classpath += project.extensions.getByType(SourceSetContainer).named(SourceSet.MAIN_SOURCE_SET_NAME).runtimeClasspath
     }
     // add "-Dtests.security.manager=false" to VM options if you want to run integ tests in IntelliJ
     systemProperty 'tests.security.manager', 'false'

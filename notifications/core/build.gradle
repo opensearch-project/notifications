@@ -74,7 +74,7 @@ publishing {
     }
 }
 
-task integTest(type: RestIntegTestTask) {
+tasks.register('integTest', RestIntegTestTask) {
     description = "Run tests against a cluster that has security enabled"
     testClassesDirs = sourceSets.test.output.classesDirs
     classpath = sourceSets.test.runtimeClasspath
@@ -108,7 +108,7 @@ test {
 }
 
 //TODO: see if this can be only set at top level and apply to subprojects, or we remove from top project if possible
-configurations.all {
+configurations.configureEach {
     if (it.state != Configuration.State.UNRESOLVED) return
     resolutionStrategy {
         force "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
