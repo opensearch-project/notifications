@@ -9,8 +9,8 @@ import org.opensearch.gradle.testclusters.StandaloneRestIntegTestTask
 import java.util.concurrent.Callable
 
 plugins {
-    id 'nebula.ospackage' version "8.5.4"
-    id "com.dorongold.task-tree" version "2.0"
+    id "com.dorongold.task-tree" version "2.1.1"
+    id "com.netflix.nebula.ospackage" version "11.3.0"
 }
 
 apply plugin: 'java'
@@ -21,7 +21,6 @@ apply plugin: 'opensearch.pluginzip'
 apply plugin: 'opensearch.testclusters'
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
-apply plugin: 'nebula.ospackage'
 
 def usingRemoteCluster = System.properties.containsKey('tests.rest.cluster') || System.properties.containsKey('tests.cluster')
 def usingMultiNode = project.properties.containsKey('numNodes')
@@ -101,7 +100,7 @@ dependencies {
     } // ${kotlin_version} does not work for coroutines
     implementation "${group}:common-utils:${common_utils_version}"
     // TODO: change compile to implementation when the _local/stats API is supported
-    compileOnly "org.json:json:20180813"
+    compileOnly "org.json:json:20230227"
     compileOnly "com.github.wnameless.json:json-flattener:0.13.0"
     // TODO: uncomment when the _local/stats API is supported
     // implementation "com.github.wnameless.json:json-base:2.0.0"
@@ -392,7 +391,7 @@ task prepareBwcTests {
 // Upgrade one node of the old cluster to new OpenSearch version with upgraded plugin version.
 // This results in a mixed cluster with 2 nodes on the old version and 1 upgraded node.
 // This is also used as a one third upgraded cluster for a rolling upgrade.
-task "${baseName}#mixedClusterTask"(type: StandaloneRestIntegTestTask) {
+task "${baseName}#oneThirdsUpgradeClusterTask"(type: StandaloneRestIntegTestTask) {
     useCluster testClusters."${baseName}0"
     dependsOn "${baseName}#oldVersionClusterTask0"
     if (bwcBundleTest){
@@ -418,7 +417,7 @@ task "${baseName}#mixedClusterTask"(type: StandaloneRestIntegTestTask) {
 // This results in a mixed cluster with 1 node on the old version and 2 upgraded nodes.
 // This is used for rolling upgrade.
 task "${baseName}#twoThirdsUpgradedClusterTask"(type: StandaloneRestIntegTestTask) {
-    dependsOn "${baseName}#mixedClusterTask"
+    dependsOn "${baseName}#oneThirdsUpgradeClusterTask"
     useCluster testClusters."${baseName}0"
     if (bwcBundleTest){
         doFirst {
@@ -457,7 +456,6 @@ task "${baseName}#rollingUpgradeClusterTask"(type: StandaloneRestIntegTestTask) 
     filter {
         includeTestsMatching "org.opensearch.integtest.bwc.*IT"
     }
-    mustRunAfter "${baseName}#mixedClusterTask"
     systemProperty 'tests.rest.bwcsuite', 'mixed_cluster'
     systemProperty 'tests.rest.bwcsuite_round', 'third'
     systemProperty 'tests.plugin_bwc_version', bwcVersion
@@ -492,7 +490,7 @@ task "${baseName}#fullRestartClusterTask"(type: StandaloneRestIntegTestTask) {
 task bwcTestSuite(type: StandaloneRestIntegTestTask) {
     exclude '**/*Test*'
     exclude '**/*IT*'
-    dependsOn tasks.named("${baseName}#mixedClusterTask")
+    dependsOn tasks.named("${baseName}#oneThirdsUpgradeClusterTask")
     dependsOn tasks.named("${baseName}#rollingUpgradeClusterTask")
     dependsOn tasks.named("${baseName}#fullRestartClusterTask")
 }
@@ -549,13 +547,25 @@ afterEvaluate {
 
     buildRpm {
         arch = 'NOARCH'
-        archiveName "${packageName}-${version}.rpm"
         dependsOn 'assemble'
+        finalizedBy 'renameRpm'
+        task renameRpm(type: Copy) {
+            from("$buildDir/distributions")
+            into("$buildDir/distributions")
+            rename "$archiveFileName", "${packageName}-${version}.rpm"
+            doLast { delete file("$buildDir/distributions/$archiveFileName") }
+        }
     }
 
     buildDeb {
-        arch = 'amd64'
-        archiveName "${packageName}-${version}.deb"
+        arch = 'all'
         dependsOn 'assemble'
+        finalizedBy 'renameDeb'
+        task renameDeb(type: Copy) {
+            from("$buildDir/distributions")
+            into("$buildDir/distributions")
+            rename "$archiveFileName", "${packageName}-${version}.deb"
+            doLast { delete file("$buildDir/distributions/$archiveFileName") }
+        }
     }
 }
