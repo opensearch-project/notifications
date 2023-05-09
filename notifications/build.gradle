@@ -67,6 +67,13 @@ allprojects {
     }
 }
 
+configurations.configureEach {
+    if (it.state != Configuration.State.UNRESOLVED) return
+    resolutionStrategy {
+        force "org.yaml:snakeyaml:2.0"
+    }
+}
+
 configurations {
     ktlint
 }
