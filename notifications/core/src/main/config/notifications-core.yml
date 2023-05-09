@@ -7,8 +7,8 @@
 # configuration file for the notifications-core plugin
 opensearch.notifications.core:
   email:
-    size_limit: 10000
-    minimum_header_length: 100
+    size_limit: 10000000
+    minimum_header_length: 160
   http:
     max_connections: 60
     max_connection_per_route: 20
