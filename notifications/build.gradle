@@ -96,6 +96,8 @@ task ktlintFormat(type: JavaExec, group: "formatting") {
     main = "com.pinterest.ktlint.Main"
     classpath = configurations.ktlint
     args "-F", "notifications/**/*.kt", "core/**/*.kt", "core-spi/**/*.kt"
+    // https://github.com/pinterest/ktlint/issues/1391
+    jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED"
 }
 
 // TODO: enable detekt only when snakeyaml vulnerability is fixed
@@ -119,12 +121,5 @@ task updateVersion {
         println "Setting version to ${newVersion}."
          // String tokenization to support -SNAPSHOT
         ant.replaceregexp(file:'build.gradle', match: '"opensearch.version", "\\d.*"', replace: '"opensearch.version", "' + newVersion.tokenize('-')[0] + '-SNAPSHOT"', flags:'g', byline:true)
-        ant.replaceregexp(file:'../.github/workflows/dashboards-notifications-test-and-build-workflow.yml', match:'OPENSEARCH_PLUGIN_VERSION: \\d+.\\d+.\\d+.\\d+', replace:'OPENSEARCH_PLUGIN_VERSION: ' + newVersion.tokenize('-')[0] + '.0', flags:'g', byline:true)
-        ant.replaceregexp(file:'../.github/workflows/draft-release-notes-workflow.yml', match:'version: \\d+.\\d+.\\d+.\\d+', replace:'version: ' + newVersion.tokenize('-')[0] + '.0', flags:'g', byline:true)
-        // Match key version in JSON files.
-        ant.replaceregexp(file:'../dashboards-notifications/opensearch_dashboards.json', match:'"version": "\\d+.\\d+.\\d+.\\d+', replace:'"version": ' + '"' + newVersion.tokenize('-')[0] + '.0', flags:'g', byline:true)
-        ant.replaceregexp(file:'../dashboards-notifications/package.json', match:'"version": "\\d+.\\d+.\\d+.\\d+', replace:'"version": ' + '"' + newVersion.tokenize('-')[0] + '.0', flags:'g', byline:true)
-        // Match key opensearchDashboardsVersion in JSON files.
-        ant.replaceregexp(file:'../dashboards-notifications/opensearch_dashboards.json', match:'"opensearchDashboardsVersion": "\\d+.\\d+.\\d+', replace:'"opensearchDashboardsVersion": ' + '"' + newVersion.tokenize('-')[0], flags:'g', byline:true)
     }
 }

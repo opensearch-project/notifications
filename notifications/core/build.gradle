@@ -224,9 +224,9 @@ afterEvaluate {
     }
 
     buildDeb {
-        arch = 'amd64'
+        arch = 'all'
         dependsOn 'assemble'
-        finalizedBy 'renameRpm'
+        finalizedBy 'renameDeb'
         task renameDeb(type: Copy) {
             from("$buildDir/distributions")
             into("$buildDir/distributions")
