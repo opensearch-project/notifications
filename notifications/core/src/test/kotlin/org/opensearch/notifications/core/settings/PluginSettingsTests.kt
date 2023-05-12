@@ -55,7 +55,8 @@ internal class PluginSettingsTests {
                 "sns",
                 "ses_account",
                 "smtp_account",
-                "email_group"
+                "email_group",
+                "microsoft_teams"
             )
         )
         .put(tooltipSupportKey, true)

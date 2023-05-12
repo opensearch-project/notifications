@@ -162,6 +162,7 @@ class DestinationHttpClient {
             // Customer webhook allows input as json or plain text, so we just return the message as it is
             is SlackDestination -> "text"
             is ChimeDestination -> "Content"
+            is MicrosoftTeamsDestination -> "text"
             is CustomWebhookDestination -> return message.textDescription
             else -> throw IllegalArgumentException(
                 "Invalid destination type is provided, Only Slack, Chime and CustomWebhook are allowed"

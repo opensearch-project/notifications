@@ -19,7 +19,8 @@ class NotificationCoreImplTests {
         "sns",
         "ses_account",
         "smtp_account",
-        "email_group"
+        "email_group",
+        "microsoft_teams"
     )
     private val defaultConfigFeatures = listOf(
         "alerting",

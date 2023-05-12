@@ -46,7 +46,6 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         val error = sendResponse.get("error").asJsonObject
         Assert.assertNotNull(error.get("reason").asString)
     }
-
     @Suppress("EmptyFunctionBlock")
     fun `test send test slack message`() {
         // Create webhook notification config
@@ -59,6 +58,38 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
                 "is_enabled":true,
                 "slack":{
                     "url":"https://hooks.slack.com/services/xxx/xxx"
+                }
+            }
+        }
+        """.trimIndent()
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        // send test message
+        val sendResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/feature/test/$configId",
+            "",
+            RestStatus.INTERNAL_SERVER_ERROR.status
+        )
+
+        // verify failure response is with message
+        val error = sendResponse.get("error").asJsonObject
+        Assert.assertNotNull(error.get("reason").asString)
+    }
+    @Suppress("EmptyFunctionBlock")
+    fun `test send test microsoft teams message`() {
+        // Create webhook notification config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"this is a sample config name",
+                "description":"this is a sample config description",
+                "config_type":"slack",
+                "is_enabled":true,
+                "microsoft_teams":{
+                    "url":"https://hooks.microsftTeams.com/services/xxx/xxx"
                 }
             }
         }
@@ -95,6 +126,38 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
                     "header_params": {
                        "Content-type": "text/plain"
                     }
+                }
+            }
+        }
+        """.trimIndent()
+        val configId = createConfigWithRequestJsonString(createRequestJsonString)
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        // send test message
+        val sendResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/feature/test/$configId",
+            "",
+            RestStatus.INTERNAL_SERVER_ERROR.status
+        )
+
+        // verify failure response is with message
+        val error = sendResponse.get("error").asJsonObject
+        Assert.assertNotNull(error.get("reason").asString)
+    }
+    @Suppress("EmptyFunctionBlock")
+    fun `test send test microsoft Teams message`() {
+        // Create webhook notification config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"this is a sample config name",
+                "description":"this is a sample config description",
+                "config_type":"webhook",
+                "is_enabled":true,
+                "chime":{
+                    "url":"https://8m7xqz.webhook.office.com/webhookb2/b0885113-57f8-4b61-8f3a-bdf3f4ae2831@500d1839-8666-4320-9f55-59d8838ad8db/IncomingWebhook/84637be48f4245c09b82e735b2cd9335/b7e1bf56-6634-422c-abe8-402e6e95fc68"
                 }
             }
         }

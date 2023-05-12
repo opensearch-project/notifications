@@ -337,6 +337,12 @@ object SendMessageActionHelper {
                 LegacyDestinationResponse.Builder().withStatusCode(400)
                     .withResponseContent("Channel type given (sns) for publishing to legacy destination not supported").build()
             }
+//            LegacyDestinationType.LEGACY_CUSTOM_WEBHOOK -> {
+//                val destination = MicrosoftTeamsDestination(baseMessage.url)
+//                val status = sendMessageThroughSpi(destination, message, "legacy")
+//                LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
+//                    .withResponseContent(status.statusText).build()
+//            }
             null -> {
                 log.warn("No channel type given (null) for publishing to legacy destination")
                 LegacyDestinationResponse.Builder().withStatusCode(400)
@@ -585,7 +591,6 @@ object SendMessageActionHelper {
             DestinationMessageResponse(RestStatus.FAILED_DEPENDENCY.status, "Failed to send notification")
         }
     }
-
     /**
      * Collects all child configs of the channel configurations (like email)
      * @param channels list of NotificationConfigDocInfo
