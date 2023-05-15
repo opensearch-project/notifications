@@ -50,13 +50,13 @@ internal class PluginSettingsTests {
             listOf(
                 "slack",
                 "chime",
+                "microsoft_teams",
                 "webhook",
                 "email",
                 "sns",
                 "ses_account",
                 "smtp_account",
-                "email_group",
-                "microsoft_teams"
+                "email_group"
             )
         )
         .put(tooltipSupportKey, true)

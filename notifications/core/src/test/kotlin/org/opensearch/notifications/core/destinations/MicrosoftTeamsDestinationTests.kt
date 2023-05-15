@@ -55,7 +55,7 @@ internal class MicrosoftTeamsDestinationTests {
     }
 
     @Test
-    fun `test Microsoft Teams message null entity response`() {
+    fun `test MicrosoftTeams message null entity response`() {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
 
         // The DestinationHttpClient replaces a null entity with "{}".
@@ -72,7 +72,7 @@ internal class MicrosoftTeamsDestinationTests {
         val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport)
 
-        val title = "test Microsoft Teams"
+        val title = "test MicrosoftTeams"
         val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
             "link test: http://sample.com email test: marymajor@example.com All member callout: " +
             "@All All Present member callout: @Present"
@@ -88,9 +88,9 @@ internal class MicrosoftTeamsDestinationTests {
     }
 
     @Test
-    fun `test microsoft teams message empty entity response`() {
+    fun `test MicrosoftTeams message empty entity response`() {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
-        val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "")
+        val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "{}")
 
         val httpResponse = mockk<CloseableHttpResponse>()
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
@@ -102,7 +102,7 @@ internal class MicrosoftTeamsDestinationTests {
         val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport)
 
-        val title = "test Microsoft Teams"
+        val title = "test MicrosoftTeams"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
             "link test: http://sample.com email test: marymajor@example.com All member callout: " +
             "@All All Present member callout: @Present\"}"
@@ -111,14 +111,14 @@ internal class MicrosoftTeamsDestinationTests {
         val destination = MicrosoftTeamsDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualMicrosftTeamsResponse: DestinationMessageResponse = NotificationCoreImpl.sendMessage(destination, message, "ref")
+        val actualMicrosoftTeamsResponse: DestinationMessageResponse = NotificationCoreImpl.sendMessage(destination, message, "ref")
 
-        assertEquals(expectedWebhookResponse.statusText, actualMicrosftTeamsResponse.statusText)
-        assertEquals(expectedWebhookResponse.statusCode, actualMicrosftTeamsResponse.statusCode)
+        assertEquals(expectedWebhookResponse.statusText, actualMicrosoftTeamsResponse.statusText)
+        assertEquals(expectedWebhookResponse.statusCode, actualMicrosoftTeamsResponse.statusCode)
     }
 
     @Test
-    fun `test Microsoft Teams message non-empty entity response`() {
+    fun `test MicrosoftTeams message non-empty entity response`() {
         val responseContent = "It worked!"
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
         val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, responseContent)
@@ -133,7 +133,7 @@ internal class MicrosoftTeamsDestinationTests {
         val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport)
 
-        val title = "test Microsoft Teams"
+        val title = "test MicrosoftTeams"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
             "link test: http://sample.com email test: marymajor@example.com All member callout: " +
             "@All All Present member callout: @Present\"}"
@@ -151,7 +151,7 @@ internal class MicrosoftTeamsDestinationTests {
     @Test
     fun `test url missing should throw IllegalArgumentException with message`() {
         val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
-            SlackDestination("")
+            MicrosoftTeamsDestination("")
         }
         assertEquals("url is null or empty", exception.message)
     }
@@ -165,12 +165,12 @@ internal class MicrosoftTeamsDestinationTests {
 
     @ParameterizedTest
     @MethodSource("escapeSequenceToRaw")
-    fun `test build webhook request body for microsoft Teams should have title included and prevent escape`(
+    fun `test build webhook request body for microsoft teams should have title included and prevent escape`(
         escapeSequence: String,
         rawString: String
     ) {
         val httpClient = DestinationHttpClient()
-        val title = "test  microsoft Teams "
+        val title = "test MicrosoftTeams"
         val messageText = "line1${escapeSequence}line2"
         val url = "https://abc/com"
         val expectedRequestBody = """{"text":"$title\n\nline1${rawString}line2"}"""

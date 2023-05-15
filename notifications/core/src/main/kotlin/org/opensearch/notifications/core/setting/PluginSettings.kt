@@ -146,12 +146,12 @@ internal object PluginSettings {
     private val DEFAULT_ALLOWED_CONFIG_TYPES = listOf(
         "slack",
         "chime",
+        "microsoft_teams",
         "webhook",
         "email",
         "sns",
         "ses_account",
         "smtp_account",
-        "microsoft_teams",
         "email_group"
     )
 
