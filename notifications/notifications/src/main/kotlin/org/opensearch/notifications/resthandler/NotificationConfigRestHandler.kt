@@ -116,6 +116,7 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
              *     email_group.recipient_list.recipient=abc,xyz (Text filter field)
              *     slack.url=domain (Text filter field)
              *     chime.url=domain (Text filter field)
+             *     microsoft_teams.url=domain (Text filter field)
              *     webhook.url=domain (Text filter field)
              *     smtp_account.host=domain (Text filter field)
              *     smtp_account.from_address=abc,xyz (Text filter field)
@@ -127,7 +128,6 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
              *     ses_account.from_address=abc,xyz (Text filter field)
              *     query=search all above keyword and text filter fields
              *     text_query=search text filter fields from above list
-             *     microsoft_teams.url=domain (Text filter field)
              * Request body: Ref [org.opensearch.commons.notifications.action.GetNotificationConfigRequest]
              * Response body: [org.opensearch.commons.notifications.action.GetNotificationConfigResponse]
              */

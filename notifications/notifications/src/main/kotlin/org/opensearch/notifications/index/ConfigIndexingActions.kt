@@ -39,7 +39,7 @@ import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.security.UserAccess
 import org.opensearch.rest.RestStatus
 import java.time.Instant
-/** Feature support microsoft teams webhooks #585
+/**
  * NotificationConfig indexing operation actions.
  */
 @Suppress("TooManyFunctions")
@@ -65,12 +65,13 @@ object ConfigIndexingActions {
     }
 
     @Suppress("UnusedPrivateMember")
-    private fun validateWebhookConfig(webhook: Webhook, user: User?) {
-        // TODO: URL validation with rules
-    }
-    @Suppress("UnusedPrivateMember")
     private fun validateMicrosoftTeamsConfig(microsoftTeams: MicrosoftTeams, user: User?) {
         // TODO: host validation with rules
+    }
+
+    @Suppress("UnusedPrivateMember")
+    private fun validateWebhookConfig(webhook: Webhook, user: User?) {
+        // TODO: URL validation with rules
     }
 
     @Suppress("UnusedPrivateMember")
@@ -165,13 +166,13 @@ object ConfigIndexingActions {
             )
             ConfigType.SLACK -> validateSlackConfig(config.configData as Slack, user)
             ConfigType.CHIME -> validateChimeConfig(config.configData as Chime, user)
+            ConfigType.MICROSOFT_TEAMS -> validateMicrosoftTeamsConfig(config.configData as MicrosoftTeams, user)
             ConfigType.WEBHOOK -> validateWebhookConfig(config.configData as Webhook, user)
             ConfigType.EMAIL -> validateEmailConfig(config.configData as Email, user)
             ConfigType.SMTP_ACCOUNT -> validateSmtpAccountConfig(config.configData as SmtpAccount, user)
             ConfigType.SES_ACCOUNT -> validateSesAccountConfig(config.configData as SesAccount, user)
             ConfigType.EMAIL_GROUP -> validateEmailGroupConfig(config.configData as EmailGroup, user)
             ConfigType.SNS -> validateSnsConfig(config.configData as Sns, user)
-            configType.MICROSOFT_TEAMS -> validateMicrosoftTeamsConfig(config.configData as MicrosoftTeams, user)
         }
     }
 
@@ -373,10 +374,10 @@ object ConfigIndexingActions {
         return listOf(
             ConfigType.SLACK.tag,
             ConfigType.CHIME.tag,
+            ConfigType.MICROSOFT_TEAMS.tag,
             ConfigType.WEBHOOK.tag,
             ConfigType.EMAIL.tag,
-            ConfigType.SNS.tag,
-            ConfigType.MICROSOFT_TEAMS.tag
+            ConfigType.SNS.tag
         )
     }
 

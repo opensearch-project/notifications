@@ -70,30 +70,28 @@ object ConfigQueryHelper {
         "$DESCRIPTION_TAG.$KEYWORD_SUFFIX",
         "${SLACK.tag}.$URL_TAG.$KEYWORD_SUFFIX",
         "${CHIME.tag}.$URL_TAG.$KEYWORD_SUFFIX",
+        "${MICROSOFT_TEAMS.tag}.$URL_TAG.$KEYWORD_SUFFIX",
         "${WEBHOOK.tag}.$URL_TAG.$KEYWORD_SUFFIX",
         "${SMTP_ACCOUNT.tag}.$HOST_TAG.$KEYWORD_SUFFIX",
         "${SMTP_ACCOUNT.tag}.$FROM_ADDRESS_TAG.$KEYWORD_SUFFIX",
         "${SNS.tag}.$TOPIC_ARN_TAG.$KEYWORD_SUFFIX",
         "${SNS.tag}.$ROLE_ARN_TAG.$KEYWORD_SUFFIX",
         "${SES_ACCOUNT.tag}.$ROLE_ARN_TAG.$KEYWORD_SUFFIX",
-        "${SES_ACCOUNT.tag}.$FROM_ADDRESS_TAG.$KEYWORD_SUFFIX",
-        "${MICROSOFT_TEAMS.tag}.$URL_TAG.$KEYWORD_SUFFIX"
-
+        "${SES_ACCOUNT.tag}.$FROM_ADDRESS_TAG.$KEYWORD_SUFFIX"
     )
     private val TEXT_FIELDS = setOf(
         NAME_TAG,
         DESCRIPTION_TAG,
         "${SLACK.tag}.$URL_TAG",
         "${CHIME.tag}.$URL_TAG",
+        "${MICROSOFT_TEAMS.tag}.$URL_TAG",
         "${WEBHOOK.tag}.$URL_TAG",
         "${SMTP_ACCOUNT.tag}.$HOST_TAG",
         "${SMTP_ACCOUNT.tag}.$FROM_ADDRESS_TAG",
         "${SNS.tag}.$TOPIC_ARN_TAG",
         "${SNS.tag}.$ROLE_ARN_TAG",
         "${SES_ACCOUNT.tag}.$ROLE_ARN_TAG",
-        "${SES_ACCOUNT.tag}.$FROM_ADDRESS_TAG",
-        "${MICROSOFT_TEAMS.tag}.$URL_TAG"
-
+        "${SES_ACCOUNT.tag}.$FROM_ADDRESS_TAG"
     )
     private val NESTED_KEYWORD_FIELDS = setOf(
         // Text fields with keyword

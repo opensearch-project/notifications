@@ -29,6 +29,7 @@ import org.opensearch.commons.notifications.model.EmailGroup
 import org.opensearch.commons.notifications.model.EmailRecipientStatus
 import org.opensearch.commons.notifications.model.EventSource
 import org.opensearch.commons.notifications.model.EventStatus
+import org.opensearch.commons.notifications.model.MicrosoftTeams
 import org.opensearch.commons.notifications.model.NotificationEvent
 import org.opensearch.commons.notifications.model.SesAccount
 import org.opensearch.commons.notifications.model.Slack
@@ -48,6 +49,7 @@ import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
 import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
+import org.opensearch.notifications.spi.model.destination.MicrosoftTeamsDestination
 import org.opensearch.notifications.spi.model.destination.SesDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
@@ -227,6 +229,7 @@ object SendMessageActionHelper {
             ConfigType.NONE -> null
             ConfigType.SLACK -> sendSlackMessage(configData as Slack, message, eventStatus, eventSource.referenceId)
             ConfigType.CHIME -> sendChimeMessage(configData as Chime, message, eventStatus, eventSource.referenceId)
+            ConfigType.MICROSOFT_TEAMS -> sendMicrosoftTeamsMessage(configData as MicrosoftTeams, message, eventStatus, eventSource.referenceId)
             ConfigType.WEBHOOK -> sendWebhookMessage(
                 configData as Webhook,
                 message,
@@ -337,12 +340,6 @@ object SendMessageActionHelper {
                 LegacyDestinationResponse.Builder().withStatusCode(400)
                     .withResponseContent("Channel type given (sns) for publishing to legacy destination not supported").build()
             }
-//            LegacyDestinationType.LEGACY_CUSTOM_WEBHOOK -> {
-//                val destination = MicrosoftTeamsDestination(baseMessage.url)
-//                val status = sendMessageThroughSpi(destination, message, "legacy")
-//                LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
-//                    .withResponseContent(status.statusText).build()
-//            }
             null -> {
                 log.warn("No channel type given (null) for publishing to legacy destination")
                 LegacyDestinationResponse.Builder().withStatusCode(400)
@@ -392,6 +389,21 @@ object SendMessageActionHelper {
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_CHIME.counter.increment()
         val destination = ChimeDestination(chime.url)
+        val status = sendMessageThroughSpi(destination, message, referenceId)
+        return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
+    }
+
+    /**
+     * send message to Microsoft Teams destination
+     */
+    private fun sendMicrosoftTeamsMessage(
+        microsoftTeams: MicrosoftTeams,
+        message: MessageContent,
+        eventStatus: EventStatus,
+        referenceId: String
+    ): EventStatus {
+        Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_MICROSOFT_TEAMS.counter.increment()
+        val destination = MicrosoftTeamsDestination(microsoftTeams.url)
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
