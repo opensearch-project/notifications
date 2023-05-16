@@ -52,6 +52,14 @@ properties:
             fields:
               keyword:
                 type: keyword
+      microsoft_teams: # Microsoft Teams configuration
+        type: object
+        properties:
+          url:
+            type: text
+            fields:
+              keyword:
+                type: keyword
       webhook: # webhook configuration
         type: object
         properties:
@@ -133,11 +141,3 @@ properties:
                 fields:
                   keyword:
                     type: keyword
-      microsoftTeams: # microsoftTeams configuration
-        type: object
-        properties:
-          url:
-            type: text
-            fields:
-              keyword:
-                type: keyword

@@ -371,7 +371,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
         )
         Thread.sleep(1000)
 
-        val channelIds = setOf(slackId, chimeId, webhookId, emailId, microsoftTeamsId)
+        val channelIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId, emailId)
         val response = executeRequest(
             RestRequest.Method.GET.name,
             "${NotificationPlugin.PLUGIN_BASE_URI}/channels",

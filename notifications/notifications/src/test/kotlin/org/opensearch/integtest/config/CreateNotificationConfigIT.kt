@@ -9,6 +9,7 @@ import org.junit.Assert
 import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.MethodType
+import org.opensearch.commons.notifications.model.MicrosoftTeams
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.SmtpAccount
@@ -89,6 +90,46 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         // Get chime notification config
+
+        val getConfigResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs/$configId",
+            "",
+            RestStatus.OK.status
+        )
+        verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
+    }
+
+    fun `test Create microsoft teams notification config with ID`() {
+        // Create sample config request reference
+        val configId = "sample_config_id"
+        val sampleMicrosoftTeams = MicrosoftTeams("https://domain.com/sample_microsoft_teams_url#1234567890")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.MICROSOFT_TEAMS,
+            isEnabled = true,
+            configData = sampleMicrosoftTeams
+        )
+
+        // Create Microsoft Teams notification config
+        val createRequestJsonString = """
+        {
+            "config_id":"$configId",
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"microsoft_teams",
+                "is_enabled":${referenceObject.isEnabled},
+                "microsoft_teams":{"url":"${(referenceObject.configData as MicrosoftTeams).url}"}
+            }
+        }
+        """.trimIndent()
+        val createdConfigId = createConfigWithRequestJsonString(createRequestJsonString)
+        Assert.assertEquals(configId, createdConfigId)
+        Thread.sleep(1000)
+
+        // Get Microsoft Teams notification config
 
         val getConfigResponse = executeRequest(
             RestRequest.Method.GET.name,

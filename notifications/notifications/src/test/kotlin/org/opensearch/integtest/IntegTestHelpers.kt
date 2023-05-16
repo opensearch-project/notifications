@@ -122,7 +122,7 @@ fun getCreateNotificationRequestJsonString(
             "chime":{"url":"https://chime.domain.com/sample_chime_url#$randomString"}
         """.trimIndent()
         ConfigType.MICROSOFT_TEAMS -> """
-            "chime":{"url":"https://microsoftTeams.domain.com/sample_microsoftTeams_url#$randomString"}
+            "microsoft_teams":{"url":"https://microsoftTeams.domain.com/sample_microsoft_teams_url#$randomString"}
         """.trimIndent()
         ConfigType.WEBHOOK -> """
             "webhook":{"url":"https://web.domain.com/sample_web_url#$randomString"}
