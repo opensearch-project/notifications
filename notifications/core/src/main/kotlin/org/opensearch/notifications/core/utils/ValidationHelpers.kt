@@ -9,7 +9,7 @@ import inet.ipaddr.IPAddressString
 import org.apache.hc.client5.http.classic.methods.HttpPatch
 import org.apache.hc.client5.http.classic.methods.HttpPost
 import org.apache.hc.client5.http.classic.methods.HttpPut
-import org.opensearch.common.Strings
+import org.opensearch.core.common.Strings
 import java.net.URL
 
 fun validateUrl(urlString: String) {

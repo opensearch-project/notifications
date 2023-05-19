@@ -10,7 +10,7 @@ import org.apache.commons.validator.routines.DomainValidator
 import org.apache.hc.client5.http.classic.methods.HttpPatch
 import org.apache.hc.client5.http.classic.methods.HttpPost
 import org.apache.hc.client5.http.classic.methods.HttpPut
-import org.opensearch.common.Strings
+import org.opensearch.core.common.Strings
 import org.opensearch.notifications.spi.utils.ValidationHelpers.FQDN_REGEX
 import java.net.InetAddress
 import java.net.URL
