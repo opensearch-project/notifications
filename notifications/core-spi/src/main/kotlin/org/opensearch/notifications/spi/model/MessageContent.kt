@@ -5,7 +5,7 @@
 
 package org.opensearch.notifications.spi.model
 
-import org.opensearch.common.Strings
+import org.opensearch.core.common.Strings
 
 /**
  *  class for storing message.
