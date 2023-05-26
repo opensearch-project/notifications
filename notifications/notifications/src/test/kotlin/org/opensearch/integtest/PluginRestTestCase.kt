@@ -248,11 +248,12 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
 
     fun createUserWithCustomRole(
         user: String,
+        passwd: String,
         role: String,
         backendRole: String,
         clusterPermissions: String?
     ) {
-        createUser(user, user, arrayOf(backendRole))
+        createUser(user, passwd, arrayOf(backendRole))
         createCustomRole(role, clusterPermissions)
         createUserRolesMapping(role, arrayOf(user))
     }
