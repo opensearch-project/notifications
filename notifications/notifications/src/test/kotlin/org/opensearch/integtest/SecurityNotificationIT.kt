@@ -30,15 +30,16 @@ class SecurityNotificationIT : PluginRestTestCase() {
         }
     }
 
-    val user = "integTestUser"
+    private val user = "integTestUser"
+    private val password = "AeTq($%u-44c_j9NJB45a#2#JP7sH"
     var userClient: RestClient? = null
 
     @Before
     fun create() {
 
         if (userClient == null) {
-            createUser(user, user, arrayOf())
-            userClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), user, user).setSocketTimeout(60000).build()
+            createUser(user, password, arrayOf())
+            userClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), user, password).setSocketTimeout(60000).build()
         }
     }
 
@@ -49,7 +50,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test Create slack notification config with user that has create Notification permission`() {
-        createUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
 
         // Create sample config request reference
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
@@ -92,7 +93,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test Create slack notification config without create Notification permission`() {
-        createUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
+        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         // Create sample config request reference
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
@@ -128,7 +129,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test update slack notification config with user that has create Notification permission`() {
-        createUserWithCustomRole(user, NOTIFICATION_UPDATE_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_UPDATE_CONFIG_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_UPDATE_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_UPDATE_CONFIG_ACCESS])
 
         // Create sample config request reference
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
@@ -205,7 +206,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test update slack notification config without create Notification permission`() {
-        createUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
+        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         // Create sample config request reference
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
@@ -241,7 +242,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test get slack notification config with user that has get Notification permission`() {
-        createUserWithCustomRole(user, NOTIFICATION_GET_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_GET_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
 
         // Create sample config request reference
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
@@ -282,7 +283,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test get slack notification config without get Notification permission`() {
-        createUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
+        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         // Get Slack notification config
 
@@ -297,7 +298,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test delete slack notification config with user that has get Notification permission`() {
-        createUserWithCustomRole(user, NOTIFICATION_DELETE_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_DELETE_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
 
         // Create sample config request reference
         val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
@@ -340,7 +341,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test delete slack notification config without get Notification permission`() {
-        createUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
+        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         // Get Slack notification config
 
@@ -355,7 +356,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test getChannelList should return only channels with get channel permission`() {
-        createUserWithCustomRole(user, NOTIFICATION_GET_CHANNEL_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CHANNEL_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_GET_CHANNEL_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CHANNEL_ACCESS])
 
         val slackId = createConfig(configType = ConfigType.SLACK)
         val chimeId = createConfig(configType = ConfigType.CHIME)
@@ -384,7 +385,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test getChannelList fails without get channel permission`() {
-        createUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
+        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         createConfig(configType = ConfigType.SLACK)
         Thread.sleep(1000)
@@ -401,7 +402,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test Get plugin features should return non-empty configTypes with get features permission`() {
-        createUserWithCustomRole(user, NOTIFICATION_GET_PLUGIN_FEATURE_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_PLUGIN_FEATURE_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_GET_PLUGIN_FEATURE_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_PLUGIN_FEATURE_ACCESS])
 
         val getResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -417,7 +418,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test Get plugin features fails without get features permission`() {
-        createUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
+        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         executeRequest(
             RestRequest.Method.GET.name,
@@ -430,7 +431,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test send test slack message with send permissions`() {
-        createUserWithCustomRole(user, NOTIFICATION_TEST_SEND_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_TEST_SEND_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
 
         // Create webhook notification config
         val createRequestJsonString = """
@@ -468,7 +469,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test send test slack message without send permissions`() {
-        createUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
+        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         // Create webhook notification config
         val createRequestJsonString = """
