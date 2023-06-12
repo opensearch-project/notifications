@@ -9,6 +9,8 @@ opensearch.notifications.core:
   email:
     size_limit: 10000000
     minimum_header_length: 160
+    enable_html_sanitization: true
+    html_sanitization_allow_list: ["blocks_group", "formatting_group", "images_group", "links_group", "styles_group", "tables_group"]
   http:
     max_connections: 60
     max_connection_per_route: 20

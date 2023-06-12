@@ -146,6 +146,8 @@ dependencies {
     implementation "com.sun.mail:javax.mail:1.6.2"
     implementation "javax.activation:activation:1.1"
     implementation "org.slf4j:slf4j-api:${versions.slf4j}" //Needed for httpclient5
+    implementation "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1"
+    api 'com.google.guava:guava:32.0.0-jre'
     testImplementation(
             'org.assertj:assertj-core:3.16.1',
             'org.junit.jupiter:junit-jupiter-api:5.6.2',

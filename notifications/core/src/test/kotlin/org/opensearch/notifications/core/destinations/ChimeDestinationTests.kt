@@ -166,7 +166,7 @@ internal class ChimeDestinationTests {
         val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
             MessageContent("title", "")
         }
-        assertEquals("text message part is null or empty", exception.message)
+        assertEquals("both text message part and html message part are null or empty", exception.message)
     }
 
     @ParameterizedTest
