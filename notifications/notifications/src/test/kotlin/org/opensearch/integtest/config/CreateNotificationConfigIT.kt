@@ -314,6 +314,6 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
 
         Assert.assertEquals(0, getCurrentMappingsSchemaVersion())
         createConfig()
-        Assert.assertEquals(1, getCurrentMappingsSchemaVersion())
+        Assert.assertEquals(2, getCurrentMappingsSchemaVersion())
     }
 }
