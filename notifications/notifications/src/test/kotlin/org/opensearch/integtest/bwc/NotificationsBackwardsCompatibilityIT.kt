@@ -5,6 +5,7 @@
 
 package org.opensearch.integtest.bwc
 
+import org.junit.Assert
 import org.opensearch.common.settings.Settings
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin
@@ -52,6 +53,8 @@ class NotificationsBackwardsCompatibilityIT : PluginRestTestCase() {
                 }
                 ClusterType.UPGRADED -> {
                     verifyConfigsExist(setOf(configId))
+                    createTestNotificationsConfig(randomAlphaOfLength(10))
+                    Assert.assertEquals(2, getCurrentMappingsSchemaVersion())
                 }
             }
             break
