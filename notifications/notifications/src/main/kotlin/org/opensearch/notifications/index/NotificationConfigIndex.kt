@@ -62,13 +62,21 @@ import java.util.concurrent.TimeUnit
  */
 @Suppress("TooManyFunctions")
 internal object NotificationConfigIndex : ConfigOperations {
+    const val DEFAULT_SCHEMA_VERSION = 1
+    const val _META = "_meta"
+    const val SCHEMA_VERSION = "schema_version"
+
     private val log by logger(NotificationConfigIndex::class.java)
     private const val INDEX_NAME = ".opensearch-notifications-config"
     private const val MAPPING_FILE_NAME = "notifications-config-mapping.yml"
     private const val SETTINGS_FILE_NAME = "notifications-config-settings.yml"
-    private const val DEFAULT_SCHEMA_VERSION = 1
-    private const val _META = "_meta"
-    private const val SCHEMA_VERSION = "schema_version"
+
+    private val indexMappingAsMap = XContentHelper.convertToMap(
+        XContentType.YAML.xContent(),
+        NotificationConfigIndex::class.java.classLoader.getResource(MAPPING_FILE_NAME)?.readText()!!,
+        false
+    )
+    private val indexMappingSchemaVersion = getSchemaVersionFromIndexMapping(indexMappingAsMap)
 
     private lateinit var client: Client
     private lateinit var clusterService: ClusterService
@@ -91,21 +99,12 @@ internal object NotificationConfigIndex : ConfigOperations {
         }
     }
 
-    private var indexMappingAsMap: Map<String, Any>? = null
-    private var indexMappingSchemaVersion: Int = DEFAULT_SCHEMA_VERSION
-
     /**
      * {@inheritDoc}
      */
     fun initialize(client: Client, clusterService: ClusterService) {
         NotificationConfigIndex.client = SecureIndexClient(client)
         NotificationConfigIndex.clusterService = clusterService
-    }
-
-    private fun initIndexMappingAndSchemaVersion() {
-        val indexMappingSource = NotificationConfigIndex::class.java.classLoader.getResource(MAPPING_FILE_NAME)?.readText()!!
-        indexMappingAsMap = XContentHelper.convertToMap(XContentType.YAML.xContent(), indexMappingSource, false)
-        indexMappingSchemaVersion = getSchemaVersionFromIndexMapping(indexMappingAsMap)
     }
 
     private fun getSchemaVersionFromIndexMapping(indexMapping: Map<String, Any>?): Int {
@@ -128,9 +127,6 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     @Suppress("TooGenericExceptionCaught")
     private suspend fun createIndex() {
-        if (indexMappingAsMap == null) {
-            initIndexMappingAndSchemaVersion()
-        }
         if (!isIndexExists()) {
             val classLoader = NotificationConfigIndex::class.java.classLoader
             val indexSettingsSource = classLoader.getResource(SETTINGS_FILE_NAME)?.readText()!!
