@@ -7,6 +7,8 @@
 # Schema file for the notifications-config index
 # "dynamic" is set to "false" so that only specified fields are indexed instead of all fields.
 dynamic: false
+_meta:
+  schema_version: 1
 properties:
   metadata:
     type: object
