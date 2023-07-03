@@ -5,7 +5,7 @@
 
 package org.opensearch.notifications.spi.model.destination
 
-import org.opensearch.common.Strings
+import org.opensearch.core.common.Strings
 import org.opensearch.notifications.spi.utils.validateEmail
 
 /**
