@@ -6,6 +6,9 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
+import org.opensearch.client.Request
+import org.opensearch.client.ResponseException
+import org.opensearch.client.WarningFailureException
 import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.MethodType
@@ -216,5 +219,60 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             createSmtpAccountRequestJsonString,
             RestStatus.BAD_REQUEST.status
         )
+    }
+
+    fun `test automatically update mappings if encountering higher schema_version`() {
+        val indexName = ".opensearch-notifications-config"
+        val deleteIndexRequest = Request(RestRequest.Method.DELETE.name, indexName)
+        try {
+            adminClient().performRequest(deleteIndexRequest)
+        } catch (e: ResponseException) {
+            /* ignore if the index has not been created */
+            assertEquals("Unexpected status", RestStatus.NOT_FOUND, RestStatus.fromCode(e.response.statusLine.statusCode))
+        }
+
+        val pseudoMappingString = """
+            {
+                "mappings": {
+                    "_meta":{
+                        "schema_version":0
+                    },
+                    "dynamic": "false",
+                    "properties": {
+                        "config": {
+                            "properties": {
+                                "chime": {
+                                    "properties": {
+                                        "url": {
+                                            "type": "text",
+                                            "fields": {
+                                                "keyword": {
+                                                    "type": "keyword"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        try {
+            executeRequest(
+                RestRequest.Method.PUT.name,
+                indexName,
+                pseudoMappingString,
+                RestStatus.OK.status
+            )
+        } catch (e: Exception) {
+            /* ignore warnings */
+            assert(e is WarningFailureException)
+        }
+
+        Assert.assertEquals(0, getCurrentMappingsSchemaVersion())
+        createConfig()
+        Assert.assertEquals(1, getCurrentMappingsSchemaVersion())
     }
 }
