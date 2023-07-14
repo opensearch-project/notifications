@@ -12,7 +12,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
-import org.opensearch.common.settings.SecureString
+import org.opensearch.core.common.settings.SecureString
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.core.NotificationCoreImpl
 import org.opensearch.notifications.core.client.DestinationSmtpClient
 import org.opensearch.notifications.core.transport.DestinationTransportProvider
@@ -22,7 +23,6 @@ import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.SecureDestinationSettings
 import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
-import org.opensearch.rest.RestStatus
 import javax.mail.MessagingException
 
 @ExtendWith(MockitoExtension::class)

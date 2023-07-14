@@ -7,8 +7,8 @@ package org.opensearch.notifications.security
 
 import org.opensearch.OpenSearchStatusException
 import org.opensearch.commons.authuser.User
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.settings.PluginSettings
-import org.opensearch.rest.RestStatus
 
 /**
  * Class for checking/filtering user access.

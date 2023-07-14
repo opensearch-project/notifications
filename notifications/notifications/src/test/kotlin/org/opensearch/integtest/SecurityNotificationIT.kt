@@ -14,11 +14,11 @@ import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.rest.SecureRestClientBuilder
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.NotificationPlugin
 import org.opensearch.notifications.verifyChannelIdEquals
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
-import org.opensearch.rest.RestStatus
 
 class SecurityNotificationIT : PluginRestTestCase() {
 

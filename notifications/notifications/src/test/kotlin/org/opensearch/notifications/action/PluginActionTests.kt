@@ -43,10 +43,10 @@ import org.opensearch.commons.notifications.model.EventStatus
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
 import org.opensearch.commons.notifications.model.NotificationEvent
 import org.opensearch.commons.notifications.model.SeverityType
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.notifications.send.SendMessageActionHelper
-import org.opensearch.rest.RestStatus
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 import kotlin.test.assertEquals

@@ -33,6 +33,7 @@ import org.opensearch.commons.notifications.model.NotificationConfigInfo
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
 import org.opensearch.commons.notifications.model.SearchResults
 import org.opensearch.commons.utils.logger
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.index.query.BoolQueryBuilder
 import org.opensearch.index.query.QueryBuilders
@@ -46,7 +47,6 @@ import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntilTimeout
-import org.opensearch.rest.RestStatus
 import org.opensearch.script.Script
 import org.opensearch.search.SearchHit
 import org.opensearch.search.builder.SearchSourceBuilder
