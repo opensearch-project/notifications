@@ -8,13 +8,13 @@ package org.opensearch.notifications.core.setting
 import org.opensearch.bootstrap.BootstrapInfo
 import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.settings.SecureSetting
-import org.opensearch.common.settings.SecureString
 import org.opensearch.common.settings.Setting
 import org.opensearch.common.settings.Setting.Property.Deprecated
 import org.opensearch.common.settings.Setting.Property.Dynamic
 import org.opensearch.common.settings.Setting.Property.Final
 import org.opensearch.common.settings.Setting.Property.NodeScope
 import org.opensearch.common.settings.Settings
+import org.opensearch.core.common.settings.SecureString
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.PLUGIN_NAME
 import org.opensearch.notifications.core.utils.OpenForTesting

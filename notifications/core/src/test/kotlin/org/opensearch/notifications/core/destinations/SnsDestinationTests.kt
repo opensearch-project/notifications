@@ -15,6 +15,7 @@ import io.mockk.spyk
 import org.easymock.EasyMock
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.core.NotificationCoreImpl
 import org.opensearch.notifications.core.client.DestinationSnsClient
 import org.opensearch.notifications.core.credentials.SnsClientFactory
@@ -24,7 +25,6 @@ import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.notifications.spi.model.destination.SnsDestination
-import org.opensearch.rest.RestStatus
 
 internal class SnsDestinationTests {
 

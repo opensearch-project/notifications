@@ -22,6 +22,7 @@ import org.apache.hc.core5.http.io.entity.StringEntity
 import org.apache.hc.core5.util.Timeout
 import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.common.xcontent.XContentType
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.core.setting.PluginSettings
 import org.opensearch.notifications.core.utils.OpenForTesting
 import org.opensearch.notifications.core.utils.logger
@@ -32,7 +33,6 @@ import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.WebhookDestination
-import org.opensearch.rest.RestStatus
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.util.Collections

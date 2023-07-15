@@ -6,7 +6,8 @@
 package org.opensearch.notifications.core.client
 
 import com.sun.mail.util.MailConnectException
-import org.opensearch.common.settings.SecureString
+import org.opensearch.core.common.settings.SecureString
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.core.setting.PluginSettings
 import org.opensearch.notifications.core.utils.SecurityAccess
 import org.opensearch.notifications.core.utils.logger
@@ -14,7 +15,6 @@ import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.SecureDestinationSettings
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
-import org.opensearch.rest.RestStatus
 import java.util.Properties
 import javax.mail.Authenticator
 import javax.mail.Message
