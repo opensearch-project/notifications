@@ -6,9 +6,9 @@ package org.opensearch.notifications.index
 
 import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.model.NotificationConfigDocInfo
-import org.opensearch.rest.RestStatus
 
 /**
  * Interface for config Operations.
