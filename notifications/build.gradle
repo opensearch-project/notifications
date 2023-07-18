@@ -40,7 +40,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-allopen:${kotlin_version}"
 // TODO: enable detekt only when snakeyaml vulnerability is fixed
 //        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.17.1"
-        classpath "org.jacoco:org.jacoco.agent:0.8.5"
+        classpath "org.jacoco:org.jacoco.agent:0.8.7"
     }
 }
 
@@ -83,7 +83,7 @@ dependencies {
 
 task ktlint(type: JavaExec, group: "verification") {
     description = "Check Kotlin code style."
-    main = "com.pinterest.ktlint.Main"
+    mainClass = "com.pinterest.ktlint.Main"
     classpath = configurations.ktlint
     args "notifications/**/*.kt", "core/**/*.kt", "core-spi/**/*.kt"
     // to generate report in checkstyle format prepend following args:
@@ -93,7 +93,7 @@ task ktlint(type: JavaExec, group: "verification") {
 
 task ktlintFormat(type: JavaExec, group: "formatting") {
     description = "Fix Kotlin code style deviations."
-    main = "com.pinterest.ktlint.Main"
+    mainClass = "com.pinterest.ktlint.Main"
     classpath = configurations.ktlint
     args "-F", "notifications/**/*.kt", "core/**/*.kt", "core-spi/**/*.kt"
     // https://github.com/pinterest/ktlint/issues/1391
