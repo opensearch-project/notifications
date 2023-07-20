@@ -429,7 +429,7 @@ internal object PluginSettings {
         tooltipSupport = TOOLTIP_SUPPORT.get(clusterService.settings)
         hostDenyList = HOST_DENY_LIST.get(clusterService.settings)
         destinationSettings = loadDestinationSettings(clusterService.settings)
-        clusterName = clusterService.settings.get(CLUSTER_NAME)
+        clusterName = clusterService.clusterName.value()
     }
 
     /**
@@ -483,7 +483,7 @@ internal object PluginSettings {
             log.debug("$LOG_PREFIX:$HOST_DENY_LIST_KEY -autoUpdatedTo-> $clusterHostDenyList")
             hostDenyList = clusterHostDenyList
         }
-        val clusterClusterName = clusterService.clusterSettings.get(CLUSTER_NAME_SETTING)
+        val clusterClusterName = clusterService.clusterName
         if (clusterClusterName != null) {
             log.debug("$LOG_PREFIX:$CLUSTER_NAME_SETTING -autoUpdatedTo-> $clusterClusterName")
             clusterName = clusterClusterName.value()
