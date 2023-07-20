@@ -36,6 +36,7 @@ import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.notifications.model.Sns
 import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.commons.utils.logger
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.core.xcontent.ToXContent
 import org.opensearch.notifications.CoreProvider
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
@@ -52,7 +53,6 @@ import org.opensearch.notifications.spi.model.destination.SesDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import org.opensearch.notifications.spi.model.destination.SnsDestination
-import org.opensearch.rest.RestStatus
 import java.io.ByteArrayOutputStream
 
 /**

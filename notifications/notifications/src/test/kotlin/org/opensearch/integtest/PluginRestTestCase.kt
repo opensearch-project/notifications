@@ -21,11 +21,11 @@ import org.opensearch.common.xcontent.XContentType
 import org.opensearch.commons.ConfigConstants
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.rest.SecureRestClientBuilder
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.core.xcontent.DeprecationHandler
 import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.NotificationPlugin
 import org.opensearch.rest.RestRequest
-import org.opensearch.rest.RestStatus
 import org.opensearch.test.rest.OpenSearchRestTestCase
 import java.io.IOException
 import java.nio.file.Files

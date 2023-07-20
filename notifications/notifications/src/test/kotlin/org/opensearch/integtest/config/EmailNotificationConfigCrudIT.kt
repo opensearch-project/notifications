@@ -14,6 +14,7 @@ import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.SesAccount
 import org.opensearch.commons.notifications.model.SmtpAccount
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.verifyMultiConfigEquals
@@ -21,7 +22,6 @@ import org.opensearch.notifications.verifyMultiConfigIdEquals
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.notifications.verifySingleConfigIdEquals
 import org.opensearch.rest.RestRequest
-import org.opensearch.rest.RestStatus
 
 class EmailNotificationConfigCrudIT : PluginRestTestCase() {
 

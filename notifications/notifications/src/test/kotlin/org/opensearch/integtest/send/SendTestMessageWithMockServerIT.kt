@@ -11,10 +11,10 @@ import com.sun.net.httpserver.HttpServer
 import org.junit.AfterClass
 import org.junit.Assert
 import org.junit.BeforeClass
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.rest.RestRequest
-import org.opensearch.rest.RestStatus
 import java.net.InetAddress
 import java.net.InetSocketAddress
 

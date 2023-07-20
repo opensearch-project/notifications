@@ -6,12 +6,12 @@
 package org.opensearch.notifications.resthandler
 
 import org.opensearch.commons.notifications.action.BaseResponse
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.core.xcontent.XContentBuilder
 import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.rest.BytesRestResponse
 import org.opensearch.rest.RestChannel
 import org.opensearch.rest.RestResponse
-import org.opensearch.rest.RestStatus
 import org.opensearch.rest.action.RestToXContentListener
 
 /**
