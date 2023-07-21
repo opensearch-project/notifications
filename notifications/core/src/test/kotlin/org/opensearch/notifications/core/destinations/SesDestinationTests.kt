@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.core.NotificationCoreImpl
 import org.opensearch.notifications.core.client.DestinationSesClient
 import org.opensearch.notifications.core.credentials.SesClientFactory
@@ -18,7 +19,6 @@ import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.notifications.spi.model.destination.SesDestination
-import org.opensearch.rest.RestStatus
 
 @ExtendWith(MockitoExtension::class)
 internal class SesDestinationTests {
