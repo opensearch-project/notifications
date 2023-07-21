@@ -39,6 +39,8 @@ internal class PluginSettingsTests {
     private val tooltipSupportKey = "$keyPrefix.tooltip_support"
     private val clusterNameKey = "cluster.name"
 
+    private val defaultClusterName = ClusterName.DEFAULT
+
     private val defaultSettings = Settings.builder()
         .put(emailSizeLimitKey, 10000000)
         .put(emailMinHeaderLengthKey, 160)
@@ -91,7 +93,6 @@ internal class PluginSettingsTests {
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.HOST_DENY_LIST
-//                    ClusterName.CLUSTER_NAME_SETTING
                 )
             )
         )
@@ -150,6 +151,7 @@ internal class PluginSettingsTests {
             .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterName).thenReturn(defaultClusterName)
         whenever(clusterService.clusterSettings).thenReturn(
             ClusterSettings(
                 clusterSettings,
@@ -210,6 +212,7 @@ internal class PluginSettingsTests {
     fun `test update settings should fall back to node settings if cluster settings is not available`() {
         val clusterSettings = Settings.builder().build()
         whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterName).thenReturn(defaultClusterName)
         whenever(clusterService.clusterSettings).thenReturn(
             ClusterSettings(
                 clusterSettings,
@@ -275,6 +278,7 @@ internal class PluginSettingsTests {
             .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterName).thenReturn(defaultClusterName)
         whenever(clusterService.clusterSettings).thenReturn(
             ClusterSettings(
                 clusterSettings,
@@ -309,6 +313,7 @@ internal class PluginSettingsTests {
             .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterName).thenReturn(defaultClusterName)
         whenever(clusterService.clusterSettings).thenReturn(
             ClusterSettings(
                 clusterSettings,
@@ -342,6 +347,7 @@ internal class PluginSettingsTests {
             .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterName).thenReturn(defaultClusterName)
         whenever(clusterService.clusterSettings).thenReturn(
             ClusterSettings(
                 clusterSettings,
