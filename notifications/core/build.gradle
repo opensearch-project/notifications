@@ -74,14 +74,6 @@ publishing {
     }
 }
 
-tasks.register('integTest', RestIntegTestTask) {
-    description = "Run tests against a cluster that has security enabled"
-    testClassesDirs = sourceSets.test.output.classesDirs
-    classpath = sourceSets.test.runtimeClasspath
-    systemProperty 'tests.security.manager', 'false'
-}
-
-tasks.named("check").configure { dependsOn(integTest) }
 check.dependsOn jacocoTestReport
 
 // turn off javadoc as it barfs on Kotlin code
@@ -105,6 +97,11 @@ test {
     useJUnitPlatform()
     // add "-Dtests.security.manager=false" to VM options if you want to run integ tests in IntelliJ
     systemProperty 'tests.security.manager', 'false'
+}
+
+// disable for core, we don't need to run test cluster
+run {
+    onlyIf { false }
 }
 
 //TODO: see if this can be only set at top level and apply to subprojects, or we remove from top project if possible
