@@ -50,6 +50,33 @@ internal class SmtpDestinationTests {
     }
 
     @Test
+    fun testSmtpEmailHTMLMessage() {
+        val expectedEmailResponse = DestinationMessageResponse(RestStatus.OK.status, "Success")
+        val emailClient = spyk<DestinationSmtpClient>()
+        every { emailClient.sendMessage(any()) } returns Unit
+
+        val smtpEmailDestinationTransport = SmtpDestinationTransport(emailClient)
+        DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SMTP to smtpEmailDestinationTransport)
+
+        val subject = "Test SMTP Email with html body subject"
+        val htmlBody = "<!DOCTYPE html>\n" +
+            "<html>\n" +
+            "<body>\n" +
+            "\n" +
+            "<h1>Test sending html email body</h1>\n" +
+            "<p>Hello OpenSearch.</p>\n" +
+            "\n" +
+            "</body>\n" +
+            "</html>"
+        val message = MessageContent(subject, "", htmlBody)
+        val destination = SmtpDestination("testAccountName", "abc", 465, "ssl", "test@abc.com", "to@abc.com")
+
+        val actualEmailResponse: DestinationMessageResponse = NotificationCoreImpl.sendMessage(destination, message, "referenceId")
+        assertEquals(expectedEmailResponse.statusCode, actualEmailResponse.statusCode)
+        assertEquals(expectedEmailResponse.statusText, actualEmailResponse.statusText)
+    }
+
+    @Test
     fun `test auth email`() {
         val expectedEmailResponse = DestinationMessageResponse(RestStatus.OK.status, "Success")
         val emailClient = spyk<DestinationSmtpClient>()

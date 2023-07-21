@@ -36,6 +36,9 @@ internal class PluginSettingsTests {
     private val httpHostDenyListKey = "$httpKeyPrefix.host_deny_list"
     private val allowedConfigTypeKey = "$keyPrefix.allowed_config_types"
     private val tooltipSupportKey = "$keyPrefix.tooltip_support"
+    private val enableHtmlSanitizationKey = "$emailKeyPrefix.enable_html_sanitization"
+    private val htmlSanitizationAllowListKey = "$emailKeyPrefix.html_sanitization_allow_list"
+    private val htmlSanitizationDenyListKey = "$emailKeyPrefix.html_sanitization_deny_list"
 
     private val defaultSettings = Settings.builder()
         .put(emailSizeLimitKey, 10000000)
@@ -59,6 +62,9 @@ internal class PluginSettingsTests {
             )
         )
         .put(tooltipSupportKey, true)
+        .put(enableHtmlSanitizationKey, true)
+        .putList(htmlSanitizationAllowListKey, listOf("blocks_group", "formatting_group", "images_group", "links_group", "styles_group", "tables_group"))
+        .putList(htmlSanitizationDenyListKey, emptyList<String>())
         .build()
 
     @BeforeEach
@@ -87,7 +93,10 @@ internal class PluginSettingsTests {
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
-                    PluginSettings.HOST_DENY_LIST
+                    PluginSettings.HOST_DENY_LIST,
+                    PluginSettings.ENABLE_EMAIL_HTML_SANITIZATION,
+                    PluginSettings.EMAIL_HTML_SANITIZATION_ALLOW_LIST,
+                    PluginSettings.EMAIL_HTML_SANITIZATION_DENY_LIST
                 )
             )
         )
@@ -124,6 +133,18 @@ internal class PluginSettingsTests {
             defaultSettings[httpHostDenyListKey],
             PluginSettings.hostDenyList.toString()
         )
+        Assertions.assertEquals(
+            defaultSettings[enableHtmlSanitizationKey],
+            PluginSettings.enableEmailHtmlSanitization.toString()
+        )
+        Assertions.assertEquals(
+            defaultSettings[htmlSanitizationAllowListKey],
+            PluginSettings.emailHtmlSanitizationAllowList.toString()
+        )
+        Assertions.assertEquals(
+            defaultSettings[htmlSanitizationDenyListKey],
+            PluginSettings.emailHtmlSanitizationDenyList.toString()
+        )
     }
 
     @Test
@@ -153,7 +174,10 @@ internal class PluginSettingsTests {
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
-                    PluginSettings.HOST_DENY_LIST
+                    PluginSettings.HOST_DENY_LIST,
+                    PluginSettings.ENABLE_EMAIL_HTML_SANITIZATION,
+                    PluginSettings.EMAIL_HTML_SANITIZATION_ALLOW_LIST,
+                    PluginSettings.EMAIL_HTML_SANITIZATION_DENY_LIST
                 )
             )
         )
@@ -190,6 +214,18 @@ internal class PluginSettingsTests {
             false,
             clusterService.clusterSettings.get(PluginSettings.TOOLTIP_SUPPORT)
         )
+        Assertions.assertEquals(
+            true,
+            clusterService.clusterSettings.get(PluginSettings.ENABLE_EMAIL_HTML_SANITIZATION)
+        )
+        Assertions.assertEquals(
+            listOf("blocks_group", "formatting_group", "images_group", "links_group", "styles_group", "tables_group"),
+            clusterService.clusterSettings.get(PluginSettings.EMAIL_HTML_SANITIZATION_ALLOW_LIST)
+        )
+        Assertions.assertEquals(
+            emptyList<String>(),
+            clusterService.clusterSettings.get(PluginSettings.EMAIL_HTML_SANITIZATION_DENY_LIST)
+        )
     }
 
     @Test
@@ -208,7 +244,10 @@ internal class PluginSettingsTests {
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
-                    PluginSettings.HOST_DENY_LIST
+                    PluginSettings.HOST_DENY_LIST,
+                    PluginSettings.ENABLE_EMAIL_HTML_SANITIZATION,
+                    PluginSettings.EMAIL_HTML_SANITIZATION_ALLOW_LIST,
+                    PluginSettings.EMAIL_HTML_SANITIZATION_DENY_LIST
                 )
             )
         )
@@ -245,6 +284,18 @@ internal class PluginSettingsTests {
             defaultSettings[tooltipSupportKey],
             clusterService.clusterSettings.get(PluginSettings.TOOLTIP_SUPPORT).toString()
         )
+        Assertions.assertEquals(
+            defaultSettings[enableHtmlSanitizationKey],
+            clusterService.clusterSettings.get(PluginSettings.ENABLE_EMAIL_HTML_SANITIZATION).toString()
+        )
+        Assertions.assertEquals(
+            defaultSettings[htmlSanitizationAllowListKey],
+            clusterService.clusterSettings.get(PluginSettings.EMAIL_HTML_SANITIZATION_ALLOW_LIST).toString()
+        )
+        Assertions.assertEquals(
+            defaultSettings[htmlSanitizationDenyListKey],
+            clusterService.clusterSettings.get(PluginSettings.EMAIL_HTML_SANITIZATION_DENY_LIST).toString()
+        )
     }
 
     @Test
@@ -270,7 +321,10 @@ internal class PluginSettingsTests {
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
                     PluginSettings.ALERTING_HOST_DENY_LIST,
-                    PluginSettings.HOST_DENY_LIST
+                    PluginSettings.HOST_DENY_LIST,
+                    PluginSettings.ENABLE_EMAIL_HTML_SANITIZATION,
+                    PluginSettings.EMAIL_HTML_SANITIZATION_ALLOW_LIST,
+                    PluginSettings.EMAIL_HTML_SANITIZATION_DENY_LIST
                 )
             )
         )
@@ -303,7 +357,10 @@ internal class PluginSettingsTests {
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
                     PluginSettings.ALERTING_HOST_DENY_LIST,
-                    PluginSettings.HOST_DENY_LIST
+                    PluginSettings.HOST_DENY_LIST,
+                    PluginSettings.ENABLE_EMAIL_HTML_SANITIZATION,
+                    PluginSettings.EMAIL_HTML_SANITIZATION_ALLOW_LIST,
+                    PluginSettings.EMAIL_HTML_SANITIZATION_DENY_LIST
                 )
             )
         )
@@ -335,7 +392,10 @@ internal class PluginSettingsTests {
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
                     PluginSettings.ALERTING_HOST_DENY_LIST,
-                    PluginSettings.HOST_DENY_LIST
+                    PluginSettings.HOST_DENY_LIST,
+                    PluginSettings.ENABLE_EMAIL_HTML_SANITIZATION,
+                    PluginSettings.EMAIL_HTML_SANITIZATION_ALLOW_LIST,
+                    PluginSettings.EMAIL_HTML_SANITIZATION_DENY_LIST
                 )
             )
         )
@@ -343,6 +403,83 @@ internal class PluginSettingsTests {
         Assertions.assertEquals(
             listOf("sample"),
             clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST)
+        )
+    }
+
+    @Test
+    fun `test html sanitization for email settings can be set at node scope`() {
+        var nodeSettings = Settings.builder()
+            .put(enableHtmlSanitizationKey, true)
+            .putList(htmlSanitizationAllowListKey, listOf("blocks_group", "links_group"))
+            .putList(htmlSanitizationDenyListKey, listOf("h1", "h2"))
+            .build()
+
+        whenever(clusterService.settings).thenReturn(nodeSettings)
+        whenever(clusterService.clusterSettings).thenReturn(
+            ClusterSettings(
+                Settings.builder().build(),
+                setOf(
+                    PluginSettings.EMAIL_SIZE_LIMIT,
+                    PluginSettings.EMAIL_MINIMUM_HEADER_LENGTH,
+                    PluginSettings.MAX_CONNECTIONS,
+                    PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
+                    PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
+                    PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.ALLOWED_CONFIG_TYPES,
+                    PluginSettings.TOOLTIP_SUPPORT,
+                    PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
+                    PluginSettings.ALERTING_HOST_DENY_LIST,
+                    PluginSettings.HOST_DENY_LIST,
+                    PluginSettings.ENABLE_EMAIL_HTML_SANITIZATION,
+                    PluginSettings.EMAIL_HTML_SANITIZATION_ALLOW_LIST,
+                    PluginSettings.EMAIL_HTML_SANITIZATION_DENY_LIST
+                )
+            )
+        )
+        PluginSettings.addSettingsUpdateConsumer(clusterService)
+        Assertions.assertEquals(
+            true,
+            PluginSettings.enableEmailHtmlSanitization
+        )
+        Assertions.assertEquals(
+            listOf("blocks_group", "links_group"),
+            PluginSettings.emailHtmlSanitizationAllowList
+        )
+        Assertions.assertEquals(
+            listOf("h1", "h2"),
+            PluginSettings.emailHtmlSanitizationDenyList
+        )
+
+        nodeSettings = Settings.builder()
+            .put(enableHtmlSanitizationKey, false)
+            .build()
+
+        whenever(clusterService.settings).thenReturn(nodeSettings)
+        PluginSettings.addSettingsUpdateConsumer(clusterService)
+        Assertions.assertEquals(
+            false,
+            PluginSettings.enableEmailHtmlSanitization
+        )
+
+        nodeSettings = Settings.builder()
+            .put(enableHtmlSanitizationKey, true)
+            .putList(htmlSanitizationAllowListKey, emptyList())
+            .putList(htmlSanitizationDenyListKey, emptyList())
+            .build()
+
+        whenever(clusterService.settings).thenReturn(nodeSettings)
+        PluginSettings.addSettingsUpdateConsumer(clusterService)
+        Assertions.assertEquals(
+            true,
+            PluginSettings.enableEmailHtmlSanitization
+        )
+        Assertions.assertEquals(
+            emptyList<String>(),
+            PluginSettings.emailHtmlSanitizationAllowList
+        )
+        Assertions.assertEquals(
+            emptyList<String>(),
+            PluginSettings.emailHtmlSanitizationDenyList
         )
     }
 }

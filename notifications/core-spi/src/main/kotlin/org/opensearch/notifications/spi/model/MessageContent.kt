@@ -23,10 +23,16 @@ class MessageContent(
 
     init {
         require(!Strings.isNullOrEmpty(title)) { "title is null or empty" }
-        require(!Strings.isNullOrEmpty(textDescription)) { "text message part is null or empty" }
+        require(!Strings.isNullOrEmpty(textDescription) || !Strings.isNullOrEmpty(htmlDescription)) {
+            "both text message part and html message part are null or empty"
+        }
     }
 
     fun buildMessageWithTitle(): String {
-        return "$title\n\n$textDescription"
+        return if (!Strings.isNullOrEmpty(htmlDescription)) {
+            htmlDescription!!
+        } else {
+            "$title\n\n$textDescription"
+        }
     }
 }

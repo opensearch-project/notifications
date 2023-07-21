@@ -106,6 +106,21 @@ internal object PluginSettings {
     private const val TOOLTIP_SUPPORT_KEY = "$KEY_PREFIX.tooltip_support"
 
     /**
+     * Setting to enable email html sanitization
+     */
+    private const val ENABLE_EMAIL_HTML_SANITIZATION_KEY = "$EMAIL_KEY_PREFIX.enable_html_sanitization"
+
+    /**
+     * Setting for allow list of email html sanitization
+     */
+    private const val EMAIL_HTML_SANITIZATION_ALLOW_LIST_KEY = "$EMAIL_KEY_PREFIX.html_sanitization_allow_list"
+
+    /**
+     * Setting for deny list of email html sanitization
+     */
+    private const val EMAIL_HTML_SANITIZATION_DENY_LIST_KEY = "$EMAIL_KEY_PREFIX.html_sanitization_deny_list"
+
+    /**
      * Default email size limit as 10MB.
      */
     private const val DEFAULT_EMAIL_SIZE_LIMIT = 10000000
@@ -170,6 +185,23 @@ internal object PluginSettings {
     private val DEFAULT_DESTINATION_SETTINGS = emptyMap<String, SecureDestinationSettings>()
 
     /**
+     * Default enable email html sanitization
+     */
+    private const val DEFAULT_ENABLE_EMAIL_HTML_SANITIZATION = true
+
+    /**
+     * Default email html sanitization allow list
+     */
+    private val DEFAULT_EMAIL_HTML_SANITIZATION_ALLOW_LIST = listOf(
+        "blocks_group", "formatting_group", "images_group", "links_group", "styles_group", "tables_group"
+    )
+
+    /**
+     * Default email html sanitization deny list
+     */
+    private val DEFAULT_EMAIL_HTML_SANITIZATION_DENY_LIST = emptyList<String>()
+
+    /**
      * list of allowed config types.
      */
     @Volatile
@@ -229,6 +261,24 @@ internal object PluginSettings {
     @Volatile
     var destinationSettings: Map<String, SecureDestinationSettings>
 
+    /**
+     * Enable email html sanitization
+     */
+    @Volatile
+    var enableEmailHtmlSanitization: Boolean
+
+    /**
+     * Email html sanitization allow list
+     */
+    @Volatile
+    var emailHtmlSanitizationAllowList: List<String>
+
+    /**
+     * Email html sanitization deny list
+     */
+    @Volatile
+    var emailHtmlSanitizationDenyList: List<String>
+
     private const val DECIMAL_RADIX: Int = 10
 
     private val log by logger(javaClass)
@@ -259,6 +309,18 @@ internal object PluginSettings {
         tooltipSupport = settings?.getAsBoolean(TOOLTIP_SUPPORT_KEY, true) ?: DEFAULT_TOOLTIP_SUPPORT
         hostDenyList = settings?.getAsList(HOST_DENY_LIST_KEY, null) ?: DEFAULT_HOST_DENY_LIST
         destinationSettings = if (settings != null) loadDestinationSettings(settings) else DEFAULT_DESTINATION_SETTINGS
+        enableEmailHtmlSanitization =
+            settings?.getAsBoolean(ENABLE_EMAIL_HTML_SANITIZATION_KEY, true) ?: DEFAULT_ENABLE_EMAIL_HTML_SANITIZATION
+        emailHtmlSanitizationAllowList = settings?.getAsList(EMAIL_HTML_SANITIZATION_ALLOW_LIST_KEY, null)
+            ?: DEFAULT_EMAIL_HTML_SANITIZATION_ALLOW_LIST
+        emailHtmlSanitizationDenyList = settings?.getAsList(EMAIL_HTML_SANITIZATION_DENY_LIST_KEY, null)
+            ?: DEFAULT_EMAIL_HTML_SANITIZATION_DENY_LIST
+        // html sanitization deny list can be set only when allow list is not empty
+        // this behavior aligns with the owasp html sanitizer, which disallow any elements by default
+        // but can use deny list to make an exception based on the allow list
+        if (emailHtmlSanitizationAllowList.isEmpty() && emailHtmlSanitizationDenyList.isNotEmpty()) {
+            throw IllegalArgumentException("html_sanitization_deny_list cannot be set if html_sanitization_allow_list is empty!")
+        }
 
         defaultSettings = mapOf(
             EMAIL_SIZE_LIMIT_KEY to emailSizeLimit.toString(DECIMAL_RADIX),
@@ -267,7 +329,8 @@ internal object PluginSettings {
             MAX_CONNECTIONS_PER_ROUTE_KEY to maxConnectionsPerRoute.toString(DECIMAL_RADIX),
             CONNECTION_TIMEOUT_MILLISECONDS_KEY to connectionTimeout.toString(DECIMAL_RADIX),
             SOCKET_TIMEOUT_MILLISECONDS_KEY to socketTimeout.toString(DECIMAL_RADIX),
-            TOOLTIP_SUPPORT_KEY to tooltipSupport.toString()
+            TOOLTIP_SUPPORT_KEY to tooltipSupport.toString(),
+            ENABLE_EMAIL_HTML_SANITIZATION_KEY to enableEmailHtmlSanitization.toString(),
         )
     }
 
@@ -342,6 +405,26 @@ internal object PluginSettings {
         NodeScope, Dynamic
     )
 
+    val ENABLE_EMAIL_HTML_SANITIZATION: Setting<Boolean> = Setting.boolSetting(
+        ENABLE_EMAIL_HTML_SANITIZATION_KEY,
+        defaultSettings[ENABLE_EMAIL_HTML_SANITIZATION_KEY]!!.toBoolean(),
+        NodeScope, Final
+    )
+
+    val EMAIL_HTML_SANITIZATION_ALLOW_LIST: Setting<List<String>> = Setting.listSetting(
+        EMAIL_HTML_SANITIZATION_ALLOW_LIST_KEY,
+        DEFAULT_EMAIL_HTML_SANITIZATION_ALLOW_LIST,
+        { it },
+        NodeScope, Final
+    )
+
+    val EMAIL_HTML_SANITIZATION_DENY_LIST: Setting<List<String>> = Setting.listSetting(
+        EMAIL_HTML_SANITIZATION_DENY_LIST_KEY,
+        DEFAULT_EMAIL_HTML_SANITIZATION_DENY_LIST,
+        { it },
+        NodeScope, Final
+    )
+
     private val LEGACY_EMAIL_USERNAME: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
         LEGACY_EMAIL_DESTINATION_SETTING_PREFIX,
         "username",
@@ -393,7 +476,10 @@ internal object PluginSettings {
             TOOLTIP_SUPPORT,
             HOST_DENY_LIST,
             EMAIL_USERNAME,
-            EMAIL_PASSWORD
+            EMAIL_PASSWORD,
+            ENABLE_EMAIL_HTML_SANITIZATION,
+            EMAIL_HTML_SANITIZATION_ALLOW_LIST,
+            EMAIL_HTML_SANITIZATION_DENY_LIST
         )
     }
     /**
@@ -401,7 +487,10 @@ internal object PluginSettings {
      * @param clusterService cluster service instance
      */
     private fun updateSettingValuesFromLocal(clusterService: ClusterService) {
-        allowedConfigTypes = ALLOWED_CONFIG_TYPES.get(clusterService.settings)
+        val localAllowedConfigTypes = clusterService.settings.get(ALLOWED_CONFIG_TYPE_KEY)
+        if (localAllowedConfigTypes != null) {
+            allowedConfigTypes = clusterService.settings.getAsList(ALLOWED_CONFIG_TYPE_KEY)
+        }
         emailSizeLimit = EMAIL_SIZE_LIMIT.get(clusterService.settings)
         emailMinimumHeaderLength = EMAIL_MINIMUM_HEADER_LENGTH.get(clusterService.settings)
         maxConnections = MAX_CONNECTIONS.get(clusterService.settings)
@@ -409,8 +498,20 @@ internal object PluginSettings {
         connectionTimeout = CONNECTION_TIMEOUT_MILLISECONDS.get(clusterService.settings)
         socketTimeout = SOCKET_TIMEOUT_MILLISECONDS.get(clusterService.settings)
         tooltipSupport = TOOLTIP_SUPPORT.get(clusterService.settings)
-        hostDenyList = HOST_DENY_LIST.get(clusterService.settings)
+        val localHostDenyList = clusterService.settings.get(HOST_DENY_LIST_KEY)
+        if (localHostDenyList != null) {
+            hostDenyList = clusterService.settings.getAsList(HOST_DENY_LIST_KEY)
+        }
         destinationSettings = loadDestinationSettings(clusterService.settings)
+        enableEmailHtmlSanitization = ENABLE_EMAIL_HTML_SANITIZATION.get(clusterService.settings)
+        val localEmailHtmlSanitizationAllowList = clusterService.settings.get(EMAIL_HTML_SANITIZATION_ALLOW_LIST_KEY)
+        if (localEmailHtmlSanitizationAllowList != null) {
+            emailHtmlSanitizationAllowList = clusterService.settings.getAsList(EMAIL_HTML_SANITIZATION_ALLOW_LIST_KEY)
+        }
+        val localEmailHtmlSanitizationDenyList = clusterService.settings.get(EMAIL_HTML_SANITIZATION_DENY_LIST_KEY)
+        if (localEmailHtmlSanitizationDenyList != null) {
+            emailHtmlSanitizationDenyList = clusterService.settings.getAsList(EMAIL_HTML_SANITIZATION_DENY_LIST_KEY)
+        }
     }
 
     /**
@@ -570,5 +671,8 @@ internal object PluginSettings {
         allowedConfigTypes = DEFAULT_ALLOWED_CONFIG_TYPES
         tooltipSupport = DEFAULT_TOOLTIP_SUPPORT
         hostDenyList = DEFAULT_HOST_DENY_LIST
+        enableEmailHtmlSanitization = DEFAULT_ENABLE_EMAIL_HTML_SANITIZATION
+        emailHtmlSanitizationAllowList = DEFAULT_EMAIL_HTML_SANITIZATION_ALLOW_LIST
+        emailHtmlSanitizationDenyList = DEFAULT_EMAIL_HTML_SANITIZATION_DENY_LIST
     }
 }
