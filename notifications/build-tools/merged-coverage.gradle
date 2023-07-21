@@ -15,6 +15,9 @@ allprojects {
 
 task jacocoReport(type: JacocoReport, group: 'verification') {
     description = 'Generates an aggregate report from all subprojects'
+    onlyIf {
+        gradle.taskGraph.hasTask("jacocoTestReport")
+    }
     gradle.projectsEvaluated {
         subprojects.each {
             jacocoReport.dependsOn it.tasks.withType(JacocoReport)

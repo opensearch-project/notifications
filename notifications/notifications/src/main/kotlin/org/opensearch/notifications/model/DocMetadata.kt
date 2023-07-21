@@ -5,7 +5,6 @@
 
 package org.opensearch.notifications.model
 
-import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.commons.notifications.NotificationConstants.CREATED_TIME_TAG
 import org.opensearch.commons.notifications.NotificationConstants.UPDATED_TIME_TAG
 import org.opensearch.commons.utils.logger
@@ -13,6 +12,7 @@ import org.opensearch.commons.utils.stringList
 import org.opensearch.core.xcontent.ToXContent
 import org.opensearch.core.xcontent.XContentBuilder
 import org.opensearch.core.xcontent.XContentParser
+import org.opensearch.core.xcontent.XContentParserUtils
 import java.time.Instant
 
 /**

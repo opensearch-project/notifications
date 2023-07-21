@@ -15,6 +15,7 @@ import com.amazonaws.services.simpleemail.model.MailFromDomainNotVerifiedExcepti
 import com.amazonaws.services.simpleemail.model.MessageRejectedException
 import com.amazonaws.services.simpleemail.model.RawMessage
 import com.amazonaws.services.simpleemail.model.SendRawEmailRequest
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.core.credentials.SesClientFactory
 import org.opensearch.notifications.core.setting.PluginSettings
@@ -23,7 +24,6 @@ import org.opensearch.notifications.core.utils.logger
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.SesDestination
-import org.opensearch.rest.RestStatus
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.util.Properties

@@ -33,12 +33,12 @@ import org.opensearch.commons.notifications.model.ConfigType.SLACK
 import org.opensearch.commons.notifications.model.ConfigType.SMTP_ACCOUNT
 import org.opensearch.commons.notifications.model.ConfigType.SNS
 import org.opensearch.commons.notifications.model.ConfigType.WEBHOOK
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.index.query.BoolQueryBuilder
 import org.opensearch.index.query.QueryBuilder
 import org.opensearch.index.query.QueryBuilders
 import org.opensearch.notifications.NotificationPlugin.Companion.TEXT_QUERY_TAG
 import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
-import org.opensearch.rest.RestStatus
 
 /**
  * Helper class for Get operations.
