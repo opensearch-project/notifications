@@ -6,12 +6,12 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.verifyMultiConfigIdEquals
 import org.opensearch.notifications.verifySingleConfigIdEquals
 import org.opensearch.rest.RestRequest
-import org.opensearch.rest.RestStatus
 
 class DeleteNotificationConfigIT : PluginRestTestCase() {
     private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
