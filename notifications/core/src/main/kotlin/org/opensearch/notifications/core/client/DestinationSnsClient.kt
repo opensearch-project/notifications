@@ -23,14 +23,17 @@ import com.amazonaws.services.sns.model.KMSOptInRequiredException
 import com.amazonaws.services.sns.model.KMSThrottlingException
 import com.amazonaws.services.sns.model.NotFoundException
 import com.amazonaws.services.sns.model.PlatformApplicationDisabledException
+import com.amazonaws.services.sns.model.PublishRequest
 import com.amazonaws.services.sns.model.PublishResult
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.core.credentials.SnsClientFactory
+import org.opensearch.notifications.core.setting.PluginSettings
 import org.opensearch.notifications.core.utils.logger
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.SnsDestination
 import org.opensearch.rest.RestStatus
+import java.util.UUID
 
 /**
  * This class handles the SNS connections to the given Destination.
@@ -118,6 +121,14 @@ class DestinationSnsClient(private val snsClientFactory: SnsClientFactory) {
      */
     @Throws(Exception::class)
     fun sendMessage(amazonSNS: AmazonSNS, destination: SnsDestination, message: MessageContent): PublishResult {
-        return amazonSNS.publish(destination.topicArn, message.textDescription, message.title)
+        val request: PublishRequest = PublishRequest()
+            .withTopicArn(destination.topicArn)
+            .withMessage(message.textDescription)
+            .withSubject(message.title)
+        if (destination.topicArn.endsWith(".fifo")) {
+            request.withMessageDeduplicationId(UUID.randomUUID().toString())
+                .withMessageGroupId(String.format("opensearch-%s", PluginSettings.clusterName))
+        }
+        return amazonSNS.publish(request)
     }
 }
