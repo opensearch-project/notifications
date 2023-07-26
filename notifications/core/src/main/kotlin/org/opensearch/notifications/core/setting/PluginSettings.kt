@@ -6,6 +6,7 @@
 package org.opensearch.notifications.core.setting
 
 import org.opensearch.bootstrap.BootstrapInfo
+import org.opensearch.cluster.ClusterName.CLUSTER_NAME_SETTING
 import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.settings.SecureSetting
 import org.opensearch.common.settings.Setting
@@ -104,6 +105,16 @@ internal object PluginSettings {
      * Setting to enable tooltip in UI
      */
     private const val TOOLTIP_SUPPORT_KEY = "$KEY_PREFIX.tooltip_support"
+
+    /**
+     * Setting to provide cluster name, which is <AWS-account-number:AWS-domain-name> on the managed service
+     */
+    private const val CLUSTER_NAME = "cluster.name"
+
+    /**
+     * Default cluster name if it cannot be retrieved.
+     */
+    private const val DEFAULT_CLUSTER_NAME = "OpenSearch:DefaultClusterName"
 
     /**
      * Default email size limit as 10MB.
@@ -224,6 +235,12 @@ internal object PluginSettings {
     var hostDenyList: List<String>
 
     /**
+     * cluster name
+     */
+    @Volatile
+    var clusterName: String
+
+    /**
      * Destination Settings
      */
     @Volatile
@@ -258,6 +275,7 @@ internal object PluginSettings {
         allowedConfigTypes = settings?.getAsList(ALLOWED_CONFIG_TYPE_KEY, null) ?: DEFAULT_ALLOWED_CONFIG_TYPES
         tooltipSupport = settings?.getAsBoolean(TOOLTIP_SUPPORT_KEY, true) ?: DEFAULT_TOOLTIP_SUPPORT
         hostDenyList = settings?.getAsList(HOST_DENY_LIST_KEY, null) ?: DEFAULT_HOST_DENY_LIST
+        clusterName = settings?.get(CLUSTER_NAME, DEFAULT_CLUSTER_NAME) ?: DEFAULT_CLUSTER_NAME
         destinationSettings = if (settings != null) loadDestinationSettings(settings) else DEFAULT_DESTINATION_SETTINGS
 
         defaultSettings = mapOf(
@@ -411,6 +429,7 @@ internal object PluginSettings {
         tooltipSupport = TOOLTIP_SUPPORT.get(clusterService.settings)
         hostDenyList = HOST_DENY_LIST.get(clusterService.settings)
         destinationSettings = loadDestinationSettings(clusterService.settings)
+        clusterName = clusterService.clusterName.value()
     }
 
     /**
@@ -463,6 +482,11 @@ internal object PluginSettings {
         if (clusterHostDenyList != null) {
             log.debug("$LOG_PREFIX:$HOST_DENY_LIST_KEY -autoUpdatedTo-> $clusterHostDenyList")
             hostDenyList = clusterHostDenyList
+        }
+        val clusterClusterName = clusterService.clusterName
+        if (clusterClusterName != null) {
+            log.debug("$LOG_PREFIX:$CLUSTER_NAME_SETTING -autoUpdatedTo-> $clusterClusterName")
+            clusterName = clusterClusterName.value()
         }
     }
 
