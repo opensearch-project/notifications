@@ -6,6 +6,7 @@
 package org.opensearch.notifications.core.destinations
 
 import io.mockk.every
+import io.mockk.mockk
 import io.mockk.mockkStatic
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpPatch
