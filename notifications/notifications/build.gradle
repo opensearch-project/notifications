@@ -231,6 +231,12 @@ integTest {
             excludeTestsMatching "org.opensearch.integtest.bwc.*IT"
         }
     }
+
+    if (usingRemoteCluster) {
+        filter {
+            excludeTestsMatching "org.opensearch.integtest.send.SendTestMessageWithMockServerIT"
+        }
+    }
 }
 
 project.getTasks().getByName("bundlePlugin").dependsOn(findProject(":${rootProject.name}-core").tasks.getByPath(":${rootProject.name}-core:bundlePlugin"))
