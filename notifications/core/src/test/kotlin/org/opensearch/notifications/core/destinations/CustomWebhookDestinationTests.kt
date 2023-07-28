@@ -6,6 +6,7 @@
 package org.opensearch.notifications.core.destinations
 
 import io.mockk.every
+import io.mockk.mockk
 import io.mockk.mockkStatic
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpPatch
@@ -108,7 +109,7 @@ internal class CustomWebhookDestinationTests {
     @MethodSource("methodToHttpRequestType")
     fun `test custom webhook message empty entity response`(method: String, expectedHttpClass: Class<HttpUriRequest>) {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
-        val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "")
+        val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "{}")
 
         val httpResponse: CloseableHttpResponse = EasyMock.createMock(CloseableHttpResponse::class.java)
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
@@ -229,5 +230,18 @@ internal class CustomWebhookDestinationTests {
         val message = MessageContent(title, messageText)
         val actualRequestBody = httpClient.buildRequestBody(destination, message)
         assertEquals(messageText, actualRequestBody)
+    }
+
+    @Test
+    fun `test get response string`() {
+        val httpClient = DestinationHttpClient()
+        val response = mockk<CloseableHttpResponse>()
+        every { response.entity } returns null
+        var responseString = httpClient.getResponseString(response)
+        assertEquals(responseString, "{}")
+
+        every { response.entity } returns StringEntity("")
+        responseString = httpClient.getResponseString(response)
+        assertEquals(responseString, "{}")
     }
 }
