@@ -20,9 +20,9 @@ import org.apache.hc.core5.http.HttpResponse
 import org.apache.hc.core5.http.io.entity.EntityUtils
 import org.apache.hc.core5.http.io.entity.StringEntity
 import org.apache.hc.core5.util.Timeout
-import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.common.xcontent.XContentType
 import org.opensearch.core.rest.RestStatus
+import org.opensearch.core.xcontent.MediaTypeRegistry
 import org.opensearch.notifications.core.setting.PluginSettings
 import org.opensearch.notifications.core.utils.OpenForTesting
 import org.opensearch.notifications.core.utils.logger
@@ -155,7 +155,7 @@ class DestinationHttpClient {
     }
 
     fun buildRequestBody(destination: WebhookDestination, message: MessageContent): String {
-        val builder = XContentFactory.contentBuilder(XContentType.JSON)
+        val builder = MediaTypeRegistry.contentBuilder(XContentType.JSON)
         val keyName = when (destination) {
             // Slack webhook request body has required "text" as key name https://api.slack.com/messaging/webhooks
             // Chime webhook request body has required "Content" as key name
