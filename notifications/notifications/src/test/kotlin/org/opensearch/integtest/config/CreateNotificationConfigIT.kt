@@ -19,6 +19,7 @@ import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
+import org.opensearch.notifications.index.NotificationConfigIndex
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 
@@ -274,5 +275,62 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         Assert.assertEquals(0, getCurrentMappingsSchemaVersion())
         createConfig()
         Assert.assertEquals(1, getCurrentMappingsSchemaVersion())
+    }
+
+    fun `test _meta field not exists in current mappings`() {
+        val indexName = ".opensearch-notifications-config"
+        val deleteIndexRequest = Request(RestRequest.Method.DELETE.name, indexName)
+        try {
+            adminClient().performRequest(deleteIndexRequest)
+        } catch (e: ResponseException) {
+            /* ignore if the index has not been created */
+            assertEquals("Unexpected status", RestStatus.NOT_FOUND, RestStatus.fromCode(e.response.statusLine.statusCode))
+        }
+
+        val pseudoMappingString = """
+            {
+                "mappings": {
+                    "dynamic": "false",
+                    "properties": {
+                        "config": {
+                            "properties": {
+                                "chime": {
+                                    "properties": {
+                                        "url": {
+                                            "type": "text",
+                                            "fields": {
+                                                "keyword": {
+                                                    "type": "keyword"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        try {
+            executeRequest(
+                RestRequest.Method.PUT.name,
+                indexName,
+                pseudoMappingString,
+                RestStatus.OK.status
+            )
+        } catch (e: Exception) {
+            /* ignore warnings */
+            assert(e is WarningFailureException)
+        }
+
+        val getMappingRequest = Request(RestRequest.Method.GET.name, "$indexName/_mappings")
+        val responseBefore = executeRequest(getMappingRequest, RestStatus.OK.status, client())
+        val mappingsObjectBefore = responseBefore.get(indexName).asJsonObject.get("mappings").asJsonObject
+        Assert.assertNull("mappings should not have _meta field", mappingsObjectBefore.get(NotificationConfigIndex._META))
+        createConfig()
+        val responseAfter = executeRequest(getMappingRequest, RestStatus.OK.status, client())
+        val mappingsObjectAfter = responseAfter.get(indexName).asJsonObject.get("mappings").asJsonObject
+        Assert.assertEquals(mappingsObjectAfter, mappingsObjectBefore)
     }
 }
