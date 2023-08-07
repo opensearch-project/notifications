@@ -7,6 +7,7 @@ package org.opensearch.notifications.resthandler
 
 import org.opensearch.client.node.NodeClient
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.action.SendTestNotificationAction
 import org.opensearch.notifications.metrics.Metrics
@@ -17,7 +18,6 @@ import org.opensearch.rest.RestHandler.ReplacedRoute
 import org.opensearch.rest.RestRequest
 import org.opensearch.rest.RestRequest.Method.GET
 import org.opensearch.rest.RestRequest.Method.POST
-import org.opensearch.rest.RestStatus
 
 /**
  * Rest handler for getting notification features.

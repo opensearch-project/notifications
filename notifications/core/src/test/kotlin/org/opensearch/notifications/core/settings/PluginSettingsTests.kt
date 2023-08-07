@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
+import org.opensearch.cluster.ClusterName
 import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.settings.ClusterSettings
 import org.opensearch.common.settings.Settings
@@ -36,6 +37,9 @@ internal class PluginSettingsTests {
     private val httpHostDenyListKey = "$httpKeyPrefix.host_deny_list"
     private val allowedConfigTypeKey = "$keyPrefix.allowed_config_types"
     private val tooltipSupportKey = "$keyPrefix.tooltip_support"
+    private val clusterNameKey = "cluster.name"
+
+    private val defaultClusterName = ClusterName.DEFAULT
 
     private val defaultSettings = Settings.builder()
         .put(emailSizeLimitKey, 10000000)
@@ -59,6 +63,7 @@ internal class PluginSettingsTests {
             )
         )
         .put(tooltipSupportKey, true)
+        .put(clusterNameKey, "OpenSearch OsDomainName")
         .build()
 
     @BeforeEach
@@ -124,6 +129,10 @@ internal class PluginSettingsTests {
             defaultSettings[httpHostDenyListKey],
             PluginSettings.hostDenyList.toString()
         )
+        Assertions.assertEquals(
+            "opensearch",
+            PluginSettings.clusterName
+        )
     }
 
     @Test
@@ -138,9 +147,11 @@ internal class PluginSettingsTests {
             .putList(httpHostDenyListKey, listOf("sample"))
             .putList(allowedConfigTypeKey, listOf("slack"))
             .put(tooltipSupportKey, false)
+            .put(clusterNameKey, "OpenSearch OsDomainNameUpdate")
             .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterName).thenReturn(defaultClusterName)
         whenever(clusterService.clusterSettings).thenReturn(
             ClusterSettings(
                 clusterSettings,
@@ -153,7 +164,8 @@ internal class PluginSettingsTests {
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
-                    PluginSettings.HOST_DENY_LIST
+                    PluginSettings.HOST_DENY_LIST,
+                    ClusterName.CLUSTER_NAME_SETTING
                 )
             )
         )
@@ -190,12 +202,17 @@ internal class PluginSettingsTests {
             false,
             clusterService.clusterSettings.get(PluginSettings.TOOLTIP_SUPPORT)
         )
+        Assertions.assertEquals(
+            "OpenSearch OsDomainNameUpdate",
+            clusterService.clusterSettings.get(ClusterName.CLUSTER_NAME_SETTING).value()
+        )
     }
 
     @Test
     fun `test update settings should fall back to node settings if cluster settings is not available`() {
         val clusterSettings = Settings.builder().build()
         whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterName).thenReturn(defaultClusterName)
         whenever(clusterService.clusterSettings).thenReturn(
             ClusterSettings(
                 clusterSettings,
@@ -208,7 +225,8 @@ internal class PluginSettingsTests {
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
-                    PluginSettings.HOST_DENY_LIST
+                    PluginSettings.HOST_DENY_LIST,
+                    ClusterName.CLUSTER_NAME_SETTING
                 )
             )
         )
@@ -245,6 +263,10 @@ internal class PluginSettingsTests {
             defaultSettings[tooltipSupportKey],
             clusterService.clusterSettings.get(PluginSettings.TOOLTIP_SUPPORT).toString()
         )
+        Assertions.assertEquals(
+            "Cluster [opensearch]",
+            clusterService.clusterSettings.get(ClusterName.CLUSTER_NAME_SETTING).toString()
+        )
     }
 
     @Test
@@ -256,6 +278,7 @@ internal class PluginSettingsTests {
             .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterName).thenReturn(defaultClusterName)
         whenever(clusterService.clusterSettings).thenReturn(
             ClusterSettings(
                 clusterSettings,
@@ -270,7 +293,8 @@ internal class PluginSettingsTests {
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
                     PluginSettings.ALERTING_HOST_DENY_LIST,
-                    PluginSettings.HOST_DENY_LIST
+                    PluginSettings.HOST_DENY_LIST,
+                    ClusterName.CLUSTER_NAME_SETTING
                 )
             )
         )
@@ -289,6 +313,7 @@ internal class PluginSettingsTests {
             .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterName).thenReturn(defaultClusterName)
         whenever(clusterService.clusterSettings).thenReturn(
             ClusterSettings(
                 clusterSettings,
@@ -303,7 +328,8 @@ internal class PluginSettingsTests {
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
                     PluginSettings.ALERTING_HOST_DENY_LIST,
-                    PluginSettings.HOST_DENY_LIST
+                    PluginSettings.HOST_DENY_LIST,
+                    ClusterName.CLUSTER_NAME_SETTING
                 )
             )
         )
@@ -321,6 +347,7 @@ internal class PluginSettingsTests {
             .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterName).thenReturn(defaultClusterName)
         whenever(clusterService.clusterSettings).thenReturn(
             ClusterSettings(
                 clusterSettings,
@@ -335,7 +362,8 @@ internal class PluginSettingsTests {
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
                     PluginSettings.ALERTING_HOST_DENY_LIST,
-                    PluginSettings.HOST_DENY_LIST
+                    PluginSettings.HOST_DENY_LIST,
+                    ClusterName.CLUSTER_NAME_SETTING
                 )
             )
         )
