@@ -8,10 +8,10 @@ package org.opensearch.integtest.send
 import org.junit.Assert
 import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.SmtpAccount
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.rest.RestRequest
-import org.opensearch.rest.RestStatus
 
 internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
     @Suppress("EmptyFunctionBlock")

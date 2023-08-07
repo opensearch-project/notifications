@@ -7,13 +7,13 @@ package org.opensearch.notifications.core.smtp
 
 import org.junit.After
 import org.junit.jupiter.api.Test
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.core.NotificationCoreImpl
 import org.opensearch.notifications.core.transport.DestinationTransportProvider
 import org.opensearch.notifications.core.transport.SmtpDestinationTransport
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
-import org.opensearch.rest.RestStatus
 import org.springframework.integration.test.mail.TestMailServer
 import kotlin.test.assertEquals
 

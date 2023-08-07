@@ -24,12 +24,12 @@ import org.opensearch.commons.notifications.NotificationConstants.STATUS_TEXT_TA
 import org.opensearch.commons.notifications.NotificationConstants.TAGS_TAG
 import org.opensearch.commons.notifications.NotificationConstants.TITLE_TAG
 import org.opensearch.commons.notifications.NotificationConstants.UPDATED_TIME_TAG
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.index.query.BoolQueryBuilder
 import org.opensearch.index.query.QueryBuilder
 import org.opensearch.index.query.QueryBuilders
 import org.opensearch.notifications.NotificationPlugin.Companion.TEXT_QUERY_TAG
 import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
-import org.opensearch.rest.RestStatus
 
 /**
  * Helper class for Get operations.

@@ -19,6 +19,7 @@ import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
 import org.opensearch.commons.notifications.action.UpdateNotificationConfigRequest
 import org.opensearch.commons.utils.contentParserNextToken
 import org.opensearch.commons.utils.logger
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.index.ConfigQueryHelper
@@ -31,7 +32,6 @@ import org.opensearch.rest.RestRequest.Method.DELETE
 import org.opensearch.rest.RestRequest.Method.GET
 import org.opensearch.rest.RestRequest.Method.POST
 import org.opensearch.rest.RestRequest.Method.PUT
-import org.opensearch.rest.RestStatus
 import org.opensearch.rest.action.RestToXContentListener
 import org.opensearch.search.sort.SortOrder
 

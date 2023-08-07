@@ -7,10 +7,10 @@ package org.opensearch.integtest.bwc
 
 import org.junit.Assert
 import org.opensearch.common.settings.Settings
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin
 import org.opensearch.rest.RestRequest
-import org.opensearch.rest.RestStatus
 
 class NotificationsBackwardsCompatibilityIT : PluginRestTestCase() {
 
