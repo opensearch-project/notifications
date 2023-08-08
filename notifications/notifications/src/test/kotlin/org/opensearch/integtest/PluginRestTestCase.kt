@@ -25,6 +25,7 @@ import org.opensearch.core.xcontent.DeprecationHandler
 import org.opensearch.core.xcontent.MediaType
 import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.NotificationPlugin
+import org.opensearch.notifications.index.NotificationConfigIndex
 import org.opensearch.rest.RestRequest
 import org.opensearch.test.rest.OpenSearchRestTestCase
 import java.io.IOException
@@ -362,6 +363,15 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
     protected open fun wipeAllClusterSettings() {
         updateClusterSettings(ClusterSetting("persistent", "*", null))
         updateClusterSettings(ClusterSetting("transient", "*", null))
+    }
+
+    protected fun getCurrentMappingsSchemaVersion(): Int {
+        val indexName = ".opensearch-notifications-config"
+        val getMappingRequest = Request(RestRequest.Method.GET.name, "$indexName/_mappings")
+        val response = executeRequest(getMappingRequest, RestStatus.OK.status, client())
+        val mappingsObject = response.get(indexName).asJsonObject.get("mappings").asJsonObject
+        return mappingsObject.get(NotificationConfigIndex._META)?.asJsonObject?.get(NotificationConfigIndex.SCHEMA_VERSION)?.asInt
+            ?: NotificationConfigIndex.DEFAULT_SCHEMA_VERSION
     }
 
     protected class ClusterSetting(val type: String, val name: String, var value: Any?) {

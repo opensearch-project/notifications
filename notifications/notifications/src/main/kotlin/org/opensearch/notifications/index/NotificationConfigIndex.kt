@@ -9,6 +9,7 @@ import org.opensearch.ResourceAlreadyExistsException
 import org.opensearch.action.DocWriteResponse
 import org.opensearch.action.admin.indices.create.CreateIndexRequest
 import org.opensearch.action.admin.indices.create.CreateIndexResponse
+import org.opensearch.action.admin.indices.mapping.put.PutMappingRequest
 import org.opensearch.action.bulk.BulkRequest
 import org.opensearch.action.bulk.BulkResponse
 import org.opensearch.action.delete.DeleteRequest
@@ -21,6 +22,7 @@ import org.opensearch.action.index.IndexRequest
 import org.opensearch.action.index.IndexResponse
 import org.opensearch.action.search.SearchRequest
 import org.opensearch.action.search.SearchResponse
+import org.opensearch.action.support.master.AcknowledgedResponse
 import org.opensearch.client.Client
 import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.unit.TimeValue
@@ -46,11 +48,13 @@ import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.notifications.util.SecureIndexClient
+import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntil
 import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntilTimeout
 import org.opensearch.script.Script
 import org.opensearch.search.SearchHit
 import org.opensearch.search.builder.SearchSourceBuilder
 import org.opensearch.search.sort.SortOrder
+import java.lang.IllegalArgumentException
 import java.util.concurrent.TimeUnit
 
 /**
@@ -58,10 +62,21 @@ import java.util.concurrent.TimeUnit
  */
 @Suppress("TooManyFunctions")
 internal object NotificationConfigIndex : ConfigOperations {
+    const val DEFAULT_SCHEMA_VERSION = 1
+    const val _META = "_meta"
+    const val SCHEMA_VERSION = "schema_version"
+
     private val log by logger(NotificationConfigIndex::class.java)
     private const val INDEX_NAME = ".opensearch-notifications-config"
     private const val MAPPING_FILE_NAME = "notifications-config-mapping.yml"
     private const val SETTINGS_FILE_NAME = "notifications-config-settings.yml"
+
+    private val indexMappingAsMap = XContentHelper.convertToMap(
+        XContentType.YAML.xContent(),
+        NotificationConfigIndex::class.java.classLoader.getResource(MAPPING_FILE_NAME)?.readText()!!,
+        false
+    )
+    private val indexMappingSchemaVersion = getSchemaVersionFromIndexMapping(indexMappingAsMap)
 
     private lateinit var client: Client
     private lateinit var clusterService: ClusterService
@@ -92,6 +107,21 @@ internal object NotificationConfigIndex : ConfigOperations {
         NotificationConfigIndex.clusterService = clusterService
     }
 
+    private fun getSchemaVersionFromIndexMapping(indexMapping: Map<String, Any>?): Int {
+        var schemaVersion = DEFAULT_SCHEMA_VERSION
+        if (indexMapping != null && indexMapping.containsKey(_META) && indexMapping[_META] is Map<*, *>) {
+            val metaData = indexMapping[_META] as Map<*, *>
+            if (metaData.containsKey(SCHEMA_VERSION)) {
+                try {
+                    schemaVersion = metaData[SCHEMA_VERSION] as Int
+                } catch (e: Exception) {
+                    throw IllegalArgumentException("schema_version can only be Integer")
+                }
+            }
+        }
+        return schemaVersion
+    }
+
     /**
      * Create index using the mapping and settings defined in resource
      */
@@ -99,8 +129,6 @@ internal object NotificationConfigIndex : ConfigOperations {
     private suspend fun createIndex() {
         if (!isIndexExists()) {
             val classLoader = NotificationConfigIndex::class.java.classLoader
-            val indexMappingSource = classLoader.getResource(MAPPING_FILE_NAME)?.readText()!!
-            val indexMappingAsMap = XContentHelper.convertToMap(XContentType.YAML.xContent(), indexMappingSource, false)
             val indexSettingsSource = classLoader.getResource(SETTINGS_FILE_NAME)?.readText()!!
             val request = CreateIndexRequest(INDEX_NAME)
                 .mapping(indexMappingAsMap)
@@ -118,6 +146,22 @@ internal object NotificationConfigIndex : ConfigOperations {
                 } catch (exception: Exception) {
                     if (exception !is ResourceAlreadyExistsException && exception.cause !is ResourceAlreadyExistsException) {
                         throw exception
+                    }
+                }
+            }
+        } else {
+            val currentIndexMappingMetadata = clusterService.state().metadata.indices[INDEX_NAME]?.mapping()?.sourceAsMap()
+            val currentIndexMappingSchemaVersion = getSchemaVersionFromIndexMapping(currentIndexMappingMetadata)
+            if (currentIndexMappingSchemaVersion < indexMappingSchemaVersion) {
+                val putMappingRequest: PutMappingRequest = PutMappingRequest(INDEX_NAME).source(indexMappingAsMap)
+                client.threadPool().threadContext.stashContext().use {
+                    val response: AcknowledgedResponse = client.suspendUntil {
+                        admin().indices().putMapping(putMappingRequest, it)
+                    }
+                    if (response.isAcknowledged) {
+                        log.info("$LOG_PREFIX:Index $INDEX_NAME update mapping Acknowledged")
+                    } else {
+                        throw IllegalStateException("$LOG_PREFIX:Index $INDEX_NAME update mapping not Acknowledged")
                     }
                 }
             }
