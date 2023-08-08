@@ -316,4 +316,56 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         createConfig()
         Assert.assertEquals(2, getCurrentMappingsSchemaVersion())
     }
+
+    fun `test _meta field not exists in current mappings`() {
+        val indexName = ".opensearch-notifications-config"
+        val deleteIndexRequest = Request(RestRequest.Method.DELETE.name, indexName)
+        try {
+            adminClient().performRequest(deleteIndexRequest)
+        } catch (e: ResponseException) {
+            /* ignore if the index has not been created */
+            assertEquals("Unexpected status", RestStatus.NOT_FOUND, RestStatus.fromCode(e.response.statusLine.statusCode))
+        }
+
+        val pseudoMappingString = """
+            {
+                "mappings": {
+                    "dynamic": "false",
+                    "properties": {
+                        "config": {
+                            "properties": {
+                                "chime": {
+                                    "properties": {
+                                        "url": {
+                                            "type": "text",
+                                            "fields": {
+                                                "keyword": {
+                                                    "type": "keyword"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        try {
+            executeRequest(
+                RestRequest.Method.PUT.name,
+                indexName,
+                pseudoMappingString,
+                RestStatus.OK.status
+            )
+        } catch (e: Exception) {
+            /* ignore warnings */
+            assert(e is WarningFailureException)
+        }
+
+        Assert.assertEquals(1, getCurrentMappingsSchemaVersion())
+        createConfig()
+        Assert.assertEquals(2, getCurrentMappingsSchemaVersion())
+    }
 }
