@@ -53,6 +53,7 @@ class NotificationsBackwardsCompatibilityIT : PluginRestTestCase() {
                 }
                 ClusterType.UPGRADED -> {
                     verifyConfigsExist(setOf(configId))
+                    Assert.assertEquals(1, getCurrentMappingsSchemaVersion())
                     createTestNotificationsConfig(randomAlphaOfLength(10))
                     Assert.assertEquals(2, getCurrentMappingsSchemaVersion())
                 }
