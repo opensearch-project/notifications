@@ -7,8 +7,8 @@ package org.opensearch.notifications.util
 
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
-import org.opensearch.action.ActionListener
 import org.opensearch.client.OpenSearchClient
+import org.opensearch.core.action.ActionListener
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
