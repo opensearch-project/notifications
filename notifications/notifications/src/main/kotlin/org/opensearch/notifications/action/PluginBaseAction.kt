@@ -10,9 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.opensearch.OpenSearchSecurityException
 import org.opensearch.OpenSearchStatusException
-import org.opensearch.action.ActionListener
 import org.opensearch.action.ActionRequest
-import org.opensearch.action.ActionResponse
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.action.support.HandledTransportAction
 import org.opensearch.client.Client
@@ -20,6 +18,8 @@ import org.opensearch.common.util.concurrent.ThreadContext
 import org.opensearch.commons.ConfigConstants.OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT
 import org.opensearch.commons.authuser.User
 import org.opensearch.commons.utils.logger
+import org.opensearch.core.action.ActionListener
+import org.opensearch.core.action.ActionResponse
 import org.opensearch.core.common.io.stream.Writeable
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.index.IndexNotFoundException

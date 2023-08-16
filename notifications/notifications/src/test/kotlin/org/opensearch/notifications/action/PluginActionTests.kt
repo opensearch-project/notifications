@@ -14,7 +14,6 @@ import org.mockito.Answers
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.junit.jupiter.MockitoExtension
-import org.opensearch.action.ActionListener
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.client.Client
 import org.opensearch.commons.destination.response.LegacyDestinationResponse
@@ -43,6 +42,7 @@ import org.opensearch.commons.notifications.model.EventStatus
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
 import org.opensearch.commons.notifications.model.NotificationEvent
 import org.opensearch.commons.notifications.model.SeverityType
+import org.opensearch.core.action.ActionListener
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.index.ConfigIndexingActions

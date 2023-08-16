@@ -5,7 +5,6 @@
 
 package org.opensearch.notifications.action
 
-import org.opensearch.action.ActionListener
 import org.opensearch.action.ActionRequest
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.client.Client
@@ -15,6 +14,7 @@ import org.opensearch.commons.notifications.action.DeleteNotificationConfigReque
 import org.opensearch.commons.notifications.action.DeleteNotificationConfigResponse
 import org.opensearch.commons.notifications.action.NotificationsActions
 import org.opensearch.commons.utils.recreateObject
+import org.opensearch.core.action.ActionListener
 import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.tasks.Task
