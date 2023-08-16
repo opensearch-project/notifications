@@ -5,7 +5,6 @@
 
 package org.opensearch.notifications.action
 
-import org.opensearch.action.ActionListener
 import org.opensearch.action.ActionType
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.action.support.HandledTransportAction
@@ -15,6 +14,7 @@ import org.opensearch.common.inject.Inject
 import org.opensearch.commons.notifications.NotificationsPluginInterface
 import org.opensearch.commons.notifications.action.SendNotificationResponse
 import org.opensearch.commons.utils.logger
+import org.opensearch.core.action.ActionListener
 import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.model.SendTestNotificationRequest
