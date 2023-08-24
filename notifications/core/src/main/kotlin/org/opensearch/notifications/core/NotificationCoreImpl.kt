@@ -16,7 +16,7 @@ import java.security.PrivilegedAction
 
 /**
  * This is a client facing NotificationCoreImpl class to send the messages
- * to the NotificationCoreImpl channels like chime, slack, webhooks, email etc
+ * to the NotificationCoreImpl channels like chime, slack, Microsoft Teams, webhooks, email etc
  */
 object NotificationCoreImpl : NotificationCore {
     /**
