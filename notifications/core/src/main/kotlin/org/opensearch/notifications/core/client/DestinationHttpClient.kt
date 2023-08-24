@@ -160,7 +160,7 @@ class DestinationHttpClient {
         val keyName = when (destination) {
             // Slack webhook request body has required "text" as key name https://api.slack.com/messaging/webhooks
             // Chime webhook request body has required "Content" as key name
-            // Microsoft Teams webhook request body has required "text" as key name https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors
+            // Microsoft Teams webhook request body has required "text" as key name https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors
             // Customer webhook allows input as json or plain text, so we just return the message as it is
             is SlackDestination -> "text"
             is ChimeDestination -> "Content"
