@@ -14,6 +14,7 @@ import org.opensearch.commons.notifications.model.Email
 import org.opensearch.commons.notifications.model.EmailGroup
 import org.opensearch.commons.notifications.model.EmailRecipient
 import org.opensearch.commons.notifications.model.MethodType
+import org.opensearch.commons.notifications.model.MicrosoftTeams
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.SesAccount
 import org.opensearch.commons.notifications.model.Slack
@@ -27,6 +28,10 @@ fun verifyEquals(slack: Slack, jsonObject: JsonObject) {
 
 fun verifyEquals(chime: Chime, jsonObject: JsonObject) {
     Assert.assertEquals(chime.url, jsonObject.get("url").asString)
+}
+
+fun verifyEquals(microsoftTeams: MicrosoftTeams, jsonObject: JsonObject) {
+    Assert.assertEquals(microsoftTeams.url, jsonObject.get("url").asString)
 }
 
 fun verifyEquals(webhook: Webhook, jsonObject: JsonObject) {
@@ -83,6 +88,7 @@ fun verifyEquals(config: NotificationConfig, jsonObject: JsonObject) {
     when (config.configType) {
         ConfigType.SLACK -> verifyEquals((config.configData as Slack), jsonObject.get("slack").asJsonObject)
         ConfigType.CHIME -> verifyEquals((config.configData as Chime), jsonObject.get("chime").asJsonObject)
+        ConfigType.MICROSOFT_TEAMS -> verifyEquals((config.configData as MicrosoftTeams), jsonObject.get("microsoft_teams").asJsonObject)
         ConfigType.WEBHOOK -> verifyEquals((config.configData as Webhook), jsonObject.get("webhook").asJsonObject)
         ConfigType.EMAIL -> verifyEquals((config.configData as Email), jsonObject.get("email").asJsonObject)
         ConfigType.SMTP_ACCOUNT -> verifyEquals(

@@ -24,6 +24,7 @@ internal object DestinationTransportProvider {
     var destinationTransportMap = mapOf(
         DestinationType.SLACK to webhookDestinationTransport,
         DestinationType.CHIME to webhookDestinationTransport,
+        DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport,
         DestinationType.CUSTOM_WEBHOOK to webhookDestinationTransport,
         DestinationType.SMTP to smtpDestinationTransport,
         DestinationType.SNS to snsDestinationTransport,

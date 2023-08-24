@@ -12,6 +12,7 @@ import org.opensearch.client.WarningFailureException
 import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.MethodType
+import org.opensearch.commons.notifications.model.MicrosoftTeams
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.SmtpAccount
@@ -19,7 +20,6 @@ import org.opensearch.commons.notifications.model.Webhook
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
-import org.opensearch.notifications.index.NotificationConfigIndex
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 
@@ -93,6 +93,46 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         // Get chime notification config
+
+        val getConfigResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs/$configId",
+            "",
+            RestStatus.OK.status
+        )
+        verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
+    }
+
+    fun `test Create microsoft teams notification config with ID`() {
+        // Create sample config request reference
+        val configId = "sample_config_id"
+        val sampleMicrosoftTeams = MicrosoftTeams("https://domain.webhook.office.com/1234567")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.MICROSOFT_TEAMS,
+            isEnabled = true,
+            configData = sampleMicrosoftTeams
+        )
+
+        // Create Microsoft Teams notification config
+        val createRequestJsonString = """
+        {
+            "config_id":"$configId",
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"microsoft_teams",
+                "is_enabled":${referenceObject.isEnabled},
+                "microsoft_teams":{"url":"${(referenceObject.configData as MicrosoftTeams).url}"}
+            }
+        }
+        """.trimIndent()
+        val createdConfigId = createConfigWithRequestJsonString(createRequestJsonString)
+        Assert.assertEquals(configId, createdConfigId)
+        Thread.sleep(1000)
+
+        // Get Microsoft Teams notification config
 
         val getConfigResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -274,7 +314,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
 
         Assert.assertEquals(0, getCurrentMappingsSchemaVersion())
         createConfig()
-        Assert.assertEquals(1, getCurrentMappingsSchemaVersion())
+        Assert.assertEquals(2, getCurrentMappingsSchemaVersion())
     }
 
     fun `test _meta field not exists in current mappings`() {
@@ -324,13 +364,8 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             assert(e is WarningFailureException)
         }
 
-        val getMappingRequest = Request(RestRequest.Method.GET.name, "$indexName/_mappings")
-        val responseBefore = executeRequest(getMappingRequest, RestStatus.OK.status, client())
-        val mappingsObjectBefore = responseBefore.get(indexName).asJsonObject.get("mappings").asJsonObject
-        Assert.assertNull("mappings should not have _meta field", mappingsObjectBefore.get(NotificationConfigIndex._META))
+        Assert.assertEquals(1, getCurrentMappingsSchemaVersion())
         createConfig()
-        val responseAfter = executeRequest(getMappingRequest, RestStatus.OK.status, client())
-        val mappingsObjectAfter = responseAfter.get(indexName).asJsonObject.get("mappings").asJsonObject
-        Assert.assertEquals(mappingsObjectAfter, mappingsObjectBefore)
+        Assert.assertEquals(2, getCurrentMappingsSchemaVersion())
     }
 }

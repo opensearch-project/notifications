@@ -8,7 +8,7 @@
 # "dynamic" is set to "false" so that only specified fields are indexed instead of all fields.
 dynamic: false
 _meta:
-  schema_version: 1
+  schema_version: 2
 properties:
   metadata:
     type: object
@@ -47,6 +47,14 @@ properties:
               keyword:
                 type: keyword
       chime: # chime configuration
+        type: object
+        properties:
+          url:
+            type: text
+            fields:
+              keyword:
+                type: keyword
+      microsoft_teams: # Microsoft Teams configuration
         type: object
         properties:
           url:

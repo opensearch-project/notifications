@@ -4,7 +4,6 @@
  */
 
 package org.opensearch.notifications.index
-
 import org.opensearch.OpenSearchStatusException
 import org.opensearch.commons.authuser.User
 import org.opensearch.commons.notifications.action.CreateNotificationConfigRequest
@@ -23,6 +22,7 @@ import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Email
 import org.opensearch.commons.notifications.model.EmailGroup
+import org.opensearch.commons.notifications.model.MicrosoftTeams
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.NotificationConfigInfo
 import org.opensearch.commons.notifications.model.NotificationConfigSearchResult
@@ -39,7 +39,6 @@ import org.opensearch.notifications.model.DocMetadata
 import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.security.UserAccess
 import java.time.Instant
-
 /**
  * NotificationConfig indexing operation actions.
  */
@@ -63,6 +62,10 @@ object ConfigIndexingActions {
     @Suppress("UnusedPrivateMember")
     private fun validateChimeConfig(chime: Chime, user: User?) {
         // TODO: URL validation with rules
+    }
+
+    private fun validateMicrosoftTeamsConfig(microsoftTeams: MicrosoftTeams, user: User?) {
+        require(microsoftTeams.url.contains(Regex("https://.*\\.webhook\\.office\\.com")))
     }
 
     @Suppress("UnusedPrivateMember")
@@ -162,6 +165,7 @@ object ConfigIndexingActions {
             )
             ConfigType.SLACK -> validateSlackConfig(config.configData as Slack, user)
             ConfigType.CHIME -> validateChimeConfig(config.configData as Chime, user)
+            ConfigType.MICROSOFT_TEAMS -> validateMicrosoftTeamsConfig(config.configData as MicrosoftTeams, user)
             ConfigType.WEBHOOK -> validateWebhookConfig(config.configData as Webhook, user)
             ConfigType.EMAIL -> validateEmailConfig(config.configData as Email, user)
             ConfigType.SMTP_ACCOUNT -> validateSmtpAccountConfig(config.configData as SmtpAccount, user)
@@ -369,6 +373,7 @@ object ConfigIndexingActions {
         return listOf(
             ConfigType.SLACK.tag,
             ConfigType.CHIME.tag,
+            ConfigType.MICROSOFT_TEAMS.tag,
             ConfigType.WEBHOOK.tag,
             ConfigType.EMAIL.tag,
             ConfigType.SNS.tag
