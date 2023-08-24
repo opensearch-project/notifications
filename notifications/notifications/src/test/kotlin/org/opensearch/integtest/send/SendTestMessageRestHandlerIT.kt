@@ -89,7 +89,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
                 "config_type":"microsoft_teams",
                 "is_enabled":true,
                 "microsoft_teams":{
-                    "url":"https://hooks.microsft_teams.com/services/xxx/xxx"
+                    "url":"https://hooks.webhook.office.com/webhook2/abcde"
                 }
             }
         }

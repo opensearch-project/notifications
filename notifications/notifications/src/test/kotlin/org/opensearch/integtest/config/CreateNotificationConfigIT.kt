@@ -106,7 +106,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
     fun `test Create microsoft teams notification config with ID`() {
         // Create sample config request reference
         val configId = "sample_config_id"
-        val sampleMicrosoftTeams = MicrosoftTeams("https://domain.com/sample_microsoft_teams_url#1234567890")
+        val sampleMicrosoftTeams = MicrosoftTeams("https://domain.webhook.office.com/1234567")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",

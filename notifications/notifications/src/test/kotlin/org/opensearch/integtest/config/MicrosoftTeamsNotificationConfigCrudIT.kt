@@ -19,7 +19,7 @@ class MicrosoftTeamsNotificationConfigCrudIT : PluginRestTestCase() {
 
     fun `test Create, Get, Update, Delete microsoft teams notification config using REST client`() {
         // Create sample config request reference
-        val sampleMicrosoftTeams = MicrosoftTeams("https://domain.com/sample_microsoft_teams_url#1234567890")
+        val sampleMicrosoftTeams = MicrosoftTeams("https://domain.webhook.office.com/webhook2/test")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -67,7 +67,7 @@ class MicrosoftTeamsNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Updated notification config object
-        val updatedMicrosoftTeams = MicrosoftTeams("https://updated.domain.com/updated_microsoft_teams_url#0987654321")
+        val updatedMicrosoftTeams = MicrosoftTeams("https://updated.domain.webhook.office.com/webhook2/test")
         val updatedObject = NotificationConfig(
             "this is a updated config name",
             "this is a updated config description",
@@ -126,7 +126,7 @@ class MicrosoftTeamsNotificationConfigCrudIT : PluginRestTestCase() {
 
     fun `test Bad Request for multiple config data for microsoft teams using REST Client`() {
         // Create sample config request reference
-        val sampleMicrosoftTeams = MicrosoftTeams("https://domain.com/sample_microsoft_teams_url#1234567890")
+        val sampleMicrosoftTeams = MicrosoftTeams("https://domain.webhook.office.com/1234567")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
