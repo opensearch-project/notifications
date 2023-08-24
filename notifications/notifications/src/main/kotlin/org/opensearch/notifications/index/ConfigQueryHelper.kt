@@ -28,6 +28,7 @@ import org.opensearch.commons.notifications.NotificationConstants.URL_TAG
 import org.opensearch.commons.notifications.model.ConfigType.CHIME
 import org.opensearch.commons.notifications.model.ConfigType.EMAIL
 import org.opensearch.commons.notifications.model.ConfigType.EMAIL_GROUP
+import org.opensearch.commons.notifications.model.ConfigType.MICROSOFT_TEAMS
 import org.opensearch.commons.notifications.model.ConfigType.SES_ACCOUNT
 import org.opensearch.commons.notifications.model.ConfigType.SLACK
 import org.opensearch.commons.notifications.model.ConfigType.SMTP_ACCOUNT
@@ -69,6 +70,7 @@ object ConfigQueryHelper {
         "$DESCRIPTION_TAG.$KEYWORD_SUFFIX",
         "${SLACK.tag}.$URL_TAG.$KEYWORD_SUFFIX",
         "${CHIME.tag}.$URL_TAG.$KEYWORD_SUFFIX",
+        "${MICROSOFT_TEAMS.tag}.$URL_TAG.$KEYWORD_SUFFIX",
         "${WEBHOOK.tag}.$URL_TAG.$KEYWORD_SUFFIX",
         "${SMTP_ACCOUNT.tag}.$HOST_TAG.$KEYWORD_SUFFIX",
         "${SMTP_ACCOUNT.tag}.$FROM_ADDRESS_TAG.$KEYWORD_SUFFIX",
@@ -82,6 +84,7 @@ object ConfigQueryHelper {
         DESCRIPTION_TAG,
         "${SLACK.tag}.$URL_TAG",
         "${CHIME.tag}.$URL_TAG",
+        "${MICROSOFT_TEAMS.tag}.$URL_TAG",
         "${WEBHOOK.tag}.$URL_TAG",
         "${SMTP_ACCOUNT.tag}.$HOST_TAG",
         "${SMTP_ACCOUNT.tag}.$FROM_ADDRESS_TAG",

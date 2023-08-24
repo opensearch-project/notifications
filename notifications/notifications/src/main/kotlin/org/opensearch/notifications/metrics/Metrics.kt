@@ -185,6 +185,10 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
         "notifications.message_destination.chime",
         BasicCounter()
     ),
+    NOTIFICATIONS_MESSAGE_DESTINATION_MICROSOFT_TEAMS(
+        "notifications.message_destination.microsoft_teams",
+        BasicCounter()
+    ),
     NOTIFICATIONS_MESSAGE_DESTINATION_WEBHOOK(
         "notifications.message_destination.webhook",
         BasicCounter()

@@ -31,6 +31,7 @@ import org.opensearch.notifications.core.utils.validateUrlHost
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.ChimeDestination
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
+import org.opensearch.notifications.spi.model.destination.MicrosoftTeamsDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.WebhookDestination
 import java.io.IOException
@@ -159,12 +160,14 @@ class DestinationHttpClient {
         val keyName = when (destination) {
             // Slack webhook request body has required "text" as key name https://api.slack.com/messaging/webhooks
             // Chime webhook request body has required "Content" as key name
+            // Microsoft Teams webhook request body has required "text" as key name https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors
             // Customer webhook allows input as json or plain text, so we just return the message as it is
             is SlackDestination -> "text"
             is ChimeDestination -> "Content"
+            is MicrosoftTeamsDestination -> "text"
             is CustomWebhookDestination -> return message.textDescription
             else -> throw IllegalArgumentException(
-                "Invalid destination type is provided, Only Slack, Chime and CustomWebhook are allowed"
+                "Invalid destination type is provided, Only Slack, Chime, Microsoft Teams and CustomWebhook are allowed"
             )
         }
 
