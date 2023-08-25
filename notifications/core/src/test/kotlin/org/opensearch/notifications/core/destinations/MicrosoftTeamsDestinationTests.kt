@@ -6,12 +6,12 @@
 package org.opensearch.notifications.core.destinations
 
 import io.mockk.every
-import io.mockk.mockk
 import io.mockk.mockkStatic
-import org.apache.hc.client5.http.classic.methods.HttpPost
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse
-import org.apache.hc.core5.http.io.entity.StringEntity
+import org.apache.http.client.methods.CloseableHttpResponse
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.entity.StringEntity
+import org.apache.http.impl.client.CloseableHttpClient
+import org.apache.http.message.BasicStatusLine
 import org.easymock.EasyMock
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -61,12 +61,16 @@ internal class MicrosoftTeamsDestinationTests {
         // The DestinationHttpClient replaces a null entity with "{}".
         val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "{}")
 
-        val httpResponse = mockk<CloseableHttpResponse>()
+        val httpResponse: CloseableHttpResponse = EasyMock.createMock(CloseableHttpResponse::class.java)
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
 
-        every { httpResponse.code } returns RestStatus.OK.status
-        every { httpResponse.entity } returns null
+        val mockStatusLine: BasicStatusLine = EasyMock.createMock(BasicStatusLine::class.java)
+        EasyMock.expect(httpResponse.statusLine).andReturn(mockStatusLine)
+        EasyMock.expect(httpResponse.entity).andReturn(null).anyTimes()
+        EasyMock.expect(mockStatusLine.statusCode).andReturn(RestStatus.OK.status)
         EasyMock.replay(mockHttpClient)
+        EasyMock.replay(httpResponse)
+        EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
@@ -92,11 +96,15 @@ internal class MicrosoftTeamsDestinationTests {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
         val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "{}")
 
-        val httpResponse = mockk<CloseableHttpResponse>()
+        val httpResponse: CloseableHttpResponse = EasyMock.createMock(CloseableHttpResponse::class.java)
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
-        every { httpResponse.code } returns RestStatus.OK.status
-        every { httpResponse.entity } returns StringEntity("")
+        val mockStatusLine: BasicStatusLine = EasyMock.createMock(BasicStatusLine::class.java)
+        EasyMock.expect(httpResponse.statusLine).andReturn(mockStatusLine)
+        EasyMock.expect(httpResponse.entity).andReturn(StringEntity("")).anyTimes()
+        EasyMock.expect(mockStatusLine.statusCode).andReturn(RestStatus.OK.status)
         EasyMock.replay(mockHttpClient)
+        EasyMock.replay(httpResponse)
+        EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
@@ -123,11 +131,15 @@ internal class MicrosoftTeamsDestinationTests {
         val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
         val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, responseContent)
 
-        val httpResponse = mockk<CloseableHttpResponse>()
+        val httpResponse: CloseableHttpResponse = EasyMock.createMock(CloseableHttpResponse::class.java)
         EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
-        every { httpResponse.code } returns RestStatus.OK.status
-        every { httpResponse.entity } returns StringEntity(responseContent)
+        val mockStatusLine: BasicStatusLine = EasyMock.createMock(BasicStatusLine::class.java)
+        EasyMock.expect(httpResponse.statusLine).andReturn(mockStatusLine)
+        EasyMock.expect(httpResponse.entity).andReturn(StringEntity(responseContent)).anyTimes()
+        EasyMock.expect(mockStatusLine.statusCode).andReturn(RestStatus.OK.status)
         EasyMock.replay(mockHttpClient)
+        EasyMock.replay(httpResponse)
+        EasyMock.replay(mockStatusLine)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
