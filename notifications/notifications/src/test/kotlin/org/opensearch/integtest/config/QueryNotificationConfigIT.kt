@@ -261,12 +261,13 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
     fun `test Get sorted notification config using single keyword sort_field(config_type)`() {
         val slackId = createConfig(configType = ConfigType.SLACK)
         val chimeId = createConfig(configType = ConfigType.CHIME)
+        val microsoftTeamsId = createConfig(configType = ConfigType.MICROSOFT_TEAMS)
         val webhookId = createConfig(configType = ConfigType.WEBHOOK)
         val emailGroupId = createConfig(configType = ConfigType.EMAIL_GROUP)
         val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
         Thread.sleep(1000)
 
-        val sortedConfigIds = listOf(chimeId, emailGroupId, slackId, smtpAccountId, webhookId)
+        val sortedConfigIds = listOf(chimeId, emailGroupId, microsoftTeamsId, slackId, smtpAccountId, webhookId)
 
         // Get all notification configs with default sort_order(asc)
         val getDefaultOrderConfigResponse = executeRequest(
@@ -338,6 +339,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
     fun `test Get filtered notification config using keyword filter_param_list(config_type)`() {
         val slackId = createConfig(configType = ConfigType.SLACK)
         val chimeId = createConfig(configType = ConfigType.CHIME)
+        val microsoftTeamsId = createConfig(configType = ConfigType.MICROSOFT_TEAMS)
         val webhookId = createConfig(configType = ConfigType.WEBHOOK)
         val emailGroupId = createConfig(configType = ConfigType.EMAIL_GROUP)
         val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
@@ -354,13 +356,13 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Get notification configs with 2 item type
-        val getSlackOrChimeResponse = executeRequest(
+        val getMicrosoftTeamsOrChimeResponse = executeRequest(
             RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs?config_type=slack,chime",
+            "$PLUGIN_BASE_URI/configs?config_type=microsoft_teams,chime",
             "",
             RestStatus.OK.status
         )
-        verifyMultiConfigIdEquals(setOf(slackId, chimeId), getSlackOrChimeResponse, 2)
+        verifyMultiConfigIdEquals(setOf(microsoftTeamsId, chimeId), getMicrosoftTeamsOrChimeResponse, 2)
         Thread.sleep(100)
 
         // Get notification configs with 3 item type
@@ -547,6 +549,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
     fun `test Get filtered notification config using keyword filter_param_list(internal config fields)`() {
         val slackId = createConfig(configType = ConfigType.SLACK)
         val chimeId = createConfig(configType = ConfigType.CHIME)
+        val microsoftTeamsId = createConfig(configType = ConfigType.MICROSOFT_TEAMS)
         val webhookId = createConfig(configType = ConfigType.WEBHOOK)
         val emailGroupId = createConfig(configType = ConfigType.EMAIL_GROUP)
         val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
@@ -570,6 +573,16 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigIdEquals(chimeId, getChimeResponse, 1)
+        Thread.sleep(100)
+
+        // Get notification configs using microsoft_teams.url
+        val getMicrosoftTeamsResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "$PLUGIN_BASE_URI/configs?microsoft_teams.url=$microsoftTeamsId",
+            "",
+            RestStatus.OK.status
+        )
+        verifySingleConfigIdEquals(microsoftTeamsId, getMicrosoftTeamsResponse, 1)
         Thread.sleep(100)
 
         // Get notification configs using webhook.url
@@ -606,14 +619,15 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
     fun `test Get filtered notification config using query`() {
         val slackId = createConfig(configType = ConfigType.SLACK)
         val chimeId = createConfig(configType = ConfigType.CHIME)
+        val microsoftTeamsId = createConfig(configType = ConfigType.MICROSOFT_TEAMS)
         val webhookId = createConfig(configType = ConfigType.WEBHOOK)
         val emailGroupId = createConfig(configType = ConfigType.EMAIL_GROUP)
         val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
-        val allIds = setOf(slackId, chimeId, webhookId, emailGroupId, smtpAccountId)
-        val urlIds = setOf(slackId, chimeId, webhookId)
+        val allIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId, emailGroupId, smtpAccountId)
+        val urlIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId)
         val recipientIds = setOf(emailGroupId)
         val fromIds = setOf(emailGroupId, smtpAccountId)
-        val domainIds = setOf(slackId, chimeId, webhookId, smtpAccountId)
+        val domainIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId, smtpAccountId)
         Thread.sleep(1000)
 
         // Get notification configs using query=slack
@@ -680,14 +694,15 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
     fun `test Get filtered notification config using text_query`() {
         val slackId = createConfig(configType = ConfigType.SLACK)
         val chimeId = createConfig(configType = ConfigType.CHIME)
+        val microsoftTeamsId = createConfig(configType = ConfigType.MICROSOFT_TEAMS)
         val webhookId = createConfig(configType = ConfigType.WEBHOOK)
         val emailGroupId = createConfig(configType = ConfigType.EMAIL_GROUP)
         val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
-        val allIds = setOf(slackId, chimeId, webhookId, emailGroupId, smtpAccountId)
-        val urlIds = setOf(slackId, chimeId, webhookId)
+        val allIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId, emailGroupId, smtpAccountId)
+        val urlIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId)
         val recipientIds = setOf(emailGroupId)
         val fromIds = setOf(emailGroupId, smtpAccountId)
-        val domainIds = setOf(slackId, chimeId, webhookId, smtpAccountId)
+        val domainIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId, smtpAccountId)
         Thread.sleep(1000)
 
         // Get notification configs using text_query=slack should not return any item

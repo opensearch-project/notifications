@@ -7,36 +7,36 @@ package org.opensearch.integtest.config
 
 import org.junit.Assert
 import org.opensearch.commons.notifications.model.ConfigType
+import org.opensearch.commons.notifications.model.MicrosoftTeams
 import org.opensearch.commons.notifications.model.NotificationConfig
-import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 
-class SlackNotificationConfigCrudIT : PluginRestTestCase() {
+class MicrosoftTeamsNotificationConfigCrudIT : PluginRestTestCase() {
 
-    fun `test Create, Get, Update, Delete slack notification config using REST client`() {
+    fun `test Create, Get, Update, Delete microsoft teams notification config using REST client`() {
         // Create sample config request reference
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+        val sampleMicrosoftTeams = MicrosoftTeams("https://domain.webhook.office.com/webhook2/test")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
-            ConfigType.SLACK,
+            ConfigType.MICROSOFT_TEAMS,
             isEnabled = true,
-            configData = sampleSlack
+            configData = sampleMicrosoftTeams
         )
 
-        // Create slack notification config
+        // Create Microsoft Teams notification config
         val createRequestJsonString = """
         {
             "config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
-                "config_type":"slack",
+                "config_type":"microsoft_teams",
                 "is_enabled":${referenceObject.isEnabled},
-                "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+                "microsoft_teams":{"url":"${(referenceObject.configData as MicrosoftTeams).url}"}
             }
         }
         """.trimIndent()
@@ -44,7 +44,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
-        // Get Slack notification config
+        // Get Microsoft Teams notification config
 
         val getConfigResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -67,24 +67,24 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Updated notification config object
-        val updatedSlack = Slack("https://updated.domain.com/updated_slack_url#0987654321")
+        val updatedMicrosoftTeams = MicrosoftTeams("https://updated.domain.webhook.office.com/webhook2/test")
         val updatedObject = NotificationConfig(
             "this is a updated config name",
             "this is a updated config description",
-            ConfigType.SLACK,
+            ConfigType.MICROSOFT_TEAMS,
             isEnabled = true,
-            configData = updatedSlack
+            configData = updatedMicrosoftTeams
         )
 
-        // Update slack notification config
+        // Update Microsoft Teams notification config
         val updateRequestJsonString = """
         {
             "config":{
                 "name":"${updatedObject.name}",
                 "description":"${updatedObject.description}",
-                "config_type":"slack",
+                "config_type":"microsoft_teams",
                 "is_enabled":${updatedObject.isEnabled},
-                "slack":{"url":"${(updatedObject.configData as Slack).url}"}
+                "microsoft_teams":{"url":"${(updatedObject.configData as MicrosoftTeams).url}"}
             }
         }
         """.trimIndent()
@@ -97,7 +97,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         Assert.assertEquals(configId, updateResponse.get("config_id").asString)
         Thread.sleep(1000)
 
-        // Get updated Slack notification config
+        // Get updated Microsoft Teams notification config
 
         val getUpdatedConfigResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -108,12 +108,12 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         verifySingleConfigEquals(configId, updatedObject, getUpdatedConfigResponse)
         Thread.sleep(100)
 
-        // Delete slack notification config
+        // Delete Microsoft Teams notification config
         val deleteResponse = deleteConfig(configId)
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
         Thread.sleep(1000)
 
-        // Get slack notification config after delete
+        // Get Microsoft Teams notification config after delete
 
         executeRequest(
             RestRequest.Method.GET.name,
@@ -124,27 +124,27 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
     }
 
-    fun `test Bad Request for multiple config data for Slack using REST Client`() {
+    fun `test Bad Request for multiple config data for microsoft teams using REST Client`() {
         // Create sample config request reference
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+        val sampleMicrosoftTeams = MicrosoftTeams("https://domain.webhook.office.com/1234567")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
-            ConfigType.SLACK,
+            ConfigType.MICROSOFT_TEAMS,
             isEnabled = true,
-            configData = sampleSlack
+            configData = sampleMicrosoftTeams
         )
 
-        // Create slack notification config
+        // Create Microsoft Teams notification config
         val createRequestJsonString = """
         {
             "config":{
                 "name":"${referenceObject.name}",
                 "description":"${referenceObject.description}",
-                "config_type":"slack",
+                "config_type":"microsoft_teams",
                 "is_enabled":${referenceObject.isEnabled},
                 "chime":{"url":"https://dummy.com"}
-                "slack":{"url":"${(referenceObject.configData as Slack).url}
+                "microsoft_teams":{"url":"${(referenceObject.configData as MicrosoftTeams).url}"}
             }
         }
         """.trimIndent()

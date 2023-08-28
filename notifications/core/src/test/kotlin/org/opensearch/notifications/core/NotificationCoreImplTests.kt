@@ -14,6 +14,7 @@ class NotificationCoreImplTests {
     private val defaultConfigTypes = listOf(
         "slack",
         "chime",
+        "microsoft_teams",
         "webhook",
         "email",
         "sns",

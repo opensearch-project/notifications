@@ -360,6 +360,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
 
         val slackId = createConfig(configType = ConfigType.SLACK)
         val chimeId = createConfig(configType = ConfigType.CHIME)
+        val microsoftTeamsId = createConfig(configType = ConfigType.MICROSOFT_TEAMS)
         val webhookId = createConfig(configType = ConfigType.WEBHOOK)
         val emailGroupId = createConfig(configType = ConfigType.EMAIL_GROUP)
         val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
@@ -370,7 +371,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
         )
         Thread.sleep(1000)
 
-        val channelIds = setOf(slackId, chimeId, webhookId, emailId)
+        val channelIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId, emailId)
         val response = executeRequest(
             RestRequest.Method.GET.name,
             "${NotificationPlugin.PLUGIN_BASE_URI}/channels",
