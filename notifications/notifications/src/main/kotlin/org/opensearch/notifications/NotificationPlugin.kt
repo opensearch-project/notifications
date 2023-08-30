@@ -22,6 +22,7 @@ import org.opensearch.core.common.io.stream.NamedWriteableRegistry
 import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.env.Environment
 import org.opensearch.env.NodeEnvironment
+import org.opensearch.indices.SystemIndexDescriptor
 import org.opensearch.notifications.action.CreateNotificationConfigAction
 import org.opensearch.notifications.action.DeleteNotificationConfigAction
 import org.opensearch.notifications.action.GetChannelListAction
@@ -44,6 +45,7 @@ import org.opensearch.notifications.spi.NotificationCore
 import org.opensearch.notifications.spi.NotificationCoreExtension
 import org.opensearch.plugins.ActionPlugin
 import org.opensearch.plugins.Plugin
+import org.opensearch.plugins.SystemIndexPlugin
 import org.opensearch.repositories.RepositoriesService
 import org.opensearch.rest.RestController
 import org.opensearch.rest.RestHandler
@@ -56,7 +58,7 @@ import java.util.function.Supplier
  * Entry point of the OpenSearch Notifications plugin
  * This class initializes the rest handlers.
  */
-class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension {
+class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, SystemIndexPlugin {
 
     lateinit var clusterService: ClusterService // initialized in createComponents()
 
@@ -78,6 +80,15 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension {
     override fun getSettings(): List<Setting<*>> {
         log.debug("$LOG_PREFIX:getSettings")
         return PluginSettings.getAllSettings()
+    }
+
+    override fun getSystemIndexDescriptors(settings: Settings?): Collection<SystemIndexDescriptor> {
+        return listOf(
+            SystemIndexDescriptor(
+                NotificationConfigIndex.INDEX_NAME,
+                "System index for storing notification channels related configurations."
+            )
+        )
     }
 
     /**
