@@ -67,7 +67,7 @@ internal object NotificationConfigIndex : ConfigOperations {
     const val SCHEMA_VERSION = "schema_version"
 
     private val log by logger(NotificationConfigIndex::class.java)
-    private const val INDEX_NAME = ".opensearch-notifications-config"
+    const val INDEX_NAME = ".opensearch-notifications-config"
     private const val MAPPING_FILE_NAME = "notifications-config-mapping.yml"
     private const val SETTINGS_FILE_NAME = "notifications-config-settings.yml"
 
