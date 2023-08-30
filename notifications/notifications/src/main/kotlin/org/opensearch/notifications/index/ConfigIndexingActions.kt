@@ -65,7 +65,9 @@ object ConfigIndexingActions {
     }
 
     private fun validateMicrosoftTeamsConfig(microsoftTeams: MicrosoftTeams, user: User?) {
-        require(microsoftTeams.url.contains(Regex("https://.*\\.webhook\\.office\\.com")))
+        require(microsoftTeams.url.contains(Regex("https://.*\\.webhook\\.office\\.com"))) {
+            "Wrong Microsoft Teams url. Should contain \"webhook.office.com\""
+        }
     }
 
     @Suppress("UnusedPrivateMember")
