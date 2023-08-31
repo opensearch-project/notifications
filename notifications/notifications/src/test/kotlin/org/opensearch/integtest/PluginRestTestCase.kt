@@ -15,6 +15,7 @@ import org.opensearch.client.RequestOptions
 import org.opensearch.client.ResponseException
 import org.opensearch.client.RestClient
 import org.opensearch.client.WarningsHandler
+import org.opensearch.client.WarningsHandler.PERMISSIVE
 import org.opensearch.common.io.PathUtils
 import org.opensearch.common.settings.Settings
 import org.opensearch.commons.ConfigConstants
@@ -368,6 +369,9 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
     protected fun getCurrentMappingsSchemaVersion(): Int {
         val indexName = ".opensearch-notifications-config"
         val getMappingRequest = Request(RestRequest.Method.GET.name, "$indexName/_mappings")
+        val options = RequestOptions.DEFAULT.toBuilder()
+        options.setWarningsHandler(PERMISSIVE)
+        getMappingRequest.options = options.build()
         val response = executeRequest(getMappingRequest, RestStatus.OK.status, client())
         val mappingsObject = response.get(indexName).asJsonObject.get("mappings").asJsonObject
         return mappingsObject.get(NotificationConfigIndex._META)?.asJsonObject?.get(NotificationConfigIndex.SCHEMA_VERSION)?.asInt
