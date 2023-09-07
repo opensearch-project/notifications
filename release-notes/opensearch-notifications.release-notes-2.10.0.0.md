@@ -15,7 +15,7 @@ Compatible with OpenSearch 2.10.0
 * Fix core XcontentFactory refactor([#732](https://github.com/opensearch-project/notifications/pull/732))
 * Fix actions components after core([#739](https://github.com/opensearch-project/notifications/pull/739))
 * Add auto release workflow([#731](https://github.com/opensearch-project/notifications/pull/731))
-* Onboarding system and hidden index([#731](https://github.com/opensearch-project/notifications/pull/731))
+* Onboarding system and hidden index([#742](https://github.com/opensearch-project/notifications/pull/742))
 * Updates demo certs used in integ tests([#756](https://github.com/opensearch-project/notifications/pull/756))
 
 ### Documentation
