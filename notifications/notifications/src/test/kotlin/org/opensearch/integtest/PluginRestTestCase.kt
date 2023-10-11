@@ -367,15 +367,42 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
     }
 
     protected fun getCurrentMappingsSchemaVersion(): Int {
-        val indexName = ".opensearch-notifications-config"
-        val getMappingRequest = Request(RestRequest.Method.GET.name, "$indexName/_mappings")
-        val options = RequestOptions.DEFAULT.toBuilder()
-        options.setWarningsHandler(PERMISSIVE)
-        getMappingRequest.options = options.build()
+        val getMappingRequest = Request(RestRequest.Method.GET.name, "${NotificationConfigIndex.INDEX_NAME}/_mappings")
+        val requestOptions = RequestOptions.DEFAULT.toBuilder()
+        // Allow direct access to system index warning
+        requestOptions.setWarningsHandler { warnings: List<String> ->
+            if (warnings.isEmpty()) {
+                return@setWarningsHandler false
+            } else if (warnings.size > 1) {
+                return@setWarningsHandler true
+            } else {
+                return@setWarningsHandler !warnings[0].startsWith("this request accesses system indices:")
+            }
+        }
+        getMappingRequest.setOptions(requestOptions)
         val response = executeRequest(getMappingRequest, RestStatus.OK.status, client())
-        val mappingsObject = response.get(indexName).asJsonObject.get("mappings").asJsonObject
+        val mappingsObject = response.get(NotificationConfigIndex.INDEX_NAME).asJsonObject.get("mappings").asJsonObject
         return mappingsObject.get(NotificationConfigIndex._META)?.asJsonObject?.get(NotificationConfigIndex.SCHEMA_VERSION)?.asInt
             ?: NotificationConfigIndex.DEFAULT_SCHEMA_VERSION
+    }
+
+    // only refresh the notification config index to avoid too many warnings
+    @Throws(IOException::class)
+    override fun refreshAllIndices() {
+        val refreshRequest = Request("POST", "${NotificationConfigIndex.INDEX_NAME}/_refresh")
+        val requestOptions = RequestOptions.DEFAULT.toBuilder()
+        // Allow direct access to system index warning
+        requestOptions.setWarningsHandler { warnings: List<String> ->
+            if (warnings.isEmpty()) {
+                return@setWarningsHandler false
+            } else if (warnings.size > 1) {
+                return@setWarningsHandler true
+            } else {
+                return@setWarningsHandler !warnings[0].startsWith("this request accesses system indices:")
+            }
+        }
+        refreshRequest.setOptions(requestOptions)
+        client().performRequest(refreshRequest)
     }
 
     protected class ClusterSetting(val type: String, val name: String, var value: Any?) {
