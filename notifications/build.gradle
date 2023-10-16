@@ -38,16 +38,14 @@ buildscript {
         classpath "org.opensearch.gradle:build-tools:${opensearch_version}"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
         classpath "org.jetbrains.kotlin:kotlin-allopen:${kotlin_version}"
-// TODO: enable detekt only when snakeyaml vulnerability is fixed
-//        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.17.1"
+        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.23.0"
         classpath "org.jacoco:org.jacoco.agent:0.8.7"
     }
 }
 
 apply plugin: 'base'
 apply plugin: 'jacoco'
-// TODO: enable detekt only when snakeyaml vulnerability is fixed
-//apply plugin: 'io.gitlab.arturbosch.detekt'
+apply plugin: 'io.gitlab.arturbosch.detekt'
 apply from: 'build-tools/merged-coverage.gradle'
 
 allprojects {
@@ -100,12 +98,11 @@ task ktlintFormat(type: JavaExec, group: "formatting") {
     jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED"
 }
 
-// TODO: enable detekt only when snakeyaml vulnerability is fixed
-//detekt {
-//    config = files("detekt.yml")
-//    buildUponDefaultConfig = true
-//    parallel = true
-//}
+detekt {
+    config = files("detekt.yml")
+    buildUponDefaultConfig = true
+    parallel = true
+}
 
 check.dependsOn ktlint
 
