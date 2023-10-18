@@ -51,7 +51,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
-        Thread.sleep(100)
+        
 
         // Get all notification config
 
@@ -62,7 +62,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, referenceObject, getAllConfigResponse)
-        Thread.sleep(100)
+        
 
         // Updated notification config object
         val updatedChime = Chime("https://updated.domain.com/updated_chime_url#0987654321")
@@ -93,7 +93,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         Assert.assertEquals(configId, updateResponse.get("config_id").asString)
-        Thread.sleep(1000)
+        
 
         // Get updated chime notification config
 
@@ -104,12 +104,12 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, updatedObject, getUpdatedConfigResponse)
-        Thread.sleep(100)
+        
 
         // Delete chime notification config
         val deleteResponse = deleteConfig(configId)
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
-        Thread.sleep(1000)
+        
 
         // Get chime notification config after delete
 
@@ -119,7 +119,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "",
             RestStatus.NOT_FOUND.status
         )
-        Thread.sleep(100)
+        
     }
 
     fun `test BAD Request for multiple config data for Chime using REST Client`() {
@@ -179,7 +179,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
+        
 
         // Update to slack notification config
         val updateRequestJsonString = """
@@ -267,7 +267,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
+        
 
         // update to new webhook URL
         val updateRequestJsonString = """
