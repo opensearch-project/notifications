@@ -5,7 +5,10 @@
 
 package org.opensearch.notifications.core.smtp
 
-import org.junit.After
+import com.icegreen.greenmail.util.GreenMail
+import com.icegreen.greenmail.util.ServerSetupTest
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.core.NotificationCoreImpl
@@ -14,20 +17,21 @@ import org.opensearch.notifications.core.transport.SmtpDestinationTransport
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
-import org.springframework.integration.test.mail.TestMailServer
 import kotlin.test.assertEquals
 
 class SmtpEmailTests {
 
-    internal companion object {
-        private const val smtpPort = 10255 // use non-standard port > 1024 to avoid permission issue
-        private val smtpServer = TestMailServer.smtp(smtpPort)
+    private lateinit var greenMail: GreenMail
+
+    @BeforeEach
+    fun setUpServer() {
+        greenMail = GreenMail(ServerSetupTest.SMTP)
+        greenMail.start()
     }
 
-    @After
+    @AfterEach
     fun tearDownServer() {
-        smtpServer.stop()
-        smtpServer.resetServer()
+        greenMail.stop()
     }
 
     @Test
@@ -35,7 +39,7 @@ class SmtpEmailTests {
         val smtpDestination = SmtpDestination(
             "testAccountName",
             "localhost",
-            smtpPort,
+            ServerSetupTest.SMTP.port,
             "none",
             "from@email.com",
             "test@localhost.com"
@@ -60,7 +64,7 @@ class SmtpEmailTests {
         val smtpDestination = SmtpDestination(
             "testAccountName",
             "invalidHost",
-            smtpPort,
+            ServerSetupTest.SMTP.port,
             "none",
             "from@email.com",
             "test@localhost.com"
@@ -77,7 +81,7 @@ class SmtpEmailTests {
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SMTP to SmtpDestinationTransport())
         val response = NotificationCoreImpl.sendMessage(smtpDestination, message, "ref")
         assertEquals(
-            "sendEmail Error, status:Couldn't connect to host, port: invalidHost, $smtpPort; timeout -1",
+            "sendEmail Error, status:Couldn't connect to host, port: invalidHost, ${ServerSetupTest.SMTP.port}; timeout -1",
             response.statusText
         )
         assertEquals(RestStatus.SERVICE_UNAVAILABLE.status, response.statusCode)
