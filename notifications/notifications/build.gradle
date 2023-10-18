@@ -100,7 +100,7 @@ dependencies {
     } // ${kotlin_version} does not work for coroutines
     implementation "${group}:common-utils:${common_utils_version}"
     // TODO: change compile to implementation when the _local/stats API is supported
-    compileOnly "org.json:json:20230227"
+    compileOnly "org.json:json:20231013"
     compileOnly "com.github.wnameless.json:json-flattener:0.13.0"
     // TODO: uncomment when the _local/stats API is supported
     // implementation "com.github.wnameless.json:json-base:2.0.0"
@@ -265,7 +265,7 @@ testClusters.integTest {
 }
 
 // Always be minimumCompatibilityVersion of current opensearch version(3.0.0)
-def bwcVersionShort = "2.11.0"
+def bwcVersionShort = "2.12.0"
 def bwcVersion = bwcVersionShort + ".0"
 def bwcOpenSearchVesion= bwcVersionShort + "-SNAPSHOT"
 def bwcPluginVersion = bwcVersion + "-SNAPSHOT"
