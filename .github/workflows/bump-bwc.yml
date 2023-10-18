@@ -21,8 +21,7 @@ jobs:
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
-          #installation_id: 22958780
-          installation_id: 42934585
+          installation_id: 22958780
 
       - uses: actions/checkout@v4
       - name: Fetch Tag and Version Information
