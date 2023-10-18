@@ -182,7 +182,7 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     override suspend fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String?): String? {
         createIndex()
-        val indexRequest = IndexRequest(INDEX_NAME)
+        val indexRequest = IndexRequest(INDEX_NAME).setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE)
             .source(configDoc.toXContent())
             .create(true)
         if (id != null) {
