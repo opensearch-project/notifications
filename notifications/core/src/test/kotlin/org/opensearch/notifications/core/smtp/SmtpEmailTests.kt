@@ -57,6 +57,7 @@ class SmtpEmailTests {
         val response = NotificationCoreImpl.sendMessage(smtpDestination, message, "ref")
         assertEquals("Success", response.statusText)
         assertEquals(RestStatus.OK.status, response.statusCode)
+        assertEquals(1, greenMail.receivedMessages.size) // Indicates retrieval of notification.
     }
 
     @Test
