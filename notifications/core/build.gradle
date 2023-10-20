@@ -162,7 +162,7 @@ dependencies {
     )
     testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
     // https://mvnrepository.com/artifact/com.icegreen/greenmail
-    testImplementation group: 'com.icegreen', name: 'greenmail', version: '2.0.0'
+    testImplementation group: 'com.icegreen', name: 'greenmail', version: '1.6.4'
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
     testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.6.2')
     testImplementation "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
