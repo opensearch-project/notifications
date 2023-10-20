@@ -42,7 +42,7 @@ class SnsNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
+        
 
         // Get SNS notification config
 
@@ -53,7 +53,7 @@ class SnsNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
-        Thread.sleep(100)
+        
 
         // Get all notification config
 
@@ -64,7 +64,7 @@ class SnsNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, referenceObject, getAllConfigResponse)
-        Thread.sleep(100)
+        
 
         // Updated notification config object
         val updatedSns = Sns("arn:aws:sns:us-west-2:012345678912:test-notification-updated", "arn:aws:iam::012345678912:role/updated-role-test")
@@ -95,7 +95,7 @@ class SnsNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         Assert.assertEquals(configId, updateResponse.get("config_id").asString)
-        Thread.sleep(1000)
+        
 
         // Get updated SNS notification config
 
@@ -106,12 +106,12 @@ class SnsNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, updatedObject, getUpdatedConfigResponse)
-        Thread.sleep(100)
+        
 
         // Delete SNS notification config
         val deleteResponse = deleteConfig(configId)
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
-        Thread.sleep(1000)
+        
 
         // Get SNS notification config after delete
 
@@ -121,7 +121,7 @@ class SnsNotificationConfigCrudIT : PluginRestTestCase() {
             "",
             RestStatus.NOT_FOUND.status
         )
-        Thread.sleep(100)
+        
     }
 
     fun `test Bad Request for multiple config data for SNS using REST Client`() {

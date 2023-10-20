@@ -47,7 +47,7 @@ class MicrosoftTeamsNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
+        
 
         // Get Microsoft Teams notification config
 
@@ -58,7 +58,7 @@ class MicrosoftTeamsNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
-        Thread.sleep(100)
+        
 
         // Get all notification config
 
@@ -69,7 +69,7 @@ class MicrosoftTeamsNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, referenceObject, getAllConfigResponse)
-        Thread.sleep(100)
+        
 
         // Updated notification config object
         val updatedMicrosoftTeams = MicrosoftTeams("https://updated.domain.webhook.office.com/webhook2/test")
@@ -100,7 +100,7 @@ class MicrosoftTeamsNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         Assert.assertEquals(configId, updateResponse.get("config_id").asString)
-        Thread.sleep(1000)
+        
 
         // Get updated Microsoft Teams notification config
 
@@ -111,12 +111,12 @@ class MicrosoftTeamsNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, updatedObject, getUpdatedConfigResponse)
-        Thread.sleep(100)
+        
 
         // Delete Microsoft Teams notification config
         val deleteResponse = deleteConfig(configId)
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
-        Thread.sleep(1000)
+        
 
         // Get Microsoft Teams notification config after delete
 
@@ -126,7 +126,7 @@ class MicrosoftTeamsNotificationConfigCrudIT : PluginRestTestCase() {
             "",
             RestStatus.NOT_FOUND.status
         )
-        Thread.sleep(100)
+        
     }
 
     fun `test create config with wrong Microsoft Teams url and get error text`() {

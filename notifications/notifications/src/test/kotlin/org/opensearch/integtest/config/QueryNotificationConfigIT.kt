@@ -24,7 +24,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
 
     fun `test Get single notification config as part of path`() {
         val configId = createConfig()
-        Thread.sleep(1000)
+        
         // Get notification config
         val getConfigResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -33,12 +33,12 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigIdEquals(configId, getConfigResponse)
-        Thread.sleep(100)
+        
     }
 
     fun `test Get single absent notification config should fail as part of path`() {
         val configId = createConfig()
-        Thread.sleep(1000)
+        
         // Get notification config with absent id
         executeRequest(
             RestRequest.Method.GET.name,
@@ -50,7 +50,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
 
     fun `test Get single notification config as part of query`() {
         val configId = createConfig()
-        Thread.sleep(1000)
+        
         // Get notification config with query parameter
         val getConfigResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -59,12 +59,12 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigIdEquals(configId, getConfigResponse)
-        Thread.sleep(100)
+        
     }
 
     fun `test Get single absent notification config should fail as part of query`() {
         val configId = createConfig()
-        Thread.sleep(1000)
+        
         // Get notification config with query parameter with absent id
         executeRequest(
             RestRequest.Method.GET.name,
@@ -76,11 +76,11 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
 
     fun `test Get multiple notification config as part of query`() {
         (1..5).map { createConfig() }.toSet()
-        Thread.sleep(100)
+        
         (1..5).map { createConfig() }.toSet()
         val configIds: Set<String> = (1..5).map { createConfig() }.toSet()
         (1..5).map { createConfig() }.toSet()
-        Thread.sleep(1000)
+        
         // Get notification config with query parameter
         val getConfigResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -89,7 +89,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(configIds, getConfigResponse, configIds.size)
-        Thread.sleep(100)
+        
     }
 
     fun `test Get all notification config`() {
@@ -111,7 +111,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         val secondConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
         val thirdConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
         val allConfigIds = firstConfigIds.union(secondConfigIds).union(thirdConfigIds)
-        Thread.sleep(1000)
+        
 
         // Get all notification configs
         val getAllConfigResponse = executeRequest(
@@ -121,7 +121,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(allConfigIds, getAllConfigResponse, allConfigIds.size)
-        Thread.sleep(100)
+        
 
         // Get first 10 notification configs
         val getFirstConfigResponse = executeRequest(
@@ -174,7 +174,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         val secondConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
         val thirdConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
         val allConfigIds = firstConfigIds.union(secondConfigIds).union(thirdConfigIds)
-        Thread.sleep(1000)
+        
 
         // Get all notification configs
         val getAllConfigResponse = executeRequest(
@@ -184,7 +184,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(allConfigIds, getAllConfigResponse, allConfigIds.size)
-        Thread.sleep(100)
+        
 
         // Get first 10 notification configs
         val getFirstConfigResponse = executeRequest(
@@ -216,15 +216,15 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
 
     fun `test Get sorted notification config using metadata keyword sort_field(created_time_ms)`() {
         val id1 = createConfig()
-        Thread.sleep(1000)
+        
         val id2 = createConfig()
-        Thread.sleep(1000)
+        
         val id3 = createConfig()
-        Thread.sleep(1000)
+        
         val id4 = createConfig()
-        Thread.sleep(1000)
+        
         val id5 = createConfig()
-        Thread.sleep(1000)
+        
         val sortedConfigIds = listOf(id1, id2, id3, id4, id5)
 
         // Get all notification configs with default sort_order(asc)
@@ -235,7 +235,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyOrderedConfigList(sortedConfigIds, getDefaultOrderConfigResponse, sortedConfigIds.size)
-        Thread.sleep(100)
+        
 
         // Get all notification configs with sort_order=asc
         val getAscConfigResponse = executeRequest(
@@ -245,7 +245,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyOrderedConfigList(sortedConfigIds, getAscConfigResponse, sortedConfigIds.size)
-        Thread.sleep(100)
+        
 
         // Get all notification configs with sort_order=desc
         val getDescConfigResponse = executeRequest(
@@ -255,7 +255,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyOrderedConfigList(sortedConfigIds.asReversed(), getDescConfigResponse, sortedConfigIds.size)
-        Thread.sleep(100)
+        
     }
 
     fun `test Get sorted notification config using single keyword sort_field(config_type)`() {
@@ -265,7 +265,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         val webhookId = createConfig(configType = ConfigType.WEBHOOK)
         val emailGroupId = createConfig(configType = ConfigType.EMAIL_GROUP)
         val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
-        Thread.sleep(1000)
+        
 
         val sortedConfigIds = listOf(chimeId, emailGroupId, microsoftTeamsId, slackId, smtpAccountId, webhookId)
 
@@ -277,7 +277,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyOrderedConfigList(sortedConfigIds, getDefaultOrderConfigResponse, sortedConfigIds.size)
-        Thread.sleep(100)
+        
 
         // Get all notification configs with sort_order=asc
         val getAscConfigResponse = executeRequest(
@@ -287,7 +287,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyOrderedConfigList(sortedConfigIds, getAscConfigResponse, sortedConfigIds.size)
-        Thread.sleep(100)
+        
 
         // Get all notification configs with sort_order=desc
         val getDescConfigResponse = executeRequest(
@@ -297,12 +297,12 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyOrderedConfigList(sortedConfigIds.asReversed(), getDescConfigResponse, sortedConfigIds.size)
-        Thread.sleep(100)
+        
     }
 
     fun `test Get sorted notification config using text sort_field(slack_url)`() {
         val configIds: Set<String> = (1..10).map { createConfig(configType = ConfigType.SLACK) }.toSet()
-        Thread.sleep(1000)
+        
         val sortedConfigIds = configIds.sorted()
 
         // Get all notification configs with default sort_order(asc)
@@ -313,7 +313,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyOrderedConfigList(sortedConfigIds, getDefaultOrderConfigResponse, configIds.size)
-        Thread.sleep(100)
+        
 
         // Get all notification configs with sort_order=asc
         val getAscConfigResponse = executeRequest(
@@ -323,7 +323,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyOrderedConfigList(sortedConfigIds, getAscConfigResponse, configIds.size)
-        Thread.sleep(100)
+        
 
         // Get all notification configs with sort_order=desc
         val getDescConfigResponse = executeRequest(
@@ -333,7 +333,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyOrderedConfigList(sortedConfigIds.asReversed(), getDescConfigResponse, configIds.size)
-        Thread.sleep(100)
+        
     }
 
     fun `test Get filtered notification config using keyword filter_param_list(config_type)`() {
@@ -343,7 +343,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         val webhookId = createConfig(configType = ConfigType.WEBHOOK)
         val emailGroupId = createConfig(configType = ConfigType.EMAIL_GROUP)
         val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
-        Thread.sleep(1000)
+        
 
         // Get notification configs with one item type
         val getSlackResponse = executeRequest(
@@ -353,7 +353,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigIdEquals(slackId, getSlackResponse, 1)
-        Thread.sleep(100)
+        
 
         // Get notification configs with 2 item type
         val getMicrosoftTeamsOrChimeResponse = executeRequest(
@@ -363,7 +363,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(setOf(microsoftTeamsId, chimeId), getMicrosoftTeamsOrChimeResponse, 2)
-        Thread.sleep(100)
+        
 
         // Get notification configs with 3 item type
         val getWebhookEmailGroupOrSmtpAccountResponse = executeRequest(
@@ -377,12 +377,12 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             getWebhookEmailGroupOrSmtpAccountResponse,
             3
         )
-        Thread.sleep(100)
+        
     }
 
     fun `test Get filtered notification config using text filter_param_list(name)`() {
         val configIds: Set<String> = (1..10).map { createConfig() }.toSet()
-        Thread.sleep(1000)
+       
 
         // Get notification configs with common text "sample config name"
         val getCommonResponse = executeRequest(
@@ -392,7 +392,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(configIds, getCommonResponse, configIds.size)
-        Thread.sleep(100)
+        
 
         // Get notification configs with random generated text (id)
         val partialString = configIds.first()
@@ -404,13 +404,13 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(partialConfigIds, getPartialResponse, partialConfigIds.size)
-        Thread.sleep(100)
+        
     }
 
     fun `test Get filtered notification config using keyword filter_param_list(is_enabled)`() {
         val enabledConfigIds: Set<String> = (1..10).map { createConfig(isEnabled = true) }.toSet()
         val disabledConfigIds: Set<String> = (1..10).map { createConfig(isEnabled = false) }.toSet()
-        Thread.sleep(1000)
+        
 
         // Get notification configs with is_enabled=true
         val getEnabledResponse = executeRequest(
@@ -420,7 +420,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(enabledConfigIds, getEnabledResponse, enabledConfigIds.size)
-        Thread.sleep(100)
+        
 
         // Get notification configs with is_enabled=false
         val getDisabledResponse = executeRequest(
@@ -430,12 +430,12 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(disabledConfigIds, getDisabledResponse, disabledConfigIds.size)
-        Thread.sleep(100)
+        
     }
 
     fun `test Get filtered notification config using text filter_param_list(description)`() {
         val configIds: Set<String> = (1..10).map { createConfig() }.toSet()
-        Thread.sleep(1000)
+        
 
         // Get notification configs with common text "sample description"
         val getCommonResponse = executeRequest(
@@ -445,7 +445,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(configIds, getCommonResponse, configIds.size)
-        Thread.sleep(100)
+        
 
         // Get notification configs with random generated text (id)
         val partialString = configIds.first()
@@ -457,19 +457,19 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(partialConfigIds, getPartialResponse, partialConfigIds.size)
-        Thread.sleep(100)
+        
     }
 
     fun `test Get filtered notification config using keyword filter_param_list(last_updated_time_ms)`() {
         val initialTime = Instant.now()
         val initialConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
-        Thread.sleep(1000)
+        
         val middleTime = Instant.now()
         val middleConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
-        Thread.sleep(1000)
+        
         val finalTime = Instant.now()
         val finalConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
-        Thread.sleep(1000)
+        
         val endTime = Instant.now()
 
         // Get notification configs between initialTime..middleTime
@@ -480,7 +480,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(initialConfigIds, getFirstResponse, initialConfigIds.size)
-        Thread.sleep(100)
+        
 
         // Get notification configs between middleTime..finalTime
         val getSecondResponse = executeRequest(
@@ -490,7 +490,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(middleConfigIds, getSecondResponse, middleConfigIds.size)
-        Thread.sleep(100)
+        
 
         // Get notification configs between finalTime..endTime
         val getThirdResponse = executeRequest(
@@ -500,19 +500,19 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(finalConfigIds, getThirdResponse, finalConfigIds.size)
-        Thread.sleep(100)
+        
     }
 
     fun `test Get filtered notification config using keyword filter_param_list(created_time_ms)`() {
         val initialTime = Instant.now()
         val initialConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
-        Thread.sleep(1000)
+        
         val middleTime = Instant.now()
         val middleConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
-        Thread.sleep(1000)
+        
         val finalTime = Instant.now()
         val finalConfigIds: Set<String> = (1..10).map { createConfig() }.toSet()
-        Thread.sleep(1000)
+        
         val endTime = Instant.now()
 
         // Get notification configs between initialTime..middleTime
@@ -523,7 +523,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(initialConfigIds, getFirstResponse, initialConfigIds.size)
-        Thread.sleep(100)
+        
 
         // Get notification configs between middleTime..finalTime
         val getSecondResponse = executeRequest(
@@ -533,7 +533,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(middleConfigIds, getSecondResponse, middleConfigIds.size)
-        Thread.sleep(100)
+        
 
         // Get notification configs between finalTime..endTime
         val getThirdResponse = executeRequest(
@@ -543,7 +543,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(finalConfigIds, getThirdResponse, finalConfigIds.size)
-        Thread.sleep(100)
+        
     }
 
     fun `test Get filtered notification config using keyword filter_param_list(internal config fields)`() {
@@ -553,7 +553,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         val webhookId = createConfig(configType = ConfigType.WEBHOOK)
         val emailGroupId = createConfig(configType = ConfigType.EMAIL_GROUP)
         val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
-        Thread.sleep(1000)
+        
 
         // Get notification configs using slack.url
         val getSlackResponse = executeRequest(
@@ -563,7 +563,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigIdEquals(slackId, getSlackResponse, 1)
-        Thread.sleep(100)
+        
 
         // Get notification configs using chime.url
         val getChimeResponse = executeRequest(
@@ -573,7 +573,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigIdEquals(chimeId, getChimeResponse, 1)
-        Thread.sleep(100)
+        
 
         // Get notification configs using microsoft_teams.url
         val getMicrosoftTeamsResponse = executeRequest(
@@ -583,7 +583,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigIdEquals(microsoftTeamsId, getMicrosoftTeamsResponse, 1)
-        Thread.sleep(100)
+        
 
         // Get notification configs using webhook.url
         val getWebhookResponse = executeRequest(
@@ -593,7 +593,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigIdEquals(webhookId, getWebhookResponse, 1)
-        Thread.sleep(100)
+        
 
         // Get notification configs using email_group.recipient_list.recipient
         val getEmailGroupResponse = executeRequest(
@@ -603,7 +603,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigIdEquals(emailGroupId, getEmailGroupResponse, 1)
-        Thread.sleep(100)
+        
 
         // Get notification configs using smtp_account.from_address
         val getSmtpAccountResponse = executeRequest(
@@ -613,7 +613,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigIdEquals(smtpAccountId, getSmtpAccountResponse, 1)
-        Thread.sleep(100)
+        
     }
 
     fun `test Get filtered notification config using query`() {
@@ -628,7 +628,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         val recipientIds = setOf(emailGroupId)
         val fromIds = setOf(emailGroupId, smtpAccountId)
         val domainIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId, smtpAccountId)
-        Thread.sleep(1000)
+        
 
         // Get notification configs using query=slack
         val getSlackResponse = executeRequest(
@@ -638,7 +638,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigIdEquals(slackId, getSlackResponse)
-        Thread.sleep(100)
+        
 
         // Get notification configs using query=sample
         val getAllResponse = executeRequest(
@@ -648,7 +648,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(allIds, getAllResponse, allIds.size)
-        Thread.sleep(100)
+        
 
         // Get notification configs using query=sample_*
         val getUrlResponse = executeRequest(
@@ -658,7 +658,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(urlIds, getUrlResponse, urlIds.size)
-        Thread.sleep(100)
+        
 
         // Get notification configs using query=recipient1
         val getRecipientResponse = executeRequest(
@@ -668,7 +668,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(recipientIds, getRecipientResponse, recipientIds.size)
-        Thread.sleep(100)
+        
 
         // Get notification configs using query=from.com
         val getFromResponse = executeRequest(
@@ -678,7 +678,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(fromIds, getFromResponse, fromIds.size)
-        Thread.sleep(100)
+        
 
         // Get notification configs using query=*.domain.*
         val getDomainResponse = executeRequest(
@@ -688,7 +688,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(domainIds, getDomainResponse, domainIds.size)
-        Thread.sleep(100)
+        
     }
 
     fun `test Get filtered notification config using text_query`() {
@@ -703,7 +703,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         val recipientIds = setOf(emailGroupId)
         val fromIds = setOf(emailGroupId, smtpAccountId)
         val domainIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId, smtpAccountId)
-        Thread.sleep(1000)
+        
 
         // Get notification configs using text_query=slack should not return any item
         val getSlackResponse = executeRequest(
@@ -713,7 +713,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(setOf(), getSlackResponse, 0)
-        Thread.sleep(100)
+        
 
         // Get notification configs using text_query=sample
         val getAllResponse = executeRequest(
@@ -723,7 +723,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(allIds, getAllResponse, allIds.size)
-        Thread.sleep(100)
+        
 
         // Get notification configs using text_query=sample_*
         val getUrlResponse = executeRequest(
@@ -733,7 +733,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(urlIds, getUrlResponse, urlIds.size)
-        Thread.sleep(100)
+        
 
         // Get notification configs using text_query=recipient1
         val getRecipientResponse = executeRequest(
@@ -743,7 +743,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(recipientIds, getRecipientResponse, recipientIds.size)
-        Thread.sleep(100)
+        
 
         // Get notification configs using text_query=from.com
         val getFromResponse = executeRequest(
@@ -753,7 +753,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(fromIds, getFromResponse, fromIds.size)
-        Thread.sleep(100)
+        
 
         // Get notification configs using text_query=*.domain.*
         val getDomainResponse = executeRequest(
@@ -763,12 +763,12 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(domainIds, getDomainResponse, domainIds.size)
-        Thread.sleep(100)
+        
     }
 
     fun `test Get single absent config should fail and then create a config using absent id should pass`() {
         val absentId = "absent_id"
-        Thread.sleep(1000)
+        
         // Get notification config with absent id
         executeRequest(
             RestRequest.Method.GET.name,
@@ -777,7 +777,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
             RestStatus.NOT_FOUND.status
         )
 
-        Thread.sleep(1000)
+        
 
         // Create sample config request reference
         val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
@@ -804,7 +804,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         """.trimIndent()
         val createdConfigId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertEquals(absentId, createdConfigId)
-        Thread.sleep(1000)
+        
 
         // Get chime notification config
 

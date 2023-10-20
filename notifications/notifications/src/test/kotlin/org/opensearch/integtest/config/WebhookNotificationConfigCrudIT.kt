@@ -50,7 +50,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
+        
 
         // Get webhook notification config
 
@@ -61,7 +61,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
-        Thread.sleep(100)
+        
 
         // Get all notification config
 
@@ -72,7 +72,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, referenceObject, getAllConfigResponse)
-        Thread.sleep(100)
+        
 
         // Updated notification config object
         val updatedWebhook = Webhook(
@@ -111,7 +111,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         Assert.assertEquals(configId, updateResponse.get("config_id").asString)
-        Thread.sleep(1000)
+        
 
         // Get updated webhook notification config
 
@@ -122,12 +122,12 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, updatedObject, getUpdatedConfigResponse)
-        Thread.sleep(100)
+        
 
         // Delete webhook notification config
         val deleteResponse = deleteConfig(configId)
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
-        Thread.sleep(1000)
+        
 
         // Get webhook notification config after delete
 
@@ -137,7 +137,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             "",
             RestStatus.NOT_FOUND.status
         )
-        Thread.sleep(100)
+        
     }
 
     fun `test Bad Request for multiple config for Webhook data using REST Client`() {

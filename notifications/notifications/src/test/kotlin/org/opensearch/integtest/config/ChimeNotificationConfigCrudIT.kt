@@ -51,7 +51,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
-        
 
         // Get all notification config
 
@@ -62,7 +61,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, referenceObject, getAllConfigResponse)
-        
 
         // Updated notification config object
         val updatedChime = Chime("https://updated.domain.com/updated_chime_url#0987654321")
@@ -93,7 +91,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         Assert.assertEquals(configId, updateResponse.get("config_id").asString)
-        
 
         // Get updated chime notification config
 
@@ -104,12 +101,10 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, updatedObject, getUpdatedConfigResponse)
-        
 
         // Delete chime notification config
         val deleteResponse = deleteConfig(configId)
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
-        
 
         // Get chime notification config after delete
 
@@ -119,7 +114,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             "",
             RestStatus.NOT_FOUND.status
         )
-        
     }
 
     fun `test BAD Request for multiple config data for Chime using REST Client`() {
@@ -179,7 +173,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
-        
 
         // Update to slack notification config
         val updateRequestJsonString = """
@@ -267,7 +260,6 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
-        
 
         // update to new webhook URL
         val updateRequestJsonString = """
