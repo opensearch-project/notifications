@@ -99,7 +99,6 @@ dependencies {
         exclude group: 'org.jetbrains', module: 'annotations' // resolve jarhell
     } // ${kotlin_version} does not work for coroutines
     implementation "${group}:common-utils:${common_utils_version}"
-    implementation "org.slf4j:slf4j-jdk14:1.7.32"
     // TODO: change compile to implementation when the _local/stats API is supported
     compileOnly "org.json:json:20230227"
     compileOnly "com.github.wnameless.json:json-flattener:0.13.0"
