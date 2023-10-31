@@ -22,7 +22,7 @@ jobs:
         java: [11, 17]
 
     # Job name
-    name: Build Notifications with JDK ${{ matrix.java }} on ${{ matrix.os }}
+    name: Build Notifications with JDK ${{ matrix.java }} on linux
     runs-on: ubuntu-latest
     container:
       # using the same image which is used by opensearch-build team to build the OpenSearch Distribution
