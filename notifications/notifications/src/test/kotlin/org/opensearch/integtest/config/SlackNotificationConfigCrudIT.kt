@@ -19,7 +19,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
 
     fun `test Create, Get, Update, Delete slack notification config using REST client`() {
         // Create sample config request reference
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+        val sampleSlack = Slack("https://hooks.slack.com/services/A123456/B1234567/A1B2C3D4E5F6G7H8I9J0K1L2")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -67,7 +67,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Updated notification config object
-        val updatedSlack = Slack("https://updated.domain.com/updated_slack_url#0987654321")
+        val updatedSlack = Slack("https://hooks.slack.com/services/A654321/B7654321/L2K9J4I6H9G5F3E2D8C2B7A4")
         val updatedObject = NotificationConfig(
             "this is a updated config name",
             "this is a updated config description",
@@ -126,7 +126,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
 
     fun `test Bad Request for multiple config data for Slack using REST Client`() {
         // Create sample config request reference
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+        val sampleSlack = Slack("https://hooks.slack.com/services/A123456/B1234567/A1B2C3D4E5F6G7H8I9J0K1L2")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",

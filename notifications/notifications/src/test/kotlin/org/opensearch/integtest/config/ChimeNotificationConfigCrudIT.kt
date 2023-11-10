@@ -190,7 +190,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                 "description":"this is a updated config description",
                 "config_type":"slack",
                 "is_enabled":"true",
-                "slack":{"url":"https://updated.domain.com/updated_slack_url#0987654321"}
+                "slack":{"url":"https://hooks.slack.com/services/A123456/B1234567/A1B2C3D4E5F6G7H8I9J0K1L2"}
             }
         }
         """.trimIndent()
