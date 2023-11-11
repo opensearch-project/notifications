@@ -25,7 +25,7 @@ internal class NotificationConfigDocTests {
             createdTimeMs,
             listOf("br1", "br2", "br3")
         )
-        val sampleSlack = Slack("https://domain.com/sample_url#1234567890")
+        val sampleSlack = Slack("https://hooks.slack.com/services/A123456/B1234567/A1B2C3D4E5F6G7H8I9J0K1L2")
         val config = NotificationConfig(
             "name",
             "description",

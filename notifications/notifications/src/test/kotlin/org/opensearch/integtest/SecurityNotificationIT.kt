@@ -54,7 +54,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
         createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
 
         // Create sample config request reference
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+        val sampleSlack = Slack("https://hooks.slack.com/services/A123456/B1234567/A1B2C3D4E5F6G7H8I9J0K1L2")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -97,7 +97,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
         createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         // Create sample config request reference
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+        val sampleSlack = Slack("https://hooks.slack.com/services/A123456/B1234567/A1B2C3D4E5F6G7H8I9J0K1L2")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -133,7 +133,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
         createUserWithCustomRole(user, password, NOTIFICATION_UPDATE_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_UPDATE_CONFIG_ACCESS])
 
         // Create sample config request reference
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+        val sampleSlack = Slack("https://hooks.slack.com/services/A123456/B1234567/A1B2C3D4E5F6G7H8I9J0K1L2")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -210,7 +210,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
         createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         // Create sample config request reference
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+        val sampleSlack = Slack("https://hooks.slack.com/services/A123456/B1234567/A1B2C3D4E5F6G7H8I9J0K1L2")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -246,7 +246,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
         createUserWithCustomRole(user, password, NOTIFICATION_GET_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
 
         // Create sample config request reference
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+        val sampleSlack = Slack("https://hooks.slack.com/services/A123456/B1234567/A1B2C3D4E5F6G7H8I9J0K1L2")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -302,7 +302,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
         createUserWithCustomRole(user, password, NOTIFICATION_DELETE_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
 
         // Create sample config request reference
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+        val sampleSlack = Slack("https://hooks.slack.com/services/A123456/B1234567/A1B2C3D4E5F6G7H8I9J0K1L2")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",

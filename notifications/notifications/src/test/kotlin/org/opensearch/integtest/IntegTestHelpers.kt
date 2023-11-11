@@ -116,7 +116,7 @@ fun getCreateNotificationRequestJsonString(
         .joinToString("")
     val configObjectString = when (configType) {
         ConfigType.SLACK -> """
-            "slack":{"url":"https://slack.domain.com/sample_slack_url#$randomString"}
+            "slack":{"url":"https://hooks.slack.com/services/A123456/B1234567/A1B2C3D4E5F6G7H8I9J0K1L2#$randomString"}
         """.trimIndent()
         ConfigType.CHIME -> """
             "chime":{"url":"https://chime.domain.com/sample_chime_url#$randomString"}
