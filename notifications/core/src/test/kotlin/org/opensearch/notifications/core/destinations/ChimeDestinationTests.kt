@@ -87,14 +87,13 @@ internal class ChimeDestinationTests {
 
     @Test
     fun `test chime message empty entity response`() {
-        val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
+        val mockHttpClient = mockk<CloseableHttpClient>()
         val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "{}")
 
         val httpResponse = mockk<CloseableHttpResponse>()
-        EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
+        every { mockHttpClient.execute(any<HttpPost>()) } returns httpResponse
         every { httpResponse.code } returns RestStatus.OK.status
         every { httpResponse.entity } returns StringEntity("")
-        EasyMock.replay(mockHttpClient)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
@@ -102,8 +101,8 @@ internal class ChimeDestinationTests {
 
         val title = "test Chime"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member call out: " +
-            "@All All Present member call out: @Present\"}"
+                "link test: http://sample.com email test: marymajor@example.com All member call out: " +
+                "@All All Present member call out: @Present\"}"
         val url = "https://abc/com"
 
         val destination = ChimeDestination(url)
