@@ -6,11 +6,16 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
+import org.opensearch.client.Request
+import org.opensearch.client.RequestOptions
+import org.opensearch.client.ResponseException
 import org.opensearch.commons.notifications.model.ConfigType
-import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
+import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.integtest.PluginRestTestCase
+import org.opensearch.integtest.getResponseBody
+import org.opensearch.integtest.jsonify
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
@@ -154,5 +159,41 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             createRequestJsonString,
             RestStatus.BAD_REQUEST.status
         )
+    }
+
+    fun `test create config with wrong Slack url and get error text`() {
+        val sampleSlack = Slack("https://webhook.slack.com/services/sample_slack_url")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.SLACK,
+            isEnabled = true,
+            configData = sampleSlack
+        )
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"slack",
+                "is_enabled":${referenceObject.isEnabled},
+                "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+            }
+        }
+        """.trimIndent()
+        val response = try {
+            val request = Request(RestRequest.Method.POST.name, "$PLUGIN_BASE_URI/configs")
+            request.setJsonEntity(createRequestJsonString)
+            val restOptionsBuilder = RequestOptions.DEFAULT.toBuilder()
+            restOptionsBuilder.addHeader("Content-Type", "application/json")
+            request.setOptions(restOptionsBuilder)
+            client().performRequest(request)
+            fail("Expected wrong Slack URL.")
+        } catch (exception: ResponseException) {
+            Assert.assertEquals(
+                "Wrong Slack url. Should contain \"hooks.slack.com/services/\"",
+                jsonify(getResponseBody(exception.response))["error"].asJsonObject["reason"].asString
+            )
+        }
     }
 }
