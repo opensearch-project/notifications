@@ -10,8 +10,8 @@ import org.opensearch.client.Request
 import org.opensearch.client.RequestOptions
 import org.opensearch.client.ResponseException
 import org.opensearch.commons.notifications.model.ConfigType
-import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.notifications.model.NotificationConfig
+import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.integtest.getResponseBody
