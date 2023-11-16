@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.opensearch.commons.authuser.User
 import org.opensearch.commons.notifications.model.MicrosoftTeams
+import org.opensearch.commons.notifications.model.Slack
 import java.lang.reflect.Method
 import kotlin.test.assertFails
 
@@ -28,8 +29,28 @@ class ConfigIndexingActionsTests {
         assertFails { validateMicrosoftTeamsConfig.invoke(ConfigIndexingActions, microsoftTeams, user) }
     }
 
+    @Test
+    fun `test validate slack`() {
+        val user = User()
+        var slack = Slack("https://hooks.slack.com/services/123456789/123456789/123456789")
+        validateSlackConfig.invoke(ConfigIndexingActions, slack, user)
+        slack = Slack("https://hooks.slack.com/services/samplesamplesamplesamplesamplesamplesamplesamplesample")
+        validateSlackConfig.invoke(ConfigIndexingActions, slack, user)
+        slack = Slack("http://hooks.slack.com/services/123456789/123456789/123456789/123456789")
+        assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
+        slack = Slack("https://slack.com/services/123456789/123456789/123456789/123456789")
+        assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
+        slack = Slack("https://hooks.slack.com/123456789/123456789/123456789/123456789/123456789")
+        assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
+        slack = Slack("https://hook.slack.com/services/123456789/123456789/123456789/123456789/123456789")
+        assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
+        slack = Slack("https://hooks.slack.com/")
+        assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
+    }
+
     companion object {
         private lateinit var validateMicrosoftTeamsConfig: Method
+        private lateinit var validateSlackConfig: Method
 
         @BeforeAll
         @JvmStatic
@@ -38,8 +59,12 @@ class ConfigIndexingActionsTests {
             validateMicrosoftTeamsConfig = ConfigIndexingActions::class.java.getDeclaredMethod(
                 "validateMicrosoftTeamsConfig", MicrosoftTeams::class.java, User::class.java
             )
+            validateSlackConfig = ConfigIndexingActions::class.java.getDeclaredMethod(
+                "validateSlackConfig", Slack::class.java, User::class.java
+            )
 
             validateMicrosoftTeamsConfig.isAccessible = true
+            validateSlackConfig.isAccessible = true
         }
     }
 }
