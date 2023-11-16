@@ -101,8 +101,8 @@ internal class ChimeDestinationTests {
 
         val title = "test Chime"
         val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
-                "link test: http://sample.com email test: marymajor@example.com All member call out: " +
-                "@All All Present member call out: @Present\"}"
+            "link test: http://sample.com email test: marymajor@example.com All member call out: " +
+            "@All All Present member call out: @Present\"}"
         val url = "https://abc/com"
 
         val destination = ChimeDestination(url)
