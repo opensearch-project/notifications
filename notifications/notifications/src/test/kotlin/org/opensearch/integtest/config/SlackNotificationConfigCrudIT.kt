@@ -191,7 +191,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             fail("Expected wrong Slack URL.")
         } catch (exception: ResponseException) {
             Assert.assertEquals(
-                "Wrong Slack url. Should contain \"hooks.slack.com/services/\"",
+                "Wrong Slack url. Should contain \"hooks.slack.com/services/\" or \"hooks.gov-slack.com/services/\"",
                 jsonify(getResponseBody(exception.response))["error"].asJsonObject["reason"].asString
             )
         }

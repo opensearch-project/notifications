@@ -34,17 +34,31 @@ class ConfigIndexingActionsTests {
         val user = User()
         var slack = Slack("https://hooks.slack.com/services/123456789/123456789/123456789")
         validateSlackConfig.invoke(ConfigIndexingActions, slack, user)
+        slack = Slack("https://hooks.gov-slack.com/services/123456789/123456789/123456789")
+        validateSlackConfig.invoke(ConfigIndexingActions, slack, user)
         slack = Slack("https://hooks.slack.com/services/samplesamplesamplesamplesamplesamplesamplesamplesample")
+        validateSlackConfig.invoke(ConfigIndexingActions, slack, user)
+        slack = Slack("https://hooks.gov-slack.com/services/samplesamplesamplesamplesamplesamplesamplesamplesample")
         validateSlackConfig.invoke(ConfigIndexingActions, slack, user)
         slack = Slack("http://hooks.slack.com/services/123456789/123456789/123456789/123456789")
         assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
+        slack = Slack("http://hooks.gov-slack.com/services/123456789/123456789/123456789/123456789")
+        assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
         slack = Slack("https://slack.com/services/123456789/123456789/123456789/123456789")
+        assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
+        slack = Slack("https://gov-slack.com/services/123456789/123456789/123456789/123456789")
         assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
         slack = Slack("https://hooks.slack.com/123456789/123456789/123456789/123456789/123456789")
         assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
+        slack = Slack("https://hooks.gov-slack.com/123456789/123456789/123456789/123456789/123456789")
+        assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
         slack = Slack("https://hook.slack.com/services/123456789/123456789/123456789/123456789/123456789")
         assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
+        slack = Slack("https://hook.gov-slack.com/services/123456789/123456789/123456789/123456789/123456789")
+        assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
         slack = Slack("https://hooks.slack.com/")
+        assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
+        slack = Slack("https://hooks.gov-slack.com/")
         assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
     }
 
