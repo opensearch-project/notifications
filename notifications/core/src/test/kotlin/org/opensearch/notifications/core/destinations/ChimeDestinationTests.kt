@@ -12,7 +12,6 @@ import org.apache.hc.client5.http.classic.methods.HttpPost
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse
 import org.apache.hc.core5.http.io.entity.StringEntity
-import org.easymock.EasyMock
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -117,14 +116,13 @@ internal class ChimeDestinationTests {
     @Test
     fun `test chime message non-empty entity response`() {
         val responseContent = "It worked!"
-        val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
+        val mockHttpClient = mockk<CloseableHttpClient>()
         val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, responseContent)
 
         val httpResponse = mockk<CloseableHttpResponse>()
-        EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
+        every { mockHttpClient.execute(any<HttpPost>()) } returns httpResponse
         every { httpResponse.code } returns RestStatus.OK.status
         every { httpResponse.entity } returns StringEntity(responseContent)
-        EasyMock.replay(mockHttpClient)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
