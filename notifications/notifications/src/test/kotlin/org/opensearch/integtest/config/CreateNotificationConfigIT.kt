@@ -50,7 +50,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
+        
 
         // Get Slack notification config
 
@@ -90,7 +90,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         """.trimIndent()
         val createdConfigId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertEquals(configId, createdConfigId)
-        Thread.sleep(1000)
+        
 
         // Get chime notification config
 
@@ -130,7 +130,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         """.trimIndent()
         val createdConfigId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertEquals(configId, createdConfigId)
-        Thread.sleep(1000)
+        
 
         // Get Microsoft Teams notification config
 
@@ -174,7 +174,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
         )
         val configId = createResponse.get("config_id").asString
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
+        
 
         // Get webhook notification config
 
@@ -185,7 +185,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
-        Thread.sleep(100)
+        
 
         // Updated notification config object
         val anotherWebhook = Webhook("https://another.domain.com/another_webhook_url#0987654321")

@@ -42,7 +42,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
+        
 
         // Get Slack notification config
 
@@ -53,7 +53,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
-        Thread.sleep(100)
+        
 
         // Get all notification config
 
@@ -64,7 +64,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, referenceObject, getAllConfigResponse)
-        Thread.sleep(100)
+        
 
         // Updated notification config object
         val updatedSlack = Slack("https://updated.domain.com/updated_slack_url#0987654321")
@@ -95,7 +95,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         Assert.assertEquals(configId, updateResponse.get("config_id").asString)
-        Thread.sleep(1000)
+        
 
         // Get updated Slack notification config
 
@@ -106,12 +106,12 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(configId, updatedObject, getUpdatedConfigResponse)
-        Thread.sleep(100)
+        
 
         // Delete slack notification config
         val deleteResponse = deleteConfig(configId)
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
-        Thread.sleep(1000)
+        
 
         // Get slack notification config after delete
 
@@ -121,7 +121,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             "",
             RestStatus.NOT_FOUND.status
         )
-        Thread.sleep(100)
+        
     }
 
     fun `test Bad Request for multiple config data for Slack using REST Client`() {

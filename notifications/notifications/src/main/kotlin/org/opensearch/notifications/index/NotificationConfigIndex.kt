@@ -22,6 +22,7 @@ import org.opensearch.action.index.IndexRequest
 import org.opensearch.action.index.IndexResponse
 import org.opensearch.action.search.SearchRequest
 import org.opensearch.action.search.SearchResponse
+import org.opensearch.action.support.WriteRequest.RefreshPolicy
 import org.opensearch.action.support.master.AcknowledgedResponse
 import org.opensearch.client.Client
 import org.opensearch.cluster.service.ClusterService
@@ -182,7 +183,7 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     override suspend fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String?): String? {
         createIndex()
-        val indexRequest = IndexRequest(INDEX_NAME)
+        val indexRequest = IndexRequest(INDEX_NAME).setRefreshPolicy(RefreshPolicy.IMMEDIATE)
             .source(configDoc.toXContent())
             .create(true)
         if (id != null) {
@@ -291,7 +292,7 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     override suspend fun updateNotificationConfig(id: String, notificationConfigDoc: NotificationConfigDoc): Boolean {
         createIndex()
-        val indexRequest = IndexRequest(INDEX_NAME)
+        val indexRequest = IndexRequest(INDEX_NAME).setRefreshPolicy(RefreshPolicy.IMMEDIATE)
             .source(notificationConfigDoc.toXContent())
             .create(false)
             .id(id)

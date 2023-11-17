@@ -60,7 +60,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val smtpAccountConfigId = createConfigWithRequestJsonString(createSmtpAccountRequestJsonString)
         Assert.assertNotNull(smtpAccountConfigId)
-        Thread.sleep(100)
+        
 
         // Create sample email group config request reference
         val sampleEmailGroup = EmailGroup(listOf(EmailRecipient("email1@email.com"), EmailRecipient("email2@email.com")))
@@ -91,7 +91,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val emailGroupConfigId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString)
         Assert.assertNotNull(emailGroupConfigId)
-        Thread.sleep(100)
+        
 
         // Create sample email config request reference
         val sampleEmail = Email(
@@ -130,7 +130,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val emailConfigId = createConfigWithRequestJsonString(createEmailRequestJsonString)
         Assert.assertNotNull(emailConfigId)
-        Thread.sleep(1000)
+        
 
         // Get email notification config
         val getSmtpAccountResponse = executeRequest(
@@ -140,7 +140,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(smtpAccountConfigId, smtpAccountConfig, getSmtpAccountResponse)
-        Thread.sleep(100)
+        
 
         val getEmailGroupResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -149,7 +149,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(emailGroupConfigId, emailGroupConfig, getEmailGroupResponse)
-        Thread.sleep(100)
+        
 
         val getEmailResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -158,7 +158,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(emailConfigId, emailConfig, getEmailResponse)
-        Thread.sleep(100)
+        
 
         // Get all notification config
 
@@ -176,7 +176,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             ),
             getAllConfigResponse
         )
-        Thread.sleep(100)
+        
 
         // Updated smtp account config object
         val updatedSmtpAccount = SmtpAccount(
@@ -219,7 +219,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         )
         Assert.assertEquals(smtpAccountConfigId, updateSmtpAccountResponse.get("config_id").asString)
 
-        Thread.sleep(1000)
+        
 
         // Get updated smtp account config
 
@@ -230,7 +230,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(smtpAccountConfigId, updatedSmtpAccountConfig, getUpdatedSmtpAccountResponse)
-        Thread.sleep(100)
+        
 
         // Get all updated config
         val getAllUpdatedConfigResponse = executeRequest(
@@ -247,12 +247,12 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             ),
             getAllUpdatedConfigResponse
         )
-        Thread.sleep(100)
+        
 
         // Delete email notification config
         val deleteResponse = deleteConfig(emailConfigId)
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(emailConfigId).asString)
-        Thread.sleep(1000)
+        
 
         // Get email notification config after delete
 
@@ -262,7 +262,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "",
             RestStatus.NOT_FOUND.status
         )
-        Thread.sleep(100)
+        
     }
 
     fun `test Create, Get, Update, Delete ses email notification config using REST client`() {
@@ -298,7 +298,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val sesAccountConfigId = createConfigWithRequestJsonString(createSesAccountRequestJsonString)
         Assert.assertNotNull(sesAccountConfigId)
-        Thread.sleep(100)
+        
 
         // Create sample email group config request reference
         val sampleEmailGroup = EmailGroup(listOf(EmailRecipient("email1@email.com"), EmailRecipient("email2@email.com")))
@@ -329,7 +329,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val emailGroupConfigId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString)
         Assert.assertNotNull(emailGroupConfigId)
-        Thread.sleep(100)
+        
 
         // Create sample email config request reference
         val sampleEmail = Email(
@@ -368,7 +368,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val emailConfigId = createConfigWithRequestJsonString(createEmailRequestJsonString)
         Assert.assertNotNull(emailConfigId)
-        Thread.sleep(1000)
+        
 
         // Get email notification config
         val getSesAccountResponse = executeRequest(
@@ -378,7 +378,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(sesAccountConfigId, sesAccountConfig, getSesAccountResponse)
-        Thread.sleep(100)
+        
 
         val getEmailGroupResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -387,7 +387,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(emailGroupConfigId, emailGroupConfig, getEmailGroupResponse)
-        Thread.sleep(100)
+        
 
         val getEmailResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -396,7 +396,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(emailConfigId, emailConfig, getEmailResponse)
-        Thread.sleep(100)
+        
 
         // Get all notification config
 
@@ -414,7 +414,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             ),
             getAllConfigResponse
         )
-        Thread.sleep(100)
+        
 
         // Updated ses account config object
         val updatedSesAccount = SesAccount(
@@ -455,7 +455,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         )
         Assert.assertEquals(sesAccountConfigId, updateSesAccountResponse.get("config_id").asString)
 
-        Thread.sleep(1000)
+        
 
         // Get updated ses account config
 
@@ -466,7 +466,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(sesAccountConfigId, updatedSesAccountConfig, getUpdatedSesAccountResponse)
-        Thread.sleep(100)
+        
 
         // Get all updated config
         val getAllUpdatedConfigResponse = executeRequest(
@@ -483,12 +483,12 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             ),
             getAllUpdatedConfigResponse
         )
-        Thread.sleep(100)
+        
 
         // Delete email notification config
         val deleteResponse = deleteConfig(emailConfigId)
         Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(emailConfigId).asString)
-        Thread.sleep(1000)
+        
 
         // Get email notification config after delete
 
@@ -498,7 +498,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             "",
             RestStatus.NOT_FOUND.status
         )
-        Thread.sleep(100)
+        
     }
 
     fun `test Create email notification config without email_group IDs`() {
@@ -521,7 +521,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val smtpAccountConfigId = createConfigWithRequestJsonString(createSmtpAccountRequestJsonString)
         Assert.assertNotNull(smtpAccountConfigId)
-        Thread.sleep(100)
+        
 
         // Create sample email config request reference
         val sampleEmail = Email(
@@ -558,7 +558,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val emailConfigId = createConfigWithRequestJsonString(createEmailRequestJsonString)
         Assert.assertNotNull(emailConfigId)
-        Thread.sleep(1000)
+        
 
         val getEmailResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -567,7 +567,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigEquals(emailConfigId, emailConfig, getEmailResponse)
-        Thread.sleep(100)
+        
     }
 
     fun `test Create email notification config using invalid email account id should fail`() {
@@ -610,7 +610,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             createEmailRequestJsonString,
             RestStatus.NOT_FOUND.status
         )
-        Thread.sleep(1000)
+        
 
         // Get all notification config should give empty result
         val getAllConfigResponse = executeRequest(
@@ -620,7 +620,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigEquals(mapOf(), getAllConfigResponse)
-        Thread.sleep(100)
+        
     }
 
     fun `test Create email notification config using invalid group ID should fail`() {
@@ -658,7 +658,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val smtpAccountConfigId = createConfigWithRequestJsonString(createSmtpAccountRequestJsonString)
         Assert.assertNotNull(smtpAccountConfigId)
-        Thread.sleep(100)
+        
 
         // Create sample email config request reference
         val sampleEmail = Email(
@@ -701,7 +701,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             createEmailRequestJsonString,
             RestStatus.NOT_FOUND.status
         )
-        Thread.sleep(1000)
+        
 
         // Get all notification config should give only smtp account
         val getAllConfigResponse = executeRequest(
@@ -711,7 +711,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigEquals(mapOf(Pair(smtpAccountConfigId, smtpAccountConfig)), getAllConfigResponse)
-        Thread.sleep(100)
+        
     }
 
     fun `test Create email notification config wit email_group IDs put as email account id should fail`() {
@@ -731,7 +731,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val emailGroupConfigId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString)
         Assert.assertNotNull(emailGroupConfigId)
-        Thread.sleep(100)
+        
 
         // Create email notification config
         val createEmailRequestJsonString = """
@@ -755,7 +755,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             createEmailRequestJsonString,
             RestStatus.NOT_ACCEPTABLE.status
         )
-        Thread.sleep(1000)
+        
 
         // Get all notification config should give only email group
         val getAllConfigResponse = executeRequest(
@@ -765,7 +765,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigIdEquals(emailGroupConfigId, getAllConfigResponse)
-        Thread.sleep(100)
+        
     }
 
     fun `test Create email notification config with email account ID put as well email group id should fail`() {
@@ -788,7 +788,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val smtpAccountConfigId = createConfigWithRequestJsonString(createSmtpAccountRequestJsonString)
         Assert.assertNotNull(smtpAccountConfigId)
-        Thread.sleep(100)
+        
         val createEmailRequestJsonString = """
         {
             "config":{
@@ -810,7 +810,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             createEmailRequestJsonString,
             RestStatus.BAD_REQUEST.status
         )
-        Thread.sleep(1000)
+        
 
         // Get all notification config should give only email group
         val getAllConfigResponse = executeRequest(
@@ -820,7 +820,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifySingleConfigIdEquals(smtpAccountConfigId, getAllConfigResponse)
-        Thread.sleep(100)
+        
     }
 
     fun `test Create email notification config with email account IDs put in email group id should fail`() {
@@ -843,12 +843,12 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
         """.trimIndent()
         val smtpAccountConfigId = createConfigWithRequestJsonString(createSmtpAccountRequestJsonString)
         Assert.assertNotNull(smtpAccountConfigId)
-        Thread.sleep(100)
+        
 
         // Create another smtp account
         val anotherAccountConfigId = createConfigWithRequestJsonString(createSmtpAccountRequestJsonString)
         Assert.assertNotNull(anotherAccountConfigId)
-        Thread.sleep(100)
+        
         val createEmailRequestJsonString = """
         {
             "config":{
@@ -870,7 +870,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             createEmailRequestJsonString,
             RestStatus.NOT_ACCEPTABLE.status
         )
-        Thread.sleep(1000)
+        
 
         // Get all notification config should give only email group
         val getAllConfigResponse = executeRequest(
@@ -880,7 +880,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
             RestStatus.OK.status
         )
         verifyMultiConfigIdEquals(setOf(smtpAccountConfigId, anotherAccountConfigId), getAllConfigResponse)
-        Thread.sleep(100)
+        
     }
 
     fun `test Bad Request for multiple config for SmtpAccount using REST Client`() {
