@@ -63,7 +63,9 @@ object ConfigIndexingActions {
 
     @Suppress("UnusedPrivateMember")
     private fun validateChimeConfig(chime: Chime, user: User?) {
-        // TODO: URL validation with rules
+        require(chime.url.contains(Regex("https://hooks\\.chime\\.aws/incomingwebhooks/.*\\?token="))) {
+            "Wrong Chime url. Should contain \"hooks.chime.aws/incomingwebhooks/\" and \"?token=\""
+        }
     }
 
     private fun validateMicrosoftTeamsConfig(microsoftTeams: MicrosoftTeams, user: User?) {
