@@ -27,7 +27,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
 
     fun `test Create slack notification config`() {
         // Create sample config request reference
-        val sampleSlack = Slack("https://domain.com/sample_slack_url#1234567890")
+        val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
