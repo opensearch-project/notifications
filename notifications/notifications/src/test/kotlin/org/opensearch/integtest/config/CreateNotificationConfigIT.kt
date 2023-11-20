@@ -66,7 +66,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
     fun `test Create chime notification config with ID`() {
         // Create sample config request reference
         val configId = "sample_config_id"
-        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
+        val sampleChime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",

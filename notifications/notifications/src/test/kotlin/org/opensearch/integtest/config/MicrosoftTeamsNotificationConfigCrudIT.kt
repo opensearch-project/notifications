@@ -184,7 +184,7 @@ class MicrosoftTeamsNotificationConfigCrudIT : PluginRestTestCase() {
                 "description":"${referenceObject.description}",
                 "config_type":"microsoft_teams",
                 "is_enabled":${referenceObject.isEnabled},
-                "chime":{"url":"https://dummy.com"},
+                "chime":{"url":"https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456"},
                 "microsoft_teams":{"url":"${(referenceObject.configData as MicrosoftTeams).url}"}
             }
         }

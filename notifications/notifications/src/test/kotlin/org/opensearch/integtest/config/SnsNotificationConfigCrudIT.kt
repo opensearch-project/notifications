@@ -143,7 +143,7 @@ class SnsNotificationConfigCrudIT : PluginRestTestCase() {
                 "description":"${referenceObject.description}",
                 "config_type":"sns",
                 "is_enabled":${referenceObject.isEnabled},
-                "chime":{"url":"https://dummy.com"}
+                "chime":{"url":"https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456"}
                 "sns":{"topic_arn":"${(referenceObject.configData as Sns).topicArn}","role_arn":"${(referenceObject.configData as Sns).roleArn}"}
             }
         }

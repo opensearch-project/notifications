@@ -18,7 +18,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
 
     fun `test Create, Get, Update, Delete chime notification config using REST client`() {
         // Create sample config request reference
-        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
+        val sampleChime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -66,7 +66,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Updated notification config object
-        val updatedChime = Chime("https://updated.domain.com/updated_chime_url#0987654321")
+        val updatedChime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=654321")
         val updatedObject = NotificationConfig(
             "this is a updated config name",
             "this is a updated config description",
@@ -125,7 +125,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
 
     fun `test BAD Request for multiple config data for Chime using REST Client`() {
         // Create sample config request reference
-        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
+        val sampleChime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -157,7 +157,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
 
     fun `test update existing config to different config type`() {
         // Create sample config request reference
-        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
+        val sampleChime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -245,7 +245,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
 
     fun `test update Chime webhook URL`() {
         // Create sample config request reference
-        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
+        val sampleChime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -278,7 +278,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                 "description":"this is a updated config description",
                 "config_type":"chime",
                 "is_enabled":"true",
-                "chime":{"url":"https://updated.domain.com/updated_chime_url#0987654321"}
+                "chime":{"url":"https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=654321"}
             }
         }
         """.trimIndent()

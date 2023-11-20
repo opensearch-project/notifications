@@ -25,7 +25,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
                 "config_type":"chime",
                 "is_enabled":true,
                 "chime":{
-                    "url":"https://hooks.chime.aws/incomingwebhooks/xxxx"
+                    "url":"https://hooks.chime.aws/incomingwebhooks/xxxx?token=xxxx"
                 }
             }
         }
