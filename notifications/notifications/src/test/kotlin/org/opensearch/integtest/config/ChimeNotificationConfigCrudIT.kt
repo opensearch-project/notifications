@@ -314,7 +314,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
     }
 
     fun `test create config with wrong Chime url and get error text`() {
-        val sampleChime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
+        val sampleChime = Chime("https://hook.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
