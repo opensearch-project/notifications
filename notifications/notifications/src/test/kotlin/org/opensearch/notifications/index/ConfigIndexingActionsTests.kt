@@ -80,7 +80,6 @@ class ConfigIndexingActionsTests {
         assertFails { validateChimeConfig.invoke(ConfigIndexingActions, chime, user) }
         chime = Chime("https://hooks.chime.aws/sample_chime_url?token=123456")
         assertFails { validateChimeConfig.invoke(ConfigIndexingActions, chime, user) }
-
     }
 
     companion object {
