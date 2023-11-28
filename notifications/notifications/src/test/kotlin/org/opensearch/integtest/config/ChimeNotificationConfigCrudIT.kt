@@ -5,11 +5,16 @@
 package org.opensearch.integtest.config
 
 import org.junit.Assert
+import org.opensearch.client.Request
+import org.opensearch.client.RequestOptions
+import org.opensearch.client.ResponseException
 import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.integtest.PluginRestTestCase
+import org.opensearch.integtest.getResponseBody
+import org.opensearch.integtest.jsonify
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
@@ -18,7 +23,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
 
     fun `test Create, Get, Update, Delete chime notification config using REST client`() {
         // Create sample config request reference
-        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
+        val sampleChime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -66,7 +71,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
         Thread.sleep(100)
 
         // Updated notification config object
-        val updatedChime = Chime("https://updated.domain.com/updated_chime_url#0987654321")
+        val updatedChime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=654321")
         val updatedObject = NotificationConfig(
             "this is a updated config name",
             "this is a updated config description",
@@ -125,7 +130,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
 
     fun `test BAD Request for multiple config data for Chime using REST Client`() {
         // Create sample config request reference
-        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
+        val sampleChime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -157,7 +162,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
 
     fun `test update existing config to different config type`() {
         // Create sample config request reference
-        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
+        val sampleChime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -245,7 +250,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
 
     fun `test update Chime webhook URL`() {
         // Create sample config request reference
-        val sampleChime = Chime("https://domain.com/sample_chime_url#1234567890")
+        val sampleChime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
         val referenceObject = NotificationConfig(
             "this is a sample config name",
             "this is a sample config description",
@@ -278,7 +283,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                 "description":"this is a updated config description",
                 "config_type":"chime",
                 "is_enabled":"true",
-                "chime":{"url":"https://updated.domain.com/updated_chime_url#0987654321"}
+                "chime":{"url":"https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=654321"}
             }
         }
         """.trimIndent()
@@ -306,5 +311,41 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
             badUpdateRequestJsonString,
             RestStatus.INTERNAL_SERVER_ERROR.status
         )
+    }
+
+    fun `test create config with wrong Chime url and get error text`() {
+        val sampleChime = Chime("https://hook.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.CHIME,
+            isEnabled = true,
+            configData = sampleChime
+        )
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"chime",
+                "is_enabled":${referenceObject.isEnabled},
+                "chime":{"url":"${(referenceObject.configData as Chime).url}"}
+            }
+        }
+        """.trimIndent()
+        val response = try {
+            val request = Request(RestRequest.Method.POST.name, "$PLUGIN_BASE_URI/configs")
+            request.setJsonEntity(createRequestJsonString)
+            val restOptionsBuilder = RequestOptions.DEFAULT.toBuilder()
+            restOptionsBuilder.addHeader("Content-Type", "application/json")
+            request.setOptions(restOptionsBuilder)
+            client().performRequest(request)
+            fail("Expected wrong Chime URL.")
+        } catch (exception: ResponseException) {
+            Assert.assertEquals(
+                "Wrong Chime url. Should contain \"hooks.chime.aws/incomingwebhooks/\" and \"?token=\"",
+                jsonify(getResponseBody(exception.response))["error"].asJsonObject["reason"].asString
+            )
+        }
     }
 }

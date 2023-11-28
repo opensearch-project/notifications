@@ -148,7 +148,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
                 "description":"${referenceObject.description}",
                 "config_type":"slack",
                 "is_enabled":${referenceObject.isEnabled},
-                "chime":{"url":"https://dummy.com"}
+                "chime":{"url":"https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456"}
                 "slack":{"url":"${(referenceObject.configData as Slack).url}
             }
         }

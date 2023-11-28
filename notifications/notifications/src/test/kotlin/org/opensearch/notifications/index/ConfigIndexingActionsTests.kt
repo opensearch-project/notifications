@@ -7,6 +7,7 @@ package org.opensearch.notifications.index
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.opensearch.commons.authuser.User
+import org.opensearch.commons.notifications.model.Chime
 import org.opensearch.commons.notifications.model.MicrosoftTeams
 import org.opensearch.commons.notifications.model.Slack
 import java.lang.reflect.Method
@@ -62,9 +63,29 @@ class ConfigIndexingActionsTests {
         assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
     }
 
+    @Test
+    fun `test validate chime`() {
+        val user = User()
+        var chime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
+        validateChimeConfig.invoke(ConfigIndexingActions, chime, user)
+        chime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456&test=123")
+        validateChimeConfig.invoke(ConfigIndexingActions, chime, user)
+        chime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url")
+        assertFails { validateChimeConfig.invoke(ConfigIndexingActions, chime, user) }
+        chime = Chime("https://hooks.chime.aws/incomingwebhooks?token=123456")
+        assertFails { validateChimeConfig.invoke(ConfigIndexingActions, chime, user) }
+        chime = Chime("http://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
+        assertFails { validateChimeConfig.invoke(ConfigIndexingActions, chime, user) }
+        chime = Chime("https://sample.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
+        assertFails { validateChimeConfig.invoke(ConfigIndexingActions, chime, user) }
+        chime = Chime("https://hooks.chime.aws/sample_chime_url?token=123456")
+        assertFails { validateChimeConfig.invoke(ConfigIndexingActions, chime, user) }
+    }
+
     companion object {
         private lateinit var validateMicrosoftTeamsConfig: Method
         private lateinit var validateSlackConfig: Method
+        private lateinit var validateChimeConfig: Method
 
         @BeforeAll
         @JvmStatic
@@ -76,9 +97,13 @@ class ConfigIndexingActionsTests {
             validateSlackConfig = ConfigIndexingActions::class.java.getDeclaredMethod(
                 "validateSlackConfig", Slack::class.java, User::class.java
             )
+            validateChimeConfig = ConfigIndexingActions::class.java.getDeclaredMethod(
+                "validateChimeConfig", Chime::class.java, User::class.java
+            )
 
             validateMicrosoftTeamsConfig.isAccessible = true
             validateSlackConfig.isAccessible = true
+            validateChimeConfig.isAccessible = true
         }
     }
 }
