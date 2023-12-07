@@ -31,6 +31,7 @@ internal class PluginSettingsTests {
     private val httpMaxConnectionKey = "$httpKeyPrefix.max_connections"
     private val httpMaxConnectionPerRouteKey = "$httpKeyPrefix.max_connection_per_route"
     private val httpConnectionTimeoutKey = "$httpKeyPrefix.connection_timeout"
+    private val disableWebhookCookieKey = "$keyPrefix.webhook.disable_http_cookie"
     private val httpSocketTimeoutKey = "$httpKeyPrefix.socket_timeout"
     private val legacyAlertingHostDenyListKey = "opendistro.destination.host.deny_list"
     private val alertingHostDenyListKey = "plugins.destination.host.deny_list"
@@ -93,7 +94,8 @@ internal class PluginSettingsTests {
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
-                    PluginSettings.HOST_DENY_LIST
+                    PluginSettings.HOST_DENY_LIST,
+                    PluginSettings.DISABLE_HTTP_COOKIE,
                 )
             )
         )
@@ -134,6 +136,10 @@ internal class PluginSettingsTests {
             "opensearch",
             PluginSettings.clusterName
         )
+        Assertions.assertEquals(
+            false,
+            PluginSettings.disableHttpCookie
+        )
     }
 
     @Test
@@ -148,6 +154,7 @@ internal class PluginSettingsTests {
             .putList(httpHostDenyListKey, listOf("sample"))
             .putList(allowedConfigTypeKey, listOf("slack"))
             .put(tooltipSupportKey, false)
+            .put(disableWebhookCookieKey, true)
             .put(clusterNameKey, "OpenSearch OsDomainNameUpdate")
             .build()
 
@@ -166,6 +173,7 @@ internal class PluginSettingsTests {
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.HOST_DENY_LIST,
+                    PluginSettings.DISABLE_HTTP_COOKIE,
                     ClusterName.CLUSTER_NAME_SETTING
                 )
             )
@@ -207,6 +215,10 @@ internal class PluginSettingsTests {
             "OpenSearch OsDomainNameUpdate",
             clusterService.clusterSettings.get(ClusterName.CLUSTER_NAME_SETTING).value()
         )
+        Assertions.assertEquals(
+            true,
+            clusterService.clusterSettings.get(PluginSettings.DISABLE_HTTP_COOKIE)
+        )
     }
 
     @Test
@@ -227,6 +239,7 @@ internal class PluginSettingsTests {
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.HOST_DENY_LIST,
+                    PluginSettings.DISABLE_HTTP_COOKIE,
                     ClusterName.CLUSTER_NAME_SETTING
                 )
             )
@@ -268,6 +281,10 @@ internal class PluginSettingsTests {
             "Cluster [opensearch]",
             clusterService.clusterSettings.get(ClusterName.CLUSTER_NAME_SETTING).toString()
         )
+        Assertions.assertEquals(
+            false,
+            clusterService.clusterSettings.get(PluginSettings.DISABLE_HTTP_COOKIE)
+        )
     }
 
     @Test
@@ -295,6 +312,7 @@ internal class PluginSettingsTests {
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
                     PluginSettings.ALERTING_HOST_DENY_LIST,
                     PluginSettings.HOST_DENY_LIST,
+                    PluginSettings.DISABLE_HTTP_COOKIE,
                     ClusterName.CLUSTER_NAME_SETTING
                 )
             )
@@ -330,6 +348,7 @@ internal class PluginSettingsTests {
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
                     PluginSettings.ALERTING_HOST_DENY_LIST,
                     PluginSettings.HOST_DENY_LIST,
+                    PluginSettings.DISABLE_HTTP_COOKIE,
                     ClusterName.CLUSTER_NAME_SETTING
                 )
             )
@@ -364,6 +383,7 @@ internal class PluginSettingsTests {
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
                     PluginSettings.ALERTING_HOST_DENY_LIST,
                     PluginSettings.HOST_DENY_LIST,
+                    PluginSettings.DISABLE_HTTP_COOKIE,
                     ClusterName.CLUSTER_NAME_SETTING
                 )
             )

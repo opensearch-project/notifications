@@ -15,6 +15,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager
+import org.apache.hc.client5.http.io.HttpClientConnectionManager
 import org.apache.hc.core5.http.HttpEntity
 import org.apache.hc.core5.http.HttpResponse
 import org.apache.hc.core5.http.io.entity.EntityUtils
@@ -45,14 +46,22 @@ import kotlin.collections.HashSet
 class DestinationHttpClient {
 
     private val httpClient: CloseableHttpClient
+    private val httpClientDisableCookie: CloseableHttpClient
 
     constructor() {
-        this.httpClient = createHttpClient()
+        val connectionManager = PoolingHttpClientConnectionManager()
+        connectionManager.maxTotal = PluginSettings.maxConnections
+        connectionManager.defaultMaxPerRoute = PluginSettings.maxConnectionsPerRoute
+
+        // share same connection pool
+        this.httpClient = createHttpClient(connectionManager, false)
+        this.httpClientDisableCookie = createHttpClient(connectionManager, true)
     }
 
     @OpenForTesting
     constructor(httpClient: CloseableHttpClient) {
         this.httpClient = httpClient
+        this.httpClientDisableCookie = httpClient
     }
 
     companion object {
@@ -76,23 +85,24 @@ class DestinationHttpClient {
             )
         )
 
-        private fun createHttpClient(): CloseableHttpClient {
+        private fun createHttpClient(connectionManager: HttpClientConnectionManager, disableCookie: Boolean): CloseableHttpClient {
             val config: RequestConfig = RequestConfig.custom()
                 .setConnectTimeout(Timeout.ofMilliseconds(PluginSettings.connectionTimeout.toLong()))
                 .setConnectionRequestTimeout(Timeout.ofMilliseconds(PluginSettings.connectionTimeout.toLong()))
                 .setResponseTimeout(Timeout.ofMilliseconds(PluginSettings.socketTimeout.toLong()))
                 .build()
-            val connectionManager = PoolingHttpClientConnectionManager()
-            connectionManager.maxTotal = PluginSettings.maxConnections
-            connectionManager.defaultMaxPerRoute = PluginSettings.maxConnectionsPerRoute
 
-            return HttpClientBuilder.create()
+            val builder = HttpClientBuilder.create()
                 .setDefaultRequestConfig(config)
                 .setConnectionManager(connectionManager)
                 .setRetryStrategy(DefaultHttpRequestRetryStrategy())
                 .useSystemProperties()
                 .disableRedirectHandling()
-                .build()
+
+            if (disableCookie) {
+                builder.disableCookieManagement()
+            }
+            return builder.build()
         }
     }
 
@@ -131,7 +141,11 @@ class DestinationHttpClient {
         val entity = StringEntity(buildRequestBody(destination, message), StandardCharsets.UTF_8)
         httpRequest.entity = entity
 
-        return httpClient.execute(httpRequest)
+        return if (PluginSettings.disableHttpCookie) {
+            httpClientDisableCookie.execute(httpRequest)
+        } else {
+            httpClient.execute(httpRequest)
+        }
     }
 
     private fun constructHttpRequest(method: String, url: String): HttpUriRequestBase {
