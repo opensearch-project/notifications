@@ -19,7 +19,7 @@ jobs:
       # This setting says that all jobs should finish, even if one fails
       fail-fast: false
       matrix:
-        java: [11, 17]
+        java: [11, 17, 21]
 
     # Job name
     name: Build Notifications with JDK ${{ matrix.java }} on linux
@@ -82,7 +82,7 @@ jobs:
       # This setting says that all jobs should finish, even if one fails
       fail-fast: false
       matrix:
-        java: [11, 17]
+        java: [11, 17, 21]
         os: [ windows-latest, macos-latest ]
         include:
           - os: windows-latest
