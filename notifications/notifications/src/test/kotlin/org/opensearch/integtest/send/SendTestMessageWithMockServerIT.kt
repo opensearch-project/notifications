@@ -46,7 +46,10 @@ internal class SendTestMessageWithMockServerIT : PluginRestTestCase() {
 
         // send test message
         val sendResponse = executeRequest(
-            RestRequest.Method.POST.name, "$PLUGIN_BASE_URI/feature/test/$configId", "", RestStatus.OK.status
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/feature/test/$configId",
+            "",
+            RestStatus.OK.status
         )
 
         logger.info(sendResponse)

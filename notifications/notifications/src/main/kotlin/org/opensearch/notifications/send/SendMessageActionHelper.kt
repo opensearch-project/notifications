@@ -603,6 +603,7 @@ object SendMessageActionHelper {
             DestinationMessageResponse(RestStatus.FAILED_DEPENDENCY.status, "Failed to send notification")
         }
     }
+
     /**
      * Collects all child configs of the channel configurations (like email)
      * @param channels list of NotificationConfigDocInfo

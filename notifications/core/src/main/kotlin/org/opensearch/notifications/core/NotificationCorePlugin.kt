@@ -41,6 +41,7 @@ class NotificationCorePlugin : ReloadablePlugin, Plugin(), ExtensiblePlugin {
         const val PLUGIN_NAME = "opensearch-notifications-core"
         const val LOG_PREFIX = "notifications-core"
     }
+
     /**
      * {@inheritDoc}
      */

@@ -46,6 +46,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         val error = sendResponse.get("error").asJsonObject
         Assert.assertNotNull(error.get("reason").asString)
     }
+
     @Suppress("EmptyFunctionBlock")
     fun `test send test slack message`() {
         // Create webhook notification config
@@ -78,6 +79,7 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
         val error = sendResponse.get("error").asJsonObject
         Assert.assertNotNull(error.get("reason").asString)
     }
+
     @Suppress("EmptyFunctionBlock")
     fun `test send test microsoft teams message`() {
         // Create webhook notification config
