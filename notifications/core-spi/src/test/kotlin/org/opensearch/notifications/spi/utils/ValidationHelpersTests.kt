@@ -100,6 +100,7 @@ internal class ValidationHelpersTests {
     fun `validator identifies chime url as valid`() {
         assert(isValidUrl(CHIME_URL))
     }
+
     @Test
     fun `validator identifies microsoft teams url as valid`() {
         assert(isValidUrl(MICROSOFT_TEAMS_WEBHOOK_URL))

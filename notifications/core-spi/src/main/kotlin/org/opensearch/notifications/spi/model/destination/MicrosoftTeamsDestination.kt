@@ -9,5 +9,5 @@ package org.opensearch.notifications.spi.model.destination
  * This class holds the contents of a Microsoft Teams destination
  */
 class MicrosoftTeamsDestination(
-    url: String,
+    url: String
 ) : WebhookDestination(url, DestinationType.MICROSOFT_TEAMS)
