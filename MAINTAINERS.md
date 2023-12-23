@@ -13,6 +13,9 @@ This document contains a list of maintainers in this repo. See [opensearch-proje
 | Zhichao Geng           | [zhichao-aws](https://github.com/zhichao-aws) | Amazon      |
 | Yuye Zhu               | [yuye-aws](https://github.com/yuye-aws)       | Amazon      |
 | Zhongnan Su            | [zhongnansu](https://github.com/zhongnansu)   | Amazon      |
+| Subhobrata Dey         | [sbcd90](https://github.com/sbcd90)           | Amazon      |
+| Amardeepsingh Siglani  | [amsiglan](https://github.com/amsiglan)       | Amazon      |
+| Praveen Sameneni       | [praveensameneni](https://github.com/praveensameneni)| Amazon |
 
 ## Emeritus
 
