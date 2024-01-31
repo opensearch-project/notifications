@@ -64,8 +64,8 @@ When launching a cluster using above commands, logs are placed in `notifications
 
 1. Setup a local OpenSearch cluster with security plugin.
 - `./gradlew build`
-- `./gradlew integTest -Dtests.rest.cluster=localhost:9200 -Dtests.cluster=localhost:9200 -Dtests.clustername=opensearch-integrationtest -Dhttps=true -Duser=admin -Dpassword=admin`
-- `./gradlew integTestRunner -Dtests.rest.cluster=localhost:9200 -Dtests.cluster=localhost:9200 -Dtests.clustername=opensearch-integrationtest -Dhttps=true -Duser=admin -Dpassword=admin --tests "<test name>"`
+- `./gradlew integTest -Dtests.rest.cluster=localhost:9200 -Dtests.cluster=localhost:9200 -Dtests.clustername=opensearch-integrationtest -Dhttps=true -Duser=admin -Dpassword=<admin-password>`
+- `./gradlew integTestRunner -Dtests.rest.cluster=localhost:9200 -Dtests.cluster=localhost:9200 -Dtests.clustername=opensearch-integrationtest -Dhttps=true -Duser=admin -Dpassword=<admin-password> --tests "<test name>"`
 
 ### Debugging
 
