@@ -79,7 +79,7 @@ internal class PluginSettingsTests {
                 clusterSettings,
                 setOf(
                     PluginSettings.OPERATION_TIMEOUT_MS,
-                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
+                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT
                 )
             )
         )

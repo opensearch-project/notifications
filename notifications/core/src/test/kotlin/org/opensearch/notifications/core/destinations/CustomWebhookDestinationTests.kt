@@ -46,6 +46,7 @@ internal class CustomWebhookDestinationTests {
                 Arguments.of("PUT", HttpPut::class.java),
                 Arguments.of("PATCH", HttpPatch::class.java)
             )
+
         @JvmStatic
         fun escapeSequenceToRaw(): Stream<Arguments> =
             Stream.of(
@@ -53,7 +54,7 @@ internal class CustomWebhookDestinationTests {
                 Arguments.of("\t", """\t"""),
                 Arguments.of("\b", """\b"""),
                 Arguments.of("\r", """\r"""),
-                Arguments.of("\"", """\""""),
+                Arguments.of("\"", """\"""")
             )
     }
 
