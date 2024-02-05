@@ -24,7 +24,8 @@ class SecurityNotificationIT : PluginRestTestCase() {
 
     companion object {
         @BeforeClass
-        @JvmStatic fun setup() {
+        @JvmStatic
+        fun setup() {
             // things to execute once and keep around for the class
             org.junit.Assume.assumeTrue(System.getProperty("https", "false")!!.toBoolean())
         }
@@ -36,7 +37,6 @@ class SecurityNotificationIT : PluginRestTestCase() {
 
     @Before
     fun create() {
-
         if (userClient == null) {
             createUser(user, password, arrayOf())
             userClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), user, password).setSocketTimeout(60000).build()
@@ -45,7 +45,6 @@ class SecurityNotificationIT : PluginRestTestCase() {
 
     @After
     fun cleanup() {
-
         userClient?.close()
     }
 

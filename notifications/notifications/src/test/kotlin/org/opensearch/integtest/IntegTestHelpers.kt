@@ -179,8 +179,12 @@ class NotificationsJsonEntity(
     var jsonEntityString: String = ""
 
     private constructor(builder: Builder) : this(
-        builder.refTag, builder.recipients, builder.title,
-        builder.textDescription, builder.htmlDescription, builder.attachment
+        builder.refTag,
+        builder.recipients,
+        builder.title,
+        builder.textDescription,
+        builder.htmlDescription,
+        builder.attachment
     )
 
     fun getJsonEntityAsString(): String {
