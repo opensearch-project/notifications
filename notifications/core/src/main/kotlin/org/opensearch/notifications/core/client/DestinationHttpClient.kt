@@ -49,6 +49,7 @@ class DestinationHttpClient {
     constructor() {
         this.httpClient = createHttpClient()
     }
+
     @OpenForTesting
     constructor(httpClient: CloseableHttpClient) {
         this.httpClient = httpClient
@@ -56,15 +57,20 @@ class DestinationHttpClient {
 
     companion object {
         private val log by logger(DestinationHttpClient::class.java)
+
         /**
          * all valid response status
          */
         private val VALID_RESPONSE_STATUS = Collections.unmodifiableSet(
             HashSet(
                 listOf(
-                    RestStatus.OK.status, RestStatus.CREATED.status, RestStatus.ACCEPTED.status,
-                    RestStatus.NON_AUTHORITATIVE_INFORMATION.status, RestStatus.NO_CONTENT.status,
-                    RestStatus.RESET_CONTENT.status, RestStatus.PARTIAL_CONTENT.status,
+                    RestStatus.OK.status,
+                    RestStatus.CREATED.status,
+                    RestStatus.ACCEPTED.status,
+                    RestStatus.NON_AUTHORITATIVE_INFORMATION.status,
+                    RestStatus.NO_CONTENT.status,
+                    RestStatus.RESET_CONTENT.status,
+                    RestStatus.PARTIAL_CONTENT.status,
                     RestStatus.MULTI_STATUS.status
                 )
             )

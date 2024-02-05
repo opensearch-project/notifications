@@ -43,7 +43,7 @@ internal class MicrosoftTeamsDestinationTests {
                 Arguments.of("\t", """\t"""),
                 Arguments.of("\b", """\b"""),
                 Arguments.of("\r", """\r"""),
-                Arguments.of("\"", """\""""),
+                Arguments.of("\"", """\"""")
             )
     }
 

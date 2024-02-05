@@ -62,7 +62,8 @@ class NotificationConfigIndexTests {
         fun initialize() {
             /* use reflection to get private method */
             getSchemaVersionFromIndexMapping = NotificationConfigIndex::class.java.getDeclaredMethod(
-                "getSchemaVersionFromIndexMapping", Map::class.java
+                "getSchemaVersionFromIndexMapping",
+                Map::class.java
             )
 
             getSchemaVersionFromIndexMapping.isAccessible = true

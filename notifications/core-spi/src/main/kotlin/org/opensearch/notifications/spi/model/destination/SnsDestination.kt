@@ -9,7 +9,7 @@ package org.opensearch.notifications.spi.model.destination
  */
 data class SnsDestination(
     val topicArn: String,
-    val roleArn: String? = null,
+    val roleArn: String? = null
 ) : BaseDestination(DestinationType.SNS) {
     // sample topic arn -> arn:aws:sns:us-west-2:075315751589:test-notification
     val region: String = topicArn.split(":".toRegex()).toTypedArray()[3]
