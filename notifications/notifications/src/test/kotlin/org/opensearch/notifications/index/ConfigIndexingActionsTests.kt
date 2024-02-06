@@ -36,7 +36,9 @@ class ConfigIndexingActionsTests {
         fun initialize() {
             /* use reflection to get private method */
             validateMicrosoftTeamsConfig = ConfigIndexingActions::class.java.getDeclaredMethod(
-                "validateMicrosoftTeamsConfig", MicrosoftTeams::class.java, User::class.java
+                "validateMicrosoftTeamsConfig",
+                MicrosoftTeams::class.java,
+                User::class.java
             )
 
             validateMicrosoftTeamsConfig.isAccessible = true

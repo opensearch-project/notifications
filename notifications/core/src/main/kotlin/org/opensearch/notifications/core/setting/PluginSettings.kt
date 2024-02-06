@@ -294,71 +294,83 @@ internal object PluginSettings {
         EMAIL_SIZE_LIMIT_KEY,
         defaultSettings[EMAIL_SIZE_LIMIT_KEY]!!.toInt(),
         MINIMUM_EMAIL_SIZE_LIMIT,
-        NodeScope, Dynamic
+        NodeScope,
+        Dynamic
     )
 
     val EMAIL_MINIMUM_HEADER_LENGTH: Setting<Int> = Setting.intSetting(
         EMAIL_MINIMUM_HEADER_LENGTH_KEY,
         defaultSettings[EMAIL_MINIMUM_HEADER_LENGTH_KEY]!!.toInt(),
-        NodeScope, Dynamic
+        NodeScope,
+        Dynamic
     )
 
     val MAX_CONNECTIONS: Setting<Int> = Setting.intSetting(
         MAX_CONNECTIONS_KEY,
         defaultSettings[MAX_CONNECTIONS_KEY]!!.toInt(),
-        NodeScope, Dynamic
+        NodeScope,
+        Dynamic
     )
 
     val MAX_CONNECTIONS_PER_ROUTE: Setting<Int> = Setting.intSetting(
         MAX_CONNECTIONS_PER_ROUTE_KEY,
         defaultSettings[MAX_CONNECTIONS_PER_ROUTE_KEY]!!.toInt(),
-        NodeScope, Dynamic
+        NodeScope,
+        Dynamic
     )
 
     val CONNECTION_TIMEOUT_MILLISECONDS: Setting<Int> = Setting.intSetting(
         CONNECTION_TIMEOUT_MILLISECONDS_KEY,
         defaultSettings[CONNECTION_TIMEOUT_MILLISECONDS_KEY]!!.toInt(),
-        NodeScope, Dynamic
+        NodeScope,
+        Dynamic
     )
 
     val SOCKET_TIMEOUT_MILLISECONDS: Setting<Int> = Setting.intSetting(
         SOCKET_TIMEOUT_MILLISECONDS_KEY,
         defaultSettings[SOCKET_TIMEOUT_MILLISECONDS_KEY]!!.toInt(),
-        NodeScope, Dynamic
+        NodeScope,
+        Dynamic
     )
 
     val ALLOWED_CONFIG_TYPES: Setting<List<String>> = Setting.listSetting(
         ALLOWED_CONFIG_TYPE_KEY,
         DEFAULT_ALLOWED_CONFIG_TYPES,
         { it },
-        NodeScope, Dynamic
+        NodeScope,
+        Dynamic
     )
 
     val TOOLTIP_SUPPORT: Setting<Boolean> = Setting.boolSetting(
         TOOLTIP_SUPPORT_KEY,
         defaultSettings[TOOLTIP_SUPPORT_KEY]!!.toBoolean(),
-        NodeScope, Dynamic
+        NodeScope,
+        Dynamic
     )
 
     val LEGACY_ALERTING_HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
         LEGACY_ALERTING_HOST_DENY_LIST_KEY,
         DEFAULT_HOST_DENY_LIST,
         { it },
-        NodeScope, Final, Deprecated
+        NodeScope,
+        Final,
+        Deprecated
     )
 
     val ALERTING_HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
         ALERTING_HOST_DENY_LIST_KEY,
         LEGACY_ALERTING_HOST_DENY_LIST,
         { it },
-        NodeScope, Final
+        NodeScope,
+        Final
     )
 
     val HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
         HOST_DENY_LIST_KEY,
         ALERTING_HOST_DENY_LIST,
         { it },
-        NodeScope, Dynamic
+        NodeScope,
+        Dynamic
     )
 
     private val LEGACY_EMAIL_USERNAME: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
@@ -415,6 +427,7 @@ internal object PluginSettings {
             EMAIL_PASSWORD
         )
     }
+
     /**
      * Update the setting variables to setting values from local settings
      * @param clusterService cluster service instance

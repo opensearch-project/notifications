@@ -34,7 +34,8 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
         RollingCounter()
     ),
     NOTIFICATIONS_EXCEPTIONS_VERSION_CONFLICT_ENGINE_EXCEPTION(
-        "exception.version_conflict_engine", RollingCounter()
+        "exception.version_conflict_engine",
+        RollingCounter()
     ),
     NOTIFICATIONS_EXCEPTIONS_INDEX_NOT_FOUND_EXCEPTION(
         "exception.index_not_found",
@@ -84,20 +85,24 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
         RollingCounter()
     ),
     NOTIFICATIONS_CONFIG_UPDATE_USER_ERROR_INVALID_CONFIG_ID(
-        "notifications_config.update.user_error.invalid_config_id", RollingCounter()
+        "notifications_config.update.user_error.invalid_config_id",
+        RollingCounter()
     ),
     NOTIFICATIONS_CONFIG_UPDATE_SYSTEM_ERROR(
         "notifications_config.update.system_error",
         RollingCounter()
     ), // Notification config general user error
     NOTIFICATIONS_CONFIG_USER_ERROR_INVALID_EMAIL_ACCOUNT_ID(
-        "notifications_config.user_error.invalid_email_account_id", RollingCounter()
+        "notifications_config.user_error.invalid_email_account_id",
+        RollingCounter()
     ),
     NOTIFICATIONS_CONFIG_USER_ERROR_INVALID_EMAIL_GROUP_ID(
-        "notifications_config.user_error.invalid_email_group_id", RollingCounter()
+        "notifications_config.user_error.invalid_email_group_id",
+        RollingCounter()
     ),
     NOTIFICATIONS_CONFIG_USER_ERROR_NEITHER_EMAIL_NOR_GROUP(
-        "notifications_config.user_error.neither_email_nor_group", RollingCounter()
+        "notifications_config.user_error.neither_email_nor_group",
+        RollingCounter()
     ), // DELETE _plugins/_notifications/configs/{configId}, Delete a notification config
     NOTIFICATIONS_CONFIG_DELETE_TOTAL(
         "notifications_config.delete.total",
@@ -108,10 +113,12 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
         RollingCounter()
     ),
     NOTIFICATIONS_CONFIG_DELETE_USER_ERROR_INVALID_CONFIG_ID(
-        "notifications_config.delete.user_error.invalid_config_id", RollingCounter()
+        "notifications_config.delete.user_error.invalid_config_id",
+        RollingCounter()
     ),
     NOTIFICATIONS_CONFIG_DELETE_USER_ERROR_SET_NOT_FOUND(
-        "notifications_config.delete.user_error.set_not_found", RollingCounter()
+        "notifications_config.delete.user_error.set_not_found",
+        RollingCounter()
     ),
     NOTIFICATIONS_CONFIG_DELETE_SYSTEM_ERROR(
         "notifications_config.delete.system_error",
@@ -126,11 +133,14 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
         RollingCounter()
     ), // add specific user errors for config GET operations
     NOTIFICATIONS_CONFIG_INFO_USER_ERROR_INVALID_CONFIG_ID(
-        "notifications_config.info.user_error.invalid_config_id", RollingCounter()
+        "notifications_config.info.user_error.invalid_config_id",
+        RollingCounter()
     ),
     NOTIFICATIONS_CONFIG_INFO_USER_ERROR_SET_NOT_FOUND(
-        "notifications_config.info.user_error.set_not_found", RollingCounter()
+        "notifications_config.info.user_error.set_not_found",
+        RollingCounter()
     ),
+
     // Feature Channels Endpoints
     // GET _plugins/_notifications/channels
     NOTIFICATIONS_CHANNELS_INFO_TOTAL(
@@ -138,8 +148,10 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
         BasicCounter()
     ),
     NOTIFICATIONS_CHANNELS_INFO_INTERVAL_COUNT(
-        "notifications_channels.info.count", RollingCounter()
+        "notifications_channels.info.count",
+        RollingCounter()
     ),
+
     // Features Endpoints
     // GET _plugins/_notifications/features
     NOTIFICATIONS_FEATURES_INFO_TOTAL(
@@ -150,6 +162,7 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
         "notifications_features.info.count",
         RollingCounter()
     ),
+
     // Send Message Endpoints
     // POST _plugins/_notifications/send
     NOTIFICATIONS_SEND_MESSAGE_TOTAL(
@@ -161,7 +174,8 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
         RollingCounter()
     ), // user errors for send message?
     NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND(
-        "notifications.send_message.user_error.not_found", RollingCounter()
+        "notifications.send_message.user_error.not_found",
+        RollingCounter()
     ),
     NOTIFICATIONS_MESSAGE_DESTINATION_SLACK(
         "notifications.message_destination.slack",
@@ -184,18 +198,22 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
         BasicCounter()
     ),
     NOTIFICATIONS_MESSAGE_DESTINATION_SES_ACCOUNT(
-        "notifications.message_destination.ses_account", BasicCounter()
+        "notifications.message_destination.ses_account",
+        BasicCounter()
     ),
     NOTIFICATIONS_MESSAGE_DESTINATION_SMTP_ACCOUNT(
-        "notifications.message_destination.smtp_account", BasicCounter()
+        "notifications.message_destination.smtp_account",
+        BasicCounter()
     ),
     NOTIFICATIONS_MESSAGE_DESTINATION_EMAIL_GROUP(
-        "notifications.message_destination.email_group", BasicCounter()
+        "notifications.message_destination.email_group",
+        BasicCounter()
     ), // TODO: add after implementation added
     NOTIFICATIONS_MESSAGE_DESTINATION_SNS(
         "notifications.message_destination.sns",
         BasicCounter()
     ),
+
     // Send Test Message Endpoints
     // GET _plugins/_notifications/feature/test/{configId}
     NOTIFICATIONS_SEND_TEST_MESSAGE_TOTAL(
@@ -203,7 +221,8 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
         BasicCounter()
     ),
     NOTIFICATIONS_SEND_TEST_MESSAGE_INTERVAL_COUNT(
-        "notifications.send_test_message.interval_count", RollingCounter()
+        "notifications.send_test_message.interval_count",
+        RollingCounter()
     ), // Send test message exceptions are thrown by the Send Message Action
     NOTIFICATIONS_SECURITY_USER_ERROR(
         "security_user_error",
