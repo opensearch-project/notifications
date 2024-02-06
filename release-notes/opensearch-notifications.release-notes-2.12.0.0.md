@@ -8,6 +8,7 @@ Compatible with OpenSearch 2.12.0
 * Replace the TestMailServer to GreenMail server ([#807](https://github.com/opensearch-project/notifications/pull/807))
 * Re-enable detekt ([#796](https://github.com/opensearch-project/notifications/pull/796))
 * Removed default admin credentials. ([#837](https://github.com/opensearch-project/notifications/pull/837))
+* Force logback to use 1.3.14 ([#849](https://github.com/opensearch-project/notifications/pull/849))
 * Bump ktlint version to fix CVE ([#850](https://github.com/opensearch-project/notifications/pull/850))
 
 ### Enhancements
