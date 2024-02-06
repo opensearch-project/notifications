@@ -43,7 +43,7 @@ internal class ChimeDestinationTests {
                 Arguments.of("\t", """\t"""),
                 Arguments.of("\b", """\b"""),
                 Arguments.of("\r", """\r"""),
-                Arguments.of("\"", """\""""),
+                Arguments.of("\"", """\"""")
             )
     }
 

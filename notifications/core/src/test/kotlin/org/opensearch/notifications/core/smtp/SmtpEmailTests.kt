@@ -47,7 +47,7 @@ class SmtpEmailTests {
             "opensearch.data",
             "base64",
             "VGVzdCBtZXNzYWdlCgo=",
-            "application/octet-stream",
+            "application/octet-stream"
         )
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SMTP to SmtpDestinationTransport())
         val response = NotificationCoreImpl.sendMessage(smtpDestination, message, "ref")
@@ -72,7 +72,7 @@ class SmtpEmailTests {
             "opensearch.data",
             "base64",
             "VGVzdCBtZXNzYWdlCgo=",
-            "application/octet-stream",
+            "application/octet-stream"
         )
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SMTP to SmtpDestinationTransport())
         val response = NotificationCoreImpl.sendMessage(smtpDestination, message, "ref")
