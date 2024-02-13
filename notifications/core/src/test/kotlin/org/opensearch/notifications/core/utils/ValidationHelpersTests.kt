@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Test
 
 internal class ValidationHelpersTests {
 
-    private val hostDentyList = listOf(
+    private val hostDenyList = listOf(
+        "www.amazon.com",
         "127.0.0.0/8",
         "10.0.0.0/8",
         "172.16.0.0/12",
@@ -20,8 +21,9 @@ internal class ValidationHelpersTests {
     )
 
     @Test
-    fun `test ips in denylist`() {
+    fun `test hosts in denylist`() {
         val ips = listOf(
+            "www.amazon.com",
             "127.0.0.1", // 127.0.0.0/8
             "10.0.0.1", // 10.0.0.0/8
             "10.11.12.13", // 10.0.0.0/8
@@ -31,15 +33,15 @@ internal class ValidationHelpersTests {
             "9.9.9.9"
         )
         for (ip in ips) {
-            assertEquals(true, isHostInDenylist("https://$ip", hostDentyList))
+            assertEquals(true, isHostInDenylist("https://$ip", hostDenyList), "for hostname $ip")
         }
     }
 
     @Test
-    fun `test url in denylist`() {
-        val urls = listOf("https://www.amazon.com", "https://mytest.com", "https://mytest.com")
+    fun `test hosts not in denylist`() {
+        val urls = listOf("156.4.77.1", "www.something.com")
         for (url in urls) {
-            assertEquals(false, isHostInDenylist(url, hostDentyList))
+            assertEquals(false, isHostInDenylist("https://$url", hostDenyList), "for hostname $url")
         }
     }
 }
