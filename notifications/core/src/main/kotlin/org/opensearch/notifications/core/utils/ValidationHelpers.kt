@@ -10,6 +10,7 @@ import inet.ipaddr.IPAddressString
 import org.apache.hc.client5.http.classic.methods.HttpPatch
 import org.apache.hc.client5.http.classic.methods.HttpPost
 import org.apache.hc.client5.http.classic.methods.HttpPut
+import org.apache.logging.log4j.LogManager
 import org.opensearch.core.common.Strings
 import java.net.URL
 
@@ -43,6 +44,7 @@ fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
             val denyIpStr = IPAddressString(network)
             val denyHostStr = HostName(network)
             if (denyIpStr.contains(ipStr) || denyHostStr.equals(hostStr)) {
+                LogManager.getLogger().error("${url.host} is denied")
                 return true
             }
         }

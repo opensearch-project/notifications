@@ -33,7 +33,7 @@ internal class ValidationHelpersTests {
             "9.9.9.9"
         )
         for (ip in ips) {
-            assertEquals(true, isHostInDenylist("https://$ip", hostDenyList), "for hostname $ip")
+            assertEquals(true, isHostInDenylist("https://$ip", hostDenyList), "address $ip was supposed to be identified as in the deny list, but was not")
         }
     }
 
@@ -41,7 +41,7 @@ internal class ValidationHelpersTests {
     fun `test hosts not in denylist`() {
         val urls = listOf("156.4.77.1", "www.something.com")
         for (url in urls) {
-            assertEquals(false, isHostInDenylist("https://$url", hostDenyList), "for hostname $url")
+            assertEquals(false, isHostInDenylist("https://$url", hostDenyList), "address $url was not supposed to be identified as in the deny list, but was")
         }
     }
 }
