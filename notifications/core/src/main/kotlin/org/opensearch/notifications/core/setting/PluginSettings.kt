@@ -82,6 +82,11 @@ internal object PluginSettings {
     private const val SOCKET_TIMEOUT_MILLISECONDS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.socket_timeout"
 
     /**
+     * Setting for maximum string length of HTTP response, allows protection from DoS
+     */
+    private const val MAX_HTTP_RESPONSE_STRING_LENGTH_KEY = "$KEY_PREFIX.max_http_response_string_length"
+
+    /**
      * Legacy setting for list of host deny list in Alerting
      */
     private const val LEGACY_ALERTING_HOST_DENY_LIST_KEY = "opendistro.destination.host.deny_list"
@@ -105,11 +110,6 @@ internal object PluginSettings {
      * Setting to enable tooltip in UI
      */
     private const val TOOLTIP_SUPPORT_KEY = "$KEY_PREFIX.tooltip_support"
-
-    /**
-     * Setting for maximum string length of HTTP response, allows protection from DoS
-     */
-    private const val MAX_HTTP_RESPONSE_STRING_LENGTH_KEY = "$KEY_PREFIX.max_http_response_string_length"
 
     /**
      * Setting to provide cluster name, which is <AWS-account-number:AWS-domain-name> on the managed service

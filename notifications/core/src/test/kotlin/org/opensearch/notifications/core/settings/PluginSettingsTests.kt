@@ -32,6 +32,7 @@ internal class PluginSettingsTests {
     private val httpMaxConnectionPerRouteKey = "$httpKeyPrefix.max_connection_per_route"
     private val httpConnectionTimeoutKey = "$httpKeyPrefix.connection_timeout"
     private val httpSocketTimeoutKey = "$httpKeyPrefix.socket_timeout"
+    private val maxHttpResponseStrLengthKey = "$keyPrefix.max_http_response_string_length"
     private val legacyAlertingHostDenyListKey = "opendistro.destination.host.deny_list"
     private val alertingHostDenyListKey = "plugins.destination.host.deny_list"
     private val httpHostDenyListKey = "$httpKeyPrefix.host_deny_list"
@@ -48,6 +49,7 @@ internal class PluginSettingsTests {
         .put(httpMaxConnectionPerRouteKey, 20)
         .put(httpConnectionTimeoutKey, 5000)
         .put(httpSocketTimeoutKey, 50000)
+        .put(maxHttpResponseStrLengthKey, 25000000)
         .putList(httpHostDenyListKey, emptyList<String>())
         .putList(
             allowedConfigTypeKey,
@@ -91,6 +93,7 @@ internal class PluginSettingsTests {
                     PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
                     PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.MAX_HTTP_RESPONSE_STRING_LENGTH,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.HOST_DENY_LIST
@@ -119,6 +122,10 @@ internal class PluginSettingsTests {
             PluginSettings.socketTimeout.toString()
         )
         Assertions.assertEquals(
+            defaultSettings[maxHttpResponseStrLengthKey],
+            PluginSettings.maxHttpResponseStrLength.toString()
+        )
+        Assertions.assertEquals(
             defaultSettings[allowedConfigTypeKey],
             PluginSettings.allowedConfigTypes.toString()
         )
@@ -145,6 +152,7 @@ internal class PluginSettingsTests {
             .put(httpMaxConnectionPerRouteKey, 100)
             .put(httpConnectionTimeoutKey, 100)
             .put(httpSocketTimeoutKey, 100)
+            .put(maxHttpResponseStrLengthKey, 20000000)
             .putList(httpHostDenyListKey, listOf("sample"))
             .putList(allowedConfigTypeKey, listOf("slack"))
             .put(tooltipSupportKey, false)
@@ -163,6 +171,7 @@ internal class PluginSettingsTests {
                     PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
                     PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.MAX_HTTP_RESPONSE_STRING_LENGTH,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.HOST_DENY_LIST,
@@ -190,6 +199,14 @@ internal class PluginSettingsTests {
         Assertions.assertEquals(
             100,
             clusterService.clusterSettings.get(PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS)
+        )
+        Assertions.assertEquals(
+            100,
+            clusterService.clusterSettings.get(PluginSettings.SOCKET_TIMEOUT_MILLISECONDS)
+        )
+        Assertions.assertEquals(
+            20000000,
+            clusterService.clusterSettings.get(PluginSettings.MAX_HTTP_RESPONSE_STRING_LENGTH)
         )
         Assertions.assertEquals(
             listOf("sample"),
@@ -224,6 +241,7 @@ internal class PluginSettingsTests {
                     PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
                     PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.MAX_HTTP_RESPONSE_STRING_LENGTH,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.HOST_DENY_LIST,
@@ -251,6 +269,14 @@ internal class PluginSettingsTests {
         Assertions.assertEquals(
             defaultSettings[httpConnectionTimeoutKey],
             clusterService.clusterSettings.get(PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS).toString()
+        )
+        Assertions.assertEquals(
+            defaultSettings[httpSocketTimeoutKey],
+            clusterService.clusterSettings.get(PluginSettings.SOCKET_TIMEOUT_MILLISECONDS).toString()
+        )
+        Assertions.assertEquals(
+            defaultSettings[maxHttpResponseStrLengthKey],
+            clusterService.clusterSettings.get(PluginSettings.MAX_HTTP_RESPONSE_STRING_LENGTH).toString()
         )
         Assertions.assertEquals(
             defaultSettings[httpHostDenyListKey],
@@ -290,6 +316,7 @@ internal class PluginSettingsTests {
                     PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
                     PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.MAX_HTTP_RESPONSE_STRING_LENGTH,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
@@ -325,6 +352,7 @@ internal class PluginSettingsTests {
                     PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
                     PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.MAX_HTTP_RESPONSE_STRING_LENGTH,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
@@ -359,6 +387,7 @@ internal class PluginSettingsTests {
                     PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
                     PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.MAX_HTTP_RESPONSE_STRING_LENGTH,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
