@@ -95,7 +95,7 @@ internal class PluginSettingsTests {
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.HOST_DENY_LIST,
-                    PluginSettings.DISABLE_HTTP_COOKIE,
+                    PluginSettings.DISABLE_HTTP_COOKIE
                 )
             )
         )

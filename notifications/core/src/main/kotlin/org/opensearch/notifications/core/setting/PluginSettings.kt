@@ -329,7 +329,8 @@ internal object PluginSettings {
     val DISABLE_HTTP_COOKIE: Setting<Boolean> = Setting.boolSetting(
         DISABLE_HTTP_COOKIE_KEY,
         false,
-        NodeScope, Dynamic
+        NodeScope,
+        Dynamic
     )
 
     val MAX_CONNECTIONS_PER_ROUTE: Setting<Int> = Setting.intSetting(
@@ -445,7 +446,7 @@ internal object PluginSettings {
             HOST_DENY_LIST,
             EMAIL_USERNAME,
             EMAIL_PASSWORD,
-            DISABLE_HTTP_COOKIE,
+            DISABLE_HTTP_COOKIE
         )
     }
 

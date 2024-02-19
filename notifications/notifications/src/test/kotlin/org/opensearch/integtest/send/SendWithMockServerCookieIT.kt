@@ -47,7 +47,10 @@ internal class SendWithMockServerCookieIT : PluginRestTestCase() {
 
         // send test message
         var sendResponse = executeRequest(
-            RestRequest.Method.POST.name, "$PLUGIN_BASE_URI/feature/test/$configId", "", RestStatus.OK.status
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/feature/test/$configId",
+            "",
+            RestStatus.OK.status
         )
 
         logger.info("sendResponse1={}", sendResponse)
@@ -59,7 +62,9 @@ internal class SendWithMockServerCookieIT : PluginRestTestCase() {
         // send test message again with cookie set
         sendResponse = executeRequest(
             RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/feature/test/$configId", "", RestStatus.INTERNAL_SERVER_ERROR.status
+            "$PLUGIN_BASE_URI/feature/test/$configId",
+            "",
+            RestStatus.INTERNAL_SERVER_ERROR.status
         )
 
         logger.info("sendResponse2={}", sendResponse)
@@ -76,7 +81,8 @@ internal class SendWithMockServerCookieIT : PluginRestTestCase() {
     fun `test webhook return with cookie disabled`() {
         // update settings
         executeRequest(
-            RestRequest.Method.PUT.name, "/_cluster/settings",
+            RestRequest.Method.PUT.name,
+            "/_cluster/settings",
             """
                 {
                   "transient": {
@@ -113,7 +119,10 @@ internal class SendWithMockServerCookieIT : PluginRestTestCase() {
 
         // send test message
         var sendResponse = executeRequest(
-            RestRequest.Method.POST.name, "$PLUGIN_BASE_URI/feature/test/$configId", "", RestStatus.OK.status
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/feature/test/$configId",
+            "",
+            RestStatus.OK.status
         )
 
         logger.info("sendResponse1={}", sendResponse)
@@ -125,7 +134,9 @@ internal class SendWithMockServerCookieIT : PluginRestTestCase() {
         // send test message again with cookie set
         sendResponse = executeRequest(
             RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/feature/test/$configId", "", RestStatus.OK.status
+            "$PLUGIN_BASE_URI/feature/test/$configId",
+            "",
+            RestStatus.OK.status
         )
 
         logger.info("sendResponse2={}", sendResponse)
