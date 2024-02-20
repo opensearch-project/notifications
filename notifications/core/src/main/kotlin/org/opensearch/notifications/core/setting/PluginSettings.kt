@@ -16,6 +16,7 @@ import org.opensearch.common.settings.Setting.Property.Final
 import org.opensearch.common.settings.Setting.Property.NodeScope
 import org.opensearch.common.settings.Settings
 import org.opensearch.core.common.settings.SecureString
+import org.opensearch.http.HttpTransportSettings.SETTING_HTTP_MAX_CONTENT_LENGTH
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.PLUGIN_NAME
 import org.opensearch.notifications.core.utils.OpenForTesting
@@ -84,7 +85,7 @@ internal object PluginSettings {
     /**
      * Setting for maximum string length of HTTP response, allows protection from DoS
      */
-    private const val MAX_HTTP_RESPONSE_STRING_LENGTH_KEY = "$KEY_PREFIX.max_http_response_string_length"
+    private const val MAX_HTTP_RESPONSE_SIZE_KEY = "$KEY_PREFIX.max_http_response_size"
 
     /**
      * Legacy setting for list of host deny list in Alerting
@@ -152,9 +153,9 @@ internal object PluginSettings {
     private const val DEFAULT_SOCKET_TIMEOUT_MILLISECONDS = 50000
 
     /**
-     * Default maximum HTTP response string length, 50MB. Java char is 2 bytes, so max string length is 25000000
+     * Default maximum HTTP response string length
      */
-    private val DEFAULT_MAX_HTTP_RESPONSE_STRING_LENGTH = 25000000
+    private val DEFAULT_MAX_HTTP_RESPONSE_SIZE = SETTING_HTTP_MAX_CONTENT_LENGTH.getDefault(Settings.EMPTY).getBytes().toInt()
 
     /**
      * Default email header length. minimum value from 100 reference emails
@@ -237,7 +238,7 @@ internal object PluginSettings {
      * Maximum HTTP response string length
      */
     @Volatile
-    var maxHttpResponseStrLength: Int
+    var maxHttpResponseSize: Int
 
     /**
      * Tooltip support
@@ -289,7 +290,7 @@ internal object PluginSettings {
         connectionTimeout = (settings?.get(CONNECTION_TIMEOUT_MILLISECONDS_KEY)?.toInt())
             ?: DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS
         socketTimeout = (settings?.get(SOCKET_TIMEOUT_MILLISECONDS_KEY)?.toInt()) ?: DEFAULT_SOCKET_TIMEOUT_MILLISECONDS
-        maxHttpResponseStrLength = (settings?.get(MAX_HTTP_RESPONSE_STRING_LENGTH_KEY)?.toInt()) ?: DEFAULT_MAX_HTTP_RESPONSE_STRING_LENGTH
+        maxHttpResponseSize = (settings?.get(MAX_HTTP_RESPONSE_SIZE_KEY)?.toInt()) ?: DEFAULT_MAX_HTTP_RESPONSE_SIZE
         allowedConfigTypes = settings?.getAsList(ALLOWED_CONFIG_TYPE_KEY, null) ?: DEFAULT_ALLOWED_CONFIG_TYPES
         tooltipSupport = settings?.getAsBoolean(TOOLTIP_SUPPORT_KEY, true) ?: DEFAULT_TOOLTIP_SUPPORT
         hostDenyList = settings?.getAsList(HOST_DENY_LIST_KEY, null) ?: DEFAULT_HOST_DENY_LIST
@@ -303,7 +304,7 @@ internal object PluginSettings {
             MAX_CONNECTIONS_PER_ROUTE_KEY to maxConnectionsPerRoute.toString(DECIMAL_RADIX),
             CONNECTION_TIMEOUT_MILLISECONDS_KEY to connectionTimeout.toString(DECIMAL_RADIX),
             SOCKET_TIMEOUT_MILLISECONDS_KEY to socketTimeout.toString(DECIMAL_RADIX),
-            MAX_HTTP_RESPONSE_STRING_LENGTH_KEY to maxHttpResponseStrLength.toString(DECIMAL_RADIX),
+            MAX_HTTP_RESPONSE_SIZE_KEY to maxHttpResponseSize.toString(DECIMAL_RADIX),
             TOOLTIP_SUPPORT_KEY to tooltipSupport.toString()
         )
     }
@@ -351,9 +352,9 @@ internal object PluginSettings {
         Dynamic
     )
 
-    val MAX_HTTP_RESPONSE_STRING_LENGTH: Setting<Int> = Setting.intSetting(
-        MAX_HTTP_RESPONSE_STRING_LENGTH_KEY,
-        defaultSettings[MAX_HTTP_RESPONSE_STRING_LENGTH_KEY]!!.toInt(),
+    val MAX_HTTP_RESPONSE_SIZE: Setting<Int> = Setting.intSetting(
+        MAX_HTTP_RESPONSE_SIZE_KEY,
+        defaultSettings[MAX_HTTP_RESPONSE_SIZE_KEY]!!.toInt(),
         NodeScope,
         Dynamic
     )
@@ -445,7 +446,7 @@ internal object PluginSettings {
             MAX_CONNECTIONS_PER_ROUTE,
             CONNECTION_TIMEOUT_MILLISECONDS,
             SOCKET_TIMEOUT_MILLISECONDS,
-            MAX_HTTP_RESPONSE_STRING_LENGTH,
+            MAX_HTTP_RESPONSE_SIZE,
             ALLOWED_CONFIG_TYPES,
             TOOLTIP_SUPPORT,
             HOST_DENY_LIST,
@@ -466,7 +467,7 @@ internal object PluginSettings {
         maxConnectionsPerRoute = MAX_CONNECTIONS_PER_ROUTE.get(clusterService.settings)
         connectionTimeout = CONNECTION_TIMEOUT_MILLISECONDS.get(clusterService.settings)
         socketTimeout = SOCKET_TIMEOUT_MILLISECONDS.get(clusterService.settings)
-        maxHttpResponseStrLength = MAX_HTTP_RESPONSE_STRING_LENGTH.get(clusterService.settings)
+        maxHttpResponseSize = MAX_HTTP_RESPONSE_SIZE.get(clusterService.settings)
         tooltipSupport = TOOLTIP_SUPPORT.get(clusterService.settings)
         hostDenyList = HOST_DENY_LIST.get(clusterService.settings)
         destinationSettings = loadDestinationSettings(clusterService.settings)
@@ -509,9 +510,9 @@ internal object PluginSettings {
             log.debug("$LOG_PREFIX:$SOCKET_TIMEOUT_MILLISECONDS_KEY -autoUpdatedTo-> $clusterSocketTimeout")
             socketTimeout = clusterSocketTimeout
         }
-        val clusterMaxHttpResponseStrLength = clusterService.clusterSettings.get(MAX_HTTP_RESPONSE_STRING_LENGTH)
-        if (clusterMaxHttpResponseStrLength != null) {
-            log.debug("$LOG_PREFIX:$MAX_HTTP_RESPONSE_STRING_LENGTH_KEY -autoUpdatedTo-> $clusterMaxHttpResponseStrLength")
+        val clusterMaxHttpResponseSize = clusterService.clusterSettings.get(MAX_HTTP_RESPONSE_SIZE)
+        if (clusterMaxHttpResponseSize != null) {
+            log.debug("$LOG_PREFIX:$MAX_HTTP_RESPONSE_SIZE_KEY -autoUpdatedTo-> $clusterMaxHttpResponseSize")
             socketTimeout = clusterSocketTimeout
         }
         val clusterAllowedConfigTypes = clusterService.clusterSettings.get(ALLOWED_CONFIG_TYPES)
@@ -574,9 +575,9 @@ internal object PluginSettings {
             socketTimeout = it
             log.info("$LOG_PREFIX:$SOCKET_TIMEOUT_MILLISECONDS_KEY -updatedTo-> $it")
         }
-        clusterService.clusterSettings.addSettingsUpdateConsumer(MAX_HTTP_RESPONSE_STRING_LENGTH) {
-            maxHttpResponseStrLength = it
-            log.info("$LOG_PREFIX:$MAX_HTTP_RESPONSE_STRING_LENGTH_KEY -updatedTo-> $it")
+        clusterService.clusterSettings.addSettingsUpdateConsumer(MAX_HTTP_RESPONSE_SIZE) {
+            maxHttpResponseSize = it
+            log.info("$LOG_PREFIX:$MAX_HTTP_RESPONSE_SIZE_KEY -updatedTo-> $it")
         }
         clusterService.clusterSettings.addSettingsUpdateConsumer(TOOLTIP_SUPPORT) {
             tooltipSupport = it
@@ -641,7 +642,7 @@ internal object PluginSettings {
         maxConnectionsPerRoute = DEFAULT_MAX_CONNECTIONS_PER_ROUTE
         connectionTimeout = DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS
         socketTimeout = DEFAULT_SOCKET_TIMEOUT_MILLISECONDS
-        maxHttpResponseStrLength = DEFAULT_MAX_HTTP_RESPONSE_STRING_LENGTH
+        maxHttpResponseSize = DEFAULT_MAX_HTTP_RESPONSE_SIZE
         allowedConfigTypes = DEFAULT_ALLOWED_CONFIG_TYPES
         tooltipSupport = DEFAULT_TOOLTIP_SUPPORT
         hostDenyList = DEFAULT_HOST_DENY_LIST
