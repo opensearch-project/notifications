@@ -276,6 +276,7 @@ configurations {
 }
 
 dependencies {
+    testImplementation project(path: ':opensearch-notifications-core')
     opensearchPlugin "org.opensearch.plugin:opensearch-notifications-core:${bwcPluginVersion}@zip"
     opensearchPlugin "org.opensearch.plugin:notifications:${bwcPluginVersion}@zip"
 }
