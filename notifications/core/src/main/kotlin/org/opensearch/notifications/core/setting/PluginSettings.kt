@@ -155,7 +155,7 @@ internal object PluginSettings {
     /**
      * Default maximum HTTP response string length
      */
-    private val DEFAULT_MAX_HTTP_RESPONSE_SIZE = SETTING_HTTP_MAX_CONTENT_LENGTH.getDefault(Settings.EMPTY).getBytes().toInt()
+    private val DEFAULT_MAX_HTTP_RESPONSE_SIZE = SETTING_HTTP_MAX_CONTENT_LENGTH.getDefault(Settings.EMPTY).bytes.toInt()
 
     /**
      * Default email header length. minimum value from 100 reference emails
