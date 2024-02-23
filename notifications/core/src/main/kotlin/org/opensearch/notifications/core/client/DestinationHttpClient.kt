@@ -148,7 +148,10 @@ class DestinationHttpClient {
     @Throws(IOException::class)
     fun getResponseString(response: CloseableHttpResponse): String {
         val entity: HttpEntity = response.entity ?: return "{}"
-        val responseString = EntityUtils.toString(entity, PluginSettings.maxHttpResponseSize / 2) // Java char is 2 bytes
+        var responseString = EntityUtils.toString(entity)
+        if (responseString.length > (PluginSettings.maxHttpResponseSize / 2)) { // Java char is 2 bytes
+            responseString = responseString.substring(0, PluginSettings.maxHttpResponseSize / 2)
+        }
         // DeliveryStatus need statusText must not be empty, convert empty response to {}
         return if (responseString.isNullOrEmpty()) "{}" else responseString
     }
