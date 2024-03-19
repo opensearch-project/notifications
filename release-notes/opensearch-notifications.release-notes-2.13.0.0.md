@@ -9,5 +9,5 @@ Compatible with OpenSearch 2.13.0
 * adding hostname support for notifications deny list (#[858](https://github.com/opensearch-project/notifications/pull/858)) (#[860](https://github.com/opensearch-project/notifications/pull/860))
 
 ### Documentation
-* Add 2.13.0 release notes 
+* Add 2.13.0 release notes (#[878](https://github.com/opensearch-project/notifications/pull/878))
         
