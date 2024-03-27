@@ -23,7 +23,7 @@ buildscript {
         common_utils_version = System.getProperty("common_utils.version", opensearch_build)
         kotlin_version = System.getProperty("kotlin.version", "1.6.10")
         junit_version = System.getProperty("junit.version", "5.7.2")
-        aws_version = System.getProperty("aws.version", "1.12.48")
+        aws_version = System.getProperty("aws.version", "1.12.687")
     }
 
     repositories {
