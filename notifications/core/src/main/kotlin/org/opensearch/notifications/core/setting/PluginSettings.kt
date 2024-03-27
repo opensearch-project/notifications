@@ -36,6 +36,8 @@ internal object PluginSettings {
      */
     private const val EMAIL_KEY_PREFIX = "$KEY_PREFIX.email"
 
+    private const val WEBHOOK_KEY_PREFIX = "$KEY_PREFIX.webhook"
+
     /**
      * Legacy Email Destination setting prefix used by Alerting.
      * Defining this here to be used as a fallback for the Notification plugin setting to account for migrated Email Destinations.
@@ -66,6 +68,11 @@ internal object PluginSettings {
      * Settings Key prefix for http connection.
      */
     private const val MAX_CONNECTIONS_KEY = "$HTTP_CONNECTION_KEY_PREFIX.max_connections"
+
+    /**
+     * Settings key for disable http cookie for webhook
+     */
+    private const val DISABLE_HTTP_COOKIE_KEY = "$WEBHOOK_KEY_PREFIX.disable_http_cookie"
 
     /**
      * Settings Key prefix for max http connection per route.
@@ -259,6 +266,12 @@ internal object PluginSettings {
     var clusterName: String
 
     /**
+     * flag to enable/disable cookie management for http connections of webhooks
+     */
+    @Volatile
+    var disableHttpCookie: Boolean
+
+    /**
      * Destination Settings
      */
     @Volatile
@@ -296,6 +309,7 @@ internal object PluginSettings {
         hostDenyList = settings?.getAsList(HOST_DENY_LIST_KEY, null) ?: DEFAULT_HOST_DENY_LIST
         clusterName = settings?.get(CLUSTER_NAME, DEFAULT_CLUSTER_NAME) ?: DEFAULT_CLUSTER_NAME
         destinationSettings = if (settings != null) loadDestinationSettings(settings) else DEFAULT_DESTINATION_SETTINGS
+        disableHttpCookie = settings?.getAsBoolean(DISABLE_HTTP_COOKIE_KEY, false) ?: false
 
         defaultSettings = mapOf(
             EMAIL_SIZE_LIMIT_KEY to emailSizeLimit.toString(DECIMAL_RADIX),
@@ -327,6 +341,13 @@ internal object PluginSettings {
     val MAX_CONNECTIONS: Setting<Int> = Setting.intSetting(
         MAX_CONNECTIONS_KEY,
         defaultSettings[MAX_CONNECTIONS_KEY]!!.toInt(),
+        NodeScope,
+        Dynamic
+    )
+
+    val DISABLE_HTTP_COOKIE: Setting<Boolean> = Setting.boolSetting(
+        DISABLE_HTTP_COOKIE_KEY,
+        false,
         NodeScope,
         Dynamic
     )
@@ -451,7 +472,8 @@ internal object PluginSettings {
             TOOLTIP_SUPPORT,
             HOST_DENY_LIST,
             EMAIL_USERNAME,
-            EMAIL_PASSWORD
+            EMAIL_PASSWORD,
+            DISABLE_HTTP_COOKIE
         )
     }
 
@@ -472,6 +494,7 @@ internal object PluginSettings {
         hostDenyList = HOST_DENY_LIST.get(clusterService.settings)
         destinationSettings = loadDestinationSettings(clusterService.settings)
         clusterName = clusterService.clusterName.value()
+        disableHttpCookie = DISABLE_HTTP_COOKIE.get(clusterService.settings)
     }
 
     /**
@@ -495,6 +518,13 @@ internal object PluginSettings {
             log.debug("$LOG_PREFIX:$MAX_CONNECTIONS_KEY -autoUpdatedTo-> $clusterMaxConnections")
             maxConnections = clusterMaxConnections
         }
+
+        val disableWebhookHttpCookie = clusterService.clusterSettings.get(DISABLE_HTTP_COOKIE)
+        if (disableWebhookHttpCookie != null) {
+            log.debug("$LOG_PREFIX:$DISABLE_HTTP_COOKIE -autoUpdatedTo-> $disableWebhookHttpCookie")
+            this.disableHttpCookie = disableWebhookHttpCookie
+        }
+
         val clusterMaxConnectionsPerRoute = clusterService.clusterSettings.get(MAX_CONNECTIONS_PER_ROUTE)
         if (clusterMaxConnectionsPerRoute != null) {
             log.debug("$LOG_PREFIX:$MAX_CONNECTIONS_PER_ROUTE_KEY -autoUpdatedTo-> $clusterMaxConnectionsPerRoute")
@@ -562,6 +592,10 @@ internal object PluginSettings {
         clusterService.clusterSettings.addSettingsUpdateConsumer(MAX_CONNECTIONS) {
             maxConnections = it
             log.info("$LOG_PREFIX:$MAX_CONNECTIONS_KEY -updatedTo-> $it")
+        }
+        clusterService.clusterSettings.addSettingsUpdateConsumer(DISABLE_HTTP_COOKIE) {
+            disableHttpCookie = it
+            log.info("$LOG_PREFIX:${this.DISABLE_HTTP_COOKIE_KEY} -updatedTo-> $it")
         }
         clusterService.clusterSettings.addSettingsUpdateConsumer(MAX_CONNECTIONS_PER_ROUTE) {
             maxConnectionsPerRoute = it
@@ -646,5 +680,6 @@ internal object PluginSettings {
         allowedConfigTypes = DEFAULT_ALLOWED_CONFIG_TYPES
         tooltipSupport = DEFAULT_TOOLTIP_SUPPORT
         hostDenyList = DEFAULT_HOST_DENY_LIST
+        disableHttpCookie = false
     }
 }
