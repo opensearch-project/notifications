@@ -233,6 +233,7 @@ integTest {
     if (usingRemoteCluster) {
         filter {
             excludeTestsMatching "org.opensearch.integtest.send.SendTestMessageWithMockServerIT"
+            excludeTestsMatching "org.opensearch.integtest.MaxHTTPResponseSizeIT"
         }
     }
 }
@@ -276,7 +277,6 @@ configurations {
 }
 
 dependencies {
-    testImplementation project(path: ':opensearch-notifications-core')
     opensearchPlugin "org.opensearch.plugin:opensearch-notifications-core:${bwcPluginVersion}@zip"
     opensearchPlugin "org.opensearch.plugin:notifications:${bwcPluginVersion}@zip"
 }
