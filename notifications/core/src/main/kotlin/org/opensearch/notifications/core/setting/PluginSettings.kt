@@ -513,7 +513,7 @@ internal object PluginSettings {
         val clusterMaxHttpResponseSize = clusterService.clusterSettings.get(MAX_HTTP_RESPONSE_SIZE)
         if (clusterMaxHttpResponseSize != null) {
             log.debug("$LOG_PREFIX:$MAX_HTTP_RESPONSE_SIZE_KEY -autoUpdatedTo-> $clusterMaxHttpResponseSize")
-            socketTimeout = clusterSocketTimeout
+            maxHttpResponseSize = clusterMaxHttpResponseSize
         }
         val clusterAllowedConfigTypes = clusterService.clusterSettings.get(ALLOWED_CONFIG_TYPES)
         if (clusterAllowedConfigTypes != null) {
