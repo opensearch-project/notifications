@@ -233,6 +233,7 @@ integTest {
     if (usingRemoteCluster) {
         filter {
             excludeTestsMatching "org.opensearch.integtest.send.SendTestMessageWithMockServerIT"
+            excludeTestsMatching "org.opensearch.integtest.MaxHTTPResponseSizeIT"
         }
     }
 }
