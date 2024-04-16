@@ -16,6 +16,7 @@ import org.opensearch.cluster.ClusterName
 import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.settings.ClusterSettings
 import org.opensearch.common.settings.Settings
+import org.opensearch.http.HttpTransportSettings.SETTING_HTTP_MAX_CONTENT_LENGTH
 import org.opensearch.notifications.core.NotificationCorePlugin
 import org.opensearch.notifications.core.setting.PluginSettings
 
@@ -32,6 +33,7 @@ internal class PluginSettingsTests {
     private val httpMaxConnectionPerRouteKey = "$httpKeyPrefix.max_connection_per_route"
     private val httpConnectionTimeoutKey = "$httpKeyPrefix.connection_timeout"
     private val httpSocketTimeoutKey = "$httpKeyPrefix.socket_timeout"
+    private val maxHttpResponseSizeKey = "$keyPrefix.max_http_response_size"
     private val legacyAlertingHostDenyListKey = "opendistro.destination.host.deny_list"
     private val alertingHostDenyListKey = "plugins.destination.host.deny_list"
     private val httpHostDenyListKey = "$httpKeyPrefix.host_deny_list"
@@ -48,6 +50,7 @@ internal class PluginSettingsTests {
         .put(httpMaxConnectionPerRouteKey, 20)
         .put(httpConnectionTimeoutKey, 5000)
         .put(httpSocketTimeoutKey, 50000)
+        .put(maxHttpResponseSizeKey, SETTING_HTTP_MAX_CONTENT_LENGTH.getDefault(Settings.EMPTY).getBytes().toInt())
         .putList(httpHostDenyListKey, emptyList<String>())
         .putList(
             allowedConfigTypeKey,
@@ -91,6 +94,7 @@ internal class PluginSettingsTests {
                     PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
                     PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.MAX_HTTP_RESPONSE_SIZE,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.HOST_DENY_LIST
@@ -119,6 +123,10 @@ internal class PluginSettingsTests {
             PluginSettings.socketTimeout.toString()
         )
         Assertions.assertEquals(
+            defaultSettings[maxHttpResponseSizeKey],
+            PluginSettings.maxHttpResponseSize.toString()
+        )
+        Assertions.assertEquals(
             defaultSettings[allowedConfigTypeKey],
             PluginSettings.allowedConfigTypes.toString()
         )
@@ -145,6 +153,7 @@ internal class PluginSettingsTests {
             .put(httpMaxConnectionPerRouteKey, 100)
             .put(httpConnectionTimeoutKey, 100)
             .put(httpSocketTimeoutKey, 100)
+            .put(maxHttpResponseSizeKey, 20000000)
             .putList(httpHostDenyListKey, listOf("sample"))
             .putList(allowedConfigTypeKey, listOf("slack"))
             .put(tooltipSupportKey, false)
@@ -163,6 +172,7 @@ internal class PluginSettingsTests {
                     PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
                     PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.MAX_HTTP_RESPONSE_SIZE,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.HOST_DENY_LIST,
@@ -190,6 +200,14 @@ internal class PluginSettingsTests {
         Assertions.assertEquals(
             100,
             clusterService.clusterSettings.get(PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS)
+        )
+        Assertions.assertEquals(
+            100,
+            clusterService.clusterSettings.get(PluginSettings.SOCKET_TIMEOUT_MILLISECONDS)
+        )
+        Assertions.assertEquals(
+            20000000,
+            clusterService.clusterSettings.get(PluginSettings.MAX_HTTP_RESPONSE_SIZE)
         )
         Assertions.assertEquals(
             listOf("sample"),
@@ -224,6 +242,7 @@ internal class PluginSettingsTests {
                     PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
                     PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.MAX_HTTP_RESPONSE_SIZE,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.HOST_DENY_LIST,
@@ -251,6 +270,14 @@ internal class PluginSettingsTests {
         Assertions.assertEquals(
             defaultSettings[httpConnectionTimeoutKey],
             clusterService.clusterSettings.get(PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS).toString()
+        )
+        Assertions.assertEquals(
+            defaultSettings[httpSocketTimeoutKey],
+            clusterService.clusterSettings.get(PluginSettings.SOCKET_TIMEOUT_MILLISECONDS).toString()
+        )
+        Assertions.assertEquals(
+            defaultSettings[maxHttpResponseSizeKey],
+            clusterService.clusterSettings.get(PluginSettings.MAX_HTTP_RESPONSE_SIZE).toString()
         )
         Assertions.assertEquals(
             defaultSettings[httpHostDenyListKey],
@@ -290,6 +317,7 @@ internal class PluginSettingsTests {
                     PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
                     PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.MAX_HTTP_RESPONSE_SIZE,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
@@ -325,6 +353,7 @@ internal class PluginSettingsTests {
                     PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
                     PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.MAX_HTTP_RESPONSE_SIZE,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
@@ -359,6 +388,7 @@ internal class PluginSettingsTests {
                     PluginSettings.MAX_CONNECTIONS_PER_ROUTE,
                     PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS,
                     PluginSettings.SOCKET_TIMEOUT_MILLISECONDS,
+                    PluginSettings.MAX_HTTP_RESPONSE_SIZE,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
