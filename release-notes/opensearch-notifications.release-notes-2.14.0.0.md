@@ -5,7 +5,7 @@ Compatible with OpenSearch 2.14.0
 ### Maintenance
 * Increment version to 2.14.0-SNAPSHOT (#[882](https://github.com/opensearch-project/notifications/pull/882))
 * Updates sample cert and admin keystore (#[862](https://github.com/opensearch-project/notifications/pull/862)) (#[885](https://github.com/opensearch-project/notifications/pull/885))
-* Updates sample cert and trust-store (#[899](https://github.com/opensearch-project/notifications/pull/862)) (#[912](https://github.com/opensearch-project/notifications/pull/912))
+* Updates sample cert and trust-store (#[899](https://github.com/opensearch-project/notifications/pull/899)) (#[912](https://github.com/opensearch-project/notifications/pull/912))
 
 ### Bug Fixes
 * Adding max http response string length as a setting, and capping http response string based on that setting (#[876](https://github.com/opensearch-project/notifications/pull/876))
