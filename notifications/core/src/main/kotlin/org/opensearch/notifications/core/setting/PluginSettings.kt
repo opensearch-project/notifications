@@ -153,9 +153,9 @@ internal object PluginSettings {
     private const val DEFAULT_SOCKET_TIMEOUT_MILLISECONDS = 50000
 
     /**
-     * Default maximum HTTP response string length
+     * Default maximum HTTP response size
      */
-    private val DEFAULT_MAX_HTTP_RESPONSE_SIZE = SETTING_HTTP_MAX_CONTENT_LENGTH.getDefault(Settings.EMPTY).getBytes().toInt()
+    private val DEFAULT_MAX_HTTP_RESPONSE_SIZE = SETTING_HTTP_MAX_CONTENT_LENGTH.getDefault(Settings.EMPTY).bytes.toInt()
 
     /**
      * Default email header length. minimum value from 100 reference emails
@@ -235,7 +235,7 @@ internal object PluginSettings {
     var socketTimeout: Int
 
     /**
-     * Maximum HTTP response string length
+     * Maximum HTTP response size
      */
     @Volatile
     var maxHttpResponseSize: Int
@@ -513,7 +513,7 @@ internal object PluginSettings {
         val clusterMaxHttpResponseSize = clusterService.clusterSettings.get(MAX_HTTP_RESPONSE_SIZE)
         if (clusterMaxHttpResponseSize != null) {
             log.debug("$LOG_PREFIX:$MAX_HTTP_RESPONSE_SIZE_KEY -autoUpdatedTo-> $clusterMaxHttpResponseSize")
-            socketTimeout = clusterSocketTimeout
+            maxHttpResponseSize = clusterMaxHttpResponseSize
         }
         val clusterAllowedConfigTypes = clusterService.clusterSettings.get(ALLOWED_CONFIG_TYPES)
         if (clusterAllowedConfigTypes != null) {
