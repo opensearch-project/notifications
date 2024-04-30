@@ -233,6 +233,7 @@ integTest {
     if (usingRemoteCluster) {
         filter {
             excludeTestsMatching "org.opensearch.integtest.send.SendTestMessageWithMockServerIT"
+            excludeTestsMatching "org.opensearch.integtest.MaxHTTPResponseSizeIT"
         }
     }
 }
@@ -265,7 +266,7 @@ testClusters.integTest {
 }
 
 // Always be minimumCompatibilityVersion of current opensearch version(3.0.0)
-def bwcVersionShort = "2.12.0"
+def bwcVersionShort = "2.14.0"
 def bwcVersion = bwcVersionShort + ".0"
 def bwcOpenSearchVesion= bwcVersionShort + "-SNAPSHOT"
 def bwcPluginVersion = bwcVersion + "-SNAPSHOT"
