@@ -14,5 +14,5 @@ Compatible with OpenSearch 2.14.0
 * Upgrade AWS version for SDKs to 1.12.687 (#[884](https://github.com/opensearch-project/notifications/pull/884)) (#[887](https://github.com/opensearch-project/notifications/pull/887))
 
 ### Documentation
-* Add 2.14.0 release notes 
+* Add 2.14.0 release notes (#[915](https://github.com/opensearch-project/notifications/pull/915))
         
