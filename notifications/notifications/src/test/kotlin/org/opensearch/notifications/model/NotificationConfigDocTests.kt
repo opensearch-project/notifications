@@ -25,7 +25,7 @@ internal class NotificationConfigDocTests {
             createdTimeMs,
             listOf("br1", "br2", "br3")
         )
-        val sampleSlack = Slack("https://domain.com/sample_url#1234567890")
+        val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
         val config = NotificationConfig(
             "name",
             "description",
@@ -47,7 +47,7 @@ internal class NotificationConfigDocTests {
             createdTimeMs,
             listOf("br1", "br2", "br3")
         )
-        val sampleSlack = Slack("https://domain.com/sample_url#1234567890")
+        val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
         val config = NotificationConfig(
             "name",
             "description",
@@ -67,7 +67,7 @@ internal class NotificationConfigDocTests {
                 "description":"description",
                 "config_type":"slack",
                 "is_enabled":true,
-                "slack":{"url":"https://domain.com/sample_url#1234567890"}
+                "slack":{"url":"https://hooks.slack.com/services/sample_slack_url"}
             },
             "extra_field_1":["extra", "value"],
             "extra_field_2":{"extra":"value"},
