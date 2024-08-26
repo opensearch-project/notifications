@@ -103,7 +103,7 @@ class NotificationsBackwardsCompatibilityIT : PluginRestTestCase() {
                 "description": "This is a sample config description $configId",
                 "config_type": "slack",
                 "is_enabled": true,
-                "slack": { "url": "https://hooks.slack.com/services/sample_slack_url#$configId" }
+                "slack": { "url": "https://slack.domain.com/sample_slack_url#$configId" }
             }
         }
         """.trimIndent()

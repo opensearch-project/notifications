@@ -159,7 +159,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
                 "description":"${referenceObject.description}",
                 "config_type":"webhook",
                 "is_enabled":${referenceObject.isEnabled},
-                "slack":{"url":"https://hooks.slack.com/services/sample_slack_url"}
+                "slack":{"url":"https://dummy.com"}
                 "webhook":{"url":"${(referenceObject.configData as Webhook).url}"}
             }
         }
