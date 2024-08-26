@@ -627,7 +627,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         val urlIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId)
         val recipientIds = setOf(emailGroupId)
         val fromIds = setOf(emailGroupId, smtpAccountId)
-        val domainIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId, smtpAccountId)
+        val domainIds = setOf(chimeId, microsoftTeamsId, webhookId, smtpAccountId)
         Thread.sleep(1000)
 
         // Get notification configs using query=slack
@@ -702,7 +702,7 @@ class QueryNotificationConfigIT : PluginRestTestCase() {
         val urlIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId)
         val recipientIds = setOf(emailGroupId)
         val fromIds = setOf(emailGroupId, smtpAccountId)
-        val domainIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId, smtpAccountId)
+        val domainIds = setOf(chimeId, microsoftTeamsId, webhookId, smtpAccountId)
         Thread.sleep(1000)
 
         // Get notification configs using text_query=slack should not return any item

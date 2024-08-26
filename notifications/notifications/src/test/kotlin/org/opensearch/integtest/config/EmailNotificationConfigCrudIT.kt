@@ -908,7 +908,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "description":"${smtpAccountConfig.description}",
                 "config_type":"smtp_account",
                 "is_enabled":${smtpAccountConfig.isEnabled},
-                "slack": {"url": "https://dummy.com"},
+                "slack": {"url": "https://hooks.slack.com/services/sample_slack_url"},
                 "smtp_account":{
                     "host":"${sampleSmtpAccount.host}",
                     "port":"${sampleSmtpAccount.port}",
@@ -949,7 +949,7 @@ class EmailNotificationConfigCrudIT : PluginRestTestCase() {
                 "description":"${emailConfig.description}",
                 "config_type":"email",
                 "is_enabled":${emailConfig.isEnabled},
-                "slack":{"url": "https://dummy.com"},
+                "slack":{"url": "https://hooks.slack.com/services/sample_slack_url"},
                 "email":{
                     "email_account_id":"${sampleEmail.emailAccountID}",
                     "default_recipients":[

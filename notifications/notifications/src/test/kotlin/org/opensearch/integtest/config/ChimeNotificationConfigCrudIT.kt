@@ -142,7 +142,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                 "description":"${referenceObject.description}",
                 "config_type":"chime",
                 "is_enabled":${referenceObject.isEnabled},
-                "slack":{"url":"https://dummy.com"}
+                "slack":{"url":"https://hooks.slack.com/services/sample_slack_url"}
                 "chime":{"url":"${(referenceObject.configData as Chime).url}"}
             }
         }
@@ -190,7 +190,7 @@ class ChimeNotificationConfigCrudIT : PluginRestTestCase() {
                 "description":"this is a updated config description",
                 "config_type":"slack",
                 "is_enabled":"true",
-                "slack":{"url":"https://updated.domain.com/updated_slack_url#0987654321"}
+                "slack":{"url":"https://hooks.slack.com/services/sample_slack_url"}
             }
         }
         """.trimIndent()
