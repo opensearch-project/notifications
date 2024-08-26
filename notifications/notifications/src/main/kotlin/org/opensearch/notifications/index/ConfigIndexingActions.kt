@@ -56,7 +56,9 @@ object ConfigIndexingActions {
 
     @Suppress("UnusedPrivateMember")
     private fun validateSlackConfig(slack: Slack, user: User?) {
-        // TODO: URL validation with rules
+        require(slack.url.contains(Regex("https://hooks\\.(?:gov-)?slack\\.com/services"))) {
+            "Wrong Slack url. Should contain \"hooks.slack.com/services/\" or \"hooks.gov-slack.com/services/\""
+        }
     }
 
     @Suppress("UnusedPrivateMember")
