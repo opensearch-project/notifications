@@ -5,10 +5,12 @@
 
 package org.opensearch.notifications.core.utils
 
+import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import org.apache.http.client.methods.HttpPatch
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.methods.HttpPut
+import org.apache.logging.log4j.LogManager
 import org.opensearch.common.Strings
 import java.net.URL
 
@@ -37,9 +39,12 @@ fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
     val url = URL(urlString)
     if (url.host != null) {
         val ipStr = IPAddressString(url.host)
+        val hostStr = HostName(url.host)
         for (network in hostDenyList) {
-            val netStr = IPAddressString(network)
-            if (netStr.contains(ipStr)) {
+            val denyIpStr = IPAddressString(network)
+            val denyHostStr = HostName(network)
+            if (denyIpStr.contains(ipStr) || denyHostStr.equals(hostStr)) {
+                LogManager.getLogger().error("${url.host} is denied")
                 return true
             }
         }
