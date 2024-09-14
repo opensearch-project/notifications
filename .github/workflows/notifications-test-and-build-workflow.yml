@@ -7,6 +7,9 @@ name: Test and Build Notifications
 
 on: [push, pull_request]
 
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
 jobs:
   Get-CI-Image-Tag:
     uses: opensearch-project/opensearch-build/.github/workflows/get-ci-image-tag.yml@main
@@ -65,13 +68,13 @@ jobs:
       - name: Upload Artifacts for notifications plugin
         uses: actions/upload-artifact@v4
         with:
-          name: notifications-plugin-${{ matrix.os }}
+          name: notifications-plugin-${{ matrix.os }}-${{ matrix.java }}
           path: notifications-build/notifications
 
       - name: Upload Artifacts for notifications-core plugin
         uses: actions/upload-artifact@v4
         with:
-          name: notifications-core-plugin-${{ matrix.os }}
+          name: notifications-core-plugin-${{ matrix.os }}-${{ matrix.java }}
           path: notifications-build/notifications-core
 
   build-windows-macos:
@@ -131,11 +134,11 @@ jobs:
       - name: Upload Artifacts for notifications plugin
         uses: actions/upload-artifact@v4
         with:
-          name: notifications-plugin-${{ matrix.os }}
+          name: notifications-plugin-${{ matrix.os }}-${{ matrix.java }}
           path: notifications-build/notifications
 
       - name: Upload Artifacts for notifications-core plugin
         uses: actions/upload-artifact@v4
         with:
-          name: notifications-core-plugin-${{ matrix.os }}
+          name: notifications-core-plugin-${{ matrix.os }}-${{ matrix.java }}
           path: notifications-build/notifications-core
