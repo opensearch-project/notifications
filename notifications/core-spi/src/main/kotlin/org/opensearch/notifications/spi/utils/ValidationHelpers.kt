@@ -5,13 +5,16 @@
 
 package org.opensearch.notifications.spi.utils
 
+import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import org.apache.commons.validator.routines.DomainValidator
 import org.apache.hc.client5.http.classic.methods.HttpPatch
 import org.apache.hc.client5.http.classic.methods.HttpPost
 import org.apache.hc.client5.http.classic.methods.HttpPut
+import org.apache.logging.log4j.LogManager
 import org.opensearch.core.common.Strings
 import org.opensearch.notifications.spi.utils.ValidationHelpers.FQDN_REGEX
+import java.lang.Exception
 import java.net.InetAddress
 import java.net.URL
 
@@ -49,13 +52,38 @@ fun isValidUrl(urlString: String): Boolean {
     }
 }
 
+fun getResolvedIps(host: String): List<IPAddressString> {
+    try {
+        val resolvedIps = InetAddress.getAllByName(host)
+        return resolvedIps.map { inetAddress -> IPAddressString(inetAddress.hostAddress) }
+    } catch (e: Exception) {
+        LogManager.getLogger().error("Unable to resolve host ips")
+    }
+
+    return listOf()
+}
+
 fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
     val url = URL(urlString)
     if (url.host != null) {
-        val ipStr = IPAddressString(InetAddress.getByName(url.host).hostAddress)
+        val resolvedIpStrings = getResolvedIps(url.host)
+        val hostStr = HostName(url.host)
+
         for (network in hostDenyList) {
-            val netStr = IPAddressString(network)
-            if (netStr.contains(ipStr)) {
+            val denyIpStr = IPAddressString(network)
+            val denyHostStr = HostName(network)
+            val hostInDenyList = denyHostStr.equals(hostStr)
+            var ipInDenyList = false
+
+            for (ipStr in resolvedIpStrings) {
+                if (denyIpStr.contains(ipStr)) {
+                    ipInDenyList = true
+                    break
+                }
+            }
+
+            if (hostInDenyList || ipInDenyList) {
+                LogManager.getLogger().error("${url.host} is denied")
                 return true
             }
         }
