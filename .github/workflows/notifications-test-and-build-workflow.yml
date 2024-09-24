@@ -63,13 +63,13 @@ jobs:
         shell: bash
 
       - name: Upload Artifacts for notifications plugin
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: notifications-plugin-${{ matrix.os }}
           path: notifications-build/notifications
 
       - name: Upload Artifacts for notifications-core plugin
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: notifications-core-plugin-${{ matrix.os }}
           path: notifications-build/notifications-core
@@ -129,13 +129,13 @@ jobs:
         shell: bash
 
       - name: Upload Artifacts for notifications plugin
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: notifications-plugin-${{ matrix.os }}
           path: notifications-build/notifications
 
       - name: Upload Artifacts for notifications-core plugin
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: notifications-core-plugin-${{ matrix.os }}
           path: notifications-build/notifications-core
