@@ -5,6 +5,7 @@
 
 package org.opensearch.notifications.core.destinations
 
+import inet.ipaddr.IPAddressString
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -62,6 +63,7 @@ internal class CustomWebhookDestinationTests {
         // Stubbing isHostInDenylist() so it doesn't attempt to resolve hosts that don't exist in the unit tests
         mockkStatic("org.opensearch.notifications.spi.utils.ValidationHelpersKt")
         every { org.opensearch.notifications.spi.utils.isHostInDenylist(any(), any()) } returns false
+        every { org.opensearch.notifications.spi.utils.getResolvedIps(any()) } returns listOf(IPAddressString("174.0.0.0"))
     }
 
     @ParameterizedTest(name = "method {0} should return corresponding type of Http request object {1}")
