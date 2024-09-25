@@ -24,9 +24,11 @@ fun validateUrl(urlString: String) {
 
 fun validateUrlHost(urlString: String, hostDenyList: List<String>) {
     val url = URL(urlString)
-    require(org.opensearch.notifications.spi.utils.getResolvedIps(url.host).isNotEmpty()) {
-        "Host could not be resolved to a valid Ip address"
+
+    if (org.opensearch.notifications.spi.utils.getResolvedIps(url.host).isEmpty()) {
+        throw UnknownHostException("Host could not be resolved to a valid Ip address")
     }
+
     require(!org.opensearch.notifications.spi.utils.isHostInDenylist(urlString, hostDenyList)) {
         "Host of url is denied, based on plugin setting [notification.core.http.host_deny_list]"
     }
