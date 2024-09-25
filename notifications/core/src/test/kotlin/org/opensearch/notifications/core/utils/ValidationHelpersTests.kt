@@ -5,8 +5,11 @@
 
 package org.opensearch.notifications.core.utils
 
+import io.mockk.every
+import io.mockk.mockkStatic
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.net.InetAddress
 
 internal class ValidationHelpersTests {
 
@@ -43,5 +46,25 @@ internal class ValidationHelpersTests {
         for (url in urls) {
             assertEquals(false, isHostInDenylist("https://$url", hostDenyList), "address $url was not supposed to be identified as in the deny list, but was")
         }
+    }
+
+    @Test
+    fun `test hostname gets resolved to ip for denylist`() {
+        val expectedAddressesForInvalidHost = arrayOf(
+            InetAddress.getByName("174.120.0.0"),
+            InetAddress.getByName("10.0.0.1")
+        )
+        val expectedAddressesForValidHost = arrayOf(
+            InetAddress.getByName("174.12.0.0")
+        )
+
+        mockkStatic(InetAddress::class)
+        val invalidHost = "invalid.com"
+        every { InetAddress.getAllByName(invalidHost) } returns expectedAddressesForInvalidHost
+        assertEquals(true, isHostInDenylist("https://$invalidHost", hostDenyList))
+
+        val validHost = "valid.com"
+        every { InetAddress.getAllByName(validHost) } returns expectedAddressesForValidHost
+        assertEquals(false, isHostInDenylist("https://$validHost", hostDenyList))
     }
 }

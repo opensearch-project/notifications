@@ -51,13 +51,21 @@ internal class ValidationHelpersTests {
 
     @Test
     fun `test hostname gets resolved to ip for denylist`() {
-        val invalidHost = "invalid.com"
+        val expectedAddressesForInvalidHost = arrayOf(
+            InetAddress.getByName("174.120.0.0"),
+            InetAddress.getByName("10.0.0.1")
+        )
+        val expectedAddressesForValidHost = arrayOf(
+            InetAddress.getByName("174.12.0.0")
+        )
+
         mockkStatic(InetAddress::class)
-        every { InetAddress.getByName(invalidHost).hostAddress } returns "10.0.0.1" // 10.0.0.0/8
+        val invalidHost = "invalid.com"
+        every { InetAddress.getAllByName(invalidHost) } returns expectedAddressesForInvalidHost
         assertEquals(true, isHostInDenylist("https://$invalidHost", hostDenyList))
 
         val validHost = "valid.com"
-        every { InetAddress.getByName(validHost).hostAddress } returns "174.12.0.0"
+        every { InetAddress.getAllByName(validHost) } returns expectedAddressesForValidHost
         assertEquals(false, isHostInDenylist("https://$validHost", hostDenyList))
     }
 

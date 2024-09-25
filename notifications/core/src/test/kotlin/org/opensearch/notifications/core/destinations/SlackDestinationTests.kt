@@ -5,6 +5,7 @@
 
 package org.opensearch.notifications.core.destinations
 
+import inet.ipaddr.IPAddressString
 import io.mockk.every
 import io.mockk.mockkStatic
 import org.apache.http.client.methods.CloseableHttpResponse
@@ -52,6 +53,7 @@ internal class SlackDestinationTests {
         // Stubbing isHostInDenylist() so it doesn't attempt to resolve hosts that don't exist in the unit tests
         mockkStatic("org.opensearch.notifications.spi.utils.ValidationHelpersKt")
         every { org.opensearch.notifications.spi.utils.isHostInDenylist(any(), any()) } returns false
+        every { org.opensearch.notifications.spi.utils.getResolvedIps(any()) } returns listOf(IPAddressString("174.0.0.0"))
     }
 
     @Test
