@@ -12,7 +12,10 @@ import org.apache.hc.client5.http.classic.methods.HttpPost
 import org.apache.hc.client5.http.classic.methods.HttpPut
 import org.apache.logging.log4j.LogManager
 import org.opensearch.core.common.Strings
+import java.lang.Exception
+import java.net.InetAddress
 import java.net.URL
+import java.net.UnknownHostException
 
 fun validateUrl(urlString: String) {
     require(!Strings.isNullOrEmpty(urlString)) { "url is null or empty" }
@@ -20,7 +23,13 @@ fun validateUrl(urlString: String) {
 }
 
 fun validateUrlHost(urlString: String, hostDenyList: List<String>) {
-    require(!isHostInDenylist(urlString, hostDenyList)) {
+    val url = URL(urlString)
+
+    if (org.opensearch.notifications.spi.utils.getResolvedIps(url.host).isEmpty()) {
+        throw UnknownHostException("Host could not be resolved to a valid Ip address")
+    }
+
+    require(!org.opensearch.notifications.spi.utils.isHostInDenylist(urlString, hostDenyList)) {
         "Host of url is denied, based on plugin setting [notification.core.http.host_deny_list]"
     }
 }
@@ -35,18 +44,39 @@ fun isValidUrl(urlString: String): Boolean {
     return ("https" == url.protocol || "http" == url.protocol) // Support only http/https, other protocols not supported
 }
 
+@Deprecated("This function is not maintained, use org.opensearch.notifications.spi.utils.isHostInDenylist instead.")
 fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
     val url = URL(urlString)
     if (url.host != null) {
-        val ipStr = IPAddressString(url.host)
-        val hostStr = HostName(url.host)
-        for (network in hostDenyList) {
-            val denyIpStr = IPAddressString(network)
-            val denyHostStr = HostName(network)
-            if (denyIpStr.contains(ipStr) || denyHostStr.equals(hostStr)) {
-                LogManager.getLogger().error("${url.host} is denied")
-                return true
+        try {
+            val resolvedIps = InetAddress.getAllByName(url.host)
+            val resolvedIpStrings = resolvedIps.map { inetAddress -> IPAddressString(inetAddress.hostAddress) }
+            val hostStr = HostName(url.host)
+
+            for (network in hostDenyList) {
+                val denyIpStr = IPAddressString(network)
+                val denyHostStr = HostName(network)
+                val hostInDenyList = denyHostStr.equals(hostStr)
+                var ipInDenyList = false
+
+                for (ipStr in resolvedIpStrings) {
+                    if (denyIpStr.contains(ipStr)) {
+                        ipInDenyList = true
+                        break
+                    }
+                }
+
+                if (hostInDenyList || ipInDenyList) {
+                    LogManager.getLogger().error("${url.host} is denied")
+                    return true
+                }
             }
+        } catch (e: UnknownHostException) {
+            LogManager.getLogger().error("Error checking denylist: Unknown host")
+            return false
+        } catch (e: Exception) {
+            LogManager.getLogger().error("Error checking denylist: ${e.message}", e)
+            return false
         }
     }
 
