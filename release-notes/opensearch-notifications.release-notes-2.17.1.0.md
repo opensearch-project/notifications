@@ -7,4 +7,4 @@ Compatible with OpenSearch 2.17.1
 * Upgrade upload-artifact to v3 and bump version to 2.17.1 (#[963](https://github.com/opensearch-project/notifications/pull/963))
 
 ### Documentation
-* Add 2.17.1 release notes (#[947](https://github.com/opensearch-project/notifications/pull/947))
+* Add 2.17.1 release notes (#[969](https://github.com/opensearch-project/notifications/pull/969))
