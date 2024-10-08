@@ -21,9 +21,10 @@ buildscript {
         }
         opensearch_no_snapshot = opensearch_version.replace("-SNAPSHOT","")
         common_utils_version = System.getProperty("common_utils.version", opensearch_build)
-        kotlin_version = System.getProperty("kotlin.version", "1.8.21")
+        kotlin_version = System.getProperty("kotlin.version", "1.9.25")
         junit_version = System.getProperty("junit.version", "5.7.2")
         aws_version = System.getProperty("aws.version", "1.12.687")
+        asm_version = "9.7"
     }
 
     repositories {
@@ -40,6 +41,16 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-allopen:${kotlin_version}"
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.23.0"
         classpath "org.jacoco:org.jacoco.agent:0.8.11"
+    }
+    
+     configurations {
+        classpath {
+            resolutionStrategy {
+                //in order to handle jackson's higher release version in shadow, this needs to be upgraded to latest
+                force(group: "org.ow2.asm", name: "asm", version: asm_version)
+                force(group: "org.ow2.asm", name: "asm-commons", version: asm_version)
+            }
+        }
     }
 }
 
@@ -58,11 +69,18 @@ allprojects {
         maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
     }
     group = "org.opensearch"
+
     plugins.withId('java') {
-        sourceCompatibility = targetCompatibility = "11"
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     plugins.withId('org.jetbrains.kotlin.jvm') {
-        compileKotlin.kotlinOptions.jvmTarget = compileTestKotlin.kotlinOptions.jvmTarget = "11"
+        compileJava.sourceCompatibility = JavaVersion.VERSION_21
+        compileJava.targetCompatibility = JavaVersion.VERSION_21
+        compileTestJava.sourceCompatibility = JavaVersion.VERSION_21
+        compileTestJava.targetCompatibility = JavaVersion.VERSION_21
+        compileKotlin.kotlinOptions.jvmTarget = "21"
+        compileTestKotlin.kotlinOptions.jvmTarget = "21"
         compileKotlin.dependsOn ktlint
     }
 }
