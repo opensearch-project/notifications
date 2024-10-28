@@ -11,4 +11,4 @@ Compatible with OpenSearch 2.18.0
 * Resolve host to all ips and check against the deny list ([#964](https://github.com/opensearch-project/notifications/pull/964))
 
 ### Documentation
-* Add 2.18.0 release notes ([#]())
+* Add 2.18.0 release notes ([#980](https://github.com/opensearch-project/notifications/pull/980))
