@@ -56,7 +56,6 @@ buildscript {
 
 apply plugin: 'base'
 apply plugin: 'jacoco'
-apply plugin: 'com.gradleup.shadow'
 apply plugin: 'io.gitlab.arturbosch.detekt'
 apply from: 'build-tools/merged-coverage.gradle'
 
