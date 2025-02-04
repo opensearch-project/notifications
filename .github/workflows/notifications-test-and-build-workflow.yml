@@ -68,13 +68,13 @@ jobs:
       - name: Upload Artifacts for notifications plugin
         uses: actions/upload-artifact@v4
         with:
-          name: notifications-plugin-${{ matrix.os }}
+          name: notifications-plugin-${{ matrix.os }}-JDK${{ matrix.java }}
           path: notifications-build/notifications
 
       - name: Upload Artifacts for notifications-core plugin
         uses: actions/upload-artifact@v4
         with:
-          name: notifications-core-plugin-${{ matrix.os }}
+          name: notifications-core-plugin-${{ matrix.os }}-JDK${{ matrix.java }}
           path: notifications-build/notifications-core
 
   build-windows-macos:
@@ -134,11 +134,11 @@ jobs:
       - name: Upload Artifacts for notifications plugin
         uses: actions/upload-artifact@v4
         with:
-          name: notifications-plugin-${{ matrix.os }}
+          name: notifications-plugin-${{ matrix.os }}-JDK${{ matrix.java }}
           path: notifications-build/notifications
 
       - name: Upload Artifacts for notifications-core plugin
         uses: actions/upload-artifact@v4
         with:
-          name: notifications-core-plugin-${{ matrix.os }}
+          name: notifications-core-plugin-${{ matrix.os }}-JDK${{ matrix.java }}
           path: notifications-build/notifications-core
