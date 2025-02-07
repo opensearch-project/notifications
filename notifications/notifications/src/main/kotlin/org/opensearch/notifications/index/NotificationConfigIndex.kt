@@ -22,7 +22,7 @@ import org.opensearch.action.index.IndexRequest
 import org.opensearch.action.index.IndexResponse
 import org.opensearch.action.search.SearchRequest
 import org.opensearch.action.search.SearchResponse
-import org.opensearch.action.support.master.AcknowledgedResponse
+import org.opensearch.action.support.clustermanager.AcknowledgedResponse
 import org.opensearch.client.Client
 import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.unit.TimeValue
