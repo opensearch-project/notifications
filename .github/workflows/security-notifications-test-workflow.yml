@@ -16,7 +16,7 @@ jobs:
       # This setting says that all jobs should finish, even if one fails
       fail-fast: false
       matrix:
-        java: [11, 17, 21]
+        java: [21, 23]
 
     runs-on: ubuntu-latest
 
