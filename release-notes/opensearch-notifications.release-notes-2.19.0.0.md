@@ -6,4 +6,4 @@ Compatible with OpenSearch 2.19.0
 * Add JDK-23 to the build matrix ([#977](https://github.com/opensearch-project/notifications/pull/977))
 
 ### Documentation
-* Add 2.19.0 release notes ([#981](https://github.com/opensearch-project/notifications/pull/981))
+* Add 2.19.0 release notes ([#996](https://github.com/opensearch-project/notifications/pull/996))
