@@ -15,7 +15,6 @@ import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.opensearch.action.support.ActionFilters
-import org.opensearch.client.Client
 import org.opensearch.commons.destination.response.LegacyDestinationResponse
 import org.opensearch.commons.notifications.action.BaseResponse
 import org.opensearch.commons.notifications.action.CreateNotificationConfigRequest
@@ -49,6 +48,7 @@ import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
+import org.opensearch.transport.client.Client
 import kotlin.test.assertEquals
 
 @ExtendWith(MockitoExtension::class)

@@ -4,10 +4,10 @@
  */
 package org.opensearch.notifications.resthandler
 
-import org.opensearch.client.node.NodeClient
 import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.rest.BaseRestHandler
 import org.opensearch.rest.RestRequest
+import org.opensearch.transport.client.node.NodeClient
 
 /**
  * Base class for Rest handler for plugin.
