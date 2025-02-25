@@ -5,13 +5,7 @@
  
 name: Security Test and Build Notifications
 
-on:
-  pull_request:
-    branches:
-      - "*"
-  push:
-    branches:
-      - "*"
+on: [push, pull_request]
 
 jobs:
   Get-CI-Image-Tag:
