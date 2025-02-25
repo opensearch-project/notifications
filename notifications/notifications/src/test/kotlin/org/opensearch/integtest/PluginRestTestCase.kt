@@ -39,7 +39,7 @@ import javax.management.remote.JMXServiceURL
 abstract class PluginRestTestCase : OpenSearchRestTestCase() {
 
     protected fun isHttps(): Boolean {
-        return System.getProperty("https", "false")!!.toBoolean()
+        return Optional.ofNullable(System.getProperty("https")).map("true"::equalsIgnoreCase).orElse(false);
     }
 
     protected fun isLocalHost(): Boolean {
@@ -111,9 +111,9 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
             return when (keystore != null) {
                 true -> {
                     // create adminDN (super-admin) client
-                    val uri = javaClass.classLoader.getResource("security/sample.pem").toURI()
+                    val uri = javaClass.classLoader.getResource("sample.pem").toURI()
                     val configPath = PathUtils.get(uri).parent.toAbsolutePath()
-                    SecureRestClientBuilder(settings, configPath)
+                    SecureRestClientBuilder(settings, configPath, hosts)
                         .setSocketTimeout(60000)
                         .setConnectionRequestTimeout(180000)
                         .build()
