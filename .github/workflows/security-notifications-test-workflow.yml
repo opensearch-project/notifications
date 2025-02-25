@@ -8,10 +8,10 @@ name: Security Test and Build Notifications
 on:
   pull_request:
     branches:
-      - "**"
+      - "*"
   push:
     branches:
-      - "**"
+      - "*"
 
 jobs:
   Get-CI-Image-Tag:
