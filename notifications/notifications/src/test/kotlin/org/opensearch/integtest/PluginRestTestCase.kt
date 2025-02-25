@@ -39,7 +39,7 @@ import javax.management.remote.JMXServiceURL
 abstract class PluginRestTestCase : OpenSearchRestTestCase() {
 
     protected fun isHttps(): Boolean {
-        return Optional.ofNullable(System.getProperty("https")).map("true"::equalsIgnoreCase).orElse(false);
+        return Optional.ofNullable(System.getProperty("https")).map("true"::equalsIgnoreCase).orElse(false)
     }
 
     protected fun isLocalHost(): Boolean {
