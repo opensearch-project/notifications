@@ -46,6 +46,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Security-enabled Notification Tests for OS ${{ matrix.os }} & JDK ${{ matrix.java }}
+        run: |
           chown -R 1000:1000 `pwd`
           su `id -un 1000` -c "./gradlew integTest -Dsecurity=true -Dhttps=true --tests '*IT'"
       - name: Upload failed logs
