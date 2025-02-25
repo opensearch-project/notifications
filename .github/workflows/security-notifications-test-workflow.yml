@@ -19,37 +19,37 @@ jobs:
     with:
       product: opensearch
 
-    security-test:
-      needs: Get-CI-Image-Tag
-      # This job runs on Linux
-      runs-on: ubuntu-latest
-      container:
-        # using the same image which is used by opensearch-build team to build the OpenSearch Distribution
-        # this image tag is subject to change as more dependencies and updates will arrive over time
-        image: ${{ needs.Get-CI-Image-Tag.outputs.ci-image-version-linux }}
-        options: ${{ needs.Get-CI-Image-Tag.outputs.ci-image-start-options }}
+  security-test:
+    needs: Get-CI-Image-Tag
+    # This job runs on Linux
+    runs-on: ubuntu-latest
+    container:
+      # using the same image which is used by opensearch-build team to build the OpenSearch Distribution
+      # this image tag is subject to change as more dependencies and updates will arrive over time
+      image: ${{ needs.Get-CI-Image-Tag.outputs.ci-image-version-linux }}
+      options: ${{ needs.Get-CI-Image-Tag.outputs.ci-image-start-options }}
 
-      steps:
-        - name: Run start commands
-          run: ${{ needs.Get-CI-Image-Tag.outputs.ci-image-start-command }}
+    steps:
+      - name: Run start commands
+        run: ${{ needs.Get-CI-Image-Tag.outputs.ci-image-start-command }}
 
-        # This step uses the setup-java Github action: https://github.com/actions/setup-java
-        - name: Set Up JDK
-          uses: actions/setup-java@v4
-          with:
-            distribution: temurin # Temurin is a distribution of adoptium
-            java-version: 21
+      # This step uses the setup-java Github action: https://github.com/actions/setup-java
+      - name: Set Up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin # Temurin is a distribution of adoptium
+          java-version: 21
 
-        - name: Checkout Notifications
-          uses: actions/checkout@v4
+      - name: Checkout Notifications
+        uses: actions/checkout@v4
 
-        - name: Run Notification Test for security enabled test cases
-            chown -R 1000:1000 `pwd`
-            su `id -un 1000` -c "./gradlew integTest -Dsecurity=true -Dhttps=true --tests '*IT'"
-        - name: Upload failed logs
-          uses: actions/upload-artifact@v4
-          if: failure()
-          with:
-            name: logs
-            overwrite: 'true'
-            path: build/testclusters/integTest-*/logs/*
+      - name: Run Notification Test for security enabled test cases
+          chown -R 1000:1000 `pwd`
+          su `id -un 1000` -c "./gradlew integTest -Dsecurity=true -Dhttps=true --tests '*IT'"
+      - name: Upload failed logs
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: logs
+          overwrite: 'true'
+          path: build/testclusters/integTest-*/logs/*
