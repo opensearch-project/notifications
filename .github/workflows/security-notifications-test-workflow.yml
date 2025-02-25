@@ -13,8 +13,9 @@ jobs:
     with:
       product: opensearch
 
-  build-linux:
+  security-test:
     needs: Get-CI-Image-Tag
+    # This job runs on Linux
     strategy:
       # This setting says that all jobs should finish, even if one fails
       fail-fast: false
@@ -23,11 +24,7 @@ jobs:
         os:
           - ubuntu-24.04-arm  # arm64-preview
           - ubuntu-24.04  # x64
-
-  security-test:
-    needs: Get-CI-Image-Tag
-    # This job runs on Linux
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     container:
       # using the same image which is used by opensearch-build team to build the OpenSearch Distribution
       # this image tag is subject to change as more dependencies and updates will arrive over time
