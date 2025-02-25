@@ -13,7 +13,6 @@ import org.opensearch.OpenSearchStatusException
 import org.opensearch.action.ActionRequest
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.action.support.HandledTransportAction
-import org.opensearch.client.Client
 import org.opensearch.common.util.concurrent.ThreadContext
 import org.opensearch.commons.ConfigConstants.OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT
 import org.opensearch.commons.authuser.User
@@ -29,6 +28,7 @@ import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
+import org.opensearch.transport.client.Client
 import java.io.IOException
 
 internal abstract class PluginBaseAction<Request : ActionRequest, Response : ActionResponse>(

@@ -8,8 +8,6 @@ package org.opensearch.notifications.action
 import org.opensearch.action.ActionType
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.action.support.HandledTransportAction
-import org.opensearch.client.Client
-import org.opensearch.client.node.NodeClient
 import org.opensearch.common.inject.Inject
 import org.opensearch.commons.notifications.NotificationsPluginInterface
 import org.opensearch.commons.notifications.action.SendNotificationResponse
@@ -21,6 +19,8 @@ import org.opensearch.notifications.model.SendTestNotificationRequest
 import org.opensearch.notifications.send.SendTestNotificationActionHelper
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
+import org.opensearch.transport.client.Client
+import org.opensearch.transport.client.node.NodeClient
 
 /**
  * Send Test Notification transport action

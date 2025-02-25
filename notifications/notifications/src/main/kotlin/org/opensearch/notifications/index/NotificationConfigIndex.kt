@@ -22,8 +22,7 @@ import org.opensearch.action.index.IndexRequest
 import org.opensearch.action.index.IndexResponse
 import org.opensearch.action.search.SearchRequest
 import org.opensearch.action.search.SearchResponse
-import org.opensearch.action.support.master.AcknowledgedResponse
-import org.opensearch.client.Client
+import org.opensearch.action.support.clustermanager.AcknowledgedResponse
 import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.unit.TimeValue
 import org.opensearch.common.util.concurrent.ThreadContext
@@ -54,6 +53,7 @@ import org.opensearch.script.Script
 import org.opensearch.search.SearchHit
 import org.opensearch.search.builder.SearchSourceBuilder
 import org.opensearch.search.sort.SortOrder
+import org.opensearch.transport.client.Client
 import java.lang.IllegalArgumentException
 import java.util.concurrent.TimeUnit
 
