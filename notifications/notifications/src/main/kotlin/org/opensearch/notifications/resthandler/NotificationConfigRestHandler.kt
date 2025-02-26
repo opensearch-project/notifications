@@ -4,7 +4,6 @@
  */
 package org.opensearch.notifications.resthandler
 
-import org.opensearch.client.node.NodeClient
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_LIST_TAG
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.notifications.NotificationConstants.DEFAULT_MAX_ITEMS
@@ -34,6 +33,7 @@ import org.opensearch.rest.RestRequest.Method.POST
 import org.opensearch.rest.RestRequest.Method.PUT
 import org.opensearch.rest.action.RestToXContentListener
 import org.opensearch.search.sort.SortOrder
+import org.opensearch.transport.client.node.NodeClient
 
 /**
  * Rest handler for notification configurations.

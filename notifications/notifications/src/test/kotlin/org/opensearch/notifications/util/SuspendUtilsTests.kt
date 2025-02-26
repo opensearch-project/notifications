@@ -16,8 +16,8 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.opensearch.action.index.IndexRequest
 import org.opensearch.action.index.IndexResponse
-import org.opensearch.client.Client
 import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntilTimeout
+import org.opensearch.transport.client.Client
 
 @ExtendWith(MockitoExtension::class)
 internal class SuspendUtilsTests {
