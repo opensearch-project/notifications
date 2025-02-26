@@ -82,7 +82,7 @@ configurations.all {
         force "joda-time:joda-time:2.8.1" // Resolve for amazonaws
         force "com.fasterxml.jackson.core:jackson-core:2.15.0" // resolve for amazonaws
         force "com.fasterxml.jackson.core:jackson-annotations:2.11.4" // resolve for amazonaws
-        force "com.fasterxml.jackson.core:jackson-databind:2.11.4" // resolve for amazonaws
+        force "com.fasterxml.jackson.core:jackson-databind:2.12.6" // resolve for amazonaws
         force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.11.4" // resolve for amazonaws
         force "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.11.4" // resolve for amazonaws
         force "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.4" // resolve for amazonaws
