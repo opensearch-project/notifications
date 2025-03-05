@@ -111,9 +111,9 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
             return when (keystore != null) {
                 true -> {
                     // create adminDN (super-admin) client
-                    val uri = javaClass.classLoader.getResource("security/sample.pem").toURI()
+                    val uri = javaClass.classLoader.getResource("sample.pem").toURI()
                     val configPath = PathUtils.get(uri).parent.toAbsolutePath()
-                    SecureRestClientBuilder(settings, configPath)
+                    SecureRestClientBuilder(settings, configPath, hosts)
                         .setSocketTimeout(60000)
                         .setConnectionRequestTimeout(180000)
                         .build()
