@@ -262,6 +262,7 @@ integTest {
 
     systemProperty 'buildDir', buildDir.path
     systemProperty "https", System.getProperty("https")
+    systemProperty "security", System.getProperty("security")
     systemProperty "user", System.getProperty("user", "admin")
     systemProperty "password", System.getProperty("password", "admin")
     // Tell the test JVM if the cluster JVM is running under a debugger so that tests can use longer timeouts for
