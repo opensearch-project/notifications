@@ -125,6 +125,10 @@ configurations.all {
     }
 }
 
+configurations {
+    opensearchPlugin
+}
+
 dependencies {
     compileOnly "${group}:opensearch:${opensearch_version}"
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
@@ -348,10 +352,6 @@ def bwcVersion = bwcVersionShort + ".0"
 def bwcOpenSearchVesion= bwcVersionShort + "-SNAPSHOT"
 def bwcPluginVersion = bwcVersion + "-SNAPSHOT"
 String baseName = "notificationsBwcCluster"
-
-configurations {
-    opensearchPlugin
-}
 
 dependencies {
     opensearchPlugin "org.opensearch.plugin:opensearch-notifications-core:${bwcPluginVersion}@zip"
