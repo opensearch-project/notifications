@@ -21,8 +21,6 @@ import org.opensearch.gradle.test.RestIntegTestTask
 import org.opensearch.gradle.testclusters.OpenSearchCluster
 import org.opensearch.gradle.testclusters.StandaloneRestIntegTestTask
 
-import java.util.concurrent.Callable
-
 plugins {
     id "com.dorongold.task-tree" version "2.1.1"
     id "com.netflix.nebula.ospackage" version "11.5.0"
@@ -313,7 +311,26 @@ integTest.dependsOn(bundle)
 integTest.getClusters().forEach{c -> {
     c.plugin(project.getObjects().fileProperty().value(bundle.getArchiveFile()))
     c.plugin(project.getObjects().fileProperty().value(coreBundle.getArchiveFile()))
+
 }}
+
+ext.resolvePluginFile = { pluginId ->
+    return new Callable<RegularFile>() {
+        @Override
+        RegularFile call() throws Exception {
+            return new RegularFile() {
+                @Override
+                File getAsFile() {
+                    return configurations.opensearchPlugin.resolvedConfiguration.resolvedArtifacts
+                            .find { ResolvedArtifact f ->
+                                f.name.startsWith(pluginId)
+                            }
+                            .file
+                }
+            }
+        }
+    }
+}
 
 testClusters.integTest {
     testDistribution = 'INTEG_TEST'
@@ -330,6 +347,11 @@ testClusters.integTest {
             debugPort += 1
         }
     }
+
+    if (securityEnabled) {
+        plugin(provider(resolvePluginFile("opensearch-security")))
+    }
+
     setting 'path.repo', repo.absolutePath
 }
 
@@ -357,24 +379,6 @@ String baseName = "notificationsBwcCluster"
 dependencies {
     opensearchPlugin "org.opensearch.plugin:opensearch-notifications-core:${bwcPluginVersion}@zip"
     opensearchPlugin "org.opensearch.plugin:notifications:${bwcPluginVersion}@zip"
-}
-
-ext.resolvePluginFile = { pluginId ->
-    return new Callable<RegularFile>() {
-        @Override
-        RegularFile call() throws Exception {
-            return new RegularFile() {
-                @Override
-                File getAsFile() {
-                    return configurations.opensearchPlugin.resolvedConfiguration.resolvedArtifacts
-                            .find { ResolvedArtifact f ->
-                                f.name.startsWith(pluginId)
-                            }
-                            .file
-                }
-            }
-        }
-    }
 }
 
 def notificationsCoreFile = resolvePluginFile("opensearch-notifications-core")
