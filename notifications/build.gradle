@@ -57,7 +57,6 @@ buildscript {
 apply plugin: 'base'
 apply plugin: 'jacoco'
 apply plugin: 'io.gitlab.arturbosch.detekt'
-apply plugin: 'opensearch.java-agent'
 apply from: 'build-tools/merged-coverage.gradle'
 
 allprojects {

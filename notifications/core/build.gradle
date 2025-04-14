@@ -24,6 +24,7 @@ apply plugin: 'opensearch.pluginzip'
 apply plugin: 'opensearch.java'
 apply plugin: 'opensearch.testclusters'
 apply plugin: 'opensearch.java-rest-test'
+apply plugin: 'opensearch.java-agent'
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
 
