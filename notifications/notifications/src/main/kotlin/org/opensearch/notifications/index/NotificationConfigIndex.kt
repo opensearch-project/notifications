@@ -49,6 +49,7 @@ import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntil
 import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntilTimeout
+import org.opensearch.remote.metadata.client.SdkClient
 import org.opensearch.script.Script
 import org.opensearch.search.SearchHit
 import org.opensearch.search.builder.SearchSourceBuilder
@@ -80,6 +81,7 @@ internal object NotificationConfigIndex : ConfigOperations {
 
     private lateinit var client: Client
     private lateinit var clusterService: ClusterService
+    private lateinit var sdkClient: SdkClient
 
     private val searchHitParser = object : SearchResults.SearchHitParser<NotificationConfigInfo> {
         override fun parse(searchHit: SearchHit): NotificationConfigInfo {
@@ -102,9 +104,10 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    fun initialize(client: Client, clusterService: ClusterService) {
+    fun initialize(sdkClient: SdkClient, client: Client, clusterService: ClusterService) {
         NotificationConfigIndex.client = SecureIndexClient(client)
         NotificationConfigIndex.clusterService = clusterService
+        NotificationConfigIndex.sdkClient = sdkClient
     }
 
     private fun getSchemaVersionFromIndexMapping(indexMapping: Map<String, Any>?): Int {

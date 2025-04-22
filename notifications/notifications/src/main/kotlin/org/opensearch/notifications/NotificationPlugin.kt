@@ -40,11 +40,22 @@ import org.opensearch.notifications.resthandler.SendTestMessageRestHandler
 import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.notifications.settings.PluginSettings
+import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_ENDPOINT
+import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_REGION
+import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_SERVICE_NAME
+import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_STORE_TYPE
 import org.opensearch.notifications.spi.NotificationCore
 import org.opensearch.notifications.spi.NotificationCoreExtension
+import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.plugins.ActionPlugin
 import org.opensearch.plugins.Plugin
 import org.opensearch.plugins.SystemIndexPlugin
+import org.opensearch.remote.metadata.client.impl.SdkClientFactory
+import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_ENDPOINT_KEY
+import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_REGION_KEY
+import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_SERVICE_NAME_KEY
+import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_TYPE_KEY
+import org.opensearch.remote.metadata.common.CommonValue.TENANT_AWARE_KEY
 import org.opensearch.repositories.RepositoriesService
 import org.opensearch.rest.RestController
 import org.opensearch.rest.RestHandler
@@ -109,11 +120,24 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
     ): Collection<Any> {
         log.debug("$LOG_PREFIX:createComponents")
         this.clusterService = clusterService
+        val settings = environment.settings()
+        val sdkClient = SdkClientFactory.createSdkClient(
+            SecureIndexClient(client),
+            xContentRegistry,
+            mapOf(
+                REMOTE_METADATA_TYPE_KEY to REMOTE_METADATA_STORE_TYPE.get(settings),
+                REMOTE_METADATA_ENDPOINT_KEY to REMOTE_METADATA_ENDPOINT.get(settings),
+                REMOTE_METADATA_REGION_KEY to REMOTE_METADATA_REGION.get(settings),
+                REMOTE_METADATA_SERVICE_NAME_KEY to REMOTE_METADATA_SERVICE_NAME.get(settings),
+                TENANT_AWARE_KEY to "false"
+            ),
+            client.threadPool().executor(ThreadPool.Names.GENERIC)
+        )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
-        NotificationConfigIndex.initialize(client, clusterService)
+        NotificationConfigIndex.initialize(sdkClient, client, clusterService)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
         SendMessageActionHelper.initialize(NotificationConfigIndex, UserAccessManager)
-        return listOf()
+        return listOf(sdkClient)
     }
 
     /**
