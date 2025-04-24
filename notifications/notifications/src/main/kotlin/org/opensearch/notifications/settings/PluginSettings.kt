@@ -16,6 +16,10 @@ import org.opensearch.commons.utils.OpenForTesting
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
+import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_ENDPOINT_KEY
+import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_REGION_KEY
+import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_SERVICE_NAME_KEY
+import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_TYPE_KEY
 import java.io.IOException
 import java.nio.file.Path
 
@@ -157,6 +161,38 @@ internal object PluginSettings {
         Dynamic
     )
 
+    /** This setting sets the remote metadata store type  */
+    val REMOTE_METADATA_STORE_TYPE: Setting<String?> = Setting
+        .simpleString(
+            "plugins.alerting.$REMOTE_METADATA_TYPE_KEY",
+            NodeScope,
+            Setting.Property.Final
+        )
+
+    /** This setting sets the remote metadata endpoint  */
+    val REMOTE_METADATA_ENDPOINT: Setting<String?> = Setting
+        .simpleString(
+            "plugins.alerting.$REMOTE_METADATA_ENDPOINT_KEY",
+            NodeScope,
+            Setting.Property.Final
+        )
+
+    /** This setting sets the remote metadata region  */
+    val REMOTE_METADATA_REGION: Setting<String?> = Setting
+        .simpleString(
+            "plugins.alerting.$REMOTE_METADATA_REGION_KEY",
+            NodeScope,
+            Setting.Property.Final
+        )
+
+    /** This setting sets the remote metadata service name  */
+    val REMOTE_METADATA_SERVICE_NAME: Setting<String?> = Setting
+        .simpleString(
+            "plugins.alerting.$REMOTE_METADATA_SERVICE_NAME_KEY",
+            NodeScope,
+            Setting.Property.Final
+        )
+
     fun isRbacEnabled(): Boolean {
         return if (clusterService.clusterSettings.get(FILTER_BY_BACKEND_ROLES_KEY) != null) {
             return clusterService.clusterSettings.get(FILTER_BY_BACKEND_ROLES) ?: false
@@ -174,7 +210,11 @@ internal object PluginSettings {
         return listOf(
             OPERATION_TIMEOUT_MS,
             DEFAULT_ITEMS_QUERY_COUNT,
-            FILTER_BY_BACKEND_ROLES
+            FILTER_BY_BACKEND_ROLES,
+            REMOTE_METADATA_REGION,
+            REMOTE_METADATA_ENDPOINT,
+            REMOTE_METADATA_STORE_TYPE,
+            REMOTE_METADATA_SERVICE_NAME
         )
     }
 
