@@ -193,7 +193,7 @@ internal object NotificationConfigIndex : ConfigOperations {
             postRequest.id(id)
         }
 
-        val response: IndexResponse = sdkClient.suspendUntilTimeout {
+        val response: IndexResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
             sdkClient.putDataObjectAsync(postRequest.build()).whenComplete(it)
         }
         return if (response.result != DocWriteResponse.Result.CREATED) {
@@ -227,7 +227,7 @@ internal object NotificationConfigIndex : ConfigOperations {
             .id(id)
             .build()
 
-        val response: GetResponse = sdkClient.suspendUntilTimeout {
+        val response: GetResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
             sdkClient.getDataObjectAsync(getRequest).whenComplete(it)
         }
         return parseNotificationConfigDoc(id, response)
@@ -285,7 +285,7 @@ internal object NotificationConfigIndex : ConfigOperations {
             .searchSourceBuilder(sourceBuilder)
             .build()
 
-        val response: SearchResponse = sdkClient.suspendUntilTimeout {
+        val response: SearchResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
             sdkClient.searchDataObjectAsync(searchRequest).whenComplete(it)
         }
         val result = NotificationConfigSearchResult(request.fromIndex.toLong(), response, searchHitParser)
@@ -309,7 +309,7 @@ internal object NotificationConfigIndex : ConfigOperations {
             .overwriteIfExists(true)
             .build()
 
-        val response: IndexResponse = sdkClient.suspendUntilTimeout {
+        val response: IndexResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
             sdkClient.putDataObjectAsync(putRequest).whenComplete(it)
         }
         if (response.result != DocWriteResponse.Result.UPDATED) {
@@ -328,7 +328,7 @@ internal object NotificationConfigIndex : ConfigOperations {
             .id(id)
             .build()
 
-        val response: DeleteResponse = sdkClient.suspendUntilTimeout {
+        val response: DeleteResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
             sdkClient.deleteDataObjectAsync(deleteRequest).whenComplete(it)
         }
         if (response.result != DocWriteResponse.Result.DELETED) {
@@ -355,7 +355,7 @@ internal object NotificationConfigIndex : ConfigOperations {
             )
         }
 
-        val response: BulkResponse = sdkClient.suspendUntilTimeout {
+        val response: BulkResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
             sdkClient.bulkDataObjectAsync(bulkDeleteRequest).whenComplete(it)
         }
         val mutableMap = mutableMapOf<String, RestStatus>()
