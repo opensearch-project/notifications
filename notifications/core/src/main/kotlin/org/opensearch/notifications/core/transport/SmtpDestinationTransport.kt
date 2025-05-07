@@ -5,6 +5,8 @@
 
 package org.opensearch.notifications.core.transport
 
+import jakarta.mail.MessagingException
+import jakarta.mail.internet.AddressException
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.core.client.DestinationClientPool
 import org.opensearch.notifications.core.client.DestinationSmtpClient
@@ -14,8 +16,6 @@ import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import java.io.IOException
-import javax.mail.MessagingException
-import javax.mail.internet.AddressException
 
 /**
  * This class handles the client responsible for submitting the messages to all types of email destinations.
