@@ -6,6 +6,14 @@
 package org.opensearch.notifications.core.client
 
 import com.sun.mail.util.MailConnectException
+import jakarta.mail.Authenticator
+import jakarta.mail.Message
+import jakarta.mail.MessagingException
+import jakarta.mail.PasswordAuthentication
+import jakarta.mail.SendFailedException
+import jakarta.mail.Session
+import jakarta.mail.Transport
+import jakarta.mail.internet.MimeMessage
 import org.opensearch.core.common.settings.SecureString
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.core.setting.PluginSettings
@@ -16,14 +24,6 @@ import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.SecureDestinationSettings
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import java.util.Properties
-import javax.mail.Authenticator
-import javax.mail.Message
-import javax.mail.MessagingException
-import javax.mail.PasswordAuthentication
-import javax.mail.SendFailedException
-import javax.mail.Session
-import javax.mail.Transport
-import javax.mail.internet.MimeMessage
 
 /**
  * This class handles the connections to the given Destination.
