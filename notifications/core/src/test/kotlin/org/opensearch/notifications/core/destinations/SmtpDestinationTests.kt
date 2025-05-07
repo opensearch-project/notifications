@@ -7,6 +7,7 @@ package org.opensearch.notifications.core.destinations
 
 import io.mockk.every
 import io.mockk.spyk
+import jakarta.mail.MessagingException
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -23,7 +24,6 @@ import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.SecureDestinationSettings
 import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
-import javax.mail.MessagingException
 
 @ExtendWith(MockitoExtension::class)
 internal class SmtpDestinationTests {
