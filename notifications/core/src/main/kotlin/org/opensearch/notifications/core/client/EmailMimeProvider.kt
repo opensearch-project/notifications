@@ -5,7 +5,9 @@
 
 package org.opensearch.notifications.core.client
 
+import jakarta.activation.CommandMap
 import jakarta.activation.DataHandler
+import jakarta.activation.MailcapCommandMap
 import jakarta.mail.Message
 import jakarta.mail.Session
 import jakarta.mail.internet.MimeBodyPart
