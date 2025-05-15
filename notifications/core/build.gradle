@@ -142,8 +142,6 @@ dependencies {
     implementation "com.amazonaws:aws-java-sdk-sns:${aws_version}"
     implementation "com.amazonaws:aws-java-sdk-sts:${aws_version}"
     implementation "com.amazonaws:aws-java-sdk-ses:${aws_version}"
-    implementation "org.slf4j:slf4j-api:${versions.slf4j}" //Needed for httpclient5
-    implementation "org.apache.logging.log4j:log4j-slf4j-impl:${versions.log4j}"
     implementation "com.sun.mail:jakarta.mail:2.0.1"
     implementation "com.sun.activation:jakarta.activation:2.0.1"
     testImplementation(
