@@ -15,6 +15,8 @@ import com.amazonaws.services.simpleemail.model.MailFromDomainNotVerifiedExcepti
 import com.amazonaws.services.simpleemail.model.MessageRejectedException
 import com.amazonaws.services.simpleemail.model.RawMessage
 import com.amazonaws.services.simpleemail.model.SendRawEmailRequest
+import jakarta.mail.Session
+import jakarta.mail.internet.MimeMessage
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.core.NotificationCorePlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.core.credentials.SesClientFactory
@@ -27,8 +29,6 @@ import org.opensearch.notifications.spi.model.destination.SesDestination
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.util.Properties
-import javax.mail.Session
-import javax.mail.internet.MimeMessage
 
 /**
  * This class handles the connections to the given Destination.

@@ -5,15 +5,15 @@
 
 package org.opensearch.notifications.core.client
 
+import jakarta.activation.DataHandler
+import jakarta.mail.Message
+import jakarta.mail.Session
+import jakarta.mail.internet.MimeBodyPart
+import jakarta.mail.internet.MimeMessage
+import jakarta.mail.internet.MimeMultipart
+import jakarta.mail.util.ByteArrayDataSource
 import org.opensearch.notifications.spi.model.MessageContent
 import java.util.Base64
-import javax.activation.DataHandler
-import javax.mail.Message
-import javax.mail.Session
-import javax.mail.internet.MimeBodyPart
-import javax.mail.internet.MimeMessage
-import javax.mail.internet.MimeMultipart
-import javax.mail.util.ByteArrayDataSource
 
 /**
  * Object for creating mime mimeMessage from the channel mimeMessage for sending mail.
