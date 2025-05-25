@@ -144,6 +144,7 @@ dependencies {
     implementation "com.amazonaws:aws-java-sdk-ses:${aws_version}"
     implementation "com.sun.mail:jakarta.mail:2.0.1"
     implementation "com.sun.activation:jakarta.activation:2.0.1"
+    implementation "org.eclipse.angus:angus-mail:2.0.3"
     testImplementation(
             'org.assertj:assertj-core:3.16.1',
             'org.junit.jupiter:junit-jupiter-api:5.6.2',
