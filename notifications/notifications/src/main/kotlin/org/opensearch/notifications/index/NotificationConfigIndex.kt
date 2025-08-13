@@ -41,7 +41,6 @@ import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
 import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.settings.PluginSettings
-import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntil
 import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntilTimeout
 import org.opensearch.remote.metadata.client.BulkDataObjectRequest
@@ -105,7 +104,7 @@ internal object NotificationConfigIndex : ConfigOperations {
      * {@inheritDoc}
      */
     fun initialize(sdkClient: SdkClient, client: Client, clusterService: ClusterService) {
-        NotificationConfigIndex.client = SecureIndexClient(client)
+        NotificationConfigIndex.client = client
         NotificationConfigIndex.clusterService = clusterService
         NotificationConfigIndex.sdkClient = sdkClient
     }
