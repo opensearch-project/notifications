@@ -5,7 +5,9 @@
 
 package org.opensearch.notifications.core.client
 
+import jakarta.activation.CommandMap
 import jakarta.activation.DataHandler
+import jakarta.activation.MailcapCommandMap
 import jakarta.mail.Message
 import jakarta.mail.Session
 import jakarta.mail.internet.MimeBodyPart
@@ -33,6 +35,13 @@ internal object EmailMimeProvider {
         recipient: String,
         messageContent: MessageContent
     ): MimeMessage {
+        val mc = CommandMap.getDefaultCommandMap() as MailcapCommandMap
+        mc.addMailcap("text/html;; x-java-content-handler=org.eclipse.angus.mail.handlers.text_html")
+        mc.addMailcap("text/xml;; x-java-content-handler=org.eclipse.angus.mail.handlers.text_xml")
+        mc.addMailcap("text/plain;; x-java-content-handler=org.eclipse.angus.mail.handlers.text_plain")
+        mc.addMailcap("multipart/*;; x-java-content-handler=org.eclipse.angus.mail.handlers.multipart_mixed")
+        mc.addMailcap("message/rfc822;; x-java-content-handler=org.eclipse.angus.mail.handlers.message_rfc822")
+
         // Create a new MimeMessage object
         val mimeMessage = MimeMessage(session)
 

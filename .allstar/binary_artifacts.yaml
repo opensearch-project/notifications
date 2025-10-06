@@ -1,0 +1,4 @@
+ignorePaths:
+# Ignore reason: These files are used for the Gradle wrapper, which is useful for
+# building the project without installing Gradle locally
+- notifications/gradle/wrapper/gradle-wrapper.jar
