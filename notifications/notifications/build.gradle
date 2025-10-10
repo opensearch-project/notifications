@@ -361,7 +361,7 @@ ext.resolvePluginFile = { pluginId ->
 }
 
 testClusters.integTest {
-    testDistribution = 'INTEG_TEST'
+    testDistribution = 'ARCHIVE'
 
     // Cluster shrink exception thrown if we try to set numberOfNodes to 1, so only apply if > 1
     if (_numNodes > 1) numberOfNodes = _numNodes
@@ -415,7 +415,7 @@ def notificationsFile = resolvePluginFile("notifications")
 2.times { i ->
     testClusters {
         "${baseName}$i" {
-            testDistribution = "INTEG_TEST"
+            testDistribution = "ARCHIVE"
             versions = [bwcOpenSearchVesion, opensearch_version]
             numberOfNodes = 3
             plugin(provider(notificationsCoreFile))
