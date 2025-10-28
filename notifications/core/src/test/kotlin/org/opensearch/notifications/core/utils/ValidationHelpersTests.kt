@@ -67,4 +67,71 @@ internal class ValidationHelpersTests {
         every { InetAddress.getAllByName(validHost) } returns expectedAddressesForValidHost
         assertEquals(false, isHostInDenylist("https://$validHost", hostDenyList))
     }
+
+    @Test
+    fun `test direct IP in denylist blocked immediately without DNS`() {
+        // URL uses direct IP that's in denylist
+        val blockedIp = "127.0.0.1"
+
+        // Should be blocked by direct IP check (no DNS resolution needed)
+        assertEquals(true, isHostInDenylist("https://$blockedIp", hostDenyList))
+    }
+
+    @Test
+    fun `test direct IP in CIDR range blocked immediately`() {
+        // URL uses direct IP within a CIDR range in denylist
+        val ipInRange = "10.5.5.5" // Within 10.0.0.0/8
+
+        // Should be blocked by direct IP check matching CIDR range
+        assertEquals(true, isHostInDenylist("https://$ipInRange", hostDenyList))
+    }
+
+    @Test
+    fun `test hostname NOT in denylist but resolves to blocked IP`() {
+        // Hostname is not in denylist (denylist has no hostnames, only IPs)
+        val hostname = "evil-domain.com"
+
+        mockkStatic(InetAddress::class)
+        // Resolves to blocked IP
+        val blockedIp = arrayOf(InetAddress.getByName("127.0.0.1"))
+        every { InetAddress.getAllByName(hostname) } returns blockedIp
+
+        // Should be blocked by post-DNS check
+        assertEquals(true, isHostInDenylist("https://$hostname", hostDenyList))
+    }
+
+    @Test
+    fun `test direct safe IP allowed without DNS`() {
+        // URL uses direct IP that's NOT in denylist
+        val safeIp = "8.8.8.8"
+
+        // Should NOT be blocked
+        assertEquals(false, isHostInDenylist("https://$safeIp", hostDenyList))
+    }
+
+    @Test
+    fun `test hostname resolves to safe IP allowed`() {
+        val safeHostname = "google.com"
+
+        mockkStatic(InetAddress::class)
+        val safeIp = arrayOf(InetAddress.getByName("8.8.8.8"))
+        every { InetAddress.getAllByName(safeHostname) } returns safeIp
+
+        // Should NOT be blocked
+        assertEquals(false, isHostInDenylist("https://$safeHostname", hostDenyList))
+    }
+
+    @Test
+    fun `test exact IP match in denylist`() {
+        // Test exact IP that's in denylist (9.9.9.9)
+        assertEquals(true, isHostInDenylist("https://9.9.9.9", hostDenyList))
+    }
+
+    @Test
+    fun `test CIDR range boundaries`() {
+        // Test IPs at the boundaries of CIDR ranges
+        assertEquals(true, isHostInDenylist("https://10.0.0.1", hostDenyList))
+        assertEquals(true, isHostInDenylist("https://10.255.255.255", hostDenyList))
+        assertEquals(false, isHostInDenylist("https://11.0.0.1", hostDenyList))
+    }
 }

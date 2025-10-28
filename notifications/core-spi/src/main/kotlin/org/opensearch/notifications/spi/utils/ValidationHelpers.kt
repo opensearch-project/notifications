@@ -5,7 +5,6 @@
 
 package org.opensearch.notifications.spi.utils
 
-import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import org.apache.commons.validator.routines.DomainValidator
 import org.apache.hc.client5.http.classic.methods.HttpPatch
@@ -66,27 +65,29 @@ fun getResolvedIps(host: String): List<IPAddressString> {
 fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
     val url = URL(urlString)
     if (url.host != null) {
-        val hostStr = HostName(url.host)
-        
-        // FIRST CHECK: Before DNS resolution - check if hostname itself is in denylist
-        for (network in hostDenyList) {
-            val denyHostStr = HostName(network)
-            if (denyHostStr.equals(hostStr)) {
-                LogManager.getLogger().error("${url.host} is denied (hostname check before DNS resolution)")
-                return true
+        // FIRST CHECK: If URL uses direct IP (not hostname), check immediately
+        val hostIpAddress = IPAddressString(url.host)
+
+        if (hostIpAddress.isValid) {
+            // It's a direct IP address - check against denylist before DNS
+            for (network in hostDenyList) {
+                val denyIpStr = IPAddressString(network)
+                if (denyIpStr.contains(hostIpAddress)) {
+                    LogManager.getLogger().error("${url.host} is denied (direct IP in denylist)")
+                    return true
+                }
             }
         }
-        
-        // Perform DNS resolution only if hostname check passed
+
+        // SECOND CHECK: Resolve hostname to IPs and check those
         val resolvedIpStrings = getResolvedIps(url.host)
-        
-        // SECOND CHECK: After DNS resolution - check if resolved IPs are in denylist
+
         for (network in hostDenyList) {
             val denyIpStr = IPAddressString(network)
-            
+
             for (ipStr in resolvedIpStrings) {
                 if (denyIpStr.contains(ipStr)) {
-                    LogManager.getLogger().error("${url.host} resolved to ${ipStr.toString()} which is denied")
+                    LogManager.getLogger().error("${url.host} resolved to $ipStr which is denied")
                     return true
                 }
             }
