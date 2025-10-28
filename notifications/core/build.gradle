@@ -9,14 +9,14 @@ plugins {
     id 'jacoco'
     id 'maven-publish'
     id 'signing'
-    id "com.netflix.nebula.ospackage" version "11.5.0"
+    id "com.netflix.nebula.ospackage" version "12.0.0"
 }
 
 repositories {
     mavenLocal()
     mavenCentral()
     maven { url "https://plugins.gradle.org/m2/" }
-    maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
+    maven { url "https://ci.opensearch.org/ci/dbc/snapshots/maven/" }
 }
 
 apply plugin: 'opensearch.opensearchplugin'
@@ -65,10 +65,11 @@ publishing {
     repositories {
         maven {
             name = "Snapshots"
-            url = "https://aws.oss.sonatype.org/content/repositories/snapshots"
-            credentials {
-                username "$System.env.SONATYPE_USERNAME"
-                password "$System.env.SONATYPE_PASSWORD"
+            url = System.getenv("MAVEN_SNAPSHOTS_S3_REPO")
+            credentials(AwsCredentials) {
+                accessKey = System.getenv("AWS_ACCESS_KEY_ID")
+                secretKey = System.getenv("AWS_SECRET_ACCESS_KEY")
+                sessionToken = System.getenv("AWS_SESSION_TOKEN")
             }
         }
     }
@@ -135,21 +136,23 @@ dependencies {
     implementation "org.apache.httpcomponents.core5:httpcore5:${versions.httpcore5}"
     implementation "org.apache.httpcomponents.client5:httpclient5:${versions.httpclient5}"
     implementation "org.apache.httpcomponents.core5:httpcore5-h2:${versions.httpcore5}"
+    implementation "org.slf4j:slf4j-api:${versions.slf4j}" //Needed for httpclient5
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:${versions.log4j}"
     implementation "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}"
     implementation "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}"
     implementation "com.amazonaws:aws-java-sdk-core:${aws_version}"
     implementation "com.amazonaws:aws-java-sdk-sns:${aws_version}"
     implementation "com.amazonaws:aws-java-sdk-sts:${aws_version}"
     implementation "com.amazonaws:aws-java-sdk-ses:${aws_version}"
-    implementation "org.slf4j:slf4j-api:${versions.slf4j}" //Needed for httpclient5
-    implementation "org.apache.logging.log4j:log4j-slf4j-impl:${versions.log4j}"
-    implementation "com.sun.mail:jakarta.mail:2.0.1"
-    implementation "com.sun.activation:jakarta.activation:2.0.1"
+    implementation "org.eclipse.angus:angus-mail:2.0.4"
+    implementation "org.eclipse.angus:angus-activation:2.0.2"
+    implementation "jakarta.mail:jakarta.mail-api:2.1.3"
+    implementation "jakarta.activation:jakarta.activation-api:2.1.3"
     testImplementation(
             'org.assertj:assertj-core:3.16.1',
             'org.junit.jupiter:junit-jupiter-api:5.6.2',
             "org.junit.jupiter:junit-jupiter-params:5.6.2",
-            "org.easymock:easymock:5.4.0",
+            "org.easymock:easymock:5.6.0",
             "org.apache.logging.log4j:log4j-core:${versions.log4j}",
             'org.mockito:mockito-junit-jupiter:3.10.0',
             'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0',
@@ -159,11 +162,11 @@ dependencies {
             'io.mockk:mockk-dsl-jvm:1.11.0',
             'io.mockk:mockk-agent-api:1.11.0',
             'io.mockk:mockk-agent-common:1.11.0',
-            'io.mockk:mockk-agent-jvm:1.11.0'
+            'io.mockk:mockk-agent-jvm:1.11.0',
     )
     testImplementation 'org.springframework.integration:spring-integration-mail:5.5.0'
     // https://mvnrepository.com/artifact/com.icegreen/greenmail
-    testImplementation group: 'com.icegreen', name: 'greenmail', version: '2.0.1'
+    testImplementation group: 'com.icegreen', name: 'greenmail', version: '2.1.3'
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
     testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.6.2')
     testImplementation "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
