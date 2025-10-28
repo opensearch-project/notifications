@@ -66,25 +66,29 @@ fun getResolvedIps(host: String): List<IPAddressString> {
 fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
     val url = URL(urlString)
     if (url.host != null) {
-        val resolvedIpStrings = getResolvedIps(url.host)
         val hostStr = HostName(url.host)
-
+        
+        // FIRST CHECK: Before DNS resolution - check if hostname itself is in denylist
+        for (network in hostDenyList) {
+            val denyHostStr = HostName(network)
+            if (denyHostStr.equals(hostStr)) {
+                LogManager.getLogger().error("${url.host} is denied (hostname check before DNS resolution)")
+                return true
+            }
+        }
+        
+        // Perform DNS resolution only if hostname check passed
+        val resolvedIpStrings = getResolvedIps(url.host)
+        
+        // SECOND CHECK: After DNS resolution - check if resolved IPs are in denylist
         for (network in hostDenyList) {
             val denyIpStr = IPAddressString(network)
-            val denyHostStr = HostName(network)
-            val hostInDenyList = denyHostStr.equals(hostStr)
-            var ipInDenyList = false
-
+            
             for (ipStr in resolvedIpStrings) {
                 if (denyIpStr.contains(ipStr)) {
-                    ipInDenyList = true
-                    break
+                    LogManager.getLogger().error("${url.host} resolved to ${ipStr.toString()} which is denied")
+                    return true
                 }
-            }
-
-            if (hostInDenyList || ipInDenyList) {
-                LogManager.getLogger().error("${url.host} is denied")
-                return true
             }
         }
     }

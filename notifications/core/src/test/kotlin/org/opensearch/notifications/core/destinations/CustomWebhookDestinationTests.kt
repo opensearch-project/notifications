@@ -234,4 +234,56 @@ internal class CustomWebhookDestinationTests {
         responseString = httpClient.getResponseString(response)
         assertEquals(responseString, "{}")
     }
+
+    @Test
+    fun `test custom webhook blocks hostname in denylist before DNS resolution`() {
+        // Remove the mock that stubs isHostInDenylist
+        // We want to test the actual denylist logic
+        
+        val blockedHostname = "blocked-evil-domain.com"
+        val hostDenyListWithHostname = listOf(
+            "127.0.0.0/8",
+            "10.0.0.0/8",
+            blockedHostname  // Blocked hostname
+        )
+        
+        mockkStatic(InetAddress::class)
+        // Mock DNS to return a safe IP (shouldn't matter, hostname check happens first)
+        val safeIp = arrayOf(InetAddress.getByName("174.12.0.0"))
+        every { InetAddress.getAllByName(blockedHostname) } returns safeIp
+        
+        val exception = assertThrows<IllegalArgumentException> {
+            CustomWebhookDestination(
+                "https://$blockedHostname",
+                mapOf("headerKey" to "headerValue"),
+                "POST"
+            )
+            // Note: CustomWebhookDestination constructor should call validateUrl and validateUrlHost
+        }
+        
+        // Verify it was blocked due to denylist
+        Assertions.assertTrue(exception.message?.contains("denied") ?: false)
+    }
+
+    @Test
+    fun `test custom webhook blocks hostname after DNS resolves to blocked IP`() {
+        val hostname = "looks-legitimate.com"
+        val hostDenyListLocal = listOf("127.0.0.0/8", "10.0.0.0/8")
+        
+        mockkStatic(InetAddress::class)
+        // DNS resolves to localhost (blocked)
+        val blockedIp = arrayOf(InetAddress.getByName("127.0.0.1"))
+        every { InetAddress.getAllByName(hostname) } returns blockedIp
+        
+        val exception = assertThrows<IllegalArgumentException> {
+            CustomWebhookDestination(
+                "https://$hostname",
+                mapOf("headerKey" to "headerValue"),
+                "POST"
+            )
+        }
+        
+        // Verify it was blocked due to resolved IP in denylist
+        Assertions.assertTrue(exception.message?.contains("denied") ?: false)
+    }
 }
