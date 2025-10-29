@@ -5,7 +5,6 @@
 
 package org.opensearch.notifications.spi.utils
 
-import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import org.apache.commons.validator.routines.DomainValidator
 import org.apache.hc.client5.http.classic.methods.HttpPatch
@@ -14,7 +13,6 @@ import org.apache.hc.client5.http.classic.methods.HttpPut
 import org.apache.logging.log4j.LogManager
 import org.opensearch.core.common.Strings
 import org.opensearch.notifications.spi.utils.ValidationHelpers.FQDN_REGEX
-import java.lang.Exception
 import java.net.InetAddress
 import java.net.URL
 
@@ -65,26 +63,34 @@ fun getResolvedIps(host: String): List<IPAddressString> {
 
 fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
     val url = URL(urlString)
-    if (url.host != null) {
-        val resolvedIpStrings = getResolvedIps(url.host)
-        val hostStr = HostName(url.host)
+    val host = url.host ?: return false
+    val resolvedIps = getResolvedIps(host)
+    if (resolvedIps.isEmpty()) return false
 
-        for (network in hostDenyList) {
-            val denyIpStr = IPAddressString(network)
-            val denyHostStr = HostName(network)
-            val hostInDenyList = denyHostStr.equals(hostStr)
-            var ipInDenyList = false
+    // Parse deny list into IPAddress objects
+    val denyNetworks = hostDenyList.map { IPAddressString(it).address }
 
-            for (ipStr in resolvedIpStrings) {
-                if (denyIpStr.contains(ipStr)) {
-                    ipInDenyList = true
-                    break
+    for (ip in resolvedIps) {
+        val candidates = mutableListOf(ip)
+
+        if (ip.isIPv4) {
+            val ipv6Mapped = IPAddressString("::ffff:${ip.toNormalizedString()}").address
+            candidates.add(ipv6Mapped)
+        }
+
+        // IPv6 -> extract IPv4 if compatible (::ffff:a.b.c.d)
+        if (ip.isIPv6 && ip.isIPv4Compatible) {
+            val ipv4 = ip.toIPv4()
+            candidates.add(ipv4)
+        }
+
+        for (candidate in candidates) {
+            for (deny in denyNetworks) {
+                // Unspecified addresses match each other
+                if ((candidate.isZero && deny.isZero) || deny.contains(candidate)) {
+                    LogManager.getLogger().error("$host is denied by rule $deny (matched $candidate)")
+                    return true
                 }
-            }
-
-            if (hostInDenyList || ipInDenyList) {
-                LogManager.getLogger().error("${url.host} is denied")
-                return true
             }
         }
     }
