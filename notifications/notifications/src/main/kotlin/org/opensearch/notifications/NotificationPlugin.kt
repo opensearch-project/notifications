@@ -21,6 +21,7 @@ import org.opensearch.core.common.io.stream.NamedWriteableRegistry
 import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.env.Environment
 import org.opensearch.env.NodeEnvironment
+import org.opensearch.identity.PluginSubject
 import org.opensearch.indices.SystemIndexDescriptor
 import org.opensearch.notifications.action.CreateNotificationConfigAction
 import org.opensearch.notifications.action.DeleteNotificationConfigAction
@@ -37,6 +38,7 @@ import org.opensearch.notifications.resthandler.NotificationChannelListRestHandl
 import org.opensearch.notifications.resthandler.NotificationConfigRestHandler
 import org.opensearch.notifications.resthandler.NotificationFeaturesRestHandler
 import org.opensearch.notifications.resthandler.SendTestMessageRestHandler
+import org.opensearch.notifications.security.PluginClient
 import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.notifications.settings.PluginSettings
@@ -46,8 +48,8 @@ import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_SERV
 import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_STORE_TYPE
 import org.opensearch.notifications.spi.NotificationCore
 import org.opensearch.notifications.spi.NotificationCoreExtension
-import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.plugins.ActionPlugin
+import org.opensearch.plugins.IdentityAwarePlugin
 import org.opensearch.plugins.Plugin
 import org.opensearch.plugins.SystemIndexPlugin
 import org.opensearch.remote.metadata.client.impl.SdkClientFactory
@@ -69,9 +71,10 @@ import java.util.function.Supplier
  * Entry point of the OpenSearch Notifications plugin
  * This class initializes the rest handlers.
  */
-class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, SystemIndexPlugin {
+class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, SystemIndexPlugin, IdentityAwarePlugin {
 
     lateinit var clusterService: ClusterService // initialized in createComponents()
+    lateinit var pluginClient: PluginClient
 
     internal companion object {
         private val log by logger(NotificationPlugin::class.java)
@@ -121,8 +124,9 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
         log.debug("$LOG_PREFIX:createComponents")
         this.clusterService = clusterService
         val settings = environment.settings()
+        pluginClient = PluginClient(client)
         val sdkClient = SdkClientFactory.createSdkClient(
-            SecureIndexClient(client),
+            pluginClient,
             xContentRegistry,
             mapOf(
                 REMOTE_METADATA_TYPE_KEY to REMOTE_METADATA_STORE_TYPE.get(settings),
@@ -134,10 +138,16 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
             client.threadPool().executor(ThreadPool.Names.GENERIC)
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
-        NotificationConfigIndex.initialize(sdkClient, client, clusterService)
+        NotificationConfigIndex.initialize(sdkClient, pluginClient, clusterService)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
         SendMessageActionHelper.initialize(NotificationConfigIndex, UserAccessManager)
-        return listOf(sdkClient)
+        return listOf(sdkClient, pluginClient)
+    }
+
+    override fun assignSubject(pluginSubject: PluginSubject) {
+        // When security is not installed, the pluginSubject will still be assigned.
+        requireNotNull(pluginSubject)
+        pluginClient.setSubject(pluginSubject)
     }
 
     /**
