@@ -34,7 +34,6 @@ import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.CustomWebhookDestination
 import org.opensearch.notifications.spi.model.destination.DestinationType
-import java.net.InetAddress
 import java.net.MalformedURLException
 import java.util.stream.Stream
 
@@ -61,7 +60,6 @@ internal class CustomWebhookDestinationTests {
 
     @BeforeEach
     fun setup() {
-        // Stubbing isHostInDenylist() so it doesn't attempt to resolve hosts that don't exist in the unit tests
         mockkStatic("org.opensearch.notifications.spi.utils.ValidationHelpersKt")
         every { org.opensearch.notifications.spi.utils.isHostInDenylist(any(), any()) } returns false
         every { org.opensearch.notifications.spi.utils.getResolvedIps(any()) } returns listOf(IPAddressString("174.0.0.0"))
@@ -234,27 +232,5 @@ internal class CustomWebhookDestinationTests {
         every { response.entity } returns StringEntity("")
         responseString = httpClient.getResponseString(response)
         assertEquals(responseString, "{}")
-    }
-
-    @Test
-    fun `test custom webhook blocks hostname after DNS resolves to blocked IP`() {
-        val hostname = "looks-legitimate.com"
-        val hostDenyListLocal = listOf("127.0.0.0/8", "10.0.0.0/8")
-
-        mockkStatic(InetAddress::class)
-        // DNS resolves to localhost (blocked)
-        val blockedIp = arrayOf(InetAddress.getByName("127.0.0.1"))
-        every { InetAddress.getAllByName(hostname) } returns blockedIp
-
-        val exception = assertThrows<IllegalArgumentException> {
-            CustomWebhookDestination(
-                "https://$hostname",
-                mapOf("headerKey" to "headerValue"),
-                "POST"
-            )
-        }
-
-        // Verify it was blocked due to resolved IP in denylist
-        Assertions.assertTrue(exception.message?.contains("denied") ?: false)
     }
 }

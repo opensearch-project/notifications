@@ -1,10 +1,6 @@
-/*
- * Copyright OpenSearch Contributors
- * SPDX-License-Identifier: Apache-2.0
- */
-
 package org.opensearch.notifications.spi.utils
 
+import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import org.apache.commons.validator.routines.DomainValidator
 import org.apache.hc.client5.http.classic.methods.HttpPatch
@@ -45,7 +41,7 @@ fun isValidUrl(urlString: String): Boolean {
     val isFQDN = regex.matches(subString)
     if (isFQDN && !DomainValidator.getInstance().isValid(subString)) return false
     return if (subString == url.host) {
-        (("https" == url.protocol || "http" == url.protocol) && isFQDN) // Support only http/https, other protocols not supported
+        (("https" == url.protocol || "http" == url.protocol) && isFQDN)
     } else {
         (("https" == url.protocol || "http" == url.protocol) && !isFQDN)
     }
@@ -65,29 +61,108 @@ fun getResolvedIps(host: String): List<IPAddressString> {
 fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
     val url = URL(urlString)
     if (url.host != null) {
-        // FIRST CHECK: If URL uses direct IP (not hostname), check immediately
         val hostIpAddress = IPAddressString(url.host)
+        val hostStr = HostName(url.host)
 
-        if (hostIpAddress.isValid) {
-            // It's a direct IP address - check against denylist before DNS
-            for (network in hostDenyList) {
-                val denyIpStr = IPAddressString(network)
-                if (denyIpStr.contains(hostIpAddress)) {
-                    LogManager.getLogger().error("${url.host} is denied (direct IP in denylist)")
-                    return true
-                }
+        // Parse denylist entries once
+        val denyNetworks = hostDenyList.map { IPAddressString(it) }
+        val denyHostnames = hostDenyList.map { HostName(it) }
+
+        // FIRST CHECK: Before DNS resolution
+        // Check hostname match
+        for (denyHostStr in denyHostnames) {
+            if (denyHostStr.equals(hostStr)) {
+                LogManager.getLogger().error("$url.host is denied (hostname in denylist)")
+                return true
             }
         }
 
-        // SECOND CHECK: Resolve hostname to IPs and check those
+        // Check direct IP with IPv4/IPv6 compatibility
+        if (hostIpAddress.isValid) {
+            val hostAddr = hostIpAddress.address
+            if (hostAddr != null && isIpInDenylist(hostAddr, denyNetworks, url.host)) {
+                return true
+            }
+        }
+
+        // SECOND CHECK: After DNS resolution
+        // Resolve hostname and check all resolved IPs against denylist
         val resolvedIpStrings = getResolvedIps(url.host)
 
-        for (network in hostDenyList) {
-            val denyIpStr = IPAddressString(network)
+        for (ipStr in resolvedIpStrings) {
+            val resolvedAddr = ipStr.address
+            if (resolvedAddr != null && isIpInDenylist(resolvedAddr, denyNetworks, url.host)) {
+                return true
+            }
+        }
+    }
 
-            for (ipStr in resolvedIpStrings) {
-                if (denyIpStr.contains(ipStr)) {
-                    LogManager.getLogger().error("${url.host} resolved to $ipStr which is denied")
+    return false
+}
+
+/**
+ * Check if an IP address (or its IPv4/IPv6 variants) is in the denylist
+ * Handles IPv4-mapped IPv6 addresses (::ffff:a.b.c.d) and IPv4-compatible IPv6 addresses
+ */
+/**
+ * Check if an IP address (or its IPv4/IPv6 variants) is in the denylist
+ * Handles IPv4-mapped IPv6 addresses (::ffff:a.b.c.d) and IPv4-compatible IPv6 addresses
+ */
+private fun isIpInDenylist(
+    ip: inet.ipaddr.IPAddress,
+    denyNetworks: List<IPAddressString>,
+    host: String
+): Boolean {
+    val candidates = mutableListOf(ip)
+
+    // IPv4 -> add IPv6-mapped version (::ffff:a.b.c.d)
+    if (ip.isIPv4) {
+        try {
+            val ipv6Mapped = IPAddressString("::ffff:${ip.toNormalizedString()}").address
+            if (ipv6Mapped != null) {
+                candidates.add(ipv6Mapped)
+            }
+        } catch (e: Exception) {
+            LogManager.getLogger().debug("Failed to create IPv6-mapped address for $ip")
+        }
+    }
+
+    // IPv6 -> extract IPv4 if it's IPv4-mapped or IPv4-compatible
+    if (ip.isIPv6) {
+        try {
+            val ipv6Address = ip.toIPv6()
+
+            // Check for IPv4-mapped IPv6 (::ffff:a.b.c.d)
+            if (ipv6Address.isIPv4Mapped) {
+                val ipv4 = ipv6Address.embeddedIPv4Address
+                if (ipv4 != null) {
+                    candidates.add(ipv4)
+                }
+            }
+
+            // Check for IPv4-compatible IPv6 (::a.b.c.d)
+            if (ipv6Address.isIPv4Compatible) {
+                val ipv4 = ipv6Address.embeddedIPv4Address
+                if (ipv4 != null) {
+                    candidates.add(ipv4)
+                }
+            }
+        } catch (e: Exception) {
+            LogManager.getLogger().debug("Failed to extract IPv4 from IPv6 address $ip")
+        }
+    }
+
+    // Check all candidate addresses against denylist
+    for (candidate in candidates) {
+        for (denyNetwork in denyNetworks) {
+            val denyAddr = denyNetwork.address
+            if (denyAddr != null) {
+                // Handle unspecified addresses (0.0.0.0 or ::)
+                if ((candidate.isZero && denyAddr.isZero) || denyAddr.contains(candidate)) {
+                    LogManager.getLogger().error(
+                        "$host is denied by rule ${denyNetwork.toNormalizedString()} " +
+                            "(matched ${candidate.toNormalizedString()})"
+                    )
                     return true
                 }
             }
