@@ -1,3 +1,7 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package org.opensearch.notifications.spi.utils
 
 import inet.ipaddr.HostName
@@ -100,10 +104,6 @@ fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
     return false
 }
 
-/**
- * Check if an IP address (or its IPv4/IPv6 variants) is in the denylist
- * Handles IPv4-mapped IPv6 addresses (::ffff:a.b.c.d) and IPv4-compatible IPv6 addresses
- */
 /**
  * Check if an IP address (or its IPv4/IPv6 variants) is in the denylist
  * Handles IPv4-mapped IPv6 addresses (::ffff:a.b.c.d) and IPv4-compatible IPv6 addresses
