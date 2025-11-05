@@ -60,7 +60,6 @@ internal class CustomWebhookDestinationTests {
 
     @BeforeEach
     fun setup() {
-        // Stubbing isHostInDenylist() so it doesn't attempt to resolve hosts that don't exist in the unit tests
         mockkStatic("org.opensearch.notifications.spi.utils.ValidationHelpersKt")
         every { org.opensearch.notifications.spi.utils.isHostInDenylist(any(), any()) } returns false
     }
