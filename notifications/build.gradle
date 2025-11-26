@@ -21,7 +21,7 @@ buildscript {
         }
         opensearch_no_snapshot = opensearch_version.replace("-SNAPSHOT","")
         common_utils_version = System.getProperty("common_utils.version", opensearch_build)
-        kotlin_version = System.getProperty("kotlin.version", "1.9.25")
+        kotlin_version = System.getProperty("kotlin.version", "2.2.20")
         junit_version = System.getProperty("junit.version", "5.7.2")
         aws_version = System.getProperty("aws.version", "1.12.687")
         asm_version = System.getProperty("asm.version", "9.7")
