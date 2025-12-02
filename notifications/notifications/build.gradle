@@ -595,7 +595,10 @@ run {
     useCluster testClusters.integTest
 }
 
-compileKotlin { kotlinOptions.freeCompilerArgs = ['-Xjsr305=strict'] }
+// Configure Kotlin compilation options (Gradle 9.x compatible)
+tasks.named('compileKotlin').configure {
+    kotlinOptions.freeCompilerArgs = ['-Xjsr305=strict']
+}
 
 // Only apply jacoco test coverage if we are running a local single node cluster
 if (!usingRemoteCluster && !usingMultiNode) {
@@ -610,7 +613,7 @@ afterEvaluate {
         version = "${project.version}" - "-SNAPSHOT"
 
         into '/usr/share/opensearch/plugins'
-        from(zipTree(bundlePlugin.archivePath)) {
+        from(zipTree(bundlePlugin.archiveFile)) {
             into opensearchplugin.name
         }
 
@@ -638,7 +641,8 @@ afterEvaluate {
         arch = 'NOARCH'
         dependsOn 'assemble'
         finalizedBy 'renameRpm'
-        task renameRpm(type: Copy) {
+        
+        tasks.register('renameRpm', Copy) {
             from("$buildDir/distributions")
             into("$buildDir/distributions")
             rename "$archiveFileName", "${packageName}-${version}.rpm"
@@ -650,7 +654,8 @@ afterEvaluate {
         arch = 'all'
         dependsOn 'assemble'
         finalizedBy 'renameDeb'
-        task renameDeb(type: Copy) {
+        
+        tasks.register('renameDeb', Copy) {
             from("$buildDir/distributions")
             into("$buildDir/distributions")
             rename "$archiveFileName", "${packageName}-${version}.deb"
