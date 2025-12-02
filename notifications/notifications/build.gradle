@@ -605,6 +605,17 @@ if (!usingRemoteCluster && !usingMultiNode) {
     apply from: '../build-tools/plugin-coverage.gradle'
 }
 
+// Register rename tasks before afterEvaluate so they can be referenced by finalizedBy
+tasks.register('renameRpm', Copy) {
+    from(layout.buildDirectory.dir("distributions"))
+    into(layout.buildDirectory.dir("distributions"))
+}
+
+tasks.register('renameDeb', Copy) {
+    from(layout.buildDirectory.dir("distributions"))
+    into(layout.buildDirectory.dir("distributions"))
+}
+
 // This is afterEvaluate because the bundlePlugin ZIP task is updated afterEvaluate and changes the ZIP name to match the plugin name
 afterEvaluate {
     ospackage {
@@ -641,26 +652,26 @@ afterEvaluate {
         arch = 'NOARCH'
         dependsOn 'assemble'
         finalizedBy 'renameRpm'
-        
-        tasks.register('renameRpm', Copy) {
-            from("$buildDir/distributions")
-            into("$buildDir/distributions")
-            rename "$archiveFileName", "${packageName}-${version}.rpm"
-            doLast { delete file("$buildDir/distributions/$archiveFileName") }
-        }
+    }
+    
+    tasks.named('renameRpm').configure {
+        from(layout.buildDirectory.dir("distributions"))
+        into(layout.buildDirectory.dir("distributions"))
+        rename "$archiveFileName", "${packageName}-${version}.rpm"
+        doLast { delete file(layout.buildDirectory.file("distributions/$archiveFileName").get().asFile) }
     }
 
     buildDeb {
         arch = 'all'
         dependsOn 'assemble'
         finalizedBy 'renameDeb'
-        
-        tasks.register('renameDeb', Copy) {
-            from("$buildDir/distributions")
-            into("$buildDir/distributions")
-            rename "$archiveFileName", "${packageName}-${version}.deb"
-            doLast { delete file("$buildDir/distributions/$archiveFileName") }
-        }
+    }
+    
+    tasks.named('renameDeb').configure {
+        from(layout.buildDirectory.dir("distributions"))
+        into(layout.buildDirectory.dir("distributions"))
+        rename "$archiveFileName", "${packageName}-${version}.deb"
+        doLast { delete file(layout.buildDirectory.file("distributions/$archiveFileName").get().asFile) }
     }
 }
 
