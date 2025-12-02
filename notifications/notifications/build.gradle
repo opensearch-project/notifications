@@ -243,13 +243,38 @@ loggerUsageCheck.enabled = false
 def es_tmp_dir = rootProject.file('build/private/es_tmp').absoluteFile
 es_tmp_dir.mkdirs()
 
-// As of ES 7.7 the sample-extension-plugin is being added to the list of plugins for the testCluster during build before
-// the notification-core plugin is causing build failures.
-// The notification-core zip is added explicitly above but the sample-extension-plugin is added implicitly at some time during evaluation.
-// Will need to do a deep dive to find out exactly what task adds the sample-extension-plugin and add notification-core there but a temporary hack is to
-// reorder the plugins list after evaluation but prior to task execution when the plugins are installed.
+// Declare variables that will be set in afterEvaluate
+Zip bundle
+Zip coreBundle
+
 // Consolidated afterEvaluate block to handle all post-evaluation configuration
 afterEvaluate {
+    // Get the core project safely
+    def coreProject = findProject(":${rootProject.name}-core")
+    
+    if (coreProject != null) {
+        def coreBundleTask = coreProject.tasks.findByName("bundlePlugin")
+        
+        if (coreBundleTask != null) {
+            bundle = (Zip) project.tasks.getByName("bundlePlugin")
+            coreBundle = (Zip) coreBundleTask
+            
+            // Set up the dependency
+            bundle.dependsOn(coreBundle)
+            
+            // Configure integTest task
+            integTest.dependsOn(bundle)
+            integTest.getClusters().forEach { c ->
+                c.plugin(project.getObjects().fileProperty().value(bundle.getArchiveFile()))
+                c.plugin(project.getObjects().fileProperty().value(coreBundle.getArchiveFile()))
+            }
+            
+            // Configure prepareBwcTests task dependencies
+            prepareBwcTests.dependsOn('bundlePlugin')
+            prepareBwcTests.dependsOn(":${rootProject.name}-core:bundlePlugin")
+        }
+    }
+    
     // Configure test cluster nodes
     testClusters.integTest.nodes.each { node ->
         def plugins = node.plugins
@@ -283,27 +308,6 @@ afterEvaluate {
             node.setting("plugins.security.restapi.roles_enabled", "[\"all_access\", \"security_rest_api_access\"]")
             node.setting("plugins.security.system_indices.enabled", "true")
         }
-    }
-    
-    // Get the bundlePlugin tasks after evaluation when they exist
-    def coreProject = findProject(":${rootProject.name}-core")
-    if (coreProject != null && coreProject.tasks.findByName("bundlePlugin") != null) {
-        bundle = (Zip) project.getTasks().getByName("bundlePlugin")
-        coreBundle = (Zip) coreProject.getTasks().getByName("bundlePlugin")
-        
-        // Set up the dependency
-        bundle.dependsOn(coreBundle)
-        
-        // Configure integTest task
-        integTest.dependsOn(bundle)
-        integTest.getClusters().forEach { c ->
-            c.plugin(project.getObjects().fileProperty().value(bundle.getArchiveFile()))
-            c.plugin(project.getObjects().fileProperty().value(coreBundle.getArchiveFile()))
-        }
-        
-        // Configure prepareBwcTests task dependencies
-        prepareBwcTests.dependsOn('bundlePlugin')
-        prepareBwcTests.dependsOn(":${rootProject.name}-core:bundlePlugin")
     }
 }
 
@@ -384,26 +388,6 @@ integTest {
     }
 }
 
-// Declare variables that will be set in afterEvaluate
-Zip bundle
-Zip coreBundle
-
-afterEvaluate {
-    // Get the bundlePlugin tasks after evaluation when they exist
-    bundle = (Zip) project.getTasks().getByName("bundlePlugin")
-    coreBundle = (Zip) findProject(":${rootProject.name}-core").getTasks().getByName("bundlePlugin")
-    
-    // Set up the dependency
-    bundle.dependsOn(coreBundle)
-    
-    // Configure integTest task
-    integTest.dependsOn(bundle)
-    integTest.getClusters().forEach { c ->
-        c.plugin(project.getObjects().fileProperty().value(bundle.getArchiveFile()))
-        c.plugin(project.getObjects().fileProperty().value(coreBundle.getArchiveFile()))
-    }
-}
-
 ext.resolvePluginFile = { pluginId ->
     return new Callable<RegularFile>() {
         @Override
@@ -446,7 +430,7 @@ testClusters.integTest {
 }
 
 // Always be minimumCompatibilityVersion of current opensearch version(3.0.0)
-// get latest 2.x version from OpenSearch 2.x branch
+// get latest 3.x version from OpenSearch 3.x branch
 static def fetchVersionProperties() {
     def url = 'https://raw.githubusercontent.com/opensearch-project/OpenSearch/refs/heads/3.2/buildSrc/version.properties'
     def content = new URL(url).text
@@ -493,15 +477,22 @@ List<Provider<RegularFile>> plugins = []
 
 // Ensure the artifact for the current project version is available to be used for the bwc tests
 task prepareBwcTests {
-    // Don't add dependencies here - will be added in afterEvaluate
+    // Dependencies will be added in afterEvaluate
     doLast {
-        // Access the tasks lazily here
-        def bundleTask = (Zip) project.getTasks().getByName("bundlePlugin")
-        def coreBundleTask = (Zip) findProject(":${rootProject.name}-core").getTasks().getByName("bundlePlugin")
-        plugins = [
-                project.getObjects().fileProperty().value(coreBundleTask.getArchiveFile()),
-                project.getObjects().fileProperty().value(bundleTask.getArchiveFile())
-        ]
+        // Get the core project safely
+        def coreProject = findProject(":${rootProject.name}-core")
+        
+        if (coreProject != null) {
+            def coreBundleTask = coreProject.tasks.findByName("bundlePlugin")
+            def bundleTask = project.tasks.findByName("bundlePlugin")
+            
+            if (coreBundleTask != null && bundleTask != null) {
+                plugins = [
+                        project.getObjects().fileProperty().value(((Zip) coreBundleTask).getArchiveFile()),
+                        project.getObjects().fileProperty().value(((Zip) bundleTask).getArchiveFile())
+                ]
+            }
+        }
     }
 }
 
