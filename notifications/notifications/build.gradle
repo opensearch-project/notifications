@@ -75,7 +75,7 @@ publishing {
     repositories {
         maven {
             name = "Snapshots"
-            url = System.getenv("MAVEN_SNAPSHOTS_S3_REPO")
+            url = uri(System.getenv("MAVEN_SNAPSHOTS_S3_REPO"))
             credentials(AwsCredentials) {
                 accessKey = System.getenv("AWS_ACCESS_KEY_ID")
                 secretKey = System.getenv("AWS_SECRET_ACCESS_KEY")
@@ -316,7 +316,7 @@ integTest {
     systemProperty "https", System.getProperty("https")
     systemProperty "security", System.getProperty("security")
     systemProperty "user", System.getProperty("user", "admin")
-    systemProperty "password", System.getProperty("password", "admin")
+    systemProperty "password", System.getProperty("password", "[REDACTED:PASSWORD]")
     // Tell the test JVM if the cluster JVM is running under a debugger so that tests can use longer timeouts for
     // requests. The 'doFirst' delays reading the debug setting on the cluster till execution time.
     doFirst {
@@ -752,7 +752,7 @@ def waitForClusterSetup(OpenSearchCluster cluster, Boolean securityEnabled) {
         String host = System.getProperty("tests.cluster", cluster.getFirstNode().getHttpSocketURI())
         WaitForClusterYellow wait = new WaitForClusterYellow(protocol, host, cluster.nodes.size())
         wait.setUsername(System.getProperty("user", "admin"))
-        wait.setPassword(System.getProperty("password", "admin"))
+        wait.setPassword(System.getProperty("password", "[REDACTED:PASSWORD]"))
         return wait.wait(180000)
     }
 
