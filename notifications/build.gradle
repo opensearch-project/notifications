@@ -155,7 +155,8 @@ if (detektEnabled) {
         jvmTarget = "17"
     }
     
-    check.dependsOn detekt
+    // FIX: Reference the detekt TASK, not the detekt extension
+    check.dependsOn tasks.named('detekt')
 } else {
     logger.warn("⚠️  Detekt is disabled because Java ${javaVersion} is not supported. Detekt requires Java < 25.")
     logger.warn("   See: https://github.com/detekt/detekt/issues/8714")
