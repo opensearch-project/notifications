@@ -85,19 +85,6 @@ allprojects {
             sourceCompatibility = '21'
             targetCompatibility = '21'
         }
-        
-        afterEvaluate {
-            tasks.findByName('compileKotlin')?.configure {
-                kotlinOptions {
-                    jvmTarget = "21"
-                }
-            }
-            tasks.findByName('compileTestKotlin')?.configure {
-                kotlinOptions {
-                    jvmTarget = "21"
-                }
-            }
-        }
     }
 }
 

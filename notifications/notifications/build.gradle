@@ -596,18 +596,17 @@ run {
     useCluster testClusters.integTest
 }
 
-// Configure Kotlin compilation options (Gradle 9.x compatible)
-afterEvaluate {
-    tasks.findByName('compileKotlin')?.configure {
-        kotlinOptions {
-            jvmTarget = "21"
-            freeCompilerArgs = ['-Xjsr305=strict']
-        }
+// Configure Kotlin compilation options - direct configuration
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "21"
+        freeCompilerArgs = ['-Xjsr305=strict']
     }
-    tasks.findByName('compileTestKotlin')?.configure {
-        kotlinOptions {
-            jvmTarget = "21"
-        }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "21"
     }
 }
 
