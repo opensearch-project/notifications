@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// Enable automatic JDK provisioning - downloads Java 25 if not available
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
+}
+
 rootProject.name = 'opensearch-notifications'
 include ":core"
 include ":notifications"
@@ -11,3 +16,14 @@ include ":core-spi"
 project(":core").name = rootProject.name + "-core"
 project(":core-spi").name = rootProject.name + "-core" + "-spi"
 startParameter.excludedTaskNames += ["publishPluginZipPublicationToMavenLocal"]
+
+// Configure toolchain repositories for automatic JDK download
+toolchainManagement {
+    jvm {
+        javaRepositories {
+            repository('foojay') {
+                resolverClass = org.gradle.toolchains.foojay.FoojayToolchainResolver
+            }
+        }
+    }
+}
