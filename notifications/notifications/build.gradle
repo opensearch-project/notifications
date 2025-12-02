@@ -316,7 +316,7 @@ integTest {
     systemProperty "https", System.getProperty("https")
     systemProperty "security", System.getProperty("security")
     systemProperty "user", System.getProperty("user", "admin")
-    systemProperty "password", System.getProperty("password", "admin")
+    systemProperty "password", System.getProperty("password", "[REDACTED:PASSWORD]")
     // Tell the test JVM if the cluster JVM is running under a debugger so that tests can use longer timeouts for
     // requests. The 'doFirst' delays reading the debug setting on the cluster till execution time.
     doFirst {
@@ -462,15 +462,20 @@ def notificationsFile = resolvePluginFile("notifications")
     }
 }
 
+// Declare plugins list at top level
 List<Provider<RegularFile>> plugins = []
 
 // Ensure the artifact for the current project version is available to be used for the bwc tests
 task prepareBwcTests {
-    dependsOn bundle
+    dependsOn 'bundlePlugin'
+    dependsOn ":${rootProject.name}-core:bundlePlugin"
     doLast {
+        // Access the tasks lazily here
+        def bundleTask = (Zip) project.getTasks().getByName("bundlePlugin")
+        def coreBundleTask = (Zip) findProject(":${rootProject.name}-core").getTasks().getByName("bundlePlugin")
         plugins = [
-                project.getObjects().fileProperty().value(coreBundle.getArchiveFile()),
-                project.getObjects().fileProperty().value(bundle.getArchiveFile())
+                project.getObjects().fileProperty().value(coreBundleTask.getArchiveFile()),
+                project.getObjects().fileProperty().value(bundleTask.getArchiveFile())
         ]
     }
 }
@@ -762,7 +767,7 @@ def waitForClusterSetup(OpenSearchCluster cluster, Boolean securityEnabled) {
         String host = System.getProperty("tests.cluster", cluster.getFirstNode().getHttpSocketURI())
         WaitForClusterYellow wait = new WaitForClusterYellow(protocol, host, cluster.nodes.size())
         wait.setUsername(System.getProperty("user", "admin"))
-        wait.setPassword(System.getProperty("password", "admin"))
+        wait.setPassword(System.getProperty("password", "[REDACTED:PASSWORD]"))
         return wait.wait(180000)
     }
 
