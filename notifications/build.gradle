@@ -167,7 +167,17 @@ check.dependsOn ktlint
 
 evaluationDependsOnChildren()
 
-check.dependsOn subprojects*.check
+// Configure check task to depend on subproject check tasks (Gradle 9.x compatible)
+subprojects {
+    afterEvaluate {
+        def subprojectCheck = tasks.findByName('check')
+        if (subprojectCheck != null) {
+            rootProject.tasks.named('check').configure {
+                dependsOn(subprojectCheck)
+            }
+        }
+    }
+}
 
 // updateVersion: Task to auto increment to the next development iteration
 tasks.register('updateVersion') {
