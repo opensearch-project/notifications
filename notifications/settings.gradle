@@ -3,21 +3,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-rootProject.name = 'opensearch-notifications'
-include ":core"
-include ":notifications"
-include ":core-spi"
+// Enable automatic JDK download for toolchains
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.9.0'
+}
 
+rootProject.name = 'opensearch-notifications'
+
+include ":notifications"
+include ":core"
+include ":core-spi"
+project(":notifications").name = rootProject.name
 project(":core").name = rootProject.name + "-core"
 project(":core-spi").name = rootProject.name + "-core" + "-spi"
 startParameter.excludedTaskNames += ["publishPluginZipPublicationToMavenLocal"]
-
-// Configure toolchain auto-download from Adoptium
-buildscript {
-    repositories {
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath 'org.gradle.toolchains:foojay-resolver:0.9.0'
-    }
-}
