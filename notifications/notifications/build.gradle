@@ -616,16 +616,6 @@ if (!usingRemoteCluster && !usingMultiNode) {
     apply from: '../build-tools/plugin-coverage.gradle'
 }
 
-// Only apply jacoco test coverage if we are running a local single node cluster
-if (!usingRemoteCluster && !usingMultiNode) {
-    apply from: '../build-tools/plugin-coverage.gradle'
-}
-
-// Only apply jacoco test coverage if we are running a local single node cluster
-if (!usingRemoteCluster && !usingMultiNode) {
-    apply from: '../build-tools/plugin-coverage.gradle'
-}
-
 // Register rename tasks before afterEvaluate so they can be referenced by finalizedBy
 tasks.register('renameRpm', Copy) {
     from(layout.buildDirectory.dir("distributions"))
