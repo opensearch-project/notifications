@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 buildscript {
     ext {
         opensearch_version = System.getProperty("opensearch.version", "3.4.0-SNAPSHOT")
@@ -41,7 +43,7 @@ buildscript {
         classpath "org.opensearch.gradle:build-tools:${opensearch_version}"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
         classpath "org.jetbrains.kotlin:kotlin-allopen:${kotlin_version}"
-        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.23.0"
+        classpath "dev.detekt:detekt-gradle-plugin:2.0.0-alpha.1"
         classpath "org.jacoco:org.jacoco.agent:0.8.13"
     }
     
@@ -58,12 +60,7 @@ buildscript {
 
 apply plugin: 'base'
 apply plugin: 'jacoco'
-
-// Only apply detekt if not on JDK 25+
-if (!isJdk25OrLater) {
-    apply plugin: 'io.gitlab.arturbosch.detekt'
-}
-
+apply plugin: "dev.detekt"
 apply from: 'build-tools/merged-coverage.gradle'
 
 allprojects {
@@ -86,20 +83,15 @@ allprojects {
     }
    
     plugins.withId('org.jetbrains.kotlin.jvm') {
-        tasks.named('compileJava').configure {
+        tasks.withType(JavaCompile).configureEach {
             sourceCompatibility = '21'
             targetCompatibility = '21'
         }
-        tasks.named('compileTestJava').configure {
-            sourceCompatibility = '21'
-            targetCompatibility = '21'
-        }
-        tasks.named('compileKotlin').configure {
-            kotlinOptions.jvmTarget = "21"
+        tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_21)
+            }
             dependsOn ktlint
-        }
-        tasks.named('compileTestKotlin').configure {
-            kotlinOptions.jvmTarget = "21"
         }
     }
 }
@@ -142,30 +134,13 @@ tasks.register('ktlintFormat', JavaExec) {
     jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED"
 }
 
-// Detekt 1.23.0 has a version parsing bug with JDK 25+ (https://github.com/detekt/detekt/issues/8714)
-// This is fixed in detekt 2.0+ but not backported to 1.x and detekt 2.0 is in alpha 
-// Moreover `2.0.0-alpha.1` artifact is not published to maven 
-// For now, we run detekt on JDK 21 and skip it on JDK 25+ to allow CI builds to pass
-if (isJdk25OrLater) {
-    tasks.withType(io.gitlab.arturbosch.detekt.Detekt).configureEach {
-        enabled = false
-    }
-    logger.warn("Detekt is disabled on JDK ${JavaVersion.current()} due to known compatibility issues. Use JDK 21 for detekt checks.")
-} else {
-    detekt {
-        config = files("detekt.yml")
-        buildUponDefaultConfig = true
-        parallel = true
-    }
-    // Ensure detekt runs with JVM target 21 for consistency
-    tasks.withType(io.gitlab.arturbosch.detekt.Detekt).configureEach {
-        jvmTarget = "21"
-    }
+detekt {
+    config = files("detekt.yml")
+    buildUponDefaultConfig = true
+    parallel = true
 }
 
-tasks.named('check').configure {
-    dependsOn(ktlint)
-}
+check.dependsOn ktlint
 
 // updateVersion: Task to auto increment to the next development iteration
 tasks.register('updateVersion') {

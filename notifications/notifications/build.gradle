@@ -20,6 +20,7 @@ import javax.net.ssl.X509TrustManager
 import org.opensearch.gradle.test.RestIntegTestTask
 import org.opensearch.gradle.testclusters.OpenSearchCluster
 import org.opensearch.gradle.testclusters.StandaloneRestIntegTestTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id "com.dorongold.task-tree" version "2.1.1"
@@ -127,6 +128,7 @@ configurations.testRuntimeClasspath {
 configurations.all {
     if (it.state != Configuration.State.UNRESOLVED) return
     resolutionStrategy {
+        force("org.jetbrains:annotations:23.0.0")
         force("org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}")
         force("org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}")
         force("com.fasterxml.jackson.core:jackson-databind:${versions.jackson}")
@@ -595,9 +597,12 @@ run {
     useCluster testClusters.integTest
 }
 
-// Configure Kotlin compilation options (Gradle 9.x compatible)
-tasks.named('compileKotlin').configure {
-    kotlinOptions.freeCompilerArgs = ['-Xjsr305=strict']
+// Configure Kotlin compilation options (Gradle 9.x + Kotlin 2.x compatible)
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
+        freeCompilerArgs.addAll(['-Xjsr305=strict'])
+    }
 }
 
 // Only apply jacoco test coverage if we are running a local single node cluster
