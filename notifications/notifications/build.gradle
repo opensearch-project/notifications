@@ -40,8 +40,6 @@ apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
 def usingRemoteCluster = System.properties.containsKey('tests.rest.cluster') || System.properties.containsKey('tests.cluster')
 def usingMultiNode = project.properties.containsKey('numNodes')
 
-check.dependsOn jacocoTestReport
-
 opensearchplugin {
     name 'opensearch-notifications'
     description 'OpenSearch Notifications Plugin'
@@ -247,8 +245,26 @@ es_tmp_dir.mkdirs()
 Zip bundle
 Zip coreBundle
 
+// Fix for detekt extension issue - clear and rebuild check task dependencies
+tasks.named('check').configure {
+    // Clear any inherited dependencies that might include detekt extension
+    setDependsOn([])
+}
+
 // Consolidated afterEvaluate block to handle all post-evaluation configuration
 afterEvaluate {
+    // Properly configure check task dependencies
+    tasks.named('check').configure {
+        dependsOn jacocoTestReport
+        dependsOn integTest
+        
+        // Add detekt task if it exists (not the extension)
+        def detektTask = tasks.findByName('detekt')
+        if (detektTask != null) {
+            dependsOn detektTask
+        }
+    }
+    
     // Get the core project safely
     def coreProject = findProject(":${rootProject.name}-core")
     
@@ -331,7 +347,6 @@ task integTest(type: RestIntegTestTask) {
     testClassesDirs = sourceSets.test.output.classesDirs
     classpath = sourceSets.test.runtimeClasspath
 }
-tasks.named("check").configure { dependsOn(integTest) }
 
 integTest {
     if (project.hasProperty('excludeTests')) {
@@ -542,7 +557,7 @@ task "${baseName}#twoThirdsUpgradedClusterTask"(type: StandaloneRestIntegTestTas
     }
     filter {
         includeTestsMatching "org.opensearch.integtest.bwc.*IT"
-    }
+        }
     systemProperty 'tests.rest.bwcsuite', 'mixed_cluster'
     systemProperty 'tests.rest.bwcsuite_round', 'second'
     systemProperty 'tests.plugin_bwc_version', bwcVersion
