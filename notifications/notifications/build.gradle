@@ -73,13 +73,16 @@ publishing {
     }
 
     repositories {
-        maven {
-            name = "Snapshots"
-            url = uri(System.getenv("MAVEN_SNAPSHOTS_S3_REPO"))
-            credentials(AwsCredentials) {
-                accessKey = System.getenv("AWS_ACCESS_KEY_ID")
-                secretKey = System.getenv("AWS_SECRET_ACCESS_KEY")
-                sessionToken = System.getenv("AWS_SESSION_TOKEN")
+        def repoUrl = System.getenv("MAVEN_SNAPSHOTS_S3_REPO")
+        if (repoUrl != null && !repoUrl.isEmpty()) {
+            maven {
+                name = "Snapshots"
+                url = uri(repoUrl)
+                credentials(AwsCredentials) {
+                    accessKey = System.getenv("AWS_ACCESS_KEY_ID")
+                    secretKey = System.getenv("AWS_SECRET_ACCESS_KEY")
+                    sessionToken = System.getenv("AWS_SESSION_TOKEN")
+                }
             }
         }
     }
