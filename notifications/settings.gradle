@@ -16,14 +16,3 @@ include ":core-spi"
 project(":core").name = rootProject.name + "-core"
 project(":core-spi").name = rootProject.name + "-core" + "-spi"
 startParameter.excludedTaskNames += ["publishPluginZipPublicationToMavenLocal"]
-
-// Configure toolchain repositories for automatic JDK download
-toolchainManagement {
-    jvm {
-        javaRepositories {
-            repository('foojay') {
-                resolverClass = org.gradle.toolchains.foojay.FoojayToolchainResolver
-            }
-        }
-    }
-}
