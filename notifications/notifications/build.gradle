@@ -244,7 +244,7 @@ loggerUsageCheck.enabled = false
 def es_tmp_dir = rootProject.file('build/private/es_tmp').absoluteFile
 es_tmp_dir.mkdirs()
 
-// Declare variables that will be set in afterEvaluate
+// Declare variables that will be set immediately
 Zip bundle = null
 Zip coreBundle = null
 
@@ -272,13 +272,6 @@ if (coreProject != null) {
         
         // Set up the dependency
         bundle.dependsOn(coreBundle)
-        
-        // Configure integTest task IMMEDIATELY
-        integTest.dependsOn(bundle)
-        integTest.getClusters().forEach { c ->
-            c.plugin(project.getObjects().fileProperty().value(bundle.getArchiveFile()))
-            c.plugin(project.getObjects().fileProperty().value(coreBundle.getArchiveFile()))
-        }
     }
 }
 
@@ -296,8 +289,15 @@ afterEvaluate {
         }
     }
 
-    // Configure prepareBwcTests task dependencies
+    // Configure integTest with plugin bundles
     if (coreBundle != null && bundle != null) {
+        integTest.dependsOn(bundle)
+        integTest.getClusters().forEach { c ->
+            c.plugin(project.getObjects().fileProperty().value(bundle.getArchiveFile()))
+            c.plugin(project.getObjects().fileProperty().value(coreBundle.getArchiveFile()))
+        }
+        
+        // Configure prepareBwcTests task dependencies
         prepareBwcTests.dependsOn('bundlePlugin')
         prepareBwcTests.dependsOn(":${rootProject.name}-core:bundlePlugin")
     }
@@ -313,7 +313,6 @@ afterEvaluate {
         }
 
         if (securityEnabled) {
-            node.extraConfigFile("kirk.pem", file("build/resources/main/kirk.pem"))
             node.extraConfigFile("kirk.pem", file("build/resources/main/kirk.pem"))
             node.extraConfigFile("kirk-key.pem", file("build/resources/main/kirk-key.pem"))
             node.extraConfigFile("esnode.pem", file("build/resources/main/esnode.pem"))
@@ -354,8 +353,9 @@ test {
 
 File repo = file("$buildDir/testclusters/repo")
 def _numNodes = findProperty('numNodes') as Integer ?: 1
+
 task integTest(type: RestIntegTestTask) {
-    description = "Run tests against a cluster that has security enabled"
+    description = "Run tests against a cluster"
     testClassesDirs = sourceSets.test.output.classesDirs
     classpath = sourceSets.test.runtimeClasspath
 }
@@ -366,14 +366,28 @@ integTest {
             exclude "${it}"
         }
     }
+    
     systemProperty 'tests.security.manager', 'false'
     systemProperty 'java.io.tmpdir', es_tmp_dir.absolutePath
-
     systemProperty 'buildDir', buildDir.path
     systemProperty "https", System.getProperty("https")
     systemProperty "security", System.getProperty("security")
     systemProperty "user", System.getProperty("user", "admin")
     systemProperty "password", System.getProperty("password", "[REDACTED:PASSWORD]")
+
+    // JDK 25 compatibility for test JVM
+    jvmArgs(
+        '--add-opens=java.base/java.lang=ALL-UNNAMED',
+        '--add-opens=java.base/java.util=ALL-UNNAMED',
+        '--add-opens=java.base/java.util.concurrent=ALL-UNNAMED',
+        '--add-opens=java.base/java.io=ALL-UNNAMED',
+        '--add-opens=java.base/java.nio=ALL-UNNAMED',
+        '--add-opens=java.base/java.nio.file=ALL-UNNAMED',
+        '--add-opens=java.base/java.security=ALL-UNNAMED',
+        '--add-opens=java.base/javax.net.ssl=ALL-UNNAMED',
+        '--add-modules=jdk.incubator.vector'
+    )
+    
     // Tell the test JVM if the cluster JVM is running under a debugger so that tests can use longer timeouts for
     // requests. The 'doFirst' delays reading the debug setting on the cluster till execution time.
     doFirst {
@@ -436,8 +450,27 @@ ext.resolvePluginFile = { pluginId ->
 testClusters.integTest {
     testDistribution = 'ARCHIVE'
 
+    // JDK 25 compatibility: Add required module opens for OpenSearch cluster JVM
+    jvmArgs(
+        '--add-opens=java.base/java.lang=ALL-UNNAMED',
+        '--add-opens=java.base/java.util=ALL-UNNAMED',
+        '--add-opens=java.base/java.util.concurrent=ALL-UNNAMED',
+        '--add-opens=java.base/java.io=ALL-UNNAMED',
+        '--add-opens=java.base/java.nio=ALL-UNNAMED',
+        '--add-opens=java.base/java.nio.file=ALL-UNNAMED',
+        '--add-opens=java.base/java.net=ALL-UNNAMED',
+        '--add-opens=java.base/java.time=ALL-UNNAMED',
+        '--add-opens=java.base/java.security=ALL-UNNAMED',
+        '--add-opens=java.base/javax.net.ssl=ALL-UNNAMED',
+        '--add-opens=java.base/sun.nio.ch=ALL-UNNAMED',
+        '--add-opens=java.base/sun.security.ssl=ALL-UNNAMED',
+        '--add-opens=java.management/sun.management=ALL-UNNAMED',
+        '--add-modules=jdk.incubator.vector'
+    )
+
     // Cluster shrink exception thrown if we try to set numberOfNodes to 1, so only apply if > 1
     if (_numNodes > 1) numberOfNodes = _numNodes
+    
     // When running integration tests it doesn't forward the --debug-jvm to the cluster anymore
     // i.e. we have to use a custom property to flag when we want to debug OpenSearch JVM
     // since we also support multi node integration tests we increase debugPort per node
@@ -471,6 +504,7 @@ static def fetchVersionProperties() {
         return "2.19.0"
     }
 }
+
 String bwcVersionShort = fetchVersionProperties()
 def bwcVersion = bwcVersionShort + ".0"
 def bwcOpenSearchVesion= bwcVersionShort + "-SNAPSHOT"
@@ -495,6 +529,24 @@ def notificationsFile = resolvePluginFile("notifications")
             plugin(provider(notificationsFile))
             setting 'path.repo', "${buildDir}/cluster/shared/repo/${baseName}"
             setting 'http.content_type.required', 'true'
+            
+            // JDK 25 compatibility for BWC test clusters
+            jvmArgs(
+                '--add-opens=java.base/java.lang=ALL-UNNAMED',
+                '--add-opens=java.base/java.util=ALL-UNNAMED',
+                '--add-opens=java.base/java.util.concurrent=ALL-UNNAMED',
+                '--add-opens=java.base/java.io=ALL-UNNAMED',
+                '--add-opens=java.base/java.nio=ALL-UNNAMED',
+                '--add-opens=java.base/java.nio.file=ALL-UNNAMED',
+                '--add-opens=java.base/java.net=ALL-UNNAMED',
+                '--add-opens=java.base/java.time=ALL-UNNAMED',
+                '--add-opens=java.base/java.security=ALL-UNNAMED',
+                '--add-opens=java.base/javax.net.ssl=ALL-UNNAMED',
+                '--add-opens=java.base/sun.nio.ch=ALL-UNNAMED',
+                '--add-opens=java.base/sun.security.ssl=ALL-UNNAMED',
+                '--add-opens=java.management/sun.management=ALL-UNNAMED',
+                '--add-modules=jdk.incubator.vector'
+            )
         }
     }
 }
@@ -504,7 +556,7 @@ List<Provider<RegularFile>> plugins = []
 
 // Ensure the artifact for the current project version is available to be used for the bwc tests
 task prepareBwcTests {
-    // Dependencies are set in afterEvaluate
+    // Dependencies will be set in afterEvaluate
     doLast {
         if (coreBundle != null && bundle != null) {
             plugins = [
@@ -617,7 +669,26 @@ run {
     useCluster testClusters.integTest
 }
 
-compileKotlin { kotlinOptions.freeCompilerArgs = ['-Xjsr305=strict'] }
+// Kotlin compiler configuration with JDK 25 compatibility
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "21"
+        freeCompilerArgs = [
+            '-Xjsr305=strict',
+            '-Xjvm-default=all'
+        ]
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "21"
+        freeCompilerArgs = [
+            '-Xjsr305=strict',
+            '-Xjvm-default=all'
+        ]
+    }
+}
 
 // Only apply jacoco test coverage if we are running a local single node cluster
 if (!usingRemoteCluster && !usingMultiNode) {
@@ -793,7 +864,7 @@ def waitForClusterSetup(OpenSearchCluster cluster, Boolean securityEnabled) {
         try {
             Files.write(node.getConfigDir().resolve("unicast_hosts.txt"), unicastUris.getBytes(StandardCharsets.UTF_8))
         } catch (IOException e) {
-            throw new java.io.UncheckedIOException("Failed to write configuation files for " + this, e)
+            throw new java.io.UncheckedIOException("Failed to write configuration files for " + this, e)
         }
     }
 
