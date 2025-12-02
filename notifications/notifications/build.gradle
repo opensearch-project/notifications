@@ -192,7 +192,7 @@ dependencies {
     compileOnly "org.apache.httpcomponents.core5:httpcore5-h2:${versions.httpcore5}"
     compileOnly "org.slf4j:slf4j-api:${versions.slf4j}"
     compileOnly "commons-logging:commons-logging:${versions.commonslogging}"
-    compileOnly "commons-codec:commons-codec:commons-codec:${versions.commonscodec}"
+    compileOnly "commons-codec:commons-codec:${versions.commonscodec}"
 
     implementation "org.apache.httpcomponents:httpclient:${versions.httpclient}"
     implementation "org.opensearch.client:opensearch-rest-client:${opensearch_build}"
