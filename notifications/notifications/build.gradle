@@ -245,23 +245,39 @@ def es_tmp_dir = rootProject.file('build/private/es_tmp').absoluteFile
 es_tmp_dir.mkdirs()
 
 // Declare variables that will be set in afterEvaluate
-Zip bundle
-Zip coreBundle
+Zip bundle = null
+Zip coreBundle = null
 
 // Workaround for detekt extension being added to check task dependencies
-// This must be done early, before task graph is built
 gradle.taskGraph.whenReady {
     tasks.findByName('check')?.with { checkTask ->
-        // The check task has invalid dependencies - need to filter them
-        // Create a wrapper that filters out the detekt extension
-        def originalDependencies = checkTask.taskDependencies
         checkTask.dependsOn = checkTask.dependsOn.findAll { dep ->
-            // Filter out anything that's not a valid task dependency
             if (dep instanceof String || dep instanceof Task || dep instanceof TaskProvider) {
                 return true
             }
-            // Filter out extensions (like detekt extension)
-            return !(dep.hasProperty('name') && dep.name == 'detekt' && !( dep instanceof Task))
+            return !(dep.hasProperty('name') && dep.name == 'detekt' && !(dep instanceof Task))
+        }
+    }
+}
+
+// Configure bundle dependencies IMMEDIATELY (not in afterEvaluate)
+def coreProject = findProject(":${rootProject.name}-core")
+if (coreProject != null) {
+    def coreBundleTask = coreProject.tasks.findByName("bundlePlugin")
+    def bundleTask = project.tasks.findByName("bundlePlugin")
+    
+    if (coreBundleTask != null && bundleTask != null) {
+        bundle = (Zip) bundleTask
+        coreBundle = (Zip) coreBundleTask
+        
+        // Set up the dependency
+        bundle.dependsOn(coreBundle)
+        
+        // Configure integTest task IMMEDIATELY
+        integTest.dependsOn(bundle)
+        integTest.getClusters().forEach { c ->
+            c.plugin(project.getObjects().fileProperty().value(bundle.getArchiveFile()))
+            c.plugin(project.getObjects().fileProperty().value(coreBundle.getArchiveFile()))
         }
     }
 }
@@ -272,51 +288,32 @@ afterEvaluate {
     tasks.named('check').configure {
         dependsOn jacocoTestReport
         dependsOn integTest
-        
-        // Add detekt task if it exists (not the extension)
+
+        // Add detekt task if it exists
         def detektTask = tasks.findByName('detekt')
         if (detektTask != null) {
             dependsOn detektTask
         }
     }
-    
-    // Get the core project safely
-    def coreProject = findProject(":${rootProject.name}-core")
-    
-    if (coreProject != null) {
-        def coreBundleTask = coreProject.tasks.findByName("bundlePlugin")
-        
-        if (coreBundleTask != null) {
-            bundle = (Zip) project.tasks.getByName("bundlePlugin")
-            coreBundle = (Zip) coreBundleTask
-            
-            // Set up the dependency
-            bundle.dependsOn(coreBundle)
-            
-            // Configure integTest task
-            integTest.dependsOn(bundle)
-            integTest.getClusters().forEach { c ->
-                c.plugin(project.getObjects().fileProperty().value(bundle.getArchiveFile()))
-                c.plugin(project.getObjects().fileProperty().value(coreBundle.getArchiveFile()))
-            }
-            
-            // Configure prepareBwcTests task dependencies
-            prepareBwcTests.dependsOn('bundlePlugin')
-            prepareBwcTests.dependsOn(":${rootProject.name}-core:bundlePlugin")
-        }
+
+    // Configure prepareBwcTests task dependencies
+    if (coreBundle != null && bundle != null) {
+        prepareBwcTests.dependsOn('bundlePlugin')
+        prepareBwcTests.dependsOn(":${rootProject.name}-core:bundlePlugin")
     }
-    
+
     // Configure test cluster nodes
     testClusters.integTest.nodes.each { node ->
         def plugins = node.plugins
-        // Only reorder if plugins list is not empty
-        if (plugins.size() > 0) {
+        // Only reorder if plugins list has at least 2 items
+        if (plugins.size() > 1) {
             def firstPlugin = plugins.get(0)
             plugins.remove(0)
             plugins.add(firstPlugin)
         }
 
         if (securityEnabled) {
+            node.extraConfigFile("kirk.pem", file("build/resources/main/kirk.pem"))
             node.extraConfigFile("kirk.pem", file("build/resources/main/kirk.pem"))
             node.extraConfigFile("kirk-key.pem", file("build/resources/main/kirk-key.pem"))
             node.extraConfigFile("esnode.pem", file("build/resources/main/esnode.pem"))
@@ -507,21 +504,13 @@ List<Provider<RegularFile>> plugins = []
 
 // Ensure the artifact for the current project version is available to be used for the bwc tests
 task prepareBwcTests {
-    // Dependencies will be added in afterEvaluate
+    // Dependencies are set in afterEvaluate
     doLast {
-        // Get the core project safely
-        def coreProject = findProject(":${rootProject.name}-core")
-        
-        if (coreProject != null) {
-            def coreBundleTask = coreProject.tasks.findByName("bundlePlugin")
-            def bundleTask = project.tasks.findByName("bundlePlugin")
-            
-            if (coreBundleTask != null && bundleTask != null) {
-                plugins = [
-                        project.getObjects().fileProperty().value(((Zip) coreBundleTask).getArchiveFile()),
-                        project.getObjects().fileProperty().value(((Zip) bundleTask).getArchiveFile())
-                ]
-            }
+        if (coreBundle != null && bundle != null) {
+            plugins = [
+                project.getObjects().fileProperty().value(coreBundle.getArchiveFile()),
+                project.getObjects().fileProperty().value(bundle.getArchiveFile())
+            ]
         }
     }
 }
