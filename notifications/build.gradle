@@ -24,6 +24,9 @@ buildscript {
         junit_version = System.getProperty("junit.version", "5.7.2")
         aws_version = System.getProperty("aws.version", "1.12.687")
         asm_version = System.getProperty("asm.version", "9.7")
+        
+        // Check if running on JDK 25 or later
+        isJdk25OrLater = JavaVersion.current() >= JavaVersion.VERSION_25
     }
 
     repositories {
@@ -55,7 +58,12 @@ buildscript {
 
 apply plugin: 'base'
 apply plugin: 'jacoco'
-apply plugin: 'io.gitlab.arturbosch.detekt'
+
+// Only apply detekt if not on JDK 25+
+if (!isJdk25OrLater) {
+    apply plugin: 'io.gitlab.arturbosch.detekt'
+}
+
 apply from: 'build-tools/merged-coverage.gradle'
 
 allprojects {
@@ -134,10 +142,25 @@ tasks.register('ktlintFormat', JavaExec) {
     jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED"
 }
 
-detekt {
-    config = files("detekt.yml")
-    buildUponDefaultConfig = true
-    parallel = true
+// Detekt 1.23.0 has a version parsing bug with JDK 25+ (https://github.com/detekt/detekt/issues/8714)
+// This is fixed in detekt 2.0+ but not backported to 1.x and detekt 2.0 is in alpha 
+// Moreover `2.0.0-alpha.1` artifact is not published to maven 
+// For now, we run detekt on JDK 21 and skip it on JDK 25+ to allow CI builds to pass
+if (isJdk25OrLater) {
+    tasks.withType(io.gitlab.arturbosch.detekt.Detekt).configureEach {
+        enabled = false
+    }
+    logger.warn("Detekt is disabled on JDK ${JavaVersion.current()} due to known compatibility issues. Use JDK 21 for detekt checks.")
+} else {
+    detekt {
+        config = files("detekt.yml")
+        buildUponDefaultConfig = true
+        parallel = true
+    }
+    // Ensure detekt runs with JVM target 21 for consistency
+    tasks.withType(io.gitlab.arturbosch.detekt.Detekt).configureEach {
+        jvmTarget = "21"
+    }
 }
 
 check.dependsOn ktlint
