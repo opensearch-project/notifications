@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 buildscript {
     ext {
         opensearch_version = System.getProperty("opensearch.version", "3.4.0-SNAPSHOT")
@@ -87,11 +85,18 @@ allprojects {
             sourceCompatibility = '21'
             targetCompatibility = '21'
         }
-        tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-            compilerOptions {
-                jvmTarget.set(JvmTarget.JVM_21)
+        
+        afterEvaluate {
+            tasks.findByName('compileKotlin')?.configure {
+                kotlinOptions {
+                    jvmTarget = "21"
+                }
             }
-            dependsOn ktlint
+            tasks.findByName('compileTestKotlin')?.configure {
+                kotlinOptions {
+                    jvmTarget = "21"
+                }
+            }
         }
     }
 }
