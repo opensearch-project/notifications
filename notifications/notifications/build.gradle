@@ -117,48 +117,48 @@ ext {
 }
 
 configurations.testImplementation {
-    exclude module: "securemock"
+    exclude(module: "securemock")
 }
 
 configurations.testRuntimeClasspath {
-    exclude group: 'org.bouncycastle', module: 'bcprov-jdk18on'
+    exclude(group: 'org.bouncycastle', module: 'bcprov-jdk18on')
 }
 
 configurations.all {
     if (it.state != Configuration.State.UNRESOLVED) return
     resolutionStrategy {
-        force "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
-        force "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
-        force "com.fasterxml.jackson.core:jackson-databind:${versions.jackson}"
-        force "com.fasterxml.jackson.core:jackson-core:${versions.jackson}"
-        force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:${versions.jackson}"
-        force "commons-logging:commons-logging:1.3.5"
-        force "commons-codec:commons-codec:1.17.1"
-        force "org.apache.httpcomponents.core5:httpcore5:${versions.httpcore5}"
-        force "org.apache.httpcomponents.client5:httpclient5:${versions.httpclient5}"
-        force "org.apache.httpcomponents:httpclient:${versions.httpclient}"
-        force "org.apache.httpcomponents.core5:httpcore5-h2:${versions.httpcore5}"
-        force "jakarta.json:jakarta.json-api:2.1.3"
-        force "org.opensearch.client:opensearch-rest-client:${opensearch_version}"
-        force "org.slf4j:slf4j-api:${versions.slf4j}"
-        force "software.amazon.awssdk:bom:${versions.aws}"
-        force "software.amazon.awssdk:kms:${versions.aws}"
-        force "software.amazon.awssdk:dynamodb:${versions.aws}"
-        force "com.amazonaws:aws-java-sdk-core:${aws_version}"
-        force "com.amazonaws:aws-java-sdk-dynamodb:${aws_version}"
-        force "com.amazonaws:aws-java-sdk-s3:${aws_version}"
-        force "com.amazonaws:aws-java-sdk-kms:${aws_version}"
-        force "joda-time:joda-time:2.12.7"
-        force "io.netty:netty-codec-http:${versions.netty}"
-        force "io.netty:netty-codec-http2:${versions.netty}"
-        force "io.netty:netty-codec:${versions.netty}"
-        force "io.netty:netty-transport:${versions.netty}"
-        force "io.netty:netty-common:${versions.netty}"
-        force "io.netty:netty-buffer:${versions.netty}"
-        force "io.netty:netty-handler:${versions.netty}"
-        force "io.netty:netty-resolver:${versions.netty}"
-        force "io.netty:netty-transport-native-unix-common:${versions.netty}"
-        force "org.dafny:DafnyRuntime:4.9.0"
+        force("org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}")
+        force("org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}")
+        force("com.fasterxml.jackson.core:jackson-databind:${versions.jackson}")
+        force("com.fasterxml.jackson.core:jackson-core:${versions.jackson}")
+        force("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:${versions.jackson}")
+        force("commons-logging:commons-logging:1.3.5")
+        force("commons-codec:commons-codec:1.17.1")
+        force("org.apache.httpcomponents.core5:httpcore5:${versions.httpcore5}")
+        force("org.apache.httpcomponents.client5:httpclient5:${versions.httpclient5}")
+        force("org.apache.httpcomponents:httpclient:${versions.httpclient}")
+        force("org.apache.httpcomponents.core5:httpcore5-h2:${versions.httpcore5}")
+        force("jakarta.json:jakarta.json-api:2.1.3")
+        force("org.opensearch.client:opensearch-rest-client:${opensearch_version}")
+        force("org.slf4j:slf4j-api:${versions.slf4j}")
+        force("software.amazon.awssdk:bom:${versions.aws}")
+        force("software.amazon.awssdk:kms:${versions.aws}")
+        force("software.amazon.awssdk:dynamodb:${versions.aws}")
+        force("com.amazonaws:aws-java-sdk-core:${aws_version}")
+        force("com.amazonaws:aws-java-sdk-dynamodb:${aws_version}")
+        force("com.amazonaws:aws-java-sdk-s3:${aws_version}")
+        force("com.amazonaws:aws-java-sdk-kms:${aws_version}")
+        force("joda-time:joda-time:2.12.7")
+        force("io.netty:netty-codec-http:${versions.netty}")
+        force("io.netty:netty-codec-http2:${versions.netty}")
+        force("io.netty:netty-codec:${versions.netty}")
+        force("io.netty:netty-transport:${versions.netty}")
+        force("io.netty:netty-common:${versions.netty}")
+        force("io.netty:netty-buffer:${versions.netty}")
+        force("io.netty:netty-handler:${versions.netty}")
+        force("io.netty:netty-resolver:${versions.netty}")
+        force("io.netty:netty-transport-native-unix-common:${versions.netty}")
+        force("org.dafny:DafnyRuntime:4.9.0")
     }
 }
 
@@ -170,8 +170,8 @@ dependencies {
     compileOnly "${group}:opensearch:${opensearch_version}"
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3") {
-        exclude group: 'org.jetbrains', module: 'annotations' // resolve jarhell
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3") {
+        exclude(group: 'org.jetbrains', module: 'annotations') // resolve jarhell
     } // ${kotlin_version} does not work for coroutines
     implementation "${group}:common-utils:${common_utils_version}"
     // TODO: change compile to implementation when the _local/stats API is supported
@@ -200,8 +200,8 @@ dependencies {
     implementation "org.apache.httpcomponents:httpclient:${versions.httpclient}"
     implementation "org.opensearch.client:opensearch-rest-client:${opensearch_build}"
     api "org.opensearch:opensearch-remote-metadata-sdk:${opensearch_build}"
-    implementation ("org.opensearch:opensearch-remote-metadata-sdk-ddb-client:${opensearch_build}") {
-        exclude group: 'com.amazonaws', module: 'aws-java-sdk-core'
+    implementation("org.opensearch:opensearch-remote-metadata-sdk-ddb-client:${opensearch_build}") {
+        exclude(group: 'com.amazonaws', module: 'aws-java-sdk-core')
     }
 
 
@@ -299,14 +299,12 @@ test {
 
 File repo = file("$buildDir/testclusters/repo")
 def _numNodes = findProperty('numNodes') as Integer ?: 1
-task integTest(type: RestIntegTestTask) {
+
+tasks.register('integTest', RestIntegTestTask) {
     description = "Run tests against a cluster that has security enabled"
     testClassesDirs = sourceSets.test.output.classesDirs
     classpath = sourceSets.test.runtimeClasspath
-}
-tasks.named("check").configure { dependsOn(integTest) }
-
-integTest {
+    
     if (project.hasProperty('excludeTests')) {
         project.properties['excludeTests']?.replaceAll('\\s', '')?.split('[,;]')?.each {
             exclude "${it}"
@@ -320,6 +318,7 @@ integTest {
     systemProperty "security", System.getProperty("security")
     systemProperty "user", System.getProperty("user", "admin")
     systemProperty "password", System.getProperty("password", "[REDACTED:PASSWORD]")
+    
     // Tell the test JVM if the cluster JVM is running under a debugger so that tests can use longer timeouts for
     // requests. The 'doFirst' delays reading the debug setting on the cluster till execution time.
     doFirst {
@@ -360,6 +359,8 @@ integTest {
         }
     }
 }
+
+tasks.named("check").configure { dependsOn(integTest) }
 
 // Configure bundlePlugin dependencies
 afterEvaluate {
@@ -468,7 +469,7 @@ def notificationsFile = resolvePluginFile("notifications")
 List<Provider<RegularFile>> plugins = []
 
 // Ensure the artifact for the current project version is available to be used for the bwc tests
-task prepareBwcTests {
+tasks.register('prepareBwcTests') {
     def coreProject = findProject(":${rootProject.name}-core")
     if (coreProject != null) {
         dependsOn tasks.named("bundlePlugin"), coreProject.tasks.named("bundlePlugin")
@@ -494,7 +495,7 @@ task prepareBwcTests {
 
 // Create two test clusters with 3 nodes of the old version
 2.times {i ->
-    task "${baseName}#oldVersionClusterTask$i"(type: StandaloneRestIntegTestTask) {
+    tasks.register("${baseName}#oldVersionClusterTask$i", StandaloneRestIntegTestTask) {
         dependsOn 'prepareBwcTests'
         useCluster testClusters."${baseName}$i"
         filter {
@@ -511,7 +512,7 @@ task prepareBwcTests {
 // Upgrade one node of the old cluster to new OpenSearch version with upgraded plugin version.
 // This results in a mixed cluster with 2 nodes on the old version and 1 upgraded node.
 // This is also used as a one third upgraded cluster for a rolling upgrade.
-task "${baseName}#mixedClusterTask"(type: StandaloneRestIntegTestTask) {
+tasks.register("${baseName}#mixedClusterTask", StandaloneRestIntegTestTask) {
     useCluster testClusters."${baseName}0"
     dependsOn "${baseName}#oldVersionClusterTask0"
     doFirst {
@@ -530,7 +531,7 @@ task "${baseName}#mixedClusterTask"(type: StandaloneRestIntegTestTask) {
 // Upgrade the second node to new OpenSearch version with upgraded plugin version after the first node is upgraded.
 // This results in a mixed cluster with 1 node on the old version and 2 upgraded nodes.
 // This is used for rolling upgrade.
-task "${baseName}#twoThirdsUpgradedClusterTask"(type: StandaloneRestIntegTestTask) {
+tasks.register("${baseName}#twoThirdsUpgradedClusterTask", StandaloneRestIntegTestTask) {
     dependsOn "${baseName}#mixedClusterTask"
     useCluster testClusters."${baseName}0"
     doFirst {
@@ -549,7 +550,7 @@ task "${baseName}#twoThirdsUpgradedClusterTask"(type: StandaloneRestIntegTestTas
 // Upgrade the third node to new OpenSearch version with upgraded plugin version after the second node is upgraded.
 // This results in a fully upgraded cluster.
 // This is used for rolling upgrade.
-task "${baseName}#rollingUpgradeClusterTask"(type: StandaloneRestIntegTestTask) {
+tasks.register("${baseName}#rollingUpgradeClusterTask", StandaloneRestIntegTestTask) {
     dependsOn "${baseName}#twoThirdsUpgradedClusterTask"
     useCluster testClusters."${baseName}0"
     doFirst {
@@ -568,7 +569,7 @@ task "${baseName}#rollingUpgradeClusterTask"(type: StandaloneRestIntegTestTask) 
 
 // Upgrade all the nodes of the old cluster to new OpenSearch version with upgraded plugin version
 // at the same time resulting in a fully upgraded cluster.
-task "${baseName}#fullRestartClusterTask"(type: StandaloneRestIntegTestTask) {
+tasks.register("${baseName}#fullRestartClusterTask", StandaloneRestIntegTestTask) {
     dependsOn "${baseName}#oldVersionClusterTask1"
     useCluster testClusters."${baseName}1"
     doFirst {
