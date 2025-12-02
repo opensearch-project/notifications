@@ -250,11 +250,13 @@ es_tmp_dir.mkdirs()
 // reorder the plugins list after evaluation but prior to task execution when the plugins are installed.
 afterEvaluate {
     testClusters.integTest.nodes.each { node ->
-        def plugins = node.plugins
-        def firstPlugin = plugins.get(0)
-        plugins.remove(0)
-        plugins.add(firstPlugin)
-
+       def plugins = node.plugins
+        // Only reorder if plugins list is not empty
+        if (plugins.size() > 0) {
+            def firstPlugin = plugins.get(0)
+            plugins.remove(0)
+            plugins.add(firstPlugin)
+        }
         if (securityEnabled) {
             node.extraConfigFile("kirk.pem", file("build/resources/main/kirk.pem"))
             node.extraConfigFile("kirk-key.pem", file("build/resources/main/kirk-key.pem"))
@@ -277,6 +279,23 @@ afterEvaluate {
             node.setting("plugins.security.check_snapshot_restore_write_privileges", "true")
             node.setting("plugins.security.restapi.roles_enabled", "[\"all_access\", \"security_rest_api_access\"]")
             node.setting("plugins.security.system_indices.enabled", "true")
+        }
+    }
+
+    // Get the bundlePlugin tasks after evaluation when they exist
+    def coreProject = findProject(":${rootProject.name}-core")
+    if (coreProject != null && coreProject.tasks.findByName("bundlePlugin") != null) {
+        bundle = (Zip) project.getTasks().getByName("bundlePlugin")
+        coreBundle = (Zip) coreProject.getTasks().getByName("bundlePlugin")
+        
+        // Set up the dependency
+        bundle.dependsOn(coreBundle)
+        
+        // Configure integTest task
+        integTest.dependsOn(bundle)
+        integTest.getClusters().forEach { c ->
+            c.plugin(project.getObjects().fileProperty().value(bundle.getArchiveFile()))
+            c.plugin(project.getObjects().fileProperty().value(coreBundle.getArchiveFile()))
         }
     }
 }
