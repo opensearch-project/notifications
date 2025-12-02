@@ -192,7 +192,7 @@ dependencies {
     compileOnly "org.apache.httpcomponents.core5:httpcore5-h2:${versions.httpcore5}"
     compileOnly "org.slf4j:slf4j-api:${versions.slf4j}"
     compileOnly "commons-logging:commons-logging:${versions.commonslogging}"
-    compileOnly "commons-codec:commons-codec:${versions.commonscodec}"
+    compileOnly "commons-codec:commons-codec:commons-codec:${versions.commonscodec}"
 
     implementation "org.apache.httpcomponents:httpclient:${versions.httpclient}"
     implementation "org.opensearch.client:opensearch-rest-client:${opensearch_build}"
@@ -247,13 +247,28 @@ es_tmp_dir.mkdirs()
 Zip bundle
 Zip coreBundle
 
+// Workaround for detekt extension being added to check task dependencies
+// This must be done early, before task graph is built
+gradle.taskGraph.whenReady {
+    tasks.findByName('check')?.with { checkTask ->
+        // The check task has invalid dependencies - need to filter them
+        // Create a wrapper that filters out the detekt extension
+        def originalDependencies = checkTask.taskDependencies
+        checkTask.dependsOn = checkTask.dependsOn.findAll { dep ->
+            // Filter out anything that's not a valid task dependency
+            if (dep instanceof String || dep instanceof Task || dep instanceof TaskProvider) {
+                return true
+            }
+            // Filter out extensions (like detekt extension)
+            return !(dep.hasProperty('name') && dep.name == 'detekt' && !( dep instanceof Task))
+        }
+    }
+}
+
 // Consolidated afterEvaluate block to handle all post-evaluation configuration
 afterEvaluate {
-    // Configure check task dependencies - do this first to avoid detekt extension issue
+    // Re-configure check task dependencies properly
     tasks.named('check').configure {
-        // Clear any inherited dependencies that might include detekt extension
-        setDependsOn([])
-        // Add only valid task dependencies
         dependsOn jacocoTestReport
         dependsOn integTest
         
