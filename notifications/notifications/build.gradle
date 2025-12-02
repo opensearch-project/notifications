@@ -248,15 +248,18 @@ es_tmp_dir.mkdirs()
 // The notification-core zip is added explicitly above but the sample-extension-plugin is added implicitly at some time during evaluation.
 // Will need to do a deep dive to find out exactly what task adds the sample-extension-plugin and add notification-core there but a temporary hack is to
 // reorder the plugins list after evaluation but prior to task execution when the plugins are installed.
+// Consolidated afterEvaluate block to handle all post-evaluation configuration
 afterEvaluate {
+    // Configure test cluster nodes
     testClusters.integTest.nodes.each { node ->
-       def plugins = node.plugins
+        def plugins = node.plugins
         // Only reorder if plugins list is not empty
         if (plugins.size() > 0) {
             def firstPlugin = plugins.get(0)
             plugins.remove(0)
             plugins.add(firstPlugin)
         }
+
         if (securityEnabled) {
             node.extraConfigFile("kirk.pem", file("build/resources/main/kirk.pem"))
             node.extraConfigFile("kirk-key.pem", file("build/resources/main/kirk-key.pem"))
@@ -281,7 +284,7 @@ afterEvaluate {
             node.setting("plugins.security.system_indices.enabled", "true")
         }
     }
-
+    
     // Get the bundlePlugin tasks after evaluation when they exist
     def coreProject = findProject(":${rootProject.name}-core")
     if (coreProject != null && coreProject.tasks.findByName("bundlePlugin") != null) {
@@ -297,6 +300,10 @@ afterEvaluate {
             c.plugin(project.getObjects().fileProperty().value(bundle.getArchiveFile()))
             c.plugin(project.getObjects().fileProperty().value(coreBundle.getArchiveFile()))
         }
+        
+        // Configure prepareBwcTests task dependencies
+        prepareBwcTests.dependsOn('bundlePlugin')
+        prepareBwcTests.dependsOn(":${rootProject.name}-core:bundlePlugin")
     }
 }
 
@@ -486,8 +493,7 @@ List<Provider<RegularFile>> plugins = []
 
 // Ensure the artifact for the current project version is available to be used for the bwc tests
 task prepareBwcTests {
-    dependsOn 'bundlePlugin'
-    dependsOn ":${rootProject.name}-core:bundlePlugin"
+    // Don't add dependencies here - will be added in afterEvaluate
     doLast {
         // Access the tasks lazily here
         def bundleTask = (Zip) project.getTasks().getByName("bundlePlugin")
