@@ -25,21 +25,28 @@ buildscript {
         junit_version = System.getProperty("junit.version", "5.7.2")
         aws_version = System.getProperty("aws.version", "1.12.687")
         asm_version = System.getProperty("asm.version", "9.7")
+        
+        // Check Java version for Detekt compatibility
+        javaVersion = JavaVersion.current().majorVersion.toInteger()
+        detektEnabled = javaVersion < 25 // Disable Detekt on Java 25+
     }
 
     repositories {
         // For local publish dependency
         mavenLocal()
         mavenCentral()
-        maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://ci.opensearch.org/ci/dbc/snapshots/maven/" }
+        maven { url = uri("https://plugins.gradle.org/m2/") }
+        maven { url = uri("https://ci.opensearch.org/ci/dbc/snapshots/maven/") }
     }
 
     dependencies {
         classpath "org.opensearch.gradle:build-tools:${opensearch_version}"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
         classpath "org.jetbrains.kotlin:kotlin-allopen:${kotlin_version}"
-        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.23.0"
+        // Conditionally add Detekt only if Java version < 25
+        if (detektEnabled) {
+            classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.23.8"
+        }
         classpath "org.jacoco:org.jacoco.agent:0.8.13"
     }
     
@@ -56,7 +63,10 @@ buildscript {
 
 apply plugin: 'base'
 apply plugin: 'jacoco'
-apply plugin: 'io.gitlab.arturbosch.detekt'
+// Conditionally apply Detekt plugin only on Java < 25
+if (detektEnabled) {
+    apply plugin: 'io.gitlab.arturbosch.detekt'
+}
 apply from: 'build-tools/merged-coverage.gradle'
 
 allprojects {
@@ -65,15 +75,22 @@ allprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://ci.opensearch.org/ci/dbc/snapshots/maven/" }
+        maven { url = uri("https://plugins.gradle.org/m2/") }
+        maven { url = uri("https://ci.opensearch.org/ci/dbc/snapshots/maven/") }
     }
     group = "org.opensearch"
 
-    plugins.withId('java') {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+    // Only apply Java configuration to projects that have the Java plugin
+    plugins.withType(JavaPlugin) {
+        java {
+            toolchain {
+                languageVersion = JavaLanguageVersion.of(25)
+            }
+            sourceCompatibility = JavaVersion.VERSION_21
+            targetCompatibility = JavaVersion.VERSION_21
+        }
     }
+    
     plugins.withId('org.jetbrains.kotlin.jvm') {
         compileJava.sourceCompatibility = JavaVersion.VERSION_21
         compileJava.targetCompatibility = JavaVersion.VERSION_21
@@ -121,10 +138,27 @@ task ktlintFormat(type: JavaExec, group: "formatting") {
     jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED"
 }
 
-detekt {
-    config = files("detekt.yml")
-    buildUponDefaultConfig = true
-    parallel = true
+// Conditionally configure Detekt only if enabled
+if (detektEnabled) {
+    detekt {
+        config = files("detekt.yml")
+        buildUponDefaultConfig = true
+        parallel = true
+    }
+    
+    tasks.withType(io.gitlab.arturbosch.detekt.Detekt).configureEach {
+        // Detekt should run under Java 25 JVM with JVM target of 17
+        jvmTarget = "17"
+    }
+    
+    tasks.withType(io.gitlab.arturbosch.detekt.DetektCreateBaselineTask).configureEach {
+        jvmTarget = "17"
+    }
+    
+    check.dependsOn detekt
+} else {
+    logger.warn("⚠️  Detekt is disabled because Java ${javaVersion} is not supported. Detekt requires Java < 25.")
+    logger.warn("   See: https://github.com/detekt/detekt/issues/8714")
 }
 
 check.dependsOn ktlint
