@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// Gradle 9.2 compatibility patch for OpenSearch build tools
+// The build tools reference IBM_SEMERU which was refactored in Gradle 9.x
+import org.gradle.api.JavaVersion
 
 buildscript {
     ext {
@@ -37,10 +40,17 @@ buildscript {
         mavenCentral()
         maven { url = uri("https://plugins.gradle.org/m2/") }
         maven { url = uri("https://ci.opensearch.org/ci/dbc/snapshots/maven/") }
+        // Add Sonatype snapshots for latest OpenSearch builds
+        maven { url = uri("https://aws.oss.sonatype.org/content/repositories/snapshots") }
     }
 
     dependencies {
-        classpath "org.opensearch.gradle:build-tools:${opensearch_version}"
+        // Try to use latest snapshot which may have Gradle 9.x compatibility
+        // If 3.4.0-SNAPSHOT doesn't work, try 3.5.0-SNAPSHOT or main branch snapshots
+        classpath("org.opensearch.gradle:build-tools:${opensearch_version}") {
+            // Exclude problematic transitive dependencies
+            exclude group: 'com.ibm.semeru', module: '*'
+        }
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
         classpath "org.jetbrains.kotlin:kotlin-allopen:${kotlin_version}"
         // Conditionally add Detekt only if Java version < 25
@@ -50,23 +60,44 @@ buildscript {
         classpath "org.jacoco:org.jacoco.agent:0.8.13"
     }
     
-     configurations {
+    configurations {
         classpath {
             resolutionStrategy {
                 //in order to handle jackson's higher release version in shadow, this needs to be upgraded to latest
                 force(group: "org.ow2.asm", name: "asm", version: asm_version)
                 force(group: "org.ow2.asm", name: "asm-commons", version: asm_version)
+                
+                // Force compatible versions for Gradle 9.2
+                force "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+                force "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}"
             }
         }
     }
 }
 
+// Apply Gradle 9.2 compatibility patches before plugins are loaded
+gradle.beforeProject { project ->
+    // Patch for JvmVendorSpec compatibility
+    try {
+        def vendorSpecClass = org.gradle.jvm.toolchain.JvmVendorSpec
+        if (!vendorSpecClass.metaClass.hasProperty(vendorSpecClass, 'IBM_SEMERU')) {
+            // Add IBM_SEMERU as an alias to IBM for backward compatibility
+            vendorSpecClass.metaClass.static.IBM_SEMERU = vendorSpecClass.IBM
+            logger.info("Applied IBM_SEMERU compatibility patch for Gradle 9.2")
+        }
+    } catch (Exception e) {
+        logger.warn("Could not apply JvmVendorSpec compatibility patch: ${e.message}")
+    }
+}
+
 apply plugin: 'base'
 apply plugin: 'jacoco'
+
 // Conditionally apply Detekt plugin only on Java < 25
 if (detektEnabled) {
     apply plugin: 'io.gitlab.arturbosch.detekt'
 }
+
 apply from: 'build-tools/merged-coverage.gradle'
 
 allprojects {
@@ -77,7 +108,9 @@ allprojects {
         mavenCentral()
         maven { url = uri("https://plugins.gradle.org/m2/") }
         maven { url = uri("https://ci.opensearch.org/ci/dbc/snapshots/maven/") }
+        maven { url = uri("https://aws.oss.sonatype.org/content/repositories/snapshots") }
     }
+    
     group = "org.opensearch"
 
     // Only apply Java configuration to projects that have the Java plugin
@@ -96,8 +129,22 @@ allprojects {
         compileJava.targetCompatibility = JavaVersion.VERSION_21
         compileTestJava.sourceCompatibility = JavaVersion.VERSION_21
         compileTestJava.targetCompatibility = JavaVersion.VERSION_21
-        compileKotlin.kotlinOptions.jvmTarget = "21"
-        compileTestKotlin.kotlinOptions.jvmTarget = "21"
+        
+        // Kotlin compiler configuration for JDK 25 compatibility
+        compileKotlin {
+            kotlinOptions {
+                jvmTarget = "21"
+                freeCompilerArgs = ['-Xjsr305=strict', '-Xjvm-default=all']
+            }
+        }
+        
+        compileTestKotlin {
+            kotlinOptions {
+                jvmTarget = "21"
+                freeCompilerArgs = ['-Xjsr305=strict', '-Xjvm-default=all']
+            }
+        }
+        
         compileKotlin.dependsOn ktlint
     }
 }
@@ -174,7 +221,7 @@ task updateVersion {
     doLast {
         ext.newVersion = System.getProperty('newVersion')
         println "Setting version to ${newVersion}."
-         // String tokenization to support -SNAPSHOT
+        // String tokenization to support -SNAPSHOT
         ant.replaceregexp(file:'build.gradle', match: '"opensearch.version", "\\d.*"', replace: '"opensearch.version", "' + newVersion.tokenize('-')[0] + '-SNAPSHOT"', flags:'g', byline:true)
     }
 }
