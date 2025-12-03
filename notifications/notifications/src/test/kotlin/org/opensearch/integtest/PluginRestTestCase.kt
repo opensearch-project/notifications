@@ -166,12 +166,14 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
 
     fun createUser(name: String, passwd: String, backendRoles: Array<String>) {
         val request = Request("PUT", "/_plugins/_security/api/internalusers/$name")
-        val broles = backendRoles.joinToString { it -> "\"$it\"" }
-        val entity = " {\n" +
-            "\"password\": \"$passwd\",\n" +
-            "\"backend_roles\": [$broles],\n" +
-            "\"attributes\": {\n" +
-            "}} "
+        val broles = backendRoles.filter { it.isNotBlank() }.joinToString { it -> "\"$it\"" }
+        val entity = """
+            {
+                "password": "$passwd",
+                "backend_roles": [$broles],
+                "attributes": {}
+            }
+        """.trimIndent()
         request.setJsonEntity(entity)
         client().performRequest(request)
     }
@@ -184,11 +186,13 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
     fun createUserRolesMapping(role: String, users: Array<String>) {
         val request = Request("PUT", "/_plugins/_security/api/rolesmapping/$role")
         val usersStr = users.joinToString { it -> "\"$it\"" }
-        val entity = "{                                  \n" +
-            "  \"backend_roles\" : [  ],\n" +
-            "  \"hosts\" : [  ],\n" +
-            "  \"users\" : [$usersStr]\n" +
-            "}"
+        val entity = """
+            {
+                "backend_roles": [],
+                "hosts": [],
+                "users": [$usersStr]
+            }
+        """.trimIndent()
         request.setJsonEntity(entity)
         client().performRequest(request)
     }
@@ -196,13 +200,13 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
     fun addPatchUserRolesMapping(role: String, users: Array<String>) {
         val request = Request("PATCH", "/_plugins/_security/api/rolesmapping/$role")
         val usersStr = users.joinToString { it -> "\"$it\"" }
-
-        val entity = "[{\n" +
-            "  \"op\" : \"add\",\n" +
-            "  \"path\" : \"users\",\n" +
-            "  \"value\" : [$usersStr]\n" +
-            "}]"
-
+        val entity = """
+            [{
+                "op": "add",
+                "path": "users",
+                "value": [$usersStr]
+            }]
+        """.trimIndent()
         request.setJsonEntity(entity)
         client().performRequest(request)
     }
@@ -210,13 +214,13 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
     fun removePatchUserRolesMapping(role: String, users: Array<String>) {
         val request = Request("PATCH", "/_plugins/_security/api/rolesmapping/$role")
         val usersStr = users.joinToString { it -> "\"$it\"" }
-
-        val entity = "[{\n" +
-            "  \"op\" : \"remove\",\n" +
-            "  \"path\" : \"users\",\n" +
-            "  \"value\" : [$usersStr]\n" +
-            "}]"
-
+        val entity = """
+            [{
+                "op": "remove",
+                "path": "users",
+                "value": [$usersStr]
+            }]
+        """.trimIndent()
         request.setJsonEntity(entity)
         client().performRequest(request)
     }
@@ -228,12 +232,13 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
 
     fun createCustomRole(name: String, clusterPermissions: String?) {
         val request = Request("PUT", "/_plugins/_security/api/roles/$name")
-        val entity = "{\n" +
-            "\"cluster_permissions\": [\n" +
-            "\"$clusterPermissions\"\n" +
-            "],\n" +
-            "\"tenant_permissions\": []\n" +
-            "}"
+        val permissions = if (clusterPermissions.isNullOrBlank()) "" else "\"$clusterPermissions\""
+        val entity = """
+            {
+                "cluster_permissions": [$permissions],
+                "tenant_permissions": []
+            }
+        """.trimIndent()
         request.setJsonEntity(entity)
         client().performRequest(request)
     }
