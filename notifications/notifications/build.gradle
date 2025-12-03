@@ -359,7 +359,7 @@ integTest {
     }
 }
 
-// set evaluationDependsOn to make sure notification-core is evaluation in advance
+// set evaluationDependsOn to make sure notification-core is evaluated in advance
 project.evaluationDependsOn(":${rootProject.name}-core")
 
 project.getTasks().getByName("bundlePlugin").dependsOn(findProject(":${rootProject.name}-core").tasks.getByPath(":${rootProject.name}-core:bundlePlugin"))
