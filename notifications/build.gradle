@@ -71,8 +71,10 @@ allprojects {
     group = "org.opensearch"
 
     plugins.withId('java') {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        java {
+            sourceCompatibility = JavaVersion.VERSION_21
+            targetCompatibility = JavaVersion.VERSION_21
+        }
     }
     plugins.withId('org.jetbrains.kotlin.jvm') {
         compileJava.sourceCompatibility = JavaVersion.VERSION_21
