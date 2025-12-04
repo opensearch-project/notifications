@@ -26,5 +26,8 @@ interface UserAccess {
     /**
      * validate if user has access based on given access list
      */
-    fun doesUserHaveAccess(user: User?, access: List<String>): Boolean
+    fun doesUserHaveAccess(
+        user: User?,
+        access: List<String>,
+    ): Boolean
 }

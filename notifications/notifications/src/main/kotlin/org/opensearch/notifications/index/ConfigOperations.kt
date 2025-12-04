@@ -21,7 +21,10 @@ interface ConfigOperations {
      * @return Notification Config id if successful, null otherwise
      * @throws java.util.concurrent.ExecutionException with a cause
      */
-    suspend fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String? = null): String?
+    suspend fun createNotificationConfig(
+        configDoc: NotificationConfigDoc,
+        id: String? = null,
+    ): String?
 
     /**
      * Query index for Notification Config with ID
@@ -45,7 +48,7 @@ interface ConfigOperations {
      */
     suspend fun getAllNotificationConfigs(
         access: List<String>,
-        request: GetNotificationConfigRequest
+        request: GetNotificationConfigRequest,
     ): NotificationConfigSearchResult
 
     /**
@@ -54,7 +57,10 @@ interface ConfigOperations {
      * @param notificationConfigDoc the NotificationConfigDoc data
      * @return true if successful, false otherwise
      */
-    suspend fun updateNotificationConfig(id: String, notificationConfigDoc: NotificationConfigDoc): Boolean
+    suspend fun updateNotificationConfig(
+        id: String,
+        notificationConfigDoc: NotificationConfigDoc,
+    ): Boolean
 
     /**
      * delete NotificationConfigDoc for given id

@@ -31,8 +31,10 @@ import java.util.function.Supplier
 /**
  *  This is a plugin that has all send notifications functionalities
  */
-class NotificationCorePlugin : ReloadablePlugin, Plugin(), ExtensiblePlugin {
-
+class NotificationCorePlugin :
+    Plugin(),
+    ReloadablePlugin,
+    ExtensiblePlugin {
     lateinit var clusterService: ClusterService // initialized in createComponents()
 
     internal companion object {
@@ -64,7 +66,7 @@ class NotificationCorePlugin : ReloadablePlugin, Plugin(), ExtensiblePlugin {
         nodeEnvironment: NodeEnvironment,
         namedWriteableRegistry: NamedWriteableRegistry,
         indexNameExpressionResolver: IndexNameExpressionResolver,
-        repositoriesServiceSupplier: Supplier<RepositoriesService>
+        repositoriesServiceSupplier: Supplier<RepositoriesService>,
     ): Collection<Any> {
         log.debug("$LOG_PREFIX:createComponents")
         this.clusterService = clusterService

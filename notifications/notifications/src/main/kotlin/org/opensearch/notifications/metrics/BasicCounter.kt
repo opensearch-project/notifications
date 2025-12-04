@@ -30,9 +30,7 @@ class BasicCounter : Counter<Long?> {
     /**
      * {@inheritDoc}
      */
-    override fun getValue(): Long {
-        return count.toLong()
-    }
+    override fun getValue(): Long = count.toLong()
 
     /** Reset the count value to zero */
     override fun reset() {

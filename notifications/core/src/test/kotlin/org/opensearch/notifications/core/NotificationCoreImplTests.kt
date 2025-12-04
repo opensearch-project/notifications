@@ -9,28 +9,30 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class NotificationCoreImplTests {
-
     private val defaultTooltipSupport = true
-    private val defaultConfigTypes = listOf(
-        "slack",
-        "chime",
-        "microsoft_teams",
-        "webhook",
-        "email",
-        "sns",
-        "ses_account",
-        "smtp_account",
-        "email_group"
-    )
-    private val defaultConfigFeatures = listOf(
-        "alerting",
-        "index_management",
-        "reports"
-    )
+    private val defaultConfigTypes =
+        listOf(
+            "slack",
+            "chime",
+            "microsoft_teams",
+            "webhook",
+            "email",
+            "sns",
+            "ses_account",
+            "smtp_account",
+            "email_group",
+        )
+    private val defaultConfigFeatures =
+        listOf(
+            "alerting",
+            "index_management",
+            "reports",
+        )
 
-    private val defaultPluginFeatures = mapOf(
-        "tooltip_support" to defaultTooltipSupport.toString()
-    )
+    private val defaultPluginFeatures =
+        mapOf(
+            "tooltip_support" to defaultTooltipSupport.toString(),
+        )
 
     @Test
     fun `test all get configs APIs return the default value`() {

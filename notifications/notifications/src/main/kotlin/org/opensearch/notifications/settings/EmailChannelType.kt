@@ -8,7 +8,9 @@ package org.opensearch.notifications.settings
 /**
  * Enum representing email channel type.
  */
-internal enum class EmailChannelType(val stringValue: String) {
+internal enum class EmailChannelType(
+    val stringValue: String,
+) {
     SMTP("smtp"),
-    SES("ses")
+    SES("ses"),
 }

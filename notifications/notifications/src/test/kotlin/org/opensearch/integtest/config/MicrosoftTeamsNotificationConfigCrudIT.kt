@@ -21,101 +21,115 @@ import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 
 class MicrosoftTeamsNotificationConfigCrudIT : PluginRestTestCase() {
-
     fun `test Create, Get, Update, Delete microsoft teams notification config using REST client`() {
         // Create sample config request reference
         val sampleMicrosoftTeams = MicrosoftTeams("https://domain.webhook.office.com/webhook2/test")
-        val referenceObject = NotificationConfig(
-            "this is a sample config name",
-            "this is a sample config description",
-            ConfigType.MICROSOFT_TEAMS,
-            isEnabled = true,
-            configData = sampleMicrosoftTeams
-        )
+        val referenceObject =
+            NotificationConfig(
+                "this is a sample config name",
+                "this is a sample config description",
+                ConfigType.MICROSOFT_TEAMS,
+                isEnabled = true,
+                configData = sampleMicrosoftTeams,
+            )
 
         // Create Microsoft Teams notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"${referenceObject.name}",
-                "description":"${referenceObject.description}",
-                "config_type":"microsoft_teams",
-                "is_enabled":${referenceObject.isEnabled},
-                "microsoft_teams":{"url":"${(referenceObject.configData as MicrosoftTeams).url}"}
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${referenceObject.name}",
+                    "description":"${referenceObject.description}",
+                    "config_type":"microsoft_teams",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "microsoft_teams":{"url":"${(referenceObject.configData as MicrosoftTeams).url}"}
+                }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
         // Get Microsoft Teams notification config
 
-        val getConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        val getConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs/$configId",
+                "",
+                RestStatus.OK.status,
+            )
         verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
         Thread.sleep(100)
 
         // Get all notification config
 
-        val getAllConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs",
-            "",
-            RestStatus.OK.status
-        )
+        val getAllConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs",
+                "",
+                RestStatus.OK.status,
+            )
         verifySingleConfigEquals(configId, referenceObject, getAllConfigResponse)
         Thread.sleep(100)
 
         // Updated notification config object
         val updatedMicrosoftTeams = MicrosoftTeams("https://updated.domain.webhook.office.com/webhook2/test")
-        val updatedObject = NotificationConfig(
-            "this is a updated config name",
-            "this is a updated config description",
-            ConfigType.MICROSOFT_TEAMS,
-            isEnabled = true,
-            configData = updatedMicrosoftTeams
-        )
+        val updatedObject =
+            NotificationConfig(
+                "this is a updated config name",
+                "this is a updated config description",
+                ConfigType.MICROSOFT_TEAMS,
+                isEnabled = true,
+                configData = updatedMicrosoftTeams,
+            )
 
         // Update Microsoft Teams notification config
-        val updateRequestJsonString = """
-        {
-            "config":{
-                "name":"${updatedObject.name}",
-                "description":"${updatedObject.description}",
-                "config_type":"microsoft_teams",
-                "is_enabled":${updatedObject.isEnabled},
-                "microsoft_teams":{"url":"${(updatedObject.configData as MicrosoftTeams).url}"}
+        val updateRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${updatedObject.name}",
+                    "description":"${updatedObject.description}",
+                    "config_type":"microsoft_teams",
+                    "is_enabled":${updatedObject.isEnabled},
+                    "microsoft_teams":{"url":"${(updatedObject.configData as MicrosoftTeams).url}"}
+                }
             }
-        }
-        """.trimIndent()
-        val updateResponse = executeRequest(
-            RestRequest.Method.PUT.name,
-            "$PLUGIN_BASE_URI/configs/$configId",
-            updateRequestJsonString,
-            RestStatus.OK.status
-        )
+            """.trimIndent()
+        val updateResponse =
+            executeRequest(
+                RestRequest.Method.PUT.name,
+                "$PLUGIN_BASE_URI/configs/$configId",
+                updateRequestJsonString,
+                RestStatus.OK.status,
+            )
         Assert.assertEquals(configId, updateResponse.get("config_id").asString)
         Thread.sleep(1000)
 
         // Get updated Microsoft Teams notification config
 
-        val getUpdatedConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        val getUpdatedConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs/$configId",
+                "",
+                RestStatus.OK.status,
+            )
         verifySingleConfigEquals(configId, updatedObject, getUpdatedConfigResponse)
         Thread.sleep(100)
 
         // Delete Microsoft Teams notification config
         val deleteResponse = deleteConfig(configId)
-        Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
+        Assert.assertEquals(
+            "OK",
+            deleteResponse
+                .get("delete_response_list")
+                .asJsonObject
+                .get(configId)
+                .asString,
+        )
         Thread.sleep(1000)
 
         // Get Microsoft Teams notification config after delete
@@ -124,76 +138,81 @@ class MicrosoftTeamsNotificationConfigCrudIT : PluginRestTestCase() {
             RestRequest.Method.GET.name,
             "$PLUGIN_BASE_URI/configs/$configId",
             "",
-            RestStatus.NOT_FOUND.status
+            RestStatus.NOT_FOUND.status,
         )
         Thread.sleep(100)
     }
 
     fun `test create config with wrong Microsoft Teams url and get error text`() {
         val sampleMicrosoftTeams = MicrosoftTeams("https://domain.office.com/1234567")
-        val referenceObject = NotificationConfig(
-            "this is a sample config name",
-            "this is a sample config description",
-            ConfigType.MICROSOFT_TEAMS,
-            isEnabled = true,
-            configData = sampleMicrosoftTeams
-        )
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"${referenceObject.name}",
-                "description":"${referenceObject.description}",
-                "config_type":"microsoft_teams",
-                "is_enabled":${referenceObject.isEnabled},
-                "microsoft_teams":{"url":"${(referenceObject.configData as MicrosoftTeams).url}"}
-            }
-        }
-        """.trimIndent()
-        val response = try {
-            val request = Request(RestRequest.Method.POST.name, "$PLUGIN_BASE_URI/configs")
-            request.setJsonEntity(createRequestJsonString)
-            val restOptionsBuilder = RequestOptions.DEFAULT.toBuilder()
-            restOptionsBuilder.addHeader("Content-Type", "application/json")
-            request.setOptions(restOptionsBuilder)
-            client().performRequest(request)
-            fail("Expected wrong Microsoft Teams URL.")
-        } catch (exception: ResponseException) {
-            Assert.assertEquals(
-                "Wrong Microsoft Teams url. Should contain \"webhook.office.com\"",
-                jsonify(getResponseBody(exception.response))["error"].asJsonObject["reason"].asString
+        val referenceObject =
+            NotificationConfig(
+                "this is a sample config name",
+                "this is a sample config description",
+                ConfigType.MICROSOFT_TEAMS,
+                isEnabled = true,
+                configData = sampleMicrosoftTeams,
             )
-        }
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${referenceObject.name}",
+                    "description":"${referenceObject.description}",
+                    "config_type":"microsoft_teams",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "microsoft_teams":{"url":"${(referenceObject.configData as MicrosoftTeams).url}"}
+                }
+            }
+            """.trimIndent()
+        val response =
+            try {
+                val request = Request(RestRequest.Method.POST.name, "$PLUGIN_BASE_URI/configs")
+                request.setJsonEntity(createRequestJsonString)
+                val restOptionsBuilder = RequestOptions.DEFAULT.toBuilder()
+                restOptionsBuilder.addHeader("Content-Type", "application/json")
+                request.setOptions(restOptionsBuilder)
+                client().performRequest(request)
+                fail("Expected wrong Microsoft Teams URL.")
+            } catch (exception: ResponseException) {
+                Assert.assertEquals(
+                    "Wrong Microsoft Teams url. Should contain \"webhook.office.com\"",
+                    jsonify(getResponseBody(exception.response))["error"].asJsonObject["reason"].asString,
+                )
+            }
     }
 
     fun `test Bad Request for multiple config data for microsoft teams using REST Client`() {
         // Create sample config request reference
         val sampleMicrosoftTeams = MicrosoftTeams("https://domain.webhook.office.com/1234567")
-        val referenceObject = NotificationConfig(
-            "this is a sample config name",
-            "this is a sample config description",
-            ConfigType.MICROSOFT_TEAMS,
-            isEnabled = true,
-            configData = sampleMicrosoftTeams
-        )
+        val referenceObject =
+            NotificationConfig(
+                "this is a sample config name",
+                "this is a sample config description",
+                ConfigType.MICROSOFT_TEAMS,
+                isEnabled = true,
+                configData = sampleMicrosoftTeams,
+            )
 
         // Create Microsoft Teams notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"${referenceObject.name}",
-                "description":"${referenceObject.description}",
-                "config_type":"microsoft_teams",
-                "is_enabled":${referenceObject.isEnabled},
-                "chime":{"url":"https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456"},
-                "microsoft_teams":{"url":"${(referenceObject.configData as MicrosoftTeams).url}"}
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${referenceObject.name}",
+                    "description":"${referenceObject.description}",
+                    "config_type":"microsoft_teams",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "chime":{"url":"https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456"},
+                    "microsoft_teams":{"url":"${(referenceObject.configData as MicrosoftTeams).url}"}
+                }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         executeRequest(
             RestRequest.Method.POST.name,
             "$PLUGIN_BASE_URI/configs",
             createRequestJsonString,
-            RestStatus.BAD_REQUEST.status
+            RestStatus.BAD_REQUEST.status,
         )
     }
 }

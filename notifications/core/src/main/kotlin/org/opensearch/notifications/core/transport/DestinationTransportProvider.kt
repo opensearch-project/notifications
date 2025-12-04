@@ -14,22 +14,22 @@ import org.opensearch.notifications.spi.model.destination.DestinationType
  * A Destination could be SMTP, Webhook etc
  */
 internal object DestinationTransportProvider {
-
     private val webhookDestinationTransport = WebhookDestinationTransport()
     private val smtpDestinationTransport = SmtpDestinationTransport()
     private val snsDestinationTransport = SnsDestinationTransport()
     private val sesDestinationTransport = SesDestinationTransport()
 
     @OpenForTesting
-    var destinationTransportMap = mapOf(
-        DestinationType.SLACK to webhookDestinationTransport,
-        DestinationType.CHIME to webhookDestinationTransport,
-        DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport,
-        DestinationType.CUSTOM_WEBHOOK to webhookDestinationTransport,
-        DestinationType.SMTP to smtpDestinationTransport,
-        DestinationType.SNS to snsDestinationTransport,
-        DestinationType.SES to sesDestinationTransport
-    )
+    var destinationTransportMap =
+        mapOf(
+            DestinationType.SLACK to webhookDestinationTransport,
+            DestinationType.CHIME to webhookDestinationTransport,
+            DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport,
+            DestinationType.CUSTOM_WEBHOOK to webhookDestinationTransport,
+            DestinationType.SMTP to smtpDestinationTransport,
+            DestinationType.SNS to snsDestinationTransport,
+            DestinationType.SES to sesDestinationTransport,
+        )
 
     /**
      * Fetches the right destination transport based on the type

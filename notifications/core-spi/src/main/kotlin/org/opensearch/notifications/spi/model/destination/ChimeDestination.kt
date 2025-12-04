@@ -9,5 +9,5 @@ package org.opensearch.notifications.spi.model.destination
  * This class holds the contents of a Chime destination
  */
 class ChimeDestination(
-    url: String
+    url: String,
 ) : WebhookDestination(url, DestinationType.CHIME)

@@ -23,40 +23,40 @@ import org.opensearch.transport.client.Client
 /**
  * Update NotificationConfig transport action
  */
-internal class UpdateNotificationConfigAction @Inject constructor(
-    transportService: TransportService,
-    client: Client,
-    actionFilters: ActionFilters,
-    val xContentRegistry: NamedXContentRegistry
-) : PluginBaseAction<UpdateNotificationConfigRequest, UpdateNotificationConfigResponse>(
-    NotificationsActions.UPDATE_NOTIFICATION_CONFIG_NAME,
-    transportService,
-    client,
-    actionFilters,
-    ::UpdateNotificationConfigRequest
-) {
+internal class UpdateNotificationConfigAction
+    @Inject
+    constructor(
+        transportService: TransportService,
+        client: Client,
+        actionFilters: ActionFilters,
+        val xContentRegistry: NamedXContentRegistry,
+    ) : PluginBaseAction<UpdateNotificationConfigRequest, UpdateNotificationConfigResponse>(
+            NotificationsActions.UPDATE_NOTIFICATION_CONFIG_NAME,
+            transportService,
+            client,
+            actionFilters,
+            ::UpdateNotificationConfigRequest,
+        ) {
+        /**
+         * {@inheritDoc}
+         * Transform the request and call super.doExecute() to support call from other plugins.
+         */
+        override fun doExecute(
+            task: Task?,
+            request: ActionRequest,
+            listener: ActionListener<UpdateNotificationConfigResponse>,
+        ) {
+            val transformedRequest =
+                request as? UpdateNotificationConfigRequest
+                    ?: recreateObject(request) { UpdateNotificationConfigRequest(it) }
+            super.doExecute(task, transformedRequest, listener)
+        }
 
-    /**
-     * {@inheritDoc}
-     * Transform the request and call super.doExecute() to support call from other plugins.
-     */
-    override fun doExecute(
-        task: Task?,
-        request: ActionRequest,
-        listener: ActionListener<UpdateNotificationConfigResponse>
-    ) {
-        val transformedRequest = request as? UpdateNotificationConfigRequest
-            ?: recreateObject(request) { UpdateNotificationConfigRequest(it) }
-        super.doExecute(task, transformedRequest, listener)
+        /**
+         * {@inheritDoc}
+         */
+        override suspend fun executeRequest(
+            request: UpdateNotificationConfigRequest,
+            user: User?,
+        ): UpdateNotificationConfigResponse = ConfigIndexingActions.update(request, user)
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    override suspend fun executeRequest(
-        request: UpdateNotificationConfigRequest,
-        user: User?
-    ): UpdateNotificationConfigResponse {
-        return ConfigIndexingActions.update(request, user)
-    }
-}

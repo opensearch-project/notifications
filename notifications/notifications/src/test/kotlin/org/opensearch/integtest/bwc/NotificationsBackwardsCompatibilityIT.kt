@@ -13,7 +13,6 @@ import org.opensearch.notifications.NotificationPlugin
 import org.opensearch.rest.RestRequest
 
 class NotificationsBackwardsCompatibilityIT : PluginRestTestCase() {
-
     companion object {
         private val CLUSTER_TYPE = ClusterType.parse(System.getProperty("tests.rest.bwcsuite"))
         private val CLUSTER_NAME = System.getProperty("tests.clustername")
@@ -23,15 +22,15 @@ class NotificationsBackwardsCompatibilityIT : PluginRestTestCase() {
 
     override fun preservePluginIndicesAfterTest(): Boolean = true
 
-    override fun restClientSettings(): Settings {
-        return Settings.builder()
+    override fun restClientSettings(): Settings =
+        Settings
+            .builder()
             .put(super.restClientSettings())
             // increase the timeout here to 90 seconds to handle long waits for a green
             // cluster health. the waits for green need to be longer than a minute to
             // account for delayed shards
             .put(CLIENT_SOCKET_TIMEOUT, "90s")
             .build()
-    }
 
     @Throws(Exception::class)
     @Suppress("UNCHECKED_CAST")
@@ -48,9 +47,11 @@ class NotificationsBackwardsCompatibilityIT : PluginRestTestCase() {
                     assertTrue(pluginNames.contains("opensearch-notifications"))
                     createTestNotificationsConfig(configId)
                 }
+
                 ClusterType.MIXED -> {
                     verifyConfigsExist(setOf(configId))
                 }
+
                 ClusterType.UPGRADED -> {
                     verifyConfigsExist(setOf(configId))
                     createTestNotificationsConfig(randomAlphaOfLength(10))
@@ -64,23 +65,26 @@ class NotificationsBackwardsCompatibilityIT : PluginRestTestCase() {
     private enum class ClusterType {
         OLD,
         MIXED,
-        UPGRADED;
+        UPGRADED,
+        ;
 
         companion object {
-            fun parse(value: String): ClusterType {
-                return when (value) {
+            fun parse(value: String): ClusterType =
+                when (value) {
                     "old_cluster" -> OLD
                     "mixed_cluster" -> MIXED
                     "upgraded_cluster" -> UPGRADED
                     else -> throw AssertionError("Unknown cluster type: $value")
                 }
-            }
         }
     }
 
-    private fun getPluginUri(): String {
-        return when (CLUSTER_TYPE) {
-            ClusterType.OLD -> "_nodes/$CLUSTER_NAME-0/plugins"
+    private fun getPluginUri(): String =
+        when (CLUSTER_TYPE) {
+            ClusterType.OLD -> {
+                "_nodes/$CLUSTER_NAME-0/plugins"
+            }
+
             ClusterType.MIXED -> {
                 when (System.getProperty("tests.rest.bwcsuite_round")) {
                     "second" -> "_nodes/$CLUSTER_NAME-1/plugins"
@@ -88,37 +92,41 @@ class NotificationsBackwardsCompatibilityIT : PluginRestTestCase() {
                     else -> "_nodes/$CLUSTER_NAME-0/plugins"
                 }
             }
-            ClusterType.UPGRADED -> "_nodes/plugins"
+
+            ClusterType.UPGRADED -> {
+                "_nodes/plugins"
+            }
         }
-    }
 
     // TODO: Add a utility method to create random config types instead of just Slack.
     //   This should be generally accessible to all integ tests.
     private fun createTestNotificationsConfig(configId: String) {
-        val requestJsonString = """
-        {
-            "config_id": "$configId",
-            "config": {
-                "name": "This is a sample config name $configId",
-                "description": "This is a sample config description $configId",
-                "config_type": "slack",
-                "is_enabled": true,
-                "slack": { "url": "https://hooks.slack.com/services/sample_slack_url#$configId" }
+        val requestJsonString =
+            """
+            {
+                "config_id": "$configId",
+                "config": {
+                    "name": "This is a sample config name $configId",
+                    "description": "This is a sample config description $configId",
+                    "config_type": "slack",
+                    "is_enabled": true,
+                    "slack": { "url": "https://hooks.slack.com/services/sample_slack_url#$configId" }
+                }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         val createdConfigId = createConfigWithRequestJsonString(requestJsonString)
         assertNotNull(createdConfigId)
         Thread.sleep(100)
     }
 
     private fun verifyConfigsExist(idSet: Set<String>) {
-        val getConfigsResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-            "",
-            RestStatus.OK.status
-        )
+        val getConfigsResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
+                "",
+                RestStatus.OK.status,
+            )
         val configList = getConfigsResponse.get("config_list").asJsonArray
         assertEquals("Expected ${idSet.size} configs but found configList.size()", idSet.size, configList.size())
         configList.forEach {

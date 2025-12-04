@@ -16,117 +16,133 @@ import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 
 class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
-
     fun `test Create, Get, Update, Delete webhook notification config using REST client`() {
         // Create sample config request reference
-        val sampleWebhook = Webhook(
-            "https://domain.com/sample_webhook_url#1234567890",
-            mapOf(Pair("User-Agent", "Mozilla/5.0"))
-        )
-        val referenceObject = NotificationConfig(
-            "this is a sample config name",
-            "this is a sample config description",
-            ConfigType.WEBHOOK,
-            isEnabled = true,
-            configData = sampleWebhook
-        )
+        val sampleWebhook =
+            Webhook(
+                "https://domain.com/sample_webhook_url#1234567890",
+                mapOf(Pair("User-Agent", "Mozilla/5.0")),
+            )
+        val referenceObject =
+            NotificationConfig(
+                "this is a sample config name",
+                "this is a sample config description",
+                ConfigType.WEBHOOK,
+                isEnabled = true,
+                configData = sampleWebhook,
+            )
 
         // Create webhook notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"${referenceObject.name}",
-                "description":"${referenceObject.description}",
-                "config_type":"webhook",
-                "is_enabled":${referenceObject.isEnabled},
-                "webhook":{
-                    "url":"${(referenceObject.configData as Webhook).url}",
-                    "header_params":{
-                        "User-Agent":"Mozilla/5.0"
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${referenceObject.name}",
+                    "description":"${referenceObject.description}",
+                    "config_type":"webhook",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "webhook":{
+                        "url":"${(referenceObject.configData as Webhook).url}",
+                        "header_params":{
+                            "User-Agent":"Mozilla/5.0"
+                        }
                     }
                 }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
         // Get webhook notification config
 
-        val getConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        val getConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs/$configId",
+                "",
+                RestStatus.OK.status,
+            )
         verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
         Thread.sleep(100)
 
         // Get all notification config
 
-        val getAllConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs",
-            "",
-            RestStatus.OK.status
-        )
+        val getAllConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs",
+                "",
+                RestStatus.OK.status,
+            )
         verifySingleConfigEquals(configId, referenceObject, getAllConfigResponse)
         Thread.sleep(100)
 
         // Updated notification config object
-        val updatedWebhook = Webhook(
-            "https://updated.domain.com/updated_webhook_url#0987654321",
-            mapOf(Pair("key", "value"))
-        )
-        val updatedObject = NotificationConfig(
-            "this is a updated config name",
-            "this is a updated config description",
-            ConfigType.WEBHOOK,
-            isEnabled = true,
-            configData = updatedWebhook
-        )
+        val updatedWebhook =
+            Webhook(
+                "https://updated.domain.com/updated_webhook_url#0987654321",
+                mapOf(Pair("key", "value")),
+            )
+        val updatedObject =
+            NotificationConfig(
+                "this is a updated config name",
+                "this is a updated config description",
+                ConfigType.WEBHOOK,
+                isEnabled = true,
+                configData = updatedWebhook,
+            )
 
         // Update webhook notification config
-        val updateRequestJsonString = """
-        {
-            "config":{
-                "name":"${updatedObject.name}",
-                "description":"${updatedObject.description}",
-                "config_type":"webhook",
-                "is_enabled":${updatedObject.isEnabled},
-                "webhook":{
-                    "url":"${(updatedObject.configData as Webhook).url}",
-                    "header_params": {
-                        "key":"value"
+        val updateRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${updatedObject.name}",
+                    "description":"${updatedObject.description}",
+                    "config_type":"webhook",
+                    "is_enabled":${updatedObject.isEnabled},
+                    "webhook":{
+                        "url":"${(updatedObject.configData as Webhook).url}",
+                        "header_params": {
+                            "key":"value"
+                        }
                     }
                 }
             }
-        }
-        """.trimIndent()
-        val updateResponse = executeRequest(
-            RestRequest.Method.PUT.name,
-            "$PLUGIN_BASE_URI/configs/$configId",
-            updateRequestJsonString,
-            RestStatus.OK.status
-        )
+            """.trimIndent()
+        val updateResponse =
+            executeRequest(
+                RestRequest.Method.PUT.name,
+                "$PLUGIN_BASE_URI/configs/$configId",
+                updateRequestJsonString,
+                RestStatus.OK.status,
+            )
         Assert.assertEquals(configId, updateResponse.get("config_id").asString)
         Thread.sleep(1000)
 
         // Get updated webhook notification config
 
-        val getUpdatedConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        val getUpdatedConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs/$configId",
+                "",
+                RestStatus.OK.status,
+            )
         verifySingleConfigEquals(configId, updatedObject, getUpdatedConfigResponse)
         Thread.sleep(100)
 
         // Delete webhook notification config
         val deleteResponse = deleteConfig(configId)
-        Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
+        Assert.assertEquals(
+            "OK",
+            deleteResponse
+                .get("delete_response_list")
+                .asJsonObject
+                .get(configId)
+                .asString,
+        )
         Thread.sleep(1000)
 
         // Get webhook notification config after delete
@@ -135,7 +151,7 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
             RestRequest.Method.GET.name,
             "$PLUGIN_BASE_URI/configs/$configId",
             "",
-            RestStatus.NOT_FOUND.status
+            RestStatus.NOT_FOUND.status,
         )
         Thread.sleep(100)
     }
@@ -143,32 +159,34 @@ class WebhookNotificationConfigCrudIT : PluginRestTestCase() {
     fun `test Bad Request for multiple config for Webhook data using REST Client`() {
         // Create sample config request reference
         val sampleWebhook = Webhook("https://domain.com/sample_webhook_url#1234567890")
-        val referenceObject = NotificationConfig(
-            "this is a sample config name",
-            "this is a sample config description",
-            ConfigType.WEBHOOK,
-            isEnabled = true,
-            configData = sampleWebhook
-        )
+        val referenceObject =
+            NotificationConfig(
+                "this is a sample config name",
+                "this is a sample config description",
+                ConfigType.WEBHOOK,
+                isEnabled = true,
+                configData = sampleWebhook,
+            )
 
         // Create webhook notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"${referenceObject.name}",
-                "description":"${referenceObject.description}",
-                "config_type":"webhook",
-                "is_enabled":${referenceObject.isEnabled},
-                "slack":{"url":"https://hooks.slack.com/services/sample_slack_url"}
-                "webhook":{"url":"${(referenceObject.configData as Webhook).url}"}
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${referenceObject.name}",
+                    "description":"${referenceObject.description}",
+                    "config_type":"webhook",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "slack":{"url":"https://hooks.slack.com/services/sample_slack_url"}
+                    "webhook":{"url":"${(referenceObject.configData as Webhook).url}"}
+                }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         executeRequest(
             RestRequest.Method.POST.name,
             "$PLUGIN_BASE_URI/configs",
             createRequestJsonString,
-            RestStatus.BAD_REQUEST.status
+            RestStatus.BAD_REQUEST.status,
         )
     }
 }

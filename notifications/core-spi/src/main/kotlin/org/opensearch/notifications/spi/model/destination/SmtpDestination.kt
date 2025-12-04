@@ -17,9 +17,8 @@ class SmtpDestination(
     val port: Int,
     val method: String,
     val fromAddress: String,
-    val recipient: String
+    val recipient: String,
 ) : BaseDestination(DestinationType.SMTP) {
-
     init {
         require(!Strings.isNullOrEmpty(host)) { "Host name should be provided" }
         require(port > 0) { "Port should be positive value" }

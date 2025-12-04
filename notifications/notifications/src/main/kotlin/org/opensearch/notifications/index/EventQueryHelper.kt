@@ -39,38 +39,43 @@ object EventQueryHelper {
     private const val NESTED_PATH = "$KEY_PREFIX.$STATUS_LIST_TAG"
     private const val KEYWORD_SUFFIX = "keyword"
 
-    private val METADATA_RANGE_FIELDS = setOf(
-        UPDATED_TIME_TAG,
-        CREATED_TIME_TAG
-    )
-    private val KEYWORD_FIELDS = setOf(
-        "$EVENT_SOURCE_TAG.$REFERENCE_ID_TAG",
-        "$EVENT_SOURCE_TAG.$SEVERITY_TAG",
-        // Text fields with keyword
-        "$EVENT_SOURCE_TAG.$TAGS_TAG.$KEYWORD_SUFFIX",
-        "$EVENT_SOURCE_TAG.$TITLE_TAG.$KEYWORD_SUFFIX"
-    )
-    private val TEXT_FIELDS = setOf(
-        "$EVENT_SOURCE_TAG.$TAGS_TAG",
-        "$EVENT_SOURCE_TAG.$TITLE_TAG"
-    )
-    private val NESTED_KEYWORD_FIELDS = setOf(
-        "$STATUS_LIST_TAG.$CONFIG_ID_TAG",
-        "$STATUS_LIST_TAG.$CONFIG_TYPE_TAG",
-        "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$DELIVERY_STATUS_TAG.$STATUS_CODE_TAG",
-        "$STATUS_LIST_TAG.$DELIVERY_STATUS_TAG.$STATUS_CODE_TAG",
-        // Text fields with keyword
-        "$STATUS_LIST_TAG.$CONFIG_NAME_TAG.$KEYWORD_SUFFIX",
-        "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$RECIPIENT_TAG.$KEYWORD_SUFFIX",
-        "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$DELIVERY_STATUS_TAG.$STATUS_TEXT_TAG.$KEYWORD_SUFFIX",
-        "$STATUS_LIST_TAG.$DELIVERY_STATUS_TAG.$STATUS_TEXT_TAG.$KEYWORD_SUFFIX"
-    )
-    private val NESTED_TEXT_FIELDS = setOf(
-        "$STATUS_LIST_TAG.$CONFIG_NAME_TAG",
-        "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$RECIPIENT_TAG",
-        "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$DELIVERY_STATUS_TAG.$STATUS_TEXT_TAG",
-        "$STATUS_LIST_TAG.$DELIVERY_STATUS_TAG.$STATUS_TEXT_TAG"
-    )
+    private val METADATA_RANGE_FIELDS =
+        setOf(
+            UPDATED_TIME_TAG,
+            CREATED_TIME_TAG,
+        )
+    private val KEYWORD_FIELDS =
+        setOf(
+            "$EVENT_SOURCE_TAG.$REFERENCE_ID_TAG",
+            "$EVENT_SOURCE_TAG.$SEVERITY_TAG",
+            // Text fields with keyword
+            "$EVENT_SOURCE_TAG.$TAGS_TAG.$KEYWORD_SUFFIX",
+            "$EVENT_SOURCE_TAG.$TITLE_TAG.$KEYWORD_SUFFIX",
+        )
+    private val TEXT_FIELDS =
+        setOf(
+            "$EVENT_SOURCE_TAG.$TAGS_TAG",
+            "$EVENT_SOURCE_TAG.$TITLE_TAG",
+        )
+    private val NESTED_KEYWORD_FIELDS =
+        setOf(
+            "$STATUS_LIST_TAG.$CONFIG_ID_TAG",
+            "$STATUS_LIST_TAG.$CONFIG_TYPE_TAG",
+            "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$DELIVERY_STATUS_TAG.$STATUS_CODE_TAG",
+            "$STATUS_LIST_TAG.$DELIVERY_STATUS_TAG.$STATUS_CODE_TAG",
+            // Text fields with keyword
+            "$STATUS_LIST_TAG.$CONFIG_NAME_TAG.$KEYWORD_SUFFIX",
+            "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$RECIPIENT_TAG.$KEYWORD_SUFFIX",
+            "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$DELIVERY_STATUS_TAG.$STATUS_TEXT_TAG.$KEYWORD_SUFFIX",
+            "$STATUS_LIST_TAG.$DELIVERY_STATUS_TAG.$STATUS_TEXT_TAG.$KEYWORD_SUFFIX",
+        )
+    private val NESTED_TEXT_FIELDS =
+        setOf(
+            "$STATUS_LIST_TAG.$CONFIG_NAME_TAG",
+            "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$RECIPIENT_TAG",
+            "$STATUS_LIST_TAG.$EMAIL_RECIPIENT_STATUS_TAG.$DELIVERY_STATUS_TAG.$STATUS_TEXT_TAG",
+            "$STATUS_LIST_TAG.$DELIVERY_STATUS_TAG.$STATUS_TEXT_TAG",
+        )
 
     private val METADATA_FIELDS = METADATA_RANGE_FIELDS
     private val EVENT_FIELDS = KEYWORD_FIELDS.union(TEXT_FIELDS)
@@ -79,8 +84,8 @@ object EventQueryHelper {
 
     val FILTER_PARAMS = ALL_FIELDS.union(setOf(QUERY_TAG, TEXT_QUERY_TAG))
 
-    fun getSortField(sortField: String?): String {
-        return if (sortField == null) {
+    fun getSortField(sortField: String?): String =
+        if (sortField == null) {
             "$METADATA_TAG.$UPDATED_TIME_TAG"
         } else {
             when {
@@ -90,9 +95,11 @@ object EventQueryHelper {
                 else -> throw OpenSearchStatusException("Sort on $sortField not acceptable", RestStatus.NOT_ACCEPTABLE)
             }
         }
-    }
 
-    fun addQueryFilters(query: BoolQueryBuilder, filterParams: Map<String, String>) {
+    fun addQueryFilters(
+        query: BoolQueryBuilder,
+        filterParams: Map<String, String>,
+    ) {
         val nestedQuery = QueryBuilders.boolQuery()
         filterParams.forEach {
             when {
@@ -145,30 +152,39 @@ object EventQueryHelper {
         return boolQuery
     }
 
-    private fun getRangeQueryBuilder(queryKey: String, queryValue: String): QueryBuilder {
+    private fun getRangeQueryBuilder(
+        queryKey: String,
+        queryValue: String,
+    ): QueryBuilder {
         val range = queryValue.split("..")
         return when (range.size) {
-            1 -> QueryBuilders.termQuery("$METADATA_TAG.$queryKey", queryValue)
+            1 -> {
+                QueryBuilders.termQuery("$METADATA_TAG.$queryKey", queryValue)
+            }
+
             2 -> {
                 val rangeQuery = QueryBuilders.rangeQuery("$METADATA_TAG.$queryKey")
                 rangeQuery.from(range[0])
                 rangeQuery.to(range[1])
                 rangeQuery
             }
+
             else -> {
                 throw OpenSearchStatusException(
                     "Invalid Range format $queryValue, allowed format 'exact' or 'from..to'",
-                    RestStatus.NOT_ACCEPTABLE
+                    RestStatus.NOT_ACCEPTABLE,
                 )
             }
         }
     }
 
-    private fun getTermsQueryBuilder(queryKey: String, queryValue: String): QueryBuilder {
-        return QueryBuilders.termsQuery("$KEY_PREFIX.$queryKey", queryValue.split(","))
-    }
+    private fun getTermsQueryBuilder(
+        queryKey: String,
+        queryValue: String,
+    ): QueryBuilder = QueryBuilders.termsQuery("$KEY_PREFIX.$queryKey", queryValue.split(","))
 
-    private fun getMatchQueryBuilder(queryKey: String, queryValue: String): QueryBuilder {
-        return QueryBuilders.matchQuery("$KEY_PREFIX.$queryKey", queryValue)
-    }
+    private fun getMatchQueryBuilder(
+        queryKey: String,
+        queryValue: String,
+    ): QueryBuilder = QueryBuilders.matchQuery("$KEY_PREFIX.$queryKey", queryValue)
 }

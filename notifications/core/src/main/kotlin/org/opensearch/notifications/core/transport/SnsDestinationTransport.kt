@@ -19,7 +19,6 @@ import java.io.IOException
  * This class handles the client responsible for submitting the messages to SNS destinations.
  */
 internal class SnsDestinationTransport : DestinationTransport<SnsDestination> {
-
     private val log by logger(SnsDestinationTransport::class.java)
     private val destinationSNSClient: DestinationSnsClient
 
@@ -35,16 +34,15 @@ internal class SnsDestinationTransport : DestinationTransport<SnsDestination> {
     override fun sendMessage(
         destination: SnsDestination,
         message: MessageContent,
-        referenceId: String
-    ): DestinationMessageResponse {
-        return try {
+        referenceId: String,
+    ): DestinationMessageResponse =
+        try {
             destinationSNSClient.execute(destination, message, referenceId)
         } catch (exception: IOException) {
             log.error("Exception sending message id $referenceId", exception)
             DestinationMessageResponse(
                 RestStatus.INTERNAL_SERVER_ERROR.status,
-                "Failed to send SNS message ${exception.message}"
+                "Failed to send SNS message ${exception.message}",
             )
         }
-    }
 }

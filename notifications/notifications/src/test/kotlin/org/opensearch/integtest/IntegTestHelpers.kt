@@ -23,11 +23,14 @@ private const val DEFAULT_TIME_ACCURACY_SEC = 5L
 
 @Throws(IOException::class)
 @Suppress("NestedBlockDepth")
-fun getResponseBody(response: Response, retainNewLines: Boolean = true): String {
+fun getResponseBody(
+    response: Response,
+    retainNewLines: Boolean = true,
+): String {
     val sb = StringBuilder()
     response.entity.content.use { `is` ->
         BufferedReader(
-            InputStreamReader(`is`, StandardCharsets.UTF_8)
+            InputStreamReader(`is`, StandardCharsets.UTF_8),
         ).use { br ->
             var line: String?
             while (br.readLine().also { line = it } != null) {
@@ -41,20 +44,29 @@ fun getResponseBody(response: Response, retainNewLines: Boolean = true): String 
     return sb.toString()
 }
 
-fun jsonify(text: String): JsonObject {
-    return JsonParser.parseString(text).asJsonObject
-}
+fun jsonify(text: String): JsonObject = JsonParser.parseString(text).asJsonObject
 
-fun validateTimeNearRefTime(time: Instant, refTime: Instant, accuracySeconds: Long) {
+fun validateTimeNearRefTime(
+    time: Instant,
+    refTime: Instant,
+    accuracySeconds: Long,
+) {
     assertTrue(time.plusSeconds(accuracySeconds).isAfter(refTime), "$time + $accuracySeconds > $refTime")
     assertTrue(time.minusSeconds(accuracySeconds).isBefore(refTime), "$time - $accuracySeconds < $refTime")
 }
 
-fun validateTimeRecency(time: Instant, accuracySeconds: Long = DEFAULT_TIME_ACCURACY_SEC) {
+fun validateTimeRecency(
+    time: Instant,
+    accuracySeconds: Long = DEFAULT_TIME_ACCURACY_SEC,
+) {
     validateTimeNearRefTime(time, Instant.now(), accuracySeconds)
 }
 
-fun validateErrorResponse(response: JsonObject, statusCode: Int, errorType: String = "status_exception") {
+fun validateErrorResponse(
+    response: JsonObject,
+    statusCode: Int,
+    errorType: String = "status_exception",
+) {
     Assert.assertNotNull("Error response content should be generated", response)
     val status = response.get("status").asInt
     val error = response.get("error").asJsonObject
@@ -68,7 +80,11 @@ fun validateErrorResponse(response: JsonObject, statusCode: Int, errorType: Stri
     Assert.assertTrue(rootCause.size() > 0)
 }
 
-fun verifyResponse(response: JsonObject, refTag: String, recipients: List<String>) {
+fun verifyResponse(
+    response: JsonObject,
+    refTag: String,
+    recipients: List<String>,
+) {
     // verify ref tag is consistent
     val actualRefTag = response.get("ref_tag").asString
     assertEquals(refTag, actualRefTag)
@@ -87,19 +103,21 @@ fun verifyResponse(response: JsonObject, refTag: String, recipients: List<String
     }
 }
 
-fun getStatusCode(response: JsonObject): Int {
-    return response
+fun getStatusCode(response: JsonObject): Int =
+    response
         .getAsJsonArray("recipient_list")
-        .get(0).asJsonObject
-        .get("status_code").asInt
-}
+        .get(0)
+        .asJsonObject
+        .get("status_code")
+        .asInt
 
-fun getStatusText(response: JsonObject): String {
-    return response
+fun getStatusText(response: JsonObject): String =
+    response
         .getAsJsonArray("recipient_list")
-        .get(0).asJsonObject
-        .get("status_text").asString
-}
+        .get(0)
+        .asJsonObject
+        .get("status_text")
+        .asString
 
 private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
 
@@ -108,62 +126,87 @@ fun getCreateNotificationRequestJsonString(
     configType: ConfigType,
     isEnabled: Boolean,
     smtpAccountId: String = "",
-    emailGroupId: Set<String> = setOf()
+    emailGroupId: Set<String> = setOf(),
 ): String {
-    val randomString = (1..20)
-        .map { Random.nextInt(0, charPool.size) }
-        .map(charPool::get)
-        .joinToString("")
-    val configObjectString = when (configType) {
-        ConfigType.SLACK -> """
-            "slack":{"url":"https://hooks.slack.com/services/sample_slack_url#$randomString"}
-        """.trimIndent()
-        ConfigType.CHIME -> """
-            "chime":{"url":"https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=$randomString"}
-        """.trimIndent()
-        ConfigType.MICROSOFT_TEAMS -> """
-            "microsoft_teams":{"url":"https://microsoftTeams.domain.webhook.office.com/sample_microsoft_teams_url#$randomString"}
-        """.trimIndent()
-        ConfigType.WEBHOOK -> """
-            "webhook":{"url":"https://web.domain.com/sample_web_url#$randomString"}
-        """.trimIndent()
-        ConfigType.SMTP_ACCOUNT -> """
-            "smtp_account":{
-                "host":"smtp.domain.com",
-                "port":"4321",
-                "method":"ssl",
-                "from_address":"$randomString@from.com"
+    val randomString =
+        (1..20)
+            .map { Random.nextInt(0, charPool.size) }
+            .map(charPool::get)
+            .joinToString("")
+    val configObjectString =
+        when (configType) {
+            ConfigType.SLACK -> {
+                """
+                "slack":{"url":"https://hooks.slack.com/services/sample_slack_url#$randomString"}
+                """.trimIndent()
             }
-        """.trimIndent()
-        ConfigType.EMAIL_GROUP -> """
-            "email_group":{
-                "recipient_list":[
-                    {"recipient":"$randomString+recipient1@from.com"},
-                    {"recipient":"$randomString+recipient2@from.com"}
-                ]
+
+            ConfigType.CHIME -> {
+                """
+                "chime":{"url":"https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=$randomString"}
+                """.trimIndent()
             }
-        """.trimIndent()
-        ConfigType.EMAIL -> """
-            "email":{
-                "email_account_id":"$smtpAccountId",
-                "recipient_list":[{"recipient":"$randomString@from.com"}],
-                "email_group_id_list":[${emailGroupId.joinToString { "\"$it\"" }}]
+
+            ConfigType.MICROSOFT_TEAMS -> {
+                """
+                "microsoft_teams":{"url":"https://microsoftTeams.domain.webhook.office.com/sample_microsoft_teams_url#$randomString"}
+                """.trimIndent()
             }
-        """.trimIndent()
-        else -> throw IllegalArgumentException("Unsupported configType=$configType")
-    }
-    return """
-    {
-        "config_id":"$randomString",
-        "config":{
-            "name":"$nameSubstring:this is a sample config name $randomString",
-            "description":"this is a sample config description $randomString",
-            "config_type":"$configType",
-            "is_enabled":$isEnabled,
-            $configObjectString
+
+            ConfigType.WEBHOOK -> {
+                """
+                "webhook":{"url":"https://web.domain.com/sample_web_url#$randomString"}
+                """.trimIndent()
+            }
+
+            ConfigType.SMTP_ACCOUNT -> {
+                """
+                "smtp_account":{
+                    "host":"smtp.domain.com",
+                    "port":"4321",
+                    "method":"ssl",
+                    "from_address":"$randomString@from.com"
+                }
+                """.trimIndent()
+            }
+
+            ConfigType.EMAIL_GROUP -> {
+                """
+                "email_group":{
+                    "recipient_list":[
+                        {"recipient":"$randomString+recipient1@from.com"},
+                        {"recipient":"$randomString+recipient2@from.com"}
+                    ]
+                }
+                """.trimIndent()
+            }
+
+            ConfigType.EMAIL -> {
+                """
+                "email":{
+                    "email_account_id":"$smtpAccountId",
+                    "recipient_list":[{"recipient":"$randomString@from.com"}],
+                    "email_group_id_list":[${emailGroupId.joinToString { "\"$it\"" }}]
+                }
+                """.trimIndent()
+            }
+
+            else -> {
+                throw IllegalArgumentException("Unsupported configType=$configType")
+            }
         }
-    }
-    """.trimIndent()
+    return """
+        {
+            "config_id":"$randomString",
+            "config":{
+                "name":"$nameSubstring:this is a sample config name $randomString",
+                "description":"this is a sample config description $randomString",
+                "config_type":"$configType",
+                "is_enabled":$isEnabled,
+                $configObjectString
+            }
+        }
+        """.trimIndent()
 }
 
 /** Util class to build Json entity of request body */
@@ -173,9 +216,8 @@ class NotificationsJsonEntity(
     private val title: String?,
     private val textDescription: String?,
     private val htmlDescription: String?,
-    private val attachment: String?
+    private val attachment: String?,
 ) {
-
     var jsonEntityString: String = ""
 
     private constructor(builder: Builder) : this(
@@ -184,7 +226,7 @@ class NotificationsJsonEntity(
         builder.title,
         builder.textDescription,
         builder.htmlDescription,
-        builder.attachment
+        builder.attachment,
     )
 
     fun getJsonEntityAsString(): String {
@@ -206,9 +248,7 @@ class NotificationsJsonEntity(
             """.trimIndent()
     }
 
-    private fun listToString(list: List<String>): String {
-        return list.joinToString("\", \"", "[\"", "\"]")
-    }
+    private fun listToString(list: List<String>): String = list.joinToString("\", \"", "[\"", "\"]")
 
     class Builder {
         var refTag: String? = null

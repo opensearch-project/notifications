@@ -33,7 +33,7 @@ internal object EmailMimeProvider {
         session: Session,
         fromAddress: String,
         recipient: String,
-        messageContent: MessageContent
+        messageContent: MessageContent,
     ): MimeMessage {
         val mc = CommandMap.getDefaultCommandMap() as MailcapCommandMap
         mc.addMailcap("text/html;; x-java-content-handler=org.eclipse.angus.mail.handlers.text_html")
@@ -112,10 +112,11 @@ internal object EmailMimeProvider {
      */
     private fun createBinaryAttachmentPart(messageContent: MessageContent): MimeBodyPart {
         val attachmentMime = MimeBodyPart()
-        val fds = ByteArrayDataSource(
-            Base64.getMimeDecoder().decode(messageContent.fileData),
-            messageContent.fileContentType ?: "application/octet-stream"
-        )
+        val fds =
+            ByteArrayDataSource(
+                Base64.getMimeDecoder().decode(messageContent.fileData),
+                messageContent.fileContentType ?: "application/octet-stream",
+            )
         attachmentMime.dataHandler = DataHandler(fds)
         attachmentMime.fileName = messageContent.fileName
         return attachmentMime

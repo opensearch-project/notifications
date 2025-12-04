@@ -26,6 +26,6 @@ internal interface DestinationTransport<T : BaseDestination> {
     fun sendMessage(
         destination: T,
         message: MessageContent,
-        referenceId: String
+        referenceId: String,
     ): DestinationMessageResponse
 }

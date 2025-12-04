@@ -27,7 +27,6 @@ import org.opensearch.notifications.spi.model.destination.SmtpDestination
 
 @ExtendWith(MockitoExtension::class)
 internal class SmtpDestinationTests {
-
     @Test
     fun testSmtpEmailMessage() {
         val expectedEmailResponse = DestinationMessageResponse(RestStatus.OK.status, "Success")
@@ -38,9 +37,10 @@ internal class SmtpDestinationTests {
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SMTP to smtpEmailDestinationTransport)
 
         val subject = "Test SMTP Email subject"
-        val messageText = "{Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present}"
+        val messageText =
+            "{Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member callout: " +
+                "@All All Present member callout: @Present}"
         val message = MessageContent(subject, messageText)
         val destination = SmtpDestination("testAccountName", "abc", 465, "ssl", "test@abc.com", "to@abc.com")
 
@@ -63,9 +63,10 @@ internal class SmtpDestinationTests {
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SMTP to smtpDestinationTransport)
 
         val subject = "Test SMTP Email subject"
-        val messageText = "{Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present}"
+        val messageText =
+            "{Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member callout: " +
+                "@All All Present member callout: @Present}"
         val message = MessageContent(subject, messageText)
         val destination = SmtpDestination("testAccountName", "abc", 465, "ssl", "test@abc.com", "to@abc.com")
 
@@ -76,31 +77,35 @@ internal class SmtpDestinationTests {
 
     @Test
     fun testSmtpFailingEmailMessage() {
-        val expectedEmailResponse = DestinationMessageResponse(
-            RestStatus.FAILED_DEPENDENCY.status,
-            "Couldn't connect to host, port: localhost, 55555; timeout -1"
-        )
+        val expectedEmailResponse =
+            DestinationMessageResponse(
+                RestStatus.FAILED_DEPENDENCY.status,
+                "Couldn't connect to host, port: localhost, 55555; timeout -1",
+            )
         val emailClient = spyk<DestinationSmtpClient>()
-        every { emailClient.sendMessage(any()) } throws MessagingException(
-            "Couldn't connect to host, port: localhost, 55555; timeout -1"
-        )
+        every { emailClient.sendMessage(any()) } throws
+            MessagingException(
+                "Couldn't connect to host, port: localhost, 55555; timeout -1",
+            )
 
         val smtpEmailDestinationTransport = SmtpDestinationTransport(emailClient)
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SMTP to smtpEmailDestinationTransport)
 
         val subject = "Test SMTP Email subject"
-        val messageText = "{Vamshi Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present}"
+        val messageText =
+            "{Vamshi Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member callout: " +
+                "@All All Present member callout: @Present}"
         val message = MessageContent(subject, messageText)
-        val destination = SmtpDestination(
-            "testAccountName",
-            "localhost",
-            55555,
-            "none",
-            "test@abc.com",
-            "to@abc.com"
-        )
+        val destination =
+            SmtpDestination(
+                "testAccountName",
+                "localhost",
+                55555,
+                "none",
+                "test@abc.com",
+                "to@abc.com",
+            )
 
         val actualEmailResponse: DestinationMessageResponse = NotificationCoreImpl.sendMessage(destination, message, "referenceId")
 
@@ -110,25 +115,28 @@ internal class SmtpDestinationTests {
 
     @Test
     fun testHostMissingEmailDestination() {
-        val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
-            SmtpDestination("testAccountName", "", 465, "ssl", "from@test.com", "to@test.com")
-        }
+        val exception =
+            Assertions.assertThrows(IllegalArgumentException::class.java) {
+                SmtpDestination("testAccountName", "", 465, "ssl", "from@test.com", "to@test.com")
+            }
         assertEquals("Host name should be provided", exception.message)
     }
 
     @Test
     fun testInvalidPortEmailDestination() {
-        val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
-            SmtpDestination("testAccountName", "localhost", -1, "ssl", "from@test.com", "to@test.com")
-        }
+        val exception =
+            Assertions.assertThrows(IllegalArgumentException::class.java) {
+                SmtpDestination("testAccountName", "localhost", -1, "ssl", "from@test.com", "to@test.com")
+            }
         assertEquals("Port should be positive value", exception.message)
     }
 
     @Test
     fun testMissingFromOrRecipientEmailDestination() {
-        val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
-            SmtpDestination("testAccountName", "localhost", 465, "ssl", "", "to@test.com")
-        }
+        val exception =
+            Assertions.assertThrows(IllegalArgumentException::class.java) {
+                SmtpDestination("testAccountName", "localhost", 465, "ssl", "", "to@test.com")
+            }
         assertEquals("FromAddress and recipient should be provided", exception.message)
     }
 }

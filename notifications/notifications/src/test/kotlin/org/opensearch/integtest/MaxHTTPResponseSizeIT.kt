@@ -18,57 +18,66 @@ import java.net.InetSocketAddress
 internal class MaxHTTPResponseSizeIT : PluginRestTestCase() {
     fun `test HTTP response has truncated size`() {
         // update max http response size setting
-        val updateSettingJsonString = """
-        {
-            "transient": {
-                "opensearch.notifications.core.max_http_response_size": "8"
+        val updateSettingJsonString =
+            """
+            {
+                "transient": {
+                    "opensearch.notifications.core.max_http_response_size": "8"
+                }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
 
-        val updateSettingsResponse = executeRequest(
-            RestRequest.Method.PUT.name,
-            "/_cluster/settings",
-            updateSettingJsonString,
-            RestStatus.OK.status
-        )
+        val updateSettingsResponse =
+            executeRequest(
+                RestRequest.Method.PUT.name,
+                "/_cluster/settings",
+                updateSettingJsonString,
+                RestStatus.OK.status,
+            )
         Assert.assertNotNull(updateSettingsResponse)
         logger.info("update settings response: $updateSettingsResponse")
         Thread.sleep(1000)
 
         val url = "http://${server.address.hostString}:${server.address.port}/webhook"
 
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"this is a sample config name",
-                "description":"this is a sample config description",
-                "config_type":"webhook",
-                "is_enabled":true,
-                "webhook":{
-                    "url":"$url",
-                    "header_params": {
-                       "Content-type": "text/plain"
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"this is a sample config name",
+                    "description":"this is a sample config description",
+                    "config_type":"webhook",
+                    "is_enabled":true,
+                    "webhook":{
+                        "url":"$url",
+                        "header_params": {
+                           "Content-type": "text/plain"
+                        }
                     }
                 }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
         // send test message
-        val sendResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/feature/test/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        val sendResponse =
+            executeRequest(
+                RestRequest.Method.POST.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/feature/test/$configId",
+                "",
+                RestStatus.OK.status,
+            )
 
         logger.info("response: $sendResponse")
 
-        val statusText = sendResponse.getAsJsonArray("status_list")[0].asJsonObject["delivery_status"].asJsonObject["status_text"].asString
+        val statusText =
+            sendResponse
+                .getAsJsonArray("status_list")[0]
+                .asJsonObject["delivery_status"]
+                .asJsonObject["status_text"]
+                .asString
 
         // we set the max HTTP response size to 8 bytes, which means the expected string length of the response is 8 / 2 (bytes per Java char) = 4
         Assert.assertEquals(4, statusText.length)

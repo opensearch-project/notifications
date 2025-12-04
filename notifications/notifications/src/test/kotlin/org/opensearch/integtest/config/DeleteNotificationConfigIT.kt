@@ -21,18 +21,26 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         // Get notification config by id
-        val getConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        val getConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs/$configId",
+                "",
+                RestStatus.OK.status,
+            )
         verifySingleConfigIdEquals(configId, getConfigResponse)
         Thread.sleep(100)
 
         // Delete notification config
         val deleteResponse = deleteConfig(configId)
-        Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
+        Assert.assertEquals(
+            "OK",
+            deleteResponse
+                .get("delete_response_list")
+                .asJsonObject
+                .get(configId)
+                .asString,
+        )
         Thread.sleep(100)
 
         // Get notification config after delete
@@ -40,7 +48,7 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
             RestRequest.Method.GET.name,
             "$PLUGIN_BASE_URI/configs/$configId",
             "",
-            RestStatus.NOT_FOUND.status
+            RestStatus.NOT_FOUND.status,
         )
         Thread.sleep(100)
     }
@@ -50,12 +58,13 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         // Get notification config by id
-        val getConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        val getConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs/$configId",
+                "",
+                RestStatus.OK.status,
+            )
         verifySingleConfigIdEquals(configId, getConfigResponse)
         Thread.sleep(100)
 
@@ -64,7 +73,7 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
             RestRequest.Method.DELETE.name,
             "$PLUGIN_BASE_URI/configs/${configId}extra",
             "",
-            RestStatus.NOT_FOUND.status
+            RestStatus.NOT_FOUND.status,
         )
     }
 
@@ -73,12 +82,13 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         // Get all notification configs
-        val getAllConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs",
-            "",
-            RestStatus.OK.status
-        )
+        val getAllConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs",
+                "",
+                RestStatus.OK.status,
+            )
         verifyMultiConfigIdEquals(configIds, getAllConfigResponse)
         Thread.sleep(100)
 
@@ -91,12 +101,13 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         // Get notification configs after delete
-        val getAfterDelete = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs",
-            "",
-            RestStatus.OK.status
-        )
+        val getAfterDelete =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs",
+                "",
+                RestStatus.OK.status,
+            )
         Assert.assertEquals(0, getAfterDelete.get("total_hits").asInt)
         Thread.sleep(100)
     }
@@ -106,12 +117,13 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         // Get all notification configs
-        val getAllConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs",
-            "",
-            RestStatus.OK.status
-        )
+        val getAllConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs",
+                "",
+                RestStatus.OK.status,
+            )
         verifyMultiConfigIdEquals(configIds, getAllConfigResponse)
         Thread.sleep(100)
 
@@ -124,17 +136,18 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
             RestRequest.Method.DELETE.name,
             "$PLUGIN_BASE_URI/configs?config_id_list=${deletedIds.joinToString(separator = ",")},extra_id",
             "",
-            RestStatus.NOT_FOUND.status
+            RestStatus.NOT_FOUND.status,
         )
         Thread.sleep(1000)
 
         // Get notification configs after failed delete
-        val getAfterDelete = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs",
-            "",
-            RestStatus.OK.status
-        )
+        val getAfterDelete =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs",
+                "",
+                RestStatus.OK.status,
+            )
         verifyMultiConfigIdEquals(configIds, getAfterDelete)
         Thread.sleep(100)
     }
@@ -144,12 +157,13 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         // Get all notification configs
-        val getAllConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs",
-            "",
-            RestStatus.OK.status
-        )
+        val getAllConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs",
+                "",
+                RestStatus.OK.status,
+            )
         verifyMultiConfigIdEquals(configIds, getAllConfigResponse)
         Thread.sleep(100)
 
@@ -167,12 +181,13 @@ class DeleteNotificationConfigIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         // Get notification configs after delete
-        val getAfterDelete = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs",
-            "",
-            RestStatus.OK.status
-        )
+        val getAfterDelete =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs",
+                "",
+                RestStatus.OK.status,
+            )
         verifyMultiConfigIdEquals(remainingIds, getAfterDelete)
         Thread.sleep(100)
     }

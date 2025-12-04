@@ -37,27 +37,21 @@ import javax.management.remote.JMXConnectorFactory
 import javax.management.remote.JMXServiceURL
 
 abstract class PluginRestTestCase : OpenSearchRestTestCase() {
-
-    protected fun isHttps(): Boolean {
-        return System.getProperty("https", "false")!!.toBoolean()
-    }
+    protected fun isHttps(): Boolean = System.getProperty("https", "false")!!.toBoolean()
 
     protected fun isLocalHost(): Boolean {
         val host = System.getProperty("tests.cluster", "dummyHost")!!.toString()
         return host.startsWith("localhost:")
     }
 
-    override fun getProtocol(): String {
-        return if (isHttps()) {
+    override fun getProtocol(): String =
+        if (isHttps()) {
             "https"
         } else {
             "http"
         }
-    }
 
-    override fun preserveIndicesUponCompletion(): Boolean {
-        return true
-    }
+    override fun preserveIndicesUponCompletion(): Boolean = true
 
     open fun preservePluginIndicesAfterTest(): Boolean = false
 
@@ -69,31 +63,33 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         val pluginIndices = listOf(".opensearch-notifications-config")
         val response = client().performRequest(Request("GET", "/_cat/indices?format=json&expand_wildcards=all"))
         val xContentType = MediaType.fromMediaType(response.entity.contentType)
-        xContentType.xContent().createParser(
-            NamedXContentRegistry.EMPTY,
-            DeprecationHandler.THROW_UNSUPPORTED_OPERATION,
-            response.entity.content
-        ).use { parser ->
-            for (index in parser.list()) {
-                val jsonObject: Map<*, *> = index as java.util.HashMap<*, *>
-                val indexName: String = jsonObject["index"] as String
-                if (pluginIndices.contains(indexName)) {
-                    // TODO: remove PERMISSIVE option after moving system index access to REST API call
-                    val request = Request("DELETE", "/$indexName")
-                    val options = RequestOptions.DEFAULT.toBuilder()
-                    options.setWarningsHandler(WarningsHandler.PERMISSIVE)
-                    request.options = options.build()
-                    adminClient().performRequest(request)
+        xContentType
+            .xContent()
+            .createParser(
+                NamedXContentRegistry.EMPTY,
+                DeprecationHandler.THROW_UNSUPPORTED_OPERATION,
+                response.entity.content,
+            ).use { parser ->
+                for (index in parser.list()) {
+                    val jsonObject: Map<*, *> = index as java.util.HashMap<*, *>
+                    val indexName: String = jsonObject["index"] as String
+                    if (pluginIndices.contains(indexName)) {
+                        // TODO: remove PERMISSIVE option after moving system index access to REST API call
+                        val request = Request("DELETE", "/$indexName")
+                        val options = RequestOptions.DEFAULT.toBuilder()
+                        options.setWarningsHandler(WarningsHandler.PERMISSIVE)
+                        request.options = options.build()
+                        adminClient().performRequest(request)
+                    }
                 }
             }
-        }
     }
 
     /**
      * Returns the REST client settings used for super-admin actions like cleaning up after the test has completed.
      */
-    override fun restAdminSettings(): Settings {
-        return Settings
+    override fun restAdminSettings(): Settings =
+        Settings
             .builder()
             .put("http.port", 9200)
             .put(ConfigConstants.OPENSEARCH_SECURITY_SSL_HTTP_ENABLED, isHttps())
@@ -102,10 +98,12 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
             .put(ConfigConstants.OPENSEARCH_SECURITY_SSL_HTTP_KEYSTORE_PASSWORD, "changeit")
             .put(ConfigConstants.OPENSEARCH_SECURITY_SSL_HTTP_KEYSTORE_KEYPASSWORD, "changeit")
             .build()
-    }
 
     @Throws(IOException::class)
-    override fun buildClient(settings: Settings, hosts: Array<HttpHost>): RestClient {
+    override fun buildClient(
+        settings: Settings,
+        hosts: Array<HttpHost>,
+    ): RestClient {
         if (isHttps()) {
             val keystore = settings.get(ConfigConstants.OPENSEARCH_SECURITY_SSL_HTTP_KEYSTORE_FILEPATH)
             return when (keystore != null) {
@@ -118,6 +116,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
                         .setConnectionRequestTimeout(180000)
                         .build()
                 }
+
                 false -> {
                     // create client with passed user
                     val userName = System.getProperty("user")
@@ -141,7 +140,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         url: String,
         jsonString: String,
         expectedRestStatus: Int? = null,
-        client: RestClient = client()
+        client: RestClient = client(),
     ): JsonObject {
         val request = Request(method, url)
         request.setJsonEntity(jsonString)
@@ -151,12 +150,17 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         return executeRequest(request, expectedRestStatus, client)
     }
 
-    fun executeRequest(request: Request, expectedRestStatus: Int? = null, client: RestClient = client()): JsonObject {
-        val response = try {
-            client.performRequest(request)
-        } catch (exception: ResponseException) {
-            exception.response
-        }
+    fun executeRequest(
+        request: Request,
+        expectedRestStatus: Int? = null,
+        client: RestClient = client(),
+    ): JsonObject {
+        val response =
+            try {
+                client.performRequest(request)
+            } catch (exception: ResponseException) {
+                exception.response
+            }
         if (expectedRestStatus != null) {
             assertEquals(expectedRestStatus, response.statusLine.statusCode)
         }
@@ -164,14 +168,19 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         return jsonify(responseBody)
     }
 
-    fun createUser(name: String, passwd: String, backendRoles: Array<String>) {
+    fun createUser(
+        name: String,
+        passwd: String,
+        backendRoles: Array<String>,
+    ) {
         val request = Request("PUT", "/_plugins/_security/api/internalusers/$name")
         val broles = backendRoles.filter { it.isNotBlank() }.joinToString { "\"$it\"" }
-        val entity = " {\n" +
-            "\"password\": \"$passwd\",\n" +
-            "\"backend_roles\": [$broles],\n" +
-            "\"attributes\": {\n" +
-            "}} "
+        val entity =
+            " {\n" +
+                "\"password\": \"$passwd\",\n" +
+                "\"backend_roles\": [$broles],\n" +
+                "\"attributes\": {\n" +
+                "}} "
         request.setJsonEntity(entity)
         client().performRequest(request)
     }
@@ -181,41 +190,53 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         executeRequest(request, RestStatus.OK.status)
     }
 
-    fun createUserRolesMapping(role: String, users: Array<String>) {
+    fun createUserRolesMapping(
+        role: String,
+        users: Array<String>,
+    ) {
         val request = Request("PUT", "/_plugins/_security/api/rolesmapping/$role")
         val usersStr = users.joinToString { it -> "\"$it\"" }
-        val entity = "{                                  \n" +
-            "  \"backend_roles\" : [],\n" +
-            "  \"hosts\" : [],\n" +
-            "  \"users\" : [$usersStr]\n" +
-            "}"
+        val entity =
+            "{                                  \n" +
+                "  \"backend_roles\" : [],\n" +
+                "  \"hosts\" : [],\n" +
+                "  \"users\" : [$usersStr]\n" +
+                "}"
         request.setJsonEntity(entity)
         client().performRequest(request)
     }
 
-    fun addPatchUserRolesMapping(role: String, users: Array<String>) {
+    fun addPatchUserRolesMapping(
+        role: String,
+        users: Array<String>,
+    ) {
         val request = Request("PATCH", "/_plugins/_security/api/rolesmapping/$role")
         val usersStr = users.joinToString { it -> "\"$it\"" }
 
-        val entity = "[{\n" +
-            "  \"op\" : \"add\",\n" +
-            "  \"path\" : \"users\",\n" +
-            "  \"value\" : [$usersStr]\n" +
-            "}]"
+        val entity =
+            "[{\n" +
+                "  \"op\" : \"add\",\n" +
+                "  \"path\" : \"users\",\n" +
+                "  \"value\" : [$usersStr]\n" +
+                "}]"
 
         request.setJsonEntity(entity)
         client().performRequest(request)
     }
 
-    fun removePatchUserRolesMapping(role: String, users: Array<String>) {
+    fun removePatchUserRolesMapping(
+        role: String,
+        users: Array<String>,
+    ) {
         val request = Request("PATCH", "/_plugins/_security/api/rolesmapping/$role")
         val usersStr = users.joinToString { it -> "\"$it\"" }
 
-        val entity = "[{\n" +
-            "  \"op\" : \"remove\",\n" +
-            "  \"path\" : \"users\",\n" +
-            "  \"value\" : [$usersStr]\n" +
-            "}]"
+        val entity =
+            "[{\n" +
+                "  \"op\" : \"remove\",\n" +
+                "  \"path\" : \"users\",\n" +
+                "  \"value\" : [$usersStr]\n" +
+                "}]"
 
         request.setJsonEntity(entity)
         client().performRequest(request)
@@ -226,15 +247,19 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         client().performRequest(request)
     }
 
-    fun createCustomRole(name: String, clusterPermissions: String?) {
+    fun createCustomRole(
+        name: String,
+        clusterPermissions: String?,
+    ) {
         val request = Request("PUT", "/_plugins/_security/api/roles/$name")
         val permissions = if (clusterPermissions.isNullOrBlank()) "" else "\"$clusterPermissions\""
-        val entity = """
+        val entity =
+            """
             {
                 "cluster_permissions": [$permissions],
                 "tenant_permissions": []
             }
-        """.trimIndent()
+            """.trimIndent()
         request.setJsonEntity(entity)
         client().performRequest(request)
     }
@@ -244,12 +269,20 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         client().performRequest(request)
     }
 
-    fun createUserWithRoles(user: String, password: String, role: String, backendRole: String) {
+    fun createUserWithRoles(
+        user: String,
+        password: String,
+        role: String,
+        backendRole: String,
+    ) {
         createUser(user, password, arrayOf(backendRole))
         addPatchUserRolesMapping(role, arrayOf(user))
     }
 
-    fun deleteUserWithRoles(user: String, role: String) {
+    fun deleteUserWithRoles(
+        user: String,
+        role: String,
+    ) {
         removePatchUserRolesMapping(role, arrayOf(user))
         deleteUser(user)
     }
@@ -259,7 +292,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         password: String,
         role: String,
         backendRole: String,
-        clusterPermissions: String?
+        clusterPermissions: String?,
     ) {
         createUser(user, password, arrayOf(backendRole))
         createCustomRole(role, clusterPermissions)
@@ -268,7 +301,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
 
     fun deleteUserWithCustomRole(
         user: String,
-        role: String
+        role: String,
     ) {
         deleteUserRolesMapping(role)
         deleteCustomRole(role)
@@ -281,22 +314,24 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         isEnabled: Boolean = true,
         smtpAccountId: String = "",
         emailGroupId: Set<String> = setOf(),
-        client: RestClient = client()
+        client: RestClient = client(),
     ): String {
-        val createRequestJsonString = getCreateNotificationRequestJsonString(
-            nameSubstring,
-            configType,
-            isEnabled,
-            smtpAccountId,
-            emailGroupId
-        )
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-            createRequestJsonString,
-            RestStatus.OK.status,
-            client
-        )
+        val createRequestJsonString =
+            getCreateNotificationRequestJsonString(
+                nameSubstring,
+                configType,
+                isEnabled,
+                smtpAccountId,
+                emailGroupId,
+            )
+        val createResponse =
+            executeRequest(
+                RestRequest.Method.POST.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
+                createRequestJsonString,
+                RestStatus.OK.status,
+                client,
+            )
         refreshAllIndices()
         val configId = createResponse.get("config_id").asString
         Assert.assertNotNull(configId)
@@ -306,15 +341,16 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
 
     fun createConfigWithRequestJsonString(
         createRequestJsonString: String,
-        client: RestClient = client()
+        client: RestClient = client(),
     ): String {
-        val createResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
-            createRequestJsonString,
-            RestStatus.OK.status,
-            client
-        )
+        val createResponse =
+            executeRequest(
+                RestRequest.Method.POST.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
+                createRequestJsonString,
+                RestStatus.OK.status,
+                client,
+            )
         refreshAllIndices()
         Thread.sleep(100)
         return createResponse.get("config_id").asString
@@ -322,30 +358,32 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
 
     fun deleteConfig(
         configId: String,
-        client: RestClient = client()
+        client: RestClient = client(),
     ): JsonObject {
-        val deleteResponse = executeRequest(
-            RestRequest.Method.DELETE.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
-            "",
-            RestStatus.OK.status,
-            client
-        )
+        val deleteResponse =
+            executeRequest(
+                RestRequest.Method.DELETE.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status,
+                client,
+            )
         refreshAllIndices()
         return deleteResponse
     }
 
     fun deleteConfigs(
         configIds: Set<String>,
-        client: RestClient = client()
+        client: RestClient = client(),
     ): JsonObject {
-        val deleteResponse = executeRequest(
-            RestRequest.Method.DELETE.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs?config_id_list=${configIds.joinToString(separator = ",")}",
-            "",
-            RestStatus.OK.status,
-            client
-        )
+        val deleteResponse =
+            executeRequest(
+                RestRequest.Method.DELETE.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs?config_id_list=${configIds.joinToString(separator = ",")}",
+                "",
+                RestStatus.OK.status,
+                client,
+            )
         refreshAllIndices()
         return deleteResponse
     }
@@ -356,7 +394,10 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
     }
 
     @Throws(IOException::class)
-    protected fun updateClusterSettings(setting: ClusterSetting, client: RestClient = client()): JsonObject {
+    protected fun updateClusterSettings(
+        setting: ClusterSetting,
+        client: RestClient = client(),
+    ): JsonObject {
         val request = Request("PUT", "/_cluster/settings")
         val persistentSetting = "{\"${setting.type}\": {\"${setting.name}\": ${setting.value}}}"
         request.setJsonEntity(persistentSetting)
@@ -387,8 +428,17 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         }
         getMappingRequest.setOptions(requestOptions)
         val response = executeRequest(getMappingRequest, RestStatus.OK.status, client())
-        val mappingsObject = response.get(NotificationConfigIndex.INDEX_NAME).asJsonObject.get("mappings").asJsonObject
-        return mappingsObject.get(NotificationConfigIndex._META)?.asJsonObject?.get(NotificationConfigIndex.SCHEMA_VERSION)?.asInt
+        val mappingsObject =
+            response
+                .get(NotificationConfigIndex.INDEX_NAME)
+                .asJsonObject
+                .get("mappings")
+                .asJsonObject
+        return mappingsObject
+            .get(NotificationConfigIndex._META)
+            ?.asJsonObject
+            ?.get(NotificationConfigIndex.SCHEMA_VERSION)
+            ?.asInt
             ?: NotificationConfigIndex.DEFAULT_SCHEMA_VERSION
     }
 
@@ -411,7 +461,11 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         client().performRequest(refreshRequest)
     }
 
-    protected class ClusterSetting(val type: String, val name: String, var value: Any?) {
+    protected class ClusterSetting(
+        val type: String,
+        val name: String,
+        var value: Any?,
+    ) {
         init {
             this.value = if (value == null) "null" else "\"" + value + "\""
         }
@@ -423,18 +477,20 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
             var sessionId: String?
 
             fun getExecutionData(reset: Boolean): ByteArray?
+
             fun dump(reset: Boolean)
+
             fun reset()
         }
 
         /*
-        * We need to be able to dump the jacoco coverage before the cluster shuts down.
-        * The new internal testing framework removed some gradle tasks we were listening to,
-        * to choose a good time to do it. This will dump the executionData to file after each test.
-        * TODO: This is also currently just overwriting integTest.exec with the updated execData without
-        *   resetting after writing each time. This can be improved to either write an exec file per test
-        *   or by letting jacoco append to the file.
-        * */
+         * We need to be able to dump the jacoco coverage before the cluster shuts down.
+         * The new internal testing framework removed some gradle tasks we were listening to,
+         * to choose a good time to do it. This will dump the executionData to file after each test.
+         * TODO: This is also currently just overwriting integTest.exec with the updated execData without
+         *   resetting after writing each time. This can be improved to either write an exec file per test
+         *   or by letting jacoco append to the file.
+         * */
         @JvmStatic
         @AfterClass
         fun dumpCoverage() {
@@ -443,12 +499,13 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
             val jacocoBuildPath = System.getProperty("jacoco.dir") ?: return
             val serverUrl = "service:jmx:rmi:///jndi/rmi://127.0.0.1:7777/jmxrmi"
             JMXConnectorFactory.connect(JMXServiceURL(serverUrl)).use { connector ->
-                val proxy = MBeanServerInvocationHandler.newProxyInstance(
-                    connector.mBeanServerConnection,
-                    ObjectName("org.jacoco:type=Runtime"),
-                    IProxy::class.java,
-                    false
-                )
+                val proxy =
+                    MBeanServerInvocationHandler.newProxyInstance(
+                        connector.mBeanServerConnection,
+                        ObjectName("org.jacoco:type=Runtime"),
+                        IProxy::class.java,
+                        false,
+                    )
                 proxy.getExecutionData(false)?.let {
                     val path = Path.of("$jacocoBuildPath/integTest.exec")
                     Files.write(path, it)

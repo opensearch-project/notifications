@@ -14,18 +14,21 @@ import org.opensearch.notifications.spi.model.MessageContent
  */
 internal object EmailMessageValidator {
     private val log by logger(EmailMessageValidator::class.java)
-    fun isMessageSizeOverLimit(message: MessageContent): Boolean {
-        val approxAttachmentLength = if (message.fileData != null && message.fileName != null) {
-            PluginSettings.emailMinimumHeaderLength + message.fileData!!.length + message.fileName!!.length
-        } else {
-            0
-        }
 
-        val approxEmailLength = PluginSettings.emailMinimumHeaderLength +
-            message.title.length +
-            message.textDescription.length +
-            (message.htmlDescription?.length ?: 0) +
-            approxAttachmentLength
+    fun isMessageSizeOverLimit(message: MessageContent): Boolean {
+        val approxAttachmentLength =
+            if (message.fileData != null && message.fileName != null) {
+                PluginSettings.emailMinimumHeaderLength + message.fileData!!.length + message.fileName!!.length
+            } else {
+                0
+            }
+
+        val approxEmailLength =
+            PluginSettings.emailMinimumHeaderLength +
+                message.title.length +
+                message.textDescription.length +
+                (message.htmlDescription?.length ?: 0) +
+                approxAttachmentLength
 
         return approxEmailLength > PluginSettings.emailSizeLimit
     }

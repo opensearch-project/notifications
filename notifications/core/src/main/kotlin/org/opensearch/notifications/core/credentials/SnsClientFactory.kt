@@ -11,5 +11,8 @@ import com.amazonaws.services.sns.AmazonSNS
  * Interface for creating SNS client
  */
 interface SnsClientFactory {
-    fun createSnsClient(region: String, roleArn: String?): AmazonSNS
+    fun createSnsClient(
+        region: String,
+        roleArn: String?,
+    ): AmazonSNS
 }

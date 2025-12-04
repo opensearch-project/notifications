@@ -13,21 +13,19 @@ import org.opensearch.commons.notifications.model.SeverityType
  * Helper function for send transport action.
  */
 object SendTestNotificationActionHelper {
-    fun generateMessage(configId: String): ChannelMessage {
-        return ChannelMessage(
+    fun generateMessage(configId: String): ChannelMessage =
+        ChannelMessage(
             getMessageTextDescription(configId),
             getMessageHtmlDescription(configId),
-            null
+            null,
         )
-    }
 
-    fun generateEventSource(configId: String): EventSource {
-        return EventSource(
+    fun generateEventSource(configId: String): EventSource =
+        EventSource(
             getMessageTitle(configId),
             configId,
-            SeverityType.INFO
+            SeverityType.INFO,
         )
-    }
 
     private fun getMessageTitle(configId: String): String {
         return "Test Message Title-$configId" // TODO: change as spec
@@ -45,6 +43,7 @@ object SendTestNotificationActionHelper {
             <p>Test Message for config id $configId</p>
             </body>
             </html>
-        """.trimIndent() // TODO: change as spec
+            """.trimIndent()
+        // TODO: change as spec
     }
 }

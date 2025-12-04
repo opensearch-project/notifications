@@ -51,51 +51,49 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
     /**
      * {@inheritDoc}
      */
-    override fun getName(): String {
-        return "notifications_config"
-    }
+    override fun getName(): String = "notifications_config"
 
     /**
      * {@inheritDoc}
      */
-    override fun routes(): List<Route> {
-        return listOf(
-            /**
+    override fun routes(): List<Route> =
+        listOf(
+            /*
              * Create a new notification config
              * Request URL: POST [REQUEST_URL]
              * Request body: Ref [org.opensearch.commons.notifications.action.CreateNotificationConfigRequest]
              * Response body: [org.opensearch.commons.notifications.action.CreateNotificationConfigResponse]
              */
             Route(POST, REQUEST_URL),
-            /**
+            /*
              * Update a notification config
              * Request URL: PUT [REQUEST_URL/{configId}]
              * Request body: Ref [org.opensearch.commons.notifications.action.UpdateNotificationConfigRequest]
              * Response body: [org.opensearch.commons.notifications.action.UpdateNotificationConfigResponse]
              */
             Route(PUT, "$REQUEST_URL/{$CONFIG_ID_TAG}"),
-            /**
+            /*
              * Delete a notification config
              * Request URL: DELETE [REQUEST_URL/{configId}]
              * Request body: Ref [org.opensearch.commons.notifications.action.DeleteNotificationConfigRequest]
              * Response body: [org.opensearch.commons.notifications.action.DeleteNotificationConfigResponse]
              */
             Route(DELETE, "$REQUEST_URL/{$CONFIG_ID_TAG}"),
-            /**
+            /*
              * Delete a notification config
              * Request URL: DELETE [REQUEST_URL?config_id=id] or [REQUEST_URL?config_id_list=comma_separated_ids]
              * Request body: Ref [org.opensearch.commons.notifications.action.DeleteNotificationConfigRequest]
              * Response body: [org.opensearch.commons.notifications.action.DeleteNotificationConfigResponse]
              */
             Route(DELETE, REQUEST_URL),
-            /**
+            /*
              * Get a notification config
              * Request URL: GET [REQUEST_URL/{configId}]
              * Request body: Ref [org.opensearch.commons.notifications.action.GetNotificationConfigRequest]
              * Response body: [org.opensearch.commons.notifications.action.GetNotificationConfigResponse]
              */
             Route(GET, "$REQUEST_URL/{$CONFIG_ID_TAG}"),
-            /**
+            /*
              * Get list of notification configs
              * Request URL: GET [REQUEST_URL?config_id=id] or [REQUEST_URL?<query_params>]
              * <query_params> ->
@@ -131,43 +129,56 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
              * Request body: Ref [org.opensearch.commons.notifications.action.GetNotificationConfigRequest]
              * Response body: [org.opensearch.commons.notifications.action.GetNotificationConfigResponse]
              */
-            Route(GET, REQUEST_URL)
+            Route(GET, REQUEST_URL),
         )
-    }
 
     /**
      * {@inheritDoc}
      */
-    override fun responseParams(): Set<String> {
-        return setOf(
+    override fun responseParams(): Set<String> =
+        setOf(
             CONFIG_ID_TAG,
             CONFIG_ID_LIST_TAG,
             SORT_FIELD_TAG,
             SORT_ORDER_TAG,
             FROM_INDEX_TAG,
-            MAX_ITEMS_TAG
+            MAX_ITEMS_TAG,
         )
-    }
 
     /**
      * {@inheritDoc}
      */
-    override fun executeRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
-        return when (request.method()) {
-            POST -> executePostRequest(request, client)
-            PUT -> executePutRequest(request, client)
-            DELETE -> executeDeleteRequest(request, client)
-            GET -> executeGetRequest(request, client)
+    override fun executeRequest(
+        request: RestRequest,
+        client: NodeClient,
+    ): RestChannelConsumer =
+        when (request.method()) {
+            POST -> {
+                executePostRequest(request, client)
+            }
 
-            else -> RestChannelConsumer {
-                it.sendResponse(BytesRestResponse(RestStatus.METHOD_NOT_ALLOWED, "${request.method()} is not allowed"))
+            PUT -> {
+                executePutRequest(request, client)
+            }
+
+            DELETE -> {
+                executeDeleteRequest(request, client)
+            }
+
+            GET -> {
+                executeGetRequest(request, client)
+            }
+
+            else -> {
+                RestChannelConsumer {
+                    it.sendResponse(BytesRestResponse(RestStatus.METHOD_NOT_ALLOWED, "${request.method()} is not allowed"))
+                }
             }
         }
-    }
 
     private fun executePutRequest(
         request: RestRequest,
-        client: NodeClient
+        client: NodeClient,
     ) = RestChannelConsumer {
         Metrics.NOTIFICATIONS_CONFIG_UPDATE_TOTAL.counter.increment()
         Metrics.NOTIFICATIONS_CONFIG_UPDATE_INTERVAL_COUNT.counter.increment()
@@ -175,28 +186,28 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
             client,
             UpdateNotificationConfigRequest.parse(
                 request.contentParserNextToken(),
-                request.param(CONFIG_ID_TAG)
+                request.param(CONFIG_ID_TAG),
             ),
-            RestToXContentListener(it)
+            RestToXContentListener(it),
         )
     }
 
     private fun executePostRequest(
         request: RestRequest,
-        client: NodeClient
+        client: NodeClient,
     ) = RestChannelConsumer {
         Metrics.NOTIFICATIONS_CONFIG_CREATE_TOTAL.counter.increment()
         Metrics.NOTIFICATIONS_CONFIG_CREATE_INTERVAL_COUNT.counter.increment()
         NotificationsPluginInterface.createNotificationConfig(
             client,
             CreateNotificationConfigRequest.parse(request.contentParserNextToken()),
-            RestToXContentListener(it)
+            RestToXContentListener(it),
         )
     }
 
     private fun executeGetRequest(
         request: RestRequest,
-        client: NodeClient
+        client: NodeClient,
     ): RestChannelConsumer {
         Metrics.NOTIFICATIONS_CONFIG_INFO_TOTAL.counter.increment()
         Metrics.NOTIFICATIONS_CONFIG_INFO_INTERVAL_COUNT.counter.increment()
@@ -204,39 +215,46 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
         val configIdList: String? = request.param(CONFIG_ID_LIST_TAG)
         val sortField: String? = request.param(SORT_FIELD_TAG)
         val sortOrderString: String? = request.param(SORT_ORDER_TAG)
-        val sortOrder: SortOrder? = if (sortOrderString == null) {
-            null
-        } else {
-            SortOrder.fromString(sortOrderString)
-        }
+        val sortOrder: SortOrder? =
+            if (sortOrderString == null) {
+                null
+            } else {
+                SortOrder.fromString(sortOrderString)
+            }
         val fromIndex = request.param(FROM_INDEX_TAG)?.toIntOrNull() ?: 0
         val maxItems = request.param(MAX_ITEMS_TAG)?.toIntOrNull() ?: DEFAULT_MAX_ITEMS
-        val filterParams = request.params()
-            .filter { ConfigQueryHelper.FILTER_PARAMS.contains(it.key) }
-            .map { Pair(it.key, request.param(it.key)) }
-            .toMap()
+        val filterParams =
+            request
+                .params()
+                .filter { ConfigQueryHelper.FILTER_PARAMS.contains(it.key) }
+                .map { Pair(it.key, request.param(it.key)) }
+                .toMap()
         log.info(
             "$LOG_PREFIX:executeGetRequest from:$fromIndex, maxItems:$maxItems," +
-                " sortField:$sortField, sortOrder=$sortOrder, filters=$filterParams"
+                " sortField:$sortField, sortOrder=$sortOrder, filters=$filterParams",
         )
-        val configRequest = GetNotificationConfigRequest(
-            getConfigIdSet(configId, configIdList),
-            fromIndex,
-            maxItems,
-            sortField,
-            sortOrder,
-            filterParams
-        )
+        val configRequest =
+            GetNotificationConfigRequest(
+                getConfigIdSet(configId, configIdList),
+                fromIndex,
+                maxItems,
+                sortField,
+                sortOrder,
+                filterParams,
+            )
         return RestChannelConsumer {
             NotificationsPluginInterface.getNotificationConfig(
                 client,
                 configRequest,
-                RestToXContentListener(it)
+                RestToXContentListener(it),
             )
         }
     }
 
-    private fun getConfigIdSet(configId: String?, configIdList: String?): Set<String> {
+    private fun getConfigIdSet(
+        configId: String?,
+        configIdList: String?,
+    ): Set<String> {
         var retIds: Set<String> = setOf()
         if (configId != null) {
             retIds = setOf(configId)
@@ -249,13 +267,14 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
 
     private fun executeDeleteRequest(
         request: RestRequest,
-        client: NodeClient
+        client: NodeClient,
     ): RestChannelConsumer {
         Metrics.NOTIFICATIONS_CONFIG_DELETE_TOTAL.counter.increment()
         Metrics.NOTIFICATIONS_CONFIG_DELETE_INTERVAL_COUNT.counter.increment()
         val configId: String? = request.param(CONFIG_ID_TAG)
         val configIdSet: Set<String> =
-            request.paramAsStringArray(CONFIG_ID_LIST_TAG, arrayOf(configId))
+            request
+                .paramAsStringArray(CONFIG_ID_LIST_TAG, arrayOf(configId))
                 .filter { s -> !s.isNullOrBlank() }
                 .toSet()
         return RestChannelConsumer {
@@ -263,14 +282,14 @@ internal class NotificationConfigRestHandler : PluginBaseHandler() {
                 it.sendResponse(
                     BytesRestResponse(
                         RestStatus.BAD_REQUEST,
-                        "either $CONFIG_ID_TAG or $CONFIG_ID_LIST_TAG is required"
-                    )
+                        "either $CONFIG_ID_TAG or $CONFIG_ID_LIST_TAG is required",
+                    ),
                 )
             } else {
                 NotificationsPluginInterface.deleteNotificationConfig(
                     client,
                     DeleteNotificationConfigRequest(configIdSet),
-                    RestResponseToXContentListener(it)
+                    RestResponseToXContentListener(it),
                 )
             }
         }

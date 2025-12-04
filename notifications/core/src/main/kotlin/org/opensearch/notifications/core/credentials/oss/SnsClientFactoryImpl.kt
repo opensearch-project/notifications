@@ -14,14 +14,17 @@ import org.opensearch.notifications.core.utils.SecurityAccess
  * Factory for creating SNS client
  */
 object SnsClientFactoryImpl : SnsClientFactory {
-    override fun createSnsClient(region: String, roleArn: String?): AmazonSNS {
-        return SecurityAccess.doPrivileged {
+    override fun createSnsClient(
+        region: String,
+        roleArn: String?,
+    ): AmazonSNS =
+        SecurityAccess.doPrivileged {
             val credentials =
                 CredentialsProviderFactory().getCredentialsProvider(region, roleArn)
-            AmazonSNSClientBuilder.standard()
+            AmazonSNSClientBuilder
+                .standard()
                 .withRegion(region)
                 .withCredentials(credentials)
                 .build()
         }
-    }
 }
