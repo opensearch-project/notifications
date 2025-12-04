@@ -11,7 +11,7 @@ interface NotificationCore {
     fun sendMessage(
         destination: BaseDestination,
         message: MessageContent,
-        referenceId: String
+        referenceId: String,
     ): DestinationMessageResponse
 
     /**

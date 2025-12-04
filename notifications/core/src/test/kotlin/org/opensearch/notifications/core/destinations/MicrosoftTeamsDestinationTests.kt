@@ -44,7 +44,7 @@ internal class MicrosoftTeamsDestinationTests {
                 Arguments.of("\t", """\t"""),
                 Arguments.of("\b", """\b"""),
                 Arguments.of("\r", """\r"""),
-                Arguments.of("\"", """\"""")
+                Arguments.of("\"", """\""""),
             )
     }
 
@@ -52,8 +52,14 @@ internal class MicrosoftTeamsDestinationTests {
     fun setup() {
         // Stubbing isHostInDenylist() so it doesn't attempt to resolve hosts that don't exist in the unit tests
         mockkStatic("org.opensearch.notifications.spi.utils.ValidationHelpersKt")
-        every { org.opensearch.notifications.spi.utils.isHostInDenylist(any(), any()) } returns false
-        every { org.opensearch.notifications.spi.utils.getResolvedIps(any()) } returns listOf(IPAddressString("174.0.0.0"))
+        every {
+            org.opensearch.notifications.spi.utils
+                .isHostInDenylist(any(), any())
+        } returns false
+        every {
+            org.opensearch.notifications.spi.utils
+                .getResolvedIps(any())
+        } returns listOf(IPAddressString("174.0.0.0"))
     }
 
     @Test
@@ -75,9 +81,10 @@ internal class MicrosoftTeamsDestinationTests {
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport)
 
         val title = "test MicrosoftTeams"
-        val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present"
+        val messageText =
+            "Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member callout: " +
+                "@All All Present member callout: @Present"
         val url = "https://abc/com"
 
         val destination = MicrosoftTeamsDestination(url)
@@ -105,9 +112,10 @@ internal class MicrosoftTeamsDestinationTests {
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport)
 
         val title = "test MicrosoftTeams"
-        val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present\"}"
+        val messageText =
+            "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member callout: " +
+                "@All All Present member callout: @Present\"}"
         val url = "https://abc/com"
 
         val destination = MicrosoftTeamsDestination(url)
@@ -136,9 +144,10 @@ internal class MicrosoftTeamsDestinationTests {
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport)
 
         val title = "test MicrosoftTeams"
-        val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present\"}"
+        val messageText =
+            "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member callout: " +
+                "@All All Present member callout: @Present\"}"
         val url = "https://abc/com"
 
         val destination = MicrosoftTeamsDestination(url)
@@ -152,9 +161,10 @@ internal class MicrosoftTeamsDestinationTests {
 
     @Test
     fun `test url missing should throw IllegalArgumentException with message`() {
-        val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
-            MicrosoftTeamsDestination("")
-        }
+        val exception =
+            Assertions.assertThrows(IllegalArgumentException::class.java) {
+                MicrosoftTeamsDestination("")
+            }
         assertEquals("url is null or empty", exception.message)
     }
 
@@ -169,7 +179,7 @@ internal class MicrosoftTeamsDestinationTests {
     @MethodSource("escapeSequenceToRaw")
     fun `test build webhook request body for microsoft teams should have title included and prevent escape`(
         escapeSequence: String,
-        rawString: String
+        rawString: String,
     ) {
         val httpClient = DestinationHttpClient()
         val title = "test MicrosoftTeams"

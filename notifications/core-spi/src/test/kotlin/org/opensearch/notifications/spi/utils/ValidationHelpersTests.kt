@@ -13,37 +13,39 @@ import org.junit.jupiter.api.assertThrows
 import java.net.InetAddress
 import java.net.MalformedURLException
 
-internal class ValidationHelpersTests {
-    private val GOOGLE_URL = "https://www.google.com"
-    private val INVALID_URL = "www.invalid.com"
-    private val VALID_NOT_FQDN_URL = "https://odfe-es-client-service:9200/"
-    private val SAMPLE_URL = "https://sample.url:1234"
-    private val LOCAL_HOST_URL = "https://localhost:6060"
-    private val LOCAL_HOST_EXTENDED = "https://localhost:6060/service"
-    private val WEBHOOK_URL = "https://test-webhook.com:1234/subdirectory?param1=value1&param2=&param3=value3"
-    private val CHIME_URL = "https://domain.com/sample_chime_url#1234567890"
-    private val MICROSOFT_TEAMS_WEBHOOK_URL = "https://test.webhook.office.com/webhookb2/12345678/IncomingWebhook/87654321"
+const val GOOGLE_URL = "https://www.google.com"
+const val INVALID_URL = "www.invalid.com"
+const val VALID_NOT_FQDN_URL = "https://odfe-es-client-service:9200/"
+const val SAMPLE_URL = "https://sample.url:1234"
+const val LOCAL_HOST_URL = "https://localhost:6060"
+const val LOCAL_HOST_EXTENDED = "https://localhost:6060/service"
+const val WEBHOOK_URL = "https://test-webhook.com:1234/subdirectory?param1=value1&param2=&param3=value3"
+const val CHIME_URL = "https://domain.com/sample_chime_url#1234567890"
+const val MICROSOFT_TEAMS_WEBHOOK_URL = "https://test.webhook.office.com/webhookb2/12345678/IncomingWebhook/87654321"
 
-    private val hostDenyList = listOf(
-        "127.0.0.0/8",
-        "10.0.0.0/8",
-        "172.16.0.0/12",
-        "192.168.0.0/16",
-        "0.0.0.0/8",
-        "9.9.9.9" // ip
-    )
+internal class ValidationHelpersTests {
+    private val hostDenyList =
+        listOf(
+            "127.0.0.0/8",
+            "10.0.0.0/8",
+            "172.16.0.0/12",
+            "192.168.0.0/16",
+            "0.0.0.0/8",
+            "9.9.9.9", // ip
+        )
 
     @Test
     fun `test ips in denylist`() {
-        val ips = listOf(
-            "127.0.0.1", // 127.0.0.0/8
-            "10.0.0.1", // 10.0.0.0/8
-            "10.11.12.13", // 10.0.0.0/8
-            "172.16.0.1", // "172.16.0.0/12"
-            "192.168.0.1", // 192.168.0.0/16"
-            "0.0.0.1", // 0.0.0.0/8
-            "9.9.9.9"
-        )
+        val ips =
+            listOf(
+                "127.0.0.1", // 127.0.0.0/8
+                "10.0.0.1", // 10.0.0.0/8
+                "10.11.12.13", // 10.0.0.0/8
+                "172.16.0.1", // "172.16.0.0/12"
+                "192.168.0.1", // 192.168.0.0/16"
+                "0.0.0.1", // 0.0.0.0/8
+                "9.9.9.9",
+            )
         for (ip in ips) {
             assertEquals(true, isHostInDenylist("https://$ip", hostDenyList))
         }
@@ -51,13 +53,15 @@ internal class ValidationHelpersTests {
 
     @Test
     fun `test hostname gets resolved to ip for denylist`() {
-        val expectedAddressesForInvalidHost = arrayOf(
-            InetAddress.getByName("174.120.0.0"),
-            InetAddress.getByName("10.0.0.1")
-        )
-        val expectedAddressesForValidHost = arrayOf(
-            InetAddress.getByName("174.12.0.0")
-        )
+        val expectedAddressesForInvalidHost =
+            arrayOf(
+                InetAddress.getByName("174.120.0.0"),
+                InetAddress.getByName("10.0.0.1"),
+            )
+        val expectedAddressesForValidHost =
+            arrayOf(
+                InetAddress.getByName("174.12.0.0"),
+            )
 
         mockkStatic(InetAddress::class)
         val invalidHost = "invalid.com"

@@ -32,49 +32,51 @@ internal class NotificationFeaturesRestHandler : PluginBaseHandler() {
     /**
      * {@inheritDoc}
      */
-    override fun getName(): String {
-        return "notifications_features"
-    }
+    override fun getName(): String = "notifications_features"
 
     /**
      * {@inheritDoc}
      */
-    override fun routes(): List<Route> {
-        return listOf(
-            /**
+    override fun routes(): List<Route> =
+        listOf(
+            /*
              * Get notification features
              * Request URL: GET [REQUEST_URL]
              * Request body: Ref [org.opensearch.commons.notifications.action.GetPluginFeaturesRequest]
              * Response body: [org.opensearch.commons.notifications.action.GetPluginFeaturesResponse]
              */
-            Route(GET, REQUEST_URL)
+            Route(GET, REQUEST_URL),
         )
-    }
 
     /**
      * {@inheritDoc}
      */
-    override fun responseParams(): Set<String> {
-        return setOf()
-    }
+    override fun responseParams(): Set<String> = setOf()
 
     /**
      * {@inheritDoc}
      */
-    override fun executeRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
-        return when (request.method()) {
-            GET -> RestChannelConsumer {
-                Metrics.NOTIFICATIONS_FEATURES_INFO_TOTAL.counter.increment()
-                Metrics.NOTIFICATIONS_FEATURES_INFO_INTERVAL_COUNT.counter.increment()
-                NotificationsPluginInterface.getPluginFeatures(
-                    client,
-                    GetPluginFeaturesRequest(),
-                    RestToXContentListener(it)
-                )
+    override fun executeRequest(
+        request: RestRequest,
+        client: NodeClient,
+    ): RestChannelConsumer =
+        when (request.method()) {
+            GET -> {
+                RestChannelConsumer {
+                    Metrics.NOTIFICATIONS_FEATURES_INFO_TOTAL.counter.increment()
+                    Metrics.NOTIFICATIONS_FEATURES_INFO_INTERVAL_COUNT.counter.increment()
+                    NotificationsPluginInterface.getPluginFeatures(
+                        client,
+                        GetPluginFeaturesRequest(),
+                        RestToXContentListener(it),
+                    )
+                }
             }
-            else -> RestChannelConsumer {
-                it.sendResponse(BytesRestResponse(RestStatus.METHOD_NOT_ALLOWED, "${request.method()} is not allowed"))
+
+            else -> {
+                RestChannelConsumer {
+                    it.sendResponse(BytesRestResponse(RestStatus.METHOD_NOT_ALLOWED, "${request.method()} is not allowed"))
+                }
             }
         }
-    }
 }

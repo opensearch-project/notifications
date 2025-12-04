@@ -69,8 +69,11 @@ import java.util.function.Supplier
  * Entry point of the OpenSearch Notifications plugin
  * This class initializes the rest handlers.
  */
-class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, SystemIndexPlugin {
-
+class NotificationPlugin :
+    Plugin(),
+    ActionPlugin,
+    NotificationCoreExtension,
+    SystemIndexPlugin {
     lateinit var clusterService: ClusterService // initialized in createComponents()
 
     internal companion object {
@@ -93,14 +96,13 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
         return PluginSettings.getAllSettings()
     }
 
-    override fun getSystemIndexDescriptors(settings: Settings?): Collection<SystemIndexDescriptor> {
-        return listOf(
+    override fun getSystemIndexDescriptors(settings: Settings?): Collection<SystemIndexDescriptor> =
+        listOf(
             SystemIndexDescriptor(
                 NotificationConfigIndex.INDEX_NAME,
-                "System index for storing notification channels related configurations."
-            )
+                "System index for storing notification channels related configurations.",
+            ),
         )
-    }
 
     /**
      * {@inheritDoc}
@@ -116,23 +118,24 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
         nodeEnvironment: NodeEnvironment,
         namedWriteableRegistry: NamedWriteableRegistry,
         indexNameExpressionResolver: IndexNameExpressionResolver,
-        repositoriesServiceSupplier: Supplier<RepositoriesService>
+        repositoriesServiceSupplier: Supplier<RepositoriesService>,
     ): Collection<Any> {
         log.debug("$LOG_PREFIX:createComponents")
         this.clusterService = clusterService
         val settings = environment.settings()
-        val sdkClient = SdkClientFactory.createSdkClient(
-            SecureIndexClient(client),
-            xContentRegistry,
-            mapOf(
-                REMOTE_METADATA_TYPE_KEY to REMOTE_METADATA_STORE_TYPE.get(settings),
-                REMOTE_METADATA_ENDPOINT_KEY to REMOTE_METADATA_ENDPOINT.get(settings),
-                REMOTE_METADATA_REGION_KEY to REMOTE_METADATA_REGION.get(settings),
-                REMOTE_METADATA_SERVICE_NAME_KEY to REMOTE_METADATA_SERVICE_NAME.get(settings),
-                TENANT_AWARE_KEY to "false"
-            ),
-            client.threadPool().executor(ThreadPool.Names.GENERIC)
-        )
+        val sdkClient =
+            SdkClientFactory.createSdkClient(
+                SecureIndexClient(client),
+                xContentRegistry,
+                mapOf(
+                    REMOTE_METADATA_TYPE_KEY to REMOTE_METADATA_STORE_TYPE.get(settings),
+                    REMOTE_METADATA_ENDPOINT_KEY to REMOTE_METADATA_ENDPOINT.get(settings),
+                    REMOTE_METADATA_REGION_KEY to REMOTE_METADATA_REGION.get(settings),
+                    REMOTE_METADATA_SERVICE_NAME_KEY to REMOTE_METADATA_SERVICE_NAME.get(settings),
+                    TENANT_AWARE_KEY to "false",
+                ),
+                client.threadPool().executor(ThreadPool.Names.GENERIC),
+            )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         NotificationConfigIndex.initialize(sdkClient, client, clusterService)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
@@ -149,36 +152,36 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
             ActionPlugin.ActionHandler(SendTestNotificationAction.ACTION_TYPE, SendTestNotificationAction::class.java),
             ActionPlugin.ActionHandler(
                 NotificationsActions.CREATE_NOTIFICATION_CONFIG_ACTION_TYPE,
-                CreateNotificationConfigAction::class.java
+                CreateNotificationConfigAction::class.java,
             ),
             ActionPlugin.ActionHandler(
                 NotificationsActions.UPDATE_NOTIFICATION_CONFIG_ACTION_TYPE,
-                UpdateNotificationConfigAction::class.java
+                UpdateNotificationConfigAction::class.java,
             ),
             ActionPlugin.ActionHandler(
                 NotificationsActions.DELETE_NOTIFICATION_CONFIG_ACTION_TYPE,
-                DeleteNotificationConfigAction::class.java
+                DeleteNotificationConfigAction::class.java,
             ),
             ActionPlugin.ActionHandler(
                 NotificationsActions.GET_NOTIFICATION_CONFIG_ACTION_TYPE,
-                GetNotificationConfigAction::class.java
+                GetNotificationConfigAction::class.java,
             ),
             ActionPlugin.ActionHandler(
                 NotificationsActions.GET_CHANNEL_LIST_ACTION_TYPE,
-                GetChannelListAction::class.java
+                GetChannelListAction::class.java,
             ),
             ActionPlugin.ActionHandler(
                 NotificationsActions.GET_PLUGIN_FEATURES_ACTION_TYPE,
-                GetPluginFeaturesAction::class.java
+                GetPluginFeaturesAction::class.java,
             ),
             ActionPlugin.ActionHandler(
                 NotificationsActions.SEND_NOTIFICATION_ACTION_TYPE,
-                SendNotificationAction::class.java
+                SendNotificationAction::class.java,
             ),
             ActionPlugin.ActionHandler(
                 NotificationsActions.LEGACY_PUBLISH_NOTIFICATION_ACTION_TYPE,
-                PublishNotificationAction::class.java
-            )
+                PublishNotificationAction::class.java,
+            ),
         )
     }
 
@@ -192,14 +195,14 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
         indexScopedSettings: IndexScopedSettings,
         settingsFilter: SettingsFilter,
         indexNameExpressionResolver: IndexNameExpressionResolver,
-        nodesInCluster: Supplier<DiscoveryNodes>
+        nodesInCluster: Supplier<DiscoveryNodes>,
     ): List<RestHandler> {
         log.debug("$LOG_PREFIX:getRestHandlers")
         return listOf(
             NotificationConfigRestHandler(),
             NotificationFeaturesRestHandler(),
             NotificationChannelListRestHandler(),
-            SendTestMessageRestHandler()
+            SendTestMessageRestHandler(),
             // NotificationStatsRestHandler()
         )
     }

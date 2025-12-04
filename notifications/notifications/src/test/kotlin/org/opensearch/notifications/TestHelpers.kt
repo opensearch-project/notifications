@@ -24,10 +24,12 @@ fun getJsonString(xContent: ToXContent): String {
 
 inline fun <reified CreateType> createObjectFromJsonString(
     jsonString: String,
-    block: (XContentParser) -> CreateType
+    block: (XContentParser) -> CreateType,
 ): CreateType {
-    val parser = XContentType.JSON.xContent()
-        .createParser(NamedXContentRegistry.EMPTY, DeprecationHandler.IGNORE_DEPRECATIONS, jsonString)
+    val parser =
+        XContentType.JSON
+            .xContent()
+            .createParser(NamedXContentRegistry.EMPTY, DeprecationHandler.IGNORE_DEPRECATIONS, jsonString)
     parser.nextToken()
     return block(parser)
 }

@@ -21,7 +21,6 @@ import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 
 class SecurityNotificationIT : PluginRestTestCase() {
-
     companion object {
         @BeforeClass
         @JvmStatic
@@ -38,10 +37,11 @@ class SecurityNotificationIT : PluginRestTestCase() {
     @Before
     fun create() {
         createUser(user, password, arrayOf())
-        userClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), user, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        userClient =
+            SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), user, password)
+                .setSocketTimeout(60000)
+                .setConnectionRequestTimeout(180000)
+                .build()
     }
 
     @After
@@ -55,38 +55,41 @@ class SecurityNotificationIT : PluginRestTestCase() {
 
         // Create sample config request reference
         val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
-        val referenceObject = NotificationConfig(
-            "this is a sample config name",
-            "this is a sample config description",
-            ConfigType.SLACK,
-            isEnabled = true,
-            configData = sampleSlack
-        )
+        val referenceObject =
+            NotificationConfig(
+                "this is a sample config name",
+                "this is a sample config description",
+                ConfigType.SLACK,
+                isEnabled = true,
+                configData = sampleSlack,
+            )
 
         // Create slack notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"${referenceObject.name}",
-                "description":"${referenceObject.description}",
-                "config_type":"slack",
-                "is_enabled":${referenceObject.isEnabled},
-                "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${referenceObject.name}",
+                    "description":"${referenceObject.description}",
+                    "config_type":"slack",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+                }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
             Thread.sleep(1000)
 
             // Get Slack notification config
-            val getConfigResponse = executeRequest(
-                RestRequest.Method.GET.name,
-                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
-                "",
-                RestStatus.OK.status
-            )
+            val getConfigResponse =
+                executeRequest(
+                    RestRequest.Method.GET.name,
+                    "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                    "",
+                    RestStatus.OK.status,
+                )
             verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
         } finally {
             deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
@@ -98,33 +101,35 @@ class SecurityNotificationIT : PluginRestTestCase() {
 
         // Create sample config request reference
         val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
-        val referenceObject = NotificationConfig(
-            "this is a sample config name",
-            "this is a sample config description",
-            ConfigType.SLACK,
-            isEnabled = true,
-            configData = sampleSlack
-        )
+        val referenceObject =
+            NotificationConfig(
+                "this is a sample config name",
+                "this is a sample config description",
+                ConfigType.SLACK,
+                isEnabled = true,
+                configData = sampleSlack,
+            )
 
         // Create slack notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"${referenceObject.name}",
-                "description":"${referenceObject.description}",
-                "config_type":"slack",
-                "is_enabled":${referenceObject.isEnabled},
-                "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${referenceObject.name}",
+                    "description":"${referenceObject.description}",
+                    "config_type":"slack",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+                }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
 
         executeRequest(
             RestRequest.Method.POST.name,
             "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
             createRequestJsonString,
             RestStatus.FORBIDDEN.status,
-            userClient!!
+            userClient!!,
         )
         deleteUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE)
     }
@@ -134,73 +139,79 @@ class SecurityNotificationIT : PluginRestTestCase() {
 
         // Create sample config request reference
         val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
-        val referenceObject = NotificationConfig(
-            "this is a sample config name",
-            "this is a sample config description",
-            ConfigType.SLACK,
-            isEnabled = true,
-            configData = sampleSlack
-        )
+        val referenceObject =
+            NotificationConfig(
+                "this is a sample config name",
+                "this is a sample config description",
+                ConfigType.SLACK,
+                isEnabled = true,
+                configData = sampleSlack,
+            )
 
         // Create slack notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"${referenceObject.name}",
-                "description":"${referenceObject.description}",
-                "config_type":"slack",
-                "is_enabled":${referenceObject.isEnabled},
-                "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${referenceObject.name}",
+                    "description":"${referenceObject.description}",
+                    "config_type":"slack",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+                }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
         // Get Slack notification config
-        var getConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        var getConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status,
+            )
         verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
 
-        val referenceObjectUpdate = NotificationConfig(
-            "this is a sample config name updated",
-            "this is a sample config description updated",
-            ConfigType.SLACK,
-            isEnabled = true,
-            configData = sampleSlack
-        )
-        val updateRequestJsonString = """
-        {
-            "config":{
-                "name":"${referenceObjectUpdate.name}",
-                "description":"${referenceObjectUpdate.description}",
-                "config_type":"slack",
-                "is_enabled":${referenceObjectUpdate.isEnabled},
-                "slack":{"url":"${(referenceObjectUpdate.configData as Slack).url}"}
+        val referenceObjectUpdate =
+            NotificationConfig(
+                "this is a sample config name updated",
+                "this is a sample config description updated",
+                ConfigType.SLACK,
+                isEnabled = true,
+                configData = sampleSlack,
+            )
+        val updateRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${referenceObjectUpdate.name}",
+                    "description":"${referenceObjectUpdate.description}",
+                    "config_type":"slack",
+                    "is_enabled":${referenceObjectUpdate.isEnabled},
+                    "slack":{"url":"${(referenceObjectUpdate.configData as Slack).url}"}
+                }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         executeRequest(
             RestRequest.Method.PUT.name,
             "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
             updateRequestJsonString,
             RestStatus.OK.status,
-            userClient!!
+            userClient!!,
         )
         Thread.sleep(1000)
 
         // Get Slack notification config
-        getConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        getConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status,
+            )
         verifySingleConfigEquals(configId, referenceObjectUpdate, getConfigResponse)
 
         deleteUserWithCustomRole(user, NOTIFICATION_UPDATE_CONFIG_ACCESS)
@@ -211,33 +222,35 @@ class SecurityNotificationIT : PluginRestTestCase() {
 
         // Create sample config request reference
         val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
-        val referenceObject = NotificationConfig(
-            "this is a sample config name",
-            "this is a sample config description",
-            ConfigType.SLACK,
-            isEnabled = true,
-            configData = sampleSlack
-        )
+        val referenceObject =
+            NotificationConfig(
+                "this is a sample config name",
+                "this is a sample config description",
+                ConfigType.SLACK,
+                isEnabled = true,
+                configData = sampleSlack,
+            )
 
         // Create slack notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"${referenceObject.name}",
-                "description":"${referenceObject.description}",
-                "config_type":"slack",
-                "is_enabled":${referenceObject.isEnabled},
-                "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${referenceObject.name}",
+                    "description":"${referenceObject.description}",
+                    "config_type":"slack",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+                }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
 
         executeRequest(
             RestRequest.Method.POST.name,
             "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
             createRequestJsonString,
             RestStatus.FORBIDDEN.status,
-            userClient!!
+            userClient!!,
         )
         deleteUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE)
     }
@@ -247,38 +260,41 @@ class SecurityNotificationIT : PluginRestTestCase() {
 
         // Create sample config request reference
         val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
-        val referenceObject = NotificationConfig(
-            "this is a sample config name",
-            "this is a sample config description",
-            ConfigType.SLACK,
-            isEnabled = true,
-            configData = sampleSlack
-        )
+        val referenceObject =
+            NotificationConfig(
+                "this is a sample config name",
+                "this is a sample config description",
+                ConfigType.SLACK,
+                isEnabled = true,
+                configData = sampleSlack,
+            )
 
         // Create slack notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"${referenceObject.name}",
-                "description":"${referenceObject.description}",
-                "config_type":"slack",
-                "is_enabled":${referenceObject.isEnabled},
-                "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${referenceObject.name}",
+                    "description":"${referenceObject.description}",
+                    "config_type":"slack",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+                }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
         // Get Slack notification config
-        val getConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
-            "",
-            RestStatus.OK.status,
-            userClient!!
-        )
+        val getConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status,
+                userClient!!,
+            )
         verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
         deleteUserWithCustomRole(user, NOTIFICATION_GET_CONFIG_ACCESS)
     }
@@ -293,7 +309,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             "${NotificationPlugin.PLUGIN_BASE_URI}/configs/randomConfig",
             "",
             RestStatus.FORBIDDEN.status,
-            userClient!!
+            userClient!!,
         )
         deleteUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE)
     }
@@ -303,26 +319,28 @@ class SecurityNotificationIT : PluginRestTestCase() {
 
         // Create sample config request reference
         val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
-        val referenceObject = NotificationConfig(
-            "this is a sample config name",
-            "this is a sample config description",
-            ConfigType.SLACK,
-            isEnabled = true,
-            configData = sampleSlack
-        )
+        val referenceObject =
+            NotificationConfig(
+                "this is a sample config name",
+                "this is a sample config description",
+                ConfigType.SLACK,
+                isEnabled = true,
+                configData = sampleSlack,
+            )
 
         // Create slack notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"${referenceObject.name}",
-                "description":"${referenceObject.description}",
-                "config_type":"slack",
-                "is_enabled":${referenceObject.isEnabled},
-                "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${referenceObject.name}",
+                    "description":"${referenceObject.description}",
+                    "config_type":"slack",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+                }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
@@ -335,7 +353,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             RestRequest.Method.GET.name,
             "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
             "",
-            RestStatus.NOT_FOUND.status
+            RestStatus.NOT_FOUND.status,
         )
 
         deleteUserWithCustomRole(user, NOTIFICATION_DELETE_CONFIG_ACCESS)
@@ -351,7 +369,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             "${NotificationPlugin.PLUGIN_BASE_URI}/configs/randomConfig",
             "",
             RestStatus.FORBIDDEN.status,
-            userClient!!
+            userClient!!,
         )
         deleteUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE)
     }
@@ -365,21 +383,23 @@ class SecurityNotificationIT : PluginRestTestCase() {
         val webhookId = createConfig(configType = ConfigType.WEBHOOK)
         val emailGroupId = createConfig(configType = ConfigType.EMAIL_GROUP)
         val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
-        val emailId = createConfig(
-            configType = ConfigType.EMAIL,
-            smtpAccountId = smtpAccountId,
-            emailGroupId = setOf(emailGroupId)
-        )
+        val emailId =
+            createConfig(
+                configType = ConfigType.EMAIL,
+                smtpAccountId = smtpAccountId,
+                emailGroupId = setOf(emailGroupId),
+            )
         Thread.sleep(1000)
 
         val channelIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId, emailId)
-        val response = executeRequest(
-            RestRequest.Method.GET.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/channels",
-            "",
-            RestStatus.OK.status,
-            userClient!!
-        )
+        val response =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/channels",
+                "",
+                RestStatus.OK.status,
+                userClient!!,
+            )
         Thread.sleep(100)
         verifyChannelIdEquals(channelIds, response, channelIds.size)
 
@@ -397,7 +417,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             "${NotificationPlugin.PLUGIN_BASE_URI}/channels",
             "",
             RestStatus.FORBIDDEN.status,
-            userClient!!
+            userClient!!,
         )
 
         deleteUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE)
@@ -406,13 +426,14 @@ class SecurityNotificationIT : PluginRestTestCase() {
     fun `test Get plugin features should return non-empty configTypes with get features permission`() {
         createUserWithCustomRole(user, password, NOTIFICATION_GET_PLUGIN_FEATURE_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_PLUGIN_FEATURE_ACCESS])
 
-        val getResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/features",
-            "",
-            RestStatus.OK.status,
-            userClient!!
-        )
+        val getResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/features",
+                "",
+                RestStatus.OK.status,
+                userClient!!,
+            )
         Assert.assertFalse(getResponse.get("allowed_config_type_list").asJsonArray.isEmpty)
         val pluginFeatures = getResponse.get("plugin_features").asJsonObject
         Assert.assertFalse(pluginFeatures.keySet().isEmpty())
@@ -427,7 +448,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             "${NotificationPlugin.PLUGIN_BASE_URI}/features",
             "",
             RestStatus.FORBIDDEN.status,
-            userClient!!
+            userClient!!,
         )
         deleteUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE)
     }
@@ -436,31 +457,33 @@ class SecurityNotificationIT : PluginRestTestCase() {
         createUserWithCustomRole(user, password, NOTIFICATION_TEST_SEND_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
 
         // Create webhook notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"this is a sample config name",
-                "description":"this is a sample config description",
-                "config_type":"slack",
-                "is_enabled":true,
-                "slack":{
-                    "url":"https://hooks.slack.com/services/xxx/xxx"
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"this is a sample config name",
+                    "description":"this is a sample config description",
+                    "config_type":"slack",
+                    "is_enabled":true,
+                    "slack":{
+                        "url":"https://hooks.slack.com/services/xxx/xxx"
+                    }
                 }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
         // send test message
-        val sendResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/feature/test/$configId",
-            "",
-            RestStatus.INTERNAL_SERVER_ERROR.status,
-            userClient!!
-        )
+        val sendResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/feature/test/$configId",
+                "",
+                RestStatus.INTERNAL_SERVER_ERROR.status,
+                userClient!!,
+            )
 
         // verify failure response is with message
         val error = sendResponse.get("error").asJsonObject
@@ -474,19 +497,20 @@ class SecurityNotificationIT : PluginRestTestCase() {
         createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         // Create webhook notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"this is a sample config name",
-                "description":"this is a sample config description",
-                "config_type":"slack",
-                "is_enabled":true,
-                "slack":{
-                    "url":"https://hooks.slack.com/services/xxx/xxx"
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"this is a sample config name",
+                    "description":"this is a sample config description",
+                    "config_type":"slack",
+                    "is_enabled":true,
+                    "slack":{
+                        "url":"https://hooks.slack.com/services/xxx/xxx"
+                    }
                 }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
@@ -497,7 +521,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             "${NotificationPlugin.PLUGIN_BASE_URI}/feature/test/$configId",
             "",
             RestStatus.FORBIDDEN.status,
-            userClient!!
+            userClient!!,
         )
 
         deleteUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE)

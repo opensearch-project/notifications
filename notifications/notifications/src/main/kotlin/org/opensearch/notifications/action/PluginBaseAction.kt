@@ -36,7 +36,7 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
     transportService: TransportService,
     val client: Client,
     actionFilters: ActionFilters,
-    requestReader: Writeable.Reader<ActionRequest>
+    requestReader: Writeable.Reader<ActionRequest>,
 ) : HandledTransportAction<ActionRequest, Response>(name, transportService, actionFilters, requestReader) {
     companion object {
         private val log by logger(PluginBaseAction::class.java)
@@ -50,7 +50,7 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
     override fun doExecute(
         task: Task?,
         request: ActionRequest,
-        listener: ActionListener<Response>
+        listener: ActionListener<Response>,
     ) {
         val userStr: String? =
             client.threadPool().threadContext.getTransient<String>(OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT)
@@ -72,8 +72,8 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
                 listener.onFailure(
                     OpenSearchStatusException(
                         "Permissions denied: ${exception.message} - Contact administrator",
-                        RestStatus.FORBIDDEN
-                    )
+                        RestStatus.FORBIDDEN,
+                    ),
                 )
             } catch (exception: VersionConflictEngineException) {
                 Metrics.NOTIFICATIONS_EXCEPTIONS_VERSION_CONFLICT_ENGINE_EXCEPTION.counter.increment()
@@ -113,7 +113,10 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
      * @param user the user context given by security plugin
      * @return the response to return.
      */
-    abstract suspend fun executeRequest(request: Request, user: User?): Response
+    abstract suspend fun executeRequest(
+        request: Request,
+        user: User?,
+    ): Response
 
     /**
      * Executes the given [block] function on this resource and then closes it down correctly whether an exception
@@ -145,12 +148,18 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
      * The suppressed exception is added to the list of suppressed exceptions of [cause] exception.
      */
     @Suppress("TooGenericExceptionCaught")
-    private fun ThreadContext.StoredContext.closeFinally(cause: Throwable?) = when (cause) {
-        null -> close()
-        else -> try {
-            close()
-        } catch (closeException: Throwable) {
-            cause.addSuppressed(closeException)
+    private fun ThreadContext.StoredContext.closeFinally(cause: Throwable?) =
+        when (cause) {
+            null -> {
+                close()
+            }
+
+            else -> {
+                try {
+                    close()
+                } catch (closeException: Throwable) {
+                    cause.addSuppressed(closeException)
+                }
+            }
         }
-    }
 }

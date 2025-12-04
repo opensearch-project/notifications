@@ -23,40 +23,40 @@ import org.opensearch.transport.client.Client
 /**
  * Send Notification transport action
  */
-internal class SendNotificationAction @Inject constructor(
-    transportService: TransportService,
-    client: Client,
-    actionFilters: ActionFilters,
-    val xContentRegistry: NamedXContentRegistry
-) : PluginBaseAction<SendNotificationRequest, SendNotificationResponse>(
-    NotificationsActions.SEND_NOTIFICATION_NAME,
-    transportService,
-    client,
-    actionFilters,
-    ::SendNotificationRequest
-) {
+internal class SendNotificationAction
+    @Inject
+    constructor(
+        transportService: TransportService,
+        client: Client,
+        actionFilters: ActionFilters,
+        val xContentRegistry: NamedXContentRegistry,
+    ) : PluginBaseAction<SendNotificationRequest, SendNotificationResponse>(
+            NotificationsActions.SEND_NOTIFICATION_NAME,
+            transportService,
+            client,
+            actionFilters,
+            ::SendNotificationRequest,
+        ) {
+        /**
+         * {@inheritDoc}
+         * Transform the request and call super.doExecute() to support call from other plugins.
+         */
+        override fun doExecute(
+            task: Task?,
+            request: ActionRequest,
+            listener: ActionListener<SendNotificationResponse>,
+        ) {
+            val transformedRequest =
+                request as? SendNotificationRequest
+                    ?: recreateObject(request) { SendNotificationRequest(it) }
+            super.doExecute(task, transformedRequest, listener)
+        }
 
-    /**
-     * {@inheritDoc}
-     * Transform the request and call super.doExecute() to support call from other plugins.
-     */
-    override fun doExecute(
-        task: Task?,
-        request: ActionRequest,
-        listener: ActionListener<SendNotificationResponse>
-    ) {
-        val transformedRequest = request as? SendNotificationRequest
-            ?: recreateObject(request) { SendNotificationRequest(it) }
-        super.doExecute(task, transformedRequest, listener)
+        /**
+         * {@inheritDoc}
+         */
+        override suspend fun executeRequest(
+            request: SendNotificationRequest,
+            user: User?,
+        ): SendNotificationResponse = SendMessageActionHelper.executeRequest(request)
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    override suspend fun executeRequest(
-        request: SendNotificationRequest,
-        user: User?
-    ): SendNotificationResponse {
-        return SendMessageActionHelper.executeRequest(request)
-    }
-}

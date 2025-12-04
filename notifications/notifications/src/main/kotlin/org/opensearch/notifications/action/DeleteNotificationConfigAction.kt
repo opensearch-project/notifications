@@ -23,40 +23,40 @@ import org.opensearch.transport.client.Client
 /**
  * Delete NotificationConfig transport action
  */
-internal class DeleteNotificationConfigAction @Inject constructor(
-    transportService: TransportService,
-    client: Client,
-    actionFilters: ActionFilters,
-    val xContentRegistry: NamedXContentRegistry
-) : PluginBaseAction<DeleteNotificationConfigRequest, DeleteNotificationConfigResponse>(
-    NotificationsActions.DELETE_NOTIFICATION_CONFIG_NAME,
-    transportService,
-    client,
-    actionFilters,
-    ::DeleteNotificationConfigRequest
-) {
+internal class DeleteNotificationConfigAction
+    @Inject
+    constructor(
+        transportService: TransportService,
+        client: Client,
+        actionFilters: ActionFilters,
+        val xContentRegistry: NamedXContentRegistry,
+    ) : PluginBaseAction<DeleteNotificationConfigRequest, DeleteNotificationConfigResponse>(
+            NotificationsActions.DELETE_NOTIFICATION_CONFIG_NAME,
+            transportService,
+            client,
+            actionFilters,
+            ::DeleteNotificationConfigRequest,
+        ) {
+        /**
+         * {@inheritDoc}
+         * Transform the request and call super.doExecute() to support call from other plugins.
+         */
+        override fun doExecute(
+            task: Task?,
+            request: ActionRequest,
+            listener: ActionListener<DeleteNotificationConfigResponse>,
+        ) {
+            val transformedRequest =
+                request as? DeleteNotificationConfigRequest
+                    ?: recreateObject(request) { DeleteNotificationConfigRequest(it) }
+            super.doExecute(task, transformedRequest, listener)
+        }
 
-    /**
-     * {@inheritDoc}
-     * Transform the request and call super.doExecute() to support call from other plugins.
-     */
-    override fun doExecute(
-        task: Task?,
-        request: ActionRequest,
-        listener: ActionListener<DeleteNotificationConfigResponse>
-    ) {
-        val transformedRequest = request as? DeleteNotificationConfigRequest
-            ?: recreateObject(request) { DeleteNotificationConfigRequest(it) }
-        super.doExecute(task, transformedRequest, listener)
+        /**
+         * {@inheritDoc}
+         */
+        override suspend fun executeRequest(
+            request: DeleteNotificationConfigRequest,
+            user: User?,
+        ): DeleteNotificationConfigResponse = ConfigIndexingActions.delete(request, user)
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    override suspend fun executeRequest(
-        request: DeleteNotificationConfigRequest,
-        user: User?
-    ): DeleteNotificationConfigResponse {
-        return ConfigIndexingActions.delete(request, user)
-    }
-}

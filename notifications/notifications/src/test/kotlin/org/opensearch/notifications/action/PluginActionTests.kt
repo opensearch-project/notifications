@@ -53,7 +53,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(MockitoExtension::class)
 internal class PluginActionTests {
-
     @Mock
     private lateinit var transportService: TransportService
 
@@ -82,12 +81,13 @@ internal class PluginActionTests {
             }
         } returns response
 
-        val createNotificationConfigAction = CreateNotificationConfigAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
-        )
+        val createNotificationConfigAction =
+            CreateNotificationConfigAction(
+                transportService,
+                client,
+                actionFilters,
+                xContentRegistry,
+            )
         createNotificationConfigAction.execute(task, request, AssertionListener(response))
     }
 
@@ -105,21 +105,23 @@ internal class PluginActionTests {
             }
         } returns response
 
-        val updateNotificationConfigAction = UpdateNotificationConfigAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
-        )
+        val updateNotificationConfigAction =
+            UpdateNotificationConfigAction(
+                transportService,
+                client,
+                actionFilters,
+                xContentRegistry,
+            )
         updateNotificationConfigAction.execute(task, request, AssertionListener(response))
     }
 
     @Test
     fun `Delete notification config action should call back action listener`() {
         val request = mock(DeleteNotificationConfigRequest::class.java)
-        val response = DeleteNotificationConfigResponse(
-            mapOf(Pair("sample_config_id", RestStatus.OK))
-        )
+        val response =
+            DeleteNotificationConfigResponse(
+                mapOf(Pair("sample_config_id", RestStatus.OK)),
+            )
 
         // Mock singleton's method by mockk framework
         mockkObject(ConfigIndexingActions)
@@ -129,21 +131,23 @@ internal class PluginActionTests {
             }
         } returns response
 
-        val deleteNotificationConfigAction = DeleteNotificationConfigAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
-        )
+        val deleteNotificationConfigAction =
+            DeleteNotificationConfigAction(
+                transportService,
+                client,
+                actionFilters,
+                xContentRegistry,
+            )
         deleteNotificationConfigAction.execute(task, request, AssertionListener(response))
     }
 
     @Test
     fun `Get notification config action should call back action listener`() {
         val request = mock(GetNotificationConfigRequest::class.java)
-        val response = GetNotificationConfigResponse(
-            mock(NotificationConfigSearchResult::class.java)
-        )
+        val response =
+            GetNotificationConfigResponse(
+                mock(NotificationConfigSearchResult::class.java),
+            )
 
         // Mock singleton's method by mockk framework
         mockkObject(ConfigIndexingActions)
@@ -153,12 +157,13 @@ internal class PluginActionTests {
             }
         } returns response
 
-        val getNotificationConfigAction = GetNotificationConfigAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
-        )
+        val getNotificationConfigAction =
+            GetNotificationConfigAction(
+                transportService,
+                client,
+                actionFilters,
+                xContentRegistry,
+            )
         getNotificationConfigAction.execute(task, request, AssertionListener(response))
     }
 
@@ -169,12 +174,13 @@ internal class PluginActionTests {
         val request = mock(GetPluginFeaturesRequest::class.java)
         val response = GetPluginFeaturesResponse(allowedConfigTypes, pluginFeatures)
 
-        val getPluginFeaturesAction = GetPluginFeaturesAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
-        )
+        val getPluginFeaturesAction =
+            GetPluginFeaturesAction(
+                transportService,
+                client,
+                actionFilters,
+                xContentRegistry,
+            )
         getPluginFeaturesAction.execute(task, request, AssertionListener(response))
     }
 
@@ -191,12 +197,13 @@ internal class PluginActionTests {
             }
         } returns response
 
-        val getChannelListAction = GetChannelListAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
-        )
+        val getChannelListAction =
+            GetChannelListAction(
+                transportService,
+                client,
+                actionFilters,
+                xContentRegistry,
+            )
         getChannelListAction.execute(task, request, AssertionListener(response))
     }
 
@@ -205,17 +212,19 @@ internal class PluginActionTests {
         val notificationId = "notification-1"
         val request = mock(SendNotificationRequest::class.java)
 
-        val sampleEventSource = EventSource(
-            "title",
-            "reference_id",
-            severity = SeverityType.INFO
-        )
-        val sampleStatus = EventStatus(
-            "config_id",
-            "name",
-            ConfigType.SLACK,
-            deliveryStatus = DeliveryStatus("404", "invalid recipient")
-        )
+        val sampleEventSource =
+            EventSource(
+                "title",
+                "reference_id",
+                severity = SeverityType.INFO,
+            )
+        val sampleStatus =
+            EventStatus(
+                "config_id",
+                "name",
+                ConfigType.SLACK,
+                deliveryStatus = DeliveryStatus("404", "invalid recipient"),
+            )
 
         val sampleEvent = NotificationEvent(sampleEventSource, listOf(sampleStatus))
 
@@ -229,32 +238,39 @@ internal class PluginActionTests {
             }
         } returns response
 
-        val sendNotificationAction = SendNotificationAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
-        )
+        val sendNotificationAction =
+            SendNotificationAction(
+                transportService,
+                client,
+                actionFilters,
+                xContentRegistry,
+            )
         sendNotificationAction.execute(task, request, AssertionListener(response))
     }
 
     @Test
     fun `Publish notification action should call back action listener`() {
         val request = mock(LegacyPublishNotificationRequest::class.java)
-        val response = LegacyPublishNotificationResponse(
-            LegacyDestinationResponse.Builder().withStatusCode(200).withResponseContent("Hello world").build()
-        )
+        val response =
+            LegacyPublishNotificationResponse(
+                LegacyDestinationResponse
+                    .Builder()
+                    .withStatusCode(200)
+                    .withResponseContent("Hello world")
+                    .build(),
+            )
 
         // Mock singleton's method by mockk framework
         mockkObject(SendMessageActionHelper)
         every { SendMessageActionHelper.executeLegacyRequest(request) } returns response
 
-        val publishNotificationAction = PublishNotificationAction(
-            transportService,
-            client,
-            actionFilters,
-            xContentRegistry
-        )
+        val publishNotificationAction =
+            PublishNotificationAction(
+                transportService,
+                client,
+                actionFilters,
+                xContentRegistry,
+            )
         publishNotificationAction.execute(task, request, AssertionListener(response))
     }
 
@@ -264,9 +280,8 @@ internal class PluginActionTests {
      * (verify listener being called once) due to CoroutineScope used in execute()
      */
     private class AssertionListener<Response : BaseResponse>(
-        val expected: Response
+        val expected: Response,
     ) : ActionListener<Response> {
-
         override fun onResponse(actual: Response?) {
             assertEquals(expected, actual)
         }

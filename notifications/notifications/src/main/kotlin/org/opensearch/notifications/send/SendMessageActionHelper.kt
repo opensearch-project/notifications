@@ -67,7 +67,10 @@ object SendMessageActionHelper {
     private lateinit var configOperations: ConfigOperations
     private lateinit var userAccess: UserAccess
 
-    fun initialize(configOperations: ConfigOperations, userAccess: UserAccess) {
+    fun initialize(
+        configOperations: ConfigOperations,
+        userAccess: UserAccess,
+    ) {
         this.configOperations = configOperations
         this.userAccess = userAccess
     }
@@ -100,7 +103,7 @@ object SendMessageActionHelper {
             val errorMessage = "{\"event_status_list\": $eventStatusListString}"
             throw OpenSearchStatusException(
                 errorMessage,
-                RestStatus.fromCode(overallStatusCode!!.toInt())
+                RestStatus.fromCode(overallStatusCode!!.toInt()),
             )
         }
 
@@ -126,17 +129,19 @@ object SendMessageActionHelper {
      * @param channelMessage channel message of request
      * @return created message content object
      */
-    private fun createMessageContent(eventSource: EventSource, channelMessage: ChannelMessage): MessageContent {
-        return MessageContent(
+    private fun createMessageContent(
+        eventSource: EventSource,
+        channelMessage: ChannelMessage,
+    ): MessageContent =
+        MessageContent(
             eventSource.title,
             channelMessage.textDescription,
             channelMessage.htmlDescription,
             channelMessage.attachment?.fileName,
             channelMessage.attachment?.fileEncoding,
             channelMessage.attachment?.fileData,
-            channelMessage.attachment?.fileContentType
+            channelMessage.attachment?.fileContentType,
         )
-    }
 
     /**
      * Send message to multiple channels in parallel
@@ -151,14 +156,15 @@ object SendMessageActionHelper {
         eventSource: EventSource,
         channelMap: Map<String, NotificationConfigDocInfo?>,
         childConfigMap: Map<String, NotificationConfigDocInfo?>,
-        message: MessageContent
+        message: MessageContent,
     ): List<EventStatus> {
         val statusList: List<EventStatus>
         // Fire all the message sending in parallel
         runBlocking {
-            val statusDeferredList = channelMap.map {
-                async(Dispatchers.IO) { sendMessageToChannel(user, eventSource, it, childConfigMap, message) }
-            }
+            val statusDeferredList =
+                channelMap.map {
+                    async(Dispatchers.IO) { sendMessageToChannel(user, eventSource, it, childConfigMap, message) }
+                }
             statusList = statusDeferredList.awaitAll()
         }
         return statusList
@@ -177,7 +183,7 @@ object SendMessageActionHelper {
         eventSource: EventSource,
         channelEntry: Map.Entry<String, NotificationConfigDocInfo?>,
         childConfigMap: Map<String, NotificationConfigDocInfo?>,
-        message: MessageContent
+        message: MessageContent,
     ): EventStatus {
         Metrics.NOTIFICATIONS_SEND_MESSAGE_TOTAL.counter.increment()
         Metrics.NOTIFICATIONS_SEND_MESSAGE_INTERVAL_COUNT.counter.increment()
@@ -188,16 +194,21 @@ object SendMessageActionHelper {
                 "invalid-config",
                 ConfigType.NONE,
                 listOf(),
-                DeliveryStatus(RestStatus.NOT_FOUND.status.toString(), "Channel ${channelEntry.key} not found")
+                DeliveryStatus(RestStatus.NOT_FOUND.status.toString(), "Channel ${channelEntry.key} not found"),
             )
-        } else if (!userAccess.doesUserHaveAccess(user, channelEntry.value!!.configDoc.metadata.access)) {
+        } else if (!userAccess.doesUserHaveAccess(
+                user,
+                channelEntry.value!!
+                    .configDoc.metadata.access,
+            )
+        ) {
             Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
             return EventStatus(
                 channelEntry.key,
                 "invalid-access",
                 ConfigType.NONE,
                 listOf(),
-                DeliveryStatus(RestStatus.FORBIDDEN.status.toString(), "Access denied for channel ${channelEntry.key}")
+                DeliveryStatus(RestStatus.FORBIDDEN.status.toString(), "Access denied for channel ${channelEntry.key}"),
             )
         }
         val channel = channelEntry.value!!
@@ -209,46 +220,77 @@ object SendMessageActionHelper {
                 listOf(
                     EmailRecipientStatus(
                         "placeholder@example.com",
-                        DeliveryStatus("Scheduled", "Pending execution")
-                    )
+                        DeliveryStatus("Scheduled", "Pending execution"),
+                    ),
                 )
         }
-        val eventStatus = EventStatus(
-            channel.docInfo.id!!, // ID from query so not expected to be null
-            channel.configDoc.config.name,
-            channel.configDoc.config.configType,
-            emailRecipientStatus,
-            DeliveryStatus("Scheduled", "Pending execution")
-        )
+        val eventStatus =
+            EventStatus(
+                channel.docInfo.id!!, // ID from query so not expected to be null
+                channel.configDoc.config.name,
+                channel.configDoc.config.configType,
+                emailRecipientStatus,
+                DeliveryStatus("Scheduled", "Pending execution"),
+            )
         val invalidStatus: DeliveryStatus? = getStatusIfChannelIsNotEligibleToSendMessage(channel)
         if (invalidStatus != null) {
             return eventStatus.copy(deliveryStatus = invalidStatus)
         }
 
-        val response = when (configType) {
-            ConfigType.NONE -> null
-            ConfigType.SLACK -> sendSlackMessage(configData as Slack, message, eventStatus, eventSource.referenceId)
-            ConfigType.CHIME -> sendChimeMessage(configData as Chime, message, eventStatus, eventSource.referenceId)
-            ConfigType.MICROSOFT_TEAMS -> sendMicrosoftTeamsMessage(configData as MicrosoftTeams, message, eventStatus, eventSource.referenceId)
-            ConfigType.WEBHOOK -> sendWebhookMessage(
-                configData as Webhook,
-                message,
-                eventStatus,
-                eventSource.referenceId
-            )
-            ConfigType.EMAIL -> sendEmailMessage(
-                user,
-                configData as Email,
-                childConfigMap,
-                message,
-                eventStatus,
-                eventSource.referenceId
-            )
-            ConfigType.SES_ACCOUNT -> null
-            ConfigType.SMTP_ACCOUNT -> null
-            ConfigType.EMAIL_GROUP -> null
-            ConfigType.SNS -> sendSNSMessage(configData as Sns, message, eventStatus, eventSource.referenceId)
-        }
+        val response =
+            when (configType) {
+                ConfigType.NONE -> {
+                    null
+                }
+
+                ConfigType.SLACK -> {
+                    sendSlackMessage(configData as Slack, message, eventStatus, eventSource.referenceId)
+                }
+
+                ConfigType.CHIME -> {
+                    sendChimeMessage(configData as Chime, message, eventStatus, eventSource.referenceId)
+                }
+
+                ConfigType.MICROSOFT_TEAMS -> {
+                    sendMicrosoftTeamsMessage(configData as MicrosoftTeams, message, eventStatus, eventSource.referenceId)
+                }
+
+                ConfigType.WEBHOOK -> {
+                    sendWebhookMessage(
+                        configData as Webhook,
+                        message,
+                        eventStatus,
+                        eventSource.referenceId,
+                    )
+                }
+
+                ConfigType.EMAIL -> {
+                    sendEmailMessage(
+                        user,
+                        configData as Email,
+                        childConfigMap,
+                        message,
+                        eventStatus,
+                        eventSource.referenceId,
+                    )
+                }
+
+                ConfigType.SES_ACCOUNT -> {
+                    null
+                }
+
+                ConfigType.SMTP_ACCOUNT -> {
+                    null
+                }
+
+                ConfigType.EMAIL_GROUP -> {
+                    null
+                }
+
+                ConfigType.SNS -> {
+                    sendSNSMessage(configData as Sns, message, eventStatus, eventSource.referenceId)
+                }
+            }
         return if (response == null) {
             log.warn("Cannot send message to destination for config id :${channel.docInfo.id}")
             Metrics.NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND.counter.increment()
@@ -277,48 +319,64 @@ object SendMessageActionHelper {
             LegacyDestinationType.LEGACY_SLACK -> {
                 val destination = SlackDestination(baseMessage.url)
                 val status = sendMessageThroughSpi(destination, message, "legacy")
-                LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
-                    .withResponseContent(status.statusText).build()
+                LegacyDestinationResponse
+                    .Builder()
+                    .withStatusCode(status.statusCode)
+                    .withResponseContent(status.statusText)
+                    .build()
             }
+
             LegacyDestinationType.LEGACY_CHIME -> {
                 val destination = ChimeDestination(baseMessage.url)
                 val status = sendMessageThroughSpi(destination, message, "legacy")
-                LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
-                    .withResponseContent(status.statusText).build()
+                LegacyDestinationResponse
+                    .Builder()
+                    .withStatusCode(status.statusCode)
+                    .withResponseContent(status.statusText)
+                    .build()
             }
+
             LegacyDestinationType.LEGACY_CUSTOM_WEBHOOK -> {
-                val destination = CustomWebhookDestination(
-                    (baseMessage as LegacyCustomWebhookMessage).uri.toString(),
-                    baseMessage.headerParams,
-                    baseMessage.method
-                )
+                val destination =
+                    CustomWebhookDestination(
+                        (baseMessage as LegacyCustomWebhookMessage).uri.toString(),
+                        baseMessage.headerParams,
+                        baseMessage.method,
+                    )
                 val status = sendMessageThroughSpi(destination, message, "legacy")
-                LegacyDestinationResponse.Builder().withStatusCode(status.statusCode)
-                    .withResponseContent(status.statusText).build()
+                LegacyDestinationResponse
+                    .Builder()
+                    .withStatusCode(status.statusCode)
+                    .withResponseContent(status.statusText)
+                    .build()
             }
+
             LegacyDestinationType.LEGACY_EMAIL -> {
                 val recipients = (baseMessage as LegacyEmailMessage).recipients
                 // The naming is a little confusing but need to use the subject from LegacyEmailMessage as the title,
                 // so it appears as the subject of the email
                 message = MessageContent(title = baseMessage.subject, textDescription = baseMessage.messageContent)
                 runBlocking {
-                    val emailRecipientStatus: List<EmailRecipientStatus> = recipients.map {
-                        async(Dispatchers.IO) {
-                            val destination = SmtpDestination(
-                                baseMessage.accountName,
-                                baseMessage.host,
-                                baseMessage.port,
-                                baseMessage.method,
-                                baseMessage.from,
-                                it
-                            )
-                            val status = sendMessageThroughSpi(destination, message, "legacy")
-                            EmailRecipientStatus(
-                                it,
-                                DeliveryStatus(status.statusCode.toString(), status.statusText)
-                            )
-                        }
-                    }.awaitAll()
+                    val emailRecipientStatus: List<EmailRecipientStatus> =
+                        recipients
+                            .map {
+                                async(Dispatchers.IO) {
+                                    val destination =
+                                        SmtpDestination(
+                                            baseMessage.accountName,
+                                            baseMessage.host,
+                                            baseMessage.port,
+                                            baseMessage.method,
+                                            baseMessage.from,
+                                            it,
+                                        )
+                                    val status = sendMessageThroughSpi(destination, message, "legacy")
+                                    EmailRecipientStatus(
+                                        it,
+                                        DeliveryStatus(status.statusCode.toString(), status.statusText),
+                                    )
+                                }
+                            }.awaitAll()
 
                     val firstStatus = emailRecipientStatus.first()
                     var overallStatus = firstStatus.deliveryStatus.statusCode
@@ -331,19 +389,30 @@ object SendMessageActionHelper {
                             overallStatusText = "Errors"
                         }
                     }
-                    LegacyDestinationResponse.Builder().withStatusCode(overallStatus.toInt())
-                        .withResponseContent(overallStatusText).build()
+                    LegacyDestinationResponse
+                        .Builder()
+                        .withStatusCode(overallStatus.toInt())
+                        .withResponseContent(overallStatusText)
+                        .build()
                 }
             }
+
             LegacyDestinationType.LEGACY_SNS -> {
                 log.warn("Channel type given (sns) for publishing to legacy destination currently not supported")
-                LegacyDestinationResponse.Builder().withStatusCode(400)
-                    .withResponseContent("Channel type given (sns) for publishing to legacy destination not supported").build()
+                LegacyDestinationResponse
+                    .Builder()
+                    .withStatusCode(400)
+                    .withResponseContent("Channel type given (sns) for publishing to legacy destination not supported")
+                    .build()
             }
+
             null -> {
                 log.warn("No channel type given (null) for publishing to legacy destination")
-                LegacyDestinationResponse.Builder().withStatusCode(400)
-                    .withResponseContent("No channel type given (null) for publishing to legacy destination").build()
+                LegacyDestinationResponse
+                    .Builder()
+                    .withStatusCode(400)
+                    .withResponseContent("No channel type given (null) for publishing to legacy destination")
+                    .build()
             }
         }
     }
@@ -354,14 +423,13 @@ object SendMessageActionHelper {
      * @return null if channel is eligible to send message. error delivery status if not
      */
     private fun getStatusIfChannelIsNotEligibleToSendMessage(
-        channel: NotificationConfigDocInfo
-    ): DeliveryStatus? {
-        return if (!channel.configDoc.config.isEnabled) {
+        channel: NotificationConfigDocInfo,
+    ): DeliveryStatus? =
+        if (!channel.configDoc.config.isEnabled) {
             DeliveryStatus(RestStatus.LOCKED.name, "The channel is muted")
         } else {
             null
         }
-    }
 
     /**
      * send message to slack destination
@@ -370,7 +438,7 @@ object SendMessageActionHelper {
         slack: Slack,
         message: MessageContent,
         eventStatus: EventStatus,
-        referenceId: String
+        referenceId: String,
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SLACK.counter.increment()
         val destination = SlackDestination(slack.url)
@@ -385,7 +453,7 @@ object SendMessageActionHelper {
         chime: Chime,
         message: MessageContent,
         eventStatus: EventStatus,
-        referenceId: String
+        referenceId: String,
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_CHIME.counter.increment()
         val destination = ChimeDestination(chime.url)
@@ -400,7 +468,7 @@ object SendMessageActionHelper {
         microsoftTeams: MicrosoftTeams,
         message: MessageContent,
         eventStatus: EventStatus,
-        referenceId: String
+        referenceId: String,
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_MICROSOFT_TEAMS.counter.increment()
         val destination = MicrosoftTeamsDestination(microsoftTeams.url)
@@ -415,7 +483,7 @@ object SendMessageActionHelper {
         webhook: Webhook,
         message: MessageContent,
         eventStatus: EventStatus,
-        referenceId: String
+        referenceId: String,
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_WEBHOOK.counter.increment()
         val destination = CustomWebhookDestination(webhook.url, webhook.headerParams, webhook.method.tag)
@@ -432,7 +500,7 @@ object SendMessageActionHelper {
         childConfigMap: Map<String, NotificationConfigDocInfo?>,
         message: MessageContent,
         eventStatus: EventStatus,
-        referenceId: String
+        referenceId: String,
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_EMAIL.counter.increment()
         val accountDocInfo = childConfigMap[email.emailAccountID]
@@ -440,67 +508,84 @@ object SendMessageActionHelper {
             Metrics.NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND.counter.increment()
             return eventStatus.copy(
                 emailRecipientStatus = listOf(),
-                deliveryStatus = DeliveryStatus(
-                    RestStatus.NOT_FOUND.status.toString(),
-                    "Sender ${email.emailAccountID} not found"
-                )
+                deliveryStatus =
+                    DeliveryStatus(
+                        RestStatus.NOT_FOUND.status.toString(),
+                        "Sender ${email.emailAccountID} not found",
+                    ),
             )
         } else if (!userAccess.doesUserHaveAccess(user, accountDocInfo.configDoc.metadata.access)) {
             Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
             return eventStatus.copy(
                 emailRecipientStatus = listOf(),
-                deliveryStatus = DeliveryStatus(
-                    RestStatus.FORBIDDEN.status.toString(),
-                    "Access denied for sender ${accountDocInfo.docInfo.id}"
-                )
+                deliveryStatus =
+                    DeliveryStatus(
+                        RestStatus.FORBIDDEN.status.toString(),
+                        "Access denied for sender ${accountDocInfo.docInfo.id}",
+                    ),
             )
         }
-        val accessDeniedGroupIds = childConfigMap.filterValues {
-            it != null && !userAccess.doesUserHaveAccess(user, it.configDoc.metadata.access)
-        }.keys
+        val accessDeniedGroupIds =
+            childConfigMap
+                .filterValues {
+                    it != null && !userAccess.doesUserHaveAccess(user, it.configDoc.metadata.access)
+                }.keys
         val invalidGroupIds = childConfigMap.filterValues { it == null }.keys
-        val groups = childConfigMap.values.filterNotNull()
-            .filter { email.emailGroupIds.contains(it.docInfo.id) && !accessDeniedGroupIds.contains(it.docInfo.id) }
+        val groups =
+            childConfigMap.values
+                .filterNotNull()
+                .filter { email.emailGroupIds.contains(it.docInfo.id) && !accessDeniedGroupIds.contains(it.docInfo.id) }
         val groupRecipients = groups.map { (it.configDoc.config.configData as EmailGroup).recipients }.flatten()
         val recipients = email.recipients.union(groupRecipients)
         val emailRecipientStatus: List<EmailRecipientStatus>
         val accountConfig = accountDocInfo.configDoc.config
         runBlocking {
-            val statusDeferredList = recipients.map {
-                async(Dispatchers.IO) {
-                    when (accountConfig.configType) {
-                        ConfigType.SMTP_ACCOUNT -> sendEmailFromSmtpAccount(
-                            accountConfig.name,
-                            accountConfig.configData as SmtpAccount,
-                            it.recipient,
-                            message,
-                            referenceId
-                        )
-                        ConfigType.SES_ACCOUNT -> sendEmailFromSesAccount(
-                            accountConfig.name,
-                            accountConfig.configData as SesAccount,
-                            it.recipient,
-                            message,
-                            referenceId
-                        )
-                        else -> EmailRecipientStatus(
-                            it.recipient,
-                            DeliveryStatus(RestStatus.NOT_ACCEPTABLE.name, "email account type not enabled")
-                        )
+            val statusDeferredList =
+                recipients.map {
+                    async(Dispatchers.IO) {
+                        when (accountConfig.configType) {
+                            ConfigType.SMTP_ACCOUNT -> {
+                                sendEmailFromSmtpAccount(
+                                    accountConfig.name,
+                                    accountConfig.configData as SmtpAccount,
+                                    it.recipient,
+                                    message,
+                                    referenceId,
+                                )
+                            }
+
+                            ConfigType.SES_ACCOUNT -> {
+                                sendEmailFromSesAccount(
+                                    accountConfig.name,
+                                    accountConfig.configData as SesAccount,
+                                    it.recipient,
+                                    message,
+                                    referenceId,
+                                )
+                            }
+
+                            else -> {
+                                EmailRecipientStatus(
+                                    it.recipient,
+                                    DeliveryStatus(RestStatus.NOT_ACCEPTABLE.name, "email account type not enabled"),
+                                )
+                            }
+                        }
                     }
                 }
-            }
-            emailRecipientStatus = statusDeferredList.awaitAll() + invalidGroupIds.map {
-                EmailRecipientStatus(
-                    "unknown-recipient@example.com",
-                    DeliveryStatus(RestStatus.NOT_FOUND.status.toString(), "Recipient $it not found")
-                )
-            } + accessDeniedGroupIds.map {
-                EmailRecipientStatus(
-                    "invalid-access@example.com",
-                    DeliveryStatus(RestStatus.FORBIDDEN.status.toString(), "Access denied for recipient $it")
-                )
-            }
+            emailRecipientStatus = statusDeferredList.awaitAll() +
+                invalidGroupIds.map {
+                    EmailRecipientStatus(
+                        "unknown-recipient@example.com",
+                        DeliveryStatus(RestStatus.NOT_FOUND.status.toString(), "Recipient $it not found"),
+                    )
+                } +
+                accessDeniedGroupIds.map {
+                    EmailRecipientStatus(
+                        "invalid-access@example.com",
+                        DeliveryStatus(RestStatus.FORBIDDEN.status.toString(), "Access denied for recipient $it"),
+                    )
+                }
         }
         val firstStatus = emailRecipientStatus.first()
         var overallStatus = firstStatus.deliveryStatus.statusCode
@@ -515,7 +600,7 @@ object SendMessageActionHelper {
         }
         return eventStatus.copy(
             emailRecipientStatus = emailRecipientStatus,
-            deliveryStatus = DeliveryStatus(overallStatus, overallStatusText)
+            deliveryStatus = DeliveryStatus(overallStatus, overallStatusText),
         )
     }
 
@@ -527,21 +612,22 @@ object SendMessageActionHelper {
         smtpAccount: SmtpAccount,
         recipient: String,
         message: MessageContent,
-        referenceId: String
+        referenceId: String,
     ): EmailRecipientStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SMTP_ACCOUNT.counter.increment()
-        val destination = SmtpDestination(
-            accountName,
-            smtpAccount.host,
-            smtpAccount.port,
-            smtpAccount.method.tag,
-            smtpAccount.fromAddress,
-            recipient
-        )
+        val destination =
+            SmtpDestination(
+                accountName,
+                smtpAccount.host,
+                smtpAccount.port,
+                smtpAccount.method.tag,
+                smtpAccount.fromAddress,
+                recipient,
+            )
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return EmailRecipientStatus(
             recipient,
-            DeliveryStatus(status.statusCode.toString(), status.statusText)
+            DeliveryStatus(status.statusCode.toString(), status.statusText),
         )
     }
 
@@ -553,20 +639,21 @@ object SendMessageActionHelper {
         sesAccount: SesAccount,
         recipient: String,
         message: MessageContent,
-        referenceId: String
+        referenceId: String,
     ): EmailRecipientStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SES_ACCOUNT.counter.increment()
-        val destination = SesDestination(
-            accountName,
-            sesAccount.awsRegion,
-            sesAccount.roleArn,
-            sesAccount.fromAddress,
-            recipient
-        )
+        val destination =
+            SesDestination(
+                accountName,
+                sesAccount.awsRegion,
+                sesAccount.roleArn,
+                sesAccount.fromAddress,
+                recipient,
+            )
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return EmailRecipientStatus(
             recipient,
-            DeliveryStatus(status.statusCode.toString(), status.statusText)
+            DeliveryStatus(status.statusCode.toString(), status.statusText),
         )
     }
 
@@ -577,7 +664,7 @@ object SendMessageActionHelper {
         sns: Sns,
         message: MessageContent,
         eventStatus: EventStatus,
-        referenceId: String
+        referenceId: String,
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SNS.counter.increment()
         val destination = SnsDestination(sns.topicArn, sns.roleArn)
@@ -592,9 +679,9 @@ object SendMessageActionHelper {
     private fun sendMessageThroughSpi(
         destination: BaseDestination,
         message: MessageContent,
-        referenceId: String
-    ): DestinationMessageResponse {
-        return try {
+        referenceId: String,
+    ): DestinationMessageResponse =
+        try {
             val status = CoreProvider.core.sendMessage(destination, message, referenceId)
             log.info("$LOG_PREFIX:sendMessage:statusCode=${status.statusCode}, statusText=${status.statusText}")
             status
@@ -602,7 +689,6 @@ object SendMessageActionHelper {
             log.warn("sendMessage Exception:$exception")
             DestinationMessageResponse(RestStatus.FAILED_DEPENDENCY.status, "Failed to send notification")
         }
-    }
 
     /**
      * Collects all child configs of the channel configurations (like email)
@@ -629,13 +715,12 @@ object SendMessageActionHelper {
      * @param configIds config id set
      * @return map of config id to [NotificationConfigDocInfo]
      */
-    private suspend fun getConfigs(configIds: Set<String>): Map<String, NotificationConfigDocInfo?> {
-        return when (configIds.size) {
+    private suspend fun getConfigs(configIds: Set<String>): Map<String, NotificationConfigDocInfo?> =
+        when (configIds.size) {
             0 -> emptyMap()
             1 -> getSingleConfig(configIds.first())
             else -> getAllConfigs(configIds)
         }
-    }
 
     /**
      * Get NotificationConfig info

@@ -21,101 +21,115 @@ import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 
 class SlackNotificationConfigCrudIT : PluginRestTestCase() {
-
     fun `test Create, Get, Update, Delete slack notification config using REST client`() {
         // Create sample config request reference
         val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
-        val referenceObject = NotificationConfig(
-            "this is a sample config name",
-            "this is a sample config description",
-            ConfigType.SLACK,
-            isEnabled = true,
-            configData = sampleSlack
-        )
+        val referenceObject =
+            NotificationConfig(
+                "this is a sample config name",
+                "this is a sample config description",
+                ConfigType.SLACK,
+                isEnabled = true,
+                configData = sampleSlack,
+            )
 
         // Create slack notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"${referenceObject.name}",
-                "description":"${referenceObject.description}",
-                "config_type":"slack",
-                "is_enabled":${referenceObject.isEnabled},
-                "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${referenceObject.name}",
+                    "description":"${referenceObject.description}",
+                    "config_type":"slack",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+                }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
         // Get Slack notification config
 
-        val getConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        val getConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs/$configId",
+                "",
+                RestStatus.OK.status,
+            )
         verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
         Thread.sleep(100)
 
         // Get all notification config
 
-        val getAllConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs",
-            "",
-            RestStatus.OK.status
-        )
+        val getAllConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs",
+                "",
+                RestStatus.OK.status,
+            )
         verifySingleConfigEquals(configId, referenceObject, getAllConfigResponse)
         Thread.sleep(100)
 
         // Updated notification config object
         val updatedSlack = Slack("https://hooks.slack.com/services/updated_slack_url")
-        val updatedObject = NotificationConfig(
-            "this is a updated config name",
-            "this is a updated config description",
-            ConfigType.SLACK,
-            isEnabled = true,
-            configData = updatedSlack
-        )
+        val updatedObject =
+            NotificationConfig(
+                "this is a updated config name",
+                "this is a updated config description",
+                ConfigType.SLACK,
+                isEnabled = true,
+                configData = updatedSlack,
+            )
 
         // Update slack notification config
-        val updateRequestJsonString = """
-        {
-            "config":{
-                "name":"${updatedObject.name}",
-                "description":"${updatedObject.description}",
-                "config_type":"slack",
-                "is_enabled":${updatedObject.isEnabled},
-                "slack":{"url":"${(updatedObject.configData as Slack).url}"}
+        val updateRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${updatedObject.name}",
+                    "description":"${updatedObject.description}",
+                    "config_type":"slack",
+                    "is_enabled":${updatedObject.isEnabled},
+                    "slack":{"url":"${(updatedObject.configData as Slack).url}"}
+                }
             }
-        }
-        """.trimIndent()
-        val updateResponse = executeRequest(
-            RestRequest.Method.PUT.name,
-            "$PLUGIN_BASE_URI/configs/$configId",
-            updateRequestJsonString,
-            RestStatus.OK.status
-        )
+            """.trimIndent()
+        val updateResponse =
+            executeRequest(
+                RestRequest.Method.PUT.name,
+                "$PLUGIN_BASE_URI/configs/$configId",
+                updateRequestJsonString,
+                RestStatus.OK.status,
+            )
         Assert.assertEquals(configId, updateResponse.get("config_id").asString)
         Thread.sleep(1000)
 
         // Get updated Slack notification config
 
-        val getUpdatedConfigResponse = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/configs/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        val getUpdatedConfigResponse =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/configs/$configId",
+                "",
+                RestStatus.OK.status,
+            )
         verifySingleConfigEquals(configId, updatedObject, getUpdatedConfigResponse)
         Thread.sleep(100)
 
         // Delete slack notification config
         val deleteResponse = deleteConfig(configId)
-        Assert.assertEquals("OK", deleteResponse.get("delete_response_list").asJsonObject.get(configId).asString)
+        Assert.assertEquals(
+            "OK",
+            deleteResponse
+                .get("delete_response_list")
+                .asJsonObject
+                .get(configId)
+                .asString,
+        )
         Thread.sleep(1000)
 
         // Get slack notification config after delete
@@ -124,7 +138,7 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
             RestRequest.Method.GET.name,
             "$PLUGIN_BASE_URI/configs/$configId",
             "",
-            RestStatus.NOT_FOUND.status
+            RestStatus.NOT_FOUND.status,
         )
         Thread.sleep(100)
     }
@@ -132,68 +146,73 @@ class SlackNotificationConfigCrudIT : PluginRestTestCase() {
     fun `test Bad Request for multiple config data for Slack using REST Client`() {
         // Create sample config request reference
         val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
-        val referenceObject = NotificationConfig(
-            "this is a sample config name",
-            "this is a sample config description",
-            ConfigType.SLACK,
-            isEnabled = true,
-            configData = sampleSlack
-        )
+        val referenceObject =
+            NotificationConfig(
+                "this is a sample config name",
+                "this is a sample config description",
+                ConfigType.SLACK,
+                isEnabled = true,
+                configData = sampleSlack,
+            )
 
         // Create slack notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"${referenceObject.name}",
-                "description":"${referenceObject.description}",
-                "config_type":"slack",
-                "is_enabled":${referenceObject.isEnabled},
-                "chime":{"url":"https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456"}
-                "slack":{"url":"${(referenceObject.configData as Slack).url}
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${referenceObject.name}",
+                    "description":"${referenceObject.description}",
+                    "config_type":"slack",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "chime":{"url":"https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456"}
+                    "slack":{"url":"${(referenceObject.configData as Slack).url}
+                }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         executeRequest(
             RestRequest.Method.POST.name,
             "$PLUGIN_BASE_URI/configs",
             createRequestJsonString,
-            RestStatus.BAD_REQUEST.status
+            RestStatus.BAD_REQUEST.status,
         )
     }
 
     fun `test create config with wrong Slack url and get error text`() {
         val sampleSlack = Slack("https://webhook.slack.com/services/sample_slack_url")
-        val referenceObject = NotificationConfig(
-            "this is a sample config name",
-            "this is a sample config description",
-            ConfigType.SLACK,
-            isEnabled = true,
-            configData = sampleSlack
-        )
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"${referenceObject.name}",
-                "description":"${referenceObject.description}",
-                "config_type":"slack",
-                "is_enabled":${referenceObject.isEnabled},
-                "slack":{"url":"${(referenceObject.configData as Slack).url}"}
-            }
-        }
-        """.trimIndent()
-        val response = try {
-            val request = Request(RestRequest.Method.POST.name, "$PLUGIN_BASE_URI/configs")
-            request.setJsonEntity(createRequestJsonString)
-            val restOptionsBuilder = RequestOptions.DEFAULT.toBuilder()
-            restOptionsBuilder.addHeader("Content-Type", "application/json")
-            request.setOptions(restOptionsBuilder)
-            client().performRequest(request)
-            fail("Expected wrong Slack URL.")
-        } catch (exception: ResponseException) {
-            Assert.assertEquals(
-                "Wrong Slack url. Should contain \"hooks.slack.com/services/\" or \"hooks.gov-slack.com/services/\"",
-                jsonify(getResponseBody(exception.response))["error"].asJsonObject["reason"].asString
+        val referenceObject =
+            NotificationConfig(
+                "this is a sample config name",
+                "this is a sample config description",
+                ConfigType.SLACK,
+                isEnabled = true,
+                configData = sampleSlack,
             )
-        }
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"${referenceObject.name}",
+                    "description":"${referenceObject.description}",
+                    "config_type":"slack",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "slack":{"url":"${(referenceObject.configData as Slack).url}"}
+                }
+            }
+            """.trimIndent()
+        val response =
+            try {
+                val request = Request(RestRequest.Method.POST.name, "$PLUGIN_BASE_URI/configs")
+                request.setJsonEntity(createRequestJsonString)
+                val restOptionsBuilder = RequestOptions.DEFAULT.toBuilder()
+                restOptionsBuilder.addHeader("Content-Type", "application/json")
+                request.setOptions(restOptionsBuilder)
+                client().performRequest(request)
+                fail("Expected wrong Slack URL.")
+            } catch (exception: ResponseException) {
+                Assert.assertEquals(
+                    "Wrong Slack url. Should contain \"hooks.slack.com/services/\" or \"hooks.gov-slack.com/services/\"",
+                    jsonify(getResponseBody(exception.response))["error"].asJsonObject["reason"].asString,
+                )
+            }
     }
 }

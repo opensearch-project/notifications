@@ -62,7 +62,10 @@ fun getResolvedIps(host: String): List<IPAddressString> {
     return listOf()
 }
 
-fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
+fun isHostInDenylist(
+    urlString: String,
+    hostDenyList: List<String>,
+): Boolean {
     val url = URL(urlString)
     if (url.host != null) {
         val hostIpAddress = IPAddressString(url.host)
@@ -111,7 +114,7 @@ fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
 private fun isIpInDenylist(
     ip: inet.ipaddr.IPAddress,
     denyNetworks: List<IPAddressString>,
-    host: String
+    host: String,
 ): Boolean {
     val candidates = mutableListOf(ip)
 
@@ -161,7 +164,7 @@ private fun isIpInDenylist(
                 if ((candidate.isZero && denyAddr.isZero) || denyAddr.contains(candidate)) {
                     LogManager.getLogger().error(
                         "$host is denied by rule ${denyNetwork.toNormalizedString()} " +
-                            "(matched ${candidate.toNormalizedString()})"
+                            "(matched ${candidate.toNormalizedString()})",
                     )
                     return true
                 }
@@ -177,17 +180,18 @@ private fun isIpInDenylist(
  * Regex was based off of this post: https://stackoverflow.com/a/201378
  */
 fun isValidEmail(email: String): Boolean {
-    val validEmailPattern = Regex(
-        "(?:[a-z0-9!#\$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#\$%&'*+\\/=?^_`{|}~-]+)*" +
-            "|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]" + "" +
-            "|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")" +
-            "@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?" +
-            "|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}" +
-            "(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:" +
-            "(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]" + "" +
-            "|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])",
-        RegexOption.IGNORE_CASE
-    )
+    val validEmailPattern =
+        Regex(
+            "(?:[a-z0-9!#\$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#\$%&'*+\\/=?^_`{|}~-]+)*" +
+                "|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]" + "" +
+                "|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")" +
+                "@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?" +
+                "|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}" +
+                "(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:" +
+                "(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]" + "" +
+                "|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])",
+            RegexOption.IGNORE_CASE,
+        )
     return validEmailPattern.matches(email)
 }
 
@@ -195,6 +199,6 @@ fun validateMethod(method: String) {
     require(!Strings.isNullOrEmpty(method)) { "Method is null or empty" }
     val validMethods = listOf(HttpPost.METHOD_NAME, HttpPut.METHOD_NAME, HttpPatch.METHOD_NAME)
     require(
-        method.findAnyOf(validMethods) != null
+        method.findAnyOf(validMethods) != null,
     ) { "Invalid method supplied. Only POST, PUT and PATCH are allowed" }
 }

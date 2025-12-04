@@ -33,8 +33,9 @@ import java.util.Properties
 /**
  * This class handles the connections to the given Destination.
  */
-class DestinationSesClient(private val sesClientFactory: SesClientFactory) {
-
+class DestinationSesClient(
+    private val sesClientFactory: SesClientFactory,
+) {
     companion object {
         private val log by logger(DestinationSesClient::class.java)
     }
@@ -52,24 +53,25 @@ class DestinationSesClient(private val sesClientFactory: SesClientFactory) {
     fun execute(
         sesDestination: SesDestination,
         message: MessageContent,
-        referenceId: String
+        referenceId: String,
     ): DestinationMessageResponse {
         if (EmailMessageValidator.isMessageSizeOverLimit(message)) {
             return DestinationMessageResponse(
                 RestStatus.REQUEST_ENTITY_TOO_LARGE.status,
-                "Email size larger than ${PluginSettings.emailSizeLimit}"
+                "Email size larger than ${PluginSettings.emailSizeLimit}",
             )
         }
 
         // prepare session
         val session = prepareSession()
         // prepare mimeMessage
-        val mimeMessage = EmailMimeProvider.prepareMimeMessage(
-            session,
-            sesDestination.fromAddress,
-            sesDestination.recipient,
-            message
-        )
+        val mimeMessage =
+            EmailMimeProvider.prepareMimeMessage(
+                session,
+                sesDestination.fromAddress,
+                sesDestination.recipient,
+                message,
+            )
         // send Mime Message
         return sendMimeMessage(referenceId, sesDestination.awsRegion, sesDestination.roleArn, mimeMessage)
     }
@@ -81,9 +83,9 @@ class DestinationSesClient(private val sesClientFactory: SesClientFactory) {
         referenceId: String,
         sesAwsRegion: String,
         roleArn: String?,
-        mimeMessage: MimeMessage
-    ): DestinationMessageResponse {
-        return try {
+        mimeMessage: MimeMessage,
+    ): DestinationMessageResponse =
+        try {
             log.debug("$LOG_PREFIX:Sending Email-SES:$referenceId")
             val client = sesClientFactory.createSesClient(sesAwsRegion, roleArn)
             val outputStream = ByteArrayOutputStream()
@@ -98,7 +100,7 @@ class DestinationSesClient(private val sesClientFactory: SesClientFactory) {
             } else {
                 DestinationMessageResponse(
                     RestStatus.REQUEST_ENTITY_TOO_LARGE.status,
-                    "Email size($emailSize) larger than ${PluginSettings.emailSizeLimit}"
+                    "Email size($emailSize) larger than ${PluginSettings.emailSizeLimit}",
                 )
             }
         } catch (exception: MessageRejectedException) {
@@ -118,7 +120,6 @@ class DestinationSesClient(private val sesClientFactory: SesClientFactory) {
         } catch (exception: SdkBaseException) {
             DestinationMessageResponse(RestStatus.FAILED_DEPENDENCY.status, getSdkExceptionText(exception))
         }
-    }
 
     /**
      * Create error string from Amazon SES Exceptions

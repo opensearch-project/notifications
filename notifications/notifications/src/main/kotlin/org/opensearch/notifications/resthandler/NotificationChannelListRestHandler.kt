@@ -32,37 +32,35 @@ internal class NotificationChannelListRestHandler : PluginBaseHandler() {
     /**
      * {@inheritDoc}
      */
-    override fun getName(): String {
-        return "notifications_channel_list"
-    }
+    override fun getName(): String = "notifications_channel_list"
 
     /**
      * {@inheritDoc}
      */
-    override fun routes(): List<Route> {
-        return listOf(
-            /**
+    override fun routes(): List<Route> =
+        listOf(
+            /*
              * Get notification channels
              * Request URL: GET [REQUEST_URL]
              * Request body: Ref [org.opensearch.commons.notifications.action.GetChannelListRequest]
              * Response body: [org.opensearch.commons.notifications.action.GetChannelListResponse]
              */
-            Route(GET, REQUEST_URL)
+            Route(GET, REQUEST_URL),
         )
-    }
 
     /**
      * {@inheritDoc}
      */
-    override fun responseParams(): Set<String> {
-        return setOf()
-    }
+    override fun responseParams(): Set<String> = setOf()
 
     /**
      * {@inheritDoc}
      */
-    override fun executeRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
-        return when (request.method()) {
+    override fun executeRequest(
+        request: RestRequest,
+        client: NodeClient,
+    ): RestChannelConsumer =
+        when (request.method()) {
             GET -> {
                 Metrics.NOTIFICATIONS_CHANNELS_INFO_TOTAL.counter.increment()
                 Metrics.NOTIFICATIONS_CHANNELS_INFO_INTERVAL_COUNT.counter.increment()
@@ -70,13 +68,15 @@ internal class NotificationChannelListRestHandler : PluginBaseHandler() {
                     NotificationsPluginInterface.getChannelList(
                         client,
                         GetChannelListRequest(),
-                        RestToXContentListener(it)
+                        RestToXContentListener(it),
                     )
                 }
             }
-            else -> RestChannelConsumer {
-                it.sendResponse(BytesRestResponse(RestStatus.METHOD_NOT_ALLOWED, "${request.method()} is not allowed"))
+
+            else -> {
+                RestChannelConsumer {
+                    it.sendResponse(BytesRestResponse(RestStatus.METHOD_NOT_ALLOWED, "${request.method()} is not allowed"))
+                }
             }
         }
-    }
 }

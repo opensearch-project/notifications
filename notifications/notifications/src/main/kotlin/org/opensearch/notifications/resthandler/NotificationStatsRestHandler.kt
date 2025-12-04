@@ -28,43 +28,45 @@ internal class NotificationStatsRestHandler : BaseRestHandler() {
     /**
      * {@inheritDoc}
      */
-    override fun getName(): String {
-        return NOTIFICATION_STATS_ACTION
-    }
+    override fun getName(): String = NOTIFICATION_STATS_ACTION
 
     /**
      * {@inheritDoc}
      */
-    override fun routes(): List<Route> {
-        return listOf(
-            /**
+    override fun routes(): List<Route> =
+        listOf(
+            /*
              * Get Notifications Stats
              * Request body: None
              * TODO: Add response body in common-utils
              */
-            Route(GET, NOTIFICATION_STATS_URL)
+            Route(GET, NOTIFICATION_STATS_URL),
         )
-    }
 
     /**
      * {@inheritDoc}
      */
-    override fun responseParams(): Set<String> {
-        return setOf()
-    }
+    override fun responseParams(): Set<String> = setOf()
 
     /**
      * {@inheritDoc}
      */
-    override fun prepareRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
-        return when (request.method()) {
+    override fun prepareRequest(
+        request: RestRequest,
+        client: NodeClient,
+    ): RestChannelConsumer =
+        when (request.method()) {
             // TODO: Wrap this into TransportAction
-            GET -> RestChannelConsumer {
-                it.sendResponse(BytesRestResponse(RestStatus.OK, Metrics.collectToFlattenedJSON()))
+            GET -> {
+                RestChannelConsumer {
+                    it.sendResponse(BytesRestResponse(RestStatus.OK, Metrics.collectToFlattenedJSON()))
+                }
             }
-            else -> RestChannelConsumer {
-                it.sendResponse(BytesRestResponse(RestStatus.METHOD_NOT_ALLOWED, "${request.method()} is not allowed"))
+
+            else -> {
+                RestChannelConsumer {
+                    it.sendResponse(BytesRestResponse(RestStatus.METHOD_NOT_ALLOWED, "${request.method()} is not allowed"))
+                }
             }
         }
-    }
 }

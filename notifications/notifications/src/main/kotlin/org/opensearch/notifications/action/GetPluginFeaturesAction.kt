@@ -23,42 +23,44 @@ import org.opensearch.transport.client.Client
 /**
  * Get plugin features transport action
  */
-internal class GetPluginFeaturesAction @Inject constructor(
-    transportService: TransportService,
-    client: Client,
-    actionFilters: ActionFilters,
-    val xContentRegistry: NamedXContentRegistry
-) : PluginBaseAction<GetPluginFeaturesRequest, GetPluginFeaturesResponse>(
-    NotificationsActions.GET_PLUGIN_FEATURES_NAME,
-    transportService,
-    client,
-    actionFilters,
-    ::GetPluginFeaturesRequest
-) {
+internal class GetPluginFeaturesAction
+    @Inject
+    constructor(
+        transportService: TransportService,
+        client: Client,
+        actionFilters: ActionFilters,
+        val xContentRegistry: NamedXContentRegistry,
+    ) : PluginBaseAction<GetPluginFeaturesRequest, GetPluginFeaturesResponse>(
+            NotificationsActions.GET_PLUGIN_FEATURES_NAME,
+            transportService,
+            client,
+            actionFilters,
+            ::GetPluginFeaturesRequest,
+        ) {
+        /**
+         * {@inheritDoc}
+         * Transform the request and call super.doExecute() to support call from other plugins.
+         */
+        override fun doExecute(
+            task: Task?,
+            request: ActionRequest,
+            listener: ActionListener<GetPluginFeaturesResponse>,
+        ) {
+            val transformedRequest =
+                request as? GetPluginFeaturesRequest
+                    ?: recreateObject(request) { GetPluginFeaturesRequest(it) }
+            super.doExecute(task, transformedRequest, listener)
+        }
 
-    /**
-     * {@inheritDoc}
-     * Transform the request and call super.doExecute() to support call from other plugins.
-     */
-    override fun doExecute(
-        task: Task?,
-        request: ActionRequest,
-        listener: ActionListener<GetPluginFeaturesResponse>
-    ) {
-        val transformedRequest = request as? GetPluginFeaturesRequest
-            ?: recreateObject(request) { GetPluginFeaturesRequest(it) }
-        super.doExecute(task, transformedRequest, listener)
+        /**
+         * {@inheritDoc}
+         */
+        override suspend fun executeRequest(
+            request: GetPluginFeaturesRequest,
+            user: User?,
+        ): GetPluginFeaturesResponse {
+            val allowedConfigTypes = CoreProvider.core.getAllowedConfigTypes()
+            val pluginFeatures = CoreProvider.core.getPluginFeatures()
+            return GetPluginFeaturesResponse(allowedConfigTypes, pluginFeatures)
+        }
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    override suspend fun executeRequest(
-        request: GetPluginFeaturesRequest,
-        user: User?
-    ): GetPluginFeaturesResponse {
-        val allowedConfigTypes = CoreProvider.core.getAllowedConfigTypes()
-        val pluginFeatures = CoreProvider.core.getPluginFeatures()
-        return GetPluginFeaturesResponse(allowedConfigTypes, pluginFeatures)
-    }
-}

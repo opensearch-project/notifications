@@ -38,13 +38,18 @@ import java.util.UUID
 /**
  * This class handles the SNS connections to the given Destination.
  */
-class DestinationSnsClient(private val snsClientFactory: SnsClientFactory) {
-
+class DestinationSnsClient(
+    private val snsClientFactory: SnsClientFactory,
+) {
     companion object {
         private val log by logger(DestinationSnsClient::class.java)
     }
 
-    fun execute(destination: SnsDestination, message: MessageContent, referenceId: String): DestinationMessageResponse {
+    fun execute(
+        destination: SnsDestination,
+        message: MessageContent,
+        referenceId: String,
+    ): DestinationMessageResponse {
         val amazonSNS: AmazonSNS = snsClientFactory.createSnsClient(destination.region, destination.roleArn)
         return try {
             val result = sendMessage(amazonSNS, destination, message)
@@ -120,13 +125,19 @@ class DestinationSnsClient(private val snsClientFactory: SnsClientFactory) {
      * This method is useful for mocking the client
      */
     @Throws(Exception::class)
-    fun sendMessage(amazonSNS: AmazonSNS, destination: SnsDestination, message: MessageContent): PublishResult {
-        val request: PublishRequest = PublishRequest()
-            .withTopicArn(destination.topicArn)
-            .withMessage(message.textDescription)
-            .withSubject(message.title)
+    fun sendMessage(
+        amazonSNS: AmazonSNS,
+        destination: SnsDestination,
+        message: MessageContent,
+    ): PublishResult {
+        val request: PublishRequest =
+            PublishRequest()
+                .withTopicArn(destination.topicArn)
+                .withMessage(message.textDescription)
+                .withSubject(message.title)
         if (destination.topicArn.endsWith(".fifo")) {
-            request.withMessageDeduplicationId(UUID.randomUUID().toString())
+            request
+                .withMessageDeduplicationId(UUID.randomUUID().toString())
                 .withMessageGroupId(String.format("opensearch-%s", PluginSettings.clusterName))
         }
         return amazonSNS.publish(request)

@@ -10,5 +10,5 @@ package org.opensearch.notifications.model
  */
 data class NotificationConfigDocInfo(
     val docInfo: DocInfo,
-    val configDoc: NotificationConfigDoc
+    val configDoc: NotificationConfigDoc,
 )

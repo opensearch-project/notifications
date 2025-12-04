@@ -165,17 +165,18 @@ internal object PluginSettings {
     /**
      * Default config type list
      */
-    private val DEFAULT_ALLOWED_CONFIG_TYPES = listOf(
-        "slack",
-        "chime",
-        "microsoft_teams",
-        "webhook",
-        "email",
-        "sns",
-        "ses_account",
-        "smtp_account",
-        "email_group"
-    )
+    private val DEFAULT_ALLOWED_CONFIG_TYPES =
+        listOf(
+            "slack",
+            "chime",
+            "microsoft_teams",
+            "webhook",
+            "email",
+            "sns",
+            "ses_account",
+            "smtp_account",
+            "email_group",
+        )
 
     /**
      * Default host deny list
@@ -297,149 +298,166 @@ internal object PluginSettings {
         clusterName = settings?.get(CLUSTER_NAME, DEFAULT_CLUSTER_NAME) ?: DEFAULT_CLUSTER_NAME
         destinationSettings = if (settings != null) loadDestinationSettings(settings) else DEFAULT_DESTINATION_SETTINGS
 
-        defaultSettings = mapOf(
-            EMAIL_SIZE_LIMIT_KEY to emailSizeLimit.toString(DECIMAL_RADIX),
-            EMAIL_MINIMUM_HEADER_LENGTH_KEY to emailMinimumHeaderLength.toString(DECIMAL_RADIX),
-            MAX_CONNECTIONS_KEY to maxConnections.toString(DECIMAL_RADIX),
-            MAX_CONNECTIONS_PER_ROUTE_KEY to maxConnectionsPerRoute.toString(DECIMAL_RADIX),
-            CONNECTION_TIMEOUT_MILLISECONDS_KEY to connectionTimeout.toString(DECIMAL_RADIX),
-            SOCKET_TIMEOUT_MILLISECONDS_KEY to socketTimeout.toString(DECIMAL_RADIX),
-            MAX_HTTP_RESPONSE_SIZE_KEY to maxHttpResponseSize.toString(DECIMAL_RADIX),
-            TOOLTIP_SUPPORT_KEY to tooltipSupport.toString()
-        )
+        defaultSettings =
+            mapOf(
+                EMAIL_SIZE_LIMIT_KEY to emailSizeLimit.toString(DECIMAL_RADIX),
+                EMAIL_MINIMUM_HEADER_LENGTH_KEY to emailMinimumHeaderLength.toString(DECIMAL_RADIX),
+                MAX_CONNECTIONS_KEY to maxConnections.toString(DECIMAL_RADIX),
+                MAX_CONNECTIONS_PER_ROUTE_KEY to maxConnectionsPerRoute.toString(DECIMAL_RADIX),
+                CONNECTION_TIMEOUT_MILLISECONDS_KEY to connectionTimeout.toString(DECIMAL_RADIX),
+                SOCKET_TIMEOUT_MILLISECONDS_KEY to socketTimeout.toString(DECIMAL_RADIX),
+                MAX_HTTP_RESPONSE_SIZE_KEY to maxHttpResponseSize.toString(DECIMAL_RADIX),
+                TOOLTIP_SUPPORT_KEY to tooltipSupport.toString(),
+            )
     }
 
-    val EMAIL_SIZE_LIMIT: Setting<Int> = Setting.intSetting(
-        EMAIL_SIZE_LIMIT_KEY,
-        defaultSettings[EMAIL_SIZE_LIMIT_KEY]!!.toInt(),
-        MINIMUM_EMAIL_SIZE_LIMIT,
-        NodeScope,
-        Dynamic
-    )
+    val EMAIL_SIZE_LIMIT: Setting<Int> =
+        Setting.intSetting(
+            EMAIL_SIZE_LIMIT_KEY,
+            defaultSettings[EMAIL_SIZE_LIMIT_KEY]!!.toInt(),
+            MINIMUM_EMAIL_SIZE_LIMIT,
+            NodeScope,
+            Dynamic,
+        )
 
-    val EMAIL_MINIMUM_HEADER_LENGTH: Setting<Int> = Setting.intSetting(
-        EMAIL_MINIMUM_HEADER_LENGTH_KEY,
-        defaultSettings[EMAIL_MINIMUM_HEADER_LENGTH_KEY]!!.toInt(),
-        NodeScope,
-        Dynamic
-    )
+    val EMAIL_MINIMUM_HEADER_LENGTH: Setting<Int> =
+        Setting.intSetting(
+            EMAIL_MINIMUM_HEADER_LENGTH_KEY,
+            defaultSettings[EMAIL_MINIMUM_HEADER_LENGTH_KEY]!!.toInt(),
+            NodeScope,
+            Dynamic,
+        )
 
-    val MAX_CONNECTIONS: Setting<Int> = Setting.intSetting(
-        MAX_CONNECTIONS_KEY,
-        defaultSettings[MAX_CONNECTIONS_KEY]!!.toInt(),
-        NodeScope,
-        Dynamic
-    )
+    val MAX_CONNECTIONS: Setting<Int> =
+        Setting.intSetting(
+            MAX_CONNECTIONS_KEY,
+            defaultSettings[MAX_CONNECTIONS_KEY]!!.toInt(),
+            NodeScope,
+            Dynamic,
+        )
 
-    val MAX_CONNECTIONS_PER_ROUTE: Setting<Int> = Setting.intSetting(
-        MAX_CONNECTIONS_PER_ROUTE_KEY,
-        defaultSettings[MAX_CONNECTIONS_PER_ROUTE_KEY]!!.toInt(),
-        NodeScope,
-        Dynamic
-    )
+    val MAX_CONNECTIONS_PER_ROUTE: Setting<Int> =
+        Setting.intSetting(
+            MAX_CONNECTIONS_PER_ROUTE_KEY,
+            defaultSettings[MAX_CONNECTIONS_PER_ROUTE_KEY]!!.toInt(),
+            NodeScope,
+            Dynamic,
+        )
 
-    val CONNECTION_TIMEOUT_MILLISECONDS: Setting<Int> = Setting.intSetting(
-        CONNECTION_TIMEOUT_MILLISECONDS_KEY,
-        defaultSettings[CONNECTION_TIMEOUT_MILLISECONDS_KEY]!!.toInt(),
-        NodeScope,
-        Dynamic
-    )
+    val CONNECTION_TIMEOUT_MILLISECONDS: Setting<Int> =
+        Setting.intSetting(
+            CONNECTION_TIMEOUT_MILLISECONDS_KEY,
+            defaultSettings[CONNECTION_TIMEOUT_MILLISECONDS_KEY]!!.toInt(),
+            NodeScope,
+            Dynamic,
+        )
 
-    val SOCKET_TIMEOUT_MILLISECONDS: Setting<Int> = Setting.intSetting(
-        SOCKET_TIMEOUT_MILLISECONDS_KEY,
-        defaultSettings[SOCKET_TIMEOUT_MILLISECONDS_KEY]!!.toInt(),
-        NodeScope,
-        Dynamic
-    )
+    val SOCKET_TIMEOUT_MILLISECONDS: Setting<Int> =
+        Setting.intSetting(
+            SOCKET_TIMEOUT_MILLISECONDS_KEY,
+            defaultSettings[SOCKET_TIMEOUT_MILLISECONDS_KEY]!!.toInt(),
+            NodeScope,
+            Dynamic,
+        )
 
-    val MAX_HTTP_RESPONSE_SIZE: Setting<Int> = Setting.intSetting(
-        MAX_HTTP_RESPONSE_SIZE_KEY,
-        defaultSettings[MAX_HTTP_RESPONSE_SIZE_KEY]!!.toInt(),
-        NodeScope,
-        Dynamic
-    )
+    val MAX_HTTP_RESPONSE_SIZE: Setting<Int> =
+        Setting.intSetting(
+            MAX_HTTP_RESPONSE_SIZE_KEY,
+            defaultSettings[MAX_HTTP_RESPONSE_SIZE_KEY]!!.toInt(),
+            NodeScope,
+            Dynamic,
+        )
 
-    val ALLOWED_CONFIG_TYPES: Setting<List<String>> = Setting.listSetting(
-        ALLOWED_CONFIG_TYPE_KEY,
-        DEFAULT_ALLOWED_CONFIG_TYPES,
-        { it },
-        NodeScope,
-        Dynamic
-    )
+    val ALLOWED_CONFIG_TYPES: Setting<List<String>> =
+        Setting.listSetting(
+            ALLOWED_CONFIG_TYPE_KEY,
+            DEFAULT_ALLOWED_CONFIG_TYPES,
+            { it },
+            NodeScope,
+            Dynamic,
+        )
 
-    val TOOLTIP_SUPPORT: Setting<Boolean> = Setting.boolSetting(
-        TOOLTIP_SUPPORT_KEY,
-        defaultSettings[TOOLTIP_SUPPORT_KEY]!!.toBoolean(),
-        NodeScope,
-        Dynamic
-    )
+    val TOOLTIP_SUPPORT: Setting<Boolean> =
+        Setting.boolSetting(
+            TOOLTIP_SUPPORT_KEY,
+            defaultSettings[TOOLTIP_SUPPORT_KEY]!!.toBoolean(),
+            NodeScope,
+            Dynamic,
+        )
 
-    val LEGACY_ALERTING_HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
-        LEGACY_ALERTING_HOST_DENY_LIST_KEY,
-        DEFAULT_HOST_DENY_LIST,
-        { it },
-        NodeScope,
-        Final,
-        Deprecated
-    )
+    val LEGACY_ALERTING_HOST_DENY_LIST: Setting<List<String>> =
+        Setting.listSetting(
+            LEGACY_ALERTING_HOST_DENY_LIST_KEY,
+            DEFAULT_HOST_DENY_LIST,
+            { it },
+            NodeScope,
+            Final,
+            Deprecated,
+        )
 
-    val ALERTING_HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
-        ALERTING_HOST_DENY_LIST_KEY,
-        LEGACY_ALERTING_HOST_DENY_LIST,
-        { it },
-        NodeScope,
-        Final
-    )
+    val ALERTING_HOST_DENY_LIST: Setting<List<String>> =
+        Setting.listSetting(
+            ALERTING_HOST_DENY_LIST_KEY,
+            LEGACY_ALERTING_HOST_DENY_LIST,
+            { it },
+            NodeScope,
+            Final,
+        )
 
-    val HOST_DENY_LIST: Setting<List<String>> = Setting.listSetting(
-        HOST_DENY_LIST_KEY,
-        ALERTING_HOST_DENY_LIST,
-        { it },
-        NodeScope,
-        Dynamic
-    )
+    val HOST_DENY_LIST: Setting<List<String>> =
+        Setting.listSetting(
+            HOST_DENY_LIST_KEY,
+            ALERTING_HOST_DENY_LIST,
+            { it },
+            NodeScope,
+            Dynamic,
+        )
 
-    private val LEGACY_EMAIL_USERNAME: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
-        LEGACY_EMAIL_DESTINATION_SETTING_PREFIX,
-        "username",
-        { key: String -> SecureSetting.secureString(key, null) }
-    )
+    private val LEGACY_EMAIL_USERNAME: Setting.AffixSetting<SecureString> =
+        Setting.affixKeySetting(
+            LEGACY_EMAIL_DESTINATION_SETTING_PREFIX,
+            "username",
+            { key: String -> SecureSetting.secureString(key, null) },
+        )
 
-    private val LEGACY_EMAIL_PASSWORD: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
-        LEGACY_EMAIL_DESTINATION_SETTING_PREFIX,
-        "password",
-        { key: String -> SecureSetting.secureString(key, null) }
-    )
+    private val LEGACY_EMAIL_PASSWORD: Setting.AffixSetting<SecureString> =
+        Setting.affixKeySetting(
+            LEGACY_EMAIL_DESTINATION_SETTING_PREFIX,
+            "password",
+            { key: String -> SecureSetting.secureString(key, null) },
+        )
 
-    private val EMAIL_USERNAME: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
-        EMAIL_DESTINATION_SETTING_PREFIX,
-        "username",
-        { key: String ->
-            SecureSetting.secureString(
-                key,
-                fallback(key, LEGACY_EMAIL_USERNAME, "opensearch\\.notifications\\.core", "plugins.alerting.destination")
-            )
-        }
-    )
+    private val EMAIL_USERNAME: Setting.AffixSetting<SecureString> =
+        Setting.affixKeySetting(
+            EMAIL_DESTINATION_SETTING_PREFIX,
+            "username",
+            { key: String ->
+                SecureSetting.secureString(
+                    key,
+                    fallback(key, LEGACY_EMAIL_USERNAME, "opensearch\\.notifications\\.core", "plugins.alerting.destination"),
+                )
+            },
+        )
 
-    private val EMAIL_PASSWORD: Setting.AffixSetting<SecureString> = Setting.affixKeySetting(
-        EMAIL_DESTINATION_SETTING_PREFIX,
-        "password",
-        { key: String ->
-            SecureSetting.secureString(
-                key,
-                fallback(key, LEGACY_EMAIL_PASSWORD, "opensearch\\.notifications\\.core", "plugins.alerting.destination")
-            )
-        }
-    )
+    private val EMAIL_PASSWORD: Setting.AffixSetting<SecureString> =
+        Setting.affixKeySetting(
+            EMAIL_DESTINATION_SETTING_PREFIX,
+            "password",
+            { key: String ->
+                SecureSetting.secureString(
+                    key,
+                    fallback(key, LEGACY_EMAIL_PASSWORD, "opensearch\\.notifications\\.core", "plugins.alerting.destination"),
+                )
+            },
+        )
 
     /**
      * Returns list of additional settings available specific to this plugin.
      *
      * @return list of settings defined in this plugin
      */
-    fun getAllSettings(): List<Setting<*>> {
-        return listOf(
+    fun getAllSettings(): List<Setting<*>> =
+        listOf(
             EMAIL_SIZE_LIMIT,
             EMAIL_MINIMUM_HEADER_LENGTH,
             MAX_CONNECTIONS,
@@ -451,9 +469,8 @@ internal object PluginSettings {
             TOOLTIP_SUPPORT,
             HOST_DENY_LIST,
             EMAIL_USERNAME,
-            EMAIL_PASSWORD
+            EMAIL_PASSWORD,
         )
-    }
 
     /**
      * Update the setting variables to setting values from local settings
@@ -609,7 +626,10 @@ internal object PluginSettings {
         return emailAccounts
     }
 
-    private fun getSecureDestinationSettings(settings: Settings, emailAccountName: String): SecureDestinationSettings? {
+    private fun getSecureDestinationSettings(
+        settings: Settings,
+        emailAccountName: String,
+    ): SecureDestinationSettings? {
         // Using 'use' to emulate Java's try-with-resources on multiple closeable resources.
         // Values are cloned so that we maintain a SecureString, the original SecureStrings will be closed after
         // they have left the scope of this function.
@@ -620,18 +640,26 @@ internal object PluginSettings {
         }
     }
 
-    private fun <T> getEmailSettingValue(settings: Settings, emailAccountName: String, emailSetting: Setting.AffixSetting<T>): T? {
+    private fun <T> getEmailSettingValue(
+        settings: Settings,
+        emailAccountName: String,
+        emailSetting: Setting.AffixSetting<T>,
+    ): T? {
         val concreteSetting = emailSetting.getConcreteSettingForNamespace(emailAccountName)
         return concreteSetting.get(settings)
     }
 
-    private fun <T> fallback(key: String, affixSetting: Setting.AffixSetting<T>, regex: String, replacement: String): Setting<T>? {
-        return if ("_na_" == key) {
+    private fun <T> fallback(
+        key: String,
+        affixSetting: Setting.AffixSetting<T>,
+        regex: String,
+        replacement: String,
+    ): Setting<T>? =
+        if ("_na_" == key) {
             affixSetting.getConcreteSettingForNamespace(key)
         } else {
             affixSetting.getConcreteSetting(key.replace(regex.toRegex(), replacement))
         }
-    }
 
     // reset the settings values to default values for testing purpose
     @OpenForTesting

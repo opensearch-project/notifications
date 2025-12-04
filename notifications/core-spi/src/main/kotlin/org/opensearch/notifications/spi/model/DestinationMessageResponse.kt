@@ -10,5 +10,5 @@ package org.opensearch.notifications.spi.model
  */
 class DestinationMessageResponse(
     val statusCode: Int,
-    val statusText: String
+    val statusText: String,
 )

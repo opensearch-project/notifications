@@ -18,15 +18,12 @@ class MessageContent(
     val fileName: String? = null,
     val fileEncoding: String? = null,
     val fileData: String? = null,
-    val fileContentType: String? = null
+    val fileContentType: String? = null,
 ) {
-
     init {
         require(!Strings.isNullOrEmpty(title)) { "title is null or empty" }
         require(!Strings.isNullOrEmpty(textDescription)) { "text message part is null or empty" }
     }
 
-    fun buildMessageWithTitle(): String {
-        return "$title\n\n$textDescription"
-    }
+    fun buildMessageWithTitle(): String = "$title\n\n$textDescription"
 }

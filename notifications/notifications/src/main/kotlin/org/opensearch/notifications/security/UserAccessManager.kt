@@ -23,7 +23,7 @@ internal object UserAccessManager : UserAccess {
         if (PluginSettings.isRbacEnabled() && user?.backendRoles.isNullOrEmpty()) {
             throw OpenSearchStatusException(
                 "User doesn't have backend roles configured. Contact administrator.",
-                RestStatus.FORBIDDEN
+                RestStatus.FORBIDDEN,
             )
         }
     }
@@ -51,7 +51,10 @@ internal object UserAccessManager : UserAccess {
     /**
      * {@inheritDoc}
      */
-    override fun doesUserHaveAccess(user: User?, access: List<String>): Boolean {
+    override fun doesUserHaveAccess(
+        user: User?,
+        access: List<String>,
+    ): Boolean {
         if (user == null || !PluginSettings.isRbacEnabled()) { // Filtering is disabled
             return true
         }

@@ -10,5 +10,8 @@ import com.amazonaws.services.simpleemail.AmazonSimpleEmailService
  * Interface for creating SES client
  */
 interface SesClientFactory {
-    fun createSesClient(region: String, roleArn: String?): AmazonSimpleEmailService
+    fun createSesClient(
+        region: String,
+        roleArn: String?,
+    ): AmazonSimpleEmailService
 }

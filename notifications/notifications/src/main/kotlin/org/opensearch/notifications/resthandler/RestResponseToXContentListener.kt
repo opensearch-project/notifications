@@ -19,9 +19,13 @@ import org.opensearch.rest.action.RestToXContentListener
  * {@link ToXContent} and automatically builds an XContent based response
  * (wrapping the toXContent in startObject/endObject).
  */
-internal class RestResponseToXContentListener<Response : BaseResponse>(channel: RestChannel) :
-    RestToXContentListener<Response>(channel) {
-    override fun buildResponse(response: Response, builder: XContentBuilder?): RestResponse {
+internal class RestResponseToXContentListener<Response : BaseResponse>(
+    channel: RestChannel,
+) : RestToXContentListener<Response>(channel) {
+    override fun buildResponse(
+        response: Response,
+        builder: XContentBuilder?,
+    ): RestResponse {
         super.buildResponse(response, builder)
 
         Metrics.REQUEST_TOTAL.counter.increment()
@@ -39,7 +43,5 @@ internal class RestResponseToXContentListener<Response : BaseResponse>(channel: 
     /**
      * {@inheritDoc}
      */
-    override fun getStatus(response: Response): RestStatus {
-        return response.getStatus()
-    }
+    override fun getStatus(response: Response): RestStatus = response.getStatus()
 }

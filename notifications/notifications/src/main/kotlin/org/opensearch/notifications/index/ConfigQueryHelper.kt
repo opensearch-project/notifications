@@ -48,60 +48,67 @@ object ConfigQueryHelper {
     private const val KEY_PREFIX = CONFIG_TAG
     private const val KEYWORD_SUFFIX = "keyword"
 
-    private val NESTED_PATHS = listOf(
-        "${EMAIL.tag}.$RECIPIENT_LIST_TAG",
-        "${EMAIL_GROUP.tag}.$RECIPIENT_LIST_TAG"
-    )
-    private val METADATA_RANGE_FIELDS = setOf(
-        UPDATED_TIME_TAG,
-        CREATED_TIME_TAG
-    )
-    private val BOOLEAN_FIELDS = setOf(
-        IS_ENABLED_TAG
-    )
-    private val KEYWORD_FIELDS = setOf(
-        CONFIG_TYPE_TAG,
-        "${EMAIL.tag}.$EMAIL_ACCOUNT_ID_TAG",
-        "${EMAIL.tag}.$EMAIL_GROUP_ID_LIST_TAG",
-        "${SMTP_ACCOUNT.tag}.$METHOD_TAG",
-        "${SES_ACCOUNT.tag}.$REGION_TAG",
-        // Text fields with keyword
-        "$NAME_TAG.$KEYWORD_SUFFIX",
-        "$DESCRIPTION_TAG.$KEYWORD_SUFFIX",
-        "${SLACK.tag}.$URL_TAG.$KEYWORD_SUFFIX",
-        "${CHIME.tag}.$URL_TAG.$KEYWORD_SUFFIX",
-        "${MICROSOFT_TEAMS.tag}.$URL_TAG.$KEYWORD_SUFFIX",
-        "${WEBHOOK.tag}.$URL_TAG.$KEYWORD_SUFFIX",
-        "${SMTP_ACCOUNT.tag}.$HOST_TAG.$KEYWORD_SUFFIX",
-        "${SMTP_ACCOUNT.tag}.$FROM_ADDRESS_TAG.$KEYWORD_SUFFIX",
-        "${SNS.tag}.$TOPIC_ARN_TAG.$KEYWORD_SUFFIX",
-        "${SNS.tag}.$ROLE_ARN_TAG.$KEYWORD_SUFFIX",
-        "${SES_ACCOUNT.tag}.$ROLE_ARN_TAG.$KEYWORD_SUFFIX",
-        "${SES_ACCOUNT.tag}.$FROM_ADDRESS_TAG.$KEYWORD_SUFFIX"
-    )
-    private val TEXT_FIELDS = setOf(
-        NAME_TAG,
-        DESCRIPTION_TAG,
-        "${SLACK.tag}.$URL_TAG",
-        "${CHIME.tag}.$URL_TAG",
-        "${MICROSOFT_TEAMS.tag}.$URL_TAG",
-        "${WEBHOOK.tag}.$URL_TAG",
-        "${SMTP_ACCOUNT.tag}.$HOST_TAG",
-        "${SMTP_ACCOUNT.tag}.$FROM_ADDRESS_TAG",
-        "${SNS.tag}.$TOPIC_ARN_TAG",
-        "${SNS.tag}.$ROLE_ARN_TAG",
-        "${SES_ACCOUNT.tag}.$ROLE_ARN_TAG",
-        "${SES_ACCOUNT.tag}.$FROM_ADDRESS_TAG"
-    )
-    private val NESTED_KEYWORD_FIELDS = setOf(
-        // Text fields with keyword
-        "${EMAIL.tag}.$RECIPIENT_LIST_TAG.$RECIPIENT_TAG.$KEYWORD_SUFFIX",
-        "${EMAIL_GROUP.tag}.$RECIPIENT_LIST_TAG.$RECIPIENT_TAG.$KEYWORD_SUFFIX"
-    )
-    private val NESTED_TEXT_FIELDS = setOf(
-        "${EMAIL.tag}.$RECIPIENT_LIST_TAG.$RECIPIENT_TAG",
-        "${EMAIL_GROUP.tag}.$RECIPIENT_LIST_TAG.$RECIPIENT_TAG"
-    )
+    private val NESTED_PATHS =
+        listOf(
+            "${EMAIL.tag}.$RECIPIENT_LIST_TAG",
+            "${EMAIL_GROUP.tag}.$RECIPIENT_LIST_TAG",
+        )
+    private val METADATA_RANGE_FIELDS =
+        setOf(
+            UPDATED_TIME_TAG,
+            CREATED_TIME_TAG,
+        )
+    private val BOOLEAN_FIELDS =
+        setOf(
+            IS_ENABLED_TAG,
+        )
+    private val KEYWORD_FIELDS =
+        setOf(
+            CONFIG_TYPE_TAG,
+            "${EMAIL.tag}.$EMAIL_ACCOUNT_ID_TAG",
+            "${EMAIL.tag}.$EMAIL_GROUP_ID_LIST_TAG",
+            "${SMTP_ACCOUNT.tag}.$METHOD_TAG",
+            "${SES_ACCOUNT.tag}.$REGION_TAG",
+            // Text fields with keyword
+            "$NAME_TAG.$KEYWORD_SUFFIX",
+            "$DESCRIPTION_TAG.$KEYWORD_SUFFIX",
+            "${SLACK.tag}.$URL_TAG.$KEYWORD_SUFFIX",
+            "${CHIME.tag}.$URL_TAG.$KEYWORD_SUFFIX",
+            "${MICROSOFT_TEAMS.tag}.$URL_TAG.$KEYWORD_SUFFIX",
+            "${WEBHOOK.tag}.$URL_TAG.$KEYWORD_SUFFIX",
+            "${SMTP_ACCOUNT.tag}.$HOST_TAG.$KEYWORD_SUFFIX",
+            "${SMTP_ACCOUNT.tag}.$FROM_ADDRESS_TAG.$KEYWORD_SUFFIX",
+            "${SNS.tag}.$TOPIC_ARN_TAG.$KEYWORD_SUFFIX",
+            "${SNS.tag}.$ROLE_ARN_TAG.$KEYWORD_SUFFIX",
+            "${SES_ACCOUNT.tag}.$ROLE_ARN_TAG.$KEYWORD_SUFFIX",
+            "${SES_ACCOUNT.tag}.$FROM_ADDRESS_TAG.$KEYWORD_SUFFIX",
+        )
+    private val TEXT_FIELDS =
+        setOf(
+            NAME_TAG,
+            DESCRIPTION_TAG,
+            "${SLACK.tag}.$URL_TAG",
+            "${CHIME.tag}.$URL_TAG",
+            "${MICROSOFT_TEAMS.tag}.$URL_TAG",
+            "${WEBHOOK.tag}.$URL_TAG",
+            "${SMTP_ACCOUNT.tag}.$HOST_TAG",
+            "${SMTP_ACCOUNT.tag}.$FROM_ADDRESS_TAG",
+            "${SNS.tag}.$TOPIC_ARN_TAG",
+            "${SNS.tag}.$ROLE_ARN_TAG",
+            "${SES_ACCOUNT.tag}.$ROLE_ARN_TAG",
+            "${SES_ACCOUNT.tag}.$FROM_ADDRESS_TAG",
+        )
+    private val NESTED_KEYWORD_FIELDS =
+        setOf(
+            // Text fields with keyword
+            "${EMAIL.tag}.$RECIPIENT_LIST_TAG.$RECIPIENT_TAG.$KEYWORD_SUFFIX",
+            "${EMAIL_GROUP.tag}.$RECIPIENT_LIST_TAG.$RECIPIENT_TAG.$KEYWORD_SUFFIX",
+        )
+    private val NESTED_TEXT_FIELDS =
+        setOf(
+            "${EMAIL.tag}.$RECIPIENT_LIST_TAG.$RECIPIENT_TAG",
+            "${EMAIL_GROUP.tag}.$RECIPIENT_LIST_TAG.$RECIPIENT_TAG",
+        )
 
     private val METADATA_FIELDS = METADATA_RANGE_FIELDS
     private val CONFIG_FIELDS = KEYWORD_FIELDS.union(TEXT_FIELDS)
@@ -110,8 +117,8 @@ object ConfigQueryHelper {
 
     val FILTER_PARAMS = ALL_FIELDS.union(setOf(QUERY_TAG, TEXT_QUERY_TAG))
 
-    fun getSortField(sortField: String?): String {
-        return if (sortField == null) {
+    fun getSortField(sortField: String?): String =
+        if (sortField == null) {
             "$METADATA_TAG.$UPDATED_TIME_TAG"
         } else {
             when {
@@ -122,9 +129,11 @@ object ConfigQueryHelper {
                 else -> throw OpenSearchStatusException("Sort on $sortField not acceptable", RestStatus.NOT_ACCEPTABLE)
             }
         }
-    }
 
-    fun addQueryFilters(query: BoolQueryBuilder, filterParams: Map<String, String>) {
+    fun addQueryFilters(
+        query: BoolQueryBuilder,
+        filterParams: Map<String, String>,
+    ) {
         filterParams.forEach {
             when {
                 QUERY_TAG == it.key -> query.filter(getQueryAllBuilder(it.value))
@@ -183,38 +192,51 @@ object ConfigQueryHelper {
         return boolQuery
     }
 
-    private fun getRangeQueryBuilder(queryKey: String, queryValue: String): QueryBuilder {
+    private fun getRangeQueryBuilder(
+        queryKey: String,
+        queryValue: String,
+    ): QueryBuilder {
         val range = queryValue.split("..")
         return when (range.size) {
-            1 -> QueryBuilders.termQuery("$METADATA_TAG.$queryKey", queryValue)
+            1 -> {
+                QueryBuilders.termQuery("$METADATA_TAG.$queryKey", queryValue)
+            }
+
             2 -> {
                 val rangeQuery = QueryBuilders.rangeQuery("$METADATA_TAG.$queryKey")
                 rangeQuery.from(range[0])
                 rangeQuery.to(range[1])
                 rangeQuery
             }
+
             else -> {
                 throw OpenSearchStatusException(
                     "Invalid Range format $queryValue, allowed format 'exact' or 'from..to'",
-                    RestStatus.NOT_ACCEPTABLE
+                    RestStatus.NOT_ACCEPTABLE,
                 )
             }
         }
     }
 
-    private fun getTermQueryBuilder(queryKey: String, queryValue: String): QueryBuilder {
-        return QueryBuilders.termQuery("$KEY_PREFIX.$queryKey", queryValue)
-    }
+    private fun getTermQueryBuilder(
+        queryKey: String,
+        queryValue: String,
+    ): QueryBuilder = QueryBuilders.termQuery("$KEY_PREFIX.$queryKey", queryValue)
 
-    private fun getTermsQueryBuilder(queryKey: String, queryValue: String): QueryBuilder {
-        return QueryBuilders.termsQuery("$KEY_PREFIX.$queryKey", queryValue.split(","))
-    }
+    private fun getTermsQueryBuilder(
+        queryKey: String,
+        queryValue: String,
+    ): QueryBuilder = QueryBuilders.termsQuery("$KEY_PREFIX.$queryKey", queryValue.split(","))
 
-    private fun getMatchQueryBuilder(queryKey: String, queryValue: String): QueryBuilder {
-        return QueryBuilders.matchQuery("$KEY_PREFIX.$queryKey", queryValue)
-    }
+    private fun getMatchQueryBuilder(
+        queryKey: String,
+        queryValue: String,
+    ): QueryBuilder = QueryBuilders.matchQuery("$KEY_PREFIX.$queryKey", queryValue)
 
-    private fun getNestedMatchQueryBuilder(queryKey: String, queryValue: String): QueryBuilder {
+    private fun getNestedMatchQueryBuilder(
+        queryKey: String,
+        queryValue: String,
+    ): QueryBuilder {
         val query = QueryBuilders.matchQuery("$KEY_PREFIX.$queryKey", queryValue)
         val nestedPath = NESTED_PATHS.first { queryKey.startsWith(it) }
         return QueryBuilders.nestedQuery("$KEY_PREFIX.$nestedPath", query, ScoreMode.None)

@@ -17,5 +17,8 @@ interface CredentialsProvider {
      * @param roleArn optional role ARN
      * @return AWSCredentialsProvider
      */
-    fun getCredentialsProvider(region: String, roleArn: String?): AWSCredentialsProvider
+    fun getCredentialsProvider(
+        region: String,
+        roleArn: String?,
+    ): AWSCredentialsProvider
 }

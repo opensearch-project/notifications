@@ -19,7 +19,6 @@ import java.io.IOException
  * This class handles the client responsible for submitting the messages to all types of webhook destinations.
  */
 internal class WebhookDestinationTransport : DestinationTransport<WebhookDestination> {
-
     private val log by logger(WebhookDestinationTransport::class.java)
     private val destinationHttpClient: DestinationHttpClient
 
@@ -35,25 +34,24 @@ internal class WebhookDestinationTransport : DestinationTransport<WebhookDestina
     override fun sendMessage(
         destination: WebhookDestination,
         message: MessageContent,
-        referenceId: String
-    ): DestinationMessageResponse {
-        return try {
+        referenceId: String,
+    ): DestinationMessageResponse =
+        try {
             val response = destinationHttpClient.execute(destination, message, referenceId)
             DestinationMessageResponse(RestStatus.OK.status, response)
         } catch (exception: IOException) {
             log.error("Exception sending webhook message $referenceId: $message", exception)
             DestinationMessageResponse(
                 RestStatus.INTERNAL_SERVER_ERROR.status,
-                "Failed to send webhook message ${exception.message}"
+                "Failed to send webhook message ${exception.message}",
             )
         } catch (illegalArgumentException: IllegalArgumentException) {
             log.error(
-                "Exception sending webhook message: message creation failed with status:${illegalArgumentException.message}"
+                "Exception sending webhook message: message creation failed with status:${illegalArgumentException.message}",
             )
             DestinationMessageResponse(
                 RestStatus.BAD_REQUEST.status,
-                "Webhook message creation failed with status:${illegalArgumentException.message}"
+                "Webhook message creation failed with status:${illegalArgumentException.message}",
             )
         }
-    }
 }

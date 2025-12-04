@@ -20,7 +20,6 @@ import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import kotlin.test.assertEquals
 
 class SmtpEmailTests {
-
     private lateinit var greenMail: GreenMail
 
     @BeforeEach
@@ -36,23 +35,25 @@ class SmtpEmailTests {
 
     @Test
     fun `test send email to one recipient over smtp server`() {
-        val smtpDestination = SmtpDestination(
-            "testAccountName",
-            "localhost",
-            ServerSetupTest.SMTP.port,
-            "none",
-            "from@email.com",
-            "test@localhost.com"
-        )
-        val message = MessageContent(
-            "Test smtp email title",
-            "Description for notification in text",
-            "Description for notification in json encode html format",
-            "opensearch.data",
-            "base64",
-            "VGVzdCBtZXNzYWdlCgo=",
-            "application/octet-stream"
-        )
+        val smtpDestination =
+            SmtpDestination(
+                "testAccountName",
+                "localhost",
+                ServerSetupTest.SMTP.port,
+                "none",
+                "from@email.com",
+                "test@localhost.com",
+            )
+        val message =
+            MessageContent(
+                "Test smtp email title",
+                "Description for notification in text",
+                "Description for notification in json encode html format",
+                "opensearch.data",
+                "base64",
+                "VGVzdCBtZXNzYWdlCgo=",
+                "application/octet-stream",
+            )
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SMTP to SmtpDestinationTransport())
         val response = NotificationCoreImpl.sendMessage(smtpDestination, message, "ref")
         assertEquals("Success", response.statusText)
@@ -62,28 +63,30 @@ class SmtpEmailTests {
 
     @Test
     fun `test send email with non-available host`() {
-        val smtpDestination = SmtpDestination(
-            "testAccountName",
-            "invalidHost",
-            ServerSetupTest.SMTP.port,
-            "none",
-            "from@email.com",
-            "test@localhost.com"
-        )
-        val message = MessageContent(
-            "Test smtp email title",
-            "Description for notification in text",
-            "Description for notification in json encode html format",
-            "opensearch.data",
-            "base64",
-            "VGVzdCBtZXNzYWdlCgo=",
-            "application/octet-stream"
-        )
+        val smtpDestination =
+            SmtpDestination(
+                "testAccountName",
+                "invalidHost",
+                ServerSetupTest.SMTP.port,
+                "none",
+                "from@email.com",
+                "test@localhost.com",
+            )
+        val message =
+            MessageContent(
+                "Test smtp email title",
+                "Description for notification in text",
+                "Description for notification in json encode html format",
+                "opensearch.data",
+                "base64",
+                "VGVzdCBtZXNzYWdlCgo=",
+                "application/octet-stream",
+            )
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.SMTP to SmtpDestinationTransport())
         val response = NotificationCoreImpl.sendMessage(smtpDestination, message, "ref")
         assertEquals(
             "sendEmail Error, status:Couldn't connect to host, port: invalidHost, ${ServerSetupTest.SMTP.port}; timeout -1",
-            response.statusText
+            response.statusText,
         )
         assertEquals(RestStatus.SERVICE_UNAVAILABLE.status, response.statusCode)
     }

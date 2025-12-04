@@ -21,7 +21,7 @@ import java.time.Instant
 data class DocMetadata(
     val lastUpdateTime: Instant,
     val createdTime: Instant,
-    val access: List<String>
+    val access: List<String>,
 ) : ToXContent {
     companion object {
         private val log by logger(DocMetadata::class.java)
@@ -42,9 +42,18 @@ data class DocMetadata(
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    UPDATED_TIME_TAG -> lastUpdateTime = Instant.ofEpochMilli(parser.longValue())
-                    CREATED_TIME_TAG -> createdTime = Instant.ofEpochMilli(parser.longValue())
-                    ACCESS_LIST_TAG -> access = parser.stringList()
+                    UPDATED_TIME_TAG -> {
+                        lastUpdateTime = Instant.ofEpochMilli(parser.longValue())
+                    }
+
+                    CREATED_TIME_TAG -> {
+                        createdTime = Instant.ofEpochMilli(parser.longValue())
+                    }
+
+                    ACCESS_LIST_TAG -> {
+                        access = parser.stringList()
+                    }
+
                     else -> {
                         parser.skipChildren()
                         log.info("DocMetadata Skipping Unknown field $fieldName")
@@ -56,7 +65,7 @@ data class DocMetadata(
             return DocMetadata(
                 lastUpdateTime,
                 createdTime,
-                access
+                access,
             )
         }
     }
@@ -64,11 +73,14 @@ data class DocMetadata(
     /**
      * {ref toXContent}
      */
-    override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
-        return builder!!.startObject()
+    override fun toXContent(
+        builder: XContentBuilder?,
+        params: ToXContent.Params?,
+    ): XContentBuilder =
+        builder!!
+            .startObject()
             .field(UPDATED_TIME_TAG, lastUpdateTime.toEpochMilli())
             .field(CREATED_TIME_TAG, createdTime.toEpochMilli())
             .field(ACCESS_LIST_TAG, access)
             .endObject()
-    }
 }

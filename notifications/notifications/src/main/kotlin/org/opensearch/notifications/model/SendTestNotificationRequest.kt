@@ -23,7 +23,9 @@ import java.io.IOException
 /**
  * Action Request to send test notification.
  */
-class SendTestNotificationRequest : ActionRequest, ToXContentObject {
+class SendTestNotificationRequest :
+    ActionRequest,
+    ToXContentObject {
     val configId: String
 
     companion object {
@@ -46,13 +48,16 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
                 parser.currentToken(),
-                parser
+                parser,
             )
             while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    CONFIG_ID_TAG -> configId = parser.text()
+                    CONFIG_ID_TAG -> {
+                        configId = parser.text()
+                    }
+
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing SendTestNotificationRequest")
@@ -69,7 +74,7 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
      * @param configId the id of the notification configuration channel
      */
     constructor(
-        configId: String
+        configId: String,
     ) {
         this.configId = configId
     }
@@ -94,9 +99,13 @@ class SendTestNotificationRequest : ActionRequest, ToXContentObject {
     /**
      * {@inheritDoc}
      */
-    override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
+    override fun toXContent(
+        builder: XContentBuilder?,
+        params: ToXContent.Params?,
+    ): XContentBuilder {
         builder!!
-        return builder.startObject()
+        return builder
+            .startObject()
             .field(CONFIG_ID_TAG, configId)
             .endObject()
     }

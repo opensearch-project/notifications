@@ -22,14 +22,23 @@ fun validateUrl(urlString: String) {
     require(isValidUrl(urlString)) { "Invalid URL or unsupported" }
 }
 
-fun validateUrlHost(urlString: String, hostDenyList: List<String>) {
+fun validateUrlHost(
+    urlString: String,
+    hostDenyList: List<String>,
+) {
     val url = URL(urlString)
 
-    if (org.opensearch.notifications.spi.utils.getResolvedIps(url.host).isEmpty()) {
+    if (org.opensearch.notifications.spi.utils
+            .getResolvedIps(url.host)
+            .isEmpty()
+    ) {
         throw UnknownHostException("Host could not be resolved to a valid Ip address")
     }
 
-    require(!org.opensearch.notifications.spi.utils.isHostInDenylist(urlString, hostDenyList)) {
+    require(
+        !org.opensearch.notifications.spi.utils
+            .isHostInDenylist(urlString, hostDenyList),
+    ) {
         "Host of url is denied, based on plugin setting [notification.core.http.host_deny_list]"
     }
 }
@@ -45,7 +54,10 @@ fun isValidUrl(urlString: String): Boolean {
 }
 
 @Deprecated("This function is not maintained, use org.opensearch.notifications.spi.utils.isHostInDenylist instead.")
-fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
+fun isHostInDenylist(
+    urlString: String,
+    hostDenyList: List<String>,
+): Boolean {
     val url = URL(urlString)
     if (url.host != null) {
         try {
@@ -88,17 +100,18 @@ fun isHostInDenylist(urlString: String, hostDenyList: List<String>): Boolean {
  * Regex was based off of this post: https://stackoverflow.com/a/201378
  */
 fun isValidEmail(email: String): Boolean {
-    val validEmailPattern = Regex(
-        "(?:[a-z0-9!#\$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#\$%&'*+\\/=?^_`{|}~-]+)*" +
-            "|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]" + "" +
-            "|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")" +
-            "@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?" +
-            "|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}" +
-            "(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:" +
-            "(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]" + "" +
-            "|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])",
-        RegexOption.IGNORE_CASE
-    )
+    val validEmailPattern =
+        Regex(
+            "(?:[a-z0-9!#\$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#\$%&'*+\\/=?^_`{|}~-]+)*" +
+                "|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]" + "" +
+                "|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")" +
+                "@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?" +
+                "|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}" +
+                "(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:" +
+                "(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]" + "" +
+                "|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])",
+            RegexOption.IGNORE_CASE,
+        )
     return validEmailPattern.matches(email)
 }
 
@@ -106,6 +119,6 @@ fun validateMethod(method: String) {
     require(!Strings.isNullOrEmpty(method)) { "Method is null or empty" }
     val validMethods = listOf(HttpPost.METHOD_NAME, HttpPut.METHOD_NAME, HttpPatch.METHOD_NAME)
     require(
-        method.findAnyOf(validMethods) != null
+        method.findAnyOf(validMethods) != null,
     ) { "Invalid method supplied. Only POST, PUT and PATCH are allowed" }
 }

@@ -7,4 +7,7 @@ package org.opensearch.notifications.spi.model
 
 import org.opensearch.core.common.settings.SecureString
 
-data class SecureDestinationSettings(val emailUsername: SecureString, val emailPassword: SecureString)
+data class SecureDestinationSettings(
+    val emailUsername: SecureString,
+    val emailPassword: SecureString,
+)

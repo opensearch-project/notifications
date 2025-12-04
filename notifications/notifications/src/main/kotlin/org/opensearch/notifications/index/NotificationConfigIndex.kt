@@ -64,6 +64,8 @@ import java.util.concurrent.TimeUnit
 @Suppress("TooManyFunctions")
 internal object NotificationConfigIndex : ConfigOperations {
     const val DEFAULT_SCHEMA_VERSION = 1
+
+    @Suppress("ktlint:standard:property-naming", "ktlint:standard:backing-property-naming")
     const val _META = "_meta"
     const val SCHEMA_VERSION = "schema_version"
 
@@ -72,39 +74,48 @@ internal object NotificationConfigIndex : ConfigOperations {
     private const val MAPPING_FILE_NAME = "notifications-config-mapping.yml"
     private const val SETTINGS_FILE_NAME = "notifications-config-settings.yml"
 
-    private val indexMappingAsMap = XContentHelper.convertToMap(
-        XContentType.YAML.xContent(),
-        NotificationConfigIndex::class.java.classLoader.getResource(MAPPING_FILE_NAME)?.readText()!!,
-        false
-    )
+    private val indexMappingAsMap =
+        XContentHelper.convertToMap(
+            XContentType.YAML.xContent(),
+            NotificationConfigIndex::class.java.classLoader
+                .getResource(MAPPING_FILE_NAME)
+                ?.readText()!!,
+            false,
+        )
     private val indexMappingSchemaVersion = getSchemaVersionFromIndexMapping(indexMappingAsMap)
 
     private lateinit var client: Client
     private lateinit var clusterService: ClusterService
     private lateinit var sdkClient: SdkClient
 
-    private val searchHitParser = object : SearchResults.SearchHitParser<NotificationConfigInfo> {
-        override fun parse(searchHit: SearchHit): NotificationConfigInfo {
-            val parser = XContentType.JSON.xContent().createParser(
-                NamedXContentRegistry.EMPTY,
-                LoggingDeprecationHandler.INSTANCE,
-                searchHit.sourceAsString
-            )
-            parser.nextToken()
-            val doc = NotificationConfigDoc.parse(parser)
-            return NotificationConfigInfo(
-                searchHit.id,
-                doc.metadata.lastUpdateTime,
-                doc.metadata.createdTime,
-                doc.config
-            )
+    private val searchHitParser =
+        object : SearchResults.SearchHitParser<NotificationConfigInfo> {
+            override fun parse(searchHit: SearchHit): NotificationConfigInfo {
+                val parser =
+                    XContentType.JSON.xContent().createParser(
+                        NamedXContentRegistry.EMPTY,
+                        LoggingDeprecationHandler.INSTANCE,
+                        searchHit.sourceAsString,
+                    )
+                parser.nextToken()
+                val doc = NotificationConfigDoc.parse(parser)
+                return NotificationConfigInfo(
+                    searchHit.id,
+                    doc.metadata.lastUpdateTime,
+                    doc.metadata.createdTime,
+                    doc.config,
+                )
+            }
         }
-    }
 
     /**
      * {@inheritDoc}
      */
-    fun initialize(sdkClient: SdkClient, client: Client, clusterService: ClusterService) {
+    fun initialize(
+        sdkClient: SdkClient,
+        client: Client,
+        clusterService: ClusterService,
+    ) {
         NotificationConfigIndex.client = SecureIndexClient(client)
         NotificationConfigIndex.clusterService = clusterService
         NotificationConfigIndex.sdkClient = sdkClient
@@ -133,14 +144,16 @@ internal object NotificationConfigIndex : ConfigOperations {
         if (!isIndexExists()) {
             val classLoader = NotificationConfigIndex::class.java.classLoader
             val indexSettingsSource = classLoader.getResource(SETTINGS_FILE_NAME)?.readText()!!
-            val request = CreateIndexRequest(INDEX_NAME)
-                .mapping(indexMappingAsMap)
-                .settings(indexSettingsSource, XContentType.YAML)
+            val request =
+                CreateIndexRequest(INDEX_NAME)
+                    .mapping(indexMappingAsMap)
+                    .settings(indexSettingsSource, XContentType.YAML)
             client.threadPool().threadContext.stashContext().use {
                 try {
-                    val response: CreateIndexResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-                        admin().indices().create(request, it)
-                    }
+                    val response: CreateIndexResponse =
+                        client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+                            admin().indices().create(request, it)
+                        }
                     if (response.isAcknowledged) {
                         log.info("$LOG_PREFIX:Index $INDEX_NAME creation Acknowledged")
                     } else {
@@ -153,14 +166,20 @@ internal object NotificationConfigIndex : ConfigOperations {
                 }
             }
         } else {
-            val currentIndexMappingMetadata = clusterService.state().metadata.indices[INDEX_NAME]?.mapping()?.sourceAsMap()
+            val currentIndexMappingMetadata =
+                clusterService
+                    .state()
+                    .metadata.indices[INDEX_NAME]
+                    ?.mapping()
+                    ?.sourceAsMap()
             val currentIndexMappingSchemaVersion = getSchemaVersionFromIndexMapping(currentIndexMappingMetadata)
             if (currentIndexMappingSchemaVersion < indexMappingSchemaVersion) {
                 val putMappingRequest: PutMappingRequest = PutMappingRequest(INDEX_NAME).source(indexMappingAsMap)
                 client.threadPool().threadContext.stashContext().use {
-                    val response: AcknowledgedResponse = client.suspendUntil {
-                        admin().indices().putMapping(putMappingRequest, it)
-                    }
+                    val response: AcknowledgedResponse =
+                        client.suspendUntil {
+                            admin().indices().putMapping(putMappingRequest, it)
+                        }
                     if (response.isAcknowledged) {
                         log.info("$LOG_PREFIX:Index $INDEX_NAME update mapping Acknowledged")
                     } else {
@@ -183,19 +202,25 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    override suspend fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String?): String? {
+    override suspend fun createNotificationConfig(
+        configDoc: NotificationConfigDoc,
+        id: String?,
+    ): String? {
         createIndex()
-        val postRequest = PutDataObjectRequest.builder()
-            .index(INDEX_NAME)
-            .dataObject({ builder, params -> configDoc.toXContent(builder, params) })
-            .overwriteIfExists(false)
+        val postRequest =
+            PutDataObjectRequest
+                .builder()
+                .index(INDEX_NAME)
+                .dataObject({ builder, params -> configDoc.toXContent(builder, params) })
+                .overwriteIfExists(false)
         if (id != null) {
             postRequest.id(id)
         }
 
-        val response: IndexResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-            sdkClient.putDataObjectAsync(postRequest.build()).whenComplete(it)
-        }
+        val response: IndexResponse =
+            sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+                sdkClient.putDataObjectAsync(postRequest.build()).whenComplete(it)
+            }
         return if (response.result != DocWriteResponse.Result.CREATED) {
             log.warn("$LOG_PREFIX:createNotificationConfig - response:$response")
             null
@@ -211,9 +236,10 @@ internal object NotificationConfigIndex : ConfigOperations {
         createIndex()
         val getRequest = MultiGetRequest()
         ids.forEach { getRequest.add(INDEX_NAME, it) }
-        val response: MultiGetResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-            multiGet(getRequest, it)
-        }
+        val response: MultiGetResponse =
+            client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+                multiGet(getRequest, it)
+            }
         return response.responses.mapNotNull { parseNotificationConfigDoc(it.id, it.response) }
     }
 
@@ -222,77 +248,90 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     override suspend fun getNotificationConfig(id: String): NotificationConfigDocInfo? {
         createIndex()
-        val getRequest = GetDataObjectRequest.builder()
-            .index(INDEX_NAME)
-            .id(id)
-            .build()
+        val getRequest =
+            GetDataObjectRequest
+                .builder()
+                .index(INDEX_NAME)
+                .id(id)
+                .build()
 
-        val response: GetResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-            sdkClient.getDataObjectAsync(getRequest).whenComplete(it)
-        }
+        val response: GetResponse =
+            sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+                sdkClient.getDataObjectAsync(getRequest).whenComplete(it)
+            }
         return parseNotificationConfigDoc(id, response)
     }
 
-    private fun parseNotificationConfigDoc(id: String, response: GetResponse): NotificationConfigDocInfo? {
-        return if (response.sourceAsString == null) {
+    private fun parseNotificationConfigDoc(
+        id: String,
+        response: GetResponse,
+    ): NotificationConfigDocInfo? =
+        if (response.sourceAsString == null) {
             log.warn("$LOG_PREFIX:getNotificationConfig - $id not found; response:$response")
             null
         } else {
-            val parser = XContentType.JSON.xContent().createParser(
-                NamedXContentRegistry.EMPTY,
-                LoggingDeprecationHandler.INSTANCE,
-                response.sourceAsString
-            )
+            val parser =
+                XContentType.JSON.xContent().createParser(
+                    NamedXContentRegistry.EMPTY,
+                    LoggingDeprecationHandler.INSTANCE,
+                    response.sourceAsString,
+                )
             parser.nextToken()
             val doc = NotificationConfigDoc.parse(parser)
-            val info = DocInfo(
-                id = id,
-                version = response.version,
-                seqNo = response.seqNo,
-                primaryTerm = response.primaryTerm
-            )
+            val info =
+                DocInfo(
+                    id = id,
+                    version = response.version,
+                    seqNo = response.seqNo,
+                    primaryTerm = response.primaryTerm,
+                )
             NotificationConfigDocInfo(info, doc)
         }
-    }
 
     /**
      * {@inheritDoc}
      */
     override suspend fun getAllNotificationConfigs(
         access: List<String>,
-        request: GetNotificationConfigRequest
+        request: GetNotificationConfigRequest,
     ): NotificationConfigSearchResult {
         createIndex()
-        val sourceBuilder = SearchSourceBuilder()
-            .timeout(TimeValue(PluginSettings.operationTimeoutMs, TimeUnit.MILLISECONDS))
-            .sort(getSortField(request.sortField), request.sortOrder ?: SortOrder.ASC)
-            .size(request.maxItems)
-            .from(request.fromIndex)
+        val sourceBuilder =
+            SearchSourceBuilder()
+                .timeout(TimeValue(PluginSettings.operationTimeoutMs, TimeUnit.MILLISECONDS))
+                .sort(getSortField(request.sortField), request.sortOrder ?: SortOrder.ASC)
+                .size(request.maxItems)
+                .from(request.fromIndex)
         val query = QueryBuilders.boolQuery()
         if (access.isNotEmpty()) {
             // We consider empty access documents public, so will fetch them as well
-            val filterQuery = BoolQueryBuilder().should(
-                QueryBuilders.termsQuery("$METADATA_TAG.$ACCESS_LIST_TAG", access)
-            ).should(
-                QueryBuilders.scriptQuery(Script("doc['$METADATA_TAG.$ACCESS_LIST_TAG'] == []"))
-            )
+            val filterQuery =
+                BoolQueryBuilder()
+                    .should(
+                        QueryBuilders.termsQuery("$METADATA_TAG.$ACCESS_LIST_TAG", access),
+                    ).should(
+                        QueryBuilders.scriptQuery(Script("doc['$METADATA_TAG.$ACCESS_LIST_TAG'] == []")),
+                    )
             query.filter(filterQuery)
         }
         ConfigQueryHelper.addQueryFilters(query, request.filterParams)
         sourceBuilder.query(query)
-        val searchRequest = SearchDataObjectRequest.builder()
-            .indices(INDEX_NAME)
-            .searchSourceBuilder(sourceBuilder)
-            .build()
+        val searchRequest =
+            SearchDataObjectRequest
+                .builder()
+                .indices(INDEX_NAME)
+                .searchSourceBuilder(sourceBuilder)
+                .build()
 
-        val response: SearchResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-            sdkClient.searchDataObjectAsync(searchRequest).whenComplete(it)
-        }
+        val response: SearchResponse =
+            sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+                sdkClient.searchDataObjectAsync(searchRequest).whenComplete(it)
+            }
         val result = NotificationConfigSearchResult(request.fromIndex.toLong(), response, searchHitParser)
         log.info(
             "$LOG_PREFIX:getAllNotificationConfigs from:${request.fromIndex}, maxItems:${request.maxItems}," +
                 " sortField:${request.sortField}, sortOrder=${request.sortOrder}, filters=${request.filterParams}" +
-                " retCount:${result.objectList.size}, totalCount:${result.totalHits}"
+                " retCount:${result.objectList.size}, totalCount:${result.totalHits}",
         )
         return result
     }
@@ -300,18 +339,24 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    override suspend fun updateNotificationConfig(id: String, notificationConfigDoc: NotificationConfigDoc): Boolean {
+    override suspend fun updateNotificationConfig(
+        id: String,
+        notificationConfigDoc: NotificationConfigDoc,
+    ): Boolean {
         createIndex()
-        val putRequest = PutDataObjectRequest.builder()
-            .index(INDEX_NAME)
-            .id(id)
-            .dataObject({ builder, params -> notificationConfigDoc.toXContent(builder, params) })
-            .overwriteIfExists(true)
-            .build()
+        val putRequest =
+            PutDataObjectRequest
+                .builder()
+                .index(INDEX_NAME)
+                .id(id)
+                .dataObject({ builder, params -> notificationConfigDoc.toXContent(builder, params) })
+                .overwriteIfExists(true)
+                .build()
 
-        val response: IndexResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-            sdkClient.putDataObjectAsync(putRequest).whenComplete(it)
-        }
+        val response: IndexResponse =
+            sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+                sdkClient.putDataObjectAsync(putRequest).whenComplete(it)
+            }
         if (response.result != DocWriteResponse.Result.UPDATED) {
             log.warn("$LOG_PREFIX:updateNotificationConfig failed for $id; response:$response")
         }
@@ -323,14 +368,17 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     override suspend fun deleteNotificationConfig(id: String): Boolean {
         createIndex()
-        val deleteRequest = DeleteDataObjectRequest.builder()
-            .index(INDEX_NAME)
-            .id(id)
-            .build()
+        val deleteRequest =
+            DeleteDataObjectRequest
+                .builder()
+                .index(INDEX_NAME)
+                .id(id)
+                .build()
 
-        val response: DeleteResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-            sdkClient.deleteDataObjectAsync(deleteRequest).whenComplete(it)
-        }
+        val response: DeleteResponse =
+            sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+                sdkClient.deleteDataObjectAsync(deleteRequest).whenComplete(it)
+            }
         if (response.result != DocWriteResponse.Result.DELETED) {
             log.warn("$LOG_PREFIX:deleteNotificationConfig failed for $id; response:$response")
         }
@@ -343,21 +391,25 @@ internal object NotificationConfigIndex : ConfigOperations {
     override suspend fun deleteNotificationConfigs(ids: Set<String>): Map<String, RestStatus> {
         createIndex()
 
-        val bulkDeleteRequest = BulkDataObjectRequest.builder()
-            .globalIndex(INDEX_NAME)
-            .build()
+        val bulkDeleteRequest =
+            BulkDataObjectRequest
+                .builder()
+                .globalIndex(INDEX_NAME)
+                .build()
         ids.forEach {
             bulkDeleteRequest.add(
-                DeleteDataObjectRequest.builder()
+                DeleteDataObjectRequest
+                    .builder()
                     .index(INDEX_NAME)
                     .id(it)
-                    .build()
+                    .build(),
             )
         }
 
-        val response: BulkResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-            sdkClient.bulkDataObjectAsync(bulkDeleteRequest).whenComplete(it)
-        }
+        val response: BulkResponse =
+            sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+                sdkClient.bulkDataObjectAsync(bulkDeleteRequest).whenComplete(it)
+            }
         val mutableMap = mutableMapOf<String, RestStatus>()
         response.forEach {
             mutableMap[it.id] = it.status()
@@ -397,11 +449,17 @@ private inline fun <T : ThreadContext.StoredContext, R> T.use(block: (T) -> R): 
  *
  * The suppressed exception is added to the list of suppressed exceptions of [cause] exception.
  */
-private fun ThreadContext.StoredContext.closeFinally(cause: Throwable?) = when (cause) {
-    null -> close()
-    else -> try {
-        close()
-    } catch (closeException: Throwable) {
-        cause.addSuppressed(closeException)
+private fun ThreadContext.StoredContext.closeFinally(cause: Throwable?) =
+    when (cause) {
+        null -> {
+            close()
+        }
+
+        else -> {
+            try {
+                close()
+            } catch (closeException: Throwable) {
+                cause.addSuppressed(closeException)
+            }
+        }
     }
-}

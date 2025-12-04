@@ -27,40 +27,40 @@ import org.opensearch.transport.client.Client
  * the legacy embedded destinations that are on its policies. No other plugin
  * should utilize this action.
  */
-internal class PublishNotificationAction @Inject constructor(
-    transportService: TransportService,
-    client: Client,
-    actionFilters: ActionFilters,
-    val xContentRegistry: NamedXContentRegistry
-) : PluginBaseAction<LegacyPublishNotificationRequest, LegacyPublishNotificationResponse>(
-    NotificationsActions.LEGACY_PUBLISH_NOTIFICATION_NAME,
-    transportService,
-    client,
-    actionFilters,
-    ::LegacyPublishNotificationRequest
-) {
+internal class PublishNotificationAction
+    @Inject
+    constructor(
+        transportService: TransportService,
+        client: Client,
+        actionFilters: ActionFilters,
+        val xContentRegistry: NamedXContentRegistry,
+    ) : PluginBaseAction<LegacyPublishNotificationRequest, LegacyPublishNotificationResponse>(
+            NotificationsActions.LEGACY_PUBLISH_NOTIFICATION_NAME,
+            transportService,
+            client,
+            actionFilters,
+            ::LegacyPublishNotificationRequest,
+        ) {
+        /**
+         * {@inheritDoc}
+         * Transform the request and call super.doExecute() to support call from other plugins.
+         */
+        override fun doExecute(
+            task: Task?,
+            request: ActionRequest,
+            listener: ActionListener<LegacyPublishNotificationResponse>,
+        ) {
+            val transformedRequest =
+                request as? LegacyPublishNotificationRequest
+                    ?: recreateObject(request) { LegacyPublishNotificationRequest(it) }
+            super.doExecute(task, transformedRequest, listener)
+        }
 
-    /**
-     * {@inheritDoc}
-     * Transform the request and call super.doExecute() to support call from other plugins.
-     */
-    override fun doExecute(
-        task: Task?,
-        request: ActionRequest,
-        listener: ActionListener<LegacyPublishNotificationResponse>
-    ) {
-        val transformedRequest = request as? LegacyPublishNotificationRequest
-            ?: recreateObject(request) { LegacyPublishNotificationRequest(it) }
-        super.doExecute(task, transformedRequest, listener)
+        /**
+         * {@inheritDoc}
+         */
+        override suspend fun executeRequest(
+            request: LegacyPublishNotificationRequest,
+            user: User?,
+        ): LegacyPublishNotificationResponse = SendMessageActionHelper.executeLegacyRequest(request)
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    override suspend fun executeRequest(
-        request: LegacyPublishNotificationRequest,
-        user: User?
-    ): LegacyPublishNotificationResponse {
-        return SendMessageActionHelper.executeLegacyRequest(request)
-    }
-}

@@ -27,7 +27,6 @@ import org.opensearch.notifications.spi.model.destination.DestinationType
 import org.opensearch.notifications.spi.model.destination.SnsDestination
 
 internal class SnsDestinationTests {
-
     @Test
     fun `test sns message success response`() {
         val expectedSnsResponse = DestinationMessageResponse(RestStatus.OK.status, "Success, message id: test-message-id")
@@ -38,14 +37,16 @@ internal class SnsDestinationTests {
         every { destinationSnsClient.sendMessage(any(), any(), any()) } returns publishResult
 
         val snsDestinationTransport = SnsDestinationTransport(destinationSnsClient)
-        DestinationTransportProvider.destinationTransportMap = mapOf(
-            DestinationType.SNS to snsDestinationTransport
-        )
+        DestinationTransportProvider.destinationTransportMap =
+            mapOf(
+                DestinationType.SNS to snsDestinationTransport,
+            )
 
         val title = "test sns"
-        val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present"
+        val messageText =
+            "Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member callout: " +
+                "@All All Present member callout: @Present"
         val topicArn = "arn:aws:sns:us-west-2:012345678912:test-notification"
         val roleArn = "arn:aws:iam::012345678912:role/iam-test"
 
@@ -73,14 +74,16 @@ internal class SnsDestinationTests {
         every { destinationSnsClient.sendMessage(any(), any(), any()) } returns publishResult
 
         val snsDestinationTransport = SnsDestinationTransport(destinationSnsClient)
-        DestinationTransportProvider.destinationTransportMap = mapOf(
-            DestinationType.SNS to snsDestinationTransport
-        )
+        DestinationTransportProvider.destinationTransportMap =
+            mapOf(
+                DestinationType.SNS to snsDestinationTransport,
+            )
 
         val title = "test sns"
-        val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present"
+        val messageText =
+            "Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member callout: " +
+                "@All All Present member callout: @Present"
         val topicArn = "arn:aws:sns:us-west-2:012345678912:test-notification"
         val roleArn = "arn:aws:iam::012345678912:role/iam-test"
 
@@ -108,14 +111,16 @@ internal class SnsDestinationTests {
         every { destinationSnsClient.sendMessage(any(), any(), any()) } returns publishResult
 
         val snsDestinationTransport = SnsDestinationTransport(destinationSnsClient)
-        DestinationTransportProvider.destinationTransportMap = mapOf(
-            DestinationType.SNS to snsDestinationTransport
-        )
+        DestinationTransportProvider.destinationTransportMap =
+            mapOf(
+                DestinationType.SNS to snsDestinationTransport,
+            )
 
         val title = "test sns"
-        val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present"
+        val messageText =
+            "Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member callout: " +
+                "@All All Present member callout: @Present"
         val topicArn = "arn:aws:sns:us-west-2:012345678912:test-notification"
         val roleArn = "arn:aws:iam::012345678912:role/iam-test"
 
@@ -140,14 +145,16 @@ internal class SnsDestinationTests {
         every { destinationSnsClient.sendMessage(any(), any(), any()) } returns publishResult
 
         val snsDestinationTransport = SnsDestinationTransport(destinationSnsClient)
-        DestinationTransportProvider.destinationTransportMap = mapOf(
-            DestinationType.SNS to snsDestinationTransport
-        )
+        DestinationTransportProvider.destinationTransportMap =
+            mapOf(
+                DestinationType.SNS to snsDestinationTransport,
+            )
 
         val title = "test sns"
-        val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present"
+        val messageText =
+            "Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member callout: " +
+                "@All All Present member callout: @Present"
         val topicArn = "arn:aws:sns:us-west-2:012345678912:test-notification"
         val roleArn = "arn:aws:iam::012345678912:role/iam-test"
 

@@ -12,14 +12,11 @@ import org.opensearch.notifications.spi.utils.validateUrl
  */
 abstract class WebhookDestination(
     val url: String,
-    destinationType: DestinationType
+    destinationType: DestinationType,
 ) : BaseDestination(destinationType) {
-
     init {
         validateUrl(url)
     }
 
-    override fun toString(): String {
-        return "DestinationType: $destinationType , Url: $url"
-    }
+    override fun toString(): String = "DestinationType: $destinationType , Url: $url"
 }

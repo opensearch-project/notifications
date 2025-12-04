@@ -30,37 +30,34 @@ object NotificationCoreImpl : NotificationCore {
     override fun sendMessage(
         destination: BaseDestination,
         message: MessageContent,
-        referenceId: String
-    ): DestinationMessageResponse {
-        return AccessController.doPrivileged(
+        referenceId: String,
+    ): DestinationMessageResponse =
+        AccessController.doPrivileged(
             PrivilegedAction {
                 val destinationFactory = DestinationTransportProvider.getTransport(destination.destinationType)
                 destinationFactory.sendMessage(destination, message, referenceId)
-            } as PrivilegedAction<DestinationMessageResponse>?
+            } as PrivilegedAction<DestinationMessageResponse>?,
         )
-    }
 
     /**
      * Get list of allowed destinations
      */
-    override fun getAllowedConfigTypes(): List<String> {
-        return AccessController.doPrivileged(
+    override fun getAllowedConfigTypes(): List<String> =
+        AccessController.doPrivileged(
             PrivilegedAction {
                 PluginSettings.allowedConfigTypes
-            } as PrivilegedAction<List<String>>?
+            } as PrivilegedAction<List<String>>?,
         )
-    }
 
     /**
      * Get map of plugin features
      */
-    override fun getPluginFeatures(): Map<String, String> {
-        return AccessController.doPrivileged(
+    override fun getPluginFeatures(): Map<String, String> =
+        AccessController.doPrivileged(
             PrivilegedAction {
                 mapOf(
-                    Pair("tooltip_support", "${PluginSettings.tooltipSupport}")
+                    Pair("tooltip_support", "${PluginSettings.tooltipSupport}"),
                 )
-            } as PrivilegedAction<Map<String, String>>?
+            } as PrivilegedAction<Map<String, String>>?,
         )
-    }
 }

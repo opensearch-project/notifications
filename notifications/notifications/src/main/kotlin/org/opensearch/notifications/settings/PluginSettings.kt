@@ -27,7 +27,6 @@ import java.nio.file.Path
  * settings specific to Notifications Plugin.
  */
 internal object PluginSettings {
-
     private lateinit var clusterService: ClusterService
 
     /**
@@ -117,81 +116,91 @@ internal object PluginSettings {
         operationTimeoutMs = (settings?.get(OPERATION_TIMEOUT_MS_KEY)?.toLong()) ?: DEFAULT_OPERATION_TIMEOUT_MS
         defaultItemsQueryCount = (settings?.get(DEFAULT_ITEMS_QUERY_COUNT_KEY)?.toInt())
             ?: DEFAULT_ITEMS_QUERY_COUNT_VALUE
-        defaultSettings = mapOf(
-            OPERATION_TIMEOUT_MS_KEY to operationTimeoutMs.toString(DECIMAL_RADIX),
-            DEFAULT_ITEMS_QUERY_COUNT_KEY to defaultItemsQueryCount.toString(DECIMAL_RADIX)
-        )
+        defaultSettings =
+            mapOf(
+                OPERATION_TIMEOUT_MS_KEY to operationTimeoutMs.toString(DECIMAL_RADIX),
+                DEFAULT_ITEMS_QUERY_COUNT_KEY to defaultItemsQueryCount.toString(DECIMAL_RADIX),
+            )
     }
 
-    val OPERATION_TIMEOUT_MS: Setting<Long> = Setting.longSetting(
-        OPERATION_TIMEOUT_MS_KEY,
-        defaultSettings[OPERATION_TIMEOUT_MS_KEY]!!.toLong(),
-        MINIMUM_OPERATION_TIMEOUT_MS,
-        NodeScope,
-        Dynamic
-    )
+    val OPERATION_TIMEOUT_MS: Setting<Long> =
+        Setting.longSetting(
+            OPERATION_TIMEOUT_MS_KEY,
+            defaultSettings[OPERATION_TIMEOUT_MS_KEY]!!.toLong(),
+            MINIMUM_OPERATION_TIMEOUT_MS,
+            NodeScope,
+            Dynamic,
+        )
 
-    val DEFAULT_ITEMS_QUERY_COUNT: Setting<Int> = Setting.intSetting(
-        DEFAULT_ITEMS_QUERY_COUNT_KEY,
-        defaultSettings[DEFAULT_ITEMS_QUERY_COUNT_KEY]!!.toInt(),
-        MINIMUM_ITEMS_QUERY_COUNT,
-        NodeScope,
-        Dynamic
-    )
+    val DEFAULT_ITEMS_QUERY_COUNT: Setting<Int> =
+        Setting.intSetting(
+            DEFAULT_ITEMS_QUERY_COUNT_KEY,
+            defaultSettings[DEFAULT_ITEMS_QUERY_COUNT_KEY]!!.toInt(),
+            MINIMUM_ITEMS_QUERY_COUNT,
+            NodeScope,
+            Dynamic,
+        )
 
-    val LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES: Setting<Boolean> = Setting.boolSetting(
-        LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES_KEY,
-        false,
-        NodeScope,
-        Dynamic,
-        Deprecated
-    )
+    val LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES: Setting<Boolean> =
+        Setting.boolSetting(
+            LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES_KEY,
+            false,
+            NodeScope,
+            Dynamic,
+            Deprecated,
+        )
 
-    val ALERTING_FILTER_BY_BACKEND_ROLES: Setting<Boolean> = Setting.boolSetting(
-        ALERTING_FILTER_BY_BACKEND_ROLES_KEY,
-        LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES,
-        NodeScope,
-        Dynamic
-    )
+    val ALERTING_FILTER_BY_BACKEND_ROLES: Setting<Boolean> =
+        Setting.boolSetting(
+            ALERTING_FILTER_BY_BACKEND_ROLES_KEY,
+            LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES,
+            NodeScope,
+            Dynamic,
+        )
 
-    val FILTER_BY_BACKEND_ROLES: Setting<Boolean> = Setting.boolSetting(
-        FILTER_BY_BACKEND_ROLES_KEY,
-        ALERTING_FILTER_BY_BACKEND_ROLES,
-        NodeScope,
-        Dynamic
-    )
+    val FILTER_BY_BACKEND_ROLES: Setting<Boolean> =
+        Setting.boolSetting(
+            FILTER_BY_BACKEND_ROLES_KEY,
+            ALERTING_FILTER_BY_BACKEND_ROLES,
+            NodeScope,
+            Dynamic,
+        )
 
     /** This setting sets the remote metadata store type  */
-    val REMOTE_METADATA_STORE_TYPE: Setting<String?> = Setting
-        .simpleString(
-            "plugins.alerting.$REMOTE_METADATA_TYPE_KEY",
-            NodeScope,
-            Setting.Property.Final
-        )
+    val REMOTE_METADATA_STORE_TYPE: Setting<String?> =
+        Setting
+            .simpleString(
+                "plugins.alerting.$REMOTE_METADATA_TYPE_KEY",
+                NodeScope,
+                Setting.Property.Final,
+            )
 
     /** This setting sets the remote metadata endpoint  */
-    val REMOTE_METADATA_ENDPOINT: Setting<String?> = Setting
-        .simpleString(
-            "plugins.alerting.$REMOTE_METADATA_ENDPOINT_KEY",
-            NodeScope,
-            Setting.Property.Final
-        )
+    val REMOTE_METADATA_ENDPOINT: Setting<String?> =
+        Setting
+            .simpleString(
+                "plugins.alerting.$REMOTE_METADATA_ENDPOINT_KEY",
+                NodeScope,
+                Setting.Property.Final,
+            )
 
     /** This setting sets the remote metadata region  */
-    val REMOTE_METADATA_REGION: Setting<String?> = Setting
-        .simpleString(
-            "plugins.alerting.$REMOTE_METADATA_REGION_KEY",
-            NodeScope,
-            Setting.Property.Final
-        )
+    val REMOTE_METADATA_REGION: Setting<String?> =
+        Setting
+            .simpleString(
+                "plugins.alerting.$REMOTE_METADATA_REGION_KEY",
+                NodeScope,
+                Setting.Property.Final,
+            )
 
     /** This setting sets the remote metadata service name  */
-    val REMOTE_METADATA_SERVICE_NAME: Setting<String?> = Setting
-        .simpleString(
-            "plugins.alerting.$REMOTE_METADATA_SERVICE_NAME_KEY",
-            NodeScope,
-            Setting.Property.Final
-        )
+    val REMOTE_METADATA_SERVICE_NAME: Setting<String?> =
+        Setting
+            .simpleString(
+                "plugins.alerting.$REMOTE_METADATA_SERVICE_NAME_KEY",
+                NodeScope,
+                Setting.Property.Final,
+            )
 
     fun isRbacEnabled(): Boolean {
         return if (clusterService.clusterSettings.get(FILTER_BY_BACKEND_ROLES_KEY) != null) {
@@ -206,17 +215,16 @@ internal object PluginSettings {
      *
      * @return list of settings defined in this plugin
      */
-    fun getAllSettings(): List<Setting<*>> {
-        return listOf(
+    fun getAllSettings(): List<Setting<*>> =
+        listOf(
             OPERATION_TIMEOUT_MS,
             DEFAULT_ITEMS_QUERY_COUNT,
             FILTER_BY_BACKEND_ROLES,
             REMOTE_METADATA_REGION,
             REMOTE_METADATA_ENDPOINT,
             REMOTE_METADATA_STORE_TYPE,
-            REMOTE_METADATA_SERVICE_NAME
+            REMOTE_METADATA_SERVICE_NAME,
         )
-    }
 
     /**
      * Update the setting variables to setting values from local settings
