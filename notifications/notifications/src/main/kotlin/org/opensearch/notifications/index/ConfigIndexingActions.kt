@@ -4,6 +4,7 @@
  */
 
 package org.opensearch.notifications.index
+
 import org.opensearch.OpenSearchStatusException
 import org.opensearch.commons.authuser.User
 import org.opensearch.commons.notifications.action.CreateNotificationConfigRequest
@@ -39,9 +40,8 @@ import org.opensearch.notifications.model.DocMetadata
 import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.security.UserAccess
 import java.time.Instant
-/**
- * NotificationConfig indexing operation actions.
- */
+
+/** NotificationConfig indexing operation actions. */
 @Suppress("TooManyFunctions")
 object ConfigIndexingActions {
     private val log by logger(ConfigIndexingActions::class.java)
@@ -63,14 +63,20 @@ object ConfigIndexingActions {
 
     @Suppress("UnusedPrivateMember")
     private fun validateChimeConfig(chime: Chime, user: User?) {
-        require(chime.url.contains(Regex("https://hooks\\.chime\\.aws/incomingwebhooks/.*\\?token="))) {
+        require(
+            chime.url.contains(
+                Regex("https://hooks\\.chime\\.aws/incomingwebhooks/.*\\?token=")
+            )
+        ) {
             "Wrong Chime url. Should contain \"hooks.chime.aws/incomingwebhooks/\" and \"?token=\""
         }
     }
 
     private fun validateMicrosoftTeamsConfig(microsoftTeams: MicrosoftTeams, user: User?) {
-        require(microsoftTeams.url.contains(Regex("https://.*\\.webhook\\.office\\.com"))) {
-            "Wrong Microsoft Teams url. Should contain \"webhook.office.com\""
+        val allowedDomains = listOf("webhook.office.com", "powerplatform.com", "logic.azure.com")
+
+        require(allowedDomains.any { microsoftTeams.url.contains(it) }) {
+            "Wrong Microsoft Teams URL. Allowed domains: ${allowedDomains.joinToString()}"
         }
     }
 
@@ -103,33 +109,40 @@ object ConfigIndexingActions {
         configDocs.forEach {
             // Validate that the config type matches the data
             when (it.configDoc.config.configType) {
-                ConfigType.EMAIL_GROUP -> if (it.docInfo.id == email.emailAccountID) {
-                    // Email Group ID is specified as Email Account ID
-                    Metrics.NOTIFICATIONS_CONFIG_USER_ERROR_INVALID_EMAIL_ACCOUNT_ID.counter.increment()
-                    throw OpenSearchStatusException(
-                        "configId ${it.docInfo.id} is not a valid email account ID",
-                        RestStatus.NOT_ACCEPTABLE
-                    )
-                }
-                ConfigType.SMTP_ACCOUNT -> if (it.docInfo.id != email.emailAccountID) {
-                    // Email Account ID is specified as Email Group ID
-                    Metrics.NOTIFICATIONS_CONFIG_USER_ERROR_INVALID_EMAIL_GROUP_ID.counter.increment()
-                    throw OpenSearchStatusException(
-                        "configId ${it.docInfo.id} is not a valid email group ID",
-                        RestStatus.NOT_ACCEPTABLE
-                    )
-                }
-                ConfigType.SES_ACCOUNT -> if (it.docInfo.id != email.emailAccountID) {
-                    // Email Account ID is specified as Email Group ID
-                    Metrics.NOTIFICATIONS_CONFIG_USER_ERROR_INVALID_EMAIL_GROUP_ID.counter.increment()
-                    throw OpenSearchStatusException(
-                        "configId ${it.docInfo.id} is not a valid email group ID",
-                        RestStatus.NOT_ACCEPTABLE
-                    )
-                }
+                ConfigType.EMAIL_GROUP ->
+                    if (it.docInfo.id == email.emailAccountID) {
+                        // Email Group ID is specified as Email Account ID
+                        Metrics.NOTIFICATIONS_CONFIG_USER_ERROR_INVALID_EMAIL_ACCOUNT_ID.counter
+                            .increment()
+                        throw OpenSearchStatusException(
+                            "configId ${it.docInfo.id} is not a valid email account ID",
+                            RestStatus.NOT_ACCEPTABLE
+                        )
+                    }
+                ConfigType.SMTP_ACCOUNT ->
+                    if (it.docInfo.id != email.emailAccountID) {
+                        // Email Account ID is specified as Email Group ID
+                        Metrics.NOTIFICATIONS_CONFIG_USER_ERROR_INVALID_EMAIL_GROUP_ID.counter
+                            .increment()
+                        throw OpenSearchStatusException(
+                            "configId ${it.docInfo.id} is not a valid email group ID",
+                            RestStatus.NOT_ACCEPTABLE
+                        )
+                    }
+                ConfigType.SES_ACCOUNT ->
+                    if (it.docInfo.id != email.emailAccountID) {
+                        // Email Account ID is specified as Email Group ID
+                        Metrics.NOTIFICATIONS_CONFIG_USER_ERROR_INVALID_EMAIL_GROUP_ID.counter
+                            .increment()
+                        throw OpenSearchStatusException(
+                            "configId ${it.docInfo.id} is not a valid email group ID",
+                            RestStatus.NOT_ACCEPTABLE
+                        )
+                    }
                 else -> {
                     // Config ID is neither Email Group ID or valid Email Account ID
-                    Metrics.NOTIFICATIONS_CONFIG_USER_ERROR_NEITHER_EMAIL_NOR_GROUP.counter.increment()
+                    Metrics.NOTIFICATIONS_CONFIG_USER_ERROR_NEITHER_EMAIL_NOR_GROUP.counter
+                        .increment()
                     throw OpenSearchStatusException(
                         "configId ${it.docInfo.id} is not a valid email group ID or email account ID",
                         RestStatus.NOT_ACCEPTABLE
@@ -165,18 +178,23 @@ object ConfigIndexingActions {
 
     private suspend fun validateConfig(config: NotificationConfig, user: User?) {
         when (config.configType) {
-            ConfigType.NONE -> throw OpenSearchStatusException(
-                "NotificationConfig with type NONE is not acceptable",
-                RestStatus.NOT_ACCEPTABLE
-            )
+            ConfigType.NONE ->
+                throw OpenSearchStatusException(
+                    "NotificationConfig with type NONE is not acceptable",
+                    RestStatus.NOT_ACCEPTABLE
+                )
             ConfigType.SLACK -> validateSlackConfig(config.configData as Slack, user)
             ConfigType.CHIME -> validateChimeConfig(config.configData as Chime, user)
-            ConfigType.MICROSOFT_TEAMS -> validateMicrosoftTeamsConfig(config.configData as MicrosoftTeams, user)
+            ConfigType.MICROSOFT_TEAMS ->
+                validateMicrosoftTeamsConfig(config.configData as MicrosoftTeams, user)
             ConfigType.WEBHOOK -> validateWebhookConfig(config.configData as Webhook, user)
             ConfigType.EMAIL -> validateEmailConfig(config.configData as Email, user)
-            ConfigType.SMTP_ACCOUNT -> validateSmtpAccountConfig(config.configData as SmtpAccount, user)
-            ConfigType.SES_ACCOUNT -> validateSesAccountConfig(config.configData as SesAccount, user)
-            ConfigType.EMAIL_GROUP -> validateEmailGroupConfig(config.configData as EmailGroup, user)
+            ConfigType.SMTP_ACCOUNT ->
+                validateSmtpAccountConfig(config.configData as SmtpAccount, user)
+            ConfigType.SES_ACCOUNT ->
+                validateSesAccountConfig(config.configData as SesAccount, user)
+            ConfigType.EMAIL_GROUP ->
+                validateEmailGroupConfig(config.configData as EmailGroup, user)
             ConfigType.SNS -> validateSnsConfig(config.configData as Sns, user)
         }
     }
@@ -187,25 +205,25 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [CreateNotificationConfigResponse]
      */
-    suspend fun create(request: CreateNotificationConfigRequest, user: User?): CreateNotificationConfigResponse {
+    suspend fun create(
+        request: CreateNotificationConfigRequest,
+        user: User?
+    ): CreateNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-create")
         userAccess.validateUser(user)
         validateConfig(request.notificationConfig, user)
         val currentTime = Instant.now()
-        val metadata = DocMetadata(
-            currentTime,
-            currentTime,
-            userAccess.getAllAccessInfo(user)
-        )
+        val metadata = DocMetadata(currentTime, currentTime, userAccess.getAllAccessInfo(user))
         val configDoc = NotificationConfigDoc(metadata, request.notificationConfig)
         val docId = operations.createNotificationConfig(configDoc, request.configId)
-        docId ?: run {
-            Metrics.NOTIFICATIONS_CONFIG_CREATE_SYSTEM_ERROR.counter.increment()
-            throw OpenSearchStatusException(
-                "NotificationConfig Creation failed",
-                RestStatus.INTERNAL_SERVER_ERROR
-            )
-        }
+        docId
+            ?: run {
+                Metrics.NOTIFICATIONS_CONFIG_CREATE_SYSTEM_ERROR.counter.increment()
+                throw OpenSearchStatusException(
+                    "NotificationConfig Creation failed",
+                    RestStatus.INTERNAL_SERVER_ERROR
+                )
+            }
         return CreateNotificationConfigResponse(docId)
     }
 
@@ -215,14 +233,18 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [UpdateNotificationConfigResponse]
      */
-    suspend fun update(request: UpdateNotificationConfigRequest, user: User?): UpdateNotificationConfigResponse {
+    suspend fun update(
+        request: UpdateNotificationConfigRequest,
+        user: User?
+    ): UpdateNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-update ${request.configId}")
         userAccess.validateUser(user)
         validateConfig(request.notificationConfig, user)
         val currentConfigDoc = operations.getNotificationConfig(request.configId)
         currentConfigDoc
             ?: run {
-                Metrics.NOTIFICATIONS_CONFIG_UPDATE_USER_ERROR_INVALID_CONFIG_ID.counter.increment()
+                Metrics.NOTIFICATIONS_CONFIG_UPDATE_USER_ERROR_INVALID_CONFIG_ID.counter
+                    .increment()
                 throw OpenSearchStatusException(
                     "NotificationConfig ${request.configId} not found",
                     RestStatus.NOT_FOUND
@@ -238,14 +260,20 @@ object ConfigIndexingActions {
             )
         }
         if (currentConfigDoc.configDoc.config.configType != request.notificationConfig.configType) {
-            throw OpenSearchStatusException("Config type cannot be changed after creation", RestStatus.CONFLICT)
+            throw OpenSearchStatusException(
+                "Config type cannot be changed after creation",
+                RestStatus.CONFLICT
+            )
         }
 
         val newMetadata = currentMetadata.copy(lastUpdateTime = Instant.now())
         val newConfigData = NotificationConfigDoc(newMetadata, request.notificationConfig)
         if (!operations.updateNotificationConfig(request.configId, newConfigData)) {
             Metrics.NOTIFICATIONS_CONFIG_UPDATE_SYSTEM_ERROR.counter.increment()
-            throw OpenSearchStatusException("NotificationConfig Update failed", RestStatus.INTERNAL_SERVER_ERROR)
+            throw OpenSearchStatusException(
+                "NotificationConfig Update failed",
+                RestStatus.INTERNAL_SERVER_ERROR
+            )
         }
         return UpdateNotificationConfigResponse(request.configId)
     }
@@ -256,7 +284,10 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [GetNotificationConfigResponse]
      */
-    suspend fun get(request: GetNotificationConfigRequest, user: User?): GetNotificationConfigResponse {
+    suspend fun get(
+        request: GetNotificationConfigRequest,
+        user: User?
+    ): GetNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-get $request")
         userAccess.validateUser(user)
         return when (request.configIds.size) {
@@ -277,20 +308,28 @@ object ConfigIndexingActions {
         val configDoc = operations.getNotificationConfig(configId)
         configDoc
             ?: run {
-                Metrics.NOTIFICATIONS_CONFIG_INFO_USER_ERROR_INVALID_CONFIG_ID.counter.increment()
-                throw OpenSearchStatusException("NotificationConfig $configId not found", RestStatus.NOT_FOUND)
+                Metrics.NOTIFICATIONS_CONFIG_INFO_USER_ERROR_INVALID_CONFIG_ID.counter
+                    .increment()
+                throw OpenSearchStatusException(
+                    "NotificationConfig $configId not found",
+                    RestStatus.NOT_FOUND
+                )
             }
         val metadata = configDoc.configDoc.metadata
         if (!userAccess.doesUserHaveAccess(user, metadata.access)) {
             Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
-            throw OpenSearchStatusException("Permission denied for NotificationConfig $configId", RestStatus.FORBIDDEN)
+            throw OpenSearchStatusException(
+                "Permission denied for NotificationConfig $configId",
+                RestStatus.FORBIDDEN
+            )
         }
-        val configInfo = NotificationConfigInfo(
-            configId,
-            metadata.lastUpdateTime,
-            metadata.createdTime,
-            configDoc.configDoc.config
-        )
+        val configInfo =
+            NotificationConfigInfo(
+                configId,
+                metadata.lastUpdateTime,
+                metadata.createdTime,
+                configDoc.configDoc.config
+            )
         return GetNotificationConfigResponse(NotificationConfigSearchResult(configInfo))
     }
 
@@ -322,14 +361,15 @@ object ConfigIndexingActions {
                 )
             }
         }
-        val configSearchResult = configDocs.map {
-            NotificationConfigInfo(
-                it.docInfo.id!!,
-                it.configDoc.metadata.lastUpdateTime,
-                it.configDoc.metadata.createdTime,
-                it.configDoc.config
-            )
-        }
+        val configSearchResult =
+            configDocs.map {
+                NotificationConfigInfo(
+                    it.docInfo.id!!,
+                    it.configDoc.metadata.lastUpdateTime,
+                    it.configDoc.metadata.createdTime,
+                    it.configDoc.config
+                )
+            }
         return GetNotificationConfigResponse(NotificationConfigSearchResult(configSearchResult))
     }
 
@@ -339,12 +379,13 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [GetNotificationConfigResponse]
      */
-    private suspend fun getAll(request: GetNotificationConfigRequest, user: User?): GetNotificationConfigResponse {
+    private suspend fun getAll(
+        request: GetNotificationConfigRequest,
+        user: User?
+    ): GetNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-getAll")
-        val searchResult = operations.getAllNotificationConfigs(
-            userAccess.getSearchAccessInfo(user),
-            request
-        )
+        val searchResult =
+            operations.getAllNotificationConfigs(userAccess.getSearchAccessInfo(user), request)
         return GetNotificationConfigResponse(searchResult)
     }
 
@@ -354,23 +395,32 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [GetChannelListResponse]
      */
-    suspend fun getChannelList(request: GetChannelListRequest, user: User?): GetChannelListResponse {
+    suspend fun getChannelList(
+        request: GetChannelListRequest,
+        user: User?
+    ): GetChannelListResponse {
         log.info("$LOG_PREFIX:getChannelList $request")
         userAccess.validateUser(user)
         val supportedChannelListString = getSupportedChannelList().joinToString(",")
-        val filterParams = mapOf(
-            Pair("config_type", supportedChannelListString)
-        )
+        val filterParams = mapOf(Pair("config_type", supportedChannelListString))
         val getAllRequest = GetNotificationConfigRequest(filterParams = filterParams)
-        val getAllResult = operations.getAllNotificationConfigs(
-            userAccess.getSearchAccessInfo(user),
-            getAllRequest
-        )
-        val searchResult = getAllResult.objectList.map {
-            val configId = it.configId
-            val config = it.notificationConfig
-            Channel(configId, config.name, config.description, config.configType, config.isEnabled)
-        }
+        val getAllResult =
+            operations.getAllNotificationConfigs(
+                userAccess.getSearchAccessInfo(user),
+                getAllRequest
+            )
+        val searchResult =
+            getAllResult.objectList.map {
+                val configId = it.configId
+                val config = it.notificationConfig
+                Channel(
+                    configId,
+                    config.name,
+                    config.description,
+                    config.configType,
+                    config.isEnabled
+                )
+            }
         val ChannelList = ChannelList(searchResult)
         return GetChannelListResponse(ChannelList)
     }
@@ -398,7 +448,8 @@ object ConfigIndexingActions {
         val currentConfigDoc = operations.getNotificationConfig(configId)
         currentConfigDoc
             ?: run {
-                Metrics.NOTIFICATIONS_CONFIG_DELETE_USER_ERROR_INVALID_CONFIG_ID.counter.increment()
+                Metrics.NOTIFICATIONS_CONFIG_DELETE_USER_ERROR_INVALID_CONFIG_ID.counter
+                    .increment()
                 throw OpenSearchStatusException(
                     "NotificationConfig $configId not found",
                     RestStatus.NOT_FOUND
@@ -429,7 +480,10 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [DeleteNotificationConfigResponse]
      */
-    private suspend fun delete(configIds: Set<String>, user: User?): DeleteNotificationConfigResponse {
+    private suspend fun delete(
+        configIds: Set<String>,
+        user: User?
+    ): DeleteNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-delete $configIds")
         userAccess.validateUser(user)
         val configDocs = operations.getNotificationConfigs(configIds)
@@ -462,7 +516,10 @@ object ConfigIndexingActions {
      * @param user the user info object
      * @return [DeleteNotificationConfigResponse]
      */
-    suspend fun delete(request: DeleteNotificationConfigRequest, user: User?): DeleteNotificationConfigResponse {
+    suspend fun delete(
+        request: DeleteNotificationConfigRequest,
+        user: User?
+    ): DeleteNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-delete ${request.configIds}")
         return if (request.configIds.size == 1) {
             delete(request.configIds.first(), user)
