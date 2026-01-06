@@ -16,6 +16,7 @@ This document contains a list of maintainers in this repo. See [opensearch-proje
 | Subhobrata Dey         | [sbcd90](https://github.com/sbcd90)           | Amazon      |
 | Amardeepsingh Siglani  | [amsiglan](https://github.com/amsiglan)       | Amazon      |
 | Praveen Sameneni       | [praveensameneni](https://github.com/praveensameneni)| Amazon |
+| Dennis Toepker         | [toepkerd](https://github.com/toepkerd)       | Amazon      |
 
 ## Emeritus
 
