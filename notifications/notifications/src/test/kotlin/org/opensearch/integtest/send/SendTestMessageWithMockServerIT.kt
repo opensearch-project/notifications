@@ -19,44 +19,48 @@ import java.net.InetAddress
 import java.net.InetSocketAddress
 
 internal class SendTestMessageWithMockServerIT : PluginRestTestCase() {
-
     fun `test webhook return with empty entity`() {
         val url = "http://${server.address.hostString}:${server.address.port}/webhook"
         logger.info("webhook url = {}", url)
         // Create webhook notification config
-        val createRequestJsonString = """
-        {
-            "config":{
-                "name":"this is a sample config name",
-                "description":"this is a sample config description",
-                "config_type":"webhook",
-                "is_enabled":true,
-                "webhook":{
-                    "url":"$url",
-                    "header_params": {
-                       "Content-type": "text/plain"
+        val createRequestJsonString =
+            """
+            {
+                "config":{
+                    "name":"this is a sample config name",
+                    "description":"this is a sample config description",
+                    "config_type":"webhook",
+                    "is_enabled":true,
+                    "webhook":{
+                        "url":"$url",
+                        "header_params": {
+                           "Content-type": "text/plain"
+                        }
                     }
                 }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
         Thread.sleep(1000)
 
         // send test message
-        val sendResponse = executeRequest(
-            RestRequest.Method.POST.name,
-            "$PLUGIN_BASE_URI/feature/test/$configId",
-            "",
-            RestStatus.OK.status
-        )
+        val sendResponse =
+            executeRequest(
+                RestRequest.Method.POST.name,
+                "$PLUGIN_BASE_URI/feature/test/$configId",
+                "",
+                RestStatus.OK.status,
+            )
 
         logger.info(sendResponse)
 
         // verify failure response is with message
-        val deliveryStatus = (sendResponse.get("status_list") as JsonArray).get(0).asJsonObject
-            .get("delivery_status") as JsonObject
+        val deliveryStatus =
+            (sendResponse.get("status_list") as JsonArray)
+                .get(0)
+                .asJsonObject
+                .get("delivery_status") as JsonObject
         Assert.assertEquals(deliveryStatus.get("status_code").asString, "200")
         Assert.assertEquals(deliveryStatus.get("status_text").asString, "{}")
     }

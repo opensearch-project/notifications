@@ -15,10 +15,9 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 internal class SendTestNotificationRequestTests {
-
     private fun assertSendTestRequestEquals(
         expected: SendTestNotificationRequest,
-        actual: SendTestNotificationRequest
+        actual: SendTestNotificationRequest,
     ) {
         assertEquals(expected.configId, actual.configId)
     }
@@ -61,25 +60,27 @@ internal class SendTestNotificationRequestTests {
     @Test
     fun `Send test request should safely ignore extra field in json object`() {
         val sendTestRequest = SendTestNotificationRequest("configId")
-        val jsonString = """
-        {
-            "config_id":"${sendTestRequest.configId}",
-            "extra_field_1":["extra", "value"],
-            "extra_field_2":{"extra":"value"},
-            "extra_field_3":"extra value 3"
-        }
-        """.trimIndent()
+        val jsonString =
+            """
+            {
+                "config_id":"${sendTestRequest.configId}",
+                "extra_field_1":["extra", "value"],
+                "extra_field_2":{"extra":"value"},
+                "extra_field_3":"extra value 3"
+            }
+            """.trimIndent()
         val recreatedObject = createObjectFromJsonString(jsonString) { SendTestNotificationRequest.parse(it) }
         assertSendTestRequestEquals(sendTestRequest, recreatedObject)
     }
 
     @Test
     fun `Send test request should throw exception if configId field is absent in json object`() {
-        val jsonString = """
-        {
-            "extra_field_1":"extra value 1"
-        }
-        """.trimIndent()
+        val jsonString =
+            """
+            {
+                "extra_field_1":"extra value 1"
+            }
+            """.trimIndent()
         assertThrows<IllegalArgumentException> {
             createObjectFromJsonString(jsonString) { SendTestNotificationRequest.parse(it) }
         }

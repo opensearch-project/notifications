@@ -11,27 +11,30 @@ import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.verifyChannelIdEquals
 import org.opensearch.rest.RestRequest
+import kotlin.test.Test
 
 class GetNotificationChannelListIT : PluginRestTestCase() {
-
+    @Test
     fun `test POST channel list should result in error`() {
         executeRequest(
             RestRequest.Method.POST.name,
             "$PLUGIN_BASE_URI/channels",
             "{\"feature\":\"reports\"}",
-            RestStatus.METHOD_NOT_ALLOWED.status
+            RestStatus.METHOD_NOT_ALLOWED.status,
         )
     }
 
+    @Test
     fun `test PUT channel list should result in error`() {
         executeRequest(
             RestRequest.Method.PUT.name,
             "$PLUGIN_BASE_URI/channels",
             "{\"feature\":\"reports\"}",
-            RestStatus.METHOD_NOT_ALLOWED.status
+            RestStatus.METHOD_NOT_ALLOWED.status,
         )
     }
 
+    @Test
     fun `test getChannelList should return only channels`() {
         val slackId = createConfig(configType = ConfigType.SLACK)
         val chimeId = createConfig(configType = ConfigType.CHIME)
@@ -39,20 +42,22 @@ class GetNotificationChannelListIT : PluginRestTestCase() {
         val webhookId = createConfig(configType = ConfigType.WEBHOOK)
         val emailGroupId = createConfig(configType = ConfigType.EMAIL_GROUP)
         val smtpAccountId = createConfig(configType = ConfigType.SMTP_ACCOUNT)
-        val emailId = createConfig(
-            configType = ConfigType.EMAIL,
-            smtpAccountId = smtpAccountId,
-            emailGroupId = setOf(emailGroupId)
-        )
+        val emailId =
+            createConfig(
+                configType = ConfigType.EMAIL,
+                smtpAccountId = smtpAccountId,
+                emailGroupId = setOf(emailGroupId),
+            )
         Thread.sleep(1000)
 
         val channelIds = setOf(slackId, chimeId, microsoftTeamsId, webhookId, emailId)
-        val response = executeRequest(
-            RestRequest.Method.GET.name,
-            "$PLUGIN_BASE_URI/channels",
-            "",
-            RestStatus.OK.status
-        )
+        val response =
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "$PLUGIN_BASE_URI/channels",
+                "",
+                RestStatus.OK.status,
+            )
         Thread.sleep(100)
         verifyChannelIdEquals(channelIds, response, channelIds.size)
         Thread.sleep(100)

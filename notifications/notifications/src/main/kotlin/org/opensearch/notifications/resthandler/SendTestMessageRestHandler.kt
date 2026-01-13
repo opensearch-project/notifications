@@ -33,49 +33,54 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
     /**
      * {@inheritDoc}
      */
-    override fun getName(): String {
-        return "notifications_send_test"
-    }
+    override fun getName(): String = "notifications_send_test"
 
     /**
      * {@inheritDoc}
      */
-    override fun replacedRoutes(): List<ReplacedRoute> {
-        return listOf(
-            /**
+    override fun replacedRoutes(): List<ReplacedRoute> =
+        // Using GET with this API has been deprecated, it will be removed in favor of the POST equivalent in the next major version.
+        listOf(
+            /*
              * Send test notification message
              * Request URL: POST [REQUEST_URL/CONFIG_ID_TAG]
              * Request body: Ref [org.opensearch.commons.notifications.action.SendNotificationRequest]
              * Response body: [org.opensearch.commons.notifications.action.SendNotificationResponse]
              */
-            // Using GET with this API has been deprecated, it will be removed in favor of the POST equivalent in the next major version.
-            ReplacedRoute(POST, "$REQUEST_URL/{$CONFIG_ID_TAG}", GET, "$REQUEST_URL/{$CONFIG_ID_TAG}")
+            ReplacedRoute(POST, "$REQUEST_URL/{$CONFIG_ID_TAG}", GET, "$REQUEST_URL/{$CONFIG_ID_TAG}"),
         )
-    }
 
     /**
      * {@inheritDoc}
      */
-    override fun responseParams(): Set<String> {
-        return setOf(CONFIG_ID_TAG)
-    }
+    override fun responseParams(): Set<String> = setOf(CONFIG_ID_TAG)
 
     /**
      * {@inheritDoc}
      */
-    override fun executeRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
-        return when (request.method()) {
-            POST -> executeSendTestMessage(request, client)
-            GET -> executeSendTestMessage(request, client)
-            else -> RestChannelConsumer {
-                it.sendResponse(BytesRestResponse(RestStatus.METHOD_NOT_ALLOWED, "${request.method()} is not allowed"))
+    override fun executeRequest(
+        request: RestRequest,
+        client: NodeClient,
+    ): RestChannelConsumer =
+        when (request.method()) {
+            POST -> {
+                executeSendTestMessage(request, client)
+            }
+
+            GET -> {
+                executeSendTestMessage(request, client)
+            }
+
+            else -> {
+                RestChannelConsumer {
+                    it.sendResponse(BytesRestResponse(RestStatus.METHOD_NOT_ALLOWED, "${request.method()} is not allowed"))
+                }
             }
         }
-    }
 
     private fun executeSendTestMessage(
         request: RestRequest,
-        client: NodeClient
+        client: NodeClient,
     ) = RestChannelConsumer {
         Metrics.NOTIFICATIONS_SEND_TEST_MESSAGE_TOTAL.counter.increment()
         Metrics.NOTIFICATIONS_SEND_TEST_MESSAGE_INTERVAL_COUNT.counter.increment()
@@ -84,7 +89,7 @@ internal class SendTestMessageRestHandler : PluginBaseHandler() {
         client.execute(
             SendTestNotificationAction.ACTION_TYPE,
             sendTestNotificationRequest,
-            RestResponseToXContentListener(it)
+            RestResponseToXContentListener(it),
         )
     }
 }

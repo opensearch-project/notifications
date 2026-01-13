@@ -29,7 +29,6 @@ import java.util.Properties
  * This class handles the connections to the given Destination.
  */
 class DestinationSmtpClient {
-
     companion object {
         private val log by logger(DestinationSmtpClient::class.java)
     }
@@ -38,12 +37,12 @@ class DestinationSmtpClient {
     fun execute(
         smtpDestination: SmtpDestination,
         message: MessageContent,
-        referenceId: String
+        referenceId: String,
     ): DestinationMessageResponse {
         if (EmailMessageValidator.isMessageSizeOverLimit(message)) {
             return DestinationMessageResponse(
                 RestStatus.REQUEST_ENTITY_TOO_LARGE.status,
-                "Email size larger than ${PluginSettings.emailSizeLimit}"
+                "Email size larger than ${PluginSettings.emailSizeLimit}",
             )
         }
 
@@ -54,38 +53,48 @@ class DestinationSmtpClient {
         var session = Session.getInstance(prop)
 
         when (smtpDestination.method) {
-            "ssl" -> prop["mail.smtp.ssl.enable"] = true
-            "start_tls" -> prop["mail.smtp.starttls.enable"] = true
+            "ssl" -> {
+                prop["mail.smtp.ssl.enable"] = true
+            }
+
+            "start_tls" -> {
+                prop["mail.smtp.starttls.enable"] = true
+            }
+
             "none" -> {
             }
-            else -> throw IllegalArgumentException("Invalid method supplied")
+
+            else -> {
+                throw IllegalArgumentException("Invalid method supplied")
+            }
         }
 
         if (smtpDestination.method != "none") {
             val secureDestinationSetting = getSecureDestinationSetting(smtpDestination)
             if (secureDestinationSetting != null) {
                 prop["mail.smtp.auth"] = true
-                session = Session.getInstance(
-                    prop,
-                    object : Authenticator() {
-                        override fun getPasswordAuthentication(): PasswordAuthentication {
-                            return PasswordAuthentication(
-                                secureDestinationSetting.emailUsername.toString(),
-                                secureDestinationSetting.emailPassword.toString()
-                            )
-                        }
-                    }
-                )
+                session =
+                    Session.getInstance(
+                        prop,
+                        object : Authenticator() {
+                            override fun getPasswordAuthentication(): PasswordAuthentication =
+                                PasswordAuthentication(
+                                    secureDestinationSetting.emailUsername.toString(),
+                                    secureDestinationSetting.emailPassword.toString(),
+                                )
+                        },
+                    )
             }
         }
 
         // prepare mimeMessage
-        val mimeMessage = EmailMimeProvider.prepareMimeMessage(
-            session,
-            smtpDestination.fromAddress,
-            smtpDestination.recipient,
-            message
-        )
+        val mimeMessage =
+            EmailMimeProvider.prepareMimeMessage(
+                session,
+                smtpDestination.fromAddress,
+                smtpDestination.recipient,
+                message,
+            )
 
         // send Mime Message
         return sendMimeMessage(mimeMessage, referenceId)
@@ -106,8 +115,11 @@ class DestinationSmtpClient {
     /**
      * {@inheritDoc}
      */
-    private fun sendMimeMessage(mimeMessage: MimeMessage, referenceId: String): DestinationMessageResponse {
-        return try {
+    private fun sendMimeMessage(
+        mimeMessage: MimeMessage,
+        referenceId: String,
+    ): DestinationMessageResponse =
+        try {
             log.debug("Sending Email-SMTP for $referenceId")
             SecurityAccess.doPrivileged { sendMessage(mimeMessage) }
             log.info("Email-SMTP sent for $referenceId")
@@ -119,7 +131,6 @@ class DestinationSmtpClient {
         } catch (exception: MessagingException) {
             DestinationMessageResponse(RestStatus.FAILED_DEPENDENCY.status, getMessagingExceptionText(exception))
         }
-    }
 
     /*
      * This method is useful for mocking the client

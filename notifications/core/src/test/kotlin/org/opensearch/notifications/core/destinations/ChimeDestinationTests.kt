@@ -42,7 +42,7 @@ internal class ChimeDestinationTests {
                 Arguments.of("\t", """\t"""),
                 Arguments.of("\b", """\b"""),
                 Arguments.of("\r", """\r"""),
-                Arguments.of("\"", """\"""")
+                Arguments.of("\"", """\""""),
             )
     }
 
@@ -50,8 +50,14 @@ internal class ChimeDestinationTests {
     fun setup() {
         // Stubbing isHostInDenylist() so it doesn't attempt to resolve hosts that don't exist in the unit tests
         mockkStatic("org.opensearch.notifications.spi.utils.ValidationHelpersKt")
-        every { org.opensearch.notifications.spi.utils.isHostInDenylist(any(), any()) } returns false
-        every { org.opensearch.notifications.spi.utils.getResolvedIps(any()) } returns listOf(IPAddressString("174.0.0.0"))
+        every {
+            org.opensearch.notifications.spi.utils
+                .isHostInDenylist(any(), any())
+        } returns false
+        every {
+            org.opensearch.notifications.spi.utils
+                .getResolvedIps(any())
+        } returns listOf(IPAddressString("174.0.0.0"))
     }
 
     @Test
@@ -72,9 +78,10 @@ internal class ChimeDestinationTests {
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.CHIME to webhookDestinationTransport)
 
         val title = "test Chime"
-        val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member call out: " +
-            "@All All Present member call out: @Present"
+        val messageText =
+            "Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member call out: " +
+                "@All All Present member call out: @Present"
         val url = "https://abc/com"
 
         val destination = ChimeDestination(url)
@@ -101,9 +108,10 @@ internal class ChimeDestinationTests {
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.CHIME to webhookDestinationTransport)
 
         val title = "test Chime"
-        val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member call out: " +
-            "@All All Present member call out: @Present\"}"
+        val messageText =
+            "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member call out: " +
+                "@All All Present member call out: @Present\"}"
         val url = "https://abc/com"
 
         val destination = ChimeDestination(url)
@@ -131,9 +139,10 @@ internal class ChimeDestinationTests {
         DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.CHIME to webhookDestinationTransport)
 
         val title = "test Chime"
-        val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member call out: " +
-            "@All All Present member call out: @Present\"}"
+        val messageText =
+            "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member call out: " +
+                "@All All Present member call out: @Present\"}"
         val url = "https://abc/com"
 
         val destination = ChimeDestination(url)
@@ -147,9 +156,10 @@ internal class ChimeDestinationTests {
 
     @Test
     fun `test url missing should throw IllegalArgumentException with message`() {
-        val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
-            ChimeDestination("")
-        }
+        val exception =
+            Assertions.assertThrows(IllegalArgumentException::class.java) {
+                ChimeDestination("")
+            }
         assertEquals("url is null or empty", exception.message)
     }
 
@@ -162,9 +172,10 @@ internal class ChimeDestinationTests {
 
     @Test
     fun `test content missing content should throw IllegalArgumentException`() {
-        val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
-            MessageContent("title", "")
-        }
+        val exception =
+            Assertions.assertThrows(IllegalArgumentException::class.java) {
+                MessageContent("title", "")
+            }
         assertEquals("text message part is null or empty", exception.message)
     }
 
@@ -172,7 +183,7 @@ internal class ChimeDestinationTests {
     @MethodSource("escapeSequenceToRaw")
     fun `test build request body for chime webhook should have title included and prevent escape`(
         escapeSequence: String,
-        rawString: String
+        rawString: String,
     ) {
         val httpClient = DestinationHttpClient()
         val title = "test chime webhook"

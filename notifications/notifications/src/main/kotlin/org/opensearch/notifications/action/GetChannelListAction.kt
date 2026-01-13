@@ -23,40 +23,40 @@ import org.opensearch.transport.client.Client
 /**
  * Get channel list transport action
  */
-internal class GetChannelListAction @Inject constructor(
-    transportService: TransportService,
-    client: Client,
-    actionFilters: ActionFilters,
-    val xContentRegistry: NamedXContentRegistry
-) : PluginBaseAction<GetChannelListRequest, GetChannelListResponse>(
-    NotificationsActions.GET_CHANNEL_LIST_NAME,
-    transportService,
-    client,
-    actionFilters,
-    ::GetChannelListRequest
-) {
+internal class GetChannelListAction
+    @Inject
+    constructor(
+        transportService: TransportService,
+        client: Client,
+        actionFilters: ActionFilters,
+        val xContentRegistry: NamedXContentRegistry,
+    ) : PluginBaseAction<GetChannelListRequest, GetChannelListResponse>(
+            NotificationsActions.GET_CHANNEL_LIST_NAME,
+            transportService,
+            client,
+            actionFilters,
+            ::GetChannelListRequest,
+        ) {
+        /**
+         * {@inheritDoc}
+         * Transform the request and call super.doExecute() to support call from other plugins.
+         */
+        override fun doExecute(
+            task: Task?,
+            request: ActionRequest,
+            listener: ActionListener<GetChannelListResponse>,
+        ) {
+            val transformedRequest =
+                request as? GetChannelListRequest
+                    ?: recreateObject(request) { GetChannelListRequest(it) }
+            super.doExecute(task, transformedRequest, listener)
+        }
 
-    /**
-     * {@inheritDoc}
-     * Transform the request and call super.doExecute() to support call from other plugins.
-     */
-    override fun doExecute(
-        task: Task?,
-        request: ActionRequest,
-        listener: ActionListener<GetChannelListResponse>
-    ) {
-        val transformedRequest = request as? GetChannelListRequest
-            ?: recreateObject(request) { GetChannelListRequest(it) }
-        super.doExecute(task, transformedRequest, listener)
+        /**
+         * {@inheritDoc}
+         */
+        override suspend fun executeRequest(
+            request: GetChannelListRequest,
+            user: User?,
+        ): GetChannelListResponse = ConfigIndexingActions.getChannelList(request, user)
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    override suspend fun executeRequest(
-        request: GetChannelListRequest,
-        user: User?
-    ): GetChannelListResponse {
-        return ConfigIndexingActions.getChannelList(request, user)
-    }
-}

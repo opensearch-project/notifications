@@ -29,11 +29,13 @@ internal class PluginSettingsTests {
     private val alertingFilterByBackendRolesKey = "plugins.alerting.filter_by_backend_roles"
     private val filterByBackendRolesKey = "$generalKeyPrefix.filter_by_backend_roles"
 
-    private val defaultSettings = Settings.builder()
-        .put(operationTimeoutKey, 60000L)
-        .put(defaultItemQueryCountKey, 100L)
-        .put(filterByBackendRolesKey, false)
-        .build()
+    private val defaultSettings =
+        Settings
+            .builder()
+            .put(operationTimeoutKey, 60000L)
+            .put(defaultItemQueryCountKey, 100L)
+            .put(filterByBackendRolesKey, false)
+            .build()
 
     @BeforeEach
     fun setup() {
@@ -55,23 +57,25 @@ internal class PluginSettingsTests {
                 listOf<Any>(
                     PluginSettings.OPERATION_TIMEOUT_MS,
                     PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
-                    PluginSettings.FILTER_BY_BACKEND_ROLES
-                )
-            )
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                ),
+            ),
         )
         Assertions.assertEquals(defaultSettings[operationTimeoutKey], PluginSettings.operationTimeoutMs.toString())
         Assertions.assertEquals(
             defaultSettings[defaultItemQueryCountKey],
-            PluginSettings.defaultItemsQueryCount.toString()
+            PluginSettings.defaultItemsQueryCount.toString(),
         )
     }
 
     @Test
     fun `test update settings should take cluster settings if available`() {
-        val clusterSettings = Settings.builder()
-            .put(operationTimeoutKey, 50000L)
-            .put(defaultItemQueryCountKey, 200)
-            .build()
+        val clusterSettings =
+            Settings
+                .builder()
+                .put(operationTimeoutKey, 50000L)
+                .put(defaultItemQueryCountKey, 200)
+                .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
         whenever(clusterService.clusterSettings).thenReturn(
@@ -79,18 +83,18 @@ internal class PluginSettingsTests {
                 clusterSettings,
                 setOf(
                     PluginSettings.OPERATION_TIMEOUT_MS,
-                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT
-                )
-            )
+                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
+                ),
+            ),
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         Assertions.assertEquals(
             50000L,
-            clusterService.clusterSettings.get(PluginSettings.OPERATION_TIMEOUT_MS)
+            clusterService.clusterSettings.get(PluginSettings.OPERATION_TIMEOUT_MS),
         )
         Assertions.assertEquals(
             200,
-            clusterService.clusterSettings.get(PluginSettings.DEFAULT_ITEMS_QUERY_COUNT)
+            clusterService.clusterSettings.get(PluginSettings.DEFAULT_ITEMS_QUERY_COUNT),
         )
     }
 
@@ -103,26 +107,28 @@ internal class PluginSettingsTests {
                 clusterSettings,
                 setOf(
                     PluginSettings.OPERATION_TIMEOUT_MS,
-                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT
-                )
-            )
+                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
+                ),
+            ),
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         Assertions.assertEquals(
             defaultSettings[operationTimeoutKey],
-            clusterService.clusterSettings.get(PluginSettings.OPERATION_TIMEOUT_MS).toString()
+            clusterService.clusterSettings.get(PluginSettings.OPERATION_TIMEOUT_MS).toString(),
         )
         Assertions.assertEquals(
             defaultSettings[defaultItemQueryCountKey],
-            clusterService.clusterSettings.get(PluginSettings.DEFAULT_ITEMS_QUERY_COUNT).toString()
+            clusterService.clusterSettings.get(PluginSettings.DEFAULT_ITEMS_QUERY_COUNT).toString(),
         )
     }
 
     @Test
     fun `test filter by backend roles setting uses notifications setting`() {
-        val clusterSettings = Settings.builder()
-            .put(filterByBackendRolesKey, true)
-            .build()
+        val clusterSettings =
+            Settings
+                .builder()
+                .put(filterByBackendRolesKey, true)
+                .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
         whenever(clusterService.clusterSettings).thenReturn(
@@ -131,9 +137,9 @@ internal class PluginSettingsTests {
                 setOf(
                     PluginSettings.OPERATION_TIMEOUT_MS,
                     PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
-                    PluginSettings.FILTER_BY_BACKEND_ROLES
-                )
-            )
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                ),
+            ),
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         Assertions.assertEquals(true, PluginSettings.isRbacEnabled())
@@ -141,11 +147,13 @@ internal class PluginSettingsTests {
 
     @Test
     fun `test filter by backend roles setting prioritizes notifications setting`() {
-        val clusterSettings = Settings.builder()
-            .put(legacyAlertingFilterByBackendRolesKey, false)
-            .put(alertingFilterByBackendRolesKey, false)
-            .put(filterByBackendRolesKey, true)
-            .build()
+        val clusterSettings =
+            Settings
+                .builder()
+                .put(legacyAlertingFilterByBackendRolesKey, false)
+                .put(alertingFilterByBackendRolesKey, false)
+                .put(filterByBackendRolesKey, true)
+                .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
         whenever(clusterService.clusterSettings).thenReturn(
@@ -156,9 +164,9 @@ internal class PluginSettingsTests {
                     PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
                     PluginSettings.LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES,
                     PluginSettings.ALERTING_FILTER_BY_BACKEND_ROLES,
-                    PluginSettings.FILTER_BY_BACKEND_ROLES
-                )
-            )
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                ),
+            ),
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         Assertions.assertEquals(true, PluginSettings.isRbacEnabled())
@@ -166,10 +174,12 @@ internal class PluginSettingsTests {
 
     @Test
     fun `test filter by backend roles setting falls back to alerting setting`() {
-        val clusterSettings = Settings.builder()
-            .put(legacyAlertingFilterByBackendRolesKey, false)
-            .put(alertingFilterByBackendRolesKey, true)
-            .build()
+        val clusterSettings =
+            Settings
+                .builder()
+                .put(legacyAlertingFilterByBackendRolesKey, false)
+                .put(alertingFilterByBackendRolesKey, true)
+                .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
         whenever(clusterService.clusterSettings).thenReturn(
@@ -180,9 +190,9 @@ internal class PluginSettingsTests {
                     PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
                     PluginSettings.LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES,
                     PluginSettings.ALERTING_FILTER_BY_BACKEND_ROLES,
-                    PluginSettings.FILTER_BY_BACKEND_ROLES
-                )
-            )
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                ),
+            ),
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         Assertions.assertEquals(true, PluginSettings.isRbacEnabled())
@@ -190,9 +200,11 @@ internal class PluginSettingsTests {
 
     @Test
     fun `test filter by backend roles setting falls back to alerting legacy setting when newer settings are not set`() {
-        val clusterSettings = Settings.builder()
-            .put(legacyAlertingFilterByBackendRolesKey, true)
-            .build()
+        val clusterSettings =
+            Settings
+                .builder()
+                .put(legacyAlertingFilterByBackendRolesKey, true)
+                .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
         whenever(clusterService.clusterSettings).thenReturn(
@@ -203,9 +215,9 @@ internal class PluginSettingsTests {
                     PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
                     PluginSettings.LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES,
                     PluginSettings.ALERTING_FILTER_BY_BACKEND_ROLES,
-                    PluginSettings.FILTER_BY_BACKEND_ROLES
-                )
-            )
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                ),
+            ),
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         Assertions.assertEquals(true, PluginSettings.isRbacEnabled())

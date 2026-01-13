@@ -17,9 +17,8 @@ class SesDestination(
     val awsRegion: String,
     val roleArn: String?,
     val fromAddress: String,
-    val recipient: String
+    val recipient: String,
 ) : BaseDestination(DestinationType.SES) {
-
     init {
         require(!Strings.isNullOrEmpty(awsRegion)) { "aws region should be provided" }
         require(Regions.values().any { it.getName() == awsRegion }) { "aws region is not valid" }

@@ -10,9 +10,7 @@ import org.apache.logging.log4j.Logger
 import org.opensearch.core.common.bytes.BytesReference
 import org.opensearch.core.xcontent.XContentBuilder
 
-fun <T : Any> logger(forClass: Class<T>): Lazy<Logger> {
-    return lazy { LogManager.getLogger(forClass) }
-}
+fun <T : Any> logger(forClass: Class<T>): Lazy<Logger> = lazy { LogManager.getLogger(forClass) }
 
 /**
  * Extension function for ES 6.3 and above that duplicates the ES 6.2 XContentBuilder.string() method.

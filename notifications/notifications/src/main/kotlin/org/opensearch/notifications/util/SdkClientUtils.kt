@@ -27,27 +27,31 @@ import kotlin.coroutines.resumeWithException
  */
 suspend inline fun <Raw : Any, reified R : Any> SdkClient.suspendUntilTimeout(
     timeoutMs: Long = 60000L,
-    crossinline block: SdkClient.(BiConsumer<Raw, Throwable?>) -> Unit
+    crossinline block: SdkClient.(BiConsumer<Raw, Throwable?>) -> Unit,
 ): R {
     try {
-        val rawResponse: Raw = withTimeout(timeoutMs) {
-            suspendCancellableCoroutine { cont ->
-                block(
-                    BiConsumer<Raw, Throwable?> { result, exception ->
-                        if (exception != null) {
-                            cont.resumeWithException(SdkClientUtils.unwrapAndConvertToException(exception))
-                        } else {
-                            cont.resume(result)
-                        }
-                    }
-                )
+        val rawResponse: Raw =
+            withTimeout(timeoutMs) {
+                suspendCancellableCoroutine { cont ->
+                    block(
+                        BiConsumer<Raw, Throwable?> { result, exception ->
+                            if (exception != null) {
+                                cont.resumeWithException(SdkClientUtils.unwrapAndConvertToException(exception))
+                            } else {
+                                cont.resume(result)
+                            }
+                        },
+                    )
+                }
             }
-        }
-        val parser = rawResponse::class.java.getMethod("parser").invoke(rawResponse) as? XContentParser
-            ?: throw IllegalArgumentException("Missing parser() on ${rawResponse::class.simpleName}")
-        val parsed = R::class.java.getMethod("fromXContent", XContentParser::class.java)
-            .invoke(null, parser) as? R
-            ?: throw IllegalArgumentException("Failed to parse response into ${R::class.simpleName}")
+        val parser =
+            rawResponse::class.java.getMethod("parser").invoke(rawResponse) as? XContentParser
+                ?: throw IllegalArgumentException("Missing parser() on ${rawResponse::class.simpleName}")
+        val parsed =
+            R::class.java
+                .getMethod("fromXContent", XContentParser::class.java)
+                .invoke(null, parser) as? R
+                ?: throw IllegalArgumentException("Failed to parse response into ${R::class.simpleName}")
         return parsed
     } catch (e: Throwable) {
         throw handleException(e)
@@ -65,7 +69,7 @@ fun handleException(exception: Throwable): Throwable {
     if (isVersionConflict(exception)) {
         return OpenSearchStatusException(
             exception.message ?: "Version conflict occurred",
-            RestStatus.CONFLICT
+            RestStatus.CONFLICT,
         )
     }
     return exception

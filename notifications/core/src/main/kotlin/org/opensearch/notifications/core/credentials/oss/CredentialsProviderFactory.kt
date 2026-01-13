@@ -14,30 +14,38 @@ import com.amazonaws.services.securitytoken.model.AssumeRoleRequest
 import org.opensearch.notifications.core.credentials.CredentialsProvider
 
 class CredentialsProviderFactory : CredentialsProvider {
-
-    override fun getCredentialsProvider(region: String, roleArn: String?): AWSCredentialsProvider {
-        return if (roleArn != null) {
+    override fun getCredentialsProvider(
+        region: String,
+        roleArn: String?,
+    ): AWSCredentialsProvider =
+        if (roleArn != null) {
             getCredentialsProviderByIAMRole(region, roleArn)
         } else {
             DefaultAWSCredentialsProviderChain()
         }
-    }
 
-    private fun getCredentialsProviderByIAMRole(region: String, roleArn: String?): AWSCredentialsProvider {
-        val stsClient = AWSSecurityTokenServiceClientBuilder.standard()
-            .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
-            .withRegion(region)
-            .build()
-        val roleRequest = AssumeRoleRequest()
-            .withRoleArn(roleArn)
-            .withRoleSessionName("opensearch-notifications")
+    private fun getCredentialsProviderByIAMRole(
+        region: String,
+        roleArn: String?,
+    ): AWSCredentialsProvider {
+        val stsClient =
+            AWSSecurityTokenServiceClientBuilder
+                .standard()
+                .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
+                .withRegion(region)
+                .build()
+        val roleRequest =
+            AssumeRoleRequest()
+                .withRoleArn(roleArn)
+                .withRoleSessionName("opensearch-notifications")
         val roleResponse = stsClient.assumeRole(roleRequest)
         val sessionCredentials = roleResponse.credentials
-        val awsCredentials = BasicSessionCredentials(
-            sessionCredentials.accessKeyId,
-            sessionCredentials.secretAccessKey,
-            sessionCredentials.sessionToken
-        )
+        val awsCredentials =
+            BasicSessionCredentials(
+                sessionCredentials.accessKeyId,
+                sessionCredentials.secretAccessKey,
+                sessionCredentials.sessionToken,
+            )
         return AWSStaticCredentialsProvider(awsCredentials)
     }
 }

@@ -20,9 +20,8 @@ import java.io.IOException
  */
 data class NotificationConfigDoc(
     val metadata: DocMetadata,
-    val config: NotificationConfig
+    val config: NotificationConfig,
 ) : ToXContent {
-
     companion object {
         private val log by logger(NotificationConfigDoc::class.java)
 
@@ -40,14 +39,20 @@ data class NotificationConfigDoc(
             XContentParserUtils.ensureExpectedToken(
                 XContentParser.Token.START_OBJECT,
                 parser.currentToken(),
-                parser
+                parser,
             )
             while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    METADATA_TAG -> metadata = DocMetadata.parse(parser)
-                    CONFIG_TAG -> config = NotificationConfig.parse(parser)
+                    METADATA_TAG -> {
+                        metadata = DocMetadata.parse(parser)
+                    }
+
+                    CONFIG_TAG -> {
+                        config = NotificationConfig.parse(parser)
+                    }
+
                     else -> {
                         parser.skipChildren()
                         log.info("Unexpected field: $fieldName, while parsing configuration doc")
@@ -58,7 +63,7 @@ data class NotificationConfigDoc(
             config ?: throw IllegalArgumentException("$CONFIG_TAG field absent")
             return NotificationConfigDoc(
                 metadata,
-                config
+                config,
             )
         }
     }
@@ -68,16 +73,18 @@ data class NotificationConfigDoc(
      * @param params XContent parameters
      * @return created XContentBuilder object
      */
-    fun toXContent(params: ToXContent.Params = ToXContent.EMPTY_PARAMS): XContentBuilder {
-        return toXContent(XContentFactory.jsonBuilder(), params)
-    }
+    fun toXContent(params: ToXContent.Params = ToXContent.EMPTY_PARAMS): XContentBuilder = toXContent(XContentFactory.jsonBuilder(), params)
 
     /**
      * {@inheritDoc}
      */
-    override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
+    override fun toXContent(
+        builder: XContentBuilder?,
+        params: ToXContent.Params?,
+    ): XContentBuilder {
         builder!!
-        return builder.startObject()
+        return builder
+            .startObject()
             .field(METADATA_TAG, metadata)
             .field(CONFIG_TAG, config)
             .endObject()

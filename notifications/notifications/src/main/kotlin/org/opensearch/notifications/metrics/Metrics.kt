@@ -10,14 +10,19 @@ import org.json.JSONObject
 /**
  * Enum to hold all the metrics that need to be logged into _plugins/_notifications/local/stats API
  */
-enum class Metrics(val metricName: String, val counter: Counter<*>) {
-    REQUEST_TOTAL("request_total", BasicCounter()), REQUEST_INTERVAL_COUNT(
+enum class Metrics(
+    val metricName: String,
+    val counter: Counter<*>,
+) {
+    REQUEST_TOTAL("request_total", BasicCounter()),
+    REQUEST_INTERVAL_COUNT(
         "request_count",
-        RollingCounter()
+        RollingCounter(),
     ),
-    REQUEST_SUCCESS("success_count", RollingCounter()), REQUEST_USER_ERROR(
+    REQUEST_SUCCESS("success_count", RollingCounter()),
+    REQUEST_USER_ERROR(
         "failed_request_count_user_error",
-        RollingCounter()
+        RollingCounter(),
     ),
     REQUEST_SYSTEM_ERROR("failed_request_count_system_error", RollingCounter()),
 
@@ -27,208 +32,209 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
      */
     NOTIFICATIONS_EXCEPTIONS_OS_STATUS_EXCEPTION(
         "exception.os_status",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_EXCEPTIONS_OS_SECURITY_EXCEPTION(
         "exception.os_security",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_EXCEPTIONS_VERSION_CONFLICT_ENGINE_EXCEPTION(
         "exception.version_conflict_engine",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_EXCEPTIONS_INDEX_NOT_FOUND_EXCEPTION(
         "exception.index_not_found",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_EXCEPTIONS_INVALID_INDEX_NAME_EXCEPTION(
         "exception.invalid_index_name",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_EXCEPTIONS_ILLEGAL_ARGUMENT_EXCEPTION(
         "exception.illegal_argument",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_EXCEPTIONS_ILLEGAL_STATE_EXCEPTION(
         "exception.illegal_state",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_EXCEPTIONS_IO_EXCEPTION(
         "exception.io",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_EXCEPTIONS_INTERNAL_SERVER_ERROR(
         "exception.internal_server_error",
-        RollingCounter()
+        RollingCounter(),
     ), // ==== Per REST endpoint metrics ==== //
 
     // Config Endpoints
     // POST _plugins/_notifications/configs, Create a new notification config
     NOTIFICATIONS_CONFIG_CREATE_TOTAL(
         "notifications_config.create.total",
-        BasicCounter()
+        BasicCounter(),
     ),
     NOTIFICATIONS_CONFIG_CREATE_INTERVAL_COUNT(
         "notifications_config.create.count",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_CONFIG_CREATE_SYSTEM_ERROR(
         "notifications_config.create.system_error",
-        RollingCounter()
+        RollingCounter(),
     ), // PUT _plugins/_notifications/configs/{configId}, Update a notification config
     NOTIFICATIONS_CONFIG_UPDATE_TOTAL(
         "notifications_config.update.total",
-        BasicCounter()
+        BasicCounter(),
     ),
     NOTIFICATIONS_CONFIG_UPDATE_INTERVAL_COUNT(
         "notifications_config.update.count",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_CONFIG_UPDATE_USER_ERROR_INVALID_CONFIG_ID(
         "notifications_config.update.user_error.invalid_config_id",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_CONFIG_UPDATE_SYSTEM_ERROR(
         "notifications_config.update.system_error",
-        RollingCounter()
+        RollingCounter(),
     ), // Notification config general user error
     NOTIFICATIONS_CONFIG_USER_ERROR_INVALID_EMAIL_ACCOUNT_ID(
         "notifications_config.user_error.invalid_email_account_id",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_CONFIG_USER_ERROR_INVALID_EMAIL_GROUP_ID(
         "notifications_config.user_error.invalid_email_group_id",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_CONFIG_USER_ERROR_NEITHER_EMAIL_NOR_GROUP(
         "notifications_config.user_error.neither_email_nor_group",
-        RollingCounter()
+        RollingCounter(),
     ), // DELETE _plugins/_notifications/configs/{configId}, Delete a notification config
     NOTIFICATIONS_CONFIG_DELETE_TOTAL(
         "notifications_config.delete.total",
-        BasicCounter()
+        BasicCounter(),
     ),
     NOTIFICATIONS_CONFIG_DELETE_INTERVAL_COUNT(
         "notifications_config.delete.count",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_CONFIG_DELETE_USER_ERROR_INVALID_CONFIG_ID(
         "notifications_config.delete.user_error.invalid_config_id",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_CONFIG_DELETE_USER_ERROR_SET_NOT_FOUND(
         "notifications_config.delete.user_error.set_not_found",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_CONFIG_DELETE_SYSTEM_ERROR(
         "notifications_config.delete.system_error",
-        RollingCounter()
+        RollingCounter(),
     ), // GET _plugins/_notifications/configs/{configId}
     NOTIFICATIONS_CONFIG_INFO_TOTAL(
         "notifications_config.info.total",
-        BasicCounter()
+        BasicCounter(),
     ),
     NOTIFICATIONS_CONFIG_INFO_INTERVAL_COUNT(
         "notifications_config.info.count",
-        RollingCounter()
+        RollingCounter(),
     ), // add specific user errors for config GET operations
     NOTIFICATIONS_CONFIG_INFO_USER_ERROR_INVALID_CONFIG_ID(
         "notifications_config.info.user_error.invalid_config_id",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_CONFIG_INFO_USER_ERROR_SET_NOT_FOUND(
         "notifications_config.info.user_error.set_not_found",
-        RollingCounter()
+        RollingCounter(),
     ),
 
     // Feature Channels Endpoints
     // GET _plugins/_notifications/channels
     NOTIFICATIONS_CHANNELS_INFO_TOTAL(
         "notifications_channels.info.total",
-        BasicCounter()
+        BasicCounter(),
     ),
     NOTIFICATIONS_CHANNELS_INFO_INTERVAL_COUNT(
         "notifications_channels.info.count",
-        RollingCounter()
+        RollingCounter(),
     ),
 
     // Features Endpoints
     // GET _plugins/_notifications/features
     NOTIFICATIONS_FEATURES_INFO_TOTAL(
         "notifications_features.info.total",
-        BasicCounter()
+        BasicCounter(),
     ),
     NOTIFICATIONS_FEATURES_INFO_INTERVAL_COUNT(
         "notifications_features.info.count",
-        RollingCounter()
+        RollingCounter(),
     ),
 
     // Send Message Endpoints
     // POST _plugins/_notifications/send
     NOTIFICATIONS_SEND_MESSAGE_TOTAL(
         "notifications.send_message.total",
-        BasicCounter()
+        BasicCounter(),
     ),
     NOTIFICATIONS_SEND_MESSAGE_INTERVAL_COUNT(
         "notifications.send_message.count",
-        RollingCounter()
+        RollingCounter(),
     ), // user errors for send message?
     NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND(
         "notifications.send_message.user_error.not_found",
-        RollingCounter()
+        RollingCounter(),
     ),
     NOTIFICATIONS_MESSAGE_DESTINATION_SLACK(
         "notifications.message_destination.slack",
-        BasicCounter()
+        BasicCounter(),
     ),
     NOTIFICATIONS_MESSAGE_DESTINATION_CHIME(
         "notifications.message_destination.chime",
-        BasicCounter()
+        BasicCounter(),
     ),
     NOTIFICATIONS_MESSAGE_DESTINATION_MICROSOFT_TEAMS(
         "notifications.message_destination.microsoft_teams",
-        BasicCounter()
+        BasicCounter(),
     ),
     NOTIFICATIONS_MESSAGE_DESTINATION_WEBHOOK(
         "notifications.message_destination.webhook",
-        BasicCounter()
+        BasicCounter(),
     ),
     NOTIFICATIONS_MESSAGE_DESTINATION_EMAIL(
         "notifications.message_destination.email",
-        BasicCounter()
+        BasicCounter(),
     ),
     NOTIFICATIONS_MESSAGE_DESTINATION_SES_ACCOUNT(
         "notifications.message_destination.ses_account",
-        BasicCounter()
+        BasicCounter(),
     ),
     NOTIFICATIONS_MESSAGE_DESTINATION_SMTP_ACCOUNT(
         "notifications.message_destination.smtp_account",
-        BasicCounter()
+        BasicCounter(),
     ),
     NOTIFICATIONS_MESSAGE_DESTINATION_EMAIL_GROUP(
         "notifications.message_destination.email_group",
-        BasicCounter()
+        BasicCounter(),
     ), // TODO: add after implementation added
     NOTIFICATIONS_MESSAGE_DESTINATION_SNS(
         "notifications.message_destination.sns",
-        BasicCounter()
+        BasicCounter(),
     ),
 
     // Send Test Message Endpoints
     // GET _plugins/_notifications/feature/test/{configId}
     NOTIFICATIONS_SEND_TEST_MESSAGE_TOTAL(
         "notifications.send_test_message.total",
-        BasicCounter()
+        BasicCounter(),
     ),
     NOTIFICATIONS_SEND_TEST_MESSAGE_INTERVAL_COUNT(
         "notifications.send_test_message.interval_count",
-        RollingCounter()
+        RollingCounter(),
     ), // Send test message exceptions are thrown by the Send Message Action
     NOTIFICATIONS_SECURITY_USER_ERROR(
         "security_user_error",
-        RollingCounter()
+        RollingCounter(),
     ),
-    NOTIFICATIONS_PERMISSION_USER_ERROR("permissions_user_error", RollingCounter());
+    NOTIFICATIONS_PERMISSION_USER_ERROR("permissions_user_error", RollingCounter()),
+    ;
 
     companion object {
         private val values = values()
@@ -257,8 +263,6 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
          * }
          * }
          */
-        fun collectToFlattenedJSON(): String {
-            return JsonUnflattener.unflatten(collectToJSON())
-        }
+        fun collectToFlattenedJSON(): String = JsonUnflattener.unflatten(collectToJSON())
     }
 }

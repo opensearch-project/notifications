@@ -43,32 +43,33 @@ internal class PluginSettingsTests {
 
     private val defaultClusterName = ClusterName.DEFAULT
 
-    private val defaultSettings = Settings.builder()
-        .put(emailSizeLimitKey, 10000000)
-        .put(emailMinHeaderLengthKey, 160)
-        .put(httpMaxConnectionKey, 60)
-        .put(httpMaxConnectionPerRouteKey, 20)
-        .put(httpConnectionTimeoutKey, 5000)
-        .put(httpSocketTimeoutKey, 50000)
-        .put(maxHttpResponseSizeKey, SETTING_HTTP_MAX_CONTENT_LENGTH.getDefault(Settings.EMPTY).getBytes().toInt())
-        .putList(httpHostDenyListKey, emptyList<String>())
-        .putList(
-            allowedConfigTypeKey,
-            listOf(
-                "slack",
-                "chime",
-                "microsoft_teams",
-                "webhook",
-                "email",
-                "sns",
-                "ses_account",
-                "smtp_account",
-                "email_group"
-            )
-        )
-        .put(tooltipSupportKey, true)
-        .put(clusterNameKey, "OpenSearch OsDomainName")
-        .build()
+    private val defaultSettings =
+        Settings
+            .builder()
+            .put(emailSizeLimitKey, 10000000)
+            .put(emailMinHeaderLengthKey, 160)
+            .put(httpMaxConnectionKey, 60)
+            .put(httpMaxConnectionPerRouteKey, 20)
+            .put(httpConnectionTimeoutKey, 5000)
+            .put(httpSocketTimeoutKey, 50000)
+            .put(maxHttpResponseSizeKey, SETTING_HTTP_MAX_CONTENT_LENGTH.getDefault(Settings.EMPTY).getBytes().toInt())
+            .putList(httpHostDenyListKey, emptyList<String>())
+            .putList(
+                allowedConfigTypeKey,
+                listOf(
+                    "slack",
+                    "chime",
+                    "microsoft_teams",
+                    "webhook",
+                    "email",
+                    "sns",
+                    "ses_account",
+                    "smtp_account",
+                    "email_group",
+                ),
+            ).put(tooltipSupportKey, true)
+            .put(clusterNameKey, "OpenSearch OsDomainName")
+            .build()
 
     @BeforeEach
     fun setup() {
@@ -87,7 +88,7 @@ internal class PluginSettingsTests {
 
         Assert.assertTrue(
             settings.containsAll(
-                listOf<Any> (
+                listOf<Any>(
                     PluginSettings.EMAIL_SIZE_LIMIT,
                     PluginSettings.EMAIL_MINIMUM_HEADER_LENGTH,
                     PluginSettings.MAX_CONNECTIONS,
@@ -97,68 +98,70 @@ internal class PluginSettingsTests {
                     PluginSettings.MAX_HTTP_RESPONSE_SIZE,
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
-                    PluginSettings.HOST_DENY_LIST
-                )
-            )
+                    PluginSettings.HOST_DENY_LIST,
+                ),
+            ),
         )
 
         Assertions.assertEquals(
             defaultSettings[emailSizeLimitKey],
-            PluginSettings.emailSizeLimit.toString()
+            PluginSettings.emailSizeLimit.toString(),
         )
         Assertions.assertEquals(
             defaultSettings[emailMinHeaderLengthKey],
-            PluginSettings.emailMinimumHeaderLength.toString()
+            PluginSettings.emailMinimumHeaderLength.toString(),
         )
         Assertions.assertEquals(
             defaultSettings[httpMaxConnectionKey],
-            PluginSettings.maxConnections.toString()
+            PluginSettings.maxConnections.toString(),
         )
         Assertions.assertEquals(
             defaultSettings[httpMaxConnectionPerRouteKey],
-            PluginSettings.maxConnectionsPerRoute.toString()
+            PluginSettings.maxConnectionsPerRoute.toString(),
         )
         Assertions.assertEquals(
             defaultSettings[httpSocketTimeoutKey],
-            PluginSettings.socketTimeout.toString()
+            PluginSettings.socketTimeout.toString(),
         )
         Assertions.assertEquals(
             defaultSettings[maxHttpResponseSizeKey],
-            PluginSettings.maxHttpResponseSize.toString()
+            PluginSettings.maxHttpResponseSize.toString(),
         )
         Assertions.assertEquals(
             defaultSettings[allowedConfigTypeKey],
-            PluginSettings.allowedConfigTypes.toString()
+            PluginSettings.allowedConfigTypes.toString(),
         )
         Assertions.assertEquals(
             defaultSettings[tooltipSupportKey],
-            PluginSettings.tooltipSupport.toString()
+            PluginSettings.tooltipSupport.toString(),
         )
         Assertions.assertEquals(
             defaultSettings[httpHostDenyListKey],
-            PluginSettings.hostDenyList.toString()
+            PluginSettings.hostDenyList.toString(),
         )
         Assertions.assertEquals(
             "opensearch",
-            PluginSettings.clusterName
+            PluginSettings.clusterName,
         )
     }
 
     @Test
     fun `test update settings should take cluster settings if available`() {
-        val clusterSettings = Settings.builder()
-            .put(emailSizeLimitKey, 20000)
-            .put(emailMinHeaderLengthKey, 100)
-            .put(httpMaxConnectionKey, 100)
-            .put(httpMaxConnectionPerRouteKey, 100)
-            .put(httpConnectionTimeoutKey, 100)
-            .put(httpSocketTimeoutKey, 100)
-            .put(maxHttpResponseSizeKey, 20000000)
-            .putList(httpHostDenyListKey, listOf("sample"))
-            .putList(allowedConfigTypeKey, listOf("slack"))
-            .put(tooltipSupportKey, false)
-            .put(clusterNameKey, "OpenSearch OsDomainNameUpdate")
-            .build()
+        val clusterSettings =
+            Settings
+                .builder()
+                .put(emailSizeLimitKey, 20000)
+                .put(emailMinHeaderLengthKey, 100)
+                .put(httpMaxConnectionKey, 100)
+                .put(httpMaxConnectionPerRouteKey, 100)
+                .put(httpConnectionTimeoutKey, 100)
+                .put(httpSocketTimeoutKey, 100)
+                .put(maxHttpResponseSizeKey, 20000000)
+                .putList(httpHostDenyListKey, listOf("sample"))
+                .putList(allowedConfigTypeKey, listOf("slack"))
+                .put(tooltipSupportKey, false)
+                .put(clusterNameKey, "OpenSearch OsDomainNameUpdate")
+                .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
         whenever(clusterService.clusterName).thenReturn(defaultClusterName)
@@ -176,54 +179,54 @@ internal class PluginSettingsTests {
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.HOST_DENY_LIST,
-                    ClusterName.CLUSTER_NAME_SETTING
-                )
-            )
+                    ClusterName.CLUSTER_NAME_SETTING,
+                ),
+            ),
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         Assertions.assertEquals(
             20000,
-            clusterService.clusterSettings.get(PluginSettings.EMAIL_SIZE_LIMIT)
+            clusterService.clusterSettings.get(PluginSettings.EMAIL_SIZE_LIMIT),
         )
         Assertions.assertEquals(
             100,
-            clusterService.clusterSettings.get(PluginSettings.EMAIL_MINIMUM_HEADER_LENGTH)
+            clusterService.clusterSettings.get(PluginSettings.EMAIL_MINIMUM_HEADER_LENGTH),
         )
         Assertions.assertEquals(
             100,
-            clusterService.clusterSettings.get(PluginSettings.MAX_CONNECTIONS)
+            clusterService.clusterSettings.get(PluginSettings.MAX_CONNECTIONS),
         )
         Assertions.assertEquals(
             100,
-            clusterService.clusterSettings.get(PluginSettings.MAX_CONNECTIONS_PER_ROUTE)
+            clusterService.clusterSettings.get(PluginSettings.MAX_CONNECTIONS_PER_ROUTE),
         )
         Assertions.assertEquals(
             100,
-            clusterService.clusterSettings.get(PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS)
+            clusterService.clusterSettings.get(PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS),
         )
         Assertions.assertEquals(
             100,
-            clusterService.clusterSettings.get(PluginSettings.SOCKET_TIMEOUT_MILLISECONDS)
+            clusterService.clusterSettings.get(PluginSettings.SOCKET_TIMEOUT_MILLISECONDS),
         )
         Assertions.assertEquals(
             20000000,
-            clusterService.clusterSettings.get(PluginSettings.MAX_HTTP_RESPONSE_SIZE)
+            clusterService.clusterSettings.get(PluginSettings.MAX_HTTP_RESPONSE_SIZE),
         )
         Assertions.assertEquals(
             listOf("sample"),
-            clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST)
+            clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST),
         )
         Assertions.assertEquals(
             listOf("slack"),
-            clusterService.clusterSettings.get(PluginSettings.ALLOWED_CONFIG_TYPES)
+            clusterService.clusterSettings.get(PluginSettings.ALLOWED_CONFIG_TYPES),
         )
         Assertions.assertEquals(
             false,
-            clusterService.clusterSettings.get(PluginSettings.TOOLTIP_SUPPORT)
+            clusterService.clusterSettings.get(PluginSettings.TOOLTIP_SUPPORT),
         )
         Assertions.assertEquals(
             "OpenSearch OsDomainNameUpdate",
-            clusterService.clusterSettings.get(ClusterName.CLUSTER_NAME_SETTING).value()
+            clusterService.clusterSettings.get(ClusterName.CLUSTER_NAME_SETTING).value(),
         )
     }
 
@@ -246,64 +249,66 @@ internal class PluginSettingsTests {
                     PluginSettings.ALLOWED_CONFIG_TYPES,
                     PluginSettings.TOOLTIP_SUPPORT,
                     PluginSettings.HOST_DENY_LIST,
-                    ClusterName.CLUSTER_NAME_SETTING
-                )
-            )
+                    ClusterName.CLUSTER_NAME_SETTING,
+                ),
+            ),
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         Assertions.assertEquals(
             defaultSettings[emailSizeLimitKey],
-            clusterService.clusterSettings.get(PluginSettings.EMAIL_SIZE_LIMIT).toString()
+            clusterService.clusterSettings.get(PluginSettings.EMAIL_SIZE_LIMIT).toString(),
         )
         Assertions.assertEquals(
             defaultSettings[emailMinHeaderLengthKey],
-            clusterService.clusterSettings.get(PluginSettings.EMAIL_MINIMUM_HEADER_LENGTH).toString()
+            clusterService.clusterSettings.get(PluginSettings.EMAIL_MINIMUM_HEADER_LENGTH).toString(),
         )
         Assertions.assertEquals(
             defaultSettings[httpMaxConnectionKey],
-            clusterService.clusterSettings.get(PluginSettings.MAX_CONNECTIONS).toString()
+            clusterService.clusterSettings.get(PluginSettings.MAX_CONNECTIONS).toString(),
         )
         Assertions.assertEquals(
             defaultSettings[httpMaxConnectionPerRouteKey],
-            clusterService.clusterSettings.get(PluginSettings.MAX_CONNECTIONS_PER_ROUTE).toString()
+            clusterService.clusterSettings.get(PluginSettings.MAX_CONNECTIONS_PER_ROUTE).toString(),
         )
         Assertions.assertEquals(
             defaultSettings[httpConnectionTimeoutKey],
-            clusterService.clusterSettings.get(PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS).toString()
+            clusterService.clusterSettings.get(PluginSettings.CONNECTION_TIMEOUT_MILLISECONDS).toString(),
         )
         Assertions.assertEquals(
             defaultSettings[httpSocketTimeoutKey],
-            clusterService.clusterSettings.get(PluginSettings.SOCKET_TIMEOUT_MILLISECONDS).toString()
+            clusterService.clusterSettings.get(PluginSettings.SOCKET_TIMEOUT_MILLISECONDS).toString(),
         )
         Assertions.assertEquals(
             defaultSettings[maxHttpResponseSizeKey],
-            clusterService.clusterSettings.get(PluginSettings.MAX_HTTP_RESPONSE_SIZE).toString()
+            clusterService.clusterSettings.get(PluginSettings.MAX_HTTP_RESPONSE_SIZE).toString(),
         )
         Assertions.assertEquals(
             defaultSettings[httpHostDenyListKey],
-            clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST).toString()
+            clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST).toString(),
         )
         Assertions.assertEquals(
             defaultSettings[allowedConfigTypeKey],
-            clusterService.clusterSettings.get(PluginSettings.ALLOWED_CONFIG_TYPES).toString()
+            clusterService.clusterSettings.get(PluginSettings.ALLOWED_CONFIG_TYPES).toString(),
         )
         Assertions.assertEquals(
             defaultSettings[tooltipSupportKey],
-            clusterService.clusterSettings.get(PluginSettings.TOOLTIP_SUPPORT).toString()
+            clusterService.clusterSettings.get(PluginSettings.TOOLTIP_SUPPORT).toString(),
         )
         Assertions.assertEquals(
             "Cluster [opensearch]",
-            clusterService.clusterSettings.get(ClusterName.CLUSTER_NAME_SETTING).toString()
+            clusterService.clusterSettings.get(ClusterName.CLUSTER_NAME_SETTING).toString(),
         )
     }
 
     @Test
     fun `test notifications host deny list takes precedence over fallbacks`() {
-        val clusterSettings = Settings.builder()
-            .putList(legacyAlertingHostDenyListKey, emptyList())
-            .putList(alertingHostDenyListKey, emptyList())
-            .putList(httpHostDenyListKey, listOf("sample"))
-            .build()
+        val clusterSettings =
+            Settings
+                .builder()
+                .putList(legacyAlertingHostDenyListKey, emptyList())
+                .putList(alertingHostDenyListKey, emptyList())
+                .putList(httpHostDenyListKey, listOf("sample"))
+                .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
         whenever(clusterService.clusterName).thenReturn(defaultClusterName)
@@ -323,23 +328,25 @@ internal class PluginSettingsTests {
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
                     PluginSettings.ALERTING_HOST_DENY_LIST,
                     PluginSettings.HOST_DENY_LIST,
-                    ClusterName.CLUSTER_NAME_SETTING
-                )
-            )
+                    ClusterName.CLUSTER_NAME_SETTING,
+                ),
+            ),
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         Assertions.assertEquals(
             listOf("sample"),
-            clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST)
+            clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST),
         )
     }
 
     @Test
     fun `test host deny list falls back to alerting setting if available`() {
-        val clusterSettings = Settings.builder()
-            .putList(legacyAlertingHostDenyListKey, emptyList())
-            .putList(alertingHostDenyListKey, listOf("sample"))
-            .build()
+        val clusterSettings =
+            Settings
+                .builder()
+                .putList(legacyAlertingHostDenyListKey, emptyList())
+                .putList(alertingHostDenyListKey, listOf("sample"))
+                .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
         whenever(clusterService.clusterName).thenReturn(defaultClusterName)
@@ -359,22 +366,24 @@ internal class PluginSettingsTests {
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
                     PluginSettings.ALERTING_HOST_DENY_LIST,
                     PluginSettings.HOST_DENY_LIST,
-                    ClusterName.CLUSTER_NAME_SETTING
-                )
-            )
+                    ClusterName.CLUSTER_NAME_SETTING,
+                ),
+            ),
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         Assertions.assertEquals(
             listOf("sample"),
-            clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST)
+            clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST),
         )
     }
 
     @Test
     fun `test host deny list falls back to legacy alerting setting if newer settings are not set`() {
-        val clusterSettings = Settings.builder()
-            .putList(legacyAlertingHostDenyListKey, listOf("sample"))
-            .build()
+        val clusterSettings =
+            Settings
+                .builder()
+                .putList(legacyAlertingHostDenyListKey, listOf("sample"))
+                .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
         whenever(clusterService.clusterName).thenReturn(defaultClusterName)
@@ -394,14 +403,14 @@ internal class PluginSettingsTests {
                     PluginSettings.LEGACY_ALERTING_HOST_DENY_LIST,
                     PluginSettings.ALERTING_HOST_DENY_LIST,
                     PluginSettings.HOST_DENY_LIST,
-                    ClusterName.CLUSTER_NAME_SETTING
-                )
-            )
+                    ClusterName.CLUSTER_NAME_SETTING,
+                ),
+            ),
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         Assertions.assertEquals(
             listOf("sample"),
-            clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST)
+            clusterService.clusterSettings.get(PluginSettings.HOST_DENY_LIST),
         )
     }
 }

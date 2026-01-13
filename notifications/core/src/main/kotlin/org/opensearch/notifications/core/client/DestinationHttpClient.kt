@@ -43,7 +43,6 @@ import kotlin.collections.HashSet
  * This class handles the connections to the given Destination.
  */
 class DestinationHttpClient {
-
     private val httpClient: CloseableHttpClient
 
     constructor() {
@@ -61,32 +60,36 @@ class DestinationHttpClient {
         /**
          * all valid response status
          */
-        private val VALID_RESPONSE_STATUS = Collections.unmodifiableSet(
-            HashSet(
-                listOf(
-                    RestStatus.OK.status,
-                    RestStatus.CREATED.status,
-                    RestStatus.ACCEPTED.status,
-                    RestStatus.NON_AUTHORITATIVE_INFORMATION.status,
-                    RestStatus.NO_CONTENT.status,
-                    RestStatus.RESET_CONTENT.status,
-                    RestStatus.PARTIAL_CONTENT.status,
-                    RestStatus.MULTI_STATUS.status
-                )
+        private val VALID_RESPONSE_STATUS =
+            Collections.unmodifiableSet(
+                HashSet(
+                    listOf(
+                        RestStatus.OK.status,
+                        RestStatus.CREATED.status,
+                        RestStatus.ACCEPTED.status,
+                        RestStatus.NON_AUTHORITATIVE_INFORMATION.status,
+                        RestStatus.NO_CONTENT.status,
+                        RestStatus.RESET_CONTENT.status,
+                        RestStatus.PARTIAL_CONTENT.status,
+                        RestStatus.MULTI_STATUS.status,
+                    ),
+                ),
             )
-        )
 
         private fun createHttpClient(): CloseableHttpClient {
-            val config: RequestConfig = RequestConfig.custom()
-                .setConnectTimeout(Timeout.ofMilliseconds(PluginSettings.connectionTimeout.toLong()))
-                .setConnectionRequestTimeout(Timeout.ofMilliseconds(PluginSettings.connectionTimeout.toLong()))
-                .setResponseTimeout(Timeout.ofMilliseconds(PluginSettings.socketTimeout.toLong()))
-                .build()
+            val config: RequestConfig =
+                RequestConfig
+                    .custom()
+                    .setConnectTimeout(Timeout.ofMilliseconds(PluginSettings.connectionTimeout.toLong()))
+                    .setConnectionRequestTimeout(Timeout.ofMilliseconds(PluginSettings.connectionTimeout.toLong()))
+                    .setResponseTimeout(Timeout.ofMilliseconds(PluginSettings.socketTimeout.toLong()))
+                    .build()
             val connectionManager = PoolingHttpClientConnectionManager()
             connectionManager.maxTotal = PluginSettings.maxConnections
             connectionManager.defaultMaxPerRoute = PluginSettings.maxConnectionsPerRoute
 
-            return HttpClientBuilder.create()
+            return HttpClientBuilder
+                .create()
                 .setDefaultRequestConfig(config)
                 .setConnectionManager(connectionManager)
                 .setRetryStrategy(DefaultHttpRequestRetryStrategy())
@@ -97,7 +100,11 @@ class DestinationHttpClient {
     }
 
     @Throws(Exception::class)
-    fun execute(destination: WebhookDestination, message: MessageContent, referenceId: String): String {
+    fun execute(
+        destination: WebhookDestination,
+        message: MessageContent,
+        referenceId: String,
+    ): String {
         var response: CloseableHttpResponse? = null
         return try {
             // validate webhook url against host_deny_list in plugin settings
@@ -115,7 +122,10 @@ class DestinationHttpClient {
     }
 
     @Throws(Exception::class)
-    private fun getHttpResponse(destination: WebhookDestination, message: MessageContent): CloseableHttpResponse {
+    private fun getHttpResponse(
+        destination: WebhookDestination,
+        message: MessageContent,
+    ): CloseableHttpResponse {
         var httpRequest: HttpUriRequestBase = HttpPost(destination.url)
 
         if (destination is CustomWebhookDestination) {
@@ -134,16 +144,21 @@ class DestinationHttpClient {
         return httpClient.execute(httpRequest)
     }
 
-    private fun constructHttpRequest(method: String, url: String): HttpUriRequestBase {
-        return when (method) {
+    private fun constructHttpRequest(
+        method: String,
+        url: String,
+    ): HttpUriRequestBase =
+        when (method) {
             HttpPost.METHOD_NAME -> HttpPost(url)
+
             HttpPut.METHOD_NAME -> HttpPut(url)
+
             HttpPatch.METHOD_NAME -> HttpPatch(url)
+
             else -> throw IllegalArgumentException(
-                "Invalid or empty method supplied. Only POST, PUT and PATCH are allowed"
+                "Invalid or empty method supplied. Only POST, PUT and PATCH are allowed",
             )
         }
-    }
 
     @Throws(IOException::class)
     fun getResponseString(response: CloseableHttpResponse): String {
@@ -161,23 +176,32 @@ class DestinationHttpClient {
         }
     }
 
-    fun buildRequestBody(destination: WebhookDestination, message: MessageContent): String {
+    fun buildRequestBody(
+        destination: WebhookDestination,
+        message: MessageContent,
+    ): String {
         val builder = MediaTypeRegistry.contentBuilder(XContentType.JSON)
-        val keyName = when (destination) {
-            // Slack webhook request body has required "text" as key name https://api.slack.com/messaging/webhooks
-            // Chime webhook request body has required "Content" as key name
-            // Microsoft Teams webhook request body has required "text" as key name https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors
-            // Customer webhook allows input as json or plain text, so we just return the message as it is
-            is SlackDestination -> "text"
-            is ChimeDestination -> "Content"
-            is MicrosoftTeamsDestination -> "text"
-            is CustomWebhookDestination -> return message.textDescription
-            else -> throw IllegalArgumentException(
-                "Invalid destination type is provided, Only Slack, Chime, Microsoft Teams and CustomWebhook are allowed"
-            )
-        }
+        val keyName =
+            when (destination) {
+                // Slack webhook request body has required "text" as key name https://api.slack.com/messaging/webhooks
+                // Chime webhook request body has required "Content" as key name
+                // Microsoft Teams webhook request body has required "text" as key name https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/what-are-webhooks-and-connectors
+                // Customer webhook allows input as json or plain text, so we just return the message as it is
+                is SlackDestination -> "text"
 
-        builder.startObject()
+                is ChimeDestination -> "Content"
+
+                is MicrosoftTeamsDestination -> "text"
+
+                is CustomWebhookDestination -> return message.textDescription
+
+                else -> throw IllegalArgumentException(
+                    "Invalid destination type is provided, Only Slack, Chime, Microsoft Teams and CustomWebhook are allowed",
+                )
+            }
+
+        builder
+            .startObject()
             .field(keyName, message.buildMessageWithTitle())
             .endObject()
         return builder.string()
