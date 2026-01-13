@@ -75,10 +75,11 @@ publishing {
     repositories {
         maven {
             name = "Snapshots"
-            url = "https://central.sonatype.com/repository/maven-snapshots/"
-            credentials {
-                username "$System.env.SONATYPE_USERNAME"
-                password "$System.env.SONATYPE_PASSWORD"
+            url = System.getenv("MAVEN_SNAPSHOTS_S3_REPO")
+            credentials(AwsCredentials) {
+                accessKey = System.getenv("AWS_ACCESS_KEY_ID")
+                secretKey = System.getenv("AWS_SECRET_ACCESS_KEY")
+                sessionToken = System.getenv("AWS_SESSION_TOKEN")
             }
         }
     }
@@ -116,21 +117,45 @@ configurations.testImplementation {
     exclude module: "securemock"
 }
 
+configurations.testRuntimeClasspath {
+    exclude group: 'org.bouncycastle', module: 'bcprov-jdk18on'
+}
+
 configurations.all {
     if (it.state != Configuration.State.UNRESOLVED) return
     resolutionStrategy {
         force "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
         force "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
-        force "com.fasterxml.jackson.core:jackson-databind:2.18.2"
-        force "com.fasterxml.jackson.core:jackson-core:2.18.2"
+        force "com.fasterxml.jackson.core:jackson-databind:${versions.jackson}"
+        force "com.fasterxml.jackson.core:jackson-core:${versions.jackson}"
+        force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:${versions.jackson}"
         force "commons-logging:commons-logging:1.3.5"
         force "commons-codec:commons-codec:1.17.1"
-        force "org.apache.httpcomponents.core5:httpcore5:5.3.3"
-        force "org.apache.httpcomponents.client5:httpclient5:5.4.2"
-        force "org.apache.httpcomponents:httpclient:4.5.14"
-        force "org.apache.httpcomponents.core5:httpcore5-h2:5.3.3"
+        force "org.apache.httpcomponents.core5:httpcore5:${versions.httpcore5}"
+        force "org.apache.httpcomponents.client5:httpclient5:${versions.httpclient5}"
+        force "org.apache.httpcomponents:httpclient:${versions.httpclient}"
+        force "org.apache.httpcomponents.core5:httpcore5-h2:${versions.httpcore5}"
         force "jakarta.json:jakarta.json-api:2.1.3"
         force "org.opensearch.client:opensearch-rest-client:${opensearch_version}"
+        force "org.slf4j:slf4j-api:${versions.slf4j}"
+        force "software.amazon.awssdk:bom:${versions.aws}"
+        force "software.amazon.awssdk:kms:${versions.aws}"
+        force "software.amazon.awssdk:dynamodb:${versions.aws}"
+        force "com.amazonaws:aws-java-sdk-core:${aws_version}"
+        force "com.amazonaws:aws-java-sdk-dynamodb:${aws_version}"
+        force "com.amazonaws:aws-java-sdk-s3:${aws_version}"
+        force "com.amazonaws:aws-java-sdk-kms:${aws_version}"
+        force "joda-time:joda-time:2.12.7"
+        force "io.netty:netty-codec-http:${versions.netty}"
+        force "io.netty:netty-codec-http2:${versions.netty}"
+        force "io.netty:netty-codec:${versions.netty}"
+        force "io.netty:netty-transport:${versions.netty}"
+        force "io.netty:netty-common:${versions.netty}"
+        force "io.netty:netty-buffer:${versions.netty}"
+        force "io.netty:netty-handler:${versions.netty}"
+        force "io.netty:netty-resolver:${versions.netty}"
+        force "io.netty:netty-transport-native-unix-common:${versions.netty}"
+        force "org.dafny:DafnyRuntime:4.9.0"
     }
 }
 
@@ -152,7 +177,7 @@ dependencies {
     // TODO: uncomment when the _local/stats API is supported
     // implementation "com.github.wnameless.json:json-base:2.0.0"
     // implementation "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}"
-    // implementation "com.fasterxml.jackson.core:jackson-annotations:2.10.4"
+    // implementation "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson_annotations}"
 
     // Needed for security tests
     if (securityEnabled) {
@@ -161,7 +186,7 @@ dependencies {
 
     compileOnly "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}"
     compileOnly "com.fasterxml.jackson.core:jackson-core:${versions.jackson}"
-    compileOnly "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}"
+    compileOnly "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson_annotations}"
     compileOnly "org.apache.httpcomponents.core5:httpcore5:${versions.httpcore5}"
     compileOnly "org.apache.httpcomponents.client5:httpclient5:${versions.httpclient5}"
     compileOnly "org.apache.httpcomponents.core5:httpcore5-h2:${versions.httpcore5}"
@@ -172,7 +197,9 @@ dependencies {
     implementation "org.apache.httpcomponents:httpclient:${versions.httpclient}"
     implementation "org.opensearch.client:opensearch-rest-client:${opensearch_build}"
     api "org.opensearch:opensearch-remote-metadata-sdk:${opensearch_build}"
-    implementation "org.opensearch:opensearch-remote-metadata-sdk-ddb-client:${opensearch_build}"
+    implementation ("org.opensearch:opensearch-remote-metadata-sdk-ddb-client:${opensearch_build}") {
+        exclude group: 'com.amazonaws', module: 'aws-java-sdk-core'
+    }
 
 
     testImplementation(
@@ -189,6 +216,7 @@ dependencies {
             "org.junit.jupiter:junit-jupiter-api:${junit_version}"
     )
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit_version}")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation "org.opensearch.test:framework:${opensearch_version}"
     testImplementation "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
@@ -331,6 +359,9 @@ integTest {
     }
 }
 
+// set evaluationDependsOn to make sure notification-core is evaluated in advance
+project.evaluationDependsOn(":${rootProject.name}-core")
+
 project.getTasks().getByName("bundlePlugin").dependsOn(findProject(":${rootProject.name}-core").tasks.getByPath(":${rootProject.name}-core:bundlePlugin"))
 Zip bundle = (Zip) project.getTasks().getByName("bundlePlugin");
 Zip coreBundle = (Zip) findProject(":${rootProject.name}-core").getTasks().getByName("bundlePlugin");
@@ -360,7 +391,7 @@ ext.resolvePluginFile = { pluginId ->
 }
 
 testClusters.integTest {
-    testDistribution = 'INTEG_TEST'
+    testDistribution = 'ARCHIVE'
 
     // Cluster shrink exception thrown if we try to set numberOfNodes to 1, so only apply if > 1
     if (_numNodes > 1) numberOfNodes = _numNodes
@@ -385,7 +416,7 @@ testClusters.integTest {
 // Always be minimumCompatibilityVersion of current opensearch version(3.0.0)
 // get latest 2.x version from OpenSearch 2.x branch
 static def fetchVersionProperties() {
-    def url = 'https://raw.githubusercontent.com/opensearch-project/OpenSearch/refs/heads/3.1/buildSrc/version.properties'
+    def url = 'https://raw.githubusercontent.com/opensearch-project/OpenSearch/refs/heads/3.2/buildSrc/version.properties'
     def content = new URL(url).text
     // Use regex to extract the version number
     def matcher = content =~ /opensearch\s*=\s*(\d+\.\d+\.\d+)/
@@ -414,7 +445,7 @@ def notificationsFile = resolvePluginFile("notifications")
 2.times { i ->
     testClusters {
         "${baseName}$i" {
-            testDistribution = "INTEG_TEST"
+            testDistribution = "ARCHIVE"
             versions = [bwcOpenSearchVesion, opensearch_version]
             numberOfNodes = 3
             plugin(provider(notificationsCoreFile))
@@ -555,7 +586,7 @@ afterEvaluate {
         version = "${project.version}" - "-SNAPSHOT"
 
         into '/usr/share/opensearch/plugins'
-        from(zipTree(bundlePlugin.archivePath)) {
+        from(zipTree(bundlePlugin.archiveFile)) {
             into opensearchplugin.name
         }
 

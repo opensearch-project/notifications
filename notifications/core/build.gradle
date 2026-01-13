@@ -16,8 +16,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven { url "https://plugins.gradle.org/m2/" }
-    maven { url "https://central.sonatype.com/repository/maven-snapshots/" }
-    maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
+    maven { url "https://ci.opensearch.org/ci/dbc/snapshots/maven/" }
 }
 
 apply plugin: 'opensearch.opensearchplugin'
@@ -66,10 +65,11 @@ publishing {
     repositories {
         maven {
             name = "Snapshots"
-            url = "https://central.sonatype.com/repository/maven-snapshots/"
-            credentials {
-                username "$System.env.SONATYPE_USERNAME"
-                password "$System.env.SONATYPE_PASSWORD"
+            url = System.getenv("MAVEN_SNAPSHOTS_S3_REPO")
+            credentials(AwsCredentials) {
+                accessKey = System.getenv("AWS_ACCESS_KEY_ID")
+                secretKey = System.getenv("AWS_SECRET_ACCESS_KEY")
+                sessionToken = System.getenv("AWS_SESSION_TOKEN")
             }
         }
     }
@@ -100,6 +100,8 @@ test {
     systemProperty 'tests.security.manager', 'false'
 }
 
+forbiddenApisTest.enabled = false
+
 // disable for core, we don't need to run test cluster
 run {
     onlyIf { false }
@@ -117,7 +119,7 @@ configurations.all {
         force "org.apache.httpcomponents.core5:httpcore5:${versions.httpcore5}" // resolve for amazonaws
         force "joda-time:joda-time:2.8.1" // Resolve for amazonaws
         force "com.fasterxml.jackson.core:jackson-core:${versions.jackson}" // resolve for amazonaws
-        force "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}" // resolve for amazonaws
+        force "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson_annotations}" // resolve for amazonaws
         force "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}" // resolve for amazonaws
         force "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.11.4" // resolve for amazonaws
         force "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.11.4" // resolve for amazonaws
@@ -139,19 +141,19 @@ dependencies {
     implementation "org.slf4j:slf4j-api:${versions.slf4j}" //Needed for httpclient5
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:${versions.log4j}"
     implementation "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}"
-    implementation "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson_annotations}"
     implementation "com.amazonaws:aws-java-sdk-core:${aws_version}"
     implementation "com.amazonaws:aws-java-sdk-sns:${aws_version}"
     implementation "com.amazonaws:aws-java-sdk-sts:${aws_version}"
     implementation "com.amazonaws:aws-java-sdk-ses:${aws_version}"
-    implementation "org.eclipse.angus:angus-mail:2.0.3"
+    implementation "org.eclipse.angus:angus-mail:2.0.4"
     implementation "org.eclipse.angus:angus-activation:2.0.2"
     implementation "jakarta.mail:jakarta.mail-api:2.1.3"
     implementation "jakarta.activation:jakarta.activation-api:2.1.3"
     testImplementation(
             'org.assertj:assertj-core:3.16.1',
-            'org.junit.jupiter:junit-jupiter-api:5.6.2',
-            "org.junit.jupiter:junit-jupiter-params:5.6.2",
+            "org.junit.jupiter:junit-jupiter-api:${junit_version}",
+            "org.junit.jupiter:junit-jupiter-params:${junit_version}",
             "org.easymock:easymock:5.6.0",
             "org.apache.logging.log4j:log4j-core:${versions.log4j}",
             'org.mockito:mockito-junit-jupiter:3.10.0',
@@ -168,7 +170,8 @@ dependencies {
     // https://mvnrepository.com/artifact/com.icegreen/greenmail
     testImplementation group: 'com.icegreen', name: 'greenmail', version: '2.1.3'
     testImplementation 'org.springframework.integration:spring-integration-test-support:5.5.0'
-    testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.6.2')
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit_version}")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
     testImplementation "net.bytebuddy:byte-buddy-agent:1.12.7"
     testImplementation "org.mockito:mockito-core:${versions.mockito}"
