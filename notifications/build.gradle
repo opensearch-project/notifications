@@ -6,7 +6,7 @@
 
 buildscript {
     ext {
-        opensearch_version = System.getProperty("opensearch.version", "3.4.0-SNAPSHOT")
+        opensearch_version = System.getProperty("opensearch.version", "3.5.0-SNAPSHOT")
         isSnapshot = "true" == System.getProperty("build.snapshot", "true")
         buildVersionQualifier = System.getProperty("build.version_qualifier", "")
         // 3.0.0-SNAPSHOT -> 3.0.0.0-SNAPSHOT
@@ -90,8 +90,8 @@ allprojects {
 configurations {
     ktlint {
         resolutionStrategy {
-            force "ch.qos.logback:logback-classic:1.5.16"
-            force "ch.qos.logback:logback-core:1.5.16"
+            force "ch.qos.logback:logback-classic:1.5.19"
+            force "ch.qos.logback:logback-core:1.5.19"
         }
     }
 }
