@@ -50,21 +50,26 @@ internal class MicrosoftTeamsDestinationTests {
 
     @BeforeEach
     fun setup() {
-        // Stubbing isHostInDenylist() so it doesn't attempt to resolve hosts that don't exist in the unit tests
+        // Stubbing isHostInDenylist() so it doesn't attempt to resolve hosts that don't exist in
+        // the unit tests
         mockkStatic("org.opensearch.notifications.spi.utils.ValidationHelpersKt")
-        every { org.opensearch.notifications.spi.utils.isHostInDenylist(any(), any()) } returns false
-        every { org.opensearch.notifications.spi.utils.getResolvedIps(any()) } returns listOf(IPAddressString("174.0.0.0"))
+        every { org.opensearch.notifications.spi.utils.isHostInDenylist(any(), any()) } returns
+            false
+        every { org.opensearch.notifications.spi.utils.getResolvedIps(any()) } returns
+            listOf(IPAddressString("174.0.0.0"))
     }
 
     @Test
     fun `test MicrosoftTeams message null entity response`() {
-        val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
+        val mockHttpClient: CloseableHttpClient =
+            EasyMock.createMock(CloseableHttpClient::class.java)
 
         // The DestinationHttpClient replaces a null entity with "{}".
         val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "{}")
 
         val httpResponse = mockk<CloseableHttpResponse>()
-        EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
+        EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java)))
+            .andReturn(httpResponse)
 
         every { httpResponse.code } returns RestStatus.OK.status
         every { httpResponse.entity } returns null
@@ -72,18 +77,21 @@ internal class MicrosoftTeamsDestinationTests {
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
-        DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport)
+        DestinationTransportProvider.destinationTransportMap =
+            mapOf(DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport)
 
         val title = "test MicrosoftTeams"
-        val messageText = "Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present"
+        val messageText =
+            "Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member callout: " +
+                "@All All Present member callout: @Present"
         val url = "https://abc/com"
 
         val destination = MicrosoftTeamsDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualMicrosoftTeamsResponse: DestinationMessageResponse = NotificationCoreImpl.sendMessage(destination, message, "ref")
+        val actualMicrosoftTeamsResponse: DestinationMessageResponse =
+            NotificationCoreImpl.sendMessage(destination, message, "ref")
 
         assertEquals(expectedWebhookResponse.statusText, actualMicrosoftTeamsResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualMicrosoftTeamsResponse.statusCode)
@@ -91,29 +99,34 @@ internal class MicrosoftTeamsDestinationTests {
 
     @Test
     fun `test MicrosoftTeams message empty entity response`() {
-        val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
+        val mockHttpClient: CloseableHttpClient =
+            EasyMock.createMock(CloseableHttpClient::class.java)
         val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, "{}")
 
         val httpResponse = mockk<CloseableHttpResponse>()
-        EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
+        EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java)))
+            .andReturn(httpResponse)
         every { httpResponse.code } returns RestStatus.OK.status
         every { httpResponse.entity } returns StringEntity("")
         EasyMock.replay(mockHttpClient)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
-        DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport)
+        DestinationTransportProvider.destinationTransportMap =
+            mapOf(DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport)
 
         val title = "test MicrosoftTeams"
-        val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present\"}"
+        val messageText =
+            "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member callout: " +
+                "@All All Present member callout: @Present\"}"
         val url = "https://abc/com"
 
         val destination = MicrosoftTeamsDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualMicrosoftTeamsResponse: DestinationMessageResponse = NotificationCoreImpl.sendMessage(destination, message, "ref")
+        val actualMicrosoftTeamsResponse: DestinationMessageResponse =
+            NotificationCoreImpl.sendMessage(destination, message, "ref")
 
         assertEquals(expectedWebhookResponse.statusText, actualMicrosoftTeamsResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualMicrosoftTeamsResponse.statusCode)
@@ -122,29 +135,35 @@ internal class MicrosoftTeamsDestinationTests {
     @Test
     fun `test MicrosoftTeams message non-empty entity response`() {
         val responseContent = "It worked!"
-        val mockHttpClient: CloseableHttpClient = EasyMock.createMock(CloseableHttpClient::class.java)
-        val expectedWebhookResponse = DestinationMessageResponse(RestStatus.OK.status, responseContent)
+        val mockHttpClient: CloseableHttpClient =
+            EasyMock.createMock(CloseableHttpClient::class.java)
+        val expectedWebhookResponse =
+            DestinationMessageResponse(RestStatus.OK.status, responseContent)
 
         val httpResponse = mockk<CloseableHttpResponse>()
-        EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java))).andReturn(httpResponse)
+        EasyMock.expect(mockHttpClient.execute(EasyMock.anyObject(HttpPost::class.java)))
+            .andReturn(httpResponse)
         every { httpResponse.code } returns RestStatus.OK.status
         every { httpResponse.entity } returns StringEntity(responseContent)
         EasyMock.replay(mockHttpClient)
 
         val httpClient = DestinationHttpClient(mockHttpClient)
         val webhookDestinationTransport = WebhookDestinationTransport(httpClient)
-        DestinationTransportProvider.destinationTransportMap = mapOf(DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport)
+        DestinationTransportProvider.destinationTransportMap =
+            mapOf(DestinationType.MICROSOFT_TEAMS to webhookDestinationTransport)
 
         val title = "test MicrosoftTeams"
-        val messageText = "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
-            "link test: http://sample.com email test: marymajor@example.com All member callout: " +
-            "@All All Present member callout: @Present\"}"
+        val messageText =
+            "{\"Content\":\"Message gughjhjlkh Body emoji test: :) :+1: " +
+                "link test: http://sample.com email test: marymajor@example.com All member callout: " +
+                "@All All Present member callout: @Present\"}"
         val url = "https://abc/com"
 
         val destination = MicrosoftTeamsDestination(url)
         val message = MessageContent(title, messageText)
 
-        val actualMicrosoftTeamsResponse: DestinationMessageResponse = NotificationCoreImpl.sendMessage(destination, message, "ref")
+        val actualMicrosoftTeamsResponse: DestinationMessageResponse =
+            NotificationCoreImpl.sendMessage(destination, message, "ref")
 
         assertEquals(expectedWebhookResponse.statusText, actualMicrosoftTeamsResponse.statusText)
         assertEquals(expectedWebhookResponse.statusCode, actualMicrosoftTeamsResponse.statusCode)
@@ -152,17 +171,16 @@ internal class MicrosoftTeamsDestinationTests {
 
     @Test
     fun `test url missing should throw IllegalArgumentException with message`() {
-        val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
-            MicrosoftTeamsDestination("")
-        }
+        val exception =
+            Assertions.assertThrows(IllegalArgumentException::class.java) {
+                MicrosoftTeamsDestination("")
+            }
         assertEquals("url is null or empty", exception.message)
     }
 
     @Test
     fun testUrlInvalidMessage() {
-        assertThrows<MalformedURLException> {
-            ChimeDestination("invalidUrl")
-        }
+        assertThrows<MalformedURLException> { ChimeDestination("invalidUrl") }
     }
 
     @ParameterizedTest
@@ -175,7 +193,8 @@ internal class MicrosoftTeamsDestinationTests {
         val title = "test MicrosoftTeams"
         val messageText = "line1${escapeSequence}line2"
         val url = "https://abc/com"
-        val expectedRequestBody = """{"text":"$title\n\nline1${rawString}line2"}"""
+        val expectedRequestBody =
+            """{"attachments":[{"contentType":"application/vnd.microsoft.card.adaptive","content":{"type":"AdaptiveCard","version":"1.2","body":[{"type":"TextBlock","text":"$title","weight":"Bolder","color":"Attention"},{"type":"TextBlock","text":"line1${rawString}line2","wrap":true}]}}]}"""
         val destination = MicrosoftTeamsDestination(url)
         val message = MessageContent(title, messageText)
         val actualRequestBody = httpClient.buildRequestBody(destination, message)
