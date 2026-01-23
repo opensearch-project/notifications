@@ -5,7 +5,6 @@
 
 package org.opensearch.notifications.core.client
 
-import com.sun.mail.util.MailConnectException
 import jakarta.mail.Authenticator
 import jakarta.mail.Message
 import jakarta.mail.MessagingException
@@ -14,6 +13,7 @@ import jakarta.mail.SendFailedException
 import jakarta.mail.Session
 import jakarta.mail.Transport
 import jakarta.mail.internet.MimeMessage
+import org.eclipse.angus.mail.util.MailConnectException
 import org.opensearch.core.common.settings.SecureString
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.core.setting.PluginSettings

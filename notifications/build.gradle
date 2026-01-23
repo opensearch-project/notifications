@@ -6,7 +6,7 @@
 
 buildscript {
     ext {
-        opensearch_version = System.getProperty("opensearch.version", "3.2.0-SNAPSHOT")
+        opensearch_version = System.getProperty("opensearch.version", "3.5.0-SNAPSHOT")
         isSnapshot = "true" == System.getProperty("build.snapshot", "true")
         buildVersionQualifier = System.getProperty("build.version_qualifier", "")
         // 3.0.0-SNAPSHOT -> 3.0.0.0-SNAPSHOT
@@ -21,7 +21,7 @@ buildscript {
         }
         opensearch_no_snapshot = opensearch_version.replace("-SNAPSHOT","")
         common_utils_version = System.getProperty("common_utils.version", opensearch_build)
-        kotlin_version = System.getProperty("kotlin.version", "1.9.25")
+        kotlin_version = System.getProperty("kotlin.version", "2.2.20")
         junit_version = System.getProperty("junit.version", "5.7.2")
         aws_version = System.getProperty("aws.version", "1.12.687")
         asm_version = System.getProperty("asm.version", "9.7")
@@ -32,8 +32,7 @@ buildscript {
         mavenLocal()
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://central.sonatype.com/repository/maven-snapshots/" }
-        maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
+        maven { url "https://ci.opensearch.org/ci/dbc/snapshots/maven/" }
     }
 
     dependencies {
@@ -67,14 +66,15 @@ allprojects {
         mavenLocal()
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://central.sonatype.com/repository/maven-snapshots/" }
-        maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
+        maven { url "https://ci.opensearch.org/ci/dbc/snapshots/maven/" }
     }
     group = "org.opensearch"
 
     plugins.withId('java') {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        java {
+            sourceCompatibility = JavaVersion.VERSION_21
+            targetCompatibility = JavaVersion.VERSION_21
+        }
     }
     plugins.withId('org.jetbrains.kotlin.jvm') {
         compileJava.sourceCompatibility = JavaVersion.VERSION_21
@@ -90,8 +90,8 @@ allprojects {
 configurations {
     ktlint {
         resolutionStrategy {
-            force "ch.qos.logback:logback-classic:1.5.16"
-            force "ch.qos.logback:logback-core:1.5.16"
+            force "ch.qos.logback:logback-classic:1.5.19"
+            force "ch.qos.logback:logback-core:1.5.19"
         }
     }
 }
