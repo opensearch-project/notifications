@@ -174,7 +174,8 @@ internal object PluginSettings {
         "sns",
         "ses_account",
         "smtp_account",
-        "email_group"
+        "email_group",
+        "mattermost"
     )
 
     /**

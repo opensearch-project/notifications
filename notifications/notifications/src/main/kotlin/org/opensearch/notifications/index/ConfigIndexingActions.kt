@@ -76,7 +76,7 @@ object ConfigIndexingActions {
 
     @Suppress("UnusedPrivateMember")
     private fun validateMattermostConfig(slack: Slack, user: User?) {
-        require(slack.url.contains(Regex("https://.*/hooks/.*"))) {
+        require(slack.url.contains(Regex("https?://.*/hooks/.*"))) {
             "Wrong webhook url. Should match \"https://.*/hooks/.*\""
         }
     }
@@ -390,7 +390,8 @@ object ConfigIndexingActions {
             ConfigType.MICROSOFT_TEAMS.tag,
             ConfigType.WEBHOOK.tag,
             ConfigType.EMAIL.tag,
-            ConfigType.SNS.tag
+            ConfigType.SNS.tag,
+            ConfigType.MATTERMOST.tag
         )
     }
 
