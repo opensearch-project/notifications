@@ -177,7 +177,7 @@ dependencies {
     // TODO: uncomment when the _local/stats API is supported
     // implementation "com.github.wnameless.json:json-base:2.0.0"
     // implementation "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}"
-    // implementation "com.fasterxml.jackson.core:jackson-annotations:2.10.4"
+    // implementation "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson_annotations}"
 
     // Needed for security tests
     if (securityEnabled) {
@@ -186,7 +186,7 @@ dependencies {
 
     compileOnly "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}"
     compileOnly "com.fasterxml.jackson.core:jackson-core:${versions.jackson}"
-    compileOnly "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}"
+    compileOnly "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson_annotations}"
     compileOnly "org.apache.httpcomponents.core5:httpcore5:${versions.httpcore5}"
     compileOnly "org.apache.httpcomponents.client5:httpclient5:${versions.httpclient5}"
     compileOnly "org.apache.httpcomponents.core5:httpcore5-h2:${versions.httpcore5}"
