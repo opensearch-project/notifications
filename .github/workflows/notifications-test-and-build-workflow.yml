@@ -52,7 +52,7 @@ jobs:
         run: |
           chown -R 1000:1000 `pwd`
           cd notifications
-          su `id -un 1000` -c "./gradlew build"
+          su `id -un 1000` -c "./gradlew build \"-Pcrypto.standard=FIPS-140-3\""
 
       - name: Upload coverage
         uses: codecov/codecov-action@v1
@@ -123,7 +123,7 @@ jobs:
         working-directory: ${{ env.WORKING_DIR }}
         run: |
           cd notifications
-          ./gradlew build ${{ env.BUILD_ARGS }}
+          ./gradlew build ${{ env.BUILD_ARGS }} "-Pcrypto.standard=FIPS-140-3"
         env:
           _JAVA_OPTIONS: ${{ matrix.os_java_options }}
 

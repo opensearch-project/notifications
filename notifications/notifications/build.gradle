@@ -17,6 +17,7 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSession
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
+import org.opensearch.gradle.info.FipsBuildParams
 import org.opensearch.gradle.test.RestIntegTestTask
 import org.opensearch.gradle.testclusters.OpenSearchCluster
 import org.opensearch.gradle.testclusters.StandaloneRestIntegTestTask
@@ -117,8 +118,11 @@ configurations.testImplementation {
     exclude module: "securemock"
 }
 
-configurations.testRuntimeClasspath {
-    exclude group: 'org.bouncycastle', module: 'bcprov-jdk18on'
+// When building with -Pcrypto.standard=FIPS-140-3, bcprov is provided by OpenSearch
+if (FipsBuildParams.isInFipsMode()) {
+    configurations.all {
+        exclude group: 'org.bouncycastle', module: 'bcprov-jdk18on'
+    }
 }
 
 configurations.all {

@@ -45,5 +45,5 @@ jobs:
       - name: publish snapshots to maven
         run: |
           cd notifications/
-          ./gradlew publishPluginZipPublicationToSnapshotsRepository
+          ./gradlew publishPluginZipPublicationToSnapshotsRepository "-Pcrypto.standard=FIPS-140-3"
 
