@@ -117,10 +117,6 @@ configurations.testImplementation {
     exclude module: "securemock"
 }
 
-configurations.testRuntimeClasspath {
-    exclude group: 'org.bouncycastle', module: 'bcprov-jdk18on'
-}
-
 configurations.all {
     if (it.state != Configuration.State.UNRESOLVED) return
     resolutionStrategy {
@@ -199,6 +195,7 @@ dependencies {
     api "org.opensearch:opensearch-remote-metadata-sdk:${opensearch_build}"
     implementation ("org.opensearch:opensearch-remote-metadata-sdk-ddb-client:${opensearch_build}") {
         exclude group: 'com.amazonaws', module: 'aws-java-sdk-core'
+        exclude group: 'org.bouncycastle'
     }
 
 
