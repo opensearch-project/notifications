@@ -6,7 +6,6 @@
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
 
 plugins {
-    id 'com.github.johnrengelman.shadow'
     id 'jacoco'
     id 'maven-publish'
     id 'signing'
@@ -19,8 +18,7 @@ repositories {
     maven { url "https://ci.opensearch.org/ci/dbc/snapshots/maven/" }
 }
 
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'opensearch.java'
+apply plugin: 'com.gradleup.shadow'
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
 
