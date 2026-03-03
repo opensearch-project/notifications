@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - directory: /notifications
+    open-pull-requests-limit: 1
+    package-ecosystem: gradle
+    schedule:
+      interval: weekly
+      day: "friday"
+  - directory: /
+    package-ecosystem: github-actions
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "dependabot:"

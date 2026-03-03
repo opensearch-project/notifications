@@ -1,2 +1,5 @@
+Wazuh Indexer Notifications Plugin
+Copyright Wazuh, Inc.
+
 OpenSearch (https://opensearch.org/)
 Copyright OpenSearch Contributors

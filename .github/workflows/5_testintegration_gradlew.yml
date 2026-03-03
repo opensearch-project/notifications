@@ -54,4 +54,4 @@ jobs:
         with:
           name: logs
           overwrite: 'true'
-          path: build/testclusters/integTest-*/logs/*
+          path: notifications/build/testclusters/integTest-*/logs/*

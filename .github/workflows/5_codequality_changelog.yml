@@ -1,0 +1,16 @@
+name: (5.x) Check changelog
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
+
+jobs:
+  # Enforces the update of a changelog file on every pull request
+  verify-changelog:
+    if: github.repository == 'wazuh/wazuh-indexer-notifications'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dangoslen/changelog-enforcer@v3
+        with:
+          skipLabels: "autocut, skip-changelog"
+          changeLogPath: "CHANGELOG.md"

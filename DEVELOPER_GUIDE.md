@@ -1,133 +1,62 @@
-# Notifications plugin for OpenSearch
+# Developer Guide
 
-## Overview
-Notifications plugin for OpenSearch enables other plugins to send notifications via Email, Slack, Amazon Chime, Custom web-hook etc channels
+- [Developer Guide](#developer-guide)
+  - [Forking and Cloning](#forking-and-cloning)
+  - [Install Prerequisites](#install-prerequisites)
+    - [JDK 21](#jdk-21)
+  - [Setup](#setup)
+  - [Build](#build)
+    - [Building from the command line](#building-from-the-command-line)
+    - [Building from the IDE](#building-from-the-ide)
 
-## Highlights
+### Forking and Cloning
 
-1. Supports sending email with attachment (PDF, PNG, CSV, etc).
-1. Supports sending multipart email with Text and HTML body with full Embedded HTML support.
-1. Supports cross-plugin calls to send notifications (without re-implementing).
-1. Supports tracking the number of email sent from this plugin and throttling based on it.
+Fork this repository on GitHub and clone it locally using `git clone`.
 
-## Documentation
+### Install Prerequisites
 
-Please see our [documentation](https://opendistro.github.io/for-elasticsearch-docs/).
+#### JDK 21
 
-## Setup
+Wazuh Indexer and its plugins are built using **Java 21** at a minimum. You must have a JDK 21 installed with the environment variable `JAVA_HOME` referencing the path to your JDK installation.
 
-1. Check out this package from version control.
-1. Launch Intellij IDEA, choose **Import Project**, and select the `settings.gradle` file in the root of this package.
-1. To build from the command line, set `JAVA_HOME` to point to a JDK >= 14 before running `./gradlew`.
+Example for Linux/WSL:
+`export JAVA_HOME=/usr/lib/jvm/java-21-openjdk`
 
-### Setup email notification using localhost email relay/server
+You can download Java 21 from [Adoptium](https://adoptium.net/releases.html?variant=openjdk21).
 
-1. Run local email server on the machine where OpenSearch is running. e.g. for Mac, run command `sudo postfix start`
-1. Verify that local email server does not require any authentication (Make sure server is listening on local port only)
-1. Update the `notification.yml` configuration file according to your setup
+### Setup
 
-### Setup Amazon SES and SDK
+1. Clone the repository (see [Forking and Cloning](#forking-and-cloning)).
+2. Ensure `JAVA_HOME` is pointing to a Java 21 JDK.
+3. Launch IntelliJ IDEA, choose **Import Project**, and select the `notifications/settings.gradle` file.
 
-While using Amazon SES as email channel for sending mail, use below procedure for SES setup and configure environment.
+### Build
 
-1. [Setup Amazon SES account](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/sign-up-for-aws.html)
-1. [Verify Email address](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses-procedure.html)
-1. [Create IAM role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_terms-and-concepts.html#iam-term-service-role-ec2) with [Allowing Access to Email-Sending Actions Only](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/control-user-access.html) `Action` required are `SendEmail` and `SendRawEmail`.
-1. While using command line [configure AWS credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) [Refer Best practices](https://docs.aws.amazon.com/general/latest/gr/aws-access-keys-best-practices.html)
-1. [Use Amazon EC2 IAM role to grant permissions](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html) while using EC2
+This package uses the [Gradle](https://docs.gradle.org/current/userguide/userguide.html) build system. We also leverage the OpenSearch build tools for Gradle. These tools follow specific conventions for building Wazuh Indexer components. For advanced troubleshooting, refer to the [OpenSearch build tools source code](https://github.com/opensearch-project/OpenSearch/tree/main/buildSrc/src/main/groovy/org/opensearch/gradle).
 
-## Build
+#### Building from the command line
 
-This project uses following tools
+Run these commands from the `notifications/` directory.
 
-1. [Gradle](https://docs.gradle.org/current/userguide/userguide.html) build system. Gradle comes with an excellent documentation that should be your first stop when trying to figure out how to operate or modify the build.
-1. OpenSearch build tools for Gradle.  These tools are idiosyncratic and don't always follow the conventions and instructions for building regular Java code using Gradle. If you encounter such a situation, the OpenSearch build tools is your best bet for figuring out what's going on.
+1. `./gradlew build`: Builds and tests the plugin.
+2. `./gradlew run`: Launches a single-node cluster with the `notifications` plugin installed.
+3. `./gradlew integTest`: Launches a single-node cluster and runs all integration tests.
+4. `./gradlew notificationsBwcCluster#mixedClusterTask`: Runs backwards compatibility tests to ensure stability across versions.
 
-### Building from the command line
+When launching a cluster, logs are stored in `notifications/build/testclusters/integTest-0/logs/` (from repository root).
 
-1. `./gradlew build` builds and tests project.
-2. `./gradlew run` launches a single node cluster with the `notifications` plugin installed.
-3. `./gradlew run -PnumNodes=3` launches a multi-node cluster (3 nodes) with the `notifications` plugin installed.
-4. `./gradlew integTest` launches a single node cluster with the `notifications` plugin installed and runs all integ tests.
-5. `./gradlew integTest -PnumNodes=3` launches a multi-node cluster with the `notifications` plugin installed and runs all integ tests.
-6. `./gradlew integTest -Dtests.class="*RunnerIT"` runs a single integ test class
-7. `./gradlew integTest -Dtests.method="test execute * with dryrun"` runs a single integ test method
-   (remember to quote the test method name if it contains spaces).
-8. `./gradlew notificationsBwcCluster#mixedClusterTask` launches a cluster with three nodes of bwc version of OpenSearch with notifications and tests backwards compatibility by upgrading one of the nodes with the current version of OpenSearch with notifications, creating a mixed cluster.
-9. `./gradlew notificationsBwcCluster#rollingUpgradeClusterTask` launches a cluster with three nodes of bwc version of OpenSearch with notifications and tests backwards compatibility by performing rolling upgrade of each node with the current version of OpenSearch with notifications.
-10. `./gradlew notificationsBwcCluster#fullRestartClusterTask` launches a cluster with three nodes of bwc version of OpenSearch with notifications and tests backwards compatibility by performing a full restart on the cluster upgrading all the nodes with the current version of OpenSearch with notifications.
-11. `./gradlew bwcTestSuite` runs all the above bwc tests combined.
+#### Building from the IDE
 
-When launching a cluster using above commands, logs are placed in `notifications/build/testclusters/integTest-0/logs/`.
-
-#### Run integration tests with Security enabled
-
-1. Setup a local OpenSearch cluster with security plugin.
-- `./gradlew build`
-- `./gradlew integTest -Dtests.rest.cluster=localhost:9200 -Dtests.cluster=localhost:9200 -Dtests.clustername=opensearch-integrationtest -Dhttps=true -Duser=admin -Dpassword=<admin-password>`
-- `./gradlew integTestRunner -Dtests.rest.cluster=localhost:9200 -Dtests.cluster=localhost:9200 -Dtests.clustername=opensearch-integrationtest -Dhttps=true -Duser=admin -Dpassword=<admin-password> --tests "<test name>"`
-
-### Debugging
-
-Sometimes it's useful to attach a debugger to either the OpenSearch cluster, or the integ tests to see what's going on. When running unit tests, hit **Debug** from the IDE's gutter to debug the tests.
-You must start your debugger to listen for remote JVM before running the below commands.
-
-To debug code running in an actual server, run:
-
-```
-./gradlew integTest -Dopensearch.debug # to start a cluster and run integ tests
-```
-
-OR
-
-```
-./gradlew run --debug-jvm # to just start a cluster that can be debugged
-```
-
-The OpenSearch server JVM will launch suspended and wait for a debugger to attach to `localhost:5005` before starting the OpenSearch server.
-The IDE needs to listen for the remote JVM. If using Intellij you must set your debug-configuration to "Listen to remote JVM" and make sure "Auto Restart" is checked.
-You must start your debugger to listen for remote JVM before running the commands.
-
-To debug code running in an integ test (which exercises the server from a separate JVM), run:
-
-```
-./gradlew -Dtest.debug integTest
-```
-
-The test runner JVM will start suspended and wait for a debugger to attach to `localhost:5005` before running the tests.
-
-
-### Advanced: Launching multi-node clusters locally
-
-Sometimes you need to launch a cluster with more than one OpenSearch server process.
-
-You can do this by running `./gradlew run -PnumNodes=<numberOfNodesYouWant>`
-
-You can also run the integration tests against a multi-node cluster by running `./gradlew integTest -PnumNodes=<numberOfNodesYouWant>`
-
-You can also debug a multi-node cluster, by using a combination of above multi-node and debug steps.
-You must set up debugger configurations to listen on each port starting from `5005` and increasing by 1 for each node.
-
-### Backport
-
-See [link to backport documentation](https://github.com/opensearch-project/opensearch-plugins/blob/main/WORKFLOWS.md#managing-backports)
+Currently, the officially supported IDE is **IntelliJ IDEA**. Gradle tasks can be executed directly from the IntelliJ Gradle toolbar, and additional parameters can be configured via Launch Configurations.
 
 ## Code of Conduct
-
-See [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md) for more information.
+See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for more information.
 
 ## Security
-
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+See [SECURITY.md](SECURITY.md) for more information.
 
 ## License
-
-This project is licensed under the Apache-2.0 License. See [LICENSE](LICENSE.txt) for more information.
-
-## Notice
-
-See [NOTICE](NOTICE.txt) for more information.
+This project is licensed under the Apache-2.0 License. See [LICENSE.txt](LICENSE.txt) for more information.
 
 ## Copyright
-
-Copyright OpenSearch Contributors. See [NOTICE](NOTICE.txt) for details.
+Copyright Wazuh, Inc. See [NOTICE.txt](NOTICE.txt) for details.

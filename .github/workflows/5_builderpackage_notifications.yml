@@ -5,7 +5,14 @@
  
 name: Test and Build Notifications
 
-on: [push, pull_request]
+on:
+  workflow_call:
+    inputs:
+      id:
+        required: false
+        type: string
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   Get-CI-Image-Tag:
