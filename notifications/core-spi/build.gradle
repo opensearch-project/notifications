@@ -17,6 +17,7 @@ repositories {
 }
 
 apply plugin: 'com.gradleup.shadow'
+apply plugin: 'opensearch.java'
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
 
