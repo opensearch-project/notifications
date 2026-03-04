@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
-
 plugins {
-    id 'com.github.johnrengelman.shadow'
+    id 'com.gradleup.shadow'
     id 'jacoco'
     id 'maven-publish'
     id 'signing'
@@ -139,7 +137,7 @@ test {
         // reverse operation of https://github.com/elastic/elasticsearch/blob/7.6/buildSrc/src/main/groovy/org/elasticsearch/gradle/BuildPlugin.groovy#L736-L743
         // to fix the classpath for unit tests
         test.classpath -= project.files(project.tasks.named('shadowJar'))
-        test.classpath -= project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
+        test.classpath -= project.configurations.getByName('shadow')
         test.classpath += project.extensions.getByType(SourceSetContainer).getByName(SourceSet.MAIN_SOURCE_SET_NAME).runtimeClasspath
     }
     // add "-Dtests.security.manager=false" to VM options if you want to run integ tests in IntelliJ
