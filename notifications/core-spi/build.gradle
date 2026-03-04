@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
+
 plugins {
     id 'jacoco'
     id 'maven-publish'
