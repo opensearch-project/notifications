@@ -19,7 +19,6 @@ repositories {
 }
 
 apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'opensearch.java'
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
 
