@@ -16,7 +16,7 @@ repositories {
     maven { url "https://ci.opensearch.org/ci/dbc/snapshots/maven/" }
 }
 
-apply plugin: 'com.gradleup.shadow'
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'opensearch.java'
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.allopen'
@@ -91,7 +91,7 @@ configurations.configureEach {
 publishing {
     publications {
         shadow(MavenPublication) {
-            from components.shadow
+            project.shadow.component(it)
             artifact sourcesJar
             artifact javadocJar
 
