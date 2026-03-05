@@ -1,8 +1,8 @@
 ---
 name: 🎆 Feature request
 about: Request a feature in this project
-title: '[FEATURE]'
-labels: 'enhancement, untriaged'
+title: ''
+labels: ["type/enhancement", "level/task"]
 assignees: ''
 ---
 **Is your feature request related to a problem?**

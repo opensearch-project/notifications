@@ -12,6 +12,7 @@ import org.opensearch.core.rest.RestStatus
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.rest.RestRequest
+import java.net.ServerSocket
 
 internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
     @Suppress("EmptyFunctionBlock")
@@ -151,9 +152,11 @@ internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
 
     @Suppress("EmptyFunctionBlock")
     fun `test send test smtp email message`() {
+        val freePort = ServerSocket(0).use { it.localPort }
+
         val sampleSmtpAccount = SmtpAccount(
             "localhost",
-            1000,
+            freePort,
             MethodType.NONE,
             "szhongna@testemail.com"
         )

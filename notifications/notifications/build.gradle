@@ -43,18 +43,18 @@ def usingMultiNode = project.properties.containsKey('numNodes')
 check.dependsOn jacocoTestReport
 
 opensearchplugin {
-    name 'opensearch-notifications'
-    description 'OpenSearch Notifications Plugin'
+    name 'wazuh-indexer-notifications'
+    description 'Wazuh Indexer Notifications Plugin'
     classname 'org.opensearch.notifications.NotificationPlugin'
-    extendedPlugins = ['opensearch-notifications-core']
+    extendedPlugins = ['wazuh-indexer-notifications-core']
 }
 
 publishing {
     publications {
         pluginZip(MavenPublication) { publication ->
             pom {
-                name = "opensearch-notifications"
-                description = "OpenSearch Notifications Plugin"
+                name = "wazuh-indexer-notifications"
+                description = "Wazuh Indexer Notifications Plugin"
                 groupId = "org.opensearch.plugin"
                 licenses {
                     license {
@@ -66,6 +66,10 @@ publishing {
                     developer {
                         name = "OpenSearch"
                         url = "https://github.com/opensearch-project/notifications"
+                    }
+                    developer {
+                        name = "Wazuh"
+                        url = "https://github.com/wazuh/wazuh-indexer-notifications"
                     }
                 }
             }
@@ -118,6 +122,12 @@ configurations.testImplementation {
 }
 
 configurations.testRuntimeClasspath {
+    exclude group: 'org.bouncycastle', module: 'bcprov-jdk18on'
+}
+
+// Exclude BouncyCastle from the bundled plugin ZIP to avoid jar hell
+// with bc-fips already provided in the OpenSearch distribution lib/
+configurations.runtimeOnly {
     exclude group: 'org.bouncycastle', module: 'bcprov-jdk18on'
 }
 
@@ -596,17 +606,17 @@ afterEvaluate {
         dirMode 0755
 
         requires('opensearch-oss', versions.opensearch, EQUAL)
-        packager = 'Amazon'
-        vendor = 'Amazon'
+        packager = 'Wazuh'
+        vendor = 'Wazuh'
         os = 'LINUX'
         prefix '/usr'
 
         license 'ASL-2.0'
-        maintainer 'OpenSearch Team <opensearch@amazon.com>'
-        url 'https://opensearch.org/'
+        maintainer 'Wazuh <info@wazuh.com>'
+        url 'https://wazuh.com'
         summary '''
-         OpenSearch Notifications.
-         Reference documentation can be found at https://opendistro.github.io/for-elasticsearch-docs/. // TODO:MIGRATE
+         Wazuh Indexer Notifications Plugin.
+         Reference documentation can be found at https://documentation.wazuh.com/.
     '''.stripIndent().replace('\n', ' ').trim()
     }
 

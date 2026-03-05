@@ -99,14 +99,14 @@ publishing {
             artifact javadocJar
 
             pom {
-                name = "OpenSearch Notifications SPI"
+                name = "Wazuh Indexer Notifications SPI"
                 packaging = "jar"
-                url = "https://github.com/opensearch-project/notifications"
-                description = "OpenSearch Notifications SPI"
+                url = "https://github.com/wazuh/wazuh-indexer-notifications"
+                description = "Wazuh Indexer Notifications SPI"
                 scm {
-                    connection = "scm:git@github.com:opensearch-project/notifications.git"
-                    developerConnection = "scm:git@github.com:opensearch-project/notifications.git"
-                    url = "git@github.com:opensearch-project/notifications.git"
+                    connection = "scm:git@github.com:wazuh/wazuh-indexer-notifications.git"
+                    developerConnection = "scm:git@github.com:wazuh/wazuh-indexer-notifications.git"
+                    url = "git@github.com:wazuh/wazuh-indexer-notifications.git"
                 }
                 licenses {
                     license {
@@ -119,6 +119,10 @@ publishing {
                         id = "amazonwebservices"
                         organization = "Amazon Web Services"
                         organizationUrl = "https://aws.amazon.com"
+                    }
+                    developer {
+                        name = "Wazuh"
+                        url = "https://github.com/wazuh/wazuh-indexer-notifications"
                     }
                 }
             }

@@ -34,8 +34,8 @@ ext {
 }
 
 opensearchplugin {
-    name 'opensearch-notifications-core'
-    description 'OpenSearch Notifications Core Plugin'
+    name 'wazuh-indexer-notifications-core'
+    description 'Wazuh Indexer Notifications Core Plugin'
     classname 'org.opensearch.notifications.core.NotificationCorePlugin'
 }
 
@@ -43,8 +43,8 @@ publishing {
     publications {
         pluginZip(MavenPublication) { publication ->
             pom {
-                name = "opensearch-notifications-core"
-                description = "OpenSearch Notifications Core Plugin"
+                name = "wazuh-indexer-notifications-core"
+                description = "Wazuh Indexer Notifications Core Plugin"
                 groupId = "org.opensearch.plugin"
                 licenses {
                     license {
@@ -56,6 +56,10 @@ publishing {
                     developer {
                         name = "OpenSearch"
                         url = "https://github.com/opensearch-project/notifications"
+                    }
+                    developer {
+                        name = "Wazuh"
+                        url = "https://github.com/wazuh/wazuh-indexer-notifications"
                     }
                 }
             }
@@ -204,17 +208,17 @@ afterEvaluate {
         dirMode 0755
 
         requires('opensearch-oss', versions.opensearch, EQUAL)
-        packager = 'Amazon'
-        vendor = 'Amazon'
+        packager = 'Wazuh'
+        vendor = 'Wazuh'
         os = 'LINUX'
         prefix '/usr'
 
         license 'ASL-2.0'
-        maintainer 'OpenSearch Team <opensearch@amazon.com>'
-        url 'https://opensearch.org/'
+        maintainer 'Wazuh <info@wazuh.com>'
+        url 'https://wazuh.com'
         summary '''
-         OpenSearch Notifications Core.
-         Reference documentation can be found at https://opendistro.github.io/for-elasticsearch-docs/. // TODO:MIGRATE
+         Wazuh Indexer Notifications Core.
+         Reference documentation can be found at https://documentation.wazuh.com/.
     '''.stripIndent().replace('\n', ' ').trim()
     }
 
