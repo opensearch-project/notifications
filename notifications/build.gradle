@@ -11,11 +11,6 @@ buildscript {
         buildVersionQualifier = System.getProperty("build.version_qualifier", "")
         wazuh_version = System.getProperty("version", "5.0.0")
         revision = System.getProperty("build.revision", "0")
-
-        // Obtain the commit hash of the current repository for package naming
-        def commitHashProc = "git rev-parse --short HEAD".execute()
-        commitHashProc.waitFor()
-        commitHash = commitHashProc.exitValue() == 0 ? commitHashProc.text.trim() : "unknown"
         
         // 3.0.0-SNAPSHOT -> 3.0.0.0-SNAPSHOT
         version_tokens = opensearch_version.tokenize('-')
@@ -68,9 +63,9 @@ apply plugin: 'io.gitlab.arturbosch.detekt'
 apply from: 'build-tools/merged-coverage.gradle'
 
 allprojects {
-    // Package version format: <wazuh_version>.<revision>-<commitHash>
-    // Example: 5.0.0.0-a1b2c3d
-    version = "${wazuh_version}" + ".${revision}" + "-${commitHash}"
+    // Package version format: <wazuh_version>.<revision>
+    // Example: 5.0.0.0
+    version = "${wazuh_version}" + ".${revision}"
 
     repositories {
         mavenLocal()
