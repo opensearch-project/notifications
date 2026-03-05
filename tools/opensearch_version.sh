@@ -21,7 +21,7 @@
 #   ./opensearch_version.sh
 # -----------------------------------------------------------------------------
 
-file="build.gradle"
+file="notifications/build.gradle"
 
 # Extract the OpenSearch version
 version=$(grep "opensearch_version =" "${file}" |
