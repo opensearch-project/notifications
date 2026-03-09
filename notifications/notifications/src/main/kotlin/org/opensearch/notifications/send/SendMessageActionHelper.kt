@@ -228,6 +228,7 @@ object SendMessageActionHelper {
         val response = when (configType) {
             ConfigType.NONE -> null
             ConfigType.SLACK -> sendSlackMessage(configData as Slack, message, eventStatus, eventSource.referenceId)
+            ConfigType.MATTERMOST -> sendSlackMessage(configData as Slack, message, eventStatus, eventSource.referenceId)
             ConfigType.CHIME -> sendChimeMessage(configData as Chime, message, eventStatus, eventSource.referenceId)
             ConfigType.MICROSOFT_TEAMS -> sendMicrosoftTeamsMessage(configData as MicrosoftTeams, message, eventStatus, eventSource.referenceId)
             ConfigType.WEBHOOK -> sendWebhookMessage(
