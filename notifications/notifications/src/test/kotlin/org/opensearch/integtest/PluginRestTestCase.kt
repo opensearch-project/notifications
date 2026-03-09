@@ -166,7 +166,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
 
     fun createUser(name: String, passwd: String, backendRoles: Array<String>) {
         val request = Request("PUT", "/_plugins/_security/api/internalusers/$name")
-        val broles = backendRoles.joinToString { it -> "\"$it\"" }
+        val broles = backendRoles.filter { it.isNotBlank() }.joinToString { "\"$it\"" }
         val entity = " {\n" +
             "\"password\": \"$passwd\",\n" +
             "\"backend_roles\": [$broles],\n" +
@@ -185,8 +185,8 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         val request = Request("PUT", "/_plugins/_security/api/rolesmapping/$role")
         val usersStr = users.joinToString { it -> "\"$it\"" }
         val entity = "{                                  \n" +
-            "  \"backend_roles\" : [  ],\n" +
-            "  \"hosts\" : [  ],\n" +
+            "  \"backend_roles\" : [],\n" +
+            "  \"hosts\" : [],\n" +
             "  \"users\" : [$usersStr]\n" +
             "}"
         request.setJsonEntity(entity)
@@ -228,12 +228,13 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
 
     fun createCustomRole(name: String, clusterPermissions: String?) {
         val request = Request("PUT", "/_plugins/_security/api/roles/$name")
-        val entity = "{\n" +
-            "\"cluster_permissions\": [\n" +
-            "\"$clusterPermissions\"\n" +
-            "],\n" +
-            "\"tenant_permissions\": []\n" +
-            "}"
+        val permissions = if (clusterPermissions.isNullOrBlank()) "" else "\"$clusterPermissions\""
+        val entity = """
+            {
+                "cluster_permissions": [$permissions],
+                "tenant_permissions": []
+            }
+        """.trimIndent()
         request.setJsonEntity(entity)
         client().performRequest(request)
     }
