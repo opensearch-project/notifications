@@ -11,8 +11,10 @@ import org.junit.Before
 import org.junit.BeforeClass
 import org.opensearch.client.RestClient
 import org.opensearch.commons.notifications.model.ConfigType
+import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
+import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.rest.SecureRestClientBuilder
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.NotificationPlugin
@@ -501,5 +503,50 @@ class SecurityNotificationIT : PluginRestTestCase() {
         )
 
         deleteUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE)
+    }
+
+    fun `test create smtp sender config with user that has create Notification permission`() {
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        // Create sample config request reference
+        val sampleSmtpAccount = SmtpAccount("example-host", 2465, MethodType.SSL, "no-reply@fake-host.com")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.SMTP_ACCOUNT,
+            isEnabled = true,
+            configData = sampleSmtpAccount
+        )
+
+        val sampleSmtpJsonString = getJsonString(sampleSmtpAccount)
+
+        // Create slack notification config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"smtp_account",
+                "is_enabled":${referenceObject.isEnabled},
+                "smtp_account":$sampleSmtpJsonString
+            }
+        }
+        """.trimIndent()
+        try {
+            val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
+            Assert.assertNotNull(configId)
+            Thread.sleep(1000)
+
+            // Get Slack notification config
+            val getConfigResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status
+            )
+            verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+        }
     }
 }

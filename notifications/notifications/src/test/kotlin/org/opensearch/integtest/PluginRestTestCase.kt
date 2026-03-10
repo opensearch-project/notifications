@@ -17,6 +17,7 @@ import org.opensearch.client.RestClient
 import org.opensearch.client.WarningsHandler
 import org.opensearch.common.io.PathUtils
 import org.opensearch.common.settings.Settings
+import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.commons.ConfigConstants
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.rest.SecureRestClientBuilder
@@ -24,10 +25,12 @@ import org.opensearch.core.rest.RestStatus
 import org.opensearch.core.xcontent.DeprecationHandler
 import org.opensearch.core.xcontent.MediaType
 import org.opensearch.core.xcontent.NamedXContentRegistry
+import org.opensearch.core.xcontent.ToXContent
 import org.opensearch.notifications.NotificationPlugin
 import org.opensearch.notifications.index.NotificationConfigIndex
 import org.opensearch.rest.RestRequest
 import org.opensearch.test.rest.OpenSearchRestTestCase
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -348,6 +351,15 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         )
         refreshAllIndices()
         return deleteResponse
+    }
+
+    fun getJsonString(xContent: ToXContent): String {
+        ByteArrayOutputStream().use { byteArrayOutputStream ->
+            val builder = XContentFactory.jsonBuilder(byteArrayOutputStream)
+            xContent.toXContent(builder, ToXContent.EMPTY_PARAMS)
+            builder.close()
+            return byteArrayOutputStream.toString("UTF8")
+        }
     }
 
     @After
