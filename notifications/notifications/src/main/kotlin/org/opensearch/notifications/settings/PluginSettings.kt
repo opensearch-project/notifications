@@ -91,6 +91,11 @@ internal object PluginSettings {
     private const val MINIMUM_ITEMS_QUERY_COUNT = 10
 
     /**
+     * Default filter by backend roles access strategy
+     */
+    private val DEFAULT_FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY = FilterByBackendRolesAccessStrategy.INTERSECT.strategy
+
+    /**
      * Operation timeout setting in ms for I/O operations
      */
     @Volatile
@@ -106,7 +111,7 @@ internal object PluginSettings {
      * Access strategy when filtering by backend roles
      */
     @Volatile
-    var filterByBackendRolesAccesStrategy: String
+    var filterByBackendRolesAccessStrategy: String
 
     private const val DECIMAL_RADIX: Int = 10
 
@@ -128,8 +133,8 @@ internal object PluginSettings {
         operationTimeoutMs = (settings?.get(OPERATION_TIMEOUT_MS_KEY)?.toLong()) ?: DEFAULT_OPERATION_TIMEOUT_MS
         defaultItemsQueryCount = (settings?.get(DEFAULT_ITEMS_QUERY_COUNT_KEY)?.toInt())
             ?: DEFAULT_ITEMS_QUERY_COUNT_VALUE
-        filterByBackendRolesAccesStrategy = (settings?.get(FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY))
-            ?: FilterByBackendRolesAccessStrategy.INTERSECT.strategy
+        filterByBackendRolesAccessStrategy = (settings?.get(FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY))
+            ?: DEFAULT_FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
         defaultSettings = mapOf(
             OPERATION_TIMEOUT_MS_KEY to operationTimeoutMs.toString(DECIMAL_RADIX),
             DEFAULT_ITEMS_QUERY_COUNT_KEY to defaultItemsQueryCount.toString(DECIMAL_RADIX)
@@ -176,7 +181,7 @@ internal object PluginSettings {
 
     val FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY: Setting<String> = Setting.simpleString(
         FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY,
-        FilterByBackendRolesAccessStrategy.INTERSECT.strategy,
+        DEFAULT_FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY,
         FilterByBackendRolesAccessStrategyValidator(),
         NodeScope,
         Dynamic
@@ -223,7 +228,7 @@ internal object PluginSettings {
     }
 
     fun getFilterByBackendAccessStrategy(): String {
-        return filterByBackendRolesAccesStrategy
+        return filterByBackendRolesAccessStrategy
     }
 
     /**
@@ -251,6 +256,7 @@ internal object PluginSettings {
     private fun updateSettingValuesFromLocal(clusterService: ClusterService) {
         operationTimeoutMs = OPERATION_TIMEOUT_MS.get(clusterService.settings)
         defaultItemsQueryCount = DEFAULT_ITEMS_QUERY_COUNT.get(clusterService.settings)
+        filterByBackendRolesAccessStrategy = FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.get(clusterService.settings)
     }
 
     /**
@@ -272,7 +278,7 @@ internal object PluginSettings {
         val clusterFilterByAccessStrategy = clusterService.clusterSettings.get(FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY)
         if (clusterFilterByAccessStrategy != null) {
             log.debug("$LOG_PREFIX:$FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY -autoUpdatedTo-> $clusterFilterByAccessStrategy")
-            filterByBackendRolesAccesStrategy = clusterFilterByAccessStrategy
+            filterByBackendRolesAccessStrategy = clusterFilterByAccessStrategy
         }
     }
 
@@ -296,7 +302,7 @@ internal object PluginSettings {
             log.info("$LOG_PREFIX:$DEFAULT_ITEMS_QUERY_COUNT_KEY -updatedTo-> $it")
         }
         clusterService.clusterSettings.addSettingsUpdateConsumer(FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY) {
-            filterByBackendRolesAccesStrategy = it
+            filterByBackendRolesAccessStrategy = it
             log.info("$LOG_PREFIX:$FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY -updatedTo-> $it")
         }
     }
@@ -306,5 +312,6 @@ internal object PluginSettings {
     fun reset() {
         operationTimeoutMs = DEFAULT_OPERATION_TIMEOUT_MS
         defaultItemsQueryCount = DEFAULT_ITEMS_QUERY_COUNT_VALUE
+        filterByBackendRolesAccessStrategy = DEFAULT_FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
     }
 }
