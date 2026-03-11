@@ -29,11 +29,13 @@ internal class PluginSettingsTests {
     private val alertingFilterByBackendRolesKey = "plugins.alerting.filter_by_backend_roles"
     private val filterByBackendRolesKey = "$generalKeyPrefix.filter_by_backend_roles"
     private val multiTenancyEnabledKey = "plugins.notifications.multi_tenancy_enabled"
+    private val filterByBackendRolesAccessStrategyKey = "$generalKeyPrefix.filter_by_backend_roles_access_strategy"
 
     private val defaultSettings = Settings.builder()
         .put(operationTimeoutKey, 60000L)
         .put(defaultItemQueryCountKey, 100L)
         .put(filterByBackendRolesKey, false)
+        .put(filterByBackendRolesAccessStrategyKey, FilterByBackendRolesAccessStrategy.INTERSECT.strategy)
         .build()
 
     @BeforeEach
