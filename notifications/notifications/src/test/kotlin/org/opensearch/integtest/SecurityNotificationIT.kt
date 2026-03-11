@@ -16,6 +16,7 @@ import org.opensearch.commons.notifications.model.Slack
 import org.opensearch.commons.rest.SecureRestClientBuilder
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.NotificationPlugin
+import org.opensearch.notifications.settings.FilterByBackendRolesAccessStrategy
 import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.notifications.verifyChannelIdEquals
 import org.opensearch.notifications.verifySingleConfigEquals
@@ -52,7 +53,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test Create slack notification config with user that has create Notification permission`() {
-        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
 
         // Create sample config request reference
         val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
@@ -95,7 +96,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test Create slack notification config without create Notification permission`() {
-        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
+        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         // Create sample config request reference
         val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
@@ -131,7 +132,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test update slack notification config with user that has create Notification permission`() {
-        createUserWithCustomRole(user, password, NOTIFICATION_UPDATE_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_UPDATE_CONFIG_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_UPDATE_CONFIG_ACCESS, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_UPDATE_CONFIG_ACCESS])
 
         // Create sample config request reference
         val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
@@ -208,7 +209,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test update slack notification config without create Notification permission`() {
-        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
+        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         // Create sample config request reference
         val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
@@ -244,7 +245,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test get slack notification config with user that has get Notification permission`() {
-        createUserWithCustomRole(user, password, NOTIFICATION_GET_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
 
         // Create sample config request reference
         val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
@@ -285,7 +286,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test get slack notification config without get Notification permission`() {
-        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
+        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         // Get Slack notification config
 
@@ -300,7 +301,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test delete slack notification config with user that has get Notification permission`() {
-        createUserWithCustomRole(user, password, NOTIFICATION_DELETE_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_DELETE_CONFIG_ACCESS, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
 
         // Create sample config request reference
         val sampleSlack = Slack("https://hooks.slack.com/services/sample_slack_url")
@@ -343,7 +344,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test delete slack notification config without get Notification permission`() {
-        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
+        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         // Get Slack notification config
 
@@ -358,7 +359,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test getChannelList should return only channels with get channel permission`() {
-        createUserWithCustomRole(user, password, NOTIFICATION_GET_CHANNEL_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CHANNEL_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_GET_CHANNEL_ACCESS, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CHANNEL_ACCESS])
 
         val slackId = createConfig(configType = ConfigType.SLACK)
         val chimeId = createConfig(configType = ConfigType.CHIME)
@@ -388,7 +389,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test getChannelList fails without get channel permission`() {
-        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
+        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         createConfig(configType = ConfigType.SLACK)
         Thread.sleep(1000)
@@ -405,7 +406,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test Get plugin features should return non-empty configTypes with get features permission`() {
-        createUserWithCustomRole(user, password, NOTIFICATION_GET_PLUGIN_FEATURE_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_PLUGIN_FEATURE_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_GET_PLUGIN_FEATURE_ACCESS, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_PLUGIN_FEATURE_ACCESS])
 
         val getResponse = executeRequest(
             RestRequest.Method.GET.name,
@@ -421,7 +422,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test Get plugin features fails without get features permission`() {
-        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
+        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         executeRequest(
             RestRequest.Method.GET.name,
@@ -434,7 +435,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test send test slack message with send permissions`() {
-        createUserWithCustomRole(user, password, NOTIFICATION_TEST_SEND_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_TEST_SEND_ACCESS, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
 
         // Create webhook notification config
         val createRequestJsonString = """
@@ -472,7 +473,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test send test slack message without send permissions`() {
-        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
+        createUserWithCustomRole(user, password, NOTIFICATION_NO_ACCESS_ROLE, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
         // Create webhook notification config
         val createRequestJsonString = """
@@ -505,7 +506,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     }
 
     fun `test create smtp sender config with user that has create Notification permission`() {
-        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, "", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
 
         // Create sample config request reference
         val sampleSmtpAccount = SmtpAccount("example-host", 2465, MethodType.SSL, "no-reply@fake-host.com")
@@ -552,7 +553,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     fun `test get smtp sender has access with filter by backend roles enabled`() {
         updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
 
-        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, "role1", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
 
         // Create sample config request reference
         val sampleSmtpAccount = SmtpAccount("example-host", 2465, MethodType.SSL, "no-reply@fake-host.com")
@@ -590,7 +591,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             Assert.assertNotNull(configId)
             Thread.sleep(1000)
 
-            createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, "role1", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
+            createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
 
             // Get SMTP account config
             val getConfigResponse = executeRequest(
@@ -611,7 +612,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     fun `test get smtp sender does not have access with filter by backend roles enabled`() {
         updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
 
-        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, "role1", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
 
         // Create sample config request reference
         val sampleSmtpAccount = SmtpAccount("example-host", 2465, MethodType.SSL, "no-reply@fake-host.com")
@@ -649,7 +650,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
             Assert.assertNotNull(configId)
             Thread.sleep(1000)
 
-            createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, "role2", ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
+            createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
 
             // Get SMTP account config
             val getConfigResponse = executeRequest(
@@ -657,6 +658,183 @@ class SecurityNotificationIT : PluginRestTestCase() {
                 "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
                 "",
                 RestStatus.FORBIDDEN.status,
+                getUserClient
+            )
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(getUser, NOTIFICATION_GET_CONFIG_ACCESS)
+            getUserClient?.close()
+        }
+    }
+
+    fun `test get smtp sender has access when filter by backend access strategy is intersect`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.INTERSECT.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        // Create sample config request reference
+        val sampleSmtpAccount = SmtpAccount("example-host", 2465, MethodType.SSL, "no-reply@fake-host.com")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.SMTP_ACCOUNT,
+            isEnabled = true,
+            configData = sampleSmtpAccount
+        )
+
+        val sampleSmtpJsonString = getJsonString(sampleSmtpAccount)
+
+        // Create SMTP account config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"smtp_account",
+                "is_enabled":${referenceObject.isEnabled},
+                "smtp_account":$sampleSmtpJsonString
+            }
+        }
+        """.trimIndent()
+
+        val getUser = "getUser"
+        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
+            Assert.assertNotNull(configId)
+            Thread.sleep(1000)
+
+            createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role2", "role3"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
+
+            // Get SMTP account config
+            val getConfigResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status,
+                getUserClient
+            )
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(getUser, NOTIFICATION_GET_CONFIG_ACCESS)
+            getUserClient?.close()
+        }
+    }
+
+    fun `test get smtp sender has access when filter by backend access strategy is all`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.ALL.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        // Create sample config request reference
+        val sampleSmtpAccount = SmtpAccount("example-host", 2465, MethodType.SSL, "no-reply@fake-host.com")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.SMTP_ACCOUNT,
+            isEnabled = true,
+            configData = sampleSmtpAccount
+        )
+
+        val sampleSmtpJsonString = getJsonString(sampleSmtpAccount)
+
+        // Create SMTP account config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"smtp_account",
+                "is_enabled":${referenceObject.isEnabled},
+                "smtp_account":$sampleSmtpJsonString
+            }
+        }
+        """.trimIndent()
+
+        val getUser = "getUser"
+        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
+            Assert.assertNotNull(configId)
+            Thread.sleep(1000)
+
+            createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
+
+            // Get SMTP account config
+            val getConfigResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status,
+                getUserClient
+            )
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(getUser, NOTIFICATION_GET_CONFIG_ACCESS)
+            getUserClient?.close()
+        }
+    }
+
+    fun `test get smtp sender has access when filter by backend access strategy is all and backend roles order is different`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.ALL.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        // Create sample config request reference
+        val sampleSmtpAccount = SmtpAccount("example-host", 2465, MethodType.SSL, "no-reply@fake-host.com")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.SMTP_ACCOUNT,
+            isEnabled = true,
+            configData = sampleSmtpAccount
+        )
+
+        val sampleSmtpJsonString = getJsonString(sampleSmtpAccount)
+
+        // Create SMTP account config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"smtp_account",
+                "is_enabled":${referenceObject.isEnabled},
+                "smtp_account":$sampleSmtpJsonString
+            }
+        }
+        """.trimIndent()
+
+        val getUser = "getUser"
+        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
+            Assert.assertNotNull(configId)
+            Thread.sleep(1000)
+
+            createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role2", "role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
+
+            // Get SMTP account config
+            val getConfigResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status,
                 getUserClient
             )
         } finally {
