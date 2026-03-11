@@ -8,6 +8,7 @@ package org.opensearch.notifications.security
 import org.opensearch.OpenSearchStatusException
 import org.opensearch.commons.authuser.User
 import org.opensearch.core.rest.RestStatus
+import org.opensearch.notifications.settings.FilterByBackendRolesAccessStrategy
 import org.opensearch.notifications.settings.PluginSettings
 
 /**
@@ -48,6 +49,20 @@ internal object UserAccessManager : UserAccess {
         return user.backendRoles
     }
 
+    fun checkUserBackendRolesAccess(userBackendRoles: List<String>, objectAccess: List<String>): Boolean {
+        val filterByAccessStrategy = PluginSettings.getFilterByBackendAccessStrategy()
+        if (filterByAccessStrategy == FilterByBackendRolesAccessStrategy.INTERSECT.strategy) {
+            return userBackendRoles.any { it in objectAccess }
+        } else if (filterByAccessStrategy == FilterByBackendRolesAccessStrategy.ALL.strategy) {
+            return userBackendRoles.sorted().equals(objectAccess.sorted())
+        }
+        // Not sure if this is necessary, since there is a validator
+        // on the setting itself
+        throw IllegalArgumentException(
+            "Invalid filter by access strategy: $filterByAccessStrategy"
+        )
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -57,6 +72,6 @@ internal object UserAccessManager : UserAccess {
         }
         // User has access to resource if resource is public i.e. no access roles attached, user is an admin user or there is any intersection
         // between user backend roles and access roles
-        return access.isEmpty() || user.roles.contains(ADMIN_ROLE) || user.backendRoles.any { it in access }
+        return access.isEmpty() || user.roles.contains(ADMIN_ROLE) || checkUserBackendRolesAccess(user.backendRoles, access)
     }
 }

@@ -66,6 +66,11 @@ internal object PluginSettings {
     private const val FILTER_BY_BACKEND_ROLES_KEY = "$GENERAL_KEY_PREFIX.filter_by_backend_roles"
 
     /**
+     * Setting to control filtering by backend roles access strategy.
+     */
+    private const val FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY = "$GENERAL_KEY_PREFIX.filter_by_backend_roles_access_strategy"
+
+    /**
      * Default operation timeout for network operations.
      */
     private const val DEFAULT_OPERATION_TIMEOUT_MS = 60000L
@@ -86,6 +91,11 @@ internal object PluginSettings {
     private const val MINIMUM_ITEMS_QUERY_COUNT = 10
 
     /**
+     * Default filter by backend roles access strategy
+     */
+    private val DEFAULT_FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY = FilterByBackendRolesAccessStrategy.INTERSECT.strategy
+
+    /**
      * Operation timeout setting in ms for I/O operations
      */
     @Volatile
@@ -96,6 +106,12 @@ internal object PluginSettings {
      */
     @Volatile
     var defaultItemsQueryCount: Int
+
+    /**
+     * Access strategy when filtering by backend roles
+     */
+    @Volatile
+    var filterByBackendRolesAccessStrategy: String
 
     private const val DECIMAL_RADIX: Int = 10
 
@@ -117,6 +133,8 @@ internal object PluginSettings {
         operationTimeoutMs = (settings?.get(OPERATION_TIMEOUT_MS_KEY)?.toLong()) ?: DEFAULT_OPERATION_TIMEOUT_MS
         defaultItemsQueryCount = (settings?.get(DEFAULT_ITEMS_QUERY_COUNT_KEY)?.toInt())
             ?: DEFAULT_ITEMS_QUERY_COUNT_VALUE
+        filterByBackendRolesAccessStrategy = (settings?.get(FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY))
+            ?: DEFAULT_FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
         defaultSettings = mapOf(
             OPERATION_TIMEOUT_MS_KEY to operationTimeoutMs.toString(DECIMAL_RADIX),
             DEFAULT_ITEMS_QUERY_COUNT_KEY to defaultItemsQueryCount.toString(DECIMAL_RADIX)
@@ -161,6 +179,14 @@ internal object PluginSettings {
         Dynamic
     )
 
+    val FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY: Setting<String> = Setting.simpleString(
+        FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY,
+        DEFAULT_FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY,
+        FilterByBackendRolesAccessStrategyValidator(),
+        NodeScope,
+        Dynamic
+    )
+
     /** This setting sets the remote metadata store type  */
     val REMOTE_METADATA_STORE_TYPE: Setting<String?> = Setting
         .simpleString(
@@ -201,6 +227,10 @@ internal object PluginSettings {
         }
     }
 
+    fun getFilterByBackendAccessStrategy(): String {
+        return filterByBackendRolesAccessStrategy
+    }
+
     /**
      * Returns list of additional settings available specific to this plugin.
      *
@@ -211,6 +241,7 @@ internal object PluginSettings {
             OPERATION_TIMEOUT_MS,
             DEFAULT_ITEMS_QUERY_COUNT,
             FILTER_BY_BACKEND_ROLES,
+            FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY,
             REMOTE_METADATA_REGION,
             REMOTE_METADATA_ENDPOINT,
             REMOTE_METADATA_STORE_TYPE,
@@ -225,6 +256,7 @@ internal object PluginSettings {
     private fun updateSettingValuesFromLocal(clusterService: ClusterService) {
         operationTimeoutMs = OPERATION_TIMEOUT_MS.get(clusterService.settings)
         defaultItemsQueryCount = DEFAULT_ITEMS_QUERY_COUNT.get(clusterService.settings)
+        filterByBackendRolesAccessStrategy = FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.get(clusterService.settings)
     }
 
     /**
@@ -242,6 +274,11 @@ internal object PluginSettings {
         if (clusterDefaultItemsQueryCount != null) {
             log.debug("$LOG_PREFIX:$DEFAULT_ITEMS_QUERY_COUNT_KEY -autoUpdatedTo-> $clusterDefaultItemsQueryCount")
             defaultItemsQueryCount = clusterDefaultItemsQueryCount
+        }
+        val clusterFilterByAccessStrategy = clusterService.clusterSettings.get(FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY)
+        if (clusterFilterByAccessStrategy != null) {
+            log.debug("$LOG_PREFIX:$FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY -autoUpdatedTo-> $clusterFilterByAccessStrategy")
+            filterByBackendRolesAccessStrategy = clusterFilterByAccessStrategy
         }
     }
 
@@ -264,6 +301,10 @@ internal object PluginSettings {
             defaultItemsQueryCount = it
             log.info("$LOG_PREFIX:$DEFAULT_ITEMS_QUERY_COUNT_KEY -updatedTo-> $it")
         }
+        clusterService.clusterSettings.addSettingsUpdateConsumer(FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY) {
+            filterByBackendRolesAccessStrategy = it
+            log.info("$LOG_PREFIX:$FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY -updatedTo-> $it")
+        }
     }
 
     // reset the settings values to default values for testing purpose
@@ -271,5 +312,6 @@ internal object PluginSettings {
     fun reset() {
         operationTimeoutMs = DEFAULT_OPERATION_TIMEOUT_MS
         defaultItemsQueryCount = DEFAULT_ITEMS_QUERY_COUNT_VALUE
+        filterByBackendRolesAccessStrategy = DEFAULT_FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
     }
 }
