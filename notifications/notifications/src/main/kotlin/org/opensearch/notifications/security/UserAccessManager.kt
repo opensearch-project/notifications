@@ -61,7 +61,6 @@ internal object UserAccessManager : UserAccess {
         throw IllegalArgumentException(
             "Invalid filter by access strategy: $filterByAccessStrategy"
         )
-        return false
     }
 
     /**
