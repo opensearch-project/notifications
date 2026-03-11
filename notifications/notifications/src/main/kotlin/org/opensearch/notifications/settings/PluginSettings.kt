@@ -66,6 +66,11 @@ internal object PluginSettings {
     private const val FILTER_BY_BACKEND_ROLES_KEY = "$GENERAL_KEY_PREFIX.filter_by_backend_roles"
 
     /**
+     * Setting to control filtering by backend roles access strategy.
+     */
+    private const val FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY = "$GENERAL_KEY_PREFIX.filter_by_backend_roles_access_strategy"
+
+    /**
      * Default operation timeout for network operations.
      */
     private const val DEFAULT_OPERATION_TIMEOUT_MS = 60000L
@@ -174,6 +179,14 @@ internal object PluginSettings {
         Setting.Property.Final
     )
 
+    val FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY: Setting<String> = Setting.simpleString(
+        FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY,
+        FilterByBackendRolesAccessStrategy.INTERSECT.strategy,
+        FilterByBackendRolesAccessStrategyValidator(),
+        NodeScope,
+        Dynamic
+    )
+
     /** This setting sets the remote metadata store type  */
     val REMOTE_METADATA_STORE_TYPE: Setting<String?> = Setting
         .simpleString(
@@ -225,6 +238,7 @@ internal object PluginSettings {
             DEFAULT_ITEMS_QUERY_COUNT,
             FILTER_BY_BACKEND_ROLES,
             MULTI_TENANCY_ENABLED,
+            FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY,
             REMOTE_METADATA_REGION,
             REMOTE_METADATA_ENDPOINT,
             REMOTE_METADATA_STORE_TYPE,
