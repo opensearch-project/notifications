@@ -102,6 +102,12 @@ internal object PluginSettings {
     @Volatile
     var defaultItemsQueryCount: Int
 
+    /**
+     * Access strategy when filtering by backend roles
+     */
+    @Volatile
+    var filterByBackendRolesAccesStrategy: String
+
     private const val DECIMAL_RADIX: Int = 10
 
     private val log by logger(javaClass)
@@ -122,6 +128,8 @@ internal object PluginSettings {
         operationTimeoutMs = (settings?.get(OPERATION_TIMEOUT_MS_KEY)?.toLong()) ?: DEFAULT_OPERATION_TIMEOUT_MS
         defaultItemsQueryCount = (settings?.get(DEFAULT_ITEMS_QUERY_COUNT_KEY)?.toInt())
             ?: DEFAULT_ITEMS_QUERY_COUNT_VALUE
+        filterByBackendRolesAccesStrategy = (settings?.get(FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY))
+            ?: FilterByBackendRolesAccessStrategy.INTERSECT.strategy
         defaultSettings = mapOf(
             OPERATION_TIMEOUT_MS_KEY to operationTimeoutMs.toString(DECIMAL_RADIX),
             DEFAULT_ITEMS_QUERY_COUNT_KEY to defaultItemsQueryCount.toString(DECIMAL_RADIX)
@@ -214,6 +222,10 @@ internal object PluginSettings {
         }
     }
 
+    fun getFilterByBackendAccessStrategy(): String {
+        return filterByBackendRolesAccesStrategy
+    }
+
     /**
      * Returns list of additional settings available specific to this plugin.
      *
@@ -257,6 +269,11 @@ internal object PluginSettings {
             log.debug("$LOG_PREFIX:$DEFAULT_ITEMS_QUERY_COUNT_KEY -autoUpdatedTo-> $clusterDefaultItemsQueryCount")
             defaultItemsQueryCount = clusterDefaultItemsQueryCount
         }
+        val clusterFilterByAccessStrategy = clusterService.clusterSettings.get(FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY)
+        if (clusterFilterByAccessStrategy != null) {
+            log.debug("$LOG_PREFIX:$FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY -autoUpdatedTo-> $clusterFilterByAccessStrategy")
+            filterByBackendRolesAccesStrategy = clusterFilterByAccessStrategy
+        }
     }
 
     /**
@@ -277,6 +294,10 @@ internal object PluginSettings {
         clusterService.clusterSettings.addSettingsUpdateConsumer(DEFAULT_ITEMS_QUERY_COUNT) {
             defaultItemsQueryCount = it
             log.info("$LOG_PREFIX:$DEFAULT_ITEMS_QUERY_COUNT_KEY -updatedTo-> $it")
+        }
+        clusterService.clusterSettings.addSettingsUpdateConsumer(FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY) {
+            filterByBackendRolesAccesStrategy = it
+            log.info("$LOG_PREFIX:$FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY -updatedTo-> $it")
         }
     }
 
