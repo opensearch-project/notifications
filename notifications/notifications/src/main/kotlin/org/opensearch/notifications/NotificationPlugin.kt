@@ -40,6 +40,7 @@ import org.opensearch.notifications.resthandler.SendTestMessageRestHandler
 import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.notifications.settings.PluginSettings
+import org.opensearch.notifications.settings.PluginSettings.MULTI_TENANCY_ENABLED
 import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_ENDPOINT
 import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_REGION
 import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_SERVICE_NAME
@@ -129,7 +130,7 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
                 REMOTE_METADATA_ENDPOINT_KEY to REMOTE_METADATA_ENDPOINT.get(settings),
                 REMOTE_METADATA_REGION_KEY to REMOTE_METADATA_REGION.get(settings),
                 REMOTE_METADATA_SERVICE_NAME_KEY to REMOTE_METADATA_SERVICE_NAME.get(settings),
-                TENANT_AWARE_KEY to "false"
+                TENANT_AWARE_KEY to MULTI_TENANCY_ENABLED.get(settings).toString()
             ),
             client.threadPool().executor(ThreadPool.Names.GENERIC)
         )
