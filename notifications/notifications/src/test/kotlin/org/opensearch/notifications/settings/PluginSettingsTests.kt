@@ -28,6 +28,7 @@ internal class PluginSettingsTests {
     private val legacyAlertingFilterByBackendRolesKey = "opendistro.alerting.filter_by_backend_roles"
     private val alertingFilterByBackendRolesKey = "plugins.alerting.filter_by_backend_roles"
     private val filterByBackendRolesKey = "$generalKeyPrefix.filter_by_backend_roles"
+    private val multiTenancyEnabledKey = "plugins.notifications.multi_tenancy_enabled"
 
     private val defaultSettings = Settings.builder()
         .put(operationTimeoutKey, 60000L)
@@ -209,5 +210,32 @@ internal class PluginSettingsTests {
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         Assertions.assertEquals(true, PluginSettings.isRbacEnabled())
+    }
+
+    @Test
+    fun `test multi_tenancy_enabled setting defaults to false`() {
+        Assertions.assertEquals(false, PluginSettings.MULTI_TENANCY_ENABLED.getDefault(Settings.EMPTY))
+    }
+
+    @Test
+    fun `test multi_tenancy_enabled setting is registered`() {
+        val settings = plugin.settings
+        Assert.assertTrue(settings.contains(PluginSettings.MULTI_TENANCY_ENABLED))
+    }
+
+    @Test
+    fun `test multi_tenancy_enabled setting reads from config`() {
+        val settings = Settings.builder()
+            .put(multiTenancyEnabledKey, true)
+            .build()
+        Assertions.assertEquals(true, PluginSettings.MULTI_TENANCY_ENABLED.get(settings))
+    }
+
+    @Test
+    fun `test remote metadata settings use plugins notifications prefix`() {
+        Assertions.assertTrue(PluginSettings.REMOTE_METADATA_STORE_TYPE.key.startsWith("plugins.notifications."))
+        Assertions.assertTrue(PluginSettings.REMOTE_METADATA_ENDPOINT.key.startsWith("plugins.notifications."))
+        Assertions.assertTrue(PluginSettings.REMOTE_METADATA_REGION.key.startsWith("plugins.notifications."))
+        Assertions.assertTrue(PluginSettings.REMOTE_METADATA_SERVICE_NAME.key.startsWith("plugins.notifications."))
     }
 }

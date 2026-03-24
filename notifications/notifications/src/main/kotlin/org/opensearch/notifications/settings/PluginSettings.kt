@@ -161,10 +161,23 @@ internal object PluginSettings {
         Dynamic
     )
 
+    /**
+     * Settings Key-prefix for remote metadata configuration.
+     */
+    private const val REMOTE_METADATA_KEY_PREFIX = "plugins.notifications"
+
+    /** This setting enables multi-tenancy for the remote metadata SDK client */
+    val MULTI_TENANCY_ENABLED: Setting<Boolean> = Setting.boolSetting(
+        "$REMOTE_METADATA_KEY_PREFIX.multi_tenancy_enabled",
+        false,
+        NodeScope,
+        Setting.Property.Final
+    )
+
     /** This setting sets the remote metadata store type  */
     val REMOTE_METADATA_STORE_TYPE: Setting<String?> = Setting
         .simpleString(
-            "plugins.alerting.$REMOTE_METADATA_TYPE_KEY",
+            "$REMOTE_METADATA_KEY_PREFIX.$REMOTE_METADATA_TYPE_KEY",
             NodeScope,
             Setting.Property.Final
         )
@@ -172,7 +185,7 @@ internal object PluginSettings {
     /** This setting sets the remote metadata endpoint  */
     val REMOTE_METADATA_ENDPOINT: Setting<String?> = Setting
         .simpleString(
-            "plugins.alerting.$REMOTE_METADATA_ENDPOINT_KEY",
+            "$REMOTE_METADATA_KEY_PREFIX.$REMOTE_METADATA_ENDPOINT_KEY",
             NodeScope,
             Setting.Property.Final
         )
@@ -180,7 +193,7 @@ internal object PluginSettings {
     /** This setting sets the remote metadata region  */
     val REMOTE_METADATA_REGION: Setting<String?> = Setting
         .simpleString(
-            "plugins.alerting.$REMOTE_METADATA_REGION_KEY",
+            "$REMOTE_METADATA_KEY_PREFIX.$REMOTE_METADATA_REGION_KEY",
             NodeScope,
             Setting.Property.Final
         )
@@ -188,7 +201,7 @@ internal object PluginSettings {
     /** This setting sets the remote metadata service name  */
     val REMOTE_METADATA_SERVICE_NAME: Setting<String?> = Setting
         .simpleString(
-            "plugins.alerting.$REMOTE_METADATA_SERVICE_NAME_KEY",
+            "$REMOTE_METADATA_KEY_PREFIX.$REMOTE_METADATA_SERVICE_NAME_KEY",
             NodeScope,
             Setting.Property.Final
         )
@@ -211,6 +224,7 @@ internal object PluginSettings {
             OPERATION_TIMEOUT_MS,
             DEFAULT_ITEMS_QUERY_COUNT,
             FILTER_BY_BACKEND_ROLES,
+            MULTI_TENANCY_ENABLED,
             REMOTE_METADATA_REGION,
             REMOTE_METADATA_ENDPOINT,
             REMOTE_METADATA_STORE_TYPE,
