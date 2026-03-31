@@ -846,4 +846,63 @@ class SecurityNotificationIT : PluginRestTestCase() {
             getUserClient?.close()
         }
     }
+
+    fun `test get smtp sender has access when filter by backend access strategy is all`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.ALL.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        // Create sample config request reference
+        val sampleSmtpAccount = SmtpAccount("example-host", 2465, MethodType.SSL, "no-reply@fake-host.com")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.SMTP_ACCOUNT,
+            isEnabled = true,
+            configData = sampleSmtpAccount
+        )
+
+        val sampleSmtpJsonString = getJsonString(sampleSmtpAccount)
+
+        // Create SMTP account config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"smtp_account",
+                "is_enabled":${referenceObject.isEnabled},
+                "smtp_account":$sampleSmtpJsonString
+            }
+        }
+        """.trimIndent()
+
+        val getUser = "getUser"
+        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
+            Assert.assertNotNull(configId)
+            Thread.sleep(1000)
+
+            createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role2", "role1", "role3"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
+
+            // Get SMTP account config
+            val getConfigResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status,
+                getUserClient
+            )
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(getUser, NOTIFICATION_GET_CONFIG_ACCESS)
+            getUserClient?.close()
+        }
+    }
 }
