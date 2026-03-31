@@ -13,8 +13,9 @@ internal class FilterByBackendRolesAccessStrategyValidatorTests {
     @Test
     fun `accepts valid values`() {
         val validator = FilterByBackendRolesAccessStrategyValidator()
-        validator.validate(FilterByBackendRolesAccessStrategy.INTERSECT.strategy)
         validator.validate(FilterByBackendRolesAccessStrategy.ALL.strategy)
+        validator.validate(FilterByBackendRolesAccessStrategy.EXACT.strategy)
+        validator.validate(FilterByBackendRolesAccessStrategy.INTERSECT.strategy)
     }
 
     @Test

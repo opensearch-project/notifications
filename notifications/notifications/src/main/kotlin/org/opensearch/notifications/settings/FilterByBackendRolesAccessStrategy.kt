@@ -10,12 +10,17 @@ package org.opensearch.notifications.settings
  */
 internal enum class FilterByBackendRolesAccessStrategy(val strategy: String) {
     /**
-     * Backend roles must intersect to have access
+     * User backend roles must contain all resource backend roles to have access
      */
-    INTERSECT("intersect"),
+    ALL("all"),
 
     /**
      * Backend roles must be exactly equal to have access
      */
-    ALL("all")
+    EXACT("exact"),
+
+    /**
+     * Backend roles must intersect to have access
+     */
+    INTERSECT("intersect"),
 }
