@@ -51,9 +51,11 @@ internal object UserAccessManager : UserAccess {
 
     fun checkUserBackendRolesAccess(userBackendRoles: List<String>, objectAccess: List<String>): Boolean {
         val filterByAccessStrategy = PluginSettings.getFilterByBackendAccessStrategy()
-        if (filterByAccessStrategy == FilterByBackendRolesAccessStrategy.INTERSECT.strategy) {
+        if (filterByAccessStrategy == FilterByBackendRolesAccessStrategy.ALL.strategy) {
+            return userBackendRoles.containsAll(objectAccess)
+        } else if (filterByAccessStrategy == FilterByBackendRolesAccessStrategy.INTERSECT.strategy) {
             return userBackendRoles.any { it in objectAccess }
-        } else if (filterByAccessStrategy == FilterByBackendRolesAccessStrategy.ALL.strategy) {
+        } else if (filterByAccessStrategy == FilterByBackendRolesAccessStrategy.EXACT.strategy) {
             return userBackendRoles.sorted().equals(objectAccess.sorted())
         }
         // Not sure if this is necessary, since there is a validator
