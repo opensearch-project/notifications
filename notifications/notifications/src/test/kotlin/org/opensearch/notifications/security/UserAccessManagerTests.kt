@@ -40,7 +40,7 @@ internal class UserAccessManagerTests {
     }
 
     @Test
-    fun `checkUserBackendRolesAccess strategy is intersect and roles are the same`() {
+    fun `checkUserBackendRolesAccess strategy is intersect and roles intersect`() {
         Assert.assertTrue(
             UserAccessManager.checkUserBackendRolesAccess(
                 listOf("role1", "role2"),
@@ -50,7 +50,7 @@ internal class UserAccessManagerTests {
     }
 
     @Test
-    fun `checkUserBackendRolesAccess strategy is intersect and roles are different`() {
+    fun `checkUserBackendRolesAccess strategy is intersect and roles do not intersect`() {
         Assert.assertFalse(
             UserAccessManager.checkUserBackendRolesAccess(
                 listOf("role1"),
@@ -60,9 +60,9 @@ internal class UserAccessManagerTests {
     }
 
     @Test
-    fun `checkUserBackendRolesAccess strategy is all and roles intersect but are not the same`() {
+    fun `checkUserBackendRolesAccess strategy is exact and roles intersect but are not the same`() {
         val clusterSettings = Settings.builder()
-            .put(filterByBackendRolesAccessStrategyKey, FilterByBackendRolesAccessStrategy.ALL.strategy)
+            .put(filterByBackendRolesAccessStrategyKey, FilterByBackendRolesAccessStrategy.EXACT.strategy)
             .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
@@ -87,9 +87,9 @@ internal class UserAccessManagerTests {
     }
 
     @Test
-    fun `checkUserBackendRolesAccess strategy is all and roles are the same`() {
+    fun `checkUserBackendRolesAccess strategy is exact and roles are the same`() {
         val clusterSettings = Settings.builder()
-            .put(filterByBackendRolesAccessStrategyKey, FilterByBackendRolesAccessStrategy.ALL.strategy)
+            .put(filterByBackendRolesAccessStrategyKey, FilterByBackendRolesAccessStrategy.EXACT.strategy)
             .build()
 
         whenever(clusterService.settings).thenReturn(defaultSettings)
@@ -114,7 +114,34 @@ internal class UserAccessManagerTests {
     }
 
     @Test
-    fun `checkUserBackendRolesAccess strategy is all and roles are the same, but in different order`() {
+    fun `checkUserBackendRolesAccess strategy is exact and roles are the same, but in different order`() {
+        val clusterSettings = Settings.builder()
+            .put(filterByBackendRolesAccessStrategyKey, FilterByBackendRolesAccessStrategy.EXACT.strategy)
+            .build()
+
+        whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterSettings).thenReturn(
+            ClusterSettings(
+                clusterSettings,
+                setOf(
+                    PluginSettings.OPERATION_TIMEOUT_MS,
+                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
+                )
+            )
+        )
+        PluginSettings.addSettingsUpdateConsumer(clusterService)
+
+        Assert.assertTrue(
+            UserAccessManager.checkUserBackendRolesAccess(
+                listOf("role2", "role1"),
+                listOf("role1", "role2")
+            )
+        )
+    }
+
+    @Test
+    fun `checkUserBackendRolesAccess strategy is all and user roles contain all object roles`() {
         val clusterSettings = Settings.builder()
             .put(filterByBackendRolesAccessStrategyKey, FilterByBackendRolesAccessStrategy.ALL.strategy)
             .build()
@@ -134,7 +161,7 @@ internal class UserAccessManagerTests {
 
         Assert.assertTrue(
             UserAccessManager.checkUserBackendRolesAccess(
-                listOf("role2", "role1"),
+                listOf("role2", "role3", "role1"),
                 listOf("role1", "role2")
             )
         )
