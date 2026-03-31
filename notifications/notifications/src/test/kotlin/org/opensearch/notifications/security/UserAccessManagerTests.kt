@@ -166,4 +166,31 @@ internal class UserAccessManagerTests {
             )
         )
     }
+
+    @Test
+    fun `checkUserBackendRolesAccess strategy is all and user roles do not contain all object roles`() {
+        val clusterSettings = Settings.builder()
+            .put(filterByBackendRolesAccessStrategyKey, FilterByBackendRolesAccessStrategy.ALL.strategy)
+            .build()
+
+        whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterSettings).thenReturn(
+            ClusterSettings(
+                clusterSettings,
+                setOf(
+                    PluginSettings.OPERATION_TIMEOUT_MS,
+                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
+                )
+            )
+        )
+        PluginSettings.addSettingsUpdateConsumer(clusterService)
+
+        Assert.assertFalse(
+            UserAccessManager.checkUserBackendRolesAccess(
+                listOf("role2", "role3"),
+                listOf("role1", "role2", "role3")
+            )
+        )
+    }
 }
