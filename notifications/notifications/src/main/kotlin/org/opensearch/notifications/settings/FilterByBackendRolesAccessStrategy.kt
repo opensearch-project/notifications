@@ -22,5 +22,5 @@ internal enum class FilterByBackendRolesAccessStrategy(val strategy: String) {
     /**
      * Backend roles must intersect to have access
      */
-    INTERSECT("intersect"),
+    INTERSECT("intersect")
 }

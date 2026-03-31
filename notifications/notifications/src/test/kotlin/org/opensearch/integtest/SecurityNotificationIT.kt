@@ -11,11 +11,14 @@ import org.junit.Before
 import org.junit.BeforeClass
 import org.opensearch.client.RestClient
 import org.opensearch.commons.notifications.model.ConfigType
+import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.Slack
+import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.rest.SecureRestClientBuilder
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.NotificationPlugin
+import org.opensearch.notifications.getJsonString
 import org.opensearch.notifications.settings.FilterByBackendRolesAccessStrategy
 import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.notifications.verifyChannelIdEquals
