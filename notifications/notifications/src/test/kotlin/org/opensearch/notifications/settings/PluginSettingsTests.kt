@@ -87,7 +87,9 @@ internal class PluginSettingsTests {
                 clusterSettings,
                 setOf(
                     PluginSettings.OPERATION_TIMEOUT_MS,
-                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT
+                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
                 )
             )
         )
@@ -111,7 +113,8 @@ internal class PluginSettingsTests {
                 clusterSettings,
                 setOf(
                     PluginSettings.OPERATION_TIMEOUT_MS,
-                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT
+                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
                 )
             )
         )
@@ -139,7 +142,8 @@ internal class PluginSettingsTests {
                 setOf(
                     PluginSettings.OPERATION_TIMEOUT_MS,
                     PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
-                    PluginSettings.FILTER_BY_BACKEND_ROLES
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
                 )
             )
         )
@@ -164,7 +168,8 @@ internal class PluginSettingsTests {
                     PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
                     PluginSettings.LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES,
                     PluginSettings.ALERTING_FILTER_BY_BACKEND_ROLES,
-                    PluginSettings.FILTER_BY_BACKEND_ROLES
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
                 )
             )
         )
@@ -188,7 +193,8 @@ internal class PluginSettingsTests {
                     PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
                     PluginSettings.LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES,
                     PluginSettings.ALERTING_FILTER_BY_BACKEND_ROLES,
-                    PluginSettings.FILTER_BY_BACKEND_ROLES
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
                 )
             )
         )
@@ -211,7 +217,8 @@ internal class PluginSettingsTests {
                     PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
                     PluginSettings.LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES,
                     PluginSettings.ALERTING_FILTER_BY_BACKEND_ROLES,
-                    PluginSettings.FILTER_BY_BACKEND_ROLES
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
                 )
             )
         )
