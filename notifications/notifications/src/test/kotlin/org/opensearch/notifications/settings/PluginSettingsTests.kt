@@ -29,11 +29,13 @@ internal class PluginSettingsTests {
     private val alertingFilterByBackendRolesKey = "plugins.alerting.filter_by_backend_roles"
     private val filterByBackendRolesKey = "$generalKeyPrefix.filter_by_backend_roles"
     private val multiTenancyEnabledKey = "plugins.notifications.multi_tenancy_enabled"
+    private val filterByBackendRolesAccessStrategyKey = "$generalKeyPrefix.filter_by_backend_roles_access_strategy"
 
     private val defaultSettings = Settings.builder()
         .put(operationTimeoutKey, 60000L)
         .put(defaultItemQueryCountKey, 100L)
         .put(filterByBackendRolesKey, false)
+        .put(filterByBackendRolesAccessStrategyKey, FilterByBackendRolesAccessStrategy.INTERSECT.strategy)
         .build()
 
     @BeforeEach
@@ -56,7 +58,8 @@ internal class PluginSettingsTests {
                 listOf<Any>(
                     PluginSettings.OPERATION_TIMEOUT_MS,
                     PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
-                    PluginSettings.FILTER_BY_BACKEND_ROLES
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
                 )
             )
         )
@@ -64,6 +67,10 @@ internal class PluginSettingsTests {
         Assertions.assertEquals(
             defaultSettings[defaultItemQueryCountKey],
             PluginSettings.defaultItemsQueryCount.toString()
+        )
+        Assertions.assertEquals(
+            FilterByBackendRolesAccessStrategy.INTERSECT.strategy,
+            PluginSettings.getFilterByBackendAccessStrategy()
         )
     }
 
@@ -80,7 +87,9 @@ internal class PluginSettingsTests {
                 clusterSettings,
                 setOf(
                     PluginSettings.OPERATION_TIMEOUT_MS,
-                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT
+                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
                 )
             )
         )
@@ -104,7 +113,8 @@ internal class PluginSettingsTests {
                 clusterSettings,
                 setOf(
                     PluginSettings.OPERATION_TIMEOUT_MS,
-                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT
+                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
                 )
             )
         )
@@ -132,7 +142,8 @@ internal class PluginSettingsTests {
                 setOf(
                     PluginSettings.OPERATION_TIMEOUT_MS,
                     PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
-                    PluginSettings.FILTER_BY_BACKEND_ROLES
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
                 )
             )
         )
@@ -157,7 +168,8 @@ internal class PluginSettingsTests {
                     PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
                     PluginSettings.LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES,
                     PluginSettings.ALERTING_FILTER_BY_BACKEND_ROLES,
-                    PluginSettings.FILTER_BY_BACKEND_ROLES
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
                 )
             )
         )
@@ -181,7 +193,8 @@ internal class PluginSettingsTests {
                     PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
                     PluginSettings.LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES,
                     PluginSettings.ALERTING_FILTER_BY_BACKEND_ROLES,
-                    PluginSettings.FILTER_BY_BACKEND_ROLES
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
                 )
             )
         )
@@ -204,7 +217,8 @@ internal class PluginSettingsTests {
                     PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
                     PluginSettings.LEGACY_ALERTING_FILTER_BY_BACKEND_ROLES,
                     PluginSettings.ALERTING_FILTER_BY_BACKEND_ROLES,
-                    PluginSettings.FILTER_BY_BACKEND_ROLES
+                    PluginSettings.FILTER_BY_BACKEND_ROLES,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
                 )
             )
         )
@@ -237,5 +251,26 @@ internal class PluginSettingsTests {
         Assertions.assertTrue(PluginSettings.REMOTE_METADATA_ENDPOINT.key.startsWith("plugins.notifications."))
         Assertions.assertTrue(PluginSettings.REMOTE_METADATA_REGION.key.startsWith("plugins.notifications."))
         Assertions.assertTrue(PluginSettings.REMOTE_METADATA_SERVICE_NAME.key.startsWith("plugins.notifications."))
+    }
+
+    @Test
+    fun `test filter by backend roles access strategy setting uses provided value`() {
+        val clusterSettings = Settings.builder()
+            .put(filterByBackendRolesAccessStrategyKey, FilterByBackendRolesAccessStrategy.ALL.strategy)
+            .build()
+
+        whenever(clusterService.settings).thenReturn(defaultSettings)
+        whenever(clusterService.clusterSettings).thenReturn(
+            ClusterSettings(
+                clusterSettings,
+                setOf(
+                    PluginSettings.OPERATION_TIMEOUT_MS,
+                    PluginSettings.DEFAULT_ITEMS_QUERY_COUNT,
+                    PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY
+                )
+            )
+        )
+        PluginSettings.addSettingsUpdateConsumer(clusterService)
+        Assertions.assertEquals(FilterByBackendRolesAccessStrategy.ALL.strategy, PluginSettings.getFilterByBackendAccessStrategy())
     }
 }
