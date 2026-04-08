@@ -18,16 +18,33 @@ class ConfigIndexingActionsTests {
     @Test
     fun `test validate microsoft teams`() {
         val user = User()
-        var microsoftTeams = MicrosoftTeams("https://abcdefg.webhook.office.com/webhookb2/12345567abcdefg")
+        var microsoftTeams =
+            MicrosoftTeams("https://abcdefg.webhook.office.com/webhookb2/12345567abcdefg")
         validateMicrosoftTeamsConfig.invoke(ConfigIndexingActions, microsoftTeams, user)
-        microsoftTeams = MicrosoftTeams("https://abcde.efg.webhook.office.com/webhookb2/12345567abcdefg")
+        microsoftTeams =
+            MicrosoftTeams("https://abcde.efg.webhook.office.com/webhookb2/12345567abcdefg")
         validateMicrosoftTeamsConfig.invoke(ConfigIndexingActions, microsoftTeams, user)
-        microsoftTeams = MicrosoftTeams("http://abcdefg.webhook.office.com/webhookb2/12345567abcdefg")
-        assertFails { validateMicrosoftTeamsConfig.invoke(ConfigIndexingActions, microsoftTeams, user) }
+
+        // New allowed domains
+        microsoftTeams = MicrosoftTeams("https://test.powerplatform.com/webhook")
+        validateMicrosoftTeamsConfig.invoke(ConfigIndexingActions, microsoftTeams, user)
+        microsoftTeams = MicrosoftTeams("https://test.logic.azure.com/webhook")
+        validateMicrosoftTeamsConfig.invoke(ConfigIndexingActions, microsoftTeams, user)
+
+        // Simple contains check now allows http if domain is present
+        microsoftTeams =
+            MicrosoftTeams("http://abcdefg.webhook.office.com/webhookb2/12345567abcdefg")
+        validateMicrosoftTeamsConfig.invoke(ConfigIndexingActions, microsoftTeams, user)
+
+        // Invalid domains
         microsoftTeams = MicrosoftTeams("https://abcdefg.webhook.abc.com/webhookb2/12345567abcdefg")
-        assertFails { validateMicrosoftTeamsConfig.invoke(ConfigIndexingActions, microsoftTeams, user) }
+        assertFails {
+            validateMicrosoftTeamsConfig.invoke(ConfigIndexingActions, microsoftTeams, user)
+        }
         microsoftTeams = MicrosoftTeams("https://abcdefg.abc.com")
-        assertFails { validateMicrosoftTeamsConfig.invoke(ConfigIndexingActions, microsoftTeams, user) }
+        assertFails {
+            validateMicrosoftTeamsConfig.invoke(ConfigIndexingActions, microsoftTeams, user)
+        }
     }
 
     @Test
@@ -37,9 +54,15 @@ class ConfigIndexingActionsTests {
         validateSlackConfig.invoke(ConfigIndexingActions, slack, user)
         slack = Slack("https://hooks.gov-slack.com/services/123456789/123456789/123456789")
         validateSlackConfig.invoke(ConfigIndexingActions, slack, user)
-        slack = Slack("https://hooks.slack.com/services/samplesamplesamplesamplesamplesamplesamplesamplesample")
+        slack =
+            Slack(
+                "https://hooks.slack.com/services/samplesamplesamplesamplesamplesamplesamplesamplesample"
+            )
         validateSlackConfig.invoke(ConfigIndexingActions, slack, user)
-        slack = Slack("https://hooks.gov-slack.com/services/samplesamplesamplesamplesamplesamplesamplesamplesample")
+        slack =
+            Slack(
+                "https://hooks.gov-slack.com/services/samplesamplesamplesamplesamplesamplesamplesamplesample"
+            )
         validateSlackConfig.invoke(ConfigIndexingActions, slack, user)
         slack = Slack("http://hooks.slack.com/services/123456789/123456789/123456789/123456789")
         assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
@@ -51,11 +74,20 @@ class ConfigIndexingActionsTests {
         assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
         slack = Slack("https://hooks.slack.com/123456789/123456789/123456789/123456789/123456789")
         assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
-        slack = Slack("https://hooks.gov-slack.com/123456789/123456789/123456789/123456789/123456789")
+        slack =
+            Slack(
+                "https://hooks.gov-slack.com/123456789/123456789/123456789/123456789/123456789"
+            )
         assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
-        slack = Slack("https://hook.slack.com/services/123456789/123456789/123456789/123456789/123456789")
+        slack =
+            Slack(
+                "https://hook.slack.com/services/123456789/123456789/123456789/123456789/123456789"
+            )
         assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
-        slack = Slack("https://hook.gov-slack.com/services/123456789/123456789/123456789/123456789/123456789")
+        slack =
+            Slack(
+                "https://hook.gov-slack.com/services/123456789/123456789/123456789/123456789/123456789"
+            )
         assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
         slack = Slack("https://hooks.slack.com/")
         assertFails { validateSlackConfig.invoke(ConfigIndexingActions, slack, user) }
@@ -68,7 +100,10 @@ class ConfigIndexingActionsTests {
         val user = User()
         var chime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456")
         validateChimeConfig.invoke(ConfigIndexingActions, chime, user)
-        chime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456&test=123")
+        chime =
+            Chime(
+                "https://hooks.chime.aws/incomingwebhooks/sample_chime_url?token=123456&test=123"
+            )
         validateChimeConfig.invoke(ConfigIndexingActions, chime, user)
         chime = Chime("https://hooks.chime.aws/incomingwebhooks/sample_chime_url")
         assertFails { validateChimeConfig.invoke(ConfigIndexingActions, chime, user) }
@@ -91,21 +126,24 @@ class ConfigIndexingActionsTests {
         @JvmStatic
         fun initialize() {
             /* use reflection to get private method */
-            validateMicrosoftTeamsConfig = ConfigIndexingActions::class.java.getDeclaredMethod(
-                "validateMicrosoftTeamsConfig",
-                MicrosoftTeams::class.java,
-                User::class.java
-            )
-            validateSlackConfig = ConfigIndexingActions::class.java.getDeclaredMethod(
-                "validateSlackConfig",
-                Slack::class.java,
-                User::class.java
-            )
-            validateChimeConfig = ConfigIndexingActions::class.java.getDeclaredMethod(
-                "validateChimeConfig",
-                Chime::class.java,
-                User::class.java
-            )
+            validateMicrosoftTeamsConfig =
+                ConfigIndexingActions::class.java.getDeclaredMethod(
+                    "validateMicrosoftTeamsConfig",
+                    MicrosoftTeams::class.java,
+                    User::class.java
+                )
+            validateSlackConfig =
+                ConfigIndexingActions::class.java.getDeclaredMethod(
+                    "validateSlackConfig",
+                    Slack::class.java,
+                    User::class.java
+                )
+            validateChimeConfig =
+                ConfigIndexingActions::class.java.getDeclaredMethod(
+                    "validateChimeConfig",
+                    Chime::class.java,
+                    User::class.java
+                )
 
             validateMicrosoftTeamsConfig.isAccessible = true
             validateSlackConfig.isAccessible = true
