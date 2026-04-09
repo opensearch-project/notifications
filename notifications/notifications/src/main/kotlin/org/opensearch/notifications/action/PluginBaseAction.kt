@@ -25,7 +25,9 @@ import org.opensearch.index.IndexNotFoundException
 import org.opensearch.index.engine.VersionConflictEngineException
 import org.opensearch.indices.InvalidIndexNameException
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
+import org.opensearch.notifications.NotificationPlugin.Companion.TENANT_ID_HEADER
 import org.opensearch.notifications.metrics.Metrics
+import org.opensearch.notifications.util.TenantContext
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 import org.opensearch.transport.client.Client
@@ -55,8 +57,9 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
         val userStr: String? =
             client.threadPool().threadContext.getTransient<String>(OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT)
         val user: User? = User.parse(userStr)
+        val tenantId: String? = client.threadPool().threadContext.getHeader(TENANT_ID_HEADER)
         val storedThreadContext = client.threadPool().threadContext.newStoredContext(false)
-        scope.launch {
+        scope.launch(TenantContext(tenantId)) {
             try {
                 client.threadPool().threadContext.stashContext().use {
                     storedThreadContext.restore()
