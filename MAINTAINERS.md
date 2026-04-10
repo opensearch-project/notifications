@@ -13,10 +13,17 @@ This document contains a list of maintainers in this repo. See [opensearch-proje
 | Zhichao Geng           | [zhichao-aws](https://github.com/zhichao-aws) | Amazon      |
 | Yuye Zhu               | [yuye-aws](https://github.com/yuye-aws)       | Amazon      |
 | Zhongnan Su            | [zhongnansu](https://github.com/zhongnansu)   | Amazon      |
-| Subhobrata Dey         | [sbcd90](https://github.com/sbcd90)           | Amazon      |
+
 | Amardeepsingh Siglani  | [amsiglan](https://github.com/amsiglan)       | Amazon      |
-| Praveen Sameneni       | [praveensameneni](https://github.com/praveensameneni)| Amazon |
+
 | Dennis Toepker         | [toepkerd](https://github.com/toepkerd)       | Amazon      |
+| Surya Sashank Nistala  | [eirsep](https://github.com/eirsep)           | Amazon      |
+| Thomas Hurney          | [AWSHurneyt](https://github.com/AWSHurneyt)   | Amazon      |
+| Riya Saxena            | [riysaxen-amzn](https://github.com/riysaxen-amzn) | Amazon  |
+| Sai Vikhyath           | [vikhy-aws](https://github.com/vikhy-aws)     | Amazon      |
+| Manaswini Ragamouni    | [manaswini1920](https://github.com/manaswini1920) | Amazon  |
+| Nishtha Mehrotra             | [nishtham-amazon](https://github.com/nishtham-amazon) | Amazon |
+| Kash Kondaka          | [KashKondaka](https://github.com/KashKondaka) | Amazon      |
 
 ## Emeritus
 
@@ -24,3 +31,5 @@ This document contains a list of maintainers in this repo. See [opensearch-proje
 | ---------------------- | --------------------------------------------- | ----------- |
 | Anantha Krishna Bhatta | [akbhatta](https://github.com/akbhatta)       | Amazon      |
 | Joshua Li              | [joshuali925](https://github.com/joshuali925) | Amazon      |
+| Subhobrata Dey         | [sbcd90](https://github.com/sbcd90)           | Amazon      |
+| Praveen Sameneni       | [praveensameneni](https://github.com/praveensameneni)| Amazon |
