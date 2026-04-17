@@ -13,9 +13,7 @@ This document contains a list of maintainers in this repo. See [opensearch-proje
 | Zhichao Geng           | [zhichao-aws](https://github.com/zhichao-aws) | Amazon      |
 | Yuye Zhu               | [yuye-aws](https://github.com/yuye-aws)       | Amazon      |
 | Zhongnan Su            | [zhongnansu](https://github.com/zhongnansu)   | Amazon      |
-
 | Amardeepsingh Siglani  | [amsiglan](https://github.com/amsiglan)       | Amazon      |
-
 | Dennis Toepker         | [toepkerd](https://github.com/toepkerd)       | Amazon      |
 | Surya Sashank Nistala  | [eirsep](https://github.com/eirsep)           | Amazon      |
 | Thomas Hurney          | [AWSHurneyt](https://github.com/AWSHurneyt)   | Amazon      |
