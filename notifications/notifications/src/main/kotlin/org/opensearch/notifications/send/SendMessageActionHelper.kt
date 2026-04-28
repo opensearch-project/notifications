@@ -55,6 +55,7 @@ import org.opensearch.notifications.spi.model.destination.SesDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import org.opensearch.notifications.spi.model.destination.SnsDestination
+import org.opensearch.notifications.util.ConfigEncryptionTransformer
 import java.io.ByteArrayOutputStream
 
 /**
@@ -66,10 +67,12 @@ object SendMessageActionHelper {
 
     private lateinit var configOperations: ConfigOperations
     private lateinit var userAccess: UserAccess
+    private lateinit var configEncryptionTransformer: ConfigEncryptionTransformer
 
-    fun initialize(configOperations: ConfigOperations, userAccess: UserAccess) {
+    fun initialize(configOperations: ConfigOperations, userAccess: UserAccess, configEncryptionTransformer: ConfigEncryptionTransformer) {
         this.configOperations = configOperations
         this.userAccess = userAccess
+        this.configEncryptionTransformer = configEncryptionTransformer
     }
 
     /**
@@ -225,14 +228,15 @@ object SendMessageActionHelper {
             return eventStatus.copy(deliveryStatus = invalidStatus)
         }
 
+        val decryptedConfig = configEncryptionTransformer.decryptConfig(channel.configDoc.config)
         val response = when (configType) {
             ConfigType.NONE -> null
-            ConfigType.SLACK -> sendSlackMessage(configData as Slack, message, eventStatus, eventSource.referenceId)
+            ConfigType.SLACK -> sendSlackMessage(decryptedConfig.configData as Slack, message, eventStatus, eventSource.referenceId)
             ConfigType.MATTERMOST -> sendSlackMessage(configData as Slack, message, eventStatus, eventSource.referenceId)
-            ConfigType.CHIME -> sendChimeMessage(configData as Chime, message, eventStatus, eventSource.referenceId)
-            ConfigType.MICROSOFT_TEAMS -> sendMicrosoftTeamsMessage(configData as MicrosoftTeams, message, eventStatus, eventSource.referenceId)
+            ConfigType.CHIME -> sendChimeMessage(decryptedConfig.configData as Chime, message, eventStatus, eventSource.referenceId)
+            ConfigType.MICROSOFT_TEAMS -> sendMicrosoftTeamsMessage(decryptedConfig.configData as MicrosoftTeams, message, eventStatus, eventSource.referenceId)
             ConfigType.WEBHOOK -> sendWebhookMessage(
-                configData as Webhook,
+                decryptedConfig.configData as Webhook,
                 message,
                 eventStatus,
                 eventSource.referenceId

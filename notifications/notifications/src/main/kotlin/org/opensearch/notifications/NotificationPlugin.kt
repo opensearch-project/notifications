@@ -47,6 +47,8 @@ import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_SERV
 import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_STORE_TYPE
 import org.opensearch.notifications.spi.NotificationCore
 import org.opensearch.notifications.spi.NotificationCoreExtension
+import org.opensearch.notifications.util.ConfigEncryptionTransformer
+import org.opensearch.notifications.util.FieldEncryptionService
 import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.plugins.ActionPlugin
 import org.opensearch.plugins.Plugin
@@ -84,6 +86,13 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
 
         // Other global constants
         const val TEXT_QUERY_TAG = "text_query"
+
+        /**
+         * Encryption service for sensitive channel-config fields.
+         * Initialised in [createComponents] from the node keystore.
+         * Runs in passthrough mode when no key is provisioned.
+         */
+        lateinit var fieldEncryptionService: FieldEncryptionService
     }
 
     /**
@@ -122,6 +131,7 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
         log.debug("$LOG_PREFIX:createComponents")
         this.clusterService = clusterService
         val settings = environment.settings()
+        fieldEncryptionService = PluginSettings.buildFieldEncryptionService(settings)
         val sdkClient = SdkClientFactory.createSdkClient(
             SecureIndexClient(client),
             xContentRegistry,
@@ -134,10 +144,13 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
             ),
             client.threadPool().executor(ThreadPool.Names.GENERIC)
         )
+
+        ConfigEncryptionTransformer.initialize(fieldEncryptionService)
+
         PluginSettings.addSettingsUpdateConsumer(clusterService)
-        NotificationConfigIndex.initialize(sdkClient, client, clusterService)
+        NotificationConfigIndex.initialize(sdkClient, client, clusterService, ConfigEncryptionTransformer)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
-        SendMessageActionHelper.initialize(NotificationConfigIndex, UserAccessManager)
+        SendMessageActionHelper.initialize(NotificationConfigIndex, UserAccessManager, ConfigEncryptionTransformer)
         return listOf(sdkClient)
     }
 

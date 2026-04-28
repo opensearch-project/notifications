@@ -7,6 +7,7 @@ package org.opensearch.notifications.settings
 
 import org.opensearch.bootstrap.BootstrapInfo
 import org.opensearch.cluster.service.ClusterService
+import org.opensearch.common.settings.SecureSetting
 import org.opensearch.common.settings.Setting
 import org.opensearch.common.settings.Setting.Property.Deprecated
 import org.opensearch.common.settings.Setting.Property.Dynamic
@@ -14,14 +15,18 @@ import org.opensearch.common.settings.Setting.Property.NodeScope
 import org.opensearch.common.settings.Settings
 import org.opensearch.commons.utils.OpenForTesting
 import org.opensearch.commons.utils.logger
+import org.opensearch.core.common.settings.SecureString
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_NAME
+import org.opensearch.notifications.util.FieldEncryptionService
 import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_ENDPOINT_KEY
 import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_REGION_KEY
 import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_SERVICE_NAME_KEY
 import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_TYPE_KEY
 import java.io.IOException
 import java.nio.file.Path
+import java.util.Base64
+import javax.crypto.spec.SecretKeySpec
 
 /**
  * settings specific to Notifications Plugin.
@@ -39,6 +44,13 @@ internal object PluginSettings {
      * General settings Key prefix.
      */
     private const val GENERAL_KEY_PREFIX = "$KEY_PREFIX.general"
+
+    /**
+     * Key for the AES-256 field-encryption keystore entry.
+     * The value must be a Base64-encoded 32-byte (256-bit) AES key, provisioned
+     * via `opensearch-keystore add opensearch.notifications.field_encryption_key`.
+     */
+    private const val FIELD_ENCRYPTION_KEY_KEY = "$KEY_PREFIX.field_encryption_key"
 
     /**
      * Operation timeout for network operations.
@@ -166,6 +178,17 @@ internal object PluginSettings {
      */
     private const val REMOTE_METADATA_KEY_PREFIX = "plugins.notifications"
 
+    /**
+     * Secure setting holding the Base64-encoded 32-byte AES-256 key used to
+     * encrypt sensitive channel-config fields at rest.
+     *
+     * When absent the plugin runs in passthrough mode (no encryption).
+     */
+    val FIELD_ENCRYPTION_KEY: Setting<SecureString> = SecureSetting.secureString(
+        FIELD_ENCRYPTION_KEY_KEY,
+        null
+    )
+
     /** This setting enables multi-tenancy for the remote metadata SDK client */
     val MULTI_TENANCY_ENABLED: Setting<Boolean> = Setting.boolSetting(
         "$REMOTE_METADATA_KEY_PREFIX.multi_tenancy_enabled",
@@ -228,8 +251,38 @@ internal object PluginSettings {
             REMOTE_METADATA_REGION,
             REMOTE_METADATA_ENDPOINT,
             REMOTE_METADATA_STORE_TYPE,
-            REMOTE_METADATA_SERVICE_NAME
+            REMOTE_METADATA_SERVICE_NAME,
+            FIELD_ENCRYPTION_KEY
         )
+    }
+
+    /**
+     * Builds a [FieldEncryptionService] from the node keystore.
+     *
+     * When [FIELD_ENCRYPTION_KEY] is absent from the keystore the service is
+     * returned in **passthrough mode** (no encryption / decryption is performed).
+     * This allows rolling out the feature without requiring all nodes to have
+     * the key provisioned simultaneously.
+     *
+     * The keystore entry must be a Base64-encoded 256-bit (32-byte) AES key,
+     * e.g. produced by:
+     *   `openssl rand -base64 32`
+     *
+     * @param settings the node-level [Settings] that back the keystore.
+     * @return a ready-to-use [FieldEncryptionService].
+     */
+    fun buildFieldEncryptionService(settings: Settings): FieldEncryptionService {
+        FIELD_ENCRYPTION_KEY.get(settings).use { secureKey ->
+            if (secureKey.length == 0) {
+                log.warn(
+                    "$LOG_PREFIX:$FIELD_ENCRYPTION_KEY_KEY not found in keystore — " +
+                        "FieldEncryptionService running in passthrough mode"
+                )
+                return FieldEncryptionService(null)
+            }
+            val keyBytes = Base64.getDecoder().decode(String(secureKey.chars))
+            return FieldEncryptionService(SecretKeySpec(keyBytes, "AES"))
+        }
     }
 
     /**

@@ -22,21 +22,41 @@ import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.notifications.model.Sns
 import org.opensearch.commons.notifications.model.Webhook
 
-fun verifyEquals(slack: Slack, jsonObject: JsonObject) {
-    Assert.assertEquals(slack.url, jsonObject.get("url").asString)
+fun verifyEquals(slack: Slack, jsonObject: JsonObject, isEncrypted: Boolean = false) {
+    if (isEncrypted) {
+        Assert.assertTrue(jsonObject.get("url").asString.startsWith("enc:"))
+    } else {
+        Assert.assertEquals(slack.url, jsonObject.get("url").asString)
+    }
 }
 
-fun verifyEquals(chime: Chime, jsonObject: JsonObject) {
-    Assert.assertEquals(chime.url, jsonObject.get("url").asString)
+fun verifyEquals(chime: Chime, jsonObject: JsonObject, isEncrypted: Boolean = false) {
+    if (isEncrypted) {
+        Assert.assertTrue(jsonObject.get("url").asString.startsWith("enc:"))
+    } else {
+        Assert.assertEquals(chime.url, jsonObject.get("url").asString)
+    }
 }
 
-fun verifyEquals(microsoftTeams: MicrosoftTeams, jsonObject: JsonObject) {
-    Assert.assertEquals(microsoftTeams.url, jsonObject.get("url").asString)
+fun verifyEquals(microsoftTeams: MicrosoftTeams, jsonObject: JsonObject, isEncrypted: Boolean = false) {
+    if (isEncrypted) {
+        Assert.assertTrue(jsonObject.get("url").asString.startsWith("enc:"))
+    } else {
+        Assert.assertEquals(microsoftTeams.url, jsonObject.get("url").asString)
+    }
 }
 
-fun verifyEquals(webhook: Webhook, jsonObject: JsonObject) {
-    Assert.assertEquals(webhook.url, jsonObject.get("url").asString)
-    Assert.assertEquals(webhook.headerParams, Gson().fromJson(jsonObject.get("header_params"), HashMap::class.java))
+fun verifyEquals(webhook: Webhook, jsonObject: JsonObject, isEncrypted: Boolean = false) {
+    if (isEncrypted) {
+        Assert.assertTrue(jsonObject.get("url").asString.startsWith("enc:"))
+        Gson().fromJson(jsonObject.get("header_params"), HashMap::class.java).all {
+            (it.value as String).startsWith("enc:")
+        }
+    } else {
+        Assert.assertEquals(webhook.url, jsonObject.get("url").asString)
+        Assert.assertEquals(webhook.headerParams, Gson().fromJson(jsonObject.get("header_params"), HashMap::class.java))
+    }
+
     Assert.assertEquals(webhook.method.tag, jsonObject.get("method").asString)
 }
 
@@ -86,10 +106,10 @@ fun verifyEquals(config: NotificationConfig, jsonObject: JsonObject) {
     Assert.assertEquals(config.configType.tag, jsonObject.get("config_type").asString)
     Assert.assertEquals(config.isEnabled, jsonObject.get("is_enabled").asBoolean)
     when (config.configType) {
-        ConfigType.SLACK -> verifyEquals((config.configData as Slack), jsonObject.get("slack").asJsonObject)
-        ConfigType.CHIME -> verifyEquals((config.configData as Chime), jsonObject.get("chime").asJsonObject)
-        ConfigType.MICROSOFT_TEAMS -> verifyEquals((config.configData as MicrosoftTeams), jsonObject.get("microsoft_teams").asJsonObject)
-        ConfigType.WEBHOOK -> verifyEquals((config.configData as Webhook), jsonObject.get("webhook").asJsonObject)
+        ConfigType.SLACK -> verifyEquals((config.configData as Slack), jsonObject.get("slack").asJsonObject, true)
+        ConfigType.CHIME -> verifyEquals((config.configData as Chime), jsonObject.get("chime").asJsonObject, true)
+        ConfigType.MICROSOFT_TEAMS -> verifyEquals((config.configData as MicrosoftTeams), jsonObject.get("microsoft_teams").asJsonObject, true)
+        ConfigType.WEBHOOK -> verifyEquals((config.configData as Webhook), jsonObject.get("webhook").asJsonObject, true)
         ConfigType.EMAIL -> verifyEquals((config.configData as Email), jsonObject.get("email").asJsonObject)
         ConfigType.SMTP_ACCOUNT -> verifyEquals(
             (config.configData as SmtpAccount),

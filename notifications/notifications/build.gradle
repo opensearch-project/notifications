@@ -91,6 +91,11 @@ allOpen {
 
 // This flag indicates the existence of security plugin
 def securityEnabled = System.getProperty("security", "false") == "true" || System.getProperty("https", "false") == "true"
+def fieldEncryptionKeySettingName = "opensearch.notifications.field_encryption_key"
+def fieldEncryptionKeyForTests = System.getProperty(
+    "tests.notifications.field_encryption_key",
+    (project.findProperty("testsFieldEncryptionKey") ?: "Nm+pBJ0odVceO0uVN7QS1Wg0dGQDFJim8fua+wA23lw=").toString()
+)
 
 ext {
     projectSubstitutions = [:]
@@ -257,6 +262,9 @@ afterEvaluate {
         def firstPlugin = plugins.get(0)
         plugins.remove(0)
         plugins.add(firstPlugin)
+
+        // Keep encryption enabled in integ tests even when security plugin is disabled.
+        node.keystore(fieldEncryptionKeySettingName, fieldEncryptionKeyForTests)
 
         if (securityEnabled) {
             node.extraConfigFile("kirk.pem", file("build/resources/main/kirk.pem"))
