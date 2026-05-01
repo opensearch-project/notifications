@@ -187,8 +187,8 @@ dependencies {
         opensearchPlugin "org.opensearch.plugin:opensearch-security:${opensearch_build}@zip"
     }
 
-    compileOnly "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}"
-    compileOnly "com.fasterxml.jackson.core:jackson-core:${versions.jackson}"
+    compileOnly "tools.jackson.core:jackson-databind:${versions.jackson3_databind}"
+    compileOnly "tools.jackson.core:jackson-core:${versions.jackson3}"
     compileOnly "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson_annotations}"
     compileOnly "org.apache.httpcomponents.core5:httpcore5:${versions.httpcore5}"
     compileOnly "org.apache.httpcomponents.client5:httpclient5:${versions.httpclient5}"
