@@ -157,6 +157,8 @@ configurations.all {
         force "io.netty:netty-resolver:${versions.netty}"
         force "io.netty:netty-transport-native-unix-common:${versions.netty}"
         force "org.dafny:DafnyRuntime:4.9.0"
+        force "org.apache.logging.log4j:log4j-api:${versions.log4j}"
+        force "org.apache.logging.log4j:log4j-core:${versions.log4j}"
     }
 }
 
