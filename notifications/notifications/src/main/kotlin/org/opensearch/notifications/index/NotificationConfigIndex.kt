@@ -13,8 +13,6 @@ import org.opensearch.action.admin.indices.mapping.put.PutMappingRequest
 import org.opensearch.action.bulk.BulkResponse
 import org.opensearch.action.delete.DeleteResponse
 import org.opensearch.action.get.GetResponse
-import org.opensearch.action.get.MultiGetRequest
-import org.opensearch.action.get.MultiGetResponse
 import org.opensearch.action.index.IndexResponse
 import org.opensearch.action.search.SearchResponse
 import org.opensearch.action.support.clustermanager.AcknowledgedResponse
@@ -212,12 +210,39 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     override suspend fun getNotificationConfigs(ids: Set<String>): List<NotificationConfigDocInfo> {
         createIndex()
-        val getRequest = MultiGetRequest()
-        ids.forEach { getRequest.add(INDEX_NAME, it) }
-        val response: MultiGetResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-            multiGet(getRequest, it)
+        val sourceBuilder = SearchSourceBuilder()
+            .timeout(TimeValue(PluginSettings.operationTimeoutMs, TimeUnit.MILLISECONDS))
+            .query(QueryBuilders.idsQuery().addIds(*ids.toTypedArray()))
+            .size(ids.size)
+        val searchRequest = SearchDataObjectRequest.builder()
+            .indices(INDEX_NAME)
+            .tenantId(currentTenantId())
+            .searchSourceBuilder(sourceBuilder)
+            .build()
+        val response: SearchResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+            sdkClient.searchDataObjectAsync(searchRequest).whenComplete(it)
         }
-        return response.responses.mapNotNull { parseNotificationConfigDoc(it.id, it.response) }
+        return response.hits.hits.mapNotNull { hit ->
+            try {
+                val parser = XContentType.JSON.xContent().createParser(
+                    NamedXContentRegistry.EMPTY,
+                    LoggingDeprecationHandler.INSTANCE,
+                    hit.sourceAsString
+                )
+                parser.nextToken()
+                val doc = NotificationConfigDoc.parse(parser)
+                val info = DocInfo(
+                    id = hit.id,
+                    version = hit.version,
+                    seqNo = hit.seqNo,
+                    primaryTerm = hit.primaryTerm
+                )
+                NotificationConfigDocInfo(info, doc)
+            } catch (e: Exception) {
+                log.warn("$LOG_PREFIX:getNotificationConfigs - failed to parse ${hit.id}: ${e.message}")
+                null
+            }
+        }
     }
 
     /**
