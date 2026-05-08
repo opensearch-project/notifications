@@ -5,6 +5,7 @@
 package org.opensearch.notifications.send
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -45,6 +46,7 @@ import org.opensearch.notifications.index.ConfigOperations
 import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.security.UserAccess
+import org.opensearch.notifications.spi.NotificationRequestContext
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
@@ -55,6 +57,7 @@ import org.opensearch.notifications.spi.model.destination.SesDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import org.opensearch.notifications.spi.model.destination.SnsDestination
+import org.opensearch.notifications.util.currentTenantId
 import java.io.ByteArrayOutputStream
 
 /**
@@ -85,7 +88,8 @@ object SendMessageActionHelper {
         val channelMap = getConfigs(channelIds)
         val childConfigMap = getConfigs(getChildConfigIds(channelMap.values.filterNotNull().toList()))
         val message = createMessageContent(eventSource, channelMessage)
-        val eventStatusList = sendMessagesInParallel(user, eventSource, channelMap, childConfigMap, message)
+        val applicationId = currentTenantId()?.split(":")?.get(0)
+        val eventStatusList = sendMessagesInParallel(user, eventSource, channelMap, childConfigMap, message, applicationId)
         val event = NotificationEvent(eventSource, eventStatusList)
 
         // traverse status to determine HTTP status code
@@ -146,16 +150,20 @@ object SendMessageActionHelper {
         eventSource: EventSource,
         channelMap: Map<String, NotificationConfigDocInfo?>,
         childConfigMap: Map<String, NotificationConfigDocInfo?>,
-        message: MessageContent
+        message: MessageContent,
+        applicationId: String? = null
     ): List<EventStatus> {
         // Fire all the message sending in parallel. Using coroutineScope instead of runBlocking
         // so the parent coroutine suspends (releasing its dispatcher thread) while awaiting the
         // children. runBlocking here would park a Dispatchers.IO thread while the children also
         // require Dispatchers.IO threads, which deadlocks the entire dispatcher once its
         // parallelism limit (64 by default) is reached by concurrent send requests.
+        // The application id is propagated to each child via a ThreadLocal context element so the
+        // credential factories can read it on whichever IO thread the child runs on.
+        val appIdContext = NotificationRequestContext.threadLocal().asContextElement(applicationId)
         return coroutineScope {
             channelMap.map {
-                async(Dispatchers.IO) { sendMessageToChannel(user, eventSource, it, childConfigMap, message) }
+                async(Dispatchers.IO + appIdContext) { sendMessageToChannel(user, eventSource, it, childConfigMap, message) }
             }.awaitAll()
         }
     }
