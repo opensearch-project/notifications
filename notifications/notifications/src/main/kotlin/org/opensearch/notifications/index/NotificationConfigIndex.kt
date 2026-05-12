@@ -94,11 +94,12 @@ internal object NotificationConfigIndex : ConfigOperations {
             )
             parser.nextToken()
             val doc = NotificationConfigDoc.parse(parser)
+            val decryptedConfig = configEncryptionTransformer.decryptConfig(doc.config)
             return NotificationConfigInfo(
                 searchHit.id,
                 doc.metadata.lastUpdateTime,
                 doc.metadata.createdTime,
-                doc.config
+                decryptedConfig
             )
         }
     }
@@ -188,6 +189,8 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     override suspend fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String?): String? {
         createIndex()
+        val foo = configEncryptionTransformer.encryptConfig(configDoc.config)
+        log.info("tomboy Encrypted config: $foo")
         val postRequest = PutDataObjectRequest.builder()
             .index(INDEX_NAME)
             .dataObject({ builder, params -> configDoc.copy(config = configEncryptionTransformer.encryptConfig(configDoc.config)).toXContent(builder, params) })
@@ -196,9 +199,12 @@ internal object NotificationConfigIndex : ConfigOperations {
             postRequest.id(id)
         }
 
+        log.info("tomboy request: ${postRequest.build().dataObject()}")
+
         val response: IndexResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
             sdkClient.putDataObjectAsync(postRequest.build()).whenComplete(it)
         }
+        log.info("tomboy response: $response")
         return if (response.result != DocWriteResponse.Result.CREATED) {
             log.warn("$LOG_PREFIX:createNotificationConfig - response:$response")
             null

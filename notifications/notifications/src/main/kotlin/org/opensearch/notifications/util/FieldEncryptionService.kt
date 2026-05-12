@@ -7,12 +7,12 @@ package org.opensearch.notifications.util
 
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
+import java.security.GeneralSecurityException
 import java.security.SecureRandom
 import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
-import javax.security.auth.Destroyable
 
 /**
  * Encrypts and decrypts sensitive notification-channel configuration fields
@@ -32,16 +32,19 @@ import javax.security.auth.Destroyable
  * The version tag (`v1`) in the prefix allows future algorithm migrations
  * without breaking existing stored values (see [decrypt] passthrough behaviour).
  *
- * **Passthrough mode** — when constructed with `secretKey = null` the service
+ * **Passthrough mode** — when constructed with `activeKey = null` the service
  * performs no encryption or decryption. [encrypt] returns the plaintext
  * unchanged; [decrypt] returns the value unchanged (even if it carries the
  * `enc:v1:` prefix). This is intentional: it lets operators roll out the
  * feature flag and provision keystore entries without causing data loss.
  *
- * @param secretKey a 256-bit AES key, or `null` to operate in passthrough mode.
+ * @param activeKey a 256-bit AES key, or `null` to operate in passthrough mode.
+ * @param previousKey optional previous AES key used as decrypt fallback during key rotation.
  */
-class FieldEncryptionService(private var secretKey: SecretKey?) : AutoCloseable {
-
+class FieldEncryptionService(
+    private var activeKey: SecretKey?,
+    private var previousKey: SecretKey? = null
+) : AutoCloseable {
     private val log by logger(javaClass)
 
     companion object {
@@ -66,16 +69,19 @@ class FieldEncryptionService(private var secretKey: SecretKey?) : AutoCloseable 
      * Returns the plaintext unchanged when operating in passthrough mode.
      */
     fun encrypt(plaintext: String): String {
-        if (secretKey == null) {
+        val encryptionKey = activeKey
+        if (encryptionKey == null) {
             log.warn("$LOG_PREFIX:FieldEncryptionService passthrough mode — field will not be encrypted")
             return plaintext
         }
 
         val nonce = ByteArray(GCM_NONCE_LENGTH_BYTES).also { SecureRandom().nextBytes(it) }
-        val cipher = Cipher.getInstance(AES_GCM_TRANSFORMATION)
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, GCMParameterSpec(GCM_TAG_LENGTH_BITS, nonce))
-        // JCE appends the 16-byte GCM auth tag to the end of the returned byte array
-        val ciphertextWithTag = cipher.doFinal(plaintext.toByteArray(Charsets.UTF_8))
+        val ciphertextWithTag = runCipher(
+            mode = Cipher.ENCRYPT_MODE,
+            key = encryptionKey,
+            nonce = nonce,
+            bytes = plaintext.toByteArray(Charsets.UTF_8)
+        )
 
         val combined = nonce + ciphertextWithTag
         return ENCRYPTED_PREFIX + Base64.getEncoder().encodeToString(combined)
@@ -97,7 +103,7 @@ class FieldEncryptionService(private var secretKey: SecretKey?) : AutoCloseable 
             // Plain-text legacy value — return unchanged (backward-compatible)
             return value
         }
-        if (secretKey == null) {
+        if (activeKey == null && previousKey == null) {
             log.warn("$LOG_PREFIX:FieldEncryptionService passthrough mode — cannot decrypt enc:v1: value, returning as-is")
             return value
         }
@@ -106,9 +112,35 @@ class FieldEncryptionService(private var secretKey: SecretKey?) : AutoCloseable 
         val nonce = combined.copyOfRange(0, GCM_NONCE_LENGTH_BYTES)
         val ciphertextWithTag = combined.copyOfRange(GCM_NONCE_LENGTH_BYTES, combined.size)
 
+        return tryDecrypt(activeKey, nonce, ciphertextWithTag)
+            ?: tryDecrypt(previousKey, nonce, ciphertextWithTag)
+            ?: throw javax.crypto.AEADBadTagException("Unable to decrypt encrypted value with configured keys")
+    }
+
+    private fun tryDecrypt(key: SecretKey?, nonce: ByteArray, ciphertextWithTag: ByteArray): String? {
+        if (key == null) {
+            return null
+        }
+        return try {
+            String(
+                runCipher(
+                    mode = Cipher.DECRYPT_MODE,
+                    key = key,
+                    nonce = nonce,
+                    bytes = ciphertextWithTag
+                ),
+                Charsets.UTF_8
+            )
+        } catch (_: GeneralSecurityException) {
+            null
+        }
+    }
+
+    private fun runCipher(mode: Int, key: SecretKey, nonce: ByteArray, bytes: ByteArray): ByteArray {
         val cipher = Cipher.getInstance(AES_GCM_TRANSFORMATION)
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, GCMParameterSpec(GCM_TAG_LENGTH_BITS, nonce))
-        return String(cipher.doFinal(ciphertextWithTag), Charsets.UTF_8)
+        cipher.init(mode, key, GCMParameterSpec(GCM_TAG_LENGTH_BITS, nonce))
+        // JCE appends the 16-byte GCM auth tag to the end of the returned byte array when encrypting.
+        return cipher.doFinal(bytes)
     }
 
     /**
@@ -120,14 +152,20 @@ class FieldEncryptionService(private var secretKey: SecretKey?) : AutoCloseable 
      * will not reveal the key.
      */
     override fun close() {
-        val key = secretKey ?: return
-        if (key is Destroyable && !key.isDestroyed) {
-            try {
-                key.destroy()
-            } catch (e: Exception) {
-                log.warn("$LOG_PREFIX:FieldEncryptionService failed to destroy key material: ${e.message}")
-            }
+        destroyIfPossible(activeKey)
+        destroyIfPossible(previousKey)
+        activeKey = null
+        previousKey = null
+    }
+
+    private fun destroyIfPossible(key: SecretKey?) {
+        if (key == null || key.isDestroyed) {
+            return
         }
-        secretKey = null
+        try {
+            key.destroy()
+        } catch (e: Exception) {
+            log.warn("$LOG_PREFIX:FieldEncryptionService failed to destroy key material: ${e.message}")
+        }
     }
 }

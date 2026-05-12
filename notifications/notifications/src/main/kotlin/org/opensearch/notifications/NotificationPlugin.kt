@@ -52,6 +52,7 @@ import org.opensearch.notifications.util.FieldEncryptionService
 import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.plugins.ActionPlugin
 import org.opensearch.plugins.Plugin
+import org.opensearch.plugins.ReloadablePlugin
 import org.opensearch.plugins.SystemIndexPlugin
 import org.opensearch.remote.metadata.client.impl.SdkClientFactory
 import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_ENDPOINT_KEY
@@ -72,7 +73,7 @@ import java.util.function.Supplier
  * Entry point of the OpenSearch Notifications plugin
  * This class initializes the rest handlers.
  */
-class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, SystemIndexPlugin {
+class NotificationPlugin : ActionPlugin, ReloadablePlugin, Plugin(), NotificationCoreExtension, SystemIndexPlugin {
 
     lateinit var clusterService: ClusterService // initialized in createComponents()
 
@@ -221,5 +222,13 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
     override fun setNotificationCore(core: NotificationCore) {
         log.debug("$LOG_PREFIX:setNotificationCore")
         CoreProvider.initialize(core)
+    }
+
+    override fun reload(settings: Settings) {
+        val previousService = runCatching { fieldEncryptionService }.getOrNull()
+        fieldEncryptionService = PluginSettings.buildFieldEncryptionService(settings)
+        ConfigEncryptionTransformer.initialize(fieldEncryptionService)
+        previousService?.close()
+        log.info("$LOG_PREFIX:Field encryption service reloaded from secure settings")
     }
 }

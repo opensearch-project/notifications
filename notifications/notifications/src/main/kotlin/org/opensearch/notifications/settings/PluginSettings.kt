@@ -53,6 +53,12 @@ internal object PluginSettings {
     private const val FIELD_ENCRYPTION_KEY_KEY = "$KEY_PREFIX.field_encryption_key"
 
     /**
+     * Key for the optional previous AES-256 field-encryption keystore entry.
+     * Present only during a key-rotation window.
+     */
+    private const val FIELD_ENCRYPTION_KEY_PREVIOUS_KEY = "$KEY_PREFIX.field_encryption_key_previous"
+
+    /**
      * Operation timeout for network operations.
      */
     private const val OPERATION_TIMEOUT_MS_KEY = "$GENERAL_KEY_PREFIX.operation_timeout_ms"
@@ -189,6 +195,15 @@ internal object PluginSettings {
         null
     )
 
+    /**
+     * Optional secure setting holding the Base64-encoded previous AES-256 key.
+     * Used only as a decrypt fallback while rotating keys.
+     */
+    val FIELD_ENCRYPTION_KEY_PREVIOUS: Setting<SecureString> = SecureSetting.secureString(
+        FIELD_ENCRYPTION_KEY_PREVIOUS_KEY,
+        null
+    )
+
     /** This setting enables multi-tenancy for the remote metadata SDK client */
     val MULTI_TENANCY_ENABLED: Setting<Boolean> = Setting.boolSetting(
         "$REMOTE_METADATA_KEY_PREFIX.multi_tenancy_enabled",
@@ -252,7 +267,8 @@ internal object PluginSettings {
             REMOTE_METADATA_ENDPOINT,
             REMOTE_METADATA_STORE_TYPE,
             REMOTE_METADATA_SERVICE_NAME,
-            FIELD_ENCRYPTION_KEY
+            FIELD_ENCRYPTION_KEY,
+            FIELD_ENCRYPTION_KEY_PREVIOUS
         )
     }
 
@@ -272,16 +288,49 @@ internal object PluginSettings {
      * @return a ready-to-use [FieldEncryptionService].
      */
     fun buildFieldEncryptionService(settings: Settings): FieldEncryptionService {
-        FIELD_ENCRYPTION_KEY.get(settings).use { secureKey ->
+        log.info("$LOG_PREFIX:Building FieldEncryptionService tlongo")
+        val activeKey = decodeAesKeyFromSecureSetting(
+            setting = FIELD_ENCRYPTION_KEY,
+            settingName = FIELD_ENCRYPTION_KEY_KEY,
+            settings = settings,
+            required = false
+        )
+        val previousKey = decodeAesKeyFromSecureSetting(
+            setting = FIELD_ENCRYPTION_KEY_PREVIOUS,
+            settingName = FIELD_ENCRYPTION_KEY_PREVIOUS_KEY,
+            settings = settings,
+            required = false
+        )
+
+        if (activeKey == null) {
+            log.warn(
+                "$LOG_PREFIX:$FIELD_ENCRYPTION_KEY_KEY not found in keystore — " +
+                    "FieldEncryptionService running in passthrough mode"
+            )
+        }
+
+        log.info("$LOG_PREFIX:Building FieldEncryptionService active key: $activeKey")
+        return FieldEncryptionService(activeKey, previousKey)
+    }
+
+    private fun decodeAesKeyFromSecureSetting(
+        setting: Setting<SecureString>,
+        settingName: String,
+        settings: Settings,
+        required: Boolean
+    ): SecretKeySpec? {
+        setting.get(settings).use { secureKey ->
             if (secureKey.length == 0) {
-                log.warn(
-                    "$LOG_PREFIX:$FIELD_ENCRYPTION_KEY_KEY not found in keystore — " +
-                        "FieldEncryptionService running in passthrough mode"
-                )
-                return FieldEncryptionService(null)
+                if (required) {
+                    throw IllegalArgumentException("$LOG_PREFIX:$settingName not found in keystore")
+                }
+                return null
             }
             val keyBytes = Base64.getDecoder().decode(String(secureKey.chars))
-            return FieldEncryptionService(SecretKeySpec(keyBytes, "AES"))
+            require(keyBytes.size == 32) {
+                "$LOG_PREFIX:$settingName must decode to exactly 32 bytes (AES-256)"
+            }
+            return SecretKeySpec(keyBytes, "AES")
         }
     }
 

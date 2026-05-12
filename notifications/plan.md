@@ -29,7 +29,7 @@ A new class in `notifications/util/FieldEncryptionService.kt`:
 - `isEncrypted(value: String): Boolean` — utility for migration checks
 - Zeroizes key material on `close()`; held as a singleton by `NotificationPlugin`
 
-The `enc:v<N>:` sentinel prefix is the key design decision — it enables the transparent migration strategy and key-rotation versioning without any schema changes.
+The `enc:v1:` sentinel prefix is the key design decision — it enables the transparent migration strategy without any schema changes. The `v1` encodes the **encryption format** (AES-256-GCM, 12-byte random IV, 16-byte GCM auth tag, Base64-encoded `IV || ciphertext || tag`). It is **not** a key version; it will only change if the algorithm or binary layout changes in the future.
 
 ---
 
@@ -47,8 +47,9 @@ val FIELD_ENCRYPTION_KEY: Setting<SecureString> =
 3. Instantiate `FieldEncryptionService`; store on the companion object
 
 **Key rotation support:**
-- Implement `ReloadablePlugin` (like `NotificationCorePlugin.reload()`) so `_nodes/reload_secure_settings` hot-rotates the in-memory key
-- Support an optional `opensearch.notifications.field_encryption_key_previous` entry so reads succeed during a rotation window
+- Implement `ReloadablePlugin` (like `NotificationCorePlugin.reload()`) so `_nodes/reload_secure_settings` hot-rotates the in-memory key without a restart
+- Support an optional `opensearch.notifications.field_encryption_key_previous` keystore entry so existing ciphertexts can still be decrypted during the rotation window (see Step 6)
+- There is **no version counter cluster setting**; the `enc:v1:` format prefix is static for this format version and carries no key identity
 
 **Passthrough mode:** If the keystore entry is absent, `FieldEncryptionService` operates as a no-op and emits a `WARN` log. This allows zero-downtime rollout.
 
@@ -98,11 +99,34 @@ When `false`, the transformer is a no-op (safe pre-key-provisioning). Flip to `t
 
 ### Key Rotation
 
-1. Provision `field_encryption_key.v2` on all nodes; call `_nodes/reload_secure_settings` → the in-memory key rotates
-2. Run the `_reencrypt` task — upgrades all ciphertexts from `enc:v1:` → `enc:v2:`
-3. Remove `field_encryption_key.v1` from all node keystores
+Two **fixed** keystore entry names are the sole mechanism for key rotation. The names never change; only the values do.
 
-The `enc:v<N>:` version tag in the ciphertext means `FieldEncryptionService` can try the current key, then the previous key during the rotation window, with no downtime.
+| Keystore Entry | Role |
+|---|---|
+| `opensearch.notifications.field_encryption_key` | **Active key** — used for all new encryptions |
+| `opensearch.notifications.field_encryption_key_previous` | **Previous key** — present only during the rotation window; used for decryption only |
+
+**Rotation steps (zero-downtime):**
+
+1. On every node, set the old key value as `field_encryption_key_previous` and the new key value as `field_encryption_key`.
+2. Call `POST /_nodes/reload_secure_settings` — all nodes now decrypt with either key, encrypt with the new key.
+3. Call `POST /_plugins/_notifications/configs/_reencrypt` — re-saves every config through `decrypt(active or previous) → encrypt(active)`. After this, no ciphertext was produced by the old key.
+4. On every node, remove `field_encryption_key_previous` from the keystore.
+5. Call `POST /_nodes/reload_secure_settings` again — rotation window is closed.
+
+**`FieldEncryptionService` decrypt logic:**
+
+```kotlin
+fun decrypt(value: String): String {
+    if (!isEncrypted(value)) return value   // plaintext pass-through (backward compat)
+    return tryDecrypt(activeKey, value)
+        ?: previousKey?.let { tryDecrypt(it, value) }
+        ?: throw DecryptionException("Decryption failed — check key configuration for config")
+}
+```
+
+No version-to-key mapping is needed. `activeKey` is tried first (common path); `previousKey` is only present during the rotation window. There is no cluster setting to bump and no version tag in the ciphertext that carries key identity — `enc:v1:` is a **format** version only.
+
 
 ### REST Response Masking
 

@@ -141,6 +141,25 @@ internal class FieldEncryptionServiceTests {
             val encrypted = encryptSvc.encrypt("top-secret")
             assertThrows<AEADBadTagException> { decryptSvc.decrypt(encrypted) }
         }
+
+        @Test
+        fun `uses previous key fallback during rotation when active key cannot decrypt`() {
+            val oldKey = generateKey()
+            val newKey = generateKey()
+            val oldService = serviceWith(oldKey)
+            val rotatingService = FieldEncryptionService(newKey, oldKey)
+
+            val encryptedWithOldKey = oldService.encrypt("rotation-secret")
+            assertEquals("rotation-secret", rotatingService.decrypt(encryptedWithOldKey))
+        }
+
+        @Test
+        fun `throws when neither active nor previous key can decrypt`() {
+            val encrypted = serviceWith(generateKey()).encrypt("rotation-secret")
+            val rotatingService = FieldEncryptionService(generateKey(), generateKey())
+
+            assertThrows<AEADBadTagException> { rotatingService.decrypt(encrypted) }
+        }
     }
 
     @Nested

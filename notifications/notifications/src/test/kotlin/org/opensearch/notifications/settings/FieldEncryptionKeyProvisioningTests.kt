@@ -17,10 +17,16 @@ import javax.crypto.KeyGenerator
 internal class FieldEncryptionKeyProvisioningTests {
 
     private val keySettingName = "opensearch.notifications.field_encryption_key"
+    private val previousKeySettingName = "opensearch.notifications.field_encryption_key_previous"
 
     @Test
     fun `FIELD_ENCRYPTION_KEY is included in getAllSettings`() {
         assertTrue(PluginSettings.getAllSettings().contains(PluginSettings.FIELD_ENCRYPTION_KEY))
+    }
+
+    @Test
+    fun `FIELD_ENCRYPTION_KEY_PREVIOUS is included in getAllSettings`() {
+        assertTrue(PluginSettings.getAllSettings().contains(PluginSettings.FIELD_ENCRYPTION_KEY_PREVIOUS))
     }
 
     @Test
@@ -56,6 +62,17 @@ internal class FieldEncryptionKeyProvisioningTests {
         assertTrue(roundTripped == original)
     }
 
+    @Test
+    fun `buildFieldEncryptionService supports active-previous fallback decryption`() {
+        val oldKey = generate256BitKeyBase64()
+        val newKey = generate256BitKeyBase64()
+        val oldService = PluginSettings.buildFieldEncryptionService(settingsWithKey(oldKey))
+        val rotatingService = PluginSettings.buildFieldEncryptionService(settingsWithKeys(newKey, oldKey))
+
+        val encryptedWithOldKey = oldService.encrypt("https://hooks.slack.com/services/OLD")
+        assertTrue(rotatingService.decrypt(encryptedWithOldKey) == "https://hooks.slack.com/services/OLD")
+    }
+
     private fun generate256BitKeyBase64(): String {
         val kg = KeyGenerator.getInstance("AES")
         kg.init(256)
@@ -65,6 +82,13 @@ internal class FieldEncryptionKeyProvisioningTests {
     private fun settingsWithKey(base64Key: String): Settings {
         val secureSettings = MockSecureSettings()
         secureSettings.setString(keySettingName, base64Key)
+        return Settings.builder().setSecureSettings(secureSettings).build()
+    }
+
+    private fun settingsWithKeys(activeBase64Key: String, previousBase64Key: String): Settings {
+        val secureSettings = MockSecureSettings()
+        secureSettings.setString(keySettingName, activeBase64Key)
+        secureSettings.setString(previousKeySettingName, previousBase64Key)
         return Settings.builder().setSecureSettings(secureSettings).build()
     }
 }

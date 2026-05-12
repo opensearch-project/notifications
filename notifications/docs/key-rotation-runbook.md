@@ -1,7 +1,7 @@
 # Notifications Plugin — Field-Encryption Key Rotation Runbook
 
 **Audience:** OpenSearch cluster operators / site-reliability engineers  
-**Last updated:** 2026-04-30  
+**Last updated:** 2026-05-11  
 **Estimated downtime:** Zero (rolling procedure)
 
 ---
@@ -9,20 +9,32 @@
 ## Background
 
 Sensitive channel-configuration fields (e.g. webhook URLs, API tokens) are
-encrypted at rest with AES-256-GCM. Every ciphertext is tagged with the key
-version that produced it:
+encrypted at rest with AES-256-GCM. Every ciphertext carries a **format
+version** sentinel — not a key version:
 
 ```
-enc:v<N>:<Base64(nonce || ciphertext || GCM-tag)>
+enc:v1:<Base64(nonce || ciphertext || GCM-tag)>
 ```
 
-Three keystore / cluster settings drive the feature:
+`v1` identifies the encryption format (AES-256-GCM, 12-byte random IV,
+16-byte GCM auth tag). It is **not** tied to which key produced the
+ciphertext and will only change if the algorithm or binary layout changes.
+
+Key selection at decrypt time is purely positional:
+
+1. Try the **active key** (`opensearch.notifications.field_encryption_key`).
+2. If that fails, try the **previous key** (`opensearch.notifications.field_encryption_key_previous`) — present only during a rotation window.
+3. If neither succeeds, raise a decryption error (logged with config ID, never values).
+
+There is **no version counter** cluster setting. The operator never needs to
+know or record "the current version number".
+
+Two keystore settings drive the feature:
 
 | Setting | Type | Description |
 |---|---|---|
 | `opensearch.notifications.field_encryption_key` | Secure (keystore) | Current AES-256 key — used for all new encryptions |
-| `opensearch.notifications.field_encryption_key_previous` | Secure (keystore) | Previous AES-256 key — kept during the rotation window so old ciphertexts can still be decrypted |
-| `opensearch.notifications.field_encryption_key_version` | `integer` (cluster setting) | Version number stamped on newly-written ciphertexts. Increment by 1 on every rotation |
+| `opensearch.notifications.field_encryption_key_previous` | Secure (keystore) | Previous AES-256 key — present only during the rotation window |
 
 ---
 
@@ -31,9 +43,6 @@ Three keystore / cluster settings drive the feature:
 * `opensearch-keystore` is available on every data / coordinator node.
 * You have shell access to every node (or an automation layer such as Ansible /
   Kubernetes secrets).
-* You know the current key version **N** (visible via
-  `GET _cluster/settings?include_defaults=true` → look for
-  `opensearch.notifications.field_encryption_key_version`; default is `1`).
 * You have generated a new 256-bit AES key:
 
   ```bash
@@ -49,14 +58,16 @@ Three keystore / cluster settings drive the feature:
 ## Phase 0 — Verify the current state
 
 ```bash
-# Check current version (should equal N)
-curl -s -u admin:password https://localhost:9200/_cluster/settings?include_defaults=true \
-  | python3 -m json.tool \
-  | grep field_encryption_key_version
+# Confirm encryption is enabled and the plugin is running normally
+curl -s -u admin:password \
+  https://localhost:9200/_plugins/_notifications/configs \
+  | python3 -m json.tool
 
-# Confirm the plugin is running in encryption mode on at least one node:
-# Any notification-channel read/write in the audit log should show enc:vN: prefixes
-# on sensitive fields.
+# Spot-check that newly written configs carry the enc:v1: prefix
+# (visible in the raw index document, not the decrypted API response)
+curl -s -u admin:password \
+  'https://localhost:9200/.opensearch-notifications-config/_search?size=1' \
+  | python3 -m json.tool | grep enc
 ```
 
 ---
@@ -67,27 +78,27 @@ Perform the following steps **on each node, one at a time**, before reloading
 settings. The cluster remains fully operational throughout.
 
 ```bash
-# 1a. Write the NEW key as the current key
-echo "<NEW_BASE64_KEY>" | \
-  opensearch-keystore add -x -f opensearch.notifications.field_encryption_key
-
-# 1b. Write the OLD (current) key as the previous key so existing
-#     ciphertexts tagged enc:vN: can still be decrypted during the window
+# 1a. Promote the CURRENT active key to "previous" so existing
+#     ciphertexts can still be decrypted during the rotation window
 echo "<OLD_BASE64_KEY>" | \
   opensearch-keystore add -x -f opensearch.notifications.field_encryption_key_previous
+
+# 1b. Set the NEW key as the active key
+echo "<NEW_BASE64_KEY>" | \
+  opensearch-keystore add -x -f opensearch.notifications.field_encryption_key
 ```
 
 > **Tip — automated via Ansible:**
 > ```yaml
-> - name: Set new encryption key
->   opensearch_keystore:
->     name: opensearch.notifications.field_encryption_key
->     value: "{{ new_field_encryption_key }}"
->
-> - name: Set previous encryption key
+> - name: Set previous encryption key (old active value)
 >   opensearch_keystore:
 >     name: opensearch.notifications.field_encryption_key_previous
 >     value: "{{ old_field_encryption_key }}"
+>
+> - name: Set new active encryption key
+>   opensearch_keystore:
+>     name: opensearch.notifications.field_encryption_key
+>     value: "{{ new_field_encryption_key }}"
 > ```
 
 Repeat for every node in the cluster before moving to Phase 2.
@@ -110,40 +121,17 @@ curl -s -X POST -u admin:password \
 **Expected response:** every node reports `"successful": true` with no failures.
 
 At this point every node has loaded:
-- New key → used for encryption (still writing `enc:v**N**:` until Phase 3)
-- Old key → available to decrypt existing `enc:v**N**:` values
+- **Active key** (new value) → used for all new encryptions
+- **Previous key** (old value) → used to decrypt existing ciphertexts only
+
+No version counter needs to be bumped. New writes immediately use the new key.
 
 ---
 
-## Phase 3 — Increment the version number
+## Phase 3 — Re-encrypt existing ciphertexts
 
-Bump the version counter to **N+1** so that all new writes use the new key:
-
-```bash
-curl -s -X PUT -u admin:password \
-  https://localhost:9200/_cluster/settings \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "persistent": {
-      "opensearch.notifications.field_encryption_key_version": <N+1>
-    }
-  }' \
-  | python3 -m json.tool
-```
-
-**Verification:** create or update a notification channel and confirm the
-stored ciphertext now carries the `enc:v<N+1>:` prefix.
-
-From this moment forward, all **new** writes use `enc:v<N+1>:` (new key) while
-all **reads** can still decrypt `enc:v<N>:` values (old key, still registered
-as `field_encryption_key_previous`).
-
----
-
-## Phase 4 — Re-encrypt existing ciphertexts (migration)
-
-Migrate all stored ciphertexts from version N to N+1 by calling the
-re-encryption admin endpoint:
+Migrate all stored ciphertexts to the new key by calling the re-encryption
+admin endpoint:
 
 ```bash
 curl -s -X POST -u admin:password \
@@ -154,57 +142,14 @@ curl -s -X POST -u admin:password \
 Monitor progress — the endpoint returns counts of migrated and failed records.
 Re-run the call until `"remaining": 0`.
 
-> **Note:** The endpoint is idempotent. Already-migrated `enc:v<N+1>:` values
-> are skipped automatically.
+> **Note:** The endpoint is idempotent. Ciphertexts that can already be
+> decrypted by the active key are skipped automatically.
 
 **Verification:**
 
 ```bash
-# No enc:vN: values should remain in any channel config
-curl -s -u admin:password \
-  https://localhost:9200/_plugins/_notifications/configs \
-  | grep -c "enc:v${N}:"
-# Expected output: 0
-```
-
----
-
-## Phase 5 — Remove the previous key from every node
-
-Once `"remaining": 0`, the old key is no longer needed. Remove it from every
-node's keystore:
-
-```bash
-opensearch-keystore remove opensearch.notifications.field_encryption_key_previous
-```
-
-Reload secure settings again to make the removal effective:
-
-```bash
-curl -s -X POST -u admin:password \
-  https://localhost:9200/_nodes/reload_secure_settings \
-  -H 'Content-Type: application/json' \
-  -d '{}' \
-  | python3 -m json.tool
-```
-
----
-
-## Phase 6 — Post-rotation verification
-
-```bash
-# 1. Confirm version is N+1
-curl -s -u admin:password \
-  https://localhost:9200/_cluster/settings?include_defaults=true \
-  | python3 -m json.tool | grep field_encryption_key_version
-
-# 2. Confirm no old-version ciphertexts remain
-curl -s -u admin:password \
-  https://localhost:9200/_plugins/_notifications/configs \
-  | grep -c "enc:v${N}:"
-# Expected: 0
-
-# 3. Round-trip test — create a channel, read it back, delete it
+# Create + read back a test channel — a round-trip success means the
+# active key is working correctly.
 CHANNEL_ID=$(curl -s -X POST -u admin:password \
   https://localhost:9200/_plugins/_notifications/configs \
   -H 'Content-Type: application/json' \
@@ -226,19 +171,69 @@ curl -s -X DELETE -u admin:password \
 
 ---
 
+## Phase 4 — Remove the previous key from every node
+
+Once `"remaining": 0`, the old key is no longer needed. Remove it from every
+node's keystore:
+
+```bash
+opensearch-keystore remove opensearch.notifications.field_encryption_key_previous
+```
+
+Reload secure settings again to close the rotation window:
+
+```bash
+curl -s -X POST -u admin:password \
+  https://localhost:9200/_nodes/reload_secure_settings \
+  -H 'Content-Type: application/json' \
+  -d '{}' \
+  | python3 -m json.tool
+```
+
+---
+
+## Phase 5 — Post-rotation verification
+
+```bash
+# 1. Round-trip test — create, read, delete a channel
+CHANNEL_ID=$(curl -s -X POST -u admin:password \
+  https://localhost:9200/_plugins/_notifications/configs \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "config": {
+      "name": "post-rotation-test",
+      "config_type": "webhook",
+      "webhook": { "url": "https://example.com/post-rotation-probe" }
+    }
+  }' | python3 -m json.tool | grep '"config_id"' | awk -F'"' '{print $4}')
+
+curl -s -u admin:password \
+  https://localhost:9200/_plugins/_notifications/configs/${CHANNEL_ID} \
+  | python3 -m json.tool
+
+curl -s -X DELETE -u admin:password \
+  https://localhost:9200/_plugins/_notifications/configs/${CHANNEL_ID}
+
+# 2. Confirm there are no decryption errors in the plugin log
+grep -i "decryption failed" /path/to/opensearch/logs/opensearch.log | tail -20
+```
+
+---
+
 ## Rollback procedure
 
-If any phase fails **before Phase 3** (version bump), the cluster is still
-operating on version N and no data has been re-encrypted. Rollback is safe:
+**Before Phase 3** (re-encrypt not yet run): no existing ciphertext has been
+re-encrypted, so rollback is safe:
 
-1. Remove `opensearch.notifications.field_encryption_key_previous` from every
-   node's keystore.
-2. Restore the old key to `opensearch.notifications.field_encryption_key`.
-3. Call `POST /_nodes/reload_secure_settings`.
+1. On every node, restore the old key to `field_encryption_key` and remove
+   `field_encryption_key_previous`.
+2. Call `POST /_nodes/reload_secure_settings`.
 
-If the failure occurs **after Phase 3**, the rotation window is active (both
-keys are registered). Do **not** remove `field_encryption_key_previous` until
-re-encryption is complete or reversed.
+**After Phase 3** (re-encryption complete or in progress): both keys are still
+registered. Do **not** remove `field_encryption_key_previous` until
+re-encryption is confirmed complete. To roll back, swap the keys (restore old
+as `field_encryption_key`, set new as `field_encryption_key_previous`), reload
+settings, and re-run `_reencrypt` to bring all ciphertexts back to the old key.
 
 ---
 
@@ -246,13 +241,12 @@ re-encryption is complete or reversed.
 
 | Step | Command / Action | Done |
 |------|-----------------|------|
-| 0 | Verify current version N and generate new key | ☐ |
-| 1 | Provision new + old key on **all** nodes | ☐ |
+| 0 | Verify current state; generate new key | ☐ |
+| 1 | Provision new active key + old previous key on **all** nodes | ☐ |
 | 2 | `POST /_nodes/reload_secure_settings` | ☐ |
-| 3 | Bump `field_encryption_key_version` to N+1 | ☐ |
-| 4 | `POST /_plugins/_notifications/configs/_reencrypt` until `remaining == 0` | ☐ |
-| 5 | Remove `field_encryption_key_previous` from all nodes + reload | ☐ |
-| 6 | Post-rotation verification | ☐ |
+| 3 | `POST /_plugins/_notifications/configs/_reencrypt` until `remaining == 0` | ☐ |
+| 4 | Remove `field_encryption_key_previous` from all nodes + reload | ☐ |
+| 5 | Post-rotation verification | ☐ |
 
 ---
 
@@ -260,8 +254,7 @@ re-encryption is complete or reversed.
 
 | Symptom | Likely cause | Remedy |
 |---------|-------------|--------|
-| `IllegalArgumentException: no key registered for version N` in logs | Node reloaded before both keystore entries were present | Re-add `field_encryption_key_previous` on the affected node and reload |
-| `AEADBadTagException` on read | Keystore entry was corrupted or wrong key was stored | Restore the correct Base64 key bytes and reload |
-| `_reencrypt` endpoint returns failures | Some records have an unknown version tag | Check plugin logs for the offending version number; register the matching key |
-| Version counter did not advance | Cluster-settings update was rejected | Check for validation errors; version must be ≥ 1 and an integer |
-
+| `DecryptionException: Decryption failed` in logs | Active key does not match the key that produced the ciphertext, and no `_previous` key is registered | Check that `field_encryption_key` holds the correct value; if mid-rotation, ensure `field_encryption_key_previous` is also set and reload |
+| `AEADBadTagException` on read | Keystore entry was corrupted or wrong key bytes were stored | Restore the correct Base64 key bytes and reload |
+| `_reencrypt` endpoint returns failures | Some records could not be decrypted by either key | Check plugin logs for the offending config ID; register the matching key as `field_encryption_key_previous` and retry |
+| Node reloaded but still failing | Keystore entries were set on some nodes but not all | Re-verify all nodes; re-run `_nodes/reload_secure_settings` after all nodes are updated |

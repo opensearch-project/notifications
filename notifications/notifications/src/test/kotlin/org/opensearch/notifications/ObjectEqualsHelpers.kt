@@ -39,6 +39,8 @@ fun verifyEquals(chime: Chime, jsonObject: JsonObject, isEncrypted: Boolean = fa
 }
 
 fun verifyEquals(microsoftTeams: MicrosoftTeams, jsonObject: JsonObject, isEncrypted: Boolean = false) {
+    println("tomboy ${jsonObject.get("url").asString}")
+    println("tomboy microsoftTeams ${microsoftTeams.url}")
     if (isEncrypted) {
         Assert.assertTrue(jsonObject.get("url").asString.startsWith("enc:"))
     } else {
