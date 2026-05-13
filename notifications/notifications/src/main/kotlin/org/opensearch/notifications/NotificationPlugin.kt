@@ -57,9 +57,11 @@ import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_REGION_
 import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_SERVICE_NAME_KEY
 import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_TYPE_KEY
 import org.opensearch.remote.metadata.common.CommonValue.TENANT_AWARE_KEY
+import org.opensearch.remote.metadata.common.CommonValue.TENANT_ID_FIELD_KEY
 import org.opensearch.repositories.RepositoriesService
 import org.opensearch.rest.RestController
 import org.opensearch.rest.RestHandler
+import org.opensearch.rest.RestHeaderDefinition
 import org.opensearch.script.ScriptService
 import org.opensearch.threadpool.ThreadPool
 import org.opensearch.transport.client.Client
@@ -84,6 +86,7 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
 
         // Other global constants
         const val TEXT_QUERY_TAG = "text_query"
+        const val TENANT_ID_HEADER = "x-tenant-id"
     }
 
     /**
@@ -92,6 +95,13 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
     override fun getSettings(): List<Setting<*>> {
         log.debug("$LOG_PREFIX:getSettings")
         return PluginSettings.getAllSettings()
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun getRestHeaders(): Collection<RestHeaderDefinition> {
+        return listOf(RestHeaderDefinition(TENANT_ID_HEADER, false))
     }
 
     override fun getSystemIndexDescriptors(settings: Settings?): Collection<SystemIndexDescriptor> {
@@ -130,7 +140,8 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
                 REMOTE_METADATA_ENDPOINT_KEY to REMOTE_METADATA_ENDPOINT.get(settings),
                 REMOTE_METADATA_REGION_KEY to REMOTE_METADATA_REGION.get(settings),
                 REMOTE_METADATA_SERVICE_NAME_KEY to REMOTE_METADATA_SERVICE_NAME.get(settings),
-                TENANT_AWARE_KEY to MULTI_TENANCY_ENABLED.get(settings).toString()
+                TENANT_AWARE_KEY to MULTI_TENANCY_ENABLED.get(settings).toString(),
+                TENANT_ID_FIELD_KEY to "tenant_id"
             ),
             client.threadPool().executor(ThreadPool.Names.GENERIC)
         )

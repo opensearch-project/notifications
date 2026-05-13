@@ -6,7 +6,7 @@
 
 buildscript {
     ext {
-        opensearch_version = System.getProperty("opensearch.version", "3.6.0-SNAPSHOT")
+        opensearch_version = System.getProperty("opensearch.version", "3.7.0-SNAPSHOT")
         isSnapshot = "true" == System.getProperty("build.snapshot", "true")
         buildVersionQualifier = System.getProperty("build.version_qualifier", "")
         // 3.0.0-SNAPSHOT -> 3.0.0.0-SNAPSHOT
@@ -121,6 +121,12 @@ task ktlintFormat(type: JavaExec, group: "formatting") {
     args "-F", "notifications/**/*.kt", "core/**/*.kt", "core-spi/**/*.kt"
     // https://github.com/pinterest/ktlint/issues/1391
     jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED"
+}
+
+project(':opensearch-notifications-core') {
+    tasks.matching { it.name == 'generatePomFileForPluginZipPublication' }.configureEach {
+        mustRunAfter 'publishNebulaPublicationToMavenLocal'
+    }
 }
 
 detekt {
