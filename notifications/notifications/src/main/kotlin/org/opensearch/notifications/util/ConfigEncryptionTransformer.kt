@@ -25,6 +25,25 @@ object ConfigEncryptionTransformer {
         return transform(config, fieldEncryptionService::decrypt)
     }
 
+    /**
+     * Returns `true` if any encrypted field in [config] was produced by a previous key
+     * and therefore needs to be re-encrypted with the current active key.
+     */
+    fun needsReencryption(config: NotificationConfig): Boolean {
+        return when (config.configType) {
+            ConfigType.SLACK,
+            ConfigType.MATTERMOST -> fieldEncryptionService.needsReencryption((config.configData as Slack).url)
+            ConfigType.CHIME -> fieldEncryptionService.needsReencryption((config.configData as Chime).url)
+            ConfigType.MICROSOFT_TEAMS -> fieldEncryptionService.needsReencryption((config.configData as MicrosoftTeams).url)
+            ConfigType.WEBHOOK -> {
+                val webhook = config.configData as Webhook
+                fieldEncryptionService.needsReencryption(webhook.url) ||
+                    webhook.headerParams.values.any { fieldEncryptionService.needsReencryption(it) }
+            }
+            else -> false
+        }
+    }
+
     private fun transform(config: NotificationConfig, transformString: (String) -> String): NotificationConfig {
         val transformedData = when (config.configType) {
             ConfigType.SLACK,

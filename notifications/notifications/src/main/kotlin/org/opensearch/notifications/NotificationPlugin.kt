@@ -28,6 +28,7 @@ import org.opensearch.notifications.action.GetChannelListAction
 import org.opensearch.notifications.action.GetNotificationConfigAction
 import org.opensearch.notifications.action.GetPluginFeaturesAction
 import org.opensearch.notifications.action.PublishNotificationAction
+import org.opensearch.notifications.action.ReencryptNotificationConfigsAction
 import org.opensearch.notifications.action.SendNotificationAction
 import org.opensearch.notifications.action.SendTestNotificationAction
 import org.opensearch.notifications.action.UpdateNotificationConfigAction
@@ -36,6 +37,7 @@ import org.opensearch.notifications.index.NotificationConfigIndex
 import org.opensearch.notifications.resthandler.NotificationChannelListRestHandler
 import org.opensearch.notifications.resthandler.NotificationConfigRestHandler
 import org.opensearch.notifications.resthandler.NotificationFeaturesRestHandler
+import org.opensearch.notifications.resthandler.ReencryptNotificationConfigsRestHandler
 import org.opensearch.notifications.resthandler.SendTestMessageRestHandler
 import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.send.SendMessageActionHelper
@@ -193,6 +195,10 @@ class NotificationPlugin : ActionPlugin, ReloadablePlugin, Plugin(), Notificatio
             ActionPlugin.ActionHandler(
                 NotificationsActions.LEGACY_PUBLISH_NOTIFICATION_ACTION_TYPE,
                 PublishNotificationAction::class.java
+            ),
+            ActionPlugin.ActionHandler(
+                ReencryptNotificationConfigsAction.ACTION_TYPE,
+                ReencryptNotificationConfigsAction::class.java
             )
         )
     }
@@ -214,7 +220,8 @@ class NotificationPlugin : ActionPlugin, ReloadablePlugin, Plugin(), Notificatio
             NotificationConfigRestHandler(),
             NotificationFeaturesRestHandler(),
             NotificationChannelListRestHandler(),
-            SendTestMessageRestHandler()
+            SendTestMessageRestHandler(),
+            ReencryptNotificationConfigsRestHandler()
             // NotificationStatsRestHandler()
         )
     }

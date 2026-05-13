@@ -63,6 +63,32 @@ class FieldEncryptionService(
     fun isEncrypted(value: String): Boolean = value.startsWith(ENCRYPTED_PREFIX)
 
     /**
+     * Returns `true` when [value] is an encrypted ciphertext that cannot be
+     * decrypted by the current [activeKey] alone — i.e. it was produced by a
+     * previous key and therefore needs to be re-encrypted during key rotation.
+     *
+     * Returns `false` if:
+     * - the value is not encrypted (no `enc:v1:` prefix), or
+     * - the active key can already decrypt it (no re-encryption needed), or
+     * - there is no active key configured (passthrough mode).
+     */
+    fun needsReencryption(value: String): Boolean {
+        if (!isEncrypted(value)) return false
+        activeKey ?: return false
+
+        return try {
+            val combined = Base64.getDecoder().decode(value.removePrefix(ENCRYPTED_PREFIX))
+            val nonce = combined.copyOfRange(0, GCM_NONCE_LENGTH_BYTES)
+            val ciphertextWithTag = combined.copyOfRange(GCM_NONCE_LENGTH_BYTES, combined.size)
+            tryDecrypt(activeKey, nonce, ciphertextWithTag) == null
+        } catch (_: Exception) {
+            // Malformed Base64 or other decode error – treat as needing re-encryption so
+            // the caller has a chance to surface the error during the update attempt.
+            true
+        }
+    }
+
+    /**
      * Encrypts [plaintext] with AES-256-GCM using a freshly generated random nonce
      * on every call (so identical inputs produce different ciphertexts).
      *

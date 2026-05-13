@@ -83,6 +83,7 @@ internal object NotificationConfigIndex : ConfigOperations {
     private lateinit var client: Client
     private lateinit var clusterService: ClusterService
     private lateinit var sdkClient: SdkClient
+
     private lateinit var configEncryptionTransformer: ConfigEncryptionTransformer
 
     private val searchHitParser = object : SearchResults.SearchHitParser<NotificationConfigInfo> {
@@ -94,12 +95,11 @@ internal object NotificationConfigIndex : ConfigOperations {
             )
             parser.nextToken()
             val doc = NotificationConfigDoc.parse(parser)
-            val decryptedConfig = configEncryptionTransformer.decryptConfig(doc.config)
             return NotificationConfigInfo(
                 searchHit.id,
                 doc.metadata.lastUpdateTime,
                 doc.metadata.createdTime,
-                decryptedConfig
+                doc.config
             )
         }
     }
@@ -189,8 +189,6 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     override suspend fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String?): String? {
         createIndex()
-        val foo = configEncryptionTransformer.encryptConfig(configDoc.config)
-        log.info("tomboy Encrypted config: $foo")
         val postRequest = PutDataObjectRequest.builder()
             .index(INDEX_NAME)
             .dataObject({ builder, params -> configDoc.copy(config = configEncryptionTransformer.encryptConfig(configDoc.config)).toXContent(builder, params) })
@@ -199,12 +197,9 @@ internal object NotificationConfigIndex : ConfigOperations {
             postRequest.id(id)
         }
 
-        log.info("tomboy request: ${postRequest.build().dataObject()}")
-
         val response: IndexResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
             sdkClient.putDataObjectAsync(postRequest.build()).whenComplete(it)
         }
-        log.info("tomboy response: $response")
         return if (response.result != DocWriteResponse.Result.CREATED) {
             log.warn("$LOG_PREFIX:createNotificationConfig - response:$response")
             null
@@ -304,6 +299,44 @@ internal object NotificationConfigIndex : ConfigOperations {
                 " retCount:${result.objectList.size}, totalCount:${result.totalHits}"
         )
         return result
+    }
+
+    /**
+     * Pages through all raw (encrypted) [NotificationConfigDocInfo] documents without
+     * applying field decryption. Used exclusively during key rotation to re-encrypt
+     * existing ciphertexts with the current active key.
+     *
+     * @param from zero-based offset into the result set
+     * @param size maximum number of documents to return in this page
+     * @return a pair of (page of raw documents, total document count in the index)
+     */
+    suspend fun getAllRawNotificationConfigs(from: Int, size: Int): Pair<List<NotificationConfigDocInfo>, Long> {
+        createIndex()
+        val sourceBuilder = SearchSourceBuilder()
+            .timeout(TimeValue(PluginSettings.operationTimeoutMs, TimeUnit.MILLISECONDS))
+            .size(size)
+            .from(from)
+        val searchRequest = SearchDataObjectRequest.builder()
+            .indices(INDEX_NAME)
+            .searchSourceBuilder(sourceBuilder)
+            .build()
+        val response: SearchResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+            sdkClient.searchDataObjectAsync(searchRequest).whenComplete(it)
+        }
+        val docs = response.hits.hits.mapNotNull { hit ->
+            val parser = XContentType.JSON.xContent().createParser(
+                NamedXContentRegistry.EMPTY,
+                LoggingDeprecationHandler.INSTANCE,
+                hit.sourceAsString
+            )
+            parser.nextToken()
+            val doc = NotificationConfigDoc.parse(parser)
+            val info = DocInfo(id = hit.id, version = hit.version, seqNo = hit.seqNo, primaryTerm = hit.primaryTerm)
+            NotificationConfigDocInfo(info, doc)
+        }
+        val totalHits = response.hits.totalHits?.value ?: 0L
+        log.info("$LOG_PREFIX:getAllRawNotificationConfigs from:$from, size:$size, returned:${docs.size}, total:$totalHits")
+        return Pair(docs, totalHits)
     }
 
     /**
