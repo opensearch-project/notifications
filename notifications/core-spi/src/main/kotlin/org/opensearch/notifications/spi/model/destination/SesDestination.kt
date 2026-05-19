@@ -17,7 +17,8 @@ class SesDestination(
     val awsRegion: String,
     val roleArn: String?,
     val fromAddress: String,
-    val recipient: String
+    val recipient: String,
+    val applicationId: String? = null
 ) : BaseDestination(DestinationType.SES) {
 
     init {

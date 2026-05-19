@@ -567,7 +567,8 @@ object SendMessageActionHelper {
             sesAccount.awsRegion,
             sesAccount.roleArn,
             sesAccount.fromAddress,
-            recipient
+            recipient,
+            NotificationRequestContext.getApplicationId()
         )
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return EmailRecipientStatus(
