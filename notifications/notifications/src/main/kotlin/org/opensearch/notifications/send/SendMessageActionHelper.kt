@@ -228,19 +228,30 @@ object SendMessageActionHelper {
             return eventStatus.copy(deliveryStatus = invalidStatus)
         }
 
-        val decryptedConfig = configEncryptionTransformer.decryptConfig(channel.configDoc.config)
         val response = when (configType) {
             ConfigType.NONE -> null
-            ConfigType.SLACK -> sendSlackMessage(decryptedConfig.configData as Slack, message, eventStatus, eventSource.referenceId)
-            ConfigType.MATTERMOST -> sendSlackMessage(configData as Slack, message, eventStatus, eventSource.referenceId)
-            ConfigType.CHIME -> sendChimeMessage(decryptedConfig.configData as Chime, message, eventStatus, eventSource.referenceId)
-            ConfigType.MICROSOFT_TEAMS -> sendMicrosoftTeamsMessage(decryptedConfig.configData as MicrosoftTeams, message, eventStatus, eventSource.referenceId)
+            ConfigType.SLACK -> sendSlackMessage(
+                configEncryptionTransformer.decryptConfig(channel.configDoc.config).configData as Slack,
+                message,
+                eventStatus,
+                eventSource.referenceId)
+            ConfigType.CHIME -> sendChimeMessage(
+                configEncryptionTransformer.decryptConfig(channel.configDoc.config).configData as Chime,
+                message,
+                eventStatus,
+                eventSource.referenceId)
+            ConfigType.MICROSOFT_TEAMS -> sendMicrosoftTeamsMessage(
+                configEncryptionTransformer.decryptConfig(channel.configDoc.config).configData as MicrosoftTeams,
+                message,
+                eventStatus,
+                eventSource.referenceId)
             ConfigType.WEBHOOK -> sendWebhookMessage(
-                decryptedConfig.configData as Webhook,
+                configEncryptionTransformer.decryptConfig(channel.configDoc.config).configData as Webhook,
                 message,
                 eventStatus,
                 eventSource.referenceId
             )
+            ConfigType.MATTERMOST -> sendSlackMessage(configData as Slack, message, eventStatus, eventSource.referenceId)
             ConfigType.EMAIL -> sendEmailMessage(
                 user,
                 configData as Email,
@@ -254,6 +265,7 @@ object SendMessageActionHelper {
             ConfigType.EMAIL_GROUP -> null
             ConfigType.SNS -> sendSNSMessage(configData as Sns, message, eventStatus, eventSource.referenceId)
         }
+
         return if (response == null) {
             log.warn("Cannot send message to destination for config id :${channel.docInfo.id}")
             Metrics.NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND.counter.increment()
