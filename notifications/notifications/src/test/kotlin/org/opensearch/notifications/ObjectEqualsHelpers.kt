@@ -130,18 +130,18 @@ fun verifyEquals(config: NotificationConfig, jsonObject: JsonObject) {
 
 fun verifySingleConfigEquals(
     configId: String,
-    config: NotificationConfig,
-    jsonObject: JsonObject,
+    expectedConfig: NotificationConfig,
+    actualConfigInfoResponse: JsonObject,
     totalHits: Int = -1
 ) {
     if (totalHits >= 0) {
-        Assert.assertEquals(totalHits, jsonObject.get("total_hits").asInt)
+        Assert.assertEquals(totalHits, actualConfigInfoResponse.get("total_hits").asInt)
     }
-    val items = jsonObject.get("config_list").asJsonArray
+    val items = actualConfigInfoResponse.get("config_list").asJsonArray
     Assert.assertEquals(1, items.size())
     val getResponseItem = items[0].asJsonObject
     Assert.assertEquals(configId, getResponseItem.get("config_id").asString)
-    verifyEquals(config, getResponseItem.get("config").asJsonObject)
+    verifyEquals(expectedConfig, getResponseItem.get("config").asJsonObject)
 }
 
 fun verifySingleConfigIdEquals(configId: String, jsonObject: JsonObject, totalHits: Int = -1) {

@@ -9,9 +9,12 @@ import org.opensearch.action.ActionType
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.common.inject.Inject
 import org.opensearch.commons.authuser.User
+import org.opensearch.commons.notifications.action.GetNotificationConfigRequest
 import org.opensearch.commons.utils.logger
 import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.index.NotificationConfigIndex
+import org.opensearch.notifications.model.DocMetadata
+import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.model.ReencryptNotificationConfigsRequest
 import org.opensearch.notifications.model.ReencryptNotificationConfigsResponse
 import org.opensearch.notifications.util.ConfigEncryptionTransformer
@@ -57,18 +60,26 @@ internal class ReencryptNotificationConfigsAction @Inject constructor(
         var from = 0
 
         while (true) {
-            val (docs, total) = NotificationConfigIndex.getAllRawNotificationConfigs(from, PAGE_SIZE)
+            val result = NotificationConfigIndex.getAllNotificationConfigs(
+                access = emptyList(),
+                request = GetNotificationConfigRequest(fromIndex = from, maxItems = PAGE_SIZE)
+            )
+            val docs = result.objectList
+            val total = result.totalHits
             if (docs.isEmpty()) break
 
-            for (docInfo in docs) {
-                val id = docInfo.docInfo.id ?: continue
-                val rawConfig = docInfo.configDoc.config
+            for (configInfo in docs) {
+                val id = configInfo.configId
+                val config = configInfo.notificationConfig
                 try {
-                    if (ConfigEncryptionTransformer.needsReencryption(rawConfig)) {
+                    if (ConfigEncryptionTransformer.needsReencryption(config)) {
                         // Decrypt using the current service (active key + previous key fallback),
                         // then write back — updateNotificationConfig will re-encrypt with the active key.
-                        val decryptedConfig = ConfigEncryptionTransformer.decryptConfig(rawConfig)
-                        val updatedDoc = docInfo.configDoc.copy(config = decryptedConfig)
+                        val decryptedConfig = ConfigEncryptionTransformer.decryptConfig(config)
+                        val updatedDoc = NotificationConfigDoc(
+                            DocMetadata(configInfo.lastUpdatedTime, configInfo.createdTime, emptyList()),
+                            decryptedConfig
+                        )
                         if (NotificationConfigIndex.updateNotificationConfig(id, updatedDoc)) {
                             log.debug("$LOG_PREFIX:ReencryptNotificationConfigs migrated config $id")
                             migrated++

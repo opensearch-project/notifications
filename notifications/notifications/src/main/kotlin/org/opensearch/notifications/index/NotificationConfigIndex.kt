@@ -302,44 +302,6 @@ internal object NotificationConfigIndex : ConfigOperations {
     }
 
     /**
-     * Pages through all raw (encrypted) [NotificationConfigDocInfo] documents without
-     * applying field decryption. Used exclusively during key rotation to re-encrypt
-     * existing ciphertexts with the current active key.
-     *
-     * @param from zero-based offset into the result set
-     * @param size maximum number of documents to return in this page
-     * @return a pair of (page of raw documents, total document count in the index)
-     */
-    suspend fun getAllRawNotificationConfigs(from: Int, size: Int): Pair<List<NotificationConfigDocInfo>, Long> {
-        createIndex()
-        val sourceBuilder = SearchSourceBuilder()
-            .timeout(TimeValue(PluginSettings.operationTimeoutMs, TimeUnit.MILLISECONDS))
-            .size(size)
-            .from(from)
-        val searchRequest = SearchDataObjectRequest.builder()
-            .indices(INDEX_NAME)
-            .searchSourceBuilder(sourceBuilder)
-            .build()
-        val response: SearchResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-            sdkClient.searchDataObjectAsync(searchRequest).whenComplete(it)
-        }
-        val docs = response.hits.hits.mapNotNull { hit ->
-            val parser = XContentType.JSON.xContent().createParser(
-                NamedXContentRegistry.EMPTY,
-                LoggingDeprecationHandler.INSTANCE,
-                hit.sourceAsString
-            )
-            parser.nextToken()
-            val doc = NotificationConfigDoc.parse(parser)
-            val info = DocInfo(id = hit.id, version = hit.version, seqNo = hit.seqNo, primaryTerm = hit.primaryTerm)
-            NotificationConfigDocInfo(info, doc)
-        }
-        val totalHits = response.hits.totalHits?.value ?: 0L
-        log.info("$LOG_PREFIX:getAllRawNotificationConfigs from:$from, size:$size, returned:${docs.size}, total:$totalHits")
-        return Pair(docs, totalHits)
-    }
-
-    /**
      * {@inheritDoc}
      */
     override suspend fun updateNotificationConfig(id: String, notificationConfigDoc: NotificationConfigDoc): Boolean {
