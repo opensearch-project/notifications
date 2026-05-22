@@ -471,9 +471,11 @@ object SendMessageActionHelper {
         val groupRecipients = groups.map { (it.configDoc.config.configData as EmailGroup).recipients }.flatten()
         val recipients = email.recipients.union(groupRecipients)
         val accountConfig = accountDocInfo.configDoc.config
+        // Re-propagate the application id (set by sendMessagesInParallel) to the per-recipient children.
+        val appIdContext = NotificationRequestContext.threadLocal().asContextElement()
         val emailRecipientStatus: List<EmailRecipientStatus> = coroutineScope {
             val statusDeferredList = recipients.map {
-                async(Dispatchers.IO) {
+                async(Dispatchers.IO + appIdContext) {
                     when (accountConfig.configType) {
                         ConfigType.SMTP_ACCOUNT -> sendEmailFromSmtpAccount(
                             accountConfig.name,
