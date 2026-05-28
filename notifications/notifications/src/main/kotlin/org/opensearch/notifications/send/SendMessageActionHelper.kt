@@ -234,17 +234,20 @@ object SendMessageActionHelper {
                 configEncryptionTransformer.decryptConfig(channel.configDoc.config).configData as Slack,
                 message,
                 eventStatus,
-                eventSource.referenceId)
+                eventSource.referenceId
+            )
             ConfigType.CHIME -> sendChimeMessage(
                 configEncryptionTransformer.decryptConfig(channel.configDoc.config).configData as Chime,
                 message,
                 eventStatus,
-                eventSource.referenceId)
+                eventSource.referenceId
+            )
             ConfigType.MICROSOFT_TEAMS -> sendMicrosoftTeamsMessage(
                 configEncryptionTransformer.decryptConfig(channel.configDoc.config).configData as MicrosoftTeams,
                 message,
                 eventStatus,
-                eventSource.referenceId)
+                eventSource.referenceId
+            )
             ConfigType.WEBHOOK -> sendWebhookMessage(
                 configEncryptionTransformer.decryptConfig(channel.configDoc.config).configData as Webhook,
                 message,

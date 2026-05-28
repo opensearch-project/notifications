@@ -45,6 +45,7 @@ import org.opensearch.notifications.util.ConfigEncryptionTransformer
 import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntil
 import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntilTimeout
+import org.opensearch.notifications.util.currentTenantId
 import org.opensearch.remote.metadata.client.BulkDataObjectRequest
 import org.opensearch.remote.metadata.client.DeleteDataObjectRequest
 import org.opensearch.remote.metadata.client.GetDataObjectRequest
@@ -189,8 +190,10 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     override suspend fun createNotificationConfig(configDoc: NotificationConfigDoc, id: String?): String? {
         createIndex()
+        val tenantId = currentTenantId()
         val postRequest = PutDataObjectRequest.builder()
             .index(INDEX_NAME)
+            .tenantId(tenantId)
             .dataObject({ builder, params -> configDoc.copy(config = configEncryptionTransformer.encryptConfig(configDoc.config)).toXContent(builder, params) })
             .overwriteIfExists(false)
         if (id != null) {
@@ -229,6 +232,7 @@ internal object NotificationConfigIndex : ConfigOperations {
         val getRequest = GetDataObjectRequest.builder()
             .index(INDEX_NAME)
             .id(id)
+            .tenantId(currentTenantId())
             .build()
 
         val response: GetResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
@@ -286,6 +290,7 @@ internal object NotificationConfigIndex : ConfigOperations {
         sourceBuilder.query(query)
         val searchRequest = SearchDataObjectRequest.builder()
             .indices(INDEX_NAME)
+            .tenantId(currentTenantId())
             .searchSourceBuilder(sourceBuilder)
             .build()
 
@@ -309,6 +314,7 @@ internal object NotificationConfigIndex : ConfigOperations {
         val putRequest = PutDataObjectRequest.builder()
             .index(INDEX_NAME)
             .id(id)
+            .tenantId(currentTenantId())
             .dataObject({ builder, params -> notificationConfigDoc.copy(config = configEncryptionTransformer.encryptConfig(notificationConfigDoc.config)).toXContent(builder, params) })
             .overwriteIfExists(true)
             .build()
@@ -330,6 +336,7 @@ internal object NotificationConfigIndex : ConfigOperations {
         val deleteRequest = DeleteDataObjectRequest.builder()
             .index(INDEX_NAME)
             .id(id)
+            .tenantId(currentTenantId())
             .build()
 
         val response: DeleteResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
@@ -347,6 +354,7 @@ internal object NotificationConfigIndex : ConfigOperations {
     override suspend fun deleteNotificationConfigs(ids: Set<String>): Map<String, RestStatus> {
         createIndex()
 
+        val tenantId = currentTenantId()
         val bulkDeleteRequest = BulkDataObjectRequest.builder()
             .globalIndex(INDEX_NAME)
             .build()
@@ -355,6 +363,7 @@ internal object NotificationConfigIndex : ConfigOperations {
                 DeleteDataObjectRequest.builder()
                     .index(INDEX_NAME)
                     .id(it)
+                    .tenantId(tenantId)
                     .build()
             )
         }
