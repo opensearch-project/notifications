@@ -9,7 +9,6 @@ import com.google.gson.JsonObject
 import org.apache.hc.core5.http.HttpHost
 import org.junit.After
 import org.junit.AfterClass
-import org.junit.Assert
 import org.opensearch.client.Request
 import org.opensearch.client.RequestOptions
 import org.opensearch.client.ResponseException
@@ -299,7 +298,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         )
         refreshAllIndices()
         val configId = createResponse.get("config_id").asString
-        Assert.assertNotNull(configId)
+        assertNotNull(configId)
         Thread.sleep(100)
         return configId
     }

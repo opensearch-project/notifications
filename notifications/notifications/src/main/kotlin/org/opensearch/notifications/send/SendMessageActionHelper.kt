@@ -55,6 +55,7 @@ import org.opensearch.notifications.spi.model.destination.SesDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import org.opensearch.notifications.spi.model.destination.SnsDestination
+import org.opensearch.notifications.util.ConfigEncryptionTransformer
 import java.io.ByteArrayOutputStream
 
 /**
@@ -66,10 +67,12 @@ object SendMessageActionHelper {
 
     private lateinit var configOperations: ConfigOperations
     private lateinit var userAccess: UserAccess
+    private lateinit var configEncryptionTransformer: ConfigEncryptionTransformer
 
-    fun initialize(configOperations: ConfigOperations, userAccess: UserAccess) {
+    fun initialize(configOperations: ConfigOperations, userAccess: UserAccess, configEncryptionTransformer: ConfigEncryptionTransformer) {
         this.configOperations = configOperations
         this.userAccess = userAccess
+        this.configEncryptionTransformer = configEncryptionTransformer
     }
 
     /**
@@ -227,16 +230,31 @@ object SendMessageActionHelper {
 
         val response = when (configType) {
             ConfigType.NONE -> null
-            ConfigType.SLACK -> sendSlackMessage(configData as Slack, message, eventStatus, eventSource.referenceId)
-            ConfigType.MATTERMOST -> sendSlackMessage(configData as Slack, message, eventStatus, eventSource.referenceId)
-            ConfigType.CHIME -> sendChimeMessage(configData as Chime, message, eventStatus, eventSource.referenceId)
-            ConfigType.MICROSOFT_TEAMS -> sendMicrosoftTeamsMessage(configData as MicrosoftTeams, message, eventStatus, eventSource.referenceId)
-            ConfigType.WEBHOOK -> sendWebhookMessage(
-                configData as Webhook,
+            ConfigType.SLACK -> sendSlackMessage(
+                configEncryptionTransformer.decryptConfig(channel.configDoc.config).configData as Slack,
                 message,
                 eventStatus,
                 eventSource.referenceId
             )
+            ConfigType.CHIME -> sendChimeMessage(
+                configEncryptionTransformer.decryptConfig(channel.configDoc.config).configData as Chime,
+                message,
+                eventStatus,
+                eventSource.referenceId
+            )
+            ConfigType.MICROSOFT_TEAMS -> sendMicrosoftTeamsMessage(
+                configEncryptionTransformer.decryptConfig(channel.configDoc.config).configData as MicrosoftTeams,
+                message,
+                eventStatus,
+                eventSource.referenceId
+            )
+            ConfigType.WEBHOOK -> sendWebhookMessage(
+                configEncryptionTransformer.decryptConfig(channel.configDoc.config).configData as Webhook,
+                message,
+                eventStatus,
+                eventSource.referenceId
+            )
+            ConfigType.MATTERMOST -> sendSlackMessage(configData as Slack, message, eventStatus, eventSource.referenceId)
             ConfigType.EMAIL -> sendEmailMessage(
                 user,
                 configData as Email,
@@ -250,6 +268,7 @@ object SendMessageActionHelper {
             ConfigType.EMAIL_GROUP -> null
             ConfigType.SNS -> sendSNSMessage(configData as Sns, message, eventStatus, eventSource.referenceId)
         }
+
         return if (response == null) {
             log.warn("Cannot send message to destination for config id :${channel.docInfo.id}")
             Metrics.NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND.counter.increment()

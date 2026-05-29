@@ -91,6 +91,11 @@ allOpen {
 
 // This flag indicates the existence of security plugin
 def securityEnabled = System.getProperty("security", "false") == "true" || System.getProperty("https", "false") == "true"
+def fieldEncryptionKeySettingName = "opensearch.notifications.field_encryption_key"
+def fieldEncryptionKeyForTests = System.getProperty(
+    "tests.notifications.field_encryption_key",
+    (project.findProperty("testsFieldEncryptionKey") ?: "Nm+pBJ0odVceO0uVN7QS1Wg0dGQDFJim8fua+wA23lw=").toString()
+)
 
 ext {
     projectSubstitutions = [:]
@@ -173,7 +178,7 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3") {
         exclude group: 'org.jetbrains', module: 'annotations' // resolve jarhell
     } // ${kotlin_version} does not work for coroutines
-    implementation "${group}:common-utils:${common_utils_version}"
+    implementation "${group}:common-utils:3.7.0.0-SNAPSHOT"
     // TODO: change compile to implementation when the _local/stats API is supported
     compileOnly "org.json:json:20231013"
     compileOnly "com.github.wnameless.json:json-flattener:0.13.0"
@@ -220,7 +225,7 @@ dependencies {
             "org.junit.jupiter:junit-jupiter-api:${junit_version}"
     )
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit_version}")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.7.2")
     testImplementation "org.opensearch.test:framework:${opensearch_version}"
     testImplementation "org.jetbrains.kotlin:kotlin-test:${kotlin_version}"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}" // required by mockk
@@ -259,6 +264,9 @@ afterEvaluate {
         def firstPlugin = plugins.get(0)
         plugins.remove(0)
         plugins.add(firstPlugin)
+
+        // Keep encryption enabled in integ tests even when security plugin is disabled.
+        node.keystore(fieldEncryptionKeySettingName, fieldEncryptionKeyForTests)
 
         if (securityEnabled) {
             node.extraConfigFile("kirk.pem", file("build/resources/main/kirk.pem"))

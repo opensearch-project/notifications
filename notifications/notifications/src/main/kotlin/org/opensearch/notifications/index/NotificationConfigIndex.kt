@@ -41,6 +41,7 @@ import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
 import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.settings.PluginSettings
+import org.opensearch.notifications.util.ConfigEncryptionTransformer
 import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntil
 import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntilTimeout
@@ -84,6 +85,8 @@ internal object NotificationConfigIndex : ConfigOperations {
     private lateinit var clusterService: ClusterService
     private lateinit var sdkClient: SdkClient
 
+    private lateinit var configEncryptionTransformer: ConfigEncryptionTransformer
+
     private val searchHitParser = object : SearchResults.SearchHitParser<NotificationConfigInfo> {
         override fun parse(searchHit: SearchHit): NotificationConfigInfo {
             val parser = XContentType.JSON.xContent().createParser(
@@ -105,10 +108,11 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    fun initialize(sdkClient: SdkClient, client: Client, clusterService: ClusterService) {
+    fun initialize(sdkClient: SdkClient, client: Client, clusterService: ClusterService, configEncryptionTransformer: ConfigEncryptionTransformer) {
         NotificationConfigIndex.client = SecureIndexClient(client)
         NotificationConfigIndex.clusterService = clusterService
         NotificationConfigIndex.sdkClient = sdkClient
+        NotificationConfigIndex.configEncryptionTransformer = configEncryptionTransformer
     }
 
     private fun getSchemaVersionFromIndexMapping(indexMapping: Map<String, Any>?): Int {
@@ -190,7 +194,7 @@ internal object NotificationConfigIndex : ConfigOperations {
         val postRequest = PutDataObjectRequest.builder()
             .index(INDEX_NAME)
             .tenantId(tenantId)
-            .dataObject({ builder, params -> configDoc.toXContent(builder, params) })
+            .dataObject({ builder, params -> configDoc.copy(config = configEncryptionTransformer.encryptConfig(configDoc.config)).toXContent(builder, params) })
             .overwriteIfExists(false)
         if (id != null) {
             postRequest.id(id)
@@ -311,7 +315,7 @@ internal object NotificationConfigIndex : ConfigOperations {
             .index(INDEX_NAME)
             .id(id)
             .tenantId(currentTenantId())
-            .dataObject({ builder, params -> notificationConfigDoc.toXContent(builder, params) })
+            .dataObject({ builder, params -> notificationConfigDoc.copy(config = configEncryptionTransformer.encryptConfig(notificationConfigDoc.config)).toXContent(builder, params) })
             .overwriteIfExists(true)
             .build()
 
