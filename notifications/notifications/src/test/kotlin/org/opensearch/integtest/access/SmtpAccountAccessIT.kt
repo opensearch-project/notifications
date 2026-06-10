@@ -362,8 +362,6 @@ class SmtpAccountAccessIT : PluginRestTestCase() {
         }
         """.trimIndent()
 
-        // verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
-
         val updateUser = "updateUser"
         val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
             .setSocketTimeout(60000)
