@@ -951,4 +951,164 @@ class SecurityNotificationIT : PluginRestTestCase() {
             updateUserClient?.close()
         }
     }
+
+    fun `test update smtp sender has access when filter by backend access strategy is exact`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.EXACT.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+        // Create sample config request reference
+        val sampleSmtpAccount = SmtpAccount("example-host", 2465, MethodType.SSL, "no-reply@fake-host.com")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.SMTP_ACCOUNT,
+            isEnabled = true,
+            configData = sampleSmtpAccount
+        )
+        val sampleSmtpJsonString = getJsonString(sampleSmtpAccount)
+
+        // Create SMTP account config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"smtp_account",
+                "is_enabled":${referenceObject.isEnabled},
+                "smtp_account":$sampleSmtpJsonString
+            }
+        }
+        """.trimIndent()
+
+        val updateUser = "updateUser"
+        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
+            Assert.assertNotNull(configId)
+            Thread.sleep(1000)
+
+            // roles on update user contain all roles from create user
+            createUserWithCustomRole(updateUser, password, NOTIFICATION_UPDATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_UPDATE_CONFIG_ACCESS])
+
+            val referenceObjectUpdate = NotificationConfig(
+                "this is a sample config name updated",
+                "this is a sample config description updated",
+                ConfigType.SMTP_ACCOUNT,
+                isEnabled = true,
+                configData = sampleSmtpAccount
+            )
+            val updateRequestJsonString = """
+            {
+                "config":{
+                    "name":"${referenceObjectUpdate.name}",
+                    "description":"${referenceObjectUpdate.description}",
+                    "config_type":"smtp_account",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "smtp_account":$sampleSmtpJsonString
+                }
+            }
+            """.trimIndent()
+            executeRequest(
+                RestRequest.Method.PUT.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                updateRequestJsonString,
+                RestStatus.OK.status,
+                updateUserClient
+            )
+            Thread.sleep(1000)
+
+            // Get SMTP account config
+            val getConfigResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status
+            )
+            verifySingleConfigEquals(configId, referenceObjectUpdate, getConfigResponse)
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(updateUser, NOTIFICATION_UPDATE_CONFIG_ACCESS)
+            updateUserClient?.close()
+        }
+    }
+
+    fun `test update smtp sender does not have access when filter by backend access strategy is exact`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.ALL.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+        // Create sample config request reference
+        val sampleSmtpAccount = SmtpAccount("example-host", 2465, MethodType.SSL, "no-reply@fake-host.com")
+        val referenceObject = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.SMTP_ACCOUNT,
+            isEnabled = true,
+            configData = sampleSmtpAccount
+        )
+        val sampleSmtpJsonString = getJsonString(sampleSmtpAccount)
+
+        // Create SMTP account config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"${referenceObject.name}",
+                "description":"${referenceObject.description}",
+                "config_type":"smtp_account",
+                "is_enabled":${referenceObject.isEnabled},
+                "smtp_account":$sampleSmtpJsonString
+            }
+        }
+        """.trimIndent()
+
+        val updateUser = "updateUser"
+        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
+            Assert.assertNotNull(configId)
+            Thread.sleep(1000)
+
+            // roles on update user does match all roles from create user
+            createUserWithCustomRole(updateUser, password, NOTIFICATION_UPDATE_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_UPDATE_CONFIG_ACCESS])
+
+            val referenceObjectUpdate = NotificationConfig(
+                "this is a sample config name updated",
+                "this is a sample config description updated",
+                ConfigType.SMTP_ACCOUNT,
+                isEnabled = true,
+                configData = sampleSmtpAccount
+            )
+            val updateRequestJsonString = """
+            {
+                "config":{
+                    "name":"${referenceObjectUpdate.name}",
+                    "description":"${referenceObjectUpdate.description}",
+                    "config_type":"smtp_account",
+                    "is_enabled":${referenceObject.isEnabled},
+                    "smtp_account":$sampleSmtpJsonString
+                }
+            }
+            """.trimIndent()
+            executeRequest(
+                RestRequest.Method.PUT.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                updateRequestJsonString,
+                RestStatus.FORBIDDEN.status,
+                updateUserClient
+            )
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(updateUser, NOTIFICATION_UPDATE_CONFIG_ACCESS)
+            updateUserClient?.close()
+        }
+    }
 }
