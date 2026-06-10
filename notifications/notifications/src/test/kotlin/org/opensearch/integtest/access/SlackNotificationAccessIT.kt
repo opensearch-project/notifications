@@ -530,4 +530,107 @@ class SlackNotificationAccessIT : PluginRestTestCase() {
             sendUserClient?.close()
         }
     }
+
+    fun `test send test slack message has access when filter by backend access strategy is exact`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.EXACT.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        // Create webhook notification config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"this is a sample config name",
+                "description":"this is a sample config description",
+                "config_type":"slack",
+                "is_enabled":true,
+                "slack":{
+                    "url":"https://hooks.slack.com/services/xxx/xxx"
+                }
+            }
+        }
+        """.trimIndent()
+
+        val sendUser = "sendUser"
+        val sendUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), sendUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
+            Assert.assertNotNull(configId)
+            Thread.sleep(1000)
+
+            createUserWithCustomRole(sendUser, password, NOTIFICATION_TEST_SEND_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
+
+            // send test message
+            val sendResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/feature/test/$configId",
+                "",
+                RestStatus.INTERNAL_SERVER_ERROR.status,
+                sendUserClient!!
+            )
+
+            // verify failure response is with message
+            val error = sendResponse.get("error").asJsonObject
+            Assert.assertNotNull(error.get("reason").asString)
+            Assert.assertTrue(error.get("reason").asString.contains("\"delivery_status\":{\"status_code\":\"500\""))
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(sendUser, NOTIFICATION_TEST_SEND_ACCESS)
+            sendUserClient?.close()
+        }
+    }
+
+    fun `test send test slack message does not have access when filter by backend access strategy is exact`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.EXACT.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        // Create webhook notification config
+        val createRequestJsonString = """
+        {
+            "config":{
+                "name":"this is a sample config name",
+                "description":"this is a sample config description",
+                "config_type":"slack",
+                "is_enabled":true,
+                "slack":{
+                    "url":"https://hooks.slack.com/services/xxx/xxx"
+                }
+            }
+        }
+        """.trimIndent()
+
+        val sendUser = "sendUser"
+        val sendUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), sendUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
+            Assert.assertNotNull(configId)
+            Thread.sleep(1000)
+
+            createUserWithCustomRole(sendUser, password, NOTIFICATION_TEST_SEND_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
+
+            // send test message
+            val sendResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/feature/test/$configId",
+                "",
+                RestStatus.FORBIDDEN.status,
+                sendUserClient!!
+            )
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(sendUser, NOTIFICATION_TEST_SEND_ACCESS)
+            sendUserClient?.close()
+        }
+    }
 }
