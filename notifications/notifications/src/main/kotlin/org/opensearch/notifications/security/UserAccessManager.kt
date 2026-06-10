@@ -56,7 +56,7 @@ internal object UserAccessManager : UserAccess {
         } else if (filterByAccessStrategy == FilterByBackendRolesAccessStrategy.INTERSECT.strategy) {
             return userBackendRoles.any { it in objectAccess }
         } else if (filterByAccessStrategy == FilterByBackendRolesAccessStrategy.EXACT.strategy) {
-            return userBackendRoles.sorted().equals(objectAccess.sorted())
+            return userBackendRoles.toSet().equals(objectAccess.toSet())
         }
         // Not sure if this is necessary, since there is a validator
         // on the setting itself
