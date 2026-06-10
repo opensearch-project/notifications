@@ -23,7 +23,7 @@ import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.notifications.verifySingleConfigEquals
 import org.opensearch.rest.RestRequest
 
-class SmtpSenderAccessIT : PluginRestTestCase() {
+class SmtpAccountAccessIT : PluginRestTestCase() {
 
     companion object {
         @BeforeClass
