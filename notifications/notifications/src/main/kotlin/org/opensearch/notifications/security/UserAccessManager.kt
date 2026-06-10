@@ -58,8 +58,6 @@ internal object UserAccessManager : UserAccess {
         } else if (filterByAccessStrategy == FilterByBackendRolesAccessStrategy.EXACT.strategy) {
             return userBackendRoles.toSet().equals(objectAccess.toSet())
         }
-        // Not sure if this is necessary, since there is a validator
-        // on the setting itself
         throw IllegalArgumentException(
             "Invalid filter by access strategy: $filterByAccessStrategy"
         )
