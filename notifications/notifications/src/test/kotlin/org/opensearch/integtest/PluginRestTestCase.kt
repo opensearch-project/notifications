@@ -19,6 +19,9 @@ import org.opensearch.common.io.PathUtils
 import org.opensearch.common.settings.Settings
 import org.opensearch.commons.ConfigConstants
 import org.opensearch.commons.notifications.model.ConfigType
+import org.opensearch.commons.notifications.model.EmailGroup
+import org.opensearch.commons.notifications.model.EmailRecipient
+import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.rest.SecureRestClientBuilder
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.core.xcontent.DeprecationHandler
@@ -348,6 +351,37 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         )
         refreshAllIndices()
         return deleteResponse
+    }
+
+    fun createTestEmailGroup(): Pair<NotificationConfig, String> {
+        val sampleEmailGroup = EmailGroup(listOf(EmailRecipient("email1@email.com"), EmailRecipient("email2@email.com")))
+        val emailGroupConfig = NotificationConfig(
+            "this is a sample email group config name",
+            "this is a sample email group config description",
+            ConfigType.EMAIL_GROUP,
+            isEnabled = true,
+            configData = sampleEmailGroup
+        )
+        val sampleSmtpJsonString = getJsonString(emailGroupConfig)
+
+        // Create email group notification config
+        val createEmailGroupRequestJsonString = """
+        {
+            "config":{
+                "name":"${emailGroupConfig.name}",
+                "description":"${emailGroupConfig.description}",
+                "config_type":"email_group",
+                "is_enabled":${emailGroupConfig.isEnabled},
+                "email_group":{
+                    "recipient_list":[
+                        {"recipient":"${sampleEmailGroup.recipients[0].recipient}"},
+                        {"recipient":"${sampleEmailGroup.recipients[1].recipient}"}
+                    ]
+                }
+            }
+        }
+        """.trimIndent()
+        return Pair<emailGroupConfig, createEmailGroupRequestJsonString>
     }
 
     @After

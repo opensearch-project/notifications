@@ -10,10 +10,6 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.BeforeClass
 import org.opensearch.client.RestClient
-import org.opensearch.commons.notifications.model.ConfigType
-import org.opensearch.commons.notifications.model.EmailGroup
-import org.opensearch.commons.notifications.model.EmailRecipient
-import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.rest.SecureRestClientBuilder
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.NotificationPlugin
@@ -54,34 +50,8 @@ class EmailGroupAccessIT : PluginRestTestCase() {
     fun `test create email group config with user that has create Notification permission`() {
         createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
 
-        // Create sample config request reference
-        val sampleEmailGroup = EmailGroup(listOf(EmailRecipient("email1@email.com"), EmailRecipient("email2@email.com")))
-        val emailGroupConfig = NotificationConfig(
-            "this is a sample email group config name",
-            "this is a sample email group config description",
-            ConfigType.EMAIL_GROUP,
-            isEnabled = true,
-            configData = sampleEmailGroup
-        )
+        val (emailGroupConfig, createEmailGroupRequestJsonString) = createTestEmailGroup()
         val sampleSmtpJsonString = getJsonString(emailGroupConfig)
-
-        // Create email group notification config
-        val createEmailGroupRequestJsonString = """
-        {
-            "config":{
-                "name":"${emailGroupConfig.name}",
-                "description":"${emailGroupConfig.description}",
-                "config_type":"email_group",
-                "is_enabled":${emailGroupConfig.isEnabled},
-                "email_group":{
-                    "recipient_list":[
-                        {"recipient":"${sampleEmailGroup.recipients[0].recipient}"},
-                        {"recipient":"${sampleEmailGroup.recipients[1].recipient}"}
-                    ]
-                }
-            }
-        }
-        """.trimIndent()
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
