@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.opensearch.integtest.access
+package org.opensearch.integtest
 
 import org.junit.After
 import org.junit.Assert
@@ -11,8 +11,9 @@ import org.junit.Before
 import org.junit.BeforeClass
 import org.opensearch.client.RestClient
 import org.opensearch.commons.notifications.model.ConfigType
-import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.EmailGroup
+import org.opensearch.commons.notifications.model.EmailRecipient
+import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.rest.SecureRestClientBuilder
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.NotificationPlugin

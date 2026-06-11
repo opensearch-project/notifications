@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.opensearch.integtest.access
+package org.opensearch.integtest
 
 import org.junit.After
 import org.junit.Assert
