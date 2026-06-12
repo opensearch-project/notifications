@@ -28,6 +28,7 @@ import org.opensearch.core.xcontent.DeprecationHandler
 import org.opensearch.core.xcontent.MediaType
 import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.NotificationPlugin
+import org.opensearch.notifications.getJsonString
 import org.opensearch.notifications.index.NotificationConfigIndex
 import org.opensearch.rest.RestRequest
 import org.opensearch.test.rest.OpenSearchRestTestCase
@@ -381,7 +382,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
             }
         }
         """.trimIndent()
-        return Pair<emailGroupConfig, createEmailGroupRequestJsonString>
+        return Pair(emailGroupConfig, createEmailGroupRequestJsonString)
     }
 
     @After
