@@ -388,7 +388,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         return Pair(emailGroupConfig, createEmailGroupRequestJsonString)
     }
 
-    fun createTestEmailNotification(): Pair<NotificationConfig, String> {
+    fun createTestEmailNotification(client: RestClient = client()): Triple<Email, NotificationConfig, String> {
         // Create sample smtp account config request reference
         val sampleSmtpAccount = SmtpAccount(
             "smtp.domain.com",
@@ -421,7 +421,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
             }
         }
         """.trimIndent()
-        val smtpAccountConfigId = createConfigWithRequestJsonString(createSmtpAccountRequestJsonString)
+        val smtpAccountConfigId = createConfigWithRequestJsonString(createSmtpAccountRequestJsonString, client)
 
         // Create sample email group config request reference
         val sampleEmailGroup = EmailGroup(listOf(EmailRecipient("email1@email.com"), EmailRecipient("email2@email.com")))
@@ -450,7 +450,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
             }
         }
         """.trimIndent()
-        val emailGroupConfigId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString)
+        val emailGroupConfigId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, client)
 
         // Create sample email config request reference
         val sampleEmail = Email(
@@ -488,7 +488,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         }
         """.trimIndent()
 
-        return Pair(emailConfig, createEmailRequestJsonString)
+        return Triple(sampleEmail, emailConfig, createEmailRequestJsonString)
     }
 
     @After
