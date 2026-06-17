@@ -718,6 +718,148 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         deleteUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE)
     }
 
+    fun `test delete email notification config has access when filter by backend access strategy is all`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.ALL.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
+        val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        val deleteUser = "deleteUser"
+        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            createUserWithCustomRole(deleteUser, password, NOTIFICATION_DELETE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
+
+            // Delete email notification config
+            deleteConfig(configId, deleteUserClient!!)
+
+            // Should not be able to find config
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.NOT_FOUND.status
+            )
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(deleteUser, NOTIFICATION_DELETE_CONFIG_ACCESS)
+            deleteUserClient?.close()
+        }
+    }
+
+    fun `test delete email notification config does not have access when filter by backend access strategy is all`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.ALL.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
+        val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        val deleteUser = "deleteUser"
+        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            createUserWithCustomRole(deleteUser, password, NOTIFICATION_DELETE_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
+
+            executeRequest(
+                RestRequest.Method.DELETE.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.FORBIDDEN.status,
+                deleteUserClient!!
+            )
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(deleteUser, NOTIFICATION_DELETE_CONFIG_ACCESS)
+            deleteUserClient?.close()
+        }
+    }
+
+    fun `test delete email notification config has access when filter by backend access strategy is exact`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.EXACT.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
+        val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        val deleteUser = "deleteUser"
+        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            createUserWithCustomRole(deleteUser, password, NOTIFICATION_DELETE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
+
+            // Delete email notification config
+            deleteConfig(configId, deleteUserClient!!)
+
+            // Should not be able to find config
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.NOT_FOUND.status
+            )
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(deleteUser, NOTIFICATION_DELETE_CONFIG_ACCESS)
+            deleteUserClient?.close()
+        }
+    }
+
+    fun `test delete email notification config does not have access when filter by backend access strategy is exact`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.EXACT.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
+        val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        val deleteUser = "deleteUser"
+        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            createUserWithCustomRole(deleteUser, password, NOTIFICATION_DELETE_CONFIG_ACCESS, arrayOf("role1", "role2", "role3"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
+
+            executeRequest(
+                RestRequest.Method.DELETE.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.FORBIDDEN.status,
+                deleteUserClient!!
+            )
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(deleteUser, NOTIFICATION_DELETE_CONFIG_ACCESS)
+            deleteUserClient?.close()
+        }
+    }
+
     fun `test send test email message with send permissions`() {
         createUserWithCustomRole(user, password, NOTIFICATION_TEST_SEND_ACCESS, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
 
