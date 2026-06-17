@@ -207,6 +207,306 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         deleteUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE)
     }
 
+    fun `test update email notification config has access when filter by backend access strategy is all`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.ALL.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
+        val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        val updateUser = "updateUser"
+        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            // Get email notification config
+            var getConfigResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status
+            )
+            verifySingleConfigEquals(configId, emailConfig, getConfigResponse)
+
+            createUserWithCustomRole(updateUser, password, NOTIFICATION_UPDATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_UPDATE_CONFIG_ACCESS])
+
+            val referenceObjectUpdate = NotificationConfig(
+                "this is a sample config name updated",
+                "this is a sample config description updated",
+                ConfigType.EMAIL,
+                isEnabled = true,
+                configData = sampleEmail
+            )
+            val updateRequestJsonString = """
+            {
+                "config":{
+                    "name":"${referenceObjectUpdate.name}",
+                    "description":"${referenceObjectUpdate.description}",
+                    "config_type":"email",
+                    "is_enabled":${referenceObjectUpdate.isEnabled},
+                    "email":{
+                        "email_account_id":"${sampleEmail.emailAccountID}",
+                        "recipient_list":[
+                            {"recipient":"${sampleEmail.recipients[0].recipient}"},
+                            {"recipient":"${sampleEmail.recipients[1].recipient}"}
+                        ],
+                        "email_group_id_list":[
+                            "${sampleEmail.emailGroupIds[0]}"
+                        ]
+                    }
+                }
+            }
+            """.trimIndent()
+            executeRequest(
+                RestRequest.Method.PUT.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                updateRequestJsonString,
+                RestStatus.OK.status,
+                updateUserClient!!
+            )
+            Thread.sleep(1000)
+
+            // Get email notification config
+            getConfigResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status
+            )
+            verifySingleConfigEquals(configId, referenceObjectUpdate, getConfigResponse)
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(updateUser, NOTIFICATION_UPDATE_CONFIG_ACCESS)
+            updateUserClient?.close()
+        }
+    }
+
+    fun `test update email notification config does not have access when filter by backend access strategy is all`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.ALL.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
+        val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        val updateUser = "updateUser"
+        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            // Get email notification config
+            var getConfigResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status
+            )
+            verifySingleConfigEquals(configId, emailConfig, getConfigResponse)
+
+            createUserWithCustomRole(updateUser, password, NOTIFICATION_UPDATE_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_UPDATE_CONFIG_ACCESS])
+
+            val referenceObjectUpdate = NotificationConfig(
+                "this is a sample config name updated",
+                "this is a sample config description updated",
+                ConfigType.EMAIL,
+                isEnabled = true,
+                configData = sampleEmail
+            )
+            val updateRequestJsonString = """
+            {
+                "config":{
+                    "name":"${referenceObjectUpdate.name}",
+                    "description":"${referenceObjectUpdate.description}",
+                    "config_type":"email",
+                    "is_enabled":${referenceObjectUpdate.isEnabled},
+                    "email":{
+                        "email_account_id":"${sampleEmail.emailAccountID}",
+                        "recipient_list":[
+                            {"recipient":"${sampleEmail.recipients[0].recipient}"},
+                            {"recipient":"${sampleEmail.recipients[1].recipient}"}
+                        ],
+                        "email_group_id_list":[
+                            "${sampleEmail.emailGroupIds[0]}"
+                        ]
+                    }
+                }
+            }
+            """.trimIndent()
+            executeRequest(
+                RestRequest.Method.PUT.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                updateRequestJsonString,
+                RestStatus.FORBIDDEN.status,
+                updateUserClient!!
+            )
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(updateUser, NOTIFICATION_UPDATE_CONFIG_ACCESS)
+            updateUserClient?.close()
+        }
+    }
+
+    fun `test update email notification config has access when filter by backend access strategy is exact`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.EXACT.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
+        val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        val updateUser = "updateUser"
+        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            // Get email notification config
+            var getConfigResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status
+            )
+            verifySingleConfigEquals(configId, emailConfig, getConfigResponse)
+
+            createUserWithCustomRole(updateUser, password, NOTIFICATION_UPDATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_UPDATE_CONFIG_ACCESS])
+
+            val referenceObjectUpdate = NotificationConfig(
+                "this is a sample config name updated",
+                "this is a sample config description updated",
+                ConfigType.EMAIL,
+                isEnabled = true,
+                configData = sampleEmail
+            )
+            val updateRequestJsonString = """
+            {
+                "config":{
+                    "name":"${referenceObjectUpdate.name}",
+                    "description":"${referenceObjectUpdate.description}",
+                    "config_type":"email",
+                    "is_enabled":${referenceObjectUpdate.isEnabled},
+                    "email":{
+                        "email_account_id":"${sampleEmail.emailAccountID}",
+                        "recipient_list":[
+                            {"recipient":"${sampleEmail.recipients[0].recipient}"},
+                            {"recipient":"${sampleEmail.recipients[1].recipient}"}
+                        ],
+                        "email_group_id_list":[
+                            "${sampleEmail.emailGroupIds[0]}"
+                        ]
+                    }
+                }
+            }
+            """.trimIndent()
+            executeRequest(
+                RestRequest.Method.PUT.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                updateRequestJsonString,
+                RestStatus.OK.status,
+                updateUserClient!!
+            )
+            Thread.sleep(1000)
+
+            // Get email notification config
+            getConfigResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status
+            )
+            verifySingleConfigEquals(configId, referenceObjectUpdate, getConfigResponse)
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(updateUser, NOTIFICATION_UPDATE_CONFIG_ACCESS)
+            updateUserClient?.close()
+        }
+    }
+
+    fun `test update email notification config does not have access when filter by backend access strategy is exact`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.EXACT.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
+        val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        val updateUser = "updateUser"
+        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            // Get email notification config
+            var getConfigResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status
+            )
+            verifySingleConfigEquals(configId, emailConfig, getConfigResponse)
+
+            createUserWithCustomRole(updateUser, password, NOTIFICATION_UPDATE_CONFIG_ACCESS, arrayOf("role1", "role2", "role3"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_UPDATE_CONFIG_ACCESS])
+
+            val referenceObjectUpdate = NotificationConfig(
+                "this is a sample config name updated",
+                "this is a sample config description updated",
+                ConfigType.EMAIL,
+                isEnabled = true,
+                configData = sampleEmail
+            )
+            val updateRequestJsonString = """
+            {
+                "config":{
+                    "name":"${referenceObjectUpdate.name}",
+                    "description":"${referenceObjectUpdate.description}",
+                    "config_type":"email",
+                    "is_enabled":${referenceObjectUpdate.isEnabled},
+                    "email":{
+                        "email_account_id":"${sampleEmail.emailAccountID}",
+                        "recipient_list":[
+                            {"recipient":"${sampleEmail.recipients[0].recipient}"},
+                            {"recipient":"${sampleEmail.recipients[1].recipient}"}
+                        ],
+                        "email_group_id_list":[
+                            "${sampleEmail.emailGroupIds[0]}"
+                        ]
+                    }
+                }
+            }
+            """.trimIndent()
+            executeRequest(
+                RestRequest.Method.PUT.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                updateRequestJsonString,
+                RestStatus.FORBIDDEN.status,
+                updateUserClient!!
+            )
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(updateUser, NOTIFICATION_UPDATE_CONFIG_ACCESS)
+            updateUserClient?.close()
+        }
+    }
+
     fun `test get email notification config with user that has get Notification permission`() {
         createUserWithCustomRole(user, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
 
@@ -238,6 +538,148 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
             userClient!!
         )
         deleteUserWithCustomRole(user, NOTIFICATION_NO_ACCESS_ROLE)
+    }
+
+    fun `test get email notification config does have access when filter by backend access strategy is all`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.ALL.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
+        val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        val getUser = "getUser"
+        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
+
+            // Get email notification config
+            val getConfigResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status,
+                getUserClient!!
+            )
+            verifySingleConfigEquals(configId, emailConfig, getConfigResponse)
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(getUser, NOTIFICATION_GET_CONFIG_ACCESS)
+            getUserClient?.close()
+        }
+    }
+
+    fun `test get email notification config does not have access when filter by backend access strategy is all`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.ALL.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
+        val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        val getUser = "getUser"
+        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
+
+            // Get email notification config
+            executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.FORBIDDEN.status,
+                getUserClient!!
+            )
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(getUser, NOTIFICATION_GET_CONFIG_ACCESS)
+            getUserClient?.close()
+        }
+    }
+
+    fun `test get email notification config does have access when filter by backend access strategy is exact`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.EXACT.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
+        val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        val getUser = "getUser"
+        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
+
+            // Get email notification config
+            val getConfigResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.OK.status,
+                getUserClient!!
+            )
+            verifySingleConfigEquals(configId, emailConfig, getConfigResponse)
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(getUser, NOTIFICATION_GET_CONFIG_ACCESS)
+            getUserClient?.close()
+        }
+    }
+
+    fun `test get email notification config does not have access when filter by backend access strategy is exact`() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES.key, true))
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY.key, FilterByBackendRolesAccessStrategy.EXACT.strategy))
+
+        createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
+
+        val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
+        val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
+        Assert.assertNotNull(configId)
+        Thread.sleep(1000)
+
+        val getUser = "getUser"
+        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+
+        try {
+            createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role1", "role2", "role3"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
+
+            // Get email notification config
+            val getConfigResponse = executeRequest(
+                RestRequest.Method.GET.name,
+                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+                "",
+                RestStatus.FORBIDDEN.status,
+                getUserClient!!
+            )
+        } finally {
+            deleteUserWithCustomRole(user, NOTIFICATION_CREATE_CONFIG_ACCESS)
+            deleteUserWithCustomRole(getUser, NOTIFICATION_GET_CONFIG_ACCESS)
+            getUserClient?.close()
+        }
     }
 
     fun `test delete email notification config with user that has get Notification permission`() {
