@@ -80,6 +80,7 @@ internal object NotificationConfigIndex : ConfigOperations {
     private lateinit var clusterService: ClusterService
     private lateinit var sdkClient: SdkClient
     private lateinit var searchSdkClient: SdkClient
+    private var multiTenancyEnabled: Boolean = false
 
     private val searchHitParser = object : SearchResults.SearchHitParser<NotificationConfigInfo> {
         override fun parse(searchHit: SearchHit): NotificationConfigInfo {
@@ -102,11 +103,18 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    fun initialize(sdkClient: SdkClient, searchSdkClient: SdkClient, client: Client, clusterService: ClusterService) {
+    fun initialize(
+        sdkClient: SdkClient,
+        searchSdkClient: SdkClient,
+        client: Client,
+        clusterService: ClusterService,
+        multiTenancyEnabled: Boolean = false
+    ) {
         NotificationConfigIndex.client = SecureIndexClient(client)
         NotificationConfigIndex.clusterService = clusterService
         NotificationConfigIndex.sdkClient = sdkClient
         NotificationConfigIndex.searchSdkClient = searchSdkClient
+        NotificationConfigIndex.multiTenancyEnabled = multiTenancyEnabled
     }
 
     private fun getSchemaVersionFromIndexMapping(indexMapping: Map<String, Any>?): Int {
@@ -129,6 +137,9 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     @Suppress("TooGenericExceptionCaught")
     private suspend fun createIndex() {
+        if (multiTenancyEnabled) {
+            return
+        }
         if (!isIndexExists()) {
             val classLoader = NotificationConfigIndex::class.java.classLoader
             val indexSettingsSource = classLoader.getResource(SETTINGS_FILE_NAME)?.readText()!!
