@@ -14,8 +14,11 @@ internal class FilterByBackendRolesAccessStrategyValidatorTests {
     fun `accepts valid values`() {
         val validator = FilterByBackendRolesAccessStrategyValidator()
         validator.validate(FilterByBackendRolesAccessStrategy.ALL.strategy)
+        validator.validate("ALL")
         validator.validate(FilterByBackendRolesAccessStrategy.EXACT.strategy)
+        validator.validate("EXACT")
         validator.validate(FilterByBackendRolesAccessStrategy.INTERSECT.strategy)
+        validator.validate("INTERSECT")
     }
 
     @Test
@@ -24,6 +27,12 @@ internal class FilterByBackendRolesAccessStrategyValidatorTests {
 
         assertThrows(IllegalArgumentException::class.java) {
             validator.validate("foo")
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate("")
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(" ")
         }
     }
 }
