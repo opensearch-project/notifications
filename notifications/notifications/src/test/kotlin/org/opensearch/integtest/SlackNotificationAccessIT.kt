@@ -75,7 +75,6 @@ class SlackNotificationAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             // Get Slack notification config
             val getConfigResponse = executeRequest(
@@ -153,7 +152,6 @@ class SlackNotificationAccessIT : PluginRestTestCase() {
         """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         // Get Slack notification config
         var getConfigResponse = executeRequest(
@@ -189,7 +187,6 @@ class SlackNotificationAccessIT : PluginRestTestCase() {
             RestStatus.OK.status,
             userClient!!
         )
-        Thread.sleep(1000)
 
         // Get Slack notification config
         getConfigResponse = executeRequest(
@@ -266,7 +263,6 @@ class SlackNotificationAccessIT : PluginRestTestCase() {
         """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         // Get Slack notification config
         val getConfigResponse = executeRequest(
@@ -322,7 +318,6 @@ class SlackNotificationAccessIT : PluginRestTestCase() {
         """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         // Delete Slack notification config
         deleteConfig(configId, userClient!!)
@@ -372,7 +367,6 @@ class SlackNotificationAccessIT : PluginRestTestCase() {
         """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         // send test message
         val sendResponse = executeRequest(
@@ -410,7 +404,6 @@ class SlackNotificationAccessIT : PluginRestTestCase() {
         """.trimIndent()
         val configId = createConfigWithRequestJsonString(createRequestJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         // send test message
         executeRequest(
@@ -451,7 +444,6 @@ class SlackNotificationAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             createUserWithCustomRole(sendUser, password, NOTIFICATION_TEST_SEND_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
 
@@ -502,7 +494,6 @@ class SlackNotificationAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             createUserWithCustomRole(sendUser, password, NOTIFICATION_TEST_SEND_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
 
@@ -548,7 +539,6 @@ class SlackNotificationAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             createUserWithCustomRole(sendUser, password, NOTIFICATION_TEST_SEND_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
 
@@ -599,7 +589,6 @@ class SlackNotificationAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             createUserWithCustomRole(sendUser, password, NOTIFICATION_TEST_SEND_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
 

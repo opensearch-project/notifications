@@ -54,7 +54,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             // Get email notification config
             val getConfigResponse = executeRequest(
@@ -90,7 +89,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification()
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         // Get email notification config
         var getConfigResponse = executeRequest(
@@ -135,7 +133,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
             RestStatus.OK.status,
             userClient!!
         )
-        Thread.sleep(1000)
 
         // Get email notification config
         getConfigResponse = executeRequest(
@@ -155,7 +152,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification()
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         // Get email notification config
         var getConfigResponse = executeRequest(
@@ -212,7 +208,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         val updateUser = "updateUser"
         val updateUserClient = buildUserClient(updateUser, password)
@@ -263,7 +258,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
                 RestStatus.OK.status,
                 updateUserClient!!
             )
-            Thread.sleep(1000)
 
             // Get email notification config
             getConfigResponse = executeRequest(
@@ -289,7 +283,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         val updateUser = "updateUser"
         val updateUserClient = buildUserClient(updateUser, password)
@@ -356,7 +349,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         val updateUser = "updateUser"
         val updateUserClient = buildUserClient(updateUser, password)
@@ -407,7 +399,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
                 RestStatus.OK.status,
                 updateUserClient!!
             )
-            Thread.sleep(1000)
 
             // Get email notification config
             getConfigResponse = executeRequest(
@@ -433,7 +424,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         val updateUser = "updateUser"
         val updateUserClient = buildUserClient(updateUser, password)
@@ -497,7 +487,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification()
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         // Get email notification config
         val getConfigResponse = executeRequest(
@@ -533,7 +522,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         val getUser = "getUser"
         val getUserClient = buildUserClient(getUser, password)
@@ -566,7 +554,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         val getUser = "getUser"
         val getUserClient = buildUserClient(getUser, password)
@@ -598,7 +585,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         val getUser = "getUser"
         val getUserClient = buildUserClient(getUser, password)
@@ -631,7 +617,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         val getUser = "getUser"
         val getUserClient = buildUserClient(getUser, password)
@@ -660,7 +645,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification()
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         // Delete email notification config
         deleteConfig(configId, userClient!!)
@@ -699,7 +683,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         val deleteUser = "deleteUser"
         val deleteUserClient = buildUserClient(deleteUser, password)
@@ -733,7 +716,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         val deleteUser = "deleteUser"
         val deleteUserClient = buildUserClient(deleteUser, password)
@@ -764,7 +746,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         val deleteUser = "deleteUser"
         val deleteUserClient = buildUserClient(deleteUser, password)
@@ -798,7 +779,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         val deleteUser = "deleteUser"
         val deleteUserClient = buildUserClient(deleteUser, password)
@@ -826,7 +806,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification()
         val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString)
         Assert.assertNotNull(configId)
-        Thread.sleep(1000)
 
         // send test message
         val sendResponse = executeRequest(
@@ -856,7 +835,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             createUserWithCustomRole(sendUser, password, NOTIFICATION_NO_ACCESS_ROLE, arrayOf(""), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_NO_ACCESS_ROLE])
 
@@ -889,7 +867,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             createUserWithCustomRole(sendUser, password, NOTIFICATION_TEST_SEND_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
 
@@ -927,7 +904,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             createUserWithCustomRole(sendUser, password, NOTIFICATION_TEST_SEND_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
 
@@ -960,7 +936,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             createUserWithCustomRole(sendUser, password, NOTIFICATION_TEST_SEND_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
 
@@ -998,7 +973,6 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             createUserWithCustomRole(sendUser, password, NOTIFICATION_TEST_SEND_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_TEST_SEND_ACCESS])
 
