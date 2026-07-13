@@ -61,7 +61,6 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             // Get SMTP account config
             val getConfigResponse = executeRequest(
@@ -92,7 +91,6 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
 
@@ -128,7 +126,6 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
 
@@ -164,7 +161,6 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
 
@@ -201,7 +197,6 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role2", "role1", "role3"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
 
@@ -264,7 +259,6 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             // roles on update user contain all roles from create user
             createUserWithCustomRole(updateUser, password, NOTIFICATION_UPDATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_UPDATE_CONFIG_ACCESS])
@@ -299,7 +293,6 @@ class EmailGroupAccessIT : PluginRestTestCase() {
                 RestStatus.OK.status,
                 updateUserClient
             )
-            Thread.sleep(1000)
 
             // Get SMTP account config
             val getConfigResponse = executeRequest(
@@ -359,7 +352,6 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             // roles on update user does not contain all roles from create user
             createUserWithCustomRole(updateUser, password, NOTIFICATION_UPDATE_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_UPDATE_CONFIG_ACCESS])
@@ -445,7 +437,6 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             // roles on update user contain all roles from create user
             createUserWithCustomRole(updateUser, password, NOTIFICATION_UPDATE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_UPDATE_CONFIG_ACCESS])
@@ -481,7 +472,6 @@ class EmailGroupAccessIT : PluginRestTestCase() {
                 RestStatus.OK.status,
                 updateUserClient
             )
-            Thread.sleep(1000)
 
             // Get SMTP account config
             val getConfigResponse = executeRequest(
@@ -542,7 +532,6 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             // roles on update user does match all roles from create user
             createUserWithCustomRole(updateUser, password, NOTIFICATION_UPDATE_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_UPDATE_CONFIG_ACCESS])
@@ -602,7 +591,6 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             // roles on update user contain all roles from create user
             createUserWithCustomRole(deleteUser, password, NOTIFICATION_DELETE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
@@ -639,7 +627,6 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             // roles on update user does not contain all roles from create user
             createUserWithCustomRole(deleteUser, password, NOTIFICATION_DELETE_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
@@ -675,7 +662,6 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             // roles on update user matches all roles from create user
             createUserWithCustomRole(deleteUser, password, NOTIFICATION_DELETE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
@@ -712,7 +698,6 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
             Assert.assertNotNull(configId)
-            Thread.sleep(1000)
 
             // roles on update user does not match all roles from create user
             createUserWithCustomRole(deleteUser, password, NOTIFICATION_DELETE_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
