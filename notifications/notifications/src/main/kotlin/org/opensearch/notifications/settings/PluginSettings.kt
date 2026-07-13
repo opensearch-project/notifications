@@ -11,6 +11,7 @@ import org.opensearch.common.settings.Setting
 import org.opensearch.common.settings.Setting.Property.Deprecated
 import org.opensearch.common.settings.Setting.Property.Dynamic
 import org.opensearch.common.settings.Setting.Property.NodeScope
+import org.opensearch.common.settings.Setting.Property.Sensitive
 import org.opensearch.common.settings.Settings
 import org.opensearch.commons.utils.OpenForTesting
 import org.opensearch.commons.utils.logger
@@ -197,7 +198,8 @@ internal object PluginSettings {
         DEFAULT_FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY,
         FilterByBackendRolesAccessStrategyValidator(),
         NodeScope,
-        Dynamic
+        Dynamic,
+        Sensitive
     )
 
     /** This setting sets the remote metadata store type  */
