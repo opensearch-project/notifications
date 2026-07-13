@@ -14,7 +14,6 @@ import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.SmtpAccount
-import org.opensearch.commons.rest.SecureRestClientBuilder
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.NotificationPlugin
 import org.opensearch.notifications.getJsonString
@@ -41,10 +40,7 @@ class SmtpAccountAccessIT : PluginRestTestCase() {
     @Before
     fun create() {
         createUser(user, password, arrayOf())
-        userClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), user, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        userClient = buildUserClient(user, password)
     }
 
     @After
@@ -128,10 +124,7 @@ class SmtpAccountAccessIT : PluginRestTestCase() {
         """.trimIndent()
 
         val getUser = "getUser"
-        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val getUserClient = buildUserClient(getUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
@@ -186,10 +179,7 @@ class SmtpAccountAccessIT : PluginRestTestCase() {
         """.trimIndent()
 
         val getUser = "getUser"
-        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val getUserClient = buildUserClient(getUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
@@ -244,10 +234,7 @@ class SmtpAccountAccessIT : PluginRestTestCase() {
         """.trimIndent()
 
         val getUser = "getUser"
-        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val getUserClient = buildUserClient(getUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
@@ -302,10 +289,7 @@ class SmtpAccountAccessIT : PluginRestTestCase() {
         """.trimIndent()
 
         val getUser = "getUser"
-        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val getUserClient = buildUserClient(getUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
@@ -358,10 +342,7 @@ class SmtpAccountAccessIT : PluginRestTestCase() {
         """.trimIndent()
 
         val updateUser = "updateUser"
-        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val updateUserClient = buildUserClient(updateUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
@@ -443,10 +424,7 @@ class SmtpAccountAccessIT : PluginRestTestCase() {
         // verifySingleConfigEquals(configId, referenceObject, getConfigResponse)
 
         val updateUser = "updateUser"
-        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val updateUserClient = buildUserClient(updateUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
@@ -517,10 +495,7 @@ class SmtpAccountAccessIT : PluginRestTestCase() {
         """.trimIndent()
 
         val updateUser = "updateUser"
-        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val updateUserClient = buildUserClient(updateUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
@@ -600,10 +575,7 @@ class SmtpAccountAccessIT : PluginRestTestCase() {
         """.trimIndent()
 
         val updateUser = "updateUser"
-        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val updateUserClient = buildUserClient(updateUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
@@ -674,10 +646,7 @@ class SmtpAccountAccessIT : PluginRestTestCase() {
         """.trimIndent()
 
         val deleteUser = "deleteUser"
-        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val deleteUserClient = buildUserClient(deleteUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
@@ -731,10 +700,7 @@ class SmtpAccountAccessIT : PluginRestTestCase() {
         """.trimIndent()
 
         val deleteUser = "deleteUser"
-        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val deleteUserClient = buildUserClient(deleteUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
@@ -787,10 +753,7 @@ class SmtpAccountAccessIT : PluginRestTestCase() {
         """.trimIndent()
 
         val deleteUser = "deleteUser"
-        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val deleteUserClient = buildUserClient(deleteUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)
@@ -844,10 +807,7 @@ class SmtpAccountAccessIT : PluginRestTestCase() {
         """.trimIndent()
 
         val deleteUser = "deleteUser"
-        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val deleteUserClient = buildUserClient(deleteUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createRequestJsonString, userClient!!)

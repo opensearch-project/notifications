@@ -491,6 +491,13 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         return Triple(sampleEmail, emailConfig, createEmailRequestJsonString)
     }
 
+    fun buildUserClient(username: String, password: String): RestClient {
+        return SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), username, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
+    }
+
     @After
     open fun wipeAllSettings() {
         wipeAllClusterSettings()

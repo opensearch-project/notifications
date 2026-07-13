@@ -14,7 +14,6 @@ import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.EmailGroup
 import org.opensearch.commons.notifications.model.EmailRecipient
 import org.opensearch.commons.notifications.model.NotificationConfig
-import org.opensearch.commons.rest.SecureRestClientBuilder
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.NotificationPlugin
 import org.opensearch.notifications.getJsonString
@@ -41,10 +40,7 @@ class EmailGroupAccessIT : PluginRestTestCase() {
     @Before
     fun create() {
         createUser(user, password, arrayOf())
-        userClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), user, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        userClient = buildUserClient(user, password)
     }
 
     @After
@@ -81,12 +77,8 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         createUserWithCustomRole(user, password, NOTIFICATION_CREATE_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_CREATE_CONFIG_ACCESS])
 
         val (emailGroupConfig, createEmailGroupRequestJsonString) = createTestEmailGroup()
-
         val getUser = "getUser"
-        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val getUserClient = buildUserClient(getUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
@@ -118,10 +110,7 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         val (emailGroupConfig, createEmailGroupRequestJsonString) = createTestEmailGroup()
 
         val getUser = "getUser"
-        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val getUserClient = buildUserClient(getUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
@@ -153,10 +142,7 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         val (emailGroupConfig, createEmailGroupRequestJsonString) = createTestEmailGroup()
 
         val getUser = "getUser"
-        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val getUserClient = buildUserClient(getUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
@@ -189,10 +175,7 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         val (emailGroupConfig, createEmailGroupRequestJsonString) = createTestEmailGroup()
 
         val getUser = "getUser"
-        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val getUserClient = buildUserClient(getUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
@@ -251,10 +234,7 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         """.trimIndent()
 
         val updateUser = "updateUser"
-        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val updateUserClient = buildUserClient(updateUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
@@ -344,10 +324,7 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         """.trimIndent()
 
         val updateUser = "updateUser"
-        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val updateUserClient = buildUserClient(updateUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
@@ -429,10 +406,7 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         """.trimIndent()
 
         val updateUser = "updateUser"
-        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val updateUserClient = buildUserClient(updateUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
@@ -524,10 +498,7 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         """.trimIndent()
 
         val updateUser = "updateUser"
-        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val updateUserClient = buildUserClient(updateUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
@@ -583,10 +554,7 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         val (emailGroupConfig, createEmailGroupRequestJsonString) = createTestEmailGroup()
 
         val deleteUser = "deleteUser"
-        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val deleteUserClient = buildUserClient(deleteUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
@@ -619,10 +587,7 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         val (emailGroupConfig, createEmailGroupRequestJsonString) = createTestEmailGroup()
 
         val deleteUser = "deleteUser"
-        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val deleteUserClient = buildUserClient(deleteUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
@@ -654,10 +619,7 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         val (emailGroupConfig, createEmailGroupRequestJsonString) = createTestEmailGroup()
 
         val deleteUser = "deleteUser"
-        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val deleteUserClient = buildUserClient(deleteUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)
@@ -690,10 +652,7 @@ class EmailGroupAccessIT : PluginRestTestCase() {
         val (emailGroupConfig, createEmailGroupRequestJsonString) = createTestEmailGroup()
 
         val deleteUser = "deleteUser"
-        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val deleteUserClient = buildUserClient(deleteUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, userClient!!)

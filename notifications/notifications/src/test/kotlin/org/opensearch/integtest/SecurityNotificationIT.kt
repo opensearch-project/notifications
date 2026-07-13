@@ -11,7 +11,6 @@ import org.junit.Before
 import org.junit.BeforeClass
 import org.opensearch.client.RestClient
 import org.opensearch.commons.notifications.model.ConfigType
-import org.opensearch.commons.rest.SecureRestClientBuilder
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.NotificationPlugin
 import org.opensearch.notifications.verifyChannelIdEquals
@@ -35,10 +34,7 @@ class SecurityNotificationIT : PluginRestTestCase() {
     @Before
     fun create() {
         createUser(user, password, arrayOf())
-        userClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), user, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        userClient = buildUserClient(user, password)
     }
 
     @After

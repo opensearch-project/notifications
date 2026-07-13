@@ -12,7 +12,6 @@ import org.junit.BeforeClass
 import org.opensearch.client.RestClient
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.NotificationConfig
-import org.opensearch.commons.rest.SecureRestClientBuilder
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.NotificationPlugin
 import org.opensearch.notifications.settings.FilterByBackendRolesAccessStrategy
@@ -38,10 +37,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
     @Before
     fun create() {
         createUser(user, password, arrayOf())
-        userClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), user, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        userClient = buildUserClient(user, password)
     }
 
     @After
@@ -219,10 +215,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         val updateUser = "updateUser"
-        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val updateUserClient = buildUserClient(updateUser, password)
 
         try {
             // Get email notification config
@@ -299,10 +292,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         val updateUser = "updateUser"
-        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val updateUserClient = buildUserClient(updateUser, password)
 
         try {
             // Get email notification config
@@ -369,10 +359,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         val updateUser = "updateUser"
-        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val updateUserClient = buildUserClient(updateUser, password)
 
         try {
             // Get email notification config
@@ -449,10 +436,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         val updateUser = "updateUser"
-        val updateUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), updateUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val updateUserClient = buildUserClient(updateUser, password)
 
         try {
             // Get email notification config
@@ -552,10 +536,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         val getUser = "getUser"
-        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val getUserClient = buildUserClient(getUser, password)
 
         try {
             createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
@@ -588,10 +569,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         val getUser = "getUser"
-        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val getUserClient = buildUserClient(getUser, password)
 
         try {
             createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
@@ -623,10 +601,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         val getUser = "getUser"
-        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val getUserClient = buildUserClient(getUser, password)
 
         try {
             createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
@@ -659,10 +634,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         val getUser = "getUser"
-        val getUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), getUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val getUserClient = buildUserClient(getUser, password)
 
         try {
             createUserWithCustomRole(getUser, password, NOTIFICATION_GET_CONFIG_ACCESS, arrayOf("role1", "role2", "role3"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_GET_CONFIG_ACCESS])
@@ -730,10 +702,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         val deleteUser = "deleteUser"
-        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val deleteUserClient = buildUserClient(deleteUser, password)
 
         try {
             createUserWithCustomRole(deleteUser, password, NOTIFICATION_DELETE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
@@ -767,10 +736,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         val deleteUser = "deleteUser"
-        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val deleteUserClient = buildUserClient(deleteUser, password)
 
         try {
             createUserWithCustomRole(deleteUser, password, NOTIFICATION_DELETE_CONFIG_ACCESS, arrayOf("role1"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
@@ -801,10 +767,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         val deleteUser = "deleteUser"
-        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val deleteUserClient = buildUserClient(deleteUser, password)
 
         try {
             createUserWithCustomRole(deleteUser, password, NOTIFICATION_DELETE_CONFIG_ACCESS, arrayOf("role1", "role2"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
@@ -838,10 +801,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         Thread.sleep(1000)
 
         val deleteUser = "deleteUser"
-        val deleteUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), deleteUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val deleteUserClient = buildUserClient(deleteUser, password)
 
         try {
             createUserWithCustomRole(deleteUser, password, NOTIFICATION_DELETE_CONFIG_ACCESS, arrayOf("role1", "role2", "role3"), ROLE_TO_PERMISSION_MAPPING[NOTIFICATION_DELETE_CONFIG_ACCESS])
@@ -891,10 +851,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification()
 
         val sendUser = "sendUser"
-        val sendUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), sendUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val sendUserClient = buildUserClient(sendUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString)
@@ -927,10 +884,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
 
         val sendUser = "sendUser"
-        val sendUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), sendUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val sendUserClient = buildUserClient(sendUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
@@ -968,10 +922,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
 
         val sendUser = "sendUser"
-        val sendUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), sendUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val sendUserClient = buildUserClient(sendUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
@@ -1004,10 +955,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
 
         val sendUser = "sendUser"
-        val sendUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), sendUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val sendUserClient = buildUserClient(sendUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
@@ -1045,10 +993,7 @@ class EmailNotificationAccessIT : PluginRestTestCase() {
         val (sampleEmail, emailConfig, createEmailNotificationJsonString) = createTestEmailNotification(userClient!!)
 
         val sendUser = "sendUser"
-        val sendUserClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), sendUser, password)
-            .setSocketTimeout(60000)
-            .setConnectionRequestTimeout(180000)
-            .build()
+        val sendUserClient = buildUserClient(sendUser, password)
 
         try {
             val configId = createConfigWithRequestJsonString(createEmailNotificationJsonString, userClient!!)
