@@ -238,4 +238,18 @@ internal class PluginSettingsTests {
         Assertions.assertTrue(PluginSettings.REMOTE_METADATA_REGION.key.startsWith("plugins.notifications."))
         Assertions.assertTrue(PluginSettings.REMOTE_METADATA_SERVICE_NAME.key.startsWith("plugins.notifications."))
     }
+
+    @Test
+    fun `test tenant id header is registered as allowed REST header`() {
+        val headers = plugin.restHeaders
+        val headerNames = headers.map { it.name }
+        Assertions.assertTrue(headerNames.contains("x-tenant-id"))
+    }
+
+    @Test
+    fun `test tenant id header does not allow multiple values`() {
+        val headers = plugin.restHeaders
+        val tenantHeader = headers.first { it.name == "x-tenant-id" }
+        Assertions.assertFalse(tenantHeader.isMultiValueAllowed)
+    }
 }
