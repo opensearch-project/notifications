@@ -358,6 +358,16 @@ integTest {
         }
     }
 
+    if (System.getProperty("resource_sharing.enabled") != "true") {
+        filter {
+            excludeTestsMatching "org.opensearch.integtest.ResourceSharingNotificationIT"
+        }
+    } else {
+        filter {
+            includeTestsMatching "org.opensearch.integtest.ResourceSharingNotificationIT"
+        }
+    }
+
     if (System.getProperty("tests.rest.bwcsuite") == null) {
         filter {
             excludeTestsMatching "org.opensearch.integtest.bwc.*IT"
