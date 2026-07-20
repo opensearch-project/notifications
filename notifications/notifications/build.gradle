@@ -129,6 +129,12 @@ configurations.all {
                     : versions.jackson
                 details.useVersion version
             }
+            if (details.requested.group.startsWith('tools.jackson')) {
+                def version = details.requested.module.name == 'jackson-databind'
+                    ? versions.jackson3_databind
+                    : versions.jackson3
+                details.useVersion version
+            }
         }
         force "commons-logging:commons-logging:1.3.5"
         force "commons-codec:commons-codec:1.17.1"
