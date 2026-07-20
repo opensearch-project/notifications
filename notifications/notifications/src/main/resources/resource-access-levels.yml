@@ -2,6 +2,7 @@
 resource_types:
   notification_config:
     notifications_read_only:
+      default: true
       allowed_actions:
         - 'cluster:admin/opensearch/notifications/configs/get'
         - 'cluster:admin/opensearch/notifications/channels/get'
