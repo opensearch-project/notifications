@@ -206,7 +206,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
 
         val entity = "[{\n" +
             "  \"op\" : \"add\",\n" +
-            "  \"path\" : \"users\",\n" +
+            "  \"path\" : \"/users\",\n" +
             "  \"value\" : [$usersStr]\n" +
             "}]"
 
@@ -220,7 +220,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
 
         val entity = "[{\n" +
             "  \"op\" : \"remove\",\n" +
-            "  \"path\" : \"users\",\n" +
+            "  \"path\" : \"/users\",\n" +
             "  \"value\" : [$usersStr]\n" +
             "}]"
 
