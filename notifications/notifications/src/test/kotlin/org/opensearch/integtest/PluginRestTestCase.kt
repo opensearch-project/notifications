@@ -19,12 +19,19 @@ import org.opensearch.common.io.PathUtils
 import org.opensearch.common.settings.Settings
 import org.opensearch.commons.ConfigConstants
 import org.opensearch.commons.notifications.model.ConfigType
+import org.opensearch.commons.notifications.model.Email
+import org.opensearch.commons.notifications.model.EmailGroup
+import org.opensearch.commons.notifications.model.EmailRecipient
+import org.opensearch.commons.notifications.model.MethodType
+import org.opensearch.commons.notifications.model.NotificationConfig
+import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.commons.rest.SecureRestClientBuilder
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.core.xcontent.DeprecationHandler
 import org.opensearch.core.xcontent.MediaType
 import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.NotificationPlugin
+import org.opensearch.notifications.getJsonString
 import org.opensearch.notifications.index.NotificationConfigIndex
 import org.opensearch.rest.RestRequest
 import org.opensearch.test.rest.OpenSearchRestTestCase
@@ -258,10 +265,10 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         user: String,
         password: String,
         role: String,
-        backendRole: String,
+        backendRoles: Array<String>,
         clusterPermissions: String?
     ) {
-        createUser(user, password, arrayOf(backendRole))
+        createUser(user, password, backendRoles)
         createCustomRole(role, clusterPermissions)
         createUserRolesMapping(role, arrayOf(user))
     }
@@ -348,6 +355,147 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         )
         refreshAllIndices()
         return deleteResponse
+    }
+
+    fun createTestEmailGroup(): Pair<NotificationConfig, String> {
+        val sampleEmailGroup = EmailGroup(listOf(EmailRecipient("email1@email.com"), EmailRecipient("email2@email.com")))
+        val emailGroupConfig = NotificationConfig(
+            "this is a sample email group config name",
+            "this is a sample email group config description",
+            ConfigType.EMAIL_GROUP,
+            isEnabled = true,
+            configData = sampleEmailGroup
+        )
+        val sampleSmtpJsonString = getJsonString(emailGroupConfig)
+
+        // Create email group notification config
+        val createEmailGroupRequestJsonString = """
+        {
+            "config":{
+                "name":"${emailGroupConfig.name}",
+                "description":"${emailGroupConfig.description}",
+                "config_type":"email_group",
+                "is_enabled":${emailGroupConfig.isEnabled},
+                "email_group":{
+                    "recipient_list":[
+                        {"recipient":"${sampleEmailGroup.recipients[0].recipient}"},
+                        {"recipient":"${sampleEmailGroup.recipients[1].recipient}"}
+                    ]
+                }
+            }
+        }
+        """.trimIndent()
+        return Pair(emailGroupConfig, createEmailGroupRequestJsonString)
+    }
+
+    fun createTestEmailNotification(client: RestClient = client()): Triple<Email, NotificationConfig, String> {
+        // Create sample smtp account config request reference
+        val sampleSmtpAccount = SmtpAccount(
+            "smtp.domain.com",
+            1234,
+            MethodType.START_TLS,
+            "from@domain.com"
+        )
+        val smtpAccountConfig = NotificationConfig(
+            "this is a sample smtp account config name",
+            "this is a sample smtp account config description",
+            ConfigType.SMTP_ACCOUNT,
+            isEnabled = true,
+            configData = sampleSmtpAccount
+        )
+
+        // Create smtp account notification config
+        val createSmtpAccountRequestJsonString = """
+        {
+            "config":{
+                "name":"${smtpAccountConfig.name}",
+                "description":"${smtpAccountConfig.description}",
+                "config_type":"smtp_account",
+                "is_enabled":${smtpAccountConfig.isEnabled},
+                "smtp_account":{
+                    "host":"${sampleSmtpAccount.host}",
+                    "port":"${sampleSmtpAccount.port}",
+                    "method":"${sampleSmtpAccount.method}",
+                    "from_address":"${sampleSmtpAccount.fromAddress}"
+                }
+            }
+        }
+        """.trimIndent()
+        val smtpAccountConfigId = createConfigWithRequestJsonString(createSmtpAccountRequestJsonString, client)
+
+        // Create sample email group config request reference
+        val sampleEmailGroup = EmailGroup(listOf(EmailRecipient("email1@email.com"), EmailRecipient("email2@email.com")))
+        val emailGroupConfig = NotificationConfig(
+            "this is a sample email group config name",
+            "this is a sample email group config description",
+            ConfigType.EMAIL_GROUP,
+            isEnabled = true,
+            configData = sampleEmailGroup
+        )
+
+        // Create email group notification config
+        val createEmailGroupRequestJsonString = """
+        {
+            "config":{
+                "name":"${emailGroupConfig.name}",
+                "description":"${emailGroupConfig.description}",
+                "config_type":"email_group",
+                "is_enabled":${emailGroupConfig.isEnabled},
+                "email_group":{
+                    "recipient_list":[
+                        {"recipient":"${sampleEmailGroup.recipients[0].recipient}"},
+                        {"recipient":"${sampleEmailGroup.recipients[1].recipient}"}
+                    ]
+                }
+            }
+        }
+        """.trimIndent()
+        val emailGroupConfigId = createConfigWithRequestJsonString(createEmailGroupRequestJsonString, client)
+
+        // Create sample email config request reference
+        val sampleEmail = Email(
+            smtpAccountConfigId,
+            listOf(EmailRecipient("default-email1@email.com"), EmailRecipient("default-email2@email.com")),
+            listOf(emailGroupConfigId)
+        )
+        val emailConfig = NotificationConfig(
+            "this is a sample config name",
+            "this is a sample config description",
+            ConfigType.EMAIL,
+            isEnabled = true,
+            configData = sampleEmail
+        )
+
+        // Create email notification config
+        val createEmailRequestJsonString = """
+        {
+            "config":{
+                "name":"${emailConfig.name}",
+                "description":"${emailConfig.description}",
+                "config_type":"email",
+                "is_enabled":${emailConfig.isEnabled},
+                "email":{
+                    "email_account_id":"${sampleEmail.emailAccountID}",
+                    "recipient_list":[
+                        {"recipient":"${sampleEmail.recipients[0].recipient}"},
+                        {"recipient":"${sampleEmail.recipients[1].recipient}"}
+                    ],
+                    "email_group_id_list":[
+                        "${sampleEmail.emailGroupIds[0]}"
+                    ]
+                }
+            }
+        }
+        """.trimIndent()
+
+        return Triple(sampleEmail, emailConfig, createEmailRequestJsonString)
+    }
+
+    fun buildUserClient(username: String, password: String): RestClient {
+        return SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), username, password)
+            .setSocketTimeout(60000)
+            .setConnectionRequestTimeout(180000)
+            .build()
     }
 
     @After
