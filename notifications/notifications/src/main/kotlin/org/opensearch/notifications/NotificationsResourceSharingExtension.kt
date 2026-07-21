@@ -10,10 +10,15 @@ import org.opensearch.security.spi.resources.ResourceSharingExtension
 import org.opensearch.security.spi.resources.client.ResourceSharingClient
 
 class NotificationsResourceSharingExtension : ResourceSharingExtension {
+
+    companion object {
+        const val RESOURCE_TYPE = "notification_config"
+    }
+
     override fun getResourceProviders(): Set<ResourceProvider> {
         return setOf(
             object : ResourceProvider {
-                override fun resourceType(): String = "notification_config"
+                override fun resourceType(): String = RESOURCE_TYPE
                 override fun resourceIndexName(): String = NotificationConfigIndex.INDEX_NAME
             }
         )

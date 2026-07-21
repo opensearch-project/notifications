@@ -8,6 +8,7 @@ package org.opensearch.notifications.security
 import org.opensearch.OpenSearchStatusException
 import org.opensearch.commons.authuser.User
 import org.opensearch.core.rest.RestStatus
+import org.opensearch.notifications.NotificationsResourceSharingExtension.Companion.RESOURCE_TYPE
 import org.opensearch.notifications.ResourceSharingClientAccessor
 import org.opensearch.notifications.settings.FilterByBackendRolesAccessStrategy
 import org.opensearch.notifications.settings.PluginSettings
@@ -21,7 +22,7 @@ internal object UserAccessManager : UserAccess {
 
     private fun isResourceSharingEnabled(): Boolean {
         val client = ResourceSharingClientAccessor.getResourceSharingClient()
-        return client != null && client.isFeatureEnabledForType("notification_config")
+        return client != null && client.isFeatureEnabledForType(RESOURCE_TYPE)
     }
 
     /**
@@ -94,6 +95,4 @@ internal object UserAccessManager : UserAccess {
             )
         }
     }
-
-    private const val RESOURCE_TYPE = "notification_config"
 }

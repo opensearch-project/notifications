@@ -313,6 +313,9 @@ object ConfigIndexingActions {
      */
     private suspend fun info(configIds: Set<String>, user: User?): GetNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-info $configIds")
+        configIds.forEach { id ->
+            UserAccessManager.verifyResourceAccess(id, "cluster:admin/opensearch/notifications/configs/get")
+        }
         val configDocs = operations.getNotificationConfigs(configIds)
         if (configDocs.size != configIds.size) {
             val mutableSet = configIds.toMutableSet()
