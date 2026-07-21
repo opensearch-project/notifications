@@ -20,6 +20,11 @@ import org.opensearch.rest.RestRequest
 /**
  * Integration tests for Resource Sharing feature with Notifications plugin.
  * Only runs when both security and resource_sharing are enabled.
+ *
+ * All users have the same cluster-level role (notifications_full_access) which grants
+ * all notification actions + resource sharing. The tests verify that resource-level
+ * access control (via access levels in resource-access-levels.yml) correctly restricts
+ * what shared users can do regardless of their cluster permissions.
  */
 class ResourceSharingNotificationIT : PluginRestTestCase() {
 
@@ -37,20 +42,26 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
     private val alicePassword = "TopSecret_1234%Alice"
     private val bobUser = "rs_bob"
     private val bobPassword = "TopSecret_1234%Bobby"
+    private val charlieUser = "rs_charlie"
+    private val charliePassword = "TopSecret_1234%Charlie"
     private var aliceClient: RestClient? = null
     private var bobClient: RestClient? = null
+    private var charlieClient: RestClient? = null
 
     @Before
     fun setupUsers() {
         if (aliceClient != null) return
-        createCustomRole(notificationsFullAccessRole, "cluster:admin/opensearch/notifications/*")
+        createNotificationsRole()
         createUser(aliceUser, alicePassword, arrayOf("engineering"))
         createUser(bobUser, bobPassword, arrayOf("marketing"))
-        createUserRolesMapping(notificationsFullAccessRole, arrayOf(aliceUser, bobUser))
+        createUser(charlieUser, charliePassword, arrayOf("sales"))
+        createUserRolesMapping(notificationsFullAccessRole, arrayOf(aliceUser, bobUser, charlieUser))
 
         aliceClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), aliceUser, alicePassword)
             .setSocketTimeout(60000).build()
         bobClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), bobUser, bobPassword)
+            .setSocketTimeout(60000).build()
+        charlieClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), charlieUser, charliePassword)
             .setSocketTimeout(60000).build()
     }
 
@@ -58,11 +69,13 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
     fun cleanupClients() {
         aliceClient?.close()
         bobClient?.close()
+        charlieClient?.close()
         aliceClient = null
         bobClient = null
+        charlieClient = null
     }
 
-    fun `test owner can access their own config`() {
+    fun `test owner can create and access their own config`() {
         val configId = createConfig(configType = ConfigType.SLACK, client = aliceClient!!)
 
         val response = executeRequest(
@@ -75,12 +88,30 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
         Assert.assertNotNull(response)
     }
 
-    fun `test non-owner cannot access config by ID`() {
+    fun `test non-owner with full cluster role cannot access unshared config`() {
         val configId = createConfig(configType = ConfigType.SLACK, client = aliceClient!!)
 
-        // Bob should be denied access to Alice's config
+        // Bob has full cluster permissions but no resource-level access
         executeRequest(
             RestRequest.Method.GET.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.FORBIDDEN.status,
+            bobClient!!
+        )
+
+        // Bob cannot update
+        executeRequest(
+            RestRequest.Method.PUT.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            buildUpdateJson("attempted update"),
+            RestStatus.FORBIDDEN.status,
+            bobClient!!
+        )
+
+        // Bob cannot delete
+        executeRequest(
+            RestRequest.Method.DELETE.name,
             "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
             "",
             RestStatus.FORBIDDEN.status,
@@ -88,39 +119,12 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
         )
     }
 
-    fun `test config becomes accessible after sharing`() {
+    fun `test read_only access grants only read`() {
         val configId = createConfig(configType = ConfigType.SLACK, client = aliceClient!!)
-
-        // Bob cannot access before sharing
-        executeRequest(
-            RestRequest.Method.GET.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
-            "",
-            RestStatus.FORBIDDEN.status,
-            bobClient!!
-        )
-
-        // Share with bob
-        val shareRequest = Request("PUT", "/_plugins/_security/api/resource/share")
-        shareRequest.setJsonEntity(
-            """
-            {
-              "resource_id": "$configId",
-              "resource_type": "notification_config",
-              "share_with": {
-                "notifications_read_only": {
-                    "users": ["$bobUser"]
-                }
-              }
-            }
-            """.trimIndent()
-        )
-        val shareResponse = aliceClient!!.performRequest(shareRequest)
-        Assert.assertEquals(200, shareResponse.statusLine.statusCode)
-
+        shareResource(aliceClient!!, configId, "notifications_read_only", bobUser)
         Thread.sleep(2000)
 
-        // Bob should now be able to get the config
+        // Bob can read
         val response = executeRequest(
             RestRequest.Method.GET.name,
             "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
@@ -129,5 +133,185 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
             bobClient!!
         )
         Assert.assertNotNull(response)
+
+        // Bob cannot update
+        executeRequest(
+            RestRequest.Method.PUT.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            buildUpdateJson("read_only user update attempt"),
+            RestStatus.FORBIDDEN.status,
+            bobClient!!
+        )
+
+        // Bob cannot delete
+        executeRequest(
+            RestRequest.Method.DELETE.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.FORBIDDEN.status,
+            bobClient!!
+        )
+
+        // Bob cannot share further
+        val shareRequest = Request("PUT", "/_plugins/_security/api/resource/share")
+        shareRequest.setJsonEntity(buildShareJson(configId, "notifications_read_only", charlieUser))
+        executeRequest(shareRequest, RestStatus.FORBIDDEN.status, bobClient!!)
+    }
+
+    fun `test read_write access grants read update and delete but not share`() {
+        val configId = createConfig(configType = ConfigType.SLACK, client = aliceClient!!)
+        shareResource(aliceClient!!, configId, "notifications_read_write", bobUser)
+        Thread.sleep(2000)
+
+        // Bob can read
+        executeRequest(
+            RestRequest.Method.GET.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.OK.status,
+            bobClient!!
+        )
+
+        // Bob can update
+        executeRequest(
+            RestRequest.Method.PUT.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            buildUpdateJson("updated by bob"),
+            RestStatus.OK.status,
+            bobClient!!
+        )
+
+        // Alice sees Bob's update
+        val aliceGetResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.OK.status,
+            aliceClient!!
+        )
+        val configName = aliceGetResponse.get("config_list").asJsonArray[0].asJsonObject
+            .get("config").asJsonObject.get("name").asString
+        Assert.assertEquals("updated by bob", configName)
+
+        // Bob cannot share — read_write does not include share action
+        val shareRequest = Request("PUT", "/_plugins/_security/api/resource/share")
+        shareRequest.setJsonEntity(buildShareJson(configId, "notifications_read_only", charlieUser))
+        executeRequest(shareRequest, RestStatus.FORBIDDEN.status, bobClient!!)
+
+        // Bob can delete
+        executeRequest(
+            RestRequest.Method.DELETE.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.OK.status,
+            bobClient!!
+        )
+    }
+
+    fun `test full_access grants all operations including share`() {
+        val configId = createConfig(configType = ConfigType.SLACK, client = aliceClient!!)
+        shareResource(aliceClient!!, configId, "notifications_full_access", bobUser)
+        Thread.sleep(2000)
+
+        // Bob can read
+        executeRequest(
+            RestRequest.Method.GET.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.OK.status,
+            bobClient!!
+        )
+
+        // Bob can update
+        executeRequest(
+            RestRequest.Method.PUT.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            buildUpdateJson("full access update by bob"),
+            RestStatus.OK.status,
+            bobClient!!
+        )
+
+        // Bob can share further with charlie at read_only level
+        shareResource(bobClient!!, configId, "notifications_read_only", charlieUser)
+        Thread.sleep(2000)
+
+        // Charlie can read (shared by bob, not the owner)
+        val charlieResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.OK.status,
+            charlieClient!!
+        )
+        Assert.assertNotNull(charlieResponse)
+
+        // Charlie cannot delete (read_only access)
+        executeRequest(
+            RestRequest.Method.DELETE.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.FORBIDDEN.status,
+            charlieClient!!
+        )
+
+        // Bob can delete (full_access)
+        executeRequest(
+            RestRequest.Method.DELETE.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.OK.status,
+            bobClient!!
+        )
+    }
+
+    private fun buildUpdateJson(name: String): String {
+        return """
+        {
+            "config":{
+                "name":"$name",
+                "description":"updated config",
+                "config_type":"slack",
+                "is_enabled":true,
+                "slack":{"url":"https://hooks.slack.com/services/updated_url"}
+            }
+        }
+        """.trimIndent()
+    }
+
+    private fun buildShareJson(resourceId: String, accessLevel: String, user: String): String {
+        return """
+        {
+          "resource_id": "$resourceId",
+          "resource_type": "notification_config",
+          "share_with": {
+            "$accessLevel": {
+                "users": ["$user"]
+            }
+          }
+        }
+        """.trimIndent()
+    }
+
+    private fun shareResource(client: RestClient, resourceId: String, accessLevel: String, user: String) {
+        val request = Request("PUT", "/_plugins/_security/api/resource/share")
+        request.setJsonEntity(buildShareJson(resourceId, accessLevel, user))
+        val response = client.performRequest(request)
+        Assert.assertEquals(200, response.statusLine.statusCode)
+    }
+
+    private fun createNotificationsRole() {
+        val request = Request("PUT", "/_plugins/_security/api/roles/$notificationsFullAccessRole")
+        request.setJsonEntity(
+            """
+            {
+                "cluster_permissions": [
+                    "cluster:admin/opensearch/notifications/*",
+                    "cluster:admin/security/resource/*"
+                ],
+                "tenant_permissions": []
+            }
+            """.trimIndent()
+        )
+        adminClient().performRequest(request)
     }
 }
