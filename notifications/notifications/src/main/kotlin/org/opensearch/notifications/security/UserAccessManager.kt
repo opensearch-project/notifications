@@ -5,13 +5,17 @@
 
 package org.opensearch.notifications.security
 
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.opensearch.OpenSearchStatusException
 import org.opensearch.commons.authuser.User
+import org.opensearch.core.action.ActionListener
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.NotificationsResourceSharingExtension.Companion.RESOURCE_TYPE
 import org.opensearch.notifications.ResourceSharingClientAccessor
 import org.opensearch.notifications.settings.FilterByBackendRolesAccessStrategy
 import org.opensearch.notifications.settings.PluginSettings
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * Class for checking/filtering user access.
@@ -79,5 +83,32 @@ internal object UserAccessManager : UserAccess {
             return true
         }
         return access.isEmpty() || user.roles.contains(ADMIN_ROLE) || checkUserBackendRolesAccess(user.backendRoles, access)
+    }
+
+    /**
+     * Verify resource access via the security plugin's ResourceSharingClient.
+     * Used for multi-ID requests where DocRequest.id() returns null and the
+     * transport-level ResourceAccessEvaluator is skipped.
+     */
+    suspend fun verifyResourceAccess(resourceId: String, action: String) {
+        val client = ResourceSharingClientAccessor.getResourceSharingClient() ?: return
+        if (!client.isFeatureEnabledForType(RESOURCE_TYPE)) return
+        val hasAccess = suspendCancellableCoroutine { cont ->
+            client.verifyAccess(
+                resourceId,
+                RESOURCE_TYPE,
+                action,
+                object : ActionListener<Boolean> {
+                    override fun onResponse(response: Boolean) = cont.resume(response)
+                    override fun onFailure(e: Exception) = cont.resumeWithException(e)
+                }
+            )
+        }
+        if (!hasAccess) {
+            throw OpenSearchStatusException(
+                "no permissions for [$action] on resource [$resourceId]",
+                RestStatus.FORBIDDEN
+            )
+        }
     }
 }

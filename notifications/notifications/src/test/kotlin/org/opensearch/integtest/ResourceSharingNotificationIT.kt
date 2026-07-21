@@ -62,7 +62,7 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
         bobClient = null
     }
 
-    fun `test create and get notification config with resource sharing enabled`() {
+    fun `test owner can access their own config`() {
         val configId = createConfig(configType = ConfigType.SLACK, client = aliceClient!!)
 
         val response = executeRequest(
@@ -75,8 +75,30 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
         Assert.assertNotNull(response)
     }
 
-    fun `test share resource with another user`() {
+    fun `test non-owner cannot access config by ID`() {
         val configId = createConfig(configType = ConfigType.SLACK, client = aliceClient!!)
+
+        // Bob should be denied access to Alice's config
+        executeRequest(
+            RestRequest.Method.GET.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.FORBIDDEN.status,
+            bobClient!!
+        )
+    }
+
+    fun `test config becomes accessible after sharing`() {
+        val configId = createConfig(configType = ConfigType.SLACK, client = aliceClient!!)
+
+        // Bob cannot access before sharing
+        executeRequest(
+            RestRequest.Method.GET.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.FORBIDDEN.status,
+            bobClient!!
+        )
 
         // Share with bob
         val shareRequest = Request("PUT", "/_plugins/_security/api/resource/share")
