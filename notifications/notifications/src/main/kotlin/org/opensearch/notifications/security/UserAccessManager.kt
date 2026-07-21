@@ -12,7 +12,6 @@ import org.opensearch.notifications.NotificationsResourceSharingExtension.Compan
 import org.opensearch.notifications.ResourceSharingClientAccessor
 import org.opensearch.notifications.settings.FilterByBackendRolesAccessStrategy
 import org.opensearch.notifications.settings.PluginSettings
-import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntilCallback
 
 /**
  * Class for checking/filtering user access.
@@ -80,19 +79,5 @@ internal object UserAccessManager : UserAccess {
             return true
         }
         return access.isEmpty() || user.roles.contains(ADMIN_ROLE) || checkUserBackendRolesAccess(user.backendRoles, access)
-    }
-
-    suspend fun verifyResourceAccess(resourceId: String, action: String) {
-        val client = ResourceSharingClientAccessor.getResourceSharingClient() ?: return
-        if (!client.isFeatureEnabledForType(RESOURCE_TYPE)) return
-        val hasAccess = suspendUntilCallback<Boolean> { listener ->
-            client.verifyAccess(resourceId, RESOURCE_TYPE, action, listener)
-        }
-        if (!hasAccess) {
-            throw OpenSearchStatusException(
-                "no permissions for [$action] on resource [$resourceId]",
-                RestStatus.FORBIDDEN
-            )
-        }
     }
 }

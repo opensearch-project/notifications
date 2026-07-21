@@ -38,7 +38,6 @@ import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.DocMetadata
 import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.security.UserAccess
-import org.opensearch.notifications.security.UserAccessManager
 import java.time.Instant
 /**
  * NotificationConfig indexing operation actions.
@@ -227,7 +226,6 @@ object ConfigIndexingActions {
     suspend fun update(request: UpdateNotificationConfigRequest, user: User?): UpdateNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-update ${request.configId}")
         userAccess.validateUser(user)
-        UserAccessManager.verifyResourceAccess(request.configId, "cluster:admin/opensearch/notifications/configs/update")
         validateConfig(request.notificationConfig, user)
         val currentConfigDoc = operations.getNotificationConfig(request.configId)
         currentConfigDoc
@@ -284,7 +282,6 @@ object ConfigIndexingActions {
      */
     private suspend fun info(configId: String, user: User?): GetNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-info $configId")
-        UserAccessManager.verifyResourceAccess(configId, "cluster:admin/opensearch/notifications/configs/get")
         val configDoc = operations.getNotificationConfig(configId)
         configDoc
             ?: run {
@@ -313,9 +310,6 @@ object ConfigIndexingActions {
      */
     private suspend fun info(configIds: Set<String>, user: User?): GetNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-info $configIds")
-        configIds.forEach { id ->
-            UserAccessManager.verifyResourceAccess(id, "cluster:admin/opensearch/notifications/configs/get")
-        }
         val configDocs = operations.getNotificationConfigs(configIds)
         if (configDocs.size != configIds.size) {
             val mutableSet = configIds.toMutableSet()
@@ -410,7 +404,6 @@ object ConfigIndexingActions {
     private suspend fun delete(configId: String, user: User?): DeleteNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-delete $configId")
         userAccess.validateUser(user)
-        UserAccessManager.verifyResourceAccess(configId, "cluster:admin/opensearch/notifications/configs/delete")
         val currentConfigDoc = operations.getNotificationConfig(configId)
         currentConfigDoc
             ?: run {
@@ -448,9 +441,6 @@ object ConfigIndexingActions {
     private suspend fun delete(configIds: Set<String>, user: User?): DeleteNotificationConfigResponse {
         log.info("$LOG_PREFIX:NotificationConfig-delete $configIds")
         userAccess.validateUser(user)
-        configIds.forEach { id ->
-            UserAccessManager.verifyResourceAccess(id, "cluster:admin/opensearch/notifications/configs/delete")
-        }
         val configDocs = operations.getNotificationConfigs(configIds)
         if (configDocs.size != configIds.size) {
             val mutableSet = configIds.toMutableSet()

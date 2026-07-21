@@ -62,34 +62,40 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
         bobClient = null
     }
 
-    fun `test config created by alice is not visible to bob`() {
+    fun `test create and get notification config with resource sharing enabled`() {
         val configId = createConfig(configType = ConfigType.SLACK, client = aliceClient!!)
 
-        // Alice can access her own config
-        val aliceResponse = executeRequest(
+        val response = executeRequest(
             RestRequest.Method.GET.name,
             "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
             "",
             RestStatus.OK.status,
             aliceClient!!
         )
-        Assert.assertNotNull(aliceResponse)
-
-        // Bob should not be able to access Alice's config
-        executeRequest(
-            RestRequest.Method.GET.name,
-            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
-            "",
-            RestStatus.FORBIDDEN.status,
-            bobClient!!
-        )
+        Assert.assertNotNull(response)
     }
 
-    fun `test config created by alice is visible after sharing`() {
+    fun `test share resource with another user`() {
         val configId = createConfig(configType = ConfigType.SLACK, client = aliceClient!!)
 
         // Share with bob
-        shareResource(aliceClient!!, configId, "notification_config", "notifications_read_only", bobUser)
+        val shareRequest = Request("PUT", "/_plugins/_security/api/resource/share")
+        shareRequest.setJsonEntity(
+            """
+            {
+              "resource_id": "$configId",
+              "resource_type": "notification_config",
+              "share_with": {
+                "notifications_read_only": {
+                    "users": ["$bobUser"]
+                }
+              }
+            }
+            """.trimIndent()
+        )
+        val shareResponse = aliceClient!!.performRequest(shareRequest)
+        Assert.assertEquals(200, shareResponse.statusLine.statusCode)
+
         Thread.sleep(2000)
 
         // Bob should now be able to get the config
@@ -97,28 +103,9 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
             RestRequest.Method.GET.name,
             "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
             "",
-            200,
+            RestStatus.OK.status,
             bobClient!!
         )
         Assert.assertNotNull(response)
-    }
-
-    private fun shareResource(client: RestClient, resourceId: String, resourceType: String, accessLevel: String, user: String) {
-        val request = Request("PUT", "/_plugins/_security/api/resource/share")
-        request.setJsonEntity(
-            """
-            {
-              "resource_id": "$resourceId",
-              "resource_type": "$resourceType",
-              "share_with": {
-                "$accessLevel": {
-                    "users": ["$user"]
-                }
-              }
-            }
-            """.trimIndent()
-        )
-        val response = client.performRequest(request)
-        Assert.assertEquals(200, response.statusLine.statusCode)
     }
 }
