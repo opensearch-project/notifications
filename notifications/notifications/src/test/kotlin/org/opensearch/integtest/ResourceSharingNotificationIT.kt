@@ -150,7 +150,7 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
         executeRequest(shareRequest, RestStatus.FORBIDDEN.status, bobClient!!)
     }
 
-    // TODO: Add list isolation test once PluginClient is integrated for DLS-based search filtering
+    // TODO: Add DLS-based list isolation test once search path uses PluginClient for DLS filtering
 
     // --- read_only access level ---
 
@@ -327,7 +327,50 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
         )
     }
 
-    // TODO: Add revoke access test once the revoke API contract is finalized
+    // --- Revoke access ---
+
+    fun `test revoking access removes permissions`() {
+        val configId = createConfig(configType = ConfigType.SLACK, client = aliceClient!!)
+        shareResource(aliceClient!!, configId, "notifications_read_only", bobUser)
+        Thread.sleep(2000)
+
+        // Bob can read while shared
+        executeRequest(
+            RestRequest.Method.GET.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.OK.status,
+            bobClient!!
+        )
+
+        // Alice revokes Bob's access via PATCH with "revoke" field
+        val revokeRequest = Request("PATCH", "/_plugins/_security/api/resource/share")
+        revokeRequest.setJsonEntity(
+            """
+            {
+              "resource_id": "$configId",
+              "resource_type": "notification_config",
+              "revoke": {
+                "notifications_read_only": {
+                    "users": ["$bobUser"]
+                }
+              }
+            }
+            """.trimIndent()
+        )
+        val revokeResponse = aliceClient!!.performRequest(revokeRequest)
+        Assert.assertEquals(200, revokeResponse.statusLine.statusCode)
+        Thread.sleep(2000)
+
+        // Bob can no longer access
+        executeRequest(
+            RestRequest.Method.GET.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.FORBIDDEN.status,
+            bobClient!!
+        )
+    }
 
     // --- Helpers ---
 
