@@ -150,7 +150,52 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
         executeRequest(shareRequest, RestStatus.FORBIDDEN.status, bobClient!!)
     }
 
-    // TODO: Add DLS-based list isolation test once search path uses PluginClient for DLS filtering
+    // --- Isolation: DLS-based search filtering ---
+
+    fun `test user only sees own and shared configs in list`() {
+        val aliceConfigId = createConfig(nameSubstring = "alice-config", configType = ConfigType.SLACK, client = aliceClient!!)
+        val bobConfigId = createConfig(nameSubstring = "bob-config", configType = ConfigType.SLACK, client = bobClient!!)
+
+        // Alice should only see her own config
+        val aliceList = executeRequest(
+            RestRequest.Method.GET.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
+            "",
+            RestStatus.OK.status,
+            aliceClient!!
+        )
+        val aliceConfigIds = extractConfigIds(aliceList)
+        Assert.assertTrue("Alice should see her own config", aliceConfigIds.contains(aliceConfigId))
+        Assert.assertFalse("Alice should NOT see Bob's config", aliceConfigIds.contains(bobConfigId))
+
+        // Bob should only see his own config
+        val bobList = executeRequest(
+            RestRequest.Method.GET.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
+            "",
+            RestStatus.OK.status,
+            bobClient!!
+        )
+        val bobConfigIds = extractConfigIds(bobList)
+        Assert.assertTrue("Bob should see his own config", bobConfigIds.contains(bobConfigId))
+        Assert.assertFalse("Bob should NOT see Alice's config", bobConfigIds.contains(aliceConfigId))
+
+        // Share Alice's config with Bob
+        shareResource(aliceClient!!, aliceConfigId, "notifications_read_only", bobUser)
+        Thread.sleep(2000)
+
+        // Now Bob should see both
+        val bobListAfterShare = executeRequest(
+            RestRequest.Method.GET.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs",
+            "",
+            RestStatus.OK.status,
+            bobClient!!
+        )
+        val bobConfigIdsAfter = extractConfigIds(bobListAfterShare)
+        Assert.assertTrue("Bob should see his own config", bobConfigIdsAfter.contains(bobConfigId))
+        Assert.assertTrue("Bob should see shared config from Alice", bobConfigIdsAfter.contains(aliceConfigId))
+    }
 
     // --- read_only access level ---
 
@@ -373,6 +418,16 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
     }
 
     // --- Helpers ---
+
+    private fun extractConfigIds(response: com.google.gson.JsonObject): List<String> {
+        val ids = mutableListOf<String>()
+        if (response.has("config_list")) {
+            response.getAsJsonArray("config_list").forEach { item ->
+                ids.add(item.asJsonObject.get("config_id").asString)
+            }
+        }
+        return ids
+    }
 
     private fun buildUpdateJson(name: String): String {
         return """

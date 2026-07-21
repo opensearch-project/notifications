@@ -152,7 +152,20 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
         PluginSettings.addSettingsUpdateConsumer(clusterService)
         val pluginClientInstance = PluginClient(client)
         this.pluginClient = pluginClientInstance
-        NotificationConfigIndex.initialize(sdkClient, client, clusterService)
+        val searchSdkClient = SdkClientFactory.createSdkClient(
+            pluginClientInstance,
+            xContentRegistry,
+            mapOf(
+                REMOTE_METADATA_TYPE_KEY to REMOTE_METADATA_STORE_TYPE.get(settings),
+                REMOTE_METADATA_ENDPOINT_KEY to REMOTE_METADATA_ENDPOINT.get(settings),
+                REMOTE_METADATA_REGION_KEY to REMOTE_METADATA_REGION.get(settings),
+                REMOTE_METADATA_SERVICE_NAME_KEY to REMOTE_METADATA_SERVICE_NAME.get(settings),
+                TENANT_AWARE_KEY to MULTI_TENANCY_ENABLED.get(settings).toString(),
+                TENANT_ID_FIELD_KEY to "tenant_id"
+            ),
+            client.threadPool().executor(ThreadPool.Names.GENERIC)
+        )
+        NotificationConfigIndex.initialize(sdkClient, searchSdkClient, client, clusterService)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
         SendMessageActionHelper.initialize(NotificationConfigIndex, UserAccessManager)
         return listOf(sdkClient, pluginClientInstance)

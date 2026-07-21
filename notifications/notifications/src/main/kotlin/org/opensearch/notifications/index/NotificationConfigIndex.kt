@@ -83,6 +83,7 @@ internal object NotificationConfigIndex : ConfigOperations {
     private lateinit var client: Client
     private lateinit var clusterService: ClusterService
     private lateinit var sdkClient: SdkClient
+    private lateinit var searchSdkClient: SdkClient
 
     private val searchHitParser = object : SearchResults.SearchHitParser<NotificationConfigInfo> {
         override fun parse(searchHit: SearchHit): NotificationConfigInfo {
@@ -105,10 +106,11 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    fun initialize(sdkClient: SdkClient, client: Client, clusterService: ClusterService) {
+    fun initialize(sdkClient: SdkClient, searchSdkClient: SdkClient, client: Client, clusterService: ClusterService) {
         NotificationConfigIndex.client = SecureIndexClient(client)
         NotificationConfigIndex.clusterService = clusterService
         NotificationConfigIndex.sdkClient = sdkClient
+        NotificationConfigIndex.searchSdkClient = searchSdkClient
     }
 
     private fun getSchemaVersionFromIndexMapping(indexMapping: Map<String, Any>?): Int {
@@ -290,8 +292,8 @@ internal object NotificationConfigIndex : ConfigOperations {
             .searchSourceBuilder(sourceBuilder)
             .build()
 
-        val response: SearchResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-            sdkClient.searchDataObjectAsync(searchRequest).whenComplete(it)
+        val response: SearchResponse = searchSdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+            searchSdkClient.searchDataObjectAsync(searchRequest).whenComplete(it)
         }
         val result = NotificationConfigSearchResult(request.fromIndex.toLong(), response, searchHitParser)
         log.info(
