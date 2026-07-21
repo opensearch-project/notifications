@@ -16,7 +16,8 @@ interface CredentialsProvider {
      * @param region AWS region
      * @param roleArn optional role ARN
      * @param sessionPolicy optional inline session policy JSON to scope down permissions
+     * @param roleSessionName optional STS role session name (for CloudTrail attribution)
      * @return AWSCredentialsProvider
      */
-    fun getCredentialsProvider(region: String, roleArn: String?, sessionPolicy: String? = null, applicationId: String? = null): AWSCredentialsProvider
+    fun getCredentialsProvider(region: String, roleArn: String?, sessionPolicy: String? = null, applicationId: String? = null, roleSessionName: String? = null): AWSCredentialsProvider
 }

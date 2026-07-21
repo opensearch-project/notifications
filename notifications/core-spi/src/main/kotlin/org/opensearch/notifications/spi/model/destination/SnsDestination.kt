@@ -10,7 +10,10 @@ package org.opensearch.notifications.spi.model.destination
 data class SnsDestination(
     val topicArn: String,
     val roleArn: String? = null,
-    val applicationId: String? = null
+    val applicationId: String? = null,
+    // Optional STS role session name used when assuming roleArn, for CloudTrail attribution
+    // (e.g. alerting-notification-<configId>). A safe default is applied downstream when null.
+    val roleSessionName: String? = null
 ) : BaseDestination(DestinationType.SNS) {
     // sample topic arn -> arn:aws:sns:us-west-2:075315751589:test-notification
     val region: String = topicArn.split(":".toRegex()).toTypedArray()[3]

@@ -254,7 +254,7 @@ object SendMessageActionHelper {
             ConfigType.SES_ACCOUNT -> null
             ConfigType.SMTP_ACCOUNT -> null
             ConfigType.EMAIL_GROUP -> null
-            ConfigType.SNS -> sendSNSMessage(configData as Sns, message, eventStatus, eventSource.referenceId)
+            ConfigType.SNS -> sendSNSMessage(configData as Sns, message, eventStatus, eventSource.referenceId, channel.docInfo.id)
         }
         return if (response == null) {
             log.warn("Cannot send message to destination for config id :${channel.docInfo.id}")
@@ -489,7 +489,8 @@ object SendMessageActionHelper {
                             accountConfig.configData as SesAccount,
                             it.recipient,
                             message,
-                            referenceId
+                            referenceId,
+                            accountDocInfo.docInfo.id
                         )
                         else -> EmailRecipientStatus(
                             it.recipient,
@@ -561,7 +562,8 @@ object SendMessageActionHelper {
         sesAccount: SesAccount,
         recipient: String,
         message: MessageContent,
-        referenceId: String
+        referenceId: String,
+        configId: String?
     ): EmailRecipientStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SES_ACCOUNT.counter.increment()
         val destination = SesDestination(
@@ -570,7 +572,8 @@ object SendMessageActionHelper {
             sesAccount.roleArn,
             sesAccount.fromAddress,
             recipient,
-            NotificationRequestContext.getApplicationId()
+            NotificationRequestContext.getApplicationId(),
+            buildRoleSessionName(configId)
         )
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return EmailRecipientStatus(
@@ -586,13 +589,22 @@ object SendMessageActionHelper {
         sns: Sns,
         message: MessageContent,
         eventStatus: EventStatus,
-        referenceId: String
+        referenceId: String,
+        configId: String?
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SNS.counter.increment()
-        val destination = SnsDestination(sns.topicArn, sns.roleArn)
+        val destination = SnsDestination(sns.topicArn, sns.roleArn, roleSessionName = buildRoleSessionName(configId))
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
+
+    /**
+     * Build an STS role session name that attributes an assumed-role notification delivery to the
+     * specific notification config, for CloudTrail traceability. Returns null when the config id is
+     * unavailable, in which case the credentials factory applies its default session name.
+     */
+    private fun buildRoleSessionName(configId: String?): String? =
+        configId?.let { "alerting-notification-$it" }
 
     /**
      * Send message to destination using SPI

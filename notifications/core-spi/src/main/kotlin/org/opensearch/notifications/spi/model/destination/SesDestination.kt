@@ -18,7 +18,10 @@ class SesDestination(
     val roleArn: String?,
     val fromAddress: String,
     val recipient: String,
-    val applicationId: String? = null
+    val applicationId: String? = null,
+    // Optional STS role session name used when assuming roleArn, for CloudTrail attribution
+    // (e.g. alerting-notification-<configId>). A safe default is applied downstream when null.
+    val roleSessionName: String? = null
 ) : BaseDestination(DestinationType.SES) {
 
     init {
