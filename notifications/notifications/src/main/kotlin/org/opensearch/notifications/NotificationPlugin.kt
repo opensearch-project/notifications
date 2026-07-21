@@ -28,6 +28,7 @@ import org.opensearch.notifications.action.GetChannelListAction
 import org.opensearch.notifications.action.GetNotificationConfigAction
 import org.opensearch.notifications.action.GetPluginFeaturesAction
 import org.opensearch.notifications.action.PublishNotificationAction
+import org.opensearch.notifications.action.ReencryptNotificationConfigsAction
 import org.opensearch.notifications.action.SendNotificationAction
 import org.opensearch.notifications.action.SendTestNotificationAction
 import org.opensearch.notifications.action.UpdateNotificationConfigAction
@@ -36,6 +37,7 @@ import org.opensearch.notifications.index.NotificationConfigIndex
 import org.opensearch.notifications.resthandler.NotificationChannelListRestHandler
 import org.opensearch.notifications.resthandler.NotificationConfigRestHandler
 import org.opensearch.notifications.resthandler.NotificationFeaturesRestHandler
+import org.opensearch.notifications.resthandler.ReencryptNotificationConfigsRestHandler
 import org.opensearch.notifications.resthandler.SendTestMessageRestHandler
 import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.send.SendMessageActionHelper
@@ -47,9 +49,12 @@ import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_SERV
 import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_STORE_TYPE
 import org.opensearch.notifications.spi.NotificationCore
 import org.opensearch.notifications.spi.NotificationCoreExtension
+import org.opensearch.notifications.util.ConfigEncryptionTransformer
+import org.opensearch.notifications.util.FieldEncryptionService
 import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.plugins.ActionPlugin
 import org.opensearch.plugins.Plugin
+import org.opensearch.plugins.ReloadablePlugin
 import org.opensearch.plugins.SystemIndexPlugin
 import org.opensearch.remote.metadata.client.impl.SdkClientFactory
 import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_ENDPOINT_KEY
@@ -72,7 +77,7 @@ import java.util.function.Supplier
  * Entry point of the OpenSearch Notifications plugin
  * This class initializes the rest handlers.
  */
-class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, SystemIndexPlugin {
+class NotificationPlugin : ActionPlugin, ReloadablePlugin, Plugin(), NotificationCoreExtension, SystemIndexPlugin {
 
     lateinit var clusterService: ClusterService // initialized in createComponents()
 
@@ -87,6 +92,13 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
         // Other global constants
         const val TEXT_QUERY_TAG = "text_query"
         const val TENANT_ID_HEADER = "x-tenant-id"
+
+        /**
+         * Encryption service for sensitive channel-config fields.
+         * Initialised in [createComponents] from the node keystore.
+         * Runs in passthrough mode when no key is provisioned.
+         */
+        lateinit var fieldEncryptionService: FieldEncryptionService
     }
 
     /**
@@ -132,6 +144,7 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
         log.debug("$LOG_PREFIX:createComponents")
         this.clusterService = clusterService
         val settings = environment.settings()
+        fieldEncryptionService = PluginSettings.buildFieldEncryptionService(settings)
         val sdkClient = SdkClientFactory.createSdkClient(
             SecureIndexClient(client),
             xContentRegistry,
@@ -145,10 +158,13 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
             ),
             client.threadPool().executor(ThreadPool.Names.GENERIC)
         )
+
+        ConfigEncryptionTransformer.initialize(fieldEncryptionService)
+
         PluginSettings.addSettingsUpdateConsumer(clusterService)
-        NotificationConfigIndex.initialize(sdkClient, client, clusterService)
+        NotificationConfigIndex.initialize(sdkClient, client, clusterService, ConfigEncryptionTransformer)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
-        SendMessageActionHelper.initialize(NotificationConfigIndex, UserAccessManager)
+        SendMessageActionHelper.initialize(NotificationConfigIndex, UserAccessManager, ConfigEncryptionTransformer)
         return listOf(sdkClient)
     }
 
@@ -190,6 +206,10 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
             ActionPlugin.ActionHandler(
                 NotificationsActions.LEGACY_PUBLISH_NOTIFICATION_ACTION_TYPE,
                 PublishNotificationAction::class.java
+            ),
+            ActionPlugin.ActionHandler(
+                ReencryptNotificationConfigsAction.ACTION_TYPE,
+                ReencryptNotificationConfigsAction::class.java
             )
         )
     }
@@ -211,7 +231,8 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
             NotificationConfigRestHandler(),
             NotificationFeaturesRestHandler(),
             NotificationChannelListRestHandler(),
-            SendTestMessageRestHandler()
+            SendTestMessageRestHandler(),
+            ReencryptNotificationConfigsRestHandler()
             // NotificationStatsRestHandler()
         )
     }
@@ -219,5 +240,13 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
     override fun setNotificationCore(core: NotificationCore) {
         log.debug("$LOG_PREFIX:setNotificationCore")
         CoreProvider.initialize(core)
+    }
+
+    override fun reload(settings: Settings) {
+        val previousService = runCatching { fieldEncryptionService }.getOrNull()
+        fieldEncryptionService = PluginSettings.buildFieldEncryptionService(settings)
+        ConfigEncryptionTransformer.initialize(fieldEncryptionService)
+        previousService?.close()
+        log.info("$LOG_PREFIX:Field encryption service reloaded from secure settings")
     }
 }
