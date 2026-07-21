@@ -10,10 +10,10 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.BeforeClass
 import org.opensearch.client.Request
-import org.opensearch.client.ResponseException
 import org.opensearch.client.RestClient
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.rest.SecureRestClientBuilder
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.NotificationPlugin
 import org.opensearch.rest.RestRequest
 
@@ -32,6 +32,7 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
         }
     }
 
+    private val notificationsFullAccessRole = "notifications_full_access"
     private val aliceUser = "rs_alice"
     private val alicePassword = "TopSecret_1234%Alice"
     private val bobUser = "rs_bob"
@@ -42,13 +43,13 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
     @Before
     fun setupUsers() {
         if (aliceClient != null) return
+        createCustomRole(notificationsFullAccessRole, "cluster:admin/opensearch/notifications/*")
         createUser(aliceUser, alicePassword, arrayOf("engineering"))
-        addPatchUserRolesMapping(ALL_ACCESS_ROLE, arrayOf(aliceUser))
+        createUser(bobUser, bobPassword, arrayOf("marketing"))
+        createUserRolesMapping(notificationsFullAccessRole, arrayOf(aliceUser, bobUser))
+
         aliceClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), aliceUser, alicePassword)
             .setSocketTimeout(60000).build()
-
-        createUser(bobUser, bobPassword, arrayOf("marketing"))
-        addPatchUserRolesMapping(ALL_ACCESS_ROLE, arrayOf(bobUser))
         bobClient = SecureRestClientBuilder(clusterHosts.toTypedArray(), isHttps(), bobUser, bobPassword)
             .setSocketTimeout(60000).build()
     }
@@ -64,18 +65,23 @@ class ResourceSharingNotificationIT : PluginRestTestCase() {
     fun `test config created by alice is not visible to bob`() {
         val configId = createConfig(configType = ConfigType.SLACK, client = aliceClient!!)
 
-        // Bob should not be able to get Alice's config
-        val exception = Assert.assertThrows(ResponseException::class.java) {
-            executeRequest(
-                RestRequest.Method.GET.name,
-                "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
-                "",
-                0,
-                bobClient!!
-            )
-        }
-        Assert.assertTrue(
-            exception.message!!.contains("no permissions") || exception.response.statusLine.statusCode == 403
+        // Alice can access her own config
+        val aliceResponse = executeRequest(
+            RestRequest.Method.GET.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.OK.status,
+            aliceClient!!
+        )
+        Assert.assertNotNull(aliceResponse)
+
+        // Bob should not be able to access Alice's config
+        executeRequest(
+            RestRequest.Method.GET.name,
+            "${NotificationPlugin.PLUGIN_BASE_URI}/configs/$configId",
+            "",
+            RestStatus.FORBIDDEN.status,
+            bobClient!!
         )
     }
 

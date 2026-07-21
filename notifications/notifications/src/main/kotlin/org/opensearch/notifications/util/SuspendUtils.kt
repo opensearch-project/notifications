@@ -33,5 +33,14 @@ class SuspendUtils {
             }
             return finalValue
         }
+
+        suspend fun <T> suspendUntilCallback(block: (ActionListener<T>) -> Unit): T =
+            suspendCancellableCoroutine { cont ->
+                block(object : ActionListener<T> {
+                    override fun onResponse(response: T) = cont.resume(response)
+
+                    override fun onFailure(e: Exception) = cont.resumeWithException(e)
+                })
+            }
     }
 }

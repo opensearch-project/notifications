@@ -556,7 +556,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
             }
         }
         refreshRequest.setOptions(requestOptions)
-        client().performRequest(refreshRequest)
+        adminClient().performRequest(refreshRequest)
     }
 
     protected class ClusterSetting(val type: String, val name: String, var value: Any?) {
