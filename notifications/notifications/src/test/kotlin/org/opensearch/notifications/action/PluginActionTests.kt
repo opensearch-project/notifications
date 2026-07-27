@@ -247,7 +247,11 @@ internal class PluginActionTests {
 
         // Mock singleton's method by mockk framework
         mockkObject(SendMessageActionHelper)
-        every { SendMessageActionHelper.executeLegacyRequest(request) } returns response
+        every {
+            runBlocking {
+                SendMessageActionHelper.executeLegacyRequest(request)
+            }
+        } returns response
 
         val publishNotificationAction = PublishNotificationAction(
             transportService,
