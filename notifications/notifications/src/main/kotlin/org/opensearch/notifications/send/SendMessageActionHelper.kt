@@ -168,6 +168,8 @@ object SendMessageActionHelper {
      * @param message the message to send
      * @return notification delivery status for the channel
      */
+    // suspend is required here because this calls sendEmailMessage, which is a suspend
+    // function (it fans out to email recipients within its own coroutineScope).
     private suspend fun sendMessageToChannel(
         user: User?,
         eventSource: EventSource,
