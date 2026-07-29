@@ -46,7 +46,7 @@ opensearchplugin {
     name 'opensearch-notifications'
     description 'OpenSearch Notifications Plugin'
     classname 'org.opensearch.notifications.NotificationPlugin'
-    extendedPlugins = ['opensearch-notifications-core']
+    extendedPlugins = ['opensearch-notifications-core', 'opensearch-security;optional=true']
 }
 
 publishing {
@@ -129,6 +129,9 @@ configurations.all {
                     : versions.jackson
                 details.useVersion version
             }
+            if (details.requested.group.startsWith('tools.jackson')) {
+                details.useVersion versions.jackson3
+            }
         }
         force "commons-logging:commons-logging:1.3.5"
         force "commons-codec:commons-codec:1.17.1"
@@ -182,7 +185,8 @@ dependencies {
     // implementation "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}"
     // implementation "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson_annotations}"
 
-    // Needed for security tests
+    // Resource sharing
+    compileOnly group: 'org.opensearch', name:'opensearch-security-spi', version:"${opensearch_build}"
     if (securityEnabled) {
         opensearchPlugin "org.opensearch.plugin:opensearch-security:${opensearch_build}@zip"
     }
@@ -282,6 +286,10 @@ afterEvaluate {
             node.setting("plugins.security.check_snapshot_restore_write_privileges", "true")
             node.setting("plugins.security.restapi.roles_enabled", "[\"all_access\", \"security_rest_api_access\"]")
             node.setting("plugins.security.system_indices.enabled", "true")
+        if (System.getProperty("resource_sharing.enabled") == "true") {
+            node.setting "plugins.security.experimental.resource_sharing.enabled", "true"
+            node.setting "plugins.security.experimental.resource_sharing.protected_types", "[\"notification_config\"]"
+        }
         }
     }
 }
@@ -322,6 +330,7 @@ integTest {
     systemProperty "security", System.getProperty("security")
     systemProperty "user", System.getProperty("user", "admin")
     systemProperty "password", System.getProperty("password", "admin")
+    systemProperty "resource_sharing.enabled", System.getProperty("resource_sharing.enabled")
     // Tell the test JVM if the cluster JVM is running under a debugger so that tests can use longer timeouts for
     // requests. The 'doFirst' delays reading the debug setting on the cluster till execution time.
     doFirst {
@@ -346,6 +355,16 @@ integTest {
     if (System.getProperty("https") == null || System.getProperty("https") == "false") {
         filter {
             excludeTestsMatching "org.opensearch.*.Security*IT"
+        }
+    }
+
+    if (System.getProperty("resource_sharing.enabled") != "true") {
+        filter {
+            excludeTestsMatching "org.opensearch.integtest.ResourceSharingNotificationIT"
+        }
+    } else {
+        filter {
+            includeTestsMatching "org.opensearch.integtest.ResourceSharingNotificationIT"
         }
     }
 

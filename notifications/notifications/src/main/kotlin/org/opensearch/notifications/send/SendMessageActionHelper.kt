@@ -7,7 +7,7 @@ package org.opensearch.notifications.send
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.coroutineScope
 import org.opensearch.OpenSearchStatusException
 import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.commons.authuser.User
@@ -111,13 +111,8 @@ object SendMessageActionHelper {
      * Send legacy notification message intended only for Index Management plugin.
      * @param request request object
      */
-    fun executeLegacyRequest(request: LegacyPublishNotificationRequest): LegacyPublishNotificationResponse {
-        val baseMessage = request.baseMessage
-        val response: LegacyDestinationResponse
-        runBlocking {
-            response = sendMessageToLegacyDestination(baseMessage)
-        }
-        return LegacyPublishNotificationResponse(response)
+    suspend fun executeLegacyRequest(request: LegacyPublishNotificationRequest): LegacyPublishNotificationResponse {
+        return LegacyPublishNotificationResponse(sendMessageToLegacyDestination(request.baseMessage))
     }
 
     /**
@@ -146,22 +141,23 @@ object SendMessageActionHelper {
      * @param message the message to send
      * @return notification delivery status for each channel
      */
-    private fun sendMessagesInParallel(
+    private suspend fun sendMessagesInParallel(
         user: User?,
         eventSource: EventSource,
         channelMap: Map<String, NotificationConfigDocInfo?>,
         childConfigMap: Map<String, NotificationConfigDocInfo?>,
         message: MessageContent
     ): List<EventStatus> {
-        val statusList: List<EventStatus>
-        // Fire all the message sending in parallel
-        runBlocking {
-            val statusDeferredList = channelMap.map {
+        // Fire all the message sending in parallel. Using coroutineScope instead of runBlocking
+        // so the parent coroutine suspends (releasing its dispatcher thread) while awaiting the
+        // children. runBlocking here would park a Dispatchers.IO thread while the children also
+        // require Dispatchers.IO threads, which deadlocks the entire dispatcher once its
+        // parallelism limit (64 by default) is reached by concurrent send requests.
+        return coroutineScope {
+            channelMap.map {
                 async(Dispatchers.IO) { sendMessageToChannel(user, eventSource, it, childConfigMap, message) }
-            }
-            statusList = statusDeferredList.awaitAll()
+            }.awaitAll()
         }
-        return statusList
     }
 
     /**
@@ -172,7 +168,9 @@ object SendMessageActionHelper {
      * @param message the message to send
      * @return notification delivery status for the channel
      */
-    private fun sendMessageToChannel(
+    // suspend is required here because this calls sendEmailMessage, which is a suspend
+    // function (it fans out to email recipients within its own coroutineScope).
+    private suspend fun sendMessageToChannel(
         user: User?,
         eventSource: EventSource,
         channelEntry: Map.Entry<String, NotificationConfigDocInfo?>,
@@ -270,7 +268,7 @@ object SendMessageActionHelper {
      * @param baseMessage legacy base message
      * @return notification delivery status for the legacy destination
      */
-    private fun sendMessageToLegacyDestination(baseMessage: LegacyBaseMessage): LegacyDestinationResponse {
+    private suspend fun sendMessageToLegacyDestination(baseMessage: LegacyBaseMessage): LegacyDestinationResponse {
         var message =
             MessageContent(title = "Legacy Notification", textDescription = baseMessage.messageContent)
         // These legacy destination calls do not have reference Ids, just passing 'legacy' constant
@@ -302,7 +300,7 @@ object SendMessageActionHelper {
                 // The naming is a little confusing but need to use the subject from LegacyEmailMessage as the title,
                 // so it appears as the subject of the email
                 message = MessageContent(title = baseMessage.subject, textDescription = baseMessage.messageContent)
-                runBlocking {
+                coroutineScope {
                     val emailRecipientStatus: List<EmailRecipientStatus> = recipients.map {
                         async(Dispatchers.IO) {
                             val destination = SmtpDestination(
@@ -427,7 +425,7 @@ object SendMessageActionHelper {
     /**
      * send message to email destination
      */
-    private fun sendEmailMessage(
+    private suspend fun sendEmailMessage(
         user: User?,
         email: Email,
         childConfigMap: Map<String, NotificationConfigDocInfo?>,
@@ -464,9 +462,8 @@ object SendMessageActionHelper {
             .filter { email.emailGroupIds.contains(it.docInfo.id) && !accessDeniedGroupIds.contains(it.docInfo.id) }
         val groupRecipients = groups.map { (it.configDoc.config.configData as EmailGroup).recipients }.flatten()
         val recipients = email.recipients.union(groupRecipients)
-        val emailRecipientStatus: List<EmailRecipientStatus>
         val accountConfig = accountDocInfo.configDoc.config
-        runBlocking {
+        val emailRecipientStatus: List<EmailRecipientStatus> = coroutineScope {
             val statusDeferredList = recipients.map {
                 async(Dispatchers.IO) {
                     when (accountConfig.configType) {
@@ -491,7 +488,7 @@ object SendMessageActionHelper {
                     }
                 }
             }
-            emailRecipientStatus = statusDeferredList.awaitAll() + invalidGroupIds.map {
+            statusDeferredList.awaitAll() + invalidGroupIds.map {
                 EmailRecipientStatus(
                     "unknown-recipient@example.com",
                     DeliveryStatus(RestStatus.NOT_FOUND.status.toString(), "Recipient $it not found")

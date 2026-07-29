@@ -24,6 +24,8 @@ class SecurityNotificationIT : PluginRestTestCase() {
         fun setup() {
             // things to execute once and keep around for the class
             org.junit.Assume.assumeTrue(System.getProperty("https", "false")!!.toBoolean())
+            // Skip these tests when resource sharing is enabled - ResourceSharingNotificationIT covers that path
+            org.junit.Assume.assumeFalse(System.getProperty("resource_sharing.enabled", "false")!!.toBoolean())
         }
     }
 

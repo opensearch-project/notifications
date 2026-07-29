@@ -314,7 +314,7 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
 
         Assert.assertEquals(0, getCurrentMappingsSchemaVersion())
         createConfig()
-        Assert.assertEquals(2, getCurrentMappingsSchemaVersion())
+        Assert.assertEquals(3, getCurrentMappingsSchemaVersion())
     }
 
     fun `test _meta field not exists in current mappings`() {
@@ -366,6 +366,6 @@ class CreateNotificationConfigIT : PluginRestTestCase() {
 
         Assert.assertEquals(1, getCurrentMappingsSchemaVersion())
         createConfig()
-        Assert.assertEquals(2, getCurrentMappingsSchemaVersion())
+        Assert.assertEquals(3, getCurrentMappingsSchemaVersion())
     }
 }

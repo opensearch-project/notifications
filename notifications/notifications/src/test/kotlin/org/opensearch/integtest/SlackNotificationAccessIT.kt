@@ -26,8 +26,8 @@ class SlackNotificationAccessIT : PluginRestTestCase() {
         @BeforeClass
         @JvmStatic
         fun setup() {
-            // things to execute once and keep around for the class
             org.junit.Assume.assumeTrue(System.getProperty("https", "false")!!.toBoolean())
+            org.junit.Assume.assumeFalse(System.getProperty("resource_sharing.enabled", "false")!!.toBoolean())
         }
     }
 

@@ -21,6 +21,7 @@ import org.opensearch.core.common.io.stream.NamedWriteableRegistry
 import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.env.Environment
 import org.opensearch.env.NodeEnvironment
+import org.opensearch.identity.PluginSubject
 import org.opensearch.indices.SystemIndexDescriptor
 import org.opensearch.notifications.action.CreateNotificationConfigAction
 import org.opensearch.notifications.action.DeleteNotificationConfigAction
@@ -47,8 +48,10 @@ import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_SERV
 import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_STORE_TYPE
 import org.opensearch.notifications.spi.NotificationCore
 import org.opensearch.notifications.spi.NotificationCoreExtension
+import org.opensearch.notifications.util.PluginClient
 import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.plugins.ActionPlugin
+import org.opensearch.plugins.IdentityAwarePlugin
 import org.opensearch.plugins.Plugin
 import org.opensearch.plugins.SystemIndexPlugin
 import org.opensearch.remote.metadata.client.impl.SdkClientFactory
@@ -72,9 +75,10 @@ import java.util.function.Supplier
  * Entry point of the OpenSearch Notifications plugin
  * This class initializes the rest handlers.
  */
-class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, SystemIndexPlugin {
+class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, SystemIndexPlugin, IdentityAwarePlugin {
 
     lateinit var clusterService: ClusterService // initialized in createComponents()
+    private var pluginClient: PluginClient? = null
 
     internal companion object {
         private val log by logger(NotificationPlugin::class.java)
@@ -146,10 +150,29 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
             client.threadPool().executor(ThreadPool.Names.GENERIC)
         )
         PluginSettings.addSettingsUpdateConsumer(clusterService)
-        NotificationConfigIndex.initialize(sdkClient, client, clusterService)
+        val pluginClientInstance = PluginClient(client)
+        this.pluginClient = pluginClientInstance
+        val searchSdkClient = SdkClientFactory.createSdkClient(
+            pluginClientInstance,
+            xContentRegistry,
+            mapOf(
+                REMOTE_METADATA_TYPE_KEY to REMOTE_METADATA_STORE_TYPE.get(settings),
+                REMOTE_METADATA_ENDPOINT_KEY to REMOTE_METADATA_ENDPOINT.get(settings),
+                REMOTE_METADATA_REGION_KEY to REMOTE_METADATA_REGION.get(settings),
+                REMOTE_METADATA_SERVICE_NAME_KEY to REMOTE_METADATA_SERVICE_NAME.get(settings),
+                TENANT_AWARE_KEY to MULTI_TENANCY_ENABLED.get(settings).toString(),
+                TENANT_ID_FIELD_KEY to "tenant_id"
+            ),
+            client.threadPool().executor(ThreadPool.Names.GENERIC)
+        )
+        NotificationConfigIndex.initialize(sdkClient, searchSdkClient, client, clusterService)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
         SendMessageActionHelper.initialize(NotificationConfigIndex, UserAccessManager)
-        return listOf(sdkClient)
+        return listOf(sdkClient, pluginClientInstance)
+    }
+
+    override fun assignSubject(pluginSubject: PluginSubject) {
+        pluginClient?.setSubject(pluginSubject)
     }
 
     /**

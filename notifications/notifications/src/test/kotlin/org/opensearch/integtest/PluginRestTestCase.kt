@@ -74,7 +74,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         if (preservePluginIndicesAfterTest()) return
 
         val pluginIndices = listOf(".opensearch-notifications-config")
-        val response = client().performRequest(Request("GET", "/_cat/indices?format=json&expand_wildcards=all"))
+        val response = adminClient().performRequest(Request("GET", "/_cat/indices?format=json&expand_wildcards=all"))
         val xContentType = MediaType.fromMediaType(response.entity.contentType)
         xContentType.xContent().createParser(
             NamedXContentRegistry.EMPTY,
@@ -180,12 +180,12 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
             "\"attributes\": {\n" +
             "}} "
         request.setJsonEntity(entity)
-        client().performRequest(request)
+        adminClient().performRequest(request)
     }
 
     fun deleteUser(name: String) {
         val request = Request(RestRequest.Method.DELETE.name, "/_plugins/_security/api/internalusers/$name")
-        executeRequest(request, RestStatus.OK.status)
+        adminClient().performRequest(request)
     }
 
     fun createUserRolesMapping(role: String, users: Array<String>) {
@@ -197,7 +197,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
             "  \"users\" : [$usersStr]\n" +
             "}"
         request.setJsonEntity(entity)
-        client().performRequest(request)
+        adminClient().performRequest(request)
     }
 
     fun addPatchUserRolesMapping(role: String, users: Array<String>) {
@@ -206,12 +206,12 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
 
         val entity = "[{\n" +
             "  \"op\" : \"add\",\n" +
-            "  \"path\" : \"users\",\n" +
+            "  \"path\" : \"/users\",\n" +
             "  \"value\" : [$usersStr]\n" +
             "}]"
 
         request.setJsonEntity(entity)
-        client().performRequest(request)
+        adminClient().performRequest(request)
     }
 
     fun removePatchUserRolesMapping(role: String, users: Array<String>) {
@@ -220,17 +220,17 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
 
         val entity = "[{\n" +
             "  \"op\" : \"remove\",\n" +
-            "  \"path\" : \"users\",\n" +
+            "  \"path\" : \"/users\",\n" +
             "  \"value\" : [$usersStr]\n" +
             "}]"
 
         request.setJsonEntity(entity)
-        client().performRequest(request)
+        adminClient().performRequest(request)
     }
 
     fun deleteUserRolesMapping(role: String) {
         val request = Request("DELETE", "/_plugins/_security/api/rolesmapping/$role")
-        client().performRequest(request)
+        adminClient().performRequest(request)
     }
 
     fun createCustomRole(name: String, clusterPermissions: String?) {
@@ -243,12 +243,12 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
             }
         """.trimIndent()
         request.setJsonEntity(entity)
-        client().performRequest(request)
+        adminClient().performRequest(request)
     }
 
     fun deleteCustomRole(name: String) {
         val request = Request("DELETE", "/_plugins/_security/api/roles/$name")
-        client().performRequest(request)
+        adminClient().performRequest(request)
     }
 
     fun createUserWithRoles(user: String, password: String, role: String, backendRole: String) {
@@ -516,8 +516,8 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
 
     @Throws(IOException::class)
     protected open fun wipeAllClusterSettings() {
-        updateClusterSettings(ClusterSetting("persistent", "*", null))
-        updateClusterSettings(ClusterSetting("transient", "*", null))
+        updateClusterSettings(ClusterSetting("persistent", "*", null), adminClient())
+        updateClusterSettings(ClusterSetting("transient", "*", null), adminClient())
     }
 
     protected fun getCurrentMappingsSchemaVersion(): Int {
@@ -556,7 +556,7 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
             }
         }
         refreshRequest.setOptions(requestOptions)
-        client().performRequest(refreshRequest)
+        adminClient().performRequest(refreshRequest)
     }
 
     protected class ClusterSetting(val type: String, val name: String, var value: Any?) {

@@ -1,0 +1,26 @@
+# For resource-access-management
+resource_types:
+  notification_config:
+    notifications_read_only:
+      default: true
+      allowed_actions:
+        - 'cluster:admin/opensearch/notifications/configs/get'
+        - 'cluster:admin/opensearch/notifications/channels/get'
+        - 'cluster:admin/opensearch/notifications/features'
+
+    notifications_read_write:
+      allowed_actions:
+        - 'cluster:admin/opensearch/notifications/configs/*'
+        - 'cluster:admin/opensearch/notifications/channels/get'
+        - 'cluster:admin/opensearch/notifications/features'
+        - 'cluster:admin/opensearch/notifications/feature/send'
+        - 'cluster:admin/opensearch/notifications/test_notification'
+
+    notifications_full_access:
+      allowed_actions:
+        - 'cluster:admin/opensearch/notifications/configs/*'
+        - 'cluster:admin/opensearch/notifications/channels/get'
+        - 'cluster:admin/opensearch/notifications/features'
+        - 'cluster:admin/opensearch/notifications/feature/send'
+        - 'cluster:admin/opensearch/notifications/test_notification'
+        - 'cluster:admin/security/resource/share'
