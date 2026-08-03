@@ -453,8 +453,8 @@ static def fetchVersionProperties() {
 }
 String bwcVersionShort = fetchVersionProperties()
 def bwcVersion = bwcVersionShort + ".0"
-def bwcOpenSearchVesion= bwcVersionShort + "-SNAPSHOT"
-def bwcPluginVersion = bwcVersion + "-SNAPSHOT"
+def bwcOpenSearchVesion= bwcVersionShort + (isSnapshot ? "-SNAPSHOT" : "")
+def bwcPluginVersion = bwcVersion + (isSnapshot ? "-SNAPSHOT" : "")
 String baseName = "notificationsBwcCluster"
 
 dependencies {
