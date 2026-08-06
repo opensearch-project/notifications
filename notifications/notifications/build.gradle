@@ -200,13 +200,20 @@ dependencies {
     compileOnly "org.slf4j:slf4j-api:${versions.slf4j}"
     compileOnly "commons-logging:commons-logging:${versions.commonslogging}"
     compileOnly "commons-codec:commons-codec:${versions.commonscodec}"
+    // httpclient (classic) is bundled by opensearch-notifications-core, which this plugin
+    // extends and shares a classloader with; bundling a second copy here causes jar hell.
+    compileOnly "org.apache.httpcomponents:httpclient:${versions.httpclient}"
 
-    implementation "org.apache.httpcomponents:httpclient:${versions.httpclient}"
     implementation "org.opensearch.client:opensearch-rest-client:${opensearch_build}"
     api "org.opensearch:opensearch-remote-metadata-sdk:${opensearch_build}"
     implementation ("org.opensearch:opensearch-remote-metadata-sdk-ddb-client:${opensearch_build}") {
         exclude group: 'com.amazonaws', module: 'aws-java-sdk-core'
         exclude group: 'org.bouncycastle'
+        // jackson-databind and httpcore (classic) are bundled by opensearch-notifications-core,
+        // which this plugin extends and shares a classloader with; bundling second copies here
+        // causes jar hell.
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
+        exclude group: 'org.apache.httpcomponents', module: 'httpcore'
     }
 
 
