@@ -210,8 +210,9 @@ dependencies {
     implementation ("org.opensearch:opensearch-remote-metadata-sdk-ddb-client:${opensearch_build}") {
         exclude group: 'com.amazonaws', module: 'aws-java-sdk-core'
         exclude group: 'org.bouncycastle'
-        // core already bundles jackson-databind and httpcore (classic) and shares its
+        // core already bundles Jackson 2 and httpcore (classic) and shares its
         // classloader; avoid second copies
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
         exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
         exclude group: 'org.apache.httpcomponents', module: 'httpcore'
     }
