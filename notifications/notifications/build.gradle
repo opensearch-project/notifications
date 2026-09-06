@@ -145,6 +145,8 @@ configurations.all {
         force "software.amazon.awssdk:bom:${versions.aws}"
         force "software.amazon.awssdk:kms:${versions.aws}"
         force "software.amazon.awssdk:dynamodb:${versions.aws}"
+        force "software.amazon.awssdk:sts:${versions.aws}"
+        force "software.amazon.awssdk:netty-nio-client:${versions.aws}"
         force "com.amazonaws:aws-java-sdk-core:${aws_version}"
         force "com.amazonaws:aws-java-sdk-dynamodb:${aws_version}"
         force "com.amazonaws:aws-java-sdk-s3:${aws_version}"
@@ -208,8 +210,9 @@ dependencies {
     implementation ("org.opensearch:opensearch-remote-metadata-sdk-ddb-client:${opensearch_build}") {
         exclude group: 'com.amazonaws', module: 'aws-java-sdk-core'
         exclude group: 'org.bouncycastle'
-        // core already bundles jackson-databind and httpcore (classic) and shares its
+        // core already bundles Jackson 2 and httpcore (classic) and shares its
         // classloader; avoid second copies
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
         exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
         exclude group: 'org.apache.httpcomponents', module: 'httpcore'
     }
