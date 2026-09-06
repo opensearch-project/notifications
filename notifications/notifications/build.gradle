@@ -145,6 +145,8 @@ configurations.all {
         force "software.amazon.awssdk:bom:${versions.aws}"
         force "software.amazon.awssdk:kms:${versions.aws}"
         force "software.amazon.awssdk:dynamodb:${versions.aws}"
+        force "software.amazon.awssdk:sts:${versions.aws}"
+        force "software.amazon.awssdk:netty-nio-client:${versions.aws}"
         force "com.amazonaws:aws-java-sdk-core:${aws_version}"
         force "com.amazonaws:aws-java-sdk-dynamodb:${aws_version}"
         force "com.amazonaws:aws-java-sdk-s3:${aws_version}"
