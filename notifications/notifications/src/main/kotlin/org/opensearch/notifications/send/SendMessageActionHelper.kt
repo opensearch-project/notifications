@@ -5,6 +5,7 @@
 package org.opensearch.notifications.send
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -45,6 +46,7 @@ import org.opensearch.notifications.index.ConfigOperations
 import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.security.UserAccess
+import org.opensearch.notifications.spi.NotificationRequestContext
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
@@ -55,6 +57,7 @@ import org.opensearch.notifications.spi.model.destination.SesDestination
 import org.opensearch.notifications.spi.model.destination.SlackDestination
 import org.opensearch.notifications.spi.model.destination.SmtpDestination
 import org.opensearch.notifications.spi.model.destination.SnsDestination
+import org.opensearch.notifications.util.currentTenantId
 import java.io.ByteArrayOutputStream
 
 /**
@@ -85,7 +88,8 @@ object SendMessageActionHelper {
         val channelMap = getConfigs(channelIds)
         val childConfigMap = getConfigs(getChildConfigIds(channelMap.values.filterNotNull().toList()))
         val message = createMessageContent(eventSource, channelMessage)
-        val eventStatusList = sendMessagesInParallel(user, eventSource, channelMap, childConfigMap, message)
+        val applicationId = currentTenantId()?.split(":")?.get(0)
+        val eventStatusList = sendMessagesInParallel(user, eventSource, channelMap, childConfigMap, message, applicationId)
         val event = NotificationEvent(eventSource, eventStatusList)
 
         // traverse status to determine HTTP status code
@@ -146,16 +150,20 @@ object SendMessageActionHelper {
         eventSource: EventSource,
         channelMap: Map<String, NotificationConfigDocInfo?>,
         childConfigMap: Map<String, NotificationConfigDocInfo?>,
-        message: MessageContent
+        message: MessageContent,
+        applicationId: String? = null
     ): List<EventStatus> {
         // Fire all the message sending in parallel. Using coroutineScope instead of runBlocking
         // so the parent coroutine suspends (releasing its dispatcher thread) while awaiting the
         // children. runBlocking here would park a Dispatchers.IO thread while the children also
         // require Dispatchers.IO threads, which deadlocks the entire dispatcher once its
         // parallelism limit (64 by default) is reached by concurrent send requests.
+        // The application id is propagated to each child via a ThreadLocal context element so the
+        // credential factories can read it on whichever IO thread the child runs on.
+        val appIdContext = NotificationRequestContext.threadLocal().asContextElement(applicationId)
         return coroutineScope {
             channelMap.map {
-                async(Dispatchers.IO) { sendMessageToChannel(user, eventSource, it, childConfigMap, message) }
+                async(Dispatchers.IO + appIdContext) { sendMessageToChannel(user, eventSource, it, childConfigMap, message) }
             }.awaitAll()
         }
     }
@@ -246,7 +254,7 @@ object SendMessageActionHelper {
             ConfigType.SES_ACCOUNT -> null
             ConfigType.SMTP_ACCOUNT -> null
             ConfigType.EMAIL_GROUP -> null
-            ConfigType.SNS -> sendSNSMessage(configData as Sns, message, eventStatus, eventSource.referenceId)
+            ConfigType.SNS -> sendSNSMessage(configData as Sns, message, eventStatus, eventSource.referenceId, channel.docInfo.id)
         }
         return if (response == null) {
             log.warn("Cannot send message to destination for config id :${channel.docInfo.id}")
@@ -463,9 +471,11 @@ object SendMessageActionHelper {
         val groupRecipients = groups.map { (it.configDoc.config.configData as EmailGroup).recipients }.flatten()
         val recipients = email.recipients.union(groupRecipients)
         val accountConfig = accountDocInfo.configDoc.config
+        // Re-propagate the application id (set by sendMessagesInParallel) to the per-recipient children.
+        val appIdContext = NotificationRequestContext.threadLocal().asContextElement()
         val emailRecipientStatus: List<EmailRecipientStatus> = coroutineScope {
             val statusDeferredList = recipients.map {
-                async(Dispatchers.IO) {
+                async(Dispatchers.IO + appIdContext) {
                     when (accountConfig.configType) {
                         ConfigType.SMTP_ACCOUNT -> sendEmailFromSmtpAccount(
                             accountConfig.name,
@@ -479,7 +489,8 @@ object SendMessageActionHelper {
                             accountConfig.configData as SesAccount,
                             it.recipient,
                             message,
-                            referenceId
+                            referenceId,
+                            accountDocInfo.docInfo.id
                         )
                         else -> EmailRecipientStatus(
                             it.recipient,
@@ -551,7 +562,8 @@ object SendMessageActionHelper {
         sesAccount: SesAccount,
         recipient: String,
         message: MessageContent,
-        referenceId: String
+        referenceId: String,
+        configId: String?
     ): EmailRecipientStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SES_ACCOUNT.counter.increment()
         val destination = SesDestination(
@@ -559,7 +571,9 @@ object SendMessageActionHelper {
             sesAccount.awsRegion,
             sesAccount.roleArn,
             sesAccount.fromAddress,
-            recipient
+            recipient,
+            NotificationRequestContext.getApplicationId(),
+            buildRoleSessionName(configId)
         )
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return EmailRecipientStatus(
@@ -575,13 +589,22 @@ object SendMessageActionHelper {
         sns: Sns,
         message: MessageContent,
         eventStatus: EventStatus,
-        referenceId: String
+        referenceId: String,
+        configId: String?
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SNS.counter.increment()
-        val destination = SnsDestination(sns.topicArn, sns.roleArn)
+        val destination = SnsDestination(sns.topicArn, sns.roleArn, roleSessionName = buildRoleSessionName(configId))
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
+
+    /**
+     * Build an STS role session name that attributes an assumed-role notification delivery to the
+     * specific notification config, for CloudTrail traceability. Returns null when the config id is
+     * unavailable, in which case the credentials factory applies its default session name.
+     */
+    private fun buildRoleSessionName(configId: String?): String? =
+        configId?.let { "alerting-notification-$it" }
 
     /**
      * Send message to destination using SPI

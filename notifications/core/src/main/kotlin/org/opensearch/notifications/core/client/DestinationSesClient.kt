@@ -71,7 +71,7 @@ class DestinationSesClient(private val sesClientFactory: SesClientFactory) {
             message
         )
         // send Mime Message
-        return sendMimeMessage(referenceId, sesDestination.awsRegion, sesDestination.roleArn, mimeMessage)
+        return sendMimeMessage(referenceId, sesDestination.awsRegion, sesDestination.roleArn, sesDestination.fromAddress, sesDestination.applicationId, sesDestination.roleSessionName, mimeMessage)
     }
 
     /**
@@ -81,11 +81,14 @@ class DestinationSesClient(private val sesClientFactory: SesClientFactory) {
         referenceId: String,
         sesAwsRegion: String,
         roleArn: String?,
+        fromAddress: String,
+        applicationId: String?,
+        roleSessionName: String?,
         mimeMessage: MimeMessage
     ): DestinationMessageResponse {
         return try {
             log.debug("$LOG_PREFIX:Sending Email-SES:$referenceId")
-            val client = sesClientFactory.createSesClient(sesAwsRegion, roleArn)
+            val client = sesClientFactory.createSesClient(sesAwsRegion, roleArn, fromAddress, applicationId, roleSessionName)
             val outputStream = ByteArrayOutputStream()
             SecurityAccess.doPrivileged { mimeMessage.writeTo(outputStream) }
             val emailSize = outputStream.size()

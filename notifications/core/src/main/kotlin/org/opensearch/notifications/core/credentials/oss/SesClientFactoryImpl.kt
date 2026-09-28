@@ -13,10 +13,10 @@ import org.opensearch.notifications.core.utils.SecurityAccess
  * Factory for creating SES client
  */
 object SesClientFactoryImpl : SesClientFactory {
-    override fun createSesClient(region: String, roleArn: String?): AmazonSimpleEmailService {
+    override fun createSesClient(region: String, roleArn: String?, fromAddress: String?, applicationId: String?, roleSessionName: String?): AmazonSimpleEmailService {
         return SecurityAccess.doPrivileged {
             val credentials =
-                CredentialsProviderFactory().getCredentialsProvider(region, roleArn)
+                CredentialsProviderFactory().getCredentialsProvider(region, roleArn, roleSessionName = roleSessionName)
             AmazonSimpleEmailServiceClientBuilder.standard()
                 .withRegion(region)
                 .withCredentials(credentials)

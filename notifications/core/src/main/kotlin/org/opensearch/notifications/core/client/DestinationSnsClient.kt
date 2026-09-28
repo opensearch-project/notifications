@@ -45,7 +45,7 @@ class DestinationSnsClient(private val snsClientFactory: SnsClientFactory) {
     }
 
     fun execute(destination: SnsDestination, message: MessageContent, referenceId: String): DestinationMessageResponse {
-        val amazonSNS: AmazonSNS = snsClientFactory.createSnsClient(destination.region, destination.roleArn)
+        val amazonSNS: AmazonSNS = snsClientFactory.createSnsClient(destination.region, destination.roleArn, destination.topicArn, destination.applicationId, destination.roleSessionName)
         return try {
             val result = sendMessage(amazonSNS, destination, message)
             DestinationMessageResponse(RestStatus.OK.status, "Success, message id: ${result.messageId}")

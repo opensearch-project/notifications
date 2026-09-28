@@ -10,11 +10,8 @@ import org.opensearch.action.DocWriteResponse
 import org.opensearch.action.admin.indices.create.CreateIndexRequest
 import org.opensearch.action.admin.indices.create.CreateIndexResponse
 import org.opensearch.action.admin.indices.mapping.put.PutMappingRequest
-import org.opensearch.action.bulk.BulkResponse
 import org.opensearch.action.delete.DeleteResponse
 import org.opensearch.action.get.GetResponse
-import org.opensearch.action.get.MultiGetRequest
-import org.opensearch.action.get.MultiGetResponse
 import org.opensearch.action.index.IndexResponse
 import org.opensearch.action.search.SearchResponse
 import org.opensearch.action.support.clustermanager.AcknowledgedResponse
@@ -45,7 +42,6 @@ import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntil
 import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntilTimeout
 import org.opensearch.notifications.util.currentTenantId
-import org.opensearch.remote.metadata.client.BulkDataObjectRequest
 import org.opensearch.remote.metadata.client.DeleteDataObjectRequest
 import org.opensearch.remote.metadata.client.GetDataObjectRequest
 import org.opensearch.remote.metadata.client.PutDataObjectRequest
@@ -84,6 +80,7 @@ internal object NotificationConfigIndex : ConfigOperations {
     private lateinit var clusterService: ClusterService
     private lateinit var sdkClient: SdkClient
     private lateinit var searchSdkClient: SdkClient
+    private var multiTenancyEnabled: Boolean = false
 
     private val searchHitParser = object : SearchResults.SearchHitParser<NotificationConfigInfo> {
         override fun parse(searchHit: SearchHit): NotificationConfigInfo {
@@ -106,11 +103,18 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    fun initialize(sdkClient: SdkClient, searchSdkClient: SdkClient, client: Client, clusterService: ClusterService) {
+    fun initialize(
+        sdkClient: SdkClient,
+        searchSdkClient: SdkClient,
+        client: Client,
+        clusterService: ClusterService,
+        multiTenancyEnabled: Boolean = false
+    ) {
         NotificationConfigIndex.client = SecureIndexClient(client)
         NotificationConfigIndex.clusterService = clusterService
         NotificationConfigIndex.sdkClient = sdkClient
         NotificationConfigIndex.searchSdkClient = searchSdkClient
+        NotificationConfigIndex.multiTenancyEnabled = multiTenancyEnabled
     }
 
     private fun getSchemaVersionFromIndexMapping(indexMapping: Map<String, Any>?): Int {
@@ -133,6 +137,9 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     @Suppress("TooGenericExceptionCaught")
     private suspend fun createIndex() {
+        if (multiTenancyEnabled) {
+            return
+        }
         if (!isIndexExists()) {
             val classLoader = NotificationConfigIndex::class.java.classLoader
             val indexSettingsSource = classLoader.getResource(SETTINGS_FILE_NAME)?.readText()!!
@@ -214,12 +221,7 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     override suspend fun getNotificationConfigs(ids: Set<String>): List<NotificationConfigDocInfo> {
         createIndex()
-        val getRequest = MultiGetRequest()
-        ids.forEach { getRequest.add(INDEX_NAME, it) }
-        val response: MultiGetResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-            multiGet(getRequest, it)
-        }
-        return response.responses.mapNotNull { parseNotificationConfigDoc(it.id, it.response) }
+        return ids.mapNotNull { id -> getNotificationConfig(id) }
     }
 
     /**
@@ -320,10 +322,10 @@ internal object NotificationConfigIndex : ConfigOperations {
         val response: IndexResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
             sdkClient.putDataObjectAsync(putRequest).whenComplete(it)
         }
-        if (response.result != DocWriteResponse.Result.UPDATED) {
-            log.warn("$LOG_PREFIX:updateNotificationConfig failed for $id; response:$response")
+        if (response.result != DocWriteResponse.Result.UPDATED && response.result != DocWriteResponse.Result.CREATED) {
+            log.warn("$LOG_PREFIX:updateNotificationConfig failed for $id; result:${response.result}")
         }
-        return response.result == DocWriteResponse.Result.UPDATED
+        return response.result == DocWriteResponse.Result.UPDATED || response.result == DocWriteResponse.Result.CREATED
     }
 
     /**
@@ -351,29 +353,14 @@ internal object NotificationConfigIndex : ConfigOperations {
      */
     override suspend fun deleteNotificationConfigs(ids: Set<String>): Map<String, RestStatus> {
         createIndex()
-
-        val tenantId = currentTenantId()
-        val bulkDeleteRequest = BulkDataObjectRequest.builder()
-            .globalIndex(INDEX_NAME)
-            .build()
-        ids.forEach {
-            bulkDeleteRequest.add(
-                DeleteDataObjectRequest.builder()
-                    .index(INDEX_NAME)
-                    .id(it)
-                    .tenantId(tenantId)
-                    .build()
-            )
-        }
-
-        val response: BulkResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-            sdkClient.bulkDataObjectAsync(bulkDeleteRequest).whenComplete(it)
-        }
         val mutableMap = mutableMapOf<String, RestStatus>()
-        response.forEach {
-            mutableMap[it.id] = it.status()
-            if (it.isFailed) {
-                log.warn("$LOG_PREFIX:deleteNotificationConfig failed for ${it.id}; response:${it.failureMessage}")
+        ids.forEach { id ->
+            try {
+                val success = deleteNotificationConfig(id)
+                mutableMap[id] = if (success) RestStatus.OK else RestStatus.NOT_FOUND
+            } catch (e: Exception) {
+                log.warn("$LOG_PREFIX:deleteNotificationConfig failed for $id", e)
+                mutableMap[id] = RestStatus.INTERNAL_SERVER_ERROR
             }
         }
         return mutableMap

@@ -165,7 +165,7 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
             ),
             client.threadPool().executor(ThreadPool.Names.GENERIC)
         )
-        NotificationConfigIndex.initialize(sdkClient, searchSdkClient, client, clusterService)
+        NotificationConfigIndex.initialize(sdkClient, searchSdkClient, client, clusterService, MULTI_TENANCY_ENABLED.get(settings))
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
         SendMessageActionHelper.initialize(NotificationConfigIndex, UserAccessManager)
         return listOf(sdkClient, pluginClientInstance)
