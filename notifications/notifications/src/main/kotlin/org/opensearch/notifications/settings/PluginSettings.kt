@@ -173,11 +173,16 @@ internal object PluginSettings {
         Dynamic
     )
 
+    /**
+     * Superseded by the security plugin's resource sharing and access control, which authorizes each resource by the
+     * access level it is shared at rather than by backend-role overlap. Slated for removal in 4.0.
+     */
     val FILTER_BY_BACKEND_ROLES: Setting<Boolean> = Setting.boolSetting(
         FILTER_BY_BACKEND_ROLES_KEY,
         ALERTING_FILTER_BY_BACKEND_ROLES,
         NodeScope,
-        Dynamic
+        Dynamic,
+        Deprecated
     )
 
     /**
@@ -193,13 +198,15 @@ internal object PluginSettings {
         Setting.Property.Final
     )
 
+    /** Only meaningful while [FILTER_BY_BACKEND_ROLES] is in use, so it retires with it in 4.0. */
     val FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY: Setting<String> = Setting.simpleString(
         FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY_KEY,
         DEFAULT_FILTER_BY_BACKEND_ROLES_ACCESS_STRATEGY,
         FilterByBackendRolesAccessStrategyValidator(),
         NodeScope,
         Dynamic,
-        Sensitive
+        Sensitive,
+        Deprecated
     )
 
     /** This setting sets the remote metadata store type  */
