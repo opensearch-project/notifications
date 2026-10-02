@@ -48,11 +48,13 @@ import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_SERV
 import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_STORE_TYPE
 import org.opensearch.notifications.spi.NotificationCore
 import org.opensearch.notifications.spi.NotificationCoreExtension
+import org.opensearch.notifications.util.NotificationConfigSecrets
 import org.opensearch.notifications.util.PluginClient
 import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.plugins.ActionPlugin
 import org.opensearch.plugins.IdentityAwarePlugin
 import org.opensearch.plugins.Plugin
+import org.opensearch.plugins.ReloadablePlugin
 import org.opensearch.plugins.SystemIndexPlugin
 import org.opensearch.remote.metadata.client.impl.SdkClientFactory
 import org.opensearch.remote.metadata.common.CommonValue.REMOTE_METADATA_ENDPOINT_KEY
@@ -75,10 +77,11 @@ import java.util.function.Supplier
  * Entry point of the OpenSearch Notifications plugin
  * This class initializes the rest handlers.
  */
-class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, SystemIndexPlugin, IdentityAwarePlugin {
+class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, SystemIndexPlugin, IdentityAwarePlugin, ReloadablePlugin {
 
     lateinit var clusterService: ClusterService // initialized in createComponents()
     private var pluginClient: PluginClient? = null
+    private var configSecrets: NotificationConfigSecrets? = null
 
     internal companion object {
         private val log by logger(NotificationPlugin::class.java)
@@ -98,7 +101,7 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
      */
     override fun getSettings(): List<Setting<*>> {
         log.debug("$LOG_PREFIX:getSettings")
-        return PluginSettings.getAllSettings()
+        return PluginSettings.getAllSettings() + NotificationConfigSecrets.SETTING
     }
 
     /**
@@ -136,6 +139,8 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
         log.debug("$LOG_PREFIX:createComponents")
         this.clusterService = clusterService
         val settings = environment.settings()
+        val notificationConfigSecrets = NotificationConfigSecrets(settings)
+        configSecrets = notificationConfigSecrets
         val sdkClient = SdkClientFactory.createSdkClient(
             SecureIndexClient(client),
             xContentRegistry,
@@ -167,8 +172,16 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
         )
         NotificationConfigIndex.initialize(sdkClient, searchSdkClient, client, clusterService)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
-        SendMessageActionHelper.initialize(NotificationConfigIndex, UserAccessManager)
+        SendMessageActionHelper.initialize(NotificationConfigIndex, UserAccessManager, notificationConfigSecrets::resolve)
         return listOf(sdkClient, pluginClientInstance)
+    }
+
+    override fun reload(settings: Settings) {
+        configSecrets?.reload(settings)
+    }
+
+    override fun close() {
+        configSecrets?.close()
     }
 
     override fun assignSubject(pluginSubject: PluginSubject) {

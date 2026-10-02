@@ -66,10 +66,16 @@ object SendMessageActionHelper {
 
     private lateinit var configOperations: ConfigOperations
     private lateinit var userAccess: UserAccess
+    private var resolveSecureValue: (String, String) -> String = { _, value -> value }
 
-    fun initialize(configOperations: ConfigOperations, userAccess: UserAccess) {
+    fun initialize(
+        configOperations: ConfigOperations,
+        userAccess: UserAccess,
+        resolveSecureValue: (String, String) -> String = { _, value -> value }
+    ) {
         this.configOperations = configOperations
         this.userAccess = userAccess
+        this.resolveSecureValue = resolveSecureValue
     }
 
     /**
@@ -225,11 +231,18 @@ object SendMessageActionHelper {
 
         val response = when (configType) {
             ConfigType.NONE -> null
-            ConfigType.SLACK -> sendSlackMessage(configData as Slack, message, eventStatus, eventSource.referenceId)
-            ConfigType.MATTERMOST -> sendSlackMessage(configData as Slack, message, eventStatus, eventSource.referenceId)
-            ConfigType.CHIME -> sendChimeMessage(configData as Chime, message, eventStatus, eventSource.referenceId)
-            ConfigType.MICROSOFT_TEAMS -> sendMicrosoftTeamsMessage(configData as MicrosoftTeams, message, eventStatus, eventSource.referenceId)
+            ConfigType.SLACK -> sendSlackMessage(channel.docInfo.id!!, configData as Slack, message, eventStatus, eventSource.referenceId)
+            ConfigType.MATTERMOST -> sendSlackMessage(channel.docInfo.id!!, configData as Slack, message, eventStatus, eventSource.referenceId)
+            ConfigType.CHIME -> sendChimeMessage(channel.docInfo.id!!, configData as Chime, message, eventStatus, eventSource.referenceId)
+            ConfigType.MICROSOFT_TEAMS -> sendMicrosoftTeamsMessage(
+                channel.docInfo.id!!,
+                configData as MicrosoftTeams,
+                message,
+                eventStatus,
+                eventSource.referenceId
+            )
             ConfigType.WEBHOOK -> sendWebhookMessage(
+                channel.docInfo.id!!,
                 configData as Webhook,
                 message,
                 eventStatus,
@@ -366,13 +379,14 @@ object SendMessageActionHelper {
      * send message to slack destination
      */
     private fun sendSlackMessage(
+        configId: String,
         slack: Slack,
         message: MessageContent,
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_SLACK.counter.increment()
-        val destination = SlackDestination(slack.url)
+        val destination = SlackDestination(resolveSecureValue(configId, slack.url))
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
@@ -381,13 +395,14 @@ object SendMessageActionHelper {
      * send message to chime destination
      */
     private fun sendChimeMessage(
+        configId: String,
         chime: Chime,
         message: MessageContent,
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_CHIME.counter.increment()
-        val destination = ChimeDestination(chime.url)
+        val destination = ChimeDestination(resolveSecureValue(configId, chime.url))
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
@@ -396,13 +411,14 @@ object SendMessageActionHelper {
      * send message to Microsoft Teams destination
      */
     private fun sendMicrosoftTeamsMessage(
+        configId: String,
         microsoftTeams: MicrosoftTeams,
         message: MessageContent,
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_MICROSOFT_TEAMS.counter.increment()
-        val destination = MicrosoftTeamsDestination(microsoftTeams.url)
+        val destination = MicrosoftTeamsDestination(resolveSecureValue(configId, microsoftTeams.url))
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
@@ -411,13 +427,18 @@ object SendMessageActionHelper {
      * send message to custom webhook destination
      */
     private fun sendWebhookMessage(
+        configId: String,
         webhook: Webhook,
         message: MessageContent,
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_WEBHOOK.counter.increment()
-        val destination = CustomWebhookDestination(webhook.url, webhook.headerParams, webhook.method.tag)
+        val destination = CustomWebhookDestination(
+            resolveSecureValue(configId, webhook.url),
+            webhook.headerParams.mapValues { resolveSecureValue(configId, it.value) },
+            webhook.method.tag
+        )
         val status = sendMessageThroughSpi(destination, message, referenceId)
         return eventStatus.copy(deliveryStatus = DeliveryStatus(status.statusCode.toString(), status.statusText))
     }
