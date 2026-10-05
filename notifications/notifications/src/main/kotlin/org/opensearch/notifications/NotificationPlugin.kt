@@ -37,6 +37,7 @@ import org.opensearch.notifications.index.NotificationConfigIndex
 import org.opensearch.notifications.resthandler.NotificationChannelListRestHandler
 import org.opensearch.notifications.resthandler.NotificationConfigRestHandler
 import org.opensearch.notifications.resthandler.NotificationFeaturesRestHandler
+import org.opensearch.notifications.resthandler.SendNotificationRestHandler
 import org.opensearch.notifications.resthandler.SendTestMessageRestHandler
 import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.send.SendMessageActionHelper
@@ -234,7 +235,8 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
             NotificationConfigRestHandler(),
             NotificationFeaturesRestHandler(),
             NotificationChannelListRestHandler(),
-            SendTestMessageRestHandler()
+            SendTestMessageRestHandler(),
+            SendNotificationRestHandler()
             // NotificationStatsRestHandler()
         )
     }
