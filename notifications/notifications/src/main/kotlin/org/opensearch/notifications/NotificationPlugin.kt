@@ -49,7 +49,6 @@ import org.opensearch.notifications.settings.PluginSettings.REMOTE_METADATA_STOR
 import org.opensearch.notifications.spi.NotificationCore
 import org.opensearch.notifications.spi.NotificationCoreExtension
 import org.opensearch.notifications.util.PluginClient
-import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.plugins.ActionPlugin
 import org.opensearch.plugins.IdentityAwarePlugin
 import org.opensearch.plugins.Plugin
@@ -136,23 +135,9 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
         log.debug("$LOG_PREFIX:createComponents")
         this.clusterService = clusterService
         val settings = environment.settings()
-        val sdkClient = SdkClientFactory.createSdkClient(
-            SecureIndexClient(client),
-            xContentRegistry,
-            mapOf(
-                REMOTE_METADATA_TYPE_KEY to REMOTE_METADATA_STORE_TYPE.get(settings),
-                REMOTE_METADATA_ENDPOINT_KEY to REMOTE_METADATA_ENDPOINT.get(settings),
-                REMOTE_METADATA_REGION_KEY to REMOTE_METADATA_REGION.get(settings),
-                REMOTE_METADATA_SERVICE_NAME_KEY to REMOTE_METADATA_SERVICE_NAME.get(settings),
-                TENANT_AWARE_KEY to MULTI_TENANCY_ENABLED.get(settings).toString(),
-                TENANT_ID_FIELD_KEY to "tenant_id"
-            ),
-            client.threadPool().executor(ThreadPool.Names.GENERIC)
-        )
-        PluginSettings.addSettingsUpdateConsumer(clusterService)
         val pluginClientInstance = PluginClient(client)
         this.pluginClient = pluginClientInstance
-        val searchSdkClient = SdkClientFactory.createSdkClient(
+        val sdkClient = SdkClientFactory.createSdkClient(
             pluginClientInstance,
             xContentRegistry,
             mapOf(
@@ -165,7 +150,8 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
             ),
             client.threadPool().executor(ThreadPool.Names.GENERIC)
         )
-        NotificationConfigIndex.initialize(sdkClient, searchSdkClient, client, clusterService)
+        PluginSettings.addSettingsUpdateConsumer(clusterService)
+        NotificationConfigIndex.initialize(sdkClient, pluginClientInstance, clusterService)
         ConfigIndexingActions.initialize(NotificationConfigIndex, UserAccessManager)
         SendMessageActionHelper.initialize(NotificationConfigIndex, UserAccessManager)
         return listOf(sdkClient, pluginClientInstance)

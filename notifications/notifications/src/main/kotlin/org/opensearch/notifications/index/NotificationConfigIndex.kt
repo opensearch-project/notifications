@@ -20,7 +20,6 @@ import org.opensearch.action.search.SearchResponse
 import org.opensearch.action.support.clustermanager.AcknowledgedResponse
 import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.unit.TimeValue
-import org.opensearch.common.util.concurrent.ThreadContext
 import org.opensearch.common.xcontent.LoggingDeprecationHandler
 import org.opensearch.common.xcontent.XContentHelper
 import org.opensearch.common.xcontent.XContentType
@@ -41,7 +40,6 @@ import org.opensearch.notifications.model.DocMetadata.Companion.METADATA_TAG
 import org.opensearch.notifications.model.NotificationConfigDoc
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.settings.PluginSettings
-import org.opensearch.notifications.util.SecureIndexClient
 import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntil
 import org.opensearch.notifications.util.SuspendUtils.Companion.suspendUntilTimeout
 import org.opensearch.notifications.util.currentTenantId
@@ -83,7 +81,6 @@ internal object NotificationConfigIndex : ConfigOperations {
     private lateinit var client: Client
     private lateinit var clusterService: ClusterService
     private lateinit var sdkClient: SdkClient
-    private lateinit var searchSdkClient: SdkClient
 
     private val searchHitParser = object : SearchResults.SearchHitParser<NotificationConfigInfo> {
         override fun parse(searchHit: SearchHit): NotificationConfigInfo {
@@ -106,11 +103,10 @@ internal object NotificationConfigIndex : ConfigOperations {
     /**
      * {@inheritDoc}
      */
-    fun initialize(sdkClient: SdkClient, searchSdkClient: SdkClient, client: Client, clusterService: ClusterService) {
-        NotificationConfigIndex.client = SecureIndexClient(client)
+    fun initialize(sdkClient: SdkClient, client: Client, clusterService: ClusterService) {
+        NotificationConfigIndex.client = client
         NotificationConfigIndex.clusterService = clusterService
         NotificationConfigIndex.sdkClient = sdkClient
-        NotificationConfigIndex.searchSdkClient = searchSdkClient
     }
 
     private fun getSchemaVersionFromIndexMapping(indexMapping: Map<String, Any>?): Int {
@@ -139,20 +135,18 @@ internal object NotificationConfigIndex : ConfigOperations {
             val request = CreateIndexRequest(INDEX_NAME)
                 .mapping(indexMappingAsMap)
                 .settings(indexSettingsSource, XContentType.YAML)
-            client.threadPool().threadContext.stashContext().use {
-                try {
-                    val response: CreateIndexResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-                        admin().indices().create(request, it)
-                    }
-                    if (response.isAcknowledged) {
-                        log.info("$LOG_PREFIX:Index $INDEX_NAME creation Acknowledged")
-                    } else {
-                        throw IllegalStateException("$LOG_PREFIX:Index $INDEX_NAME creation not Acknowledged")
-                    }
-                } catch (exception: Exception) {
-                    if (exception !is ResourceAlreadyExistsException && exception.cause !is ResourceAlreadyExistsException) {
-                        throw exception
-                    }
+            try {
+                val response: CreateIndexResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+                    admin().indices().create(request, it)
+                }
+                if (response.isAcknowledged) {
+                    log.info("$LOG_PREFIX:Index $INDEX_NAME creation Acknowledged")
+                } else {
+                    throw IllegalStateException("$LOG_PREFIX:Index $INDEX_NAME creation not Acknowledged")
+                }
+            } catch (exception: Exception) {
+                if (exception !is ResourceAlreadyExistsException && exception.cause !is ResourceAlreadyExistsException) {
+                    throw exception
                 }
             }
         } else {
@@ -160,15 +154,13 @@ internal object NotificationConfigIndex : ConfigOperations {
             val currentIndexMappingSchemaVersion = getSchemaVersionFromIndexMapping(currentIndexMappingMetadata)
             if (currentIndexMappingSchemaVersion < indexMappingSchemaVersion) {
                 val putMappingRequest: PutMappingRequest = PutMappingRequest(INDEX_NAME).source(indexMappingAsMap)
-                client.threadPool().threadContext.stashContext().use {
-                    val response: AcknowledgedResponse = client.suspendUntil {
-                        admin().indices().putMapping(putMappingRequest, it)
-                    }
-                    if (response.isAcknowledged) {
-                        log.info("$LOG_PREFIX:Index $INDEX_NAME update mapping Acknowledged")
-                    } else {
-                        throw IllegalStateException("$LOG_PREFIX:Index $INDEX_NAME update mapping not Acknowledged")
-                    }
+                val response: AcknowledgedResponse = client.suspendUntil {
+                    admin().indices().putMapping(putMappingRequest, it)
+                }
+                if (response.isAcknowledged) {
+                    log.info("$LOG_PREFIX:Index $INDEX_NAME update mapping Acknowledged")
+                } else {
+                    throw IllegalStateException("$LOG_PREFIX:Index $INDEX_NAME update mapping not Acknowledged")
                 }
             }
         }
@@ -292,8 +284,8 @@ internal object NotificationConfigIndex : ConfigOperations {
             .searchSourceBuilder(sourceBuilder)
             .build()
 
-        val response: SearchResponse = searchSdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-            searchSdkClient.searchDataObjectAsync(searchRequest).whenComplete(it)
+        val response: SearchResponse = sdkClient.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+            sdkClient.searchDataObjectAsync(searchRequest).whenComplete(it)
         }
         val result = NotificationConfigSearchResult(request.fromIndex.toLong(), response, searchHitParser)
         log.info(
@@ -377,42 +369,5 @@ internal object NotificationConfigIndex : ConfigOperations {
             }
         }
         return mutableMap
-    }
-}
-
-/**
- * Executes the given [block] function on this resource and then closes it down correctly whether an exception
- * is thrown or not.
- *
- * In case if the resource is being closed due to an exception occurred in [block], and the closing also fails with an exception,
- * the latter is added to the [suppressed][java.lang.Throwable.addSuppressed] exceptions of the former.
- *
- * @param block a function to process this [AutoCloseable] resource.
- * @return the result of [block] function invoked on this resource.
- */
-private inline fun <T : ThreadContext.StoredContext, R> T.use(block: (T) -> R): R {
-    var exception: Throwable? = null
-    try {
-        return block(this)
-    } catch (e: Throwable) {
-        exception = e
-        throw e
-    } finally {
-        closeFinally(exception)
-    }
-}
-
-/**
- * Closes this [AutoCloseable], suppressing possible exception or error thrown by [AutoCloseable.close] function when
- * it's being closed due to some other [cause] exception occurred.
- *
- * The suppressed exception is added to the list of suppressed exceptions of [cause] exception.
- */
-private fun ThreadContext.StoredContext.closeFinally(cause: Throwable?) = when (cause) {
-    null -> close()
-    else -> try {
-        close()
-    } catch (closeException: Throwable) {
-        cause.addSuppressed(closeException)
     }
 }
