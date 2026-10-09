@@ -19,6 +19,7 @@ val NOTIFICATION_GET_CONFIG_ACCESS = "notifications_get_config_access"
 val NOTIFICATION_GET_PLUGIN_FEATURE_ACCESS = "notifications_get_plugin_access"
 val NOTIFICATION_GET_CHANNEL_ACCESS = "notifications_get_channel_access"
 val NOTIFICATION_TEST_SEND_ACCESS = "notifications_test_send_access"
+val NOTIFICATION_SEND_ACCESS = "notifications_send_access"
 
 val ROLE_TO_PERMISSION_MAPPING = mapOf(
     NOTIFICATION_NO_ACCESS_ROLE to "",
@@ -28,5 +29,6 @@ val ROLE_TO_PERMISSION_MAPPING = mapOf(
     NOTIFICATION_GET_CONFIG_ACCESS to NotificationsActions.GET_NOTIFICATION_CONFIG_NAME,
     NOTIFICATION_GET_PLUGIN_FEATURE_ACCESS to NotificationsActions.GET_PLUGIN_FEATURES_NAME,
     NOTIFICATION_GET_CHANNEL_ACCESS to NotificationsActions.GET_CHANNEL_LIST_NAME,
-    NOTIFICATION_TEST_SEND_ACCESS to SendTestNotificationAction.NAME
+    NOTIFICATION_TEST_SEND_ACCESS to SendTestNotificationAction.NAME,
+    NOTIFICATION_SEND_ACCESS to NotificationsActions.SEND_NOTIFICATION_NAME
 )

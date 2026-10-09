@@ -369,10 +369,12 @@ integTest {
     if (System.getProperty("resource_sharing.enabled") != "true") {
         filter {
             excludeTestsMatching "org.opensearch.integtest.ResourceSharingNotificationIT"
+            excludeTestsMatching "org.opensearch.integtest.send.SendNotificationResourceSharingIT"
         }
     } else {
         filter {
             includeTestsMatching "org.opensearch.integtest.ResourceSharingNotificationIT"
+            includeTestsMatching "org.opensearch.integtest.send.SendNotificationResourceSharingIT"
         }
     }
 

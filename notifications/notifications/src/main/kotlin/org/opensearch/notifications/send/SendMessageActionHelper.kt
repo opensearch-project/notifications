@@ -251,7 +251,7 @@ object SendMessageActionHelper {
         return if (response == null) {
             log.warn("Cannot send message to destination for config id :${channel.docInfo.id}")
             Metrics.NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND.counter.increment()
-            eventStatus.copy(deliveryStatus = DeliveryStatus(RestStatus.NOT_FOUND.name, "Channel not found"))
+            eventStatus.copy(deliveryStatus = DeliveryStatus(RestStatus.NOT_FOUND.status.toString(), "Channel not found"))
         } else {
             response
         }
@@ -356,7 +356,7 @@ object SendMessageActionHelper {
         channel: NotificationConfigDocInfo
     ): DeliveryStatus? {
         return if (!channel.configDoc.config.isEnabled) {
-            DeliveryStatus(RestStatus.LOCKED.name, "The channel is muted")
+            DeliveryStatus(RestStatus.LOCKED.status.toString(), "The channel is muted")
         } else {
             null
         }
@@ -483,7 +483,7 @@ object SendMessageActionHelper {
                         )
                         else -> EmailRecipientStatus(
                             it.recipient,
-                            DeliveryStatus(RestStatus.NOT_ACCEPTABLE.name, "email account type not enabled")
+                            DeliveryStatus(RestStatus.NOT_ACCEPTABLE.status.toString(), "email account type not enabled")
                         )
                     }
                 }
