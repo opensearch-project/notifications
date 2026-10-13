@@ -180,37 +180,99 @@ internal class SendNotificationResourceSharingIT : PluginRestTestCase() {
         )
     }
 
-    fun `test send through a shared email channel requires access to its account`() {
-        val accountId = createConfigWithRequestJsonString(
-            getCreateNotificationRequestJsonString("send api account", ConfigType.SMTP_ACCOUNT, true),
-            ownerClient!!
-        )
-        // Muted, so a send that passes every access check stops before contacting the SMTP host.
-        val channelId = createConfigWithRequestJsonString(
-            getCreateNotificationRequestJsonString("send api email", ConfigType.EMAIL, false, accountId),
-            ownerClient!!
-        )
-        share(channelId, "notifications_read_write", "users", otherUser)
+    fun `test user the channel is shared with send_only can send but not change it`() {
+        val configId = createWebhookConfig()
+        share(configId, "notifications_send_only", "users", otherUser)
         Thread.sleep(1000)
 
         executeRequest(
+            RestRequest.Method.POST.name,
+            sendUrl(configId),
+            sendNotificationRequestJson("Sent with send only access"),
+            RestStatus.OK.status,
+            otherClient!!
+        )
+        Assert.assertTrue(webhook.receivedBodies.any { it.contains("Sent with send only access") })
+
+        executeRequest(
+            RestRequest.Method.PUT.name,
+            "$PLUGIN_BASE_URI/configs/$configId",
+            webhookConfigJson("renamed by a send only user", webhook.url("/shared")),
+            RestStatus.FORBIDDEN.status,
+            otherClient!!
+        )
+        executeRequest(
+            RestRequest.Method.DELETE.name,
+            "$PLUGIN_BASE_URI/configs/$configId",
+            "",
+            RestStatus.FORBIDDEN.status,
+            otherClient!!
+        )
+    }
+
+    /** An email channel with no direct recipients, so a send never reaches the SMTP host of the test account. */
+    private fun createEmailChannel(accountId: String, groupIds: List<String>): String {
+        val channelId = createConfigWithRequestJsonString(
+            """
+            {
+                "config":{
+                    "name":"send api email",
+                    "description":"email channel for the send api",
+                    "config_type":"email",
+                    "is_enabled":true,
+                    "email":{
+                        "email_account_id":"$accountId",
+                        "recipient_list":[],
+                        "email_group_id_list":[${groupIds.joinToString { "\"$it\"" }}]
+                    }
+                }
+            }
+            """.trimIndent(),
+            ownerClient!!
+        )
+        share(channelId, "notifications_send_only", "users", otherUser)
+        return channelId
+    }
+
+    private fun createOwnerConfig(nameSubstring: String, configType: ConfigType): String =
+        createConfigWithRequestJsonString(getCreateNotificationRequestJsonString(nameSubstring, configType, true), ownerClient!!)
+
+    fun `test send through a shared email channel reports the account the caller cannot access`() {
+        val accountId = createOwnerConfig("send api account", ConfigType.SMTP_ACCOUNT)
+        val groupId = createOwnerConfig("send api group", ConfigType.EMAIL_GROUP)
+        share(groupId, "notifications_send_only", "users", otherUser)
+        val channelId = createEmailChannel(accountId, listOf(groupId))
+        Thread.sleep(1000)
+
+        val response = executeRequest(
             RestRequest.Method.POST.name,
             sendUrl(channelId),
             sendNotificationRequestJson("Sent without access to the account"),
             RestStatus.FORBIDDEN.status,
             otherClient!!
         )
+        Assert.assertTrue(response.toString().contains("Access denied for sender $accountId"))
+    }
 
-        share(accountId, "notifications_read_write", "users", otherUser)
+    fun `test send through a shared email channel reports each group that is not accessible or no longer exists`() {
+        val accountId = createOwnerConfig("send api account", ConfigType.SMTP_ACCOUNT)
+        share(accountId, "notifications_send_only", "users", otherUser)
+        val unsharedGroupId = createOwnerConfig("send api unshared group", ConfigType.EMAIL_GROUP)
+        val deletedGroupId = createOwnerConfig("send api deleted group", ConfigType.EMAIL_GROUP)
+        val channelId = createEmailChannel(accountId, listOf(unsharedGroupId, deletedGroupId))
+        executeRequest(RestRequest.Method.DELETE.name, "$PLUGIN_BASE_URI/configs/$deletedGroupId", "", RestStatus.OK.status, ownerClient!!)
         Thread.sleep(1000)
 
-        executeRequest(
+        // Each group gets its own status instead of one group failing the whole send
+        val response = executeRequest(
             RestRequest.Method.POST.name,
             sendUrl(channelId),
-            sendNotificationRequestJson("Sent with access to the account"),
-            RestStatus.LOCKED.status,
+            sendNotificationRequestJson("Sent to groups the caller cannot use"),
+            RestStatus.MULTI_STATUS.status,
             otherClient!!
-        )
+        ).toString()
+        Assert.assertTrue(response.contains("Access denied for recipient $unsharedGroupId"))
+        Assert.assertTrue(response.contains("Recipient $deletedGroupId not found"))
     }
 
     companion object {

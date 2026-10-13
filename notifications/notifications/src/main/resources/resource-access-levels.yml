@@ -8,6 +8,15 @@ resource_types:
         - 'cluster:admin/opensearch/notifications/channels/get'
         - 'cluster:admin/opensearch/notifications/features'
 
+    # Lets a user send through a shared channel without being able to change it. Sending through an email
+    # channel also needs its account and recipient groups shared at this level or higher.
+    notifications_send_only:
+      allowed_actions:
+        - 'cluster:admin/opensearch/notifications/configs/get'
+        - 'cluster:admin/opensearch/notifications/channels/get'
+        - 'cluster:admin/opensearch/notifications/features'
+        - 'cluster:admin/opensearch/notifications/channel/send'
+
     notifications_read_write:
       allowed_actions:
         - 'cluster:admin/opensearch/notifications/configs/*'
