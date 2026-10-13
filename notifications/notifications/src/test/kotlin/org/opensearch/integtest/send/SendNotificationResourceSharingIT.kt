@@ -12,8 +12,10 @@ import org.junit.Before
 import org.junit.BeforeClass
 import org.opensearch.client.Request
 import org.opensearch.client.RestClient
+import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.integtest.PluginRestTestCase
+import org.opensearch.integtest.getCreateNotificationRequestJsonString
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.rest.RestRequest
 
@@ -143,6 +145,72 @@ internal class SendNotificationResourceSharingIT : PluginRestTestCase() {
             otherClient!!
         )
         Assert.assertTrue(webhook.receivedBodies.any { it.contains("Sent through a channel shared by backend role") })
+    }
+
+    fun `test user the channel is shared with read_only cannot send`() {
+        val configId = createWebhookConfig()
+        share(configId, "notifications_read_only", "users", otherUser)
+        Thread.sleep(1000)
+
+        executeRequest(
+            RestRequest.Method.POST.name,
+            sendUrl(configId),
+            sendNotificationRequestJson("Sent with read only access"),
+            RestStatus.FORBIDDEN.status,
+            otherClient!!
+        )
+        Assert.assertFalse(webhook.receivedBodies.any { it.contains("Sent with read only access") })
+    }
+
+    /**
+     * The test route delivers through the in-process send path that Alerting and ISM use. That path must keep
+     * working for a channel shared with the caller by user name, which a per-channel check on it would break.
+     */
+    fun `test in-process send path still delivers through a channel shared by user name`() {
+        val configId = createWebhookConfig()
+        share(configId, "notifications_read_write", "users", otherUser)
+        Thread.sleep(1000)
+
+        executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/feature/test/$configId",
+            "",
+            RestStatus.OK.status,
+            otherClient!!
+        )
+    }
+
+    fun `test send through a shared email channel requires access to its account`() {
+        val accountId = createConfigWithRequestJsonString(
+            getCreateNotificationRequestJsonString("send api account", ConfigType.SMTP_ACCOUNT, true),
+            ownerClient!!
+        )
+        // Muted, so a send that passes every access check stops before contacting the SMTP host.
+        val channelId = createConfigWithRequestJsonString(
+            getCreateNotificationRequestJsonString("send api email", ConfigType.EMAIL, false, accountId),
+            ownerClient!!
+        )
+        share(channelId, "notifications_read_write", "users", otherUser)
+        Thread.sleep(1000)
+
+        executeRequest(
+            RestRequest.Method.POST.name,
+            sendUrl(channelId),
+            sendNotificationRequestJson("Sent without access to the account"),
+            RestStatus.FORBIDDEN.status,
+            otherClient!!
+        )
+
+        share(accountId, "notifications_read_write", "users", otherUser)
+        Thread.sleep(1000)
+
+        executeRequest(
+            RestRequest.Method.POST.name,
+            sendUrl(channelId),
+            sendNotificationRequestJson("Sent with access to the account"),
+            RestStatus.LOCKED.status,
+            otherClient!!
+        )
     }
 
     companion object {

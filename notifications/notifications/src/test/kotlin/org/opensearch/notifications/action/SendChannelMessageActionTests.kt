@@ -6,9 +6,7 @@ package org.opensearch.notifications.action
 
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.just
 import io.mockk.mockkObject
-import io.mockk.runs
 import io.mockk.slot
 import io.mockk.unmockkAll
 import org.junit.jupiter.api.AfterEach
@@ -25,7 +23,6 @@ import org.opensearch.action.support.PlainActionFuture
 import org.opensearch.common.settings.Settings
 import org.opensearch.common.util.concurrent.ThreadContext
 import org.opensearch.commons.ConfigConstants.OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT
-import org.opensearch.commons.notifications.action.NotificationsActions
 import org.opensearch.commons.notifications.action.SendNotificationRequest
 import org.opensearch.commons.notifications.action.SendNotificationResponse
 import org.opensearch.commons.notifications.model.ChannelMessage
@@ -36,8 +33,7 @@ import org.opensearch.commons.notifications.model.EventStatus
 import org.opensearch.commons.notifications.model.NotificationEvent
 import org.opensearch.commons.notifications.model.SeverityType
 import org.opensearch.core.rest.RestStatus
-import org.opensearch.core.xcontent.NamedXContentRegistry
-import org.opensearch.notifications.security.UserAccessManager
+import org.opensearch.notifications.model.SendChannelMessageRequest
 import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.tasks.Task
 import org.opensearch.threadpool.ThreadPool
@@ -46,7 +42,7 @@ import org.opensearch.transport.client.Client
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
-internal class SendNotificationActionTests {
+internal class SendChannelMessageActionTests {
     private val callerUserInfo = "alice|engineering|notifications_send_access"
     private val eventSource = EventSource("title", "reference_id", severity = SeverityType.INFO)
     private val channelMessage = ChannelMessage("text", null, null)
@@ -58,7 +54,7 @@ internal class SendNotificationActionTests {
     )
 
     private lateinit var threadContext: ThreadContext
-    private lateinit var action: SendNotificationAction
+    private lateinit var action: SendChannelMessageAction
 
     @BeforeEach
     fun setup() {
@@ -67,14 +63,8 @@ internal class SendNotificationActionTests {
         `when`(threadPool.threadContext).thenReturn(threadContext)
         val client = mock(Client::class.java)
         `when`(client.threadPool()).thenReturn(threadPool)
-        action = SendNotificationAction(
-            mock(TransportService::class.java),
-            client,
-            ActionFilters(setOf()),
-            mock(NamedXContentRegistry::class.java)
-        )
+        action = SendChannelMessageAction(mock(TransportService::class.java), client, ActionFilters(setOf()))
         mockkObject(SendMessageActionHelper)
-        mockkObject(UserAccessManager)
     }
 
     @AfterEach
@@ -82,60 +72,57 @@ internal class SendNotificationActionTests {
         unmockkAll()
     }
 
-    private fun execute(request: SendNotificationRequest): SendNotificationResponse {
+    private fun execute(request: SendChannelMessageRequest): SendNotificationResponse {
         val future = PlainActionFuture<SendNotificationResponse>()
         action.execute(mock(Task::class.java), request, future)
         return future.get(10, TimeUnit.SECONDS)
     }
 
     @Test
-    fun `send in the caller's security context is authorized as the caller for the channel`() {
+    fun `send delivers to the one channel as the authenticated caller`() {
         val sent = slot<SendNotificationRequest>()
-        coEvery { UserAccessManager.verifyResourceAccess(any(), any()) } just runs
-        coEvery { SendMessageActionHelper.executeRequest(capture(sent)) } returns response
+        coEvery { SendMessageActionHelper.executeRequest(capture(sent), any()) } returns response
         threadContext.putTransient(OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT, callerUserInfo)
 
-        val actual = execute(SendNotificationRequest(eventSource, channelMessage, listOf("a"), null))
+        val actual = execute(SendChannelMessageRequest("a", eventSource, channelMessage))
 
         assertEquals(response, actual)
+        assertEquals(listOf("a"), sent.captured.channelIds)
+        assertEquals(eventSource, sent.captured.eventSource)
+        assertEquals(channelMessage, sent.captured.channelMessage)
         assertEquals(callerUserInfo, sent.captured.threadContext)
-        coVerify(exactly = 1) { UserAccessManager.verifyResourceAccess("a", NotificationsActions.SEND_NOTIFICATION_NAME) }
     }
 
     @Test
-    fun `send without a caller security context keeps the user the request acts for`() {
-        val sent = slot<SendNotificationRequest>()
-        coEvery { SendMessageActionHelper.executeRequest(capture(sent)) } returns response
-        val inProcessUser = "bob|marketing|alerting_full_access"
+    fun `send verifies the channel's child configs for the send action`() {
+        coEvery { SendMessageActionHelper.executeRequest(any(), any()) } returns response
 
-        execute(SendNotificationRequest(eventSource, channelMessage, listOf("a"), inProcessUser))
+        execute(SendChannelMessageRequest("a", eventSource, channelMessage))
 
-        assertEquals(inProcessUser, sent.captured.threadContext)
-        coVerify(exactly = 0) { UserAccessManager.verifyResourceAccess(any(), any()) }
+        coVerify(exactly = 1) {
+            SendMessageActionHelper.executeRequest(any(), SendChannelMessageAction.NAME)
+        }
     }
 
     @Test
-    fun `send without any user context is not checked per channel`() {
+    fun `send without the security plugin carries no user`() {
         val sent = slot<SendNotificationRequest>()
-        coEvery { SendMessageActionHelper.executeRequest(capture(sent)) } returns response
+        coEvery { SendMessageActionHelper.executeRequest(capture(sent), any()) } returns response
 
-        execute(SendNotificationRequest(eventSource, channelMessage, listOf("a"), null))
+        execute(SendChannelMessageRequest("a", eventSource, channelMessage))
 
         assertNull(sent.captured.threadContext)
-        coVerify(exactly = 0) { UserAccessManager.verifyResourceAccess(any(), any()) }
     }
 
     @Test
-    fun `send fails without delivering when the caller cannot access the channel`() {
-        coEvery { UserAccessManager.verifyResourceAccess("a", any()) } throws
+    fun `a delivery failure is returned with its status`() {
+        coEvery { SendMessageActionHelper.executeRequest(any(), any()) } throws
             OpenSearchStatusException("no permissions", RestStatus.FORBIDDEN)
-        threadContext.putTransient(OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT, callerUserInfo)
 
         val error = assertThrows<ExecutionException> {
-            execute(SendNotificationRequest(eventSource, channelMessage, listOf("a"), null))
+            execute(SendChannelMessageRequest("a", eventSource, channelMessage))
         }
 
         assertEquals(RestStatus.FORBIDDEN, (error.cause as OpenSearchStatusException).status())
-        coVerify(exactly = 0) { SendMessageActionHelper.executeRequest(any()) }
     }
 }

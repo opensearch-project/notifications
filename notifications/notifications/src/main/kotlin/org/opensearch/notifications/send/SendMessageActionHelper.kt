@@ -45,6 +45,7 @@ import org.opensearch.notifications.index.ConfigOperations
 import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.security.UserAccess
+import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
@@ -75,15 +76,25 @@ object SendMessageActionHelper {
     /**
      * Send notification message and keep audit.
      * @param request request object
+     * @param childConfigAccessAction when set, the caller's access to each child config (an email channel's account
+     * and recipient groups) is verified for this action under resource sharing
      */
-    suspend fun executeRequest(request: SendNotificationRequest): SendNotificationResponse {
+    suspend fun executeRequest(
+        request: SendNotificationRequest,
+        childConfigAccessAction: String? = null
+    ): SendNotificationResponse {
         val eventSource = request.eventSource
         val channelMessage = request.channelMessage
         val channelIds = request.channelIds.toSet()
         val user: User? = User.parse(request.threadContext)
         userAccess.validateUser(user)
         val channelMap = getConfigs(channelIds)
-        val childConfigMap = getConfigs(getChildConfigIds(channelMap.values.filterNotNull().toList()))
+        val childConfigIds = getChildConfigIds(channelMap.values.filterNotNull().toList())
+        // With resource sharing, an email channel's account and recipient groups are resources of their own.
+        childConfigAccessAction?.let { action ->
+            childConfigIds.forEach { UserAccessManager.verifyResourceAccess(it, action) }
+        }
+        val childConfigMap = getConfigs(childConfigIds)
         val message = createMessageContent(eventSource, channelMessage)
         val eventStatusList = sendMessagesInParallel(user, eventSource, channelMap, childConfigMap, message)
         val event = NotificationEvent(eventSource, eventStatusList)

@@ -6,6 +6,7 @@
 package org.opensearch.integtest
 
 import org.opensearch.commons.notifications.action.NotificationsActions
+import org.opensearch.notifications.action.SendChannelMessageAction
 import org.opensearch.notifications.action.SendTestNotificationAction
 
 val ALL_ACCESS_ROLE = "all_access"
@@ -30,5 +31,5 @@ val ROLE_TO_PERMISSION_MAPPING = mapOf(
     NOTIFICATION_GET_PLUGIN_FEATURE_ACCESS to NotificationsActions.GET_PLUGIN_FEATURES_NAME,
     NOTIFICATION_GET_CHANNEL_ACCESS to NotificationsActions.GET_CHANNEL_LIST_NAME,
     NOTIFICATION_TEST_SEND_ACCESS to SendTestNotificationAction.NAME,
-    NOTIFICATION_SEND_ACCESS to NotificationsActions.SEND_NOTIFICATION_NAME
+    NOTIFICATION_SEND_ACCESS to SendChannelMessageAction.NAME
 )

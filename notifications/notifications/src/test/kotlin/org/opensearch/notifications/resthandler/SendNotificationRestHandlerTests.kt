@@ -8,15 +8,14 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.opensearch.common.xcontent.XContentType
-import org.opensearch.commons.notifications.action.NotificationsActions
-import org.opensearch.commons.notifications.action.SendNotificationRequest
 import org.opensearch.core.common.bytes.BytesArray
 import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
+import org.opensearch.notifications.action.SendChannelMessageAction
+import org.opensearch.notifications.model.SendChannelMessageRequest
 import org.opensearch.rest.RestRequest
 import org.opensearch.test.rest.FakeRestChannel
 import org.opensearch.test.rest.FakeRestRequest
@@ -41,18 +40,17 @@ internal class SendNotificationRestHandlerTests {
     }
 
     @Test
-    fun `handler sends to the channel named in the path`() {
+    fun `handler sends to the channel named in the path through the channel send action`() {
         val client = mockk<NodeClient>(relaxed = true)
         val request = sendRequest(validBody, "a1b2c3")
 
         handler.handleRequest(request, FakeRestChannel(request, true, 1), client)
 
-        val sent = slot<SendNotificationRequest>()
-        verify { client.execute(NotificationsActions.SEND_NOTIFICATION_ACTION_TYPE, capture(sent), any()) }
-        assertEquals(listOf("a1b2c3"), sent.captured.channelIds)
+        val sent = slot<SendChannelMessageRequest>()
+        verify { client.execute(SendChannelMessageAction.ACTION_TYPE, capture(sent), any()) }
+        assertEquals("a1b2c3", sent.captured.configId)
         assertEquals("title", sent.captured.eventSource.title)
         assertEquals("text", sent.captured.channelMessage.textDescription)
-        assertNull(sent.captured.threadContext)
     }
 
     @Test

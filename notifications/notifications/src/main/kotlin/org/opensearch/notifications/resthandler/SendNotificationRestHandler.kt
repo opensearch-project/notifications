@@ -8,14 +8,10 @@ package org.opensearch.notifications.resthandler
 import org.opensearch.commons.notifications.NotificationConstants.CHANNEL_MESSAGE_TAG
 import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.notifications.NotificationConstants.EVENT_SOURCE_TAG
-import org.opensearch.commons.notifications.action.NotificationsActions
-import org.opensearch.commons.notifications.action.SendNotificationRequest
-import org.opensearch.commons.notifications.model.ChannelMessage
-import org.opensearch.commons.notifications.model.EventSource
 import org.opensearch.commons.utils.contentParserNextToken
-import org.opensearch.core.xcontent.XContentParser
-import org.opensearch.core.xcontent.XContentParserUtils
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
+import org.opensearch.notifications.action.SendChannelMessageAction
+import org.opensearch.notifications.model.SendChannelMessageRequest
 import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
 import org.opensearch.rest.RestHandler.Route
 import org.opensearch.rest.RestRequest
@@ -23,7 +19,7 @@ import org.opensearch.rest.RestRequest.Method.POST
 import org.opensearch.transport.client.node.NodeClient
 
 /**
- * Rest handler for sending a message to an existing notification channel.
+ * Rest handler for sending a caller-supplied message to one existing notification channel.
  */
 internal class SendNotificationRestHandler : PluginBaseHandler() {
     companion object {
@@ -50,6 +46,7 @@ internal class SendNotificationRestHandler : PluginBaseHandler() {
              * Request URL: POST [REQUEST_URL/CONFIG_ID_TAG]
              * Request body: [EVENT_SOURCE_TAG] and [CHANNEL_MESSAGE_TAG]
              * Response body: [org.opensearch.commons.notifications.action.SendNotificationResponse]
+             * Transport action: [SendChannelMessageAction]
              */
             Route(POST, "$REQUEST_URL/{$CONFIG_ID_TAG}")
         )
@@ -68,35 +65,13 @@ internal class SendNotificationRestHandler : PluginBaseHandler() {
     override fun executeRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
         val configId = request.param(CONFIG_ID_TAG)
         require(!configId.isNullOrBlank()) { "$CONFIG_ID_TAG is required" }
-        val sendNotificationRequest = parse(request.contentParserNextToken(), configId)
+        val sendRequest = SendChannelMessageRequest.parse(request.contentParserNextToken(), configId)
         return RestChannelConsumer {
             client.execute(
-                NotificationsActions.SEND_NOTIFICATION_ACTION_TYPE,
-                sendNotificationRequest,
+                SendChannelMessageAction.ACTION_TYPE,
+                sendRequest,
                 RestResponseToXContentListener(it)
             )
         }
-    }
-
-    /**
-     * The channel is taken from the path and the user from the authenticated caller, so the body carries
-     * only the event source and the message.
-     */
-    private fun parse(parser: XContentParser, configId: String): SendNotificationRequest {
-        var eventSource: EventSource? = null
-        var channelMessage: ChannelMessage? = null
-        XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser)
-        while (parser.nextToken() != XContentParser.Token.END_OBJECT) {
-            val fieldName = parser.currentName()
-            parser.nextToken()
-            when (fieldName) {
-                EVENT_SOURCE_TAG -> eventSource = EventSource.parse(parser)
-                CHANNEL_MESSAGE_TAG -> channelMessage = ChannelMessage.parse(parser)
-                else -> throw IllegalArgumentException("Unexpected field $fieldName")
-            }
-        }
-        requireNotNull(eventSource) { "$EVENT_SOURCE_TAG is required" }
-        requireNotNull(channelMessage) { "$CHANNEL_MESSAGE_TAG is required" }
-        return SendNotificationRequest(eventSource, channelMessage, listOf(configId), null)
     }
 }
