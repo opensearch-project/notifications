@@ -13,7 +13,6 @@ import org.opensearch.OpenSearchStatusException
 import org.opensearch.action.ActionRequest
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.action.support.HandledTransportAction
-import org.opensearch.common.util.concurrent.ThreadContext
 import org.opensearch.commons.ConfigConstants.OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT
 import org.opensearch.commons.authuser.User
 import org.opensearch.commons.utils.logger
@@ -28,6 +27,7 @@ import org.opensearch.notifications.NotificationPlugin.Companion.LOG_PREFIX
 import org.opensearch.notifications.NotificationPlugin.Companion.TENANT_ID_HEADER
 import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.util.TenantContext
+import org.opensearch.notifications.util.ThreadContextSnapshotElement
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 import org.opensearch.transport.client.Client
@@ -58,13 +58,13 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
             client.threadPool().threadContext.getTransient<String>(OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT)
         val user: User? = User.parse(userStr)
         val tenantId: String? = client.threadPool().threadContext.getHeader(TENANT_ID_HEADER)
-        val storedThreadContext = client.threadPool().threadContext.newStoredContext(false)
-        scope.launch(TenantContext(tenantId)) {
+        val threadContext = client.threadPool().threadContext
+        // The coroutine hops between Dispatchers.IO threads at every suspension, so the caller's context is
+        // reinstalled on each thread it runs on instead of only the first one
+        val callerContext = ThreadContextSnapshotElement(threadContext, threadContext.newStoredContext(false))
+        scope.launch(TenantContext(tenantId) + callerContext) {
             try {
-                client.threadPool().threadContext.stashContext().use {
-                    storedThreadContext.restore()
-                    listener.onResponse(executeRequest(request as Request, user))
-                }
+                listener.onResponse(executeRequest(request as Request, user))
             } catch (exception: OpenSearchStatusException) {
                 Metrics.NOTIFICATIONS_EXCEPTIONS_OS_STATUS_EXCEPTION.counter.increment()
                 log.warn("$LOG_PREFIX:OpenSearchStatusException:", exception)
@@ -117,43 +117,4 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
      * @return the response to return.
      */
     abstract suspend fun executeRequest(request: Request, user: User?): Response
-
-    /**
-     * Executes the given [block] function on this resource and then closes it down correctly whether an exception
-     * is thrown or not.
-     *
-     * In case if the resource is being closed due to an exception occurred in [block], and the closing also fails with an exception,
-     * the latter is added to the [suppressed][java.lang.Throwable.addSuppressed] exceptions of the former.
-     *
-     * @param block a function to process this [AutoCloseable] resource.
-     * @return the result of [block] function invoked on this resource.
-     */
-    @Suppress("TooGenericExceptionCaught")
-    private inline fun <T : ThreadContext.StoredContext, R> T.use(block: (T) -> R): R {
-        var exception: Throwable? = null
-        try {
-            return block(this)
-        } catch (e: Throwable) {
-            exception = e
-            throw e
-        } finally {
-            closeFinally(exception)
-        }
-    }
-
-    /**
-     * Closes this [AutoCloseable], suppressing possible exception or error thrown by [AutoCloseable.close] function when
-     * it's being closed due to some other [cause] exception occurred.
-     *
-     * The suppressed exception is added to the list of suppressed exceptions of [cause] exception.
-     */
-    @Suppress("TooGenericExceptionCaught")
-    private fun ThreadContext.StoredContext.closeFinally(cause: Throwable?) = when (cause) {
-        null -> close()
-        else -> try {
-            close()
-        } catch (closeException: Throwable) {
-            cause.addSuppressed(closeException)
-        }
-    }
 }
