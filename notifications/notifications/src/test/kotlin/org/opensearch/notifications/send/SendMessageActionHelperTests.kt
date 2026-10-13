@@ -24,9 +24,13 @@ import org.opensearch.commons.notifications.action.SendNotificationRequest
 import org.opensearch.commons.notifications.model.ChannelMessage
 import org.opensearch.commons.notifications.model.ConfigType
 import org.opensearch.commons.notifications.model.Email
+import org.opensearch.commons.notifications.model.EmailGroup
+import org.opensearch.commons.notifications.model.EmailRecipient
 import org.opensearch.commons.notifications.model.EventSource
+import org.opensearch.commons.notifications.model.MethodType
 import org.opensearch.commons.notifications.model.NotificationConfig
 import org.opensearch.commons.notifications.model.SeverityType
+import org.opensearch.commons.notifications.model.SmtpAccount
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.index.ConfigOperations
 import org.opensearch.notifications.model.DocInfo
@@ -76,33 +80,83 @@ internal class SendMessageActionHelperTests {
         return NotificationConfigDocInfo(DocInfo("channel"), NotificationConfigDoc(metadata, config))
     }
 
+    /** An enabled email channel with no direct recipients, so delivery only fans out to the given groups. */
+    private fun emailChannel(groupIds: List<String>): NotificationConfigDocInfo {
+        val config = NotificationConfig("email", "", ConfigType.EMAIL, Email("account", listOf(), groupIds))
+        val metadata = DocMetadata(Instant.now(), Instant.now(), listOf())
+        return NotificationConfigDocInfo(DocInfo("channel"), NotificationConfigDoc(metadata, config))
+    }
+
+    private fun childConfig(id: String, config: NotificationConfig): NotificationConfigDocInfo {
+        val metadata = DocMetadata(Instant.now(), Instant.now(), listOf())
+        return NotificationConfigDocInfo(DocInfo(id), NotificationConfigDoc(metadata, config))
+    }
+
+    private val account = childConfig(
+        "account",
+        NotificationConfig("account", "", ConfigType.SMTP_ACCOUNT, SmtpAccount("smtp.domain.com", 4321, MethodType.SSL, "from@domain.com"))
+    )
+
+    private fun group(id: String) = childConfig(
+        id,
+        NotificationConfig(id, "", ConfigType.EMAIL_GROUP, EmailGroup(listOf(EmailRecipient("$id@domain.com"))))
+    )
+
     private fun sendExpectingStatus(childConfigAccessAction: String?): OpenSearchStatusException =
         assertThrows {
             runBlocking { SendMessageActionHelper.executeRequest(request, childConfigAccessAction) }
         }
 
     @Test
-    fun `send verifies the email channel's account and groups for the given action`() {
-        coEvery { configOperations.getNotificationConfig("channel") } returns mutedEmailChannel()
-        coEvery { configOperations.getNotificationConfigs(setOf("account", "group")) } returns listOf()
-        coEvery { UserAccessManager.verifyResourceAccess(any(), any()) } just runs
+    fun `send checks each child config that exists for the given action`() {
+        coEvery { configOperations.getNotificationConfig("channel") } returns emailChannel(listOf("group", "deleted"))
+        coEvery { configOperations.getNotificationConfigs(setOf("account", "group", "deleted")) } returns
+            listOf(account, group("group"))
+        coEvery { UserAccessManager.hasResourceAccess(any(), any()) } returns false
 
         sendExpectingStatus(action)
 
-        coVerify(exactly = 1) { UserAccessManager.verifyResourceAccess("account", action) }
-        coVerify(exactly = 1) { UserAccessManager.verifyResourceAccess("group", action) }
+        coVerify(exactly = 1) { UserAccessManager.hasResourceAccess("account", action) }
+        coVerify(exactly = 1) { UserAccessManager.hasResourceAccess("group", action) }
+        coVerify(exactly = 0) { UserAccessManager.hasResourceAccess("deleted", any()) }
     }
 
     @Test
-    fun `send stops before loading child configs the caller cannot access`() {
-        coEvery { configOperations.getNotificationConfig("channel") } returns mutedEmailChannel()
-        coEvery { UserAccessManager.verifyResourceAccess("account", action) } throws
-            OpenSearchStatusException("no permissions", RestStatus.FORBIDDEN)
+    fun `an account the caller cannot access is reported as access denied for the sender`() {
+        coEvery { configOperations.getNotificationConfig("channel") } returns emailChannel(listOf("group"))
+        coEvery { configOperations.getNotificationConfigs(any()) } returns listOf(account, group("group"))
+        coEvery { UserAccessManager.hasResourceAccess("account", action) } returns false
+        coEvery { UserAccessManager.hasResourceAccess("group", action) } returns true
 
         val error = sendExpectingStatus(action)
 
         assertEquals(RestStatus.FORBIDDEN, error.status())
-        coVerify(exactly = 0) { configOperations.getNotificationConfigs(any()) }
+        assertTrue(error.message!!.contains("Access denied for sender account"))
+    }
+
+    @Test
+    fun `an account that no longer exists is reported as sender not found`() {
+        coEvery { configOperations.getNotificationConfig("channel") } returns emailChannel(listOf("group"))
+        coEvery { configOperations.getNotificationConfigs(any()) } returns listOf(group("group"))
+
+        val error = sendExpectingStatus(null)
+
+        assertEquals(RestStatus.NOT_FOUND, error.status())
+        assertTrue(error.message!!.contains("Sender account not found"))
+    }
+
+    @Test
+    fun `each group is reported on its own instead of failing the whole send`() {
+        coEvery { configOperations.getNotificationConfig("channel") } returns emailChannel(listOf("denied", "deleted"))
+        coEvery { configOperations.getNotificationConfigs(any()) } returns listOf(account, group("denied"))
+        coEvery { UserAccessManager.hasResourceAccess("account", action) } returns true
+        coEvery { UserAccessManager.hasResourceAccess("denied", action) } returns false
+
+        val error = sendExpectingStatus(action)
+
+        assertEquals(RestStatus.MULTI_STATUS, error.status())
+        assertTrue(error.message!!.contains("Access denied for recipient denied"))
+        assertTrue(error.message!!.contains("Recipient deleted not found"))
     }
 
     @Test
@@ -112,7 +166,7 @@ internal class SendMessageActionHelperTests {
 
         sendExpectingStatus(null)
 
-        coVerify(exactly = 0) { UserAccessManager.verifyResourceAccess(any(), any()) }
+        coVerify(exactly = 0) { UserAccessManager.hasResourceAccess(any(), any()) }
     }
 
     @Test
