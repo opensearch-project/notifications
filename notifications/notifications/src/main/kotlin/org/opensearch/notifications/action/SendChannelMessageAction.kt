@@ -35,7 +35,7 @@ internal class SendChannelMessageAction @Inject constructor(
     ::SendChannelMessageRequest
 ) {
     companion object {
-        internal const val NAME = "cluster:admin/opensearch/notifications/channels/send"
+        internal const val NAME = "cluster:admin/opensearch/notifications/channel/send"
         internal val ACTION_TYPE = ActionType(NAME, ::SendNotificationResponse)
     }
 

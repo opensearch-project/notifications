@@ -38,7 +38,7 @@ import org.opensearch.notifications.security.UserAccessManager
 import java.time.Instant
 
 internal class SendMessageActionHelperTests {
-    private val action = "cluster:admin/opensearch/notifications/channels/send"
+    private val action = "cluster:admin/opensearch/notifications/channel/send"
     private val request = SendNotificationRequest(
         EventSource("title", "reference_id", SeverityType.INFO),
         ChannelMessage("text", null, null),

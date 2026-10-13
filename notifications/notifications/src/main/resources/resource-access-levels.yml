@@ -14,7 +14,7 @@ resource_types:
         - 'cluster:admin/opensearch/notifications/channels/get'
         - 'cluster:admin/opensearch/notifications/features'
         - 'cluster:admin/opensearch/notifications/feature/send'
-        - 'cluster:admin/opensearch/notifications/channels/send'
+        - 'cluster:admin/opensearch/notifications/channel/send'
         - 'cluster:admin/opensearch/notifications/test_notification'
 
     notifications_full_access:
@@ -23,6 +23,6 @@ resource_types:
         - 'cluster:admin/opensearch/notifications/channels/get'
         - 'cluster:admin/opensearch/notifications/features'
         - 'cluster:admin/opensearch/notifications/feature/send'
-        - 'cluster:admin/opensearch/notifications/channels/send'
+        - 'cluster:admin/opensearch/notifications/channel/send'
         - 'cluster:admin/opensearch/notifications/test_notification'
         - 'cluster:admin/security/resource/share'
