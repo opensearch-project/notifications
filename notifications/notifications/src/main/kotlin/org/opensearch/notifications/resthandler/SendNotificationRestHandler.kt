@@ -11,6 +11,7 @@ import org.opensearch.commons.notifications.NotificationConstants.EVENT_SOURCE_T
 import org.opensearch.commons.utils.contentParserNextToken
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.action.SendChannelMessageAction
+import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.SendChannelMessageRequest
 import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
 import org.opensearch.rest.RestHandler.Route
@@ -63,10 +64,10 @@ internal class SendNotificationRestHandler : PluginBaseHandler() {
      * {@inheritDoc}
      */
     override fun executeRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
-        val configId = request.param(CONFIG_ID_TAG)
-        require(!configId.isNullOrBlank()) { "$CONFIG_ID_TAG is required" }
-        val sendRequest = SendChannelMessageRequest.parse(request.contentParserNextToken(), configId)
+        val sendRequest = SendChannelMessageRequest.parse(request.contentParserNextToken(), request.param(CONFIG_ID_TAG))
         return RestChannelConsumer {
+            Metrics.NOTIFICATIONS_SEND_CHANNEL_MESSAGE_TOTAL.counter.increment()
+            Metrics.NOTIFICATIONS_SEND_CHANNEL_MESSAGE_INTERVAL_COUNT.counter.increment()
             client.execute(
                 SendChannelMessageAction.ACTION_TYPE,
                 sendRequest,

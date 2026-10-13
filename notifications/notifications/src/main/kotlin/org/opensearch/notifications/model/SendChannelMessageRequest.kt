@@ -10,7 +10,6 @@ import org.opensearch.action.ActionRequestValidationException
 import org.opensearch.action.DocRequest
 import org.opensearch.action.ValidateActions
 import org.opensearch.commons.notifications.NotificationConstants.CHANNEL_MESSAGE_TAG
-import org.opensearch.commons.notifications.NotificationConstants.CONFIG_ID_TAG
 import org.opensearch.commons.notifications.NotificationConstants.EVENT_SOURCE_TAG
 import org.opensearch.commons.notifications.model.ChannelMessage
 import org.opensearch.commons.notifications.model.EventSource
@@ -108,8 +107,8 @@ class SendChannelMessageRequest : ActionRequest, DocRequest, ToXContentObject {
      */
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         builder!!
+        // The channel id travels in the request path, so the body holds only what parse reads back
         return builder.startObject()
-            .field(CONFIG_ID_TAG, configId)
             .field(EVENT_SOURCE_TAG, eventSource)
             .field(CHANNEL_MESSAGE_TAG, channelMessage)
             .endObject()

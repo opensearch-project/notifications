@@ -15,6 +15,7 @@ import org.opensearch.core.common.bytes.BytesArray
 import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.action.SendChannelMessageAction
+import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.SendChannelMessageRequest
 import org.opensearch.rest.RestRequest
 import org.opensearch.test.rest.FakeRestChannel
@@ -43,8 +44,11 @@ internal class SendNotificationRestHandlerTests {
     fun `handler sends to the channel named in the path through the channel send action`() {
         val client = mockk<NodeClient>(relaxed = true)
         val request = sendRequest(validBody, "a1b2c3")
+        val sendsBefore = Metrics.NOTIFICATIONS_SEND_CHANNEL_MESSAGE_TOTAL.counter.getValue()
 
         handler.handleRequest(request, FakeRestChannel(request, true, 1), client)
+
+        assertEquals(sendsBefore + 1, Metrics.NOTIFICATIONS_SEND_CHANNEL_MESSAGE_TOTAL.counter.getValue())
 
         val sent = slot<SendChannelMessageRequest>()
         verify { client.execute(SendChannelMessageAction.ACTION_TYPE, capture(sent), any()) }

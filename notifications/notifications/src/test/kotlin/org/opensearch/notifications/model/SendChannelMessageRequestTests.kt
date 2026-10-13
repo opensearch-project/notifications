@@ -12,6 +12,7 @@ import org.opensearch.commons.notifications.model.EventSource
 import org.opensearch.commons.notifications.model.SeverityType
 import org.opensearch.commons.utils.recreateObject
 import org.opensearch.notifications.createObjectFromJsonString
+import org.opensearch.notifications.getJsonString
 import org.opensearch.notifications.index.NotificationConfigIndex
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -44,6 +45,12 @@ internal class SendChannelMessageRequestTests {
             }
         """.trimIndent()
         val parsed = createObjectFromJsonString(json) { SendChannelMessageRequest.parse(it, "config_id") }
+        assertRequestEquals(request, parsed)
+    }
+
+    @Test
+    fun `request XContent output parses back with the channel from the path`() {
+        val parsed = createObjectFromJsonString(getJsonString(request)) { SendChannelMessageRequest.parse(it, "config_id") }
         assertRequestEquals(request, parsed)
     }
 

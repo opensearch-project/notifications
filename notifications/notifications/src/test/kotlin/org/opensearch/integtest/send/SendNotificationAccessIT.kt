@@ -35,9 +35,9 @@ internal class SendNotificationAccessIT : PluginRestTestCase() {
         return configId
     }
 
-    private fun enableBackendRoleFiltering() {
+    private fun setBackendRoleFiltering(enabled: Boolean?) {
         updateClusterSettings(
-            ClusterSetting("persistent", "opensearch.notifications.general.filter_by_backend_roles", "true"),
+            ClusterSetting("persistent", "opensearch.notifications.general.filter_by_backend_roles", enabled),
             adminClient()
         )
     }
@@ -111,7 +111,7 @@ internal class SendNotificationAccessIT : PluginRestTestCase() {
         createUser(teammate, password, arrayOf("engineering"))
         createUser(outsider, password, arrayOf("marketing"))
         createUserRolesMapping(role, arrayOf(owner, teammate, outsider))
-        enableBackendRoleFiltering()
+        setBackendRoleFiltering(true)
 
         val ownerClient = buildUserClient(owner, password)
         val teammateClient = buildUserClient(teammate, password)
@@ -150,6 +150,8 @@ internal class SendNotificationAccessIT : PluginRestTestCase() {
             )
             Assert.assertFalse(webhook.receivedBodies.any { it.contains("Sent with a forged context") })
         } finally {
+            // A persistent setting outlives the test, so clear it for the tests that share this cluster
+            setBackendRoleFiltering(null)
             ownerClient.close()
             teammateClient.close()
             outsiderClient.close()
