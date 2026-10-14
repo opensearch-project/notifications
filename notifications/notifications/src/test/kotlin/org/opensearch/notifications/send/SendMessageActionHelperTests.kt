@@ -108,11 +108,12 @@ internal class SendMessageActionHelperTests {
         }
 
     @Test
-    fun `send checks each child config that exists for the given action`() {
+    fun `send checks the account and the groups of an email channel it delivers to`() {
         coEvery { configOperations.getNotificationConfig("channel") } returns emailChannel(listOf("group", "deleted"))
         coEvery { configOperations.getNotificationConfigs(setOf("account", "group", "deleted")) } returns
             listOf(account, group("group"))
-        coEvery { UserAccessManager.hasResourceAccess(any(), any()) } returns false
+        coEvery { UserAccessManager.hasResourceAccess("account", action) } returns true
+        coEvery { UserAccessManager.hasResourceAccess("group", action) } returns false
 
         sendExpectingStatus(action)
 
@@ -122,11 +123,37 @@ internal class SendMessageActionHelperTests {
     }
 
     @Test
+    fun `send to a muted email channel checks no child configs`() {
+        coEvery { configOperations.getNotificationConfig("channel") } returns mutedEmailChannel()
+        coEvery { configOperations.getNotificationConfigs(any()) } returns listOf(account, group("group"))
+
+        val error = sendExpectingStatus(action)
+
+        assertEquals(RestStatus.LOCKED, error.status())
+        coVerify(exactly = 0) { UserAccessManager.hasResourceAccess(any(), any()) }
+    }
+
+    @Test
     fun `an account the caller cannot access is reported as access denied for the sender`() {
         coEvery { configOperations.getNotificationConfig("channel") } returns emailChannel(listOf("group"))
         coEvery { configOperations.getNotificationConfigs(any()) } returns listOf(account, group("group"))
         coEvery { UserAccessManager.hasResourceAccess("account", action) } returns false
-        coEvery { UserAccessManager.hasResourceAccess("group", action) } returns true
+
+        val error = sendExpectingStatus(action)
+
+        assertEquals(RestStatus.FORBIDDEN, error.status())
+        assertTrue(error.message!!.contains("Access denied for sender account"))
+        // Still an email status, with the error on a placeholder recipient
+        assertTrue(error.message!!.contains("\"config_type\":\"email\""))
+        assertTrue(error.message!!.contains("invalid-access@example.com"))
+        coVerify(exactly = 0) { UserAccessManager.hasResourceAccess("group", any()) }
+    }
+
+    @Test
+    fun `a failed access check counts as denied for that config only`() {
+        coEvery { configOperations.getNotificationConfig("channel") } returns emailChannel(listOf("group"))
+        coEvery { configOperations.getNotificationConfigs(any()) } returns listOf(account, group("group"))
+        coEvery { UserAccessManager.hasResourceAccess("account", action) } throws RuntimeException("security plugin unavailable")
 
         val error = sendExpectingStatus(action)
 
@@ -143,6 +170,8 @@ internal class SendMessageActionHelperTests {
 
         assertEquals(RestStatus.NOT_FOUND, error.status())
         assertTrue(error.message!!.contains("Sender account not found"))
+        assertTrue(error.message!!.contains("\"config_type\":\"email\""))
+        assertTrue(error.message!!.contains("unknown-sender@example.com"))
     }
 
     @Test
@@ -160,12 +189,13 @@ internal class SendMessageActionHelperTests {
     }
 
     @Test
-    fun `send without a child config action does not verify child configs`() {
-        coEvery { configOperations.getNotificationConfig("channel") } returns mutedEmailChannel()
-        coEvery { configOperations.getNotificationConfigs(setOf("account", "group")) } returns listOf()
+    fun `send without a child config action does not check resource access`() {
+        coEvery { configOperations.getNotificationConfig("channel") } returns emailChannel(listOf("deleted"))
+        coEvery { configOperations.getNotificationConfigs(any()) } returns listOf(account)
 
-        sendExpectingStatus(null)
+        val error = sendExpectingStatus(null)
 
+        assertEquals(RestStatus.NOT_FOUND, error.status())
         coVerify(exactly = 0) { UserAccessManager.hasResourceAccess(any(), any()) }
     }
 
