@@ -15,6 +15,35 @@ import org.opensearch.rest.RestRequest
 
 internal class SendTestMessageRestHandlerIT : PluginRestTestCase() {
     @Suppress("EmptyFunctionBlock")
+    fun `test send test message to a muted channel returns locked with the status list`() {
+        // On main this returned 400 'For input string: "LOCKED"' without the event status list
+        val configId = createConfigWithRequestJsonString(
+            """
+            {
+                "config":{
+                    "name":"muted chime",
+                    "description":"a muted channel",
+                    "config_type":"chime",
+                    "is_enabled":false,
+                    "chime":{"url":"https://hooks.chime.aws/incomingwebhooks/xxxx?token=xxxx"}
+                }
+            }
+            """.trimIndent()
+        )
+        Thread.sleep(1000)
+
+        val sendResponse = executeRequest(
+            RestRequest.Method.POST.name,
+            "$PLUGIN_BASE_URI/feature/test/$configId",
+            "",
+            RestStatus.LOCKED.status
+        )
+
+        val reason = sendResponse.get("error").asJsonObject.get("reason").asString
+        Assert.assertTrue(reason.contains("event_status_list"))
+        Assert.assertTrue(reason.contains("The channel is muted"))
+    }
+
     fun `test send test chime message`() {
         // Create webhook notification config
         val createRequestJsonString = """
