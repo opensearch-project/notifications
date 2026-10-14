@@ -4,6 +4,7 @@
  */
 package org.opensearch.notifications.send
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -45,6 +46,7 @@ import org.opensearch.notifications.index.ConfigOperations
 import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.NotificationConfigDocInfo
 import org.opensearch.notifications.security.UserAccess
+import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.spi.model.DestinationMessageResponse
 import org.opensearch.notifications.spi.model.MessageContent
 import org.opensearch.notifications.spi.model.destination.BaseDestination
@@ -75,8 +77,14 @@ object SendMessageActionHelper {
     /**
      * Send notification message and keep audit.
      * @param request request object
+     * @param childConfigAccessAction when set, the caller's access to the account and recipient groups of an email
+     * channel being delivered to is checked for this action under resource sharing. One the caller can't access, or
+     * whose check fails, is reported as access denied for that sender or recipient, like a backend-role mismatch.
      */
-    suspend fun executeRequest(request: SendNotificationRequest): SendNotificationResponse {
+    suspend fun executeRequest(
+        request: SendNotificationRequest,
+        childConfigAccessAction: String? = null
+    ): SendNotificationResponse {
         val eventSource = request.eventSource
         val channelMessage = request.channelMessage
         val channelIds = request.channelIds.toSet()
@@ -84,8 +92,10 @@ object SendMessageActionHelper {
         userAccess.validateUser(user)
         val channelMap = getConfigs(channelIds)
         val childConfigMap = getConfigs(getChildConfigIds(channelMap.values.filterNotNull().toList()))
+        val childConfigAccess = ChildConfigAccess(user, childConfigAccessAction)
         val message = createMessageContent(eventSource, channelMessage)
-        val eventStatusList = sendMessagesInParallel(user, eventSource, channelMap, childConfigMap, message)
+        val eventStatusList =
+            sendMessagesInParallel(user, eventSource, channelMap, childConfigMap, childConfigAccess, message)
         val event = NotificationEvent(eventSource, eventStatusList)
 
         // traverse status to determine HTTP status code
@@ -105,6 +115,28 @@ object SendMessageActionHelper {
         }
 
         return SendNotificationResponse(event)
+    }
+
+    /**
+     * Whether the caller may use an email channel's account or recipient group. Backend-role filtering applies to
+     * every send. Under resource sharing, the configs are resources of their own, so when [resourceAction] is set
+     * (only for the send API) the caller's access to each one is also checked for it. A check that fails counts as
+     * denied for that config alone rather than failing the whole send.
+     */
+    private class ChildConfigAccess(private val user: User?, private val resourceAction: String?) {
+        @Suppress("TooGenericExceptionCaught")
+        suspend fun canUse(id: String, config: NotificationConfigDocInfo): Boolean {
+            if (!userAccess.doesUserHaveAccess(user, config.configDoc.metadata.access)) return false
+            if (resourceAction == null) return true
+            return try {
+                UserAccessManager.hasResourceAccess(id, resourceAction)
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                log.warn("$LOG_PREFIX:resource access check for $id failed, treating it as denied", exception)
+                false
+            }
+        }
     }
 
     /**
@@ -138,6 +170,7 @@ object SendMessageActionHelper {
      * @param eventSource event source information
      * @param channelMap map of channel id to channel info
      * @param childConfigMap map of config id to configuration info of child for compound channels like email
+     * @param childConfigAccess the caller's access to child configs
      * @param message the message to send
      * @return notification delivery status for each channel
      */
@@ -146,6 +179,7 @@ object SendMessageActionHelper {
         eventSource: EventSource,
         channelMap: Map<String, NotificationConfigDocInfo?>,
         childConfigMap: Map<String, NotificationConfigDocInfo?>,
+        childConfigAccess: ChildConfigAccess,
         message: MessageContent
     ): List<EventStatus> {
         // Fire all the message sending in parallel. Using coroutineScope instead of runBlocking
@@ -155,7 +189,7 @@ object SendMessageActionHelper {
         // parallelism limit (64 by default) is reached by concurrent send requests.
         return coroutineScope {
             channelMap.map {
-                async(Dispatchers.IO) { sendMessageToChannel(user, eventSource, it, childConfigMap, message) }
+                async(Dispatchers.IO) { sendMessageToChannel(user, eventSource, it, childConfigMap, childConfigAccess, message) }
             }.awaitAll()
         }
     }
@@ -165,6 +199,7 @@ object SendMessageActionHelper {
      * @param eventSource event source information
      * @param channelEntry channel info
      * @param childConfigMap configuration info of child for compound channels like email
+     * @param childConfigAccess the caller's access to child configs
      * @param message the message to send
      * @return notification delivery status for the channel
      */
@@ -175,6 +210,7 @@ object SendMessageActionHelper {
         eventSource: EventSource,
         channelEntry: Map.Entry<String, NotificationConfigDocInfo?>,
         childConfigMap: Map<String, NotificationConfigDocInfo?>,
+        childConfigAccess: ChildConfigAccess,
         message: MessageContent
     ): EventStatus {
         Metrics.NOTIFICATIONS_SEND_MESSAGE_TOTAL.counter.increment()
@@ -236,9 +272,9 @@ object SendMessageActionHelper {
                 eventSource.referenceId
             )
             ConfigType.EMAIL -> sendEmailMessage(
-                user,
                 configData as Email,
                 childConfigMap,
+                childConfigAccess,
                 message,
                 eventStatus,
                 eventSource.referenceId
@@ -251,7 +287,7 @@ object SendMessageActionHelper {
         return if (response == null) {
             log.warn("Cannot send message to destination for config id :${channel.docInfo.id}")
             Metrics.NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND.counter.increment()
-            eventStatus.copy(deliveryStatus = DeliveryStatus(RestStatus.NOT_FOUND.name, "Channel not found"))
+            eventStatus.copy(deliveryStatus = DeliveryStatus(RestStatus.NOT_FOUND.status.toString(), "Channel not found"))
         } else {
             response
         }
@@ -356,7 +392,7 @@ object SendMessageActionHelper {
         channel: NotificationConfigDocInfo
     ): DeliveryStatus? {
         return if (!channel.configDoc.config.isEnabled) {
-            DeliveryStatus(RestStatus.LOCKED.name, "The channel is muted")
+            DeliveryStatus(RestStatus.LOCKED.status.toString(), "The channel is muted")
         } else {
             null
         }
@@ -426,40 +462,39 @@ object SendMessageActionHelper {
      * send message to email destination
      */
     private suspend fun sendEmailMessage(
-        user: User?,
         email: Email,
         childConfigMap: Map<String, NotificationConfigDocInfo?>,
+        childConfigAccess: ChildConfigAccess,
         message: MessageContent,
         eventStatus: EventStatus,
         referenceId: String
     ): EventStatus {
         Metrics.NOTIFICATIONS_MESSAGE_DESTINATION_EMAIL.counter.increment()
         val accountDocInfo = childConfigMap[email.emailAccountID]
+        // An EMAIL status must list a recipient, so a sender error is reported through a placeholder recipient
         if (accountDocInfo == null) {
             Metrics.NOTIFICATIONS_SEND_MESSAGE_USER_ERROR_NOT_FOUND.counter.increment()
-            return eventStatus.copy(
-                emailRecipientStatus = listOf(),
-                deliveryStatus = DeliveryStatus(
-                    RestStatus.NOT_FOUND.status.toString(),
-                    "Sender ${email.emailAccountID} not found"
-                )
+            return senderErrorStatus(
+                eventStatus,
+                "unknown-sender@example.com",
+                DeliveryStatus(RestStatus.NOT_FOUND.status.toString(), "Sender ${email.emailAccountID} not found")
             )
-        } else if (!userAccess.doesUserHaveAccess(user, accountDocInfo.configDoc.metadata.access)) {
+        } else if (!childConfigAccess.canUse(email.emailAccountID, accountDocInfo)) {
             Metrics.NOTIFICATIONS_PERMISSION_USER_ERROR.counter.increment()
-            return eventStatus.copy(
-                emailRecipientStatus = listOf(),
-                deliveryStatus = DeliveryStatus(
-                    RestStatus.FORBIDDEN.status.toString(),
-                    "Access denied for sender ${accountDocInfo.docInfo.id}"
-                )
+            return senderErrorStatus(
+                eventStatus,
+                "invalid-access@example.com",
+                DeliveryStatus(RestStatus.FORBIDDEN.status.toString(), "Access denied for sender ${email.emailAccountID}")
             )
         }
-        val accessDeniedGroupIds = childConfigMap.filterValues {
-            it != null && !userAccess.doesUserHaveAccess(user, it.configDoc.metadata.access)
-        }.keys
-        val invalidGroupIds = childConfigMap.filterValues { it == null }.keys
-        val groups = childConfigMap.values.filterNotNull()
-            .filter { email.emailGroupIds.contains(it.docInfo.id) && !accessDeniedGroupIds.contains(it.docInfo.id) }
+        val groupConfigs = email.emailGroupIds.associateWith { childConfigMap[it] }
+        val invalidGroupIds = groupConfigs.filterValues { it == null }.keys
+        val accessDeniedGroupIds = coroutineScope {
+            groupConfigs.mapNotNull { (id, config) ->
+                config?.let { async { id.takeUnless { childConfigAccess.canUse(id, config) } } }
+            }.awaitAll().filterNotNull().toSet()
+        }
+        val groups = groupConfigs.filterKeys { it !in accessDeniedGroupIds }.values.filterNotNull()
         val groupRecipients = groups.map { (it.configDoc.config.configData as EmailGroup).recipients }.flatten()
         val recipients = email.recipients.union(groupRecipients)
         val accountConfig = accountDocInfo.configDoc.config
@@ -483,7 +518,7 @@ object SendMessageActionHelper {
                         )
                         else -> EmailRecipientStatus(
                             it.recipient,
-                            DeliveryStatus(RestStatus.NOT_ACCEPTABLE.name, "email account type not enabled")
+                            DeliveryStatus(RestStatus.NOT_ACCEPTABLE.status.toString(), "email account type not enabled")
                         )
                     }
                 }
@@ -516,6 +551,9 @@ object SendMessageActionHelper {
             deliveryStatus = DeliveryStatus(overallStatus, overallStatusText)
         )
     }
+
+    private fun senderErrorStatus(eventStatus: EventStatus, placeholder: String, status: DeliveryStatus): EventStatus =
+        eventStatus.copy(emailRecipientStatus = listOf(EmailRecipientStatus(placeholder, status)), deliveryStatus = status)
 
     /**
      * send message to smtp destination

@@ -139,20 +139,20 @@ internal object NotificationConfigIndex : ConfigOperations {
             val request = CreateIndexRequest(INDEX_NAME)
                 .mapping(indexMappingAsMap)
                 .settings(indexSettingsSource, XContentType.YAML)
-            client.threadPool().threadContext.stashContext().use {
-                try {
-                    val response: CreateIndexResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
-                        admin().indices().create(request, it)
-                    }
-                    if (response.isAcknowledged) {
-                        log.info("$LOG_PREFIX:Index $INDEX_NAME creation Acknowledged")
-                    } else {
-                        throw IllegalStateException("$LOG_PREFIX:Index $INDEX_NAME creation not Acknowledged")
-                    }
-                } catch (exception: Exception) {
-                    if (exception !is ResourceAlreadyExistsException && exception.cause !is ResourceAlreadyExistsException) {
-                        throw exception
-                    }
+            try {
+                val response: CreateIndexResponse = client.suspendUntilTimeout(PluginSettings.operationTimeoutMs) {
+                    // The system context covers only sending the request. Code after the await runs as the caller,
+                    // because the coroutine's ThreadContextSnapshotElement reinstalls the caller's context on resume.
+                    threadPool().threadContext.stashContext().use { _ -> admin().indices().create(request, it) }
+                }
+                if (response.isAcknowledged) {
+                    log.info("$LOG_PREFIX:Index $INDEX_NAME creation Acknowledged")
+                } else {
+                    throw IllegalStateException("$LOG_PREFIX:Index $INDEX_NAME creation not Acknowledged")
+                }
+            } catch (exception: Exception) {
+                if (exception !is ResourceAlreadyExistsException && exception.cause !is ResourceAlreadyExistsException) {
+                    throw exception
                 }
             }
         } else {
@@ -160,15 +160,13 @@ internal object NotificationConfigIndex : ConfigOperations {
             val currentIndexMappingSchemaVersion = getSchemaVersionFromIndexMapping(currentIndexMappingMetadata)
             if (currentIndexMappingSchemaVersion < indexMappingSchemaVersion) {
                 val putMappingRequest: PutMappingRequest = PutMappingRequest(INDEX_NAME).source(indexMappingAsMap)
-                client.threadPool().threadContext.stashContext().use {
-                    val response: AcknowledgedResponse = client.suspendUntil {
-                        admin().indices().putMapping(putMappingRequest, it)
-                    }
-                    if (response.isAcknowledged) {
-                        log.info("$LOG_PREFIX:Index $INDEX_NAME update mapping Acknowledged")
-                    } else {
-                        throw IllegalStateException("$LOG_PREFIX:Index $INDEX_NAME update mapping not Acknowledged")
-                    }
+                val response: AcknowledgedResponse = client.suspendUntil {
+                    threadPool().threadContext.stashContext().use { _ -> admin().indices().putMapping(putMappingRequest, it) }
+                }
+                if (response.isAcknowledged) {
+                    log.info("$LOG_PREFIX:Index $INDEX_NAME update mapping Acknowledged")
+                } else {
+                    throw IllegalStateException("$LOG_PREFIX:Index $INDEX_NAME update mapping not Acknowledged")
                 }
             }
         }

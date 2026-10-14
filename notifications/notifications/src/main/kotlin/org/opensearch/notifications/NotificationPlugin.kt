@@ -29,6 +29,7 @@ import org.opensearch.notifications.action.GetChannelListAction
 import org.opensearch.notifications.action.GetNotificationConfigAction
 import org.opensearch.notifications.action.GetPluginFeaturesAction
 import org.opensearch.notifications.action.PublishNotificationAction
+import org.opensearch.notifications.action.SendChannelMessageAction
 import org.opensearch.notifications.action.SendNotificationAction
 import org.opensearch.notifications.action.SendTestNotificationAction
 import org.opensearch.notifications.action.UpdateNotificationConfigAction
@@ -37,6 +38,7 @@ import org.opensearch.notifications.index.NotificationConfigIndex
 import org.opensearch.notifications.resthandler.NotificationChannelListRestHandler
 import org.opensearch.notifications.resthandler.NotificationConfigRestHandler
 import org.opensearch.notifications.resthandler.NotificationFeaturesRestHandler
+import org.opensearch.notifications.resthandler.SendNotificationRestHandler
 import org.opensearch.notifications.resthandler.SendTestMessageRestHandler
 import org.opensearch.notifications.security.UserAccessManager
 import org.opensearch.notifications.send.SendMessageActionHelper
@@ -182,6 +184,7 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
         log.debug("$LOG_PREFIX:getActions")
         return listOf(
             ActionPlugin.ActionHandler(SendTestNotificationAction.ACTION_TYPE, SendTestNotificationAction::class.java),
+            ActionPlugin.ActionHandler(SendChannelMessageAction.ACTION_TYPE, SendChannelMessageAction::class.java),
             ActionPlugin.ActionHandler(
                 NotificationsActions.CREATE_NOTIFICATION_CONFIG_ACTION_TYPE,
                 CreateNotificationConfigAction::class.java
@@ -234,7 +237,8 @@ class NotificationPlugin : ActionPlugin, Plugin(), NotificationCoreExtension, Sy
             NotificationConfigRestHandler(),
             NotificationFeaturesRestHandler(),
             NotificationChannelListRestHandler(),
-            SendTestMessageRestHandler()
+            SendTestMessageRestHandler(),
+            SendNotificationRestHandler()
             // NotificationStatsRestHandler()
         )
     }

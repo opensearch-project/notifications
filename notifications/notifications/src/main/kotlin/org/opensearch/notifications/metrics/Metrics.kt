@@ -214,6 +214,17 @@ enum class Metrics(val metricName: String, val counter: Counter<*>) {
         BasicCounter()
     ),
 
+    // Send Channel Message Endpoints
+    // POST _plugins/_notifications/feature/send/{configId}
+    NOTIFICATIONS_SEND_CHANNEL_MESSAGE_TOTAL(
+        "notifications.send_channel_message.total",
+        BasicCounter()
+    ),
+    NOTIFICATIONS_SEND_CHANNEL_MESSAGE_INTERVAL_COUNT(
+        "notifications.send_channel_message.interval_count",
+        RollingCounter()
+    ),
+
     // Send Test Message Endpoints
     // GET _plugins/_notifications/feature/test/{configId}
     NOTIFICATIONS_SEND_TEST_MESSAGE_TOTAL(

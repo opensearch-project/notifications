@@ -91,9 +91,22 @@ internal object UserAccessManager : UserAccess {
      * transport-level ResourceAccessEvaluator is skipped.
      */
     suspend fun verifyResourceAccess(resourceId: String, action: String) {
-        val client = ResourceSharingClientAccessor.getResourceSharingClient() ?: return
-        if (!client.isFeatureEnabledForType(RESOURCE_TYPE)) return
-        val hasAccess = suspendCancellableCoroutine { cont ->
+        if (!hasResourceAccess(resourceId, action)) {
+            throw OpenSearchStatusException(
+                "no permissions for [$action] on resource [$resourceId]",
+                RestStatus.FORBIDDEN
+            )
+        }
+    }
+
+    /**
+     * Whether the caller may perform [action] on [resourceId] under resource sharing. Always true when resource
+     * sharing is not enabled for notification configs.
+     */
+    suspend fun hasResourceAccess(resourceId: String, action: String): Boolean {
+        val client = ResourceSharingClientAccessor.getResourceSharingClient() ?: return true
+        if (!client.isFeatureEnabledForType(RESOURCE_TYPE)) return true
+        return suspendCancellableCoroutine { cont ->
             client.verifyAccess(
                 resourceId,
                 RESOURCE_TYPE,
@@ -102,12 +115,6 @@ internal object UserAccessManager : UserAccess {
                     override fun onResponse(response: Boolean) = cont.resume(response)
                     override fun onFailure(e: Exception) = cont.resumeWithException(e)
                 }
-            )
-        }
-        if (!hasAccess) {
-            throw OpenSearchStatusException(
-                "no permissions for [$action] on resource [$resourceId]",
-                RestStatus.FORBIDDEN
             )
         }
     }

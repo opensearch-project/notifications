@@ -241,6 +241,47 @@ internal object PluginSettings {
             Setting.Property.Final
         )
 
+    /**
+     * Settings Key-prefix for the send API (POST _plugins/_notifications/feature/send/{config_id}). The API takes
+     * message content from any caller holding the send permission, so these bound what it accepts.
+     */
+    private const val SEND_API_KEY_PREFIX = "$KEY_PREFIX.send_api"
+
+    /** The longest event_source.title the send API accepts. 99 is the most an SNS subject allows. */
+    val SEND_API_MAX_TITLE_LENGTH: Setting<Int> = Setting.intSetting(
+        "$SEND_API_KEY_PREFIX.max_title_length",
+        99,
+        1,
+        NodeScope,
+        Dynamic
+    )
+
+    /** The longest channel_message.text_description the send API accepts. */
+    val SEND_API_MAX_TEXT_LENGTH: Setting<Int> = Setting.intSetting(
+        "$SEND_API_KEY_PREFIX.max_text_length",
+        16384,
+        1,
+        NodeScope,
+        Dynamic
+    )
+
+    /** Whether the send API accepts channel_message.html_description and attachments. */
+    val SEND_API_ALLOW_HTML_AND_ATTACHMENTS: Setting<Boolean> = Setting.boolSetting(
+        "$SEND_API_KEY_PREFIX.allow_html_and_attachments",
+        false,
+        NodeScope,
+        Dynamic
+    )
+
+    /** The current send API limits */
+    fun getSendApiLimits(): SendApiLimits = clusterService.clusterSettings.let {
+        SendApiLimits(
+            it.get(SEND_API_MAX_TITLE_LENGTH),
+            it.get(SEND_API_MAX_TEXT_LENGTH),
+            it.get(SEND_API_ALLOW_HTML_AND_ATTACHMENTS)
+        )
+    }
+
     fun isRbacEnabled(): Boolean {
         return if (clusterService.clusterSettings.get(FILTER_BY_BACKEND_ROLES_KEY) != null) {
             return clusterService.clusterSettings.get(FILTER_BY_BACKEND_ROLES) ?: false
@@ -268,7 +309,10 @@ internal object PluginSettings {
             REMOTE_METADATA_REGION,
             REMOTE_METADATA_ENDPOINT,
             REMOTE_METADATA_STORE_TYPE,
-            REMOTE_METADATA_SERVICE_NAME
+            REMOTE_METADATA_SERVICE_NAME,
+            SEND_API_MAX_TITLE_LENGTH,
+            SEND_API_MAX_TEXT_LENGTH,
+            SEND_API_ALLOW_HTML_AND_ATTACHMENTS
         )
     }
 
