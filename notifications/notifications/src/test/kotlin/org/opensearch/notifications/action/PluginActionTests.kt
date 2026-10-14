@@ -5,6 +5,7 @@
 package org.opensearch.notifications.action
 
 import io.mockk.every
+import io.mockk.mockk
 import io.mockk.mockkObject
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
@@ -44,8 +45,10 @@ import org.opensearch.commons.notifications.model.SeverityType
 import org.opensearch.core.action.ActionListener
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.core.xcontent.NamedXContentRegistry
+import org.opensearch.notifications.CoreProvider
 import org.opensearch.notifications.index.ConfigIndexingActions
 import org.opensearch.notifications.send.SendMessageActionHelper
+import org.opensearch.notifications.spi.NotificationCore
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 import org.opensearch.transport.client.Client
@@ -168,6 +171,10 @@ internal class PluginActionTests {
         val pluginFeatures = mapOf(Pair("FeatureKey1", "Feature1"))
         val request = mock(GetPluginFeaturesRequest::class.java)
         val response = GetPluginFeaturesResponse(allowedConfigTypes, pluginFeatures)
+        val core = mockk<NotificationCore>()
+        every { core.getAllowedConfigTypes() } returns allowedConfigTypes
+        every { core.getPluginFeatures() } returns pluginFeatures
+        CoreProvider.initialize(core)
 
         val getPluginFeaturesAction = GetPluginFeaturesAction(
             transportService,

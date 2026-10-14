@@ -7,6 +7,7 @@ package org.opensearch.notifications.action
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.opensearch.OpenSearchSecurityException
 import org.opensearch.OpenSearchStatusException
@@ -42,7 +43,10 @@ internal abstract class PluginBaseAction<Request : ActionRequest, Response : Act
 ) : HandledTransportAction<ActionRequest, Response>(name, transportService, actionFilters, requestReader) {
     companion object {
         private val log by logger(PluginBaseAction::class.java)
-        private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+
+        // A SupervisorJob keeps one action's uncaught Throwable from cancelling the scope, which would leave every
+        // later action on the node unable to run
+        private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     }
 
     /**
