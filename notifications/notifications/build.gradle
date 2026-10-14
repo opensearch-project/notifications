@@ -387,6 +387,10 @@ integTest {
     if (usingRemoteCluster) {
         filter {
             excludeTestsMatching "org.opensearch.integtest.send.SendTestMessageWithMockServerIT"
+            // These deliver to MockWebhookServer on the test runner's loopback address, which a remote cluster can't reach
+            excludeTestsMatching "org.opensearch.integtest.send.SendNotificationRestHandlerIT"
+            excludeTestsMatching "org.opensearch.integtest.send.SendNotificationAccessIT"
+            excludeTestsMatching "org.opensearch.integtest.send.SendNotificationResourceSharingIT"
             excludeTestsMatching "org.opensearch.integtest.MaxHTTPResponseSizeIT"
         }
     }
