@@ -111,6 +111,35 @@ internal class SendNotificationRestHandlerIT : PluginRestTestCase() {
         Assert.assertFalse(webhook.receivedBodies.any { it.contains("Must not be delivered to a muted channel") })
     }
 
+    private fun sendBody(title: String, htmlDescription: String? = null) = """
+        {
+            "event_source":{"title":"$title","reference_id":"r","severity":"info","tags":[]},
+            "channel_message":{"text_description":"$title"${htmlDescription?.let { ",\"html_description\":\"$it\"" } ?: ""}}
+        }
+    """.trimIndent()
+
+    fun `test send rejects a title longer than the limit`() {
+        val configId = createConfigWithRequestJsonString(webhookConfigJson("send api limits", webhook.url("/limits")))
+        Thread.sleep(1000)
+
+        executeRequest(RestRequest.Method.POST.name, sendUrl(configId), sendBody("a".repeat(100)), RestStatus.BAD_REQUEST.status)
+        Assert.assertFalse(webhook.receivedBodies.any { it.contains("a".repeat(100)) })
+    }
+
+    fun `test send accepts html only when the cluster allows it`() {
+        val configId = createConfigWithRequestJsonString(webhookConfigJson("send api html", webhook.url("/html")))
+        Thread.sleep(1000)
+
+        executeRequest(RestRequest.Method.POST.name, sendUrl(configId), sendBody("html rejected", "<b>hi</b>"), RestStatus.BAD_REQUEST.status)
+        try {
+            updateClusterSettings(ClusterSetting("persistent", "opensearch.notifications.send_api.allow_html_and_attachments", true), adminClient())
+            executeRequest(RestRequest.Method.POST.name, sendUrl(configId), sendBody("html allowed", "<b>hi</b>"), RestStatus.OK.status)
+            Assert.assertTrue(webhook.receivedBodies.any { it.contains("html allowed") })
+        } finally {
+            updateClusterSettings(ClusterSetting("persistent", "opensearch.notifications.send_api.allow_html_and_attachments", null), adminClient())
+        }
+    }
+
     companion object {
         private val webhook = MockWebhookServer()
 

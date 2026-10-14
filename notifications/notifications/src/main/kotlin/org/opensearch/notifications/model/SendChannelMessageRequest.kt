@@ -23,6 +23,7 @@ import org.opensearch.core.xcontent.XContentParser
 import org.opensearch.core.xcontent.XContentParserUtils
 import org.opensearch.notifications.NotificationsResourceSharingExtension.Companion.RESOURCE_TYPE
 import org.opensearch.notifications.index.NotificationConfigIndex
+import org.opensearch.notifications.settings.SendApiLimits
 import java.io.IOException
 
 /**
@@ -123,6 +124,25 @@ class SendChannelMessageRequest : ActionRequest, DocRequest, ToXContentObject {
             validationException = ValidateActions.addValidationError("config id is empty", validationException)
         }
         return validationException
+    }
+
+    /**
+     * Checks the caller-supplied content against [limits]. A title becomes an SNS subject among others, which can't
+     * contain line breaks or control characters, so those are rejected here instead of failing delivery.
+     * @throws IllegalArgumentException if the content is outside the limits
+     */
+    internal fun validateContent(limits: SendApiLimits) {
+        val title = eventSource.title
+        require(title.length <= limits.maxTitleLength) {
+            "$EVENT_SOURCE_TAG.title must be at most ${limits.maxTitleLength} characters"
+        }
+        require(title.none { it.isISOControl() }) { "$EVENT_SOURCE_TAG.title must not contain line breaks or control characters" }
+        require(channelMessage.textDescription.length <= limits.maxTextLength) {
+            "$CHANNEL_MESSAGE_TAG.text_description must be at most ${limits.maxTextLength} characters"
+        }
+        require(limits.allowHtmlAndAttachments || (channelMessage.htmlDescription == null && channelMessage.attachment == null)) {
+            "$CHANNEL_MESSAGE_TAG.html_description and attachments are disabled for this API"
+        }
     }
 
     /**

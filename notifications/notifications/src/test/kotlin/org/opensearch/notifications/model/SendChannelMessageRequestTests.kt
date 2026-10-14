@@ -7,6 +7,7 @@ package org.opensearch.notifications.model
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.opensearch.commons.notifications.model.Attachment
 import org.opensearch.commons.notifications.model.ChannelMessage
 import org.opensearch.commons.notifications.model.EventSource
 import org.opensearch.commons.notifications.model.SeverityType
@@ -14,6 +15,7 @@ import org.opensearch.commons.utils.recreateObject
 import org.opensearch.notifications.createObjectFromJsonString
 import org.opensearch.notifications.getJsonString
 import org.opensearch.notifications.index.NotificationConfigIndex
+import org.opensearch.notifications.settings.SendApiLimits
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -75,6 +77,46 @@ internal class SendChannelMessageRequestTests {
         assertEquals(NotificationConfigIndex.INDEX_NAME, request.index())
         assertEquals("config_id", request.id())
         assertEquals("notification_config", request.type())
+    }
+
+    private val limits = SendApiLimits(maxTitleLength = 10, maxTextLength = 20, allowHtmlAndAttachments = false)
+
+    private fun requestWith(title: String = "title", message: ChannelMessage = ChannelMessage("text", null, null)) =
+        SendChannelMessageRequest("config_id", EventSource(title, "reference_id", SeverityType.INFO), message)
+
+    @Test
+    fun `content within the limits is accepted`() {
+        requestWith(title = "a".repeat(10), message = ChannelMessage("b".repeat(20), null, null)).validateContent(limits)
+    }
+
+    @Test
+    fun `a title that is too long is rejected`() {
+        val error = assertThrows<IllegalArgumentException> { requestWith(title = "a".repeat(11)).validateContent(limits) }
+        assertEquals("event_source.title must be at most 10 characters", error.message)
+    }
+
+    @Test
+    fun `a title with a line break or control character is rejected`() {
+        listOf("two\nlines", "tab\there", "bell\u0007").forEach {
+            assertThrows<IllegalArgumentException> { requestWith(title = it).validateContent(limits) }
+        }
+    }
+
+    @Test
+    fun `a text description that is too long is rejected`() {
+        assertThrows<IllegalArgumentException> {
+            requestWith(message = ChannelMessage("b".repeat(21), null, null)).validateContent(limits)
+        }
+    }
+
+    @Test
+    fun `html and attachments are rejected unless allowed`() {
+        val html = requestWith(message = ChannelMessage("text", "<p>text</p>", null))
+        val attachment = requestWith(message = ChannelMessage("text", null, Attachment("report.pdf", "base64", "data", "application/pdf")))
+        listOf(html, attachment).forEach {
+            assertThrows<IllegalArgumentException> { it.validateContent(limits) }
+            it.validateContent(limits.copy(allowHtmlAndAttachments = true))
+        }
     }
 
     @Test

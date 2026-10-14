@@ -14,6 +14,7 @@ import org.opensearch.commons.notifications.action.SendNotificationRequest
 import org.opensearch.commons.notifications.action.SendNotificationResponse
 import org.opensearch.notifications.model.SendChannelMessageRequest
 import org.opensearch.notifications.send.SendMessageActionHelper
+import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.transport.TransportService
 import org.opensearch.transport.client.Client
 
@@ -48,6 +49,7 @@ internal class SendChannelMessageAction @Inject constructor(
         request: SendChannelMessageRequest,
         user: User?
     ): SendNotificationResponse {
+        request.validateContent(PluginSettings.getSendApiLimits())
         // The user that delivery authorizes against is always the authenticated caller, never the request.
         val callerUserInfo: String? =
             client.threadPool().threadContext.getTransient<String>(OPENSEARCH_SECURITY_USER_INFO_THREAD_CONTEXT)

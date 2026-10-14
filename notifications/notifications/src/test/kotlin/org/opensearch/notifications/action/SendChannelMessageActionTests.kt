@@ -6,6 +6,7 @@ package org.opensearch.notifications.action
 
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.unmockkAll
@@ -35,6 +36,8 @@ import org.opensearch.commons.notifications.model.SeverityType
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.model.SendChannelMessageRequest
 import org.opensearch.notifications.send.SendMessageActionHelper
+import org.opensearch.notifications.settings.PluginSettings
+import org.opensearch.notifications.settings.SendApiLimits
 import org.opensearch.tasks.Task
 import org.opensearch.threadpool.ThreadPool
 import org.opensearch.transport.TransportService
@@ -65,6 +68,8 @@ internal class SendChannelMessageActionTests {
         `when`(client.threadPool()).thenReturn(threadPool)
         action = SendChannelMessageAction(mock(TransportService::class.java), client, ActionFilters(setOf()))
         mockkObject(SendMessageActionHelper)
+        mockkObject(PluginSettings)
+        every { PluginSettings.getSendApiLimits() } returns SendApiLimits(99, 16384, false)
     }
 
     @AfterEach
@@ -112,6 +117,18 @@ internal class SendChannelMessageActionTests {
         execute(SendChannelMessageRequest("a", eventSource, channelMessage))
 
         assertNull(sent.captured.threadContext)
+    }
+
+    @Test
+    fun `content outside the send api limits is rejected before delivery`() {
+        val tooLong = EventSource("a".repeat(100), "reference_id", severity = SeverityType.INFO)
+
+        val error = assertThrows<ExecutionException> {
+            execute(SendChannelMessageRequest("a", tooLong, channelMessage))
+        }
+
+        assertEquals(RestStatus.BAD_REQUEST, (error.cause as OpenSearchStatusException).status())
+        coVerify(exactly = 0) { SendMessageActionHelper.executeRequest(any(), any()) }
     }
 
     @Test
