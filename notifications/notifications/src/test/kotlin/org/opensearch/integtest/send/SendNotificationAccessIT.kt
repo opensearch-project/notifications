@@ -8,6 +8,7 @@ package org.opensearch.integtest.send
 import com.google.gson.JsonArray
 import org.junit.AfterClass
 import org.junit.Assert
+import org.junit.Before
 import org.junit.BeforeClass
 import org.opensearch.client.RestClient
 import org.opensearch.core.rest.RestStatus
@@ -22,6 +23,9 @@ import org.opensearch.rest.RestRequest
  * Authorization of the send API with the security plugin, with and without backend-role filtering.
  */
 internal class SendNotificationAccessIT : PluginRestTestCase() {
+
+    @Before
+    fun enableTheExperimentalSendApi() = enableSendApi()
 
     private val password = randomAlphaOfLength(6) + "_" + randomIntBetween(1000, 10000) + "!" + randomAlphaOfLength(10)
     private fun sendUrl(configId: String) = "$PLUGIN_BASE_URI/feature/send/$configId"
