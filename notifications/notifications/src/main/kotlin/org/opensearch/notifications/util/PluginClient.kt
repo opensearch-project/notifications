@@ -6,57 +6,58 @@ package org.opensearch.notifications.util
 
 import org.opensearch.action.ActionRequest
 import org.opensearch.action.ActionType
+import org.opensearch.action.support.ContextPreservingActionListener
 import org.opensearch.commons.utils.logger
 import org.opensearch.core.action.ActionListener
 import org.opensearch.core.action.ActionResponse
-import org.opensearch.identity.Subject
+import org.opensearch.identity.PluginSubject
 import org.opensearch.transport.client.Client
 import org.opensearch.transport.client.FilterClient
+import java.util.concurrent.atomic.AtomicReference
 
+/** A client whose actions run as the notifications plugin subject, which is assigned after construction. */
 class PluginClient(delegate: Client) : FilterClient(delegate) {
 
-    private var subject: Subject? = null
+    // Set once, from assignSubject, on a different thread from the actions that read it.
+    private val subject = AtomicReference<PluginSubject?>()
 
     companion object {
         private val log by logger(PluginClient::class.java)
     }
 
-    fun setSubject(subject: Subject) {
-        this.subject = subject
+    /**
+     * Assigns the subject every action runs as. It can be assigned once; assigning the same subject again is a no-op.
+     *
+     * @throws IllegalStateException if a different subject is already assigned
+     */
+    fun setSubject(subject: PluginSubject) {
+        check(this.subject.compareAndSet(null, subject) || this.subject.get() === subject) {
+            "PluginClient already has a subject assigned."
+        }
     }
 
-    @Suppress("UNCHECKED_CAST")
+    /** Always throws [UnsupportedOperationException], because a plugin subject has no meaning on another cluster. */
+    override fun getRemoteClusterClient(clusterAlias: String): Client =
+        throw UnsupportedOperationException("PluginClient cannot run actions on a remote cluster.")
+
+    /**
+     * Runs the action as the assigned subject, notifying the listener with the caller's thread context in place.
+     * A failure the delegate throws synchronously propagates to the caller, as it would from the wrapped client.
+     *
+     * @throws IllegalStateException if no subject has been assigned yet, which is a wiring error
+     */
     override fun <Request : ActionRequest, Response : ActionResponse> doExecute(
         action: ActionType<Response>,
         request: Request,
         listener: ActionListener<Response>
     ) {
-        val currentSubject = subject
-            ?: error("PluginClient is not initialized.")
-
-        val storedContext = threadPool().threadContext.newStoredContext(false)
-
-        try {
-            currentSubject.runAs<Exception> {
-                super.doExecute(
-                    action,
-                    request,
-                    object : ActionListener<Response> {
-                        override fun onResponse(response: Response) {
-                            storedContext.restore()
-                            listener.onResponse(response)
-                        }
-
-                        override fun onFailure(e: Exception) {
-                            storedContext.restore()
-                            listener.onFailure(e)
-                        }
-                    }
-                )
-            }
-        } catch (e: Exception) {
-            storedContext.restore()
-            listener.onFailure(e)
+        val currentSubject = checkNotNull(subject.get()) { "PluginClient is not initialized with a subject." }
+        // Captured before runAs stashes the context; core restores it around the callback, then puts
+        // the responding thread's own context back.
+        val callerContext = ContextPreservingActionListener.wrapPreservingContext(listener, threadPool().threadContext)
+        currentSubject.runAs<RuntimeException> {
+            log.debug("Running transport action as subject: {}", currentSubject.principal.name)
+            super.doExecute(action, request, callerContext)
         }
     }
 }
