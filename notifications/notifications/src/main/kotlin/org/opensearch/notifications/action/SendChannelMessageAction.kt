@@ -5,6 +5,8 @@
 
 package org.opensearch.notifications.action
 
+import org.opensearch.OpenSearchStatusException
+import org.opensearch.action.ActionRequest
 import org.opensearch.action.ActionType
 import org.opensearch.action.support.ActionFilters
 import org.opensearch.common.inject.Inject
@@ -12,9 +14,12 @@ import org.opensearch.commons.ConfigConstants.OPENSEARCH_SECURITY_USER_INFO_THRE
 import org.opensearch.commons.authuser.User
 import org.opensearch.commons.notifications.action.SendNotificationRequest
 import org.opensearch.commons.notifications.action.SendNotificationResponse
+import org.opensearch.core.action.ActionListener
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.notifications.model.SendChannelMessageRequest
 import org.opensearch.notifications.send.SendMessageActionHelper
 import org.opensearch.notifications.settings.PluginSettings
+import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 import org.opensearch.transport.client.Client
 
@@ -23,6 +28,8 @@ import org.opensearch.transport.client.Client
  *
  * This is the action behind the REST send route. In-process callers such as Alerting keep using the send
  * notification action, which this action does not change.
+ *
+ * Experimental: refused unless [PluginSettings.SEND_API_ENABLED] is true.
  */
 internal class SendChannelMessageAction @Inject constructor(
     transportService: TransportService,
@@ -38,6 +45,24 @@ internal class SendChannelMessageAction @Inject constructor(
     companion object {
         internal const val NAME = "cluster:admin/opensearch/notifications/channel/send"
         internal val ACTION_TYPE = ActionType(NAME, ::SendNotificationResponse)
+        internal val DISABLED_MESSAGE: String
+            get() = "The send API is experimental and disabled. Set ${PluginSettings.SEND_API_ENABLED.key} to true to use it."
+
+        /** The error returned for every send while the experimental API is disabled. */
+        internal fun disabledError() = OpenSearchStatusException(DISABLED_MESSAGE, RestStatus.FORBIDDEN)
+    }
+
+    /**
+     * {@inheritDoc}
+     * Refuses at once while the API is disabled, before the request is handed to a coroutine, so a refusal is not
+     * counted or logged as a failed request.
+     */
+    override fun doExecute(task: Task?, request: ActionRequest, listener: ActionListener<SendNotificationResponse>) {
+        if (!PluginSettings.isSendApiEnabled()) {
+            listener.onFailure(disabledError())
+            return
+        }
+        super.doExecute(task, request, listener)
     }
 
     /**

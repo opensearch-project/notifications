@@ -36,6 +36,7 @@ internal class SendNotificationResourceSharingIT : PluginRestTestCase() {
 
     @Before
     fun setupUsers() {
+        enableSendApi()
         val request = Request("PUT", "/_plugins/_security/api/roles/$role")
         request.setJsonEntity(
             """

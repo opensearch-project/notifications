@@ -12,6 +12,7 @@ import io.mockk.slot
 import io.mockk.unmockkAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -69,6 +70,7 @@ internal class SendChannelMessageActionTests {
         action = SendChannelMessageAction(mock(TransportService::class.java), client, ActionFilters(setOf()))
         mockkObject(SendMessageActionHelper)
         mockkObject(PluginSettings)
+        every { PluginSettings.isSendApiEnabled() } returns true
         every { PluginSettings.getSendApiLimits() } returns SendApiLimits(99, 16384, false)
     }
 
@@ -117,6 +119,29 @@ internal class SendChannelMessageActionTests {
         execute(SendChannelMessageRequest("a", eventSource, channelMessage))
 
         assertNull(sent.captured.threadContext)
+    }
+
+    @Test
+    fun `the experimental send api is disabled by default`() {
+        assertFalse(PluginSettings.SEND_API_ENABLED.get(Settings.EMPTY))
+    }
+
+    @Test
+    fun `the send api is refused while it is disabled, before the content is validated`() {
+        every { PluginSettings.isSendApiEnabled() } returns false
+        val tooLong = EventSource("a".repeat(100), "reference_id", severity = SeverityType.INFO)
+
+        val error = assertThrows<ExecutionException> {
+            execute(SendChannelMessageRequest("a", tooLong, channelMessage))
+        }
+
+        val cause = error.cause as OpenSearchStatusException
+        assertEquals(RestStatus.FORBIDDEN, cause.status())
+        assertEquals(
+            "The send API is experimental and disabled. Set opensearch.notifications.send_api.enabled to true to use it.",
+            cause.message
+        )
+        coVerify(exactly = 0) { SendMessageActionHelper.executeRequest(any(), any()) }
     }
 
     @Test
