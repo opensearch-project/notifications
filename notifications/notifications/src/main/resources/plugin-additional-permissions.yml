@@ -1,0 +1,12 @@
+---
+##
+ # Copyright OpenSearch Contributors
+ # SPDX-License-Identifier: Apache-2.0
+##
+
+# Actions the plugin subject needs beyond what it is granted implicitly on its own registered
+# system indices. The security plugin classifies these as cluster permissions even though they
+# operate on indices, so they are not covered by that implicit grant.
+cluster_permissions:
+  # getNotificationConfigs multi-gets from .opensearch-notifications-config
+  - 'indices:data/read/mget'
