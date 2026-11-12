@@ -247,6 +247,17 @@ internal object PluginSettings {
      */
     private const val SEND_API_KEY_PREFIX = "$KEY_PREFIX.send_api"
 
+    /**
+     * Whether the send API is enabled. The API is experimental, so it is off unless a cluster admin turns it on;
+     * in-process callers of the send notification action (such as Alerting) are not affected.
+     */
+    val SEND_API_ENABLED: Setting<Boolean> = Setting.boolSetting(
+        "$SEND_API_KEY_PREFIX.enabled",
+        false,
+        NodeScope,
+        Dynamic
+    )
+
     /** The longest event_source.title the send API accepts. 99 is the most an SNS subject allows. */
     val SEND_API_MAX_TITLE_LENGTH: Setting<Int> = Setting.intSetting(
         "$SEND_API_KEY_PREFIX.max_title_length",
@@ -272,6 +283,9 @@ internal object PluginSettings {
         NodeScope,
         Dynamic
     )
+
+    /** Whether the experimental send API is enabled */
+    fun isSendApiEnabled(): Boolean = clusterService.clusterSettings.get(SEND_API_ENABLED)
 
     /** The current send API limits */
     fun getSendApiLimits(): SendApiLimits = clusterService.clusterSettings.let {
@@ -310,6 +324,7 @@ internal object PluginSettings {
             REMOTE_METADATA_ENDPOINT,
             REMOTE_METADATA_STORE_TYPE,
             REMOTE_METADATA_SERVICE_NAME,
+            SEND_API_ENABLED,
             SEND_API_MAX_TITLE_LENGTH,
             SEND_API_MAX_TEXT_LENGTH,
             SEND_API_ALLOW_HTML_AND_ATTACHMENTS

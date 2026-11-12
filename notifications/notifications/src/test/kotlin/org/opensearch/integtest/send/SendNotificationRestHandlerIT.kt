@@ -8,13 +8,18 @@ package org.opensearch.integtest.send
 import com.google.gson.JsonArray
 import org.junit.AfterClass
 import org.junit.Assert
+import org.junit.Before
 import org.junit.BeforeClass
 import org.opensearch.core.rest.RestStatus
 import org.opensearch.integtest.PluginRestTestCase
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
+import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.rest.RestRequest
 
 internal class SendNotificationRestHandlerIT : PluginRestTestCase() {
+
+    @Before
+    fun enableTheExperimentalSendApi() = enableSendApi()
 
     private fun sendUrl(configId: String) = "$PLUGIN_BASE_URI/feature/send/$configId"
 
@@ -117,6 +122,17 @@ internal class SendNotificationRestHandlerIT : PluginRestTestCase() {
             "channel_message":{"text_description":"$title"${htmlDescription?.let { ",\"html_description\":\"$it\"" } ?: ""}}
         }
     """.trimIndent()
+
+    fun `test send is refused while the experimental send api is at its default`() {
+        val configId = createWebhookConfig("/disabled")
+        // Clear the setting rather than set it to false, so this checks the shipped default
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.SEND_API_ENABLED.key, null), adminClient())
+
+        val error = executeRequest(RestRequest.Method.POST.name, sendUrl(configId), sendBody("while disabled"), RestStatus.FORBIDDEN.status)
+
+        Assert.assertTrue(error.toString().contains("experimental and disabled"))
+        Assert.assertFalse(webhook.receivedBodies.any { it.contains("while disabled") })
+    }
 
     fun `test send rejects a title longer than the limit`() {
         val configId = createConfigWithRequestJsonString(webhookConfigJson("send api limits", webhook.url("/limits")))

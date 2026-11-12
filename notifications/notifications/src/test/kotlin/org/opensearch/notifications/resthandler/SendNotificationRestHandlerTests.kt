@@ -4,19 +4,27 @@
  */
 package org.opensearch.notifications.resthandler
 
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkObject
 import io.mockk.slot
+import io.mockk.unmockkAll
 import io.mockk.verify
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.opensearch.OpenSearchStatusException
 import org.opensearch.common.xcontent.XContentType
 import org.opensearch.core.common.bytes.BytesArray
+import org.opensearch.core.rest.RestStatus
 import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.action.SendChannelMessageAction
 import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.SendChannelMessageRequest
+import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.rest.RestRequest
 import org.opensearch.test.rest.FakeRestChannel
 import org.opensearch.test.rest.FakeRestRequest
@@ -31,6 +39,33 @@ internal class SendNotificationRestHandlerTests {
             "channel_message":{"text_description":"text"}
         }
     """.trimIndent()
+
+    @BeforeEach
+    fun enableTheSendApi() {
+        mockkObject(PluginSettings)
+        every { PluginSettings.isSendApiEnabled() } returns true
+    }
+
+    @AfterEach
+    fun cleanup() {
+        unmockkAll()
+    }
+
+    @Test
+    fun `handler refuses while the send api is disabled, before reading the body or counting the send`() {
+        every { PluginSettings.isSendApiEnabled() } returns false
+        val client = mockk<NodeClient>(relaxed = true)
+        val request = sendRequest("{\"not\":\"a send request\"}", "a1b2c3")
+        val sendsBefore = Metrics.NOTIFICATIONS_SEND_CHANNEL_MESSAGE_TOTAL.counter.getValue()
+
+        val error = assertThrows<OpenSearchStatusException> {
+            handler.handleRequest(request, FakeRestChannel(request, true, 1), client)
+        }
+
+        assertEquals(RestStatus.FORBIDDEN, error.status())
+        assertEquals(sendsBefore, Metrics.NOTIFICATIONS_SEND_CHANNEL_MESSAGE_TOTAL.counter.getValue())
+        verify(exactly = 0) { client.execute(SendChannelMessageAction.ACTION_TYPE, any(), any()) }
+    }
 
     @Test
     fun `handler registers the send route with the channel in the path`() {

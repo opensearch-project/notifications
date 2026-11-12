@@ -33,6 +33,7 @@ import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.notifications.NotificationPlugin
 import org.opensearch.notifications.getJsonString
 import org.opensearch.notifications.index.NotificationConfigIndex
+import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.rest.RestRequest
 import org.opensearch.test.rest.OpenSearchRestTestCase
 import java.io.IOException
@@ -512,6 +513,12 @@ abstract class PluginRestTestCase : OpenSearchRestTestCase() {
         restOptionsBuilder.addHeader("Content-Type", "application/json")
         request.setOptions(restOptionsBuilder)
         return executeRequest(request, client = client)
+    }
+
+    /** Turns on the experimental send API, which is off by default; [wipeAllSettings] turns it off again. */
+    @Throws(IOException::class)
+    protected fun enableSendApi() {
+        updateClusterSettings(ClusterSetting("persistent", PluginSettings.SEND_API_ENABLED.key, true), adminClient())
     }
 
     @Throws(IOException::class)

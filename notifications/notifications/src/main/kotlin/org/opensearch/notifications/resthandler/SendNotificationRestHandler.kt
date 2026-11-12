@@ -13,6 +13,7 @@ import org.opensearch.notifications.NotificationPlugin.Companion.PLUGIN_BASE_URI
 import org.opensearch.notifications.action.SendChannelMessageAction
 import org.opensearch.notifications.metrics.Metrics
 import org.opensearch.notifications.model.SendChannelMessageRequest
+import org.opensearch.notifications.settings.PluginSettings
 import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
 import org.opensearch.rest.RestHandler.Route
 import org.opensearch.rest.RestRequest
@@ -21,6 +22,9 @@ import org.opensearch.transport.client.node.NodeClient
 
 /**
  * Rest handler for sending a caller-supplied message to one existing notification channel.
+ *
+ * Experimental: while [PluginSettings.SEND_API_ENABLED] is false every request is refused with 403, before its body
+ * is read.
  */
 internal class SendNotificationRestHandler : PluginBaseHandler() {
     companion object {
@@ -64,6 +68,9 @@ internal class SendNotificationRestHandler : PluginBaseHandler() {
      * {@inheritDoc}
      */
     override fun executeRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
+        if (!PluginSettings.isSendApiEnabled()) {
+            throw SendChannelMessageAction.disabledError()
+        }
         val sendRequest = SendChannelMessageRequest.parse(request.contentParserNextToken(), request.param(CONFIG_ID_TAG))
         return RestChannelConsumer {
             Metrics.NOTIFICATIONS_SEND_CHANNEL_MESSAGE_TOTAL.counter.increment()
