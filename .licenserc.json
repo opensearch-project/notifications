@@ -32,6 +32,7 @@
     "licenses/",
     "src/test/resources/",
     "LICENSE",
-    "NOTICE"
+    "NOTICE",
+    ".settings"
   ]
 }
